@@ -41,7 +41,7 @@
 <p>이렇게 하면 나머지는 자동으로 했으면 좋겠다. 이럴 때 Github Action 을 쓰면 된다. 이 전에는 Travis Ci, Circle Ci 등을 이용했는데, 2019년 말에 Github 자체에도 push, pull 등의 이벤트가 발생하면 자동으로 실행되는 기능이 생겼다.</p>
 <p>이렇게 실행되는 작업을 workflow 라 부른다. workflow 는 여러 개의 액션들의 조합으로 만들어진다.</p>
 <p>workflow 를 실행하는 머신을 runner 라고 부르는데, 클라우드 호스트라고 생각하면 된다. workflow 실행은 호스트를 준비하는 것으로부터 시작한다. 매 번 이렇게 호스트를 올리는게 비효율적인 것 같긴 한데, Github 의 runner 관리 입장에서 보면 효율적인 설계일 수도 있겠다.</p>
-<p>lionhairdino 에 걸어둔 workflow 동작 순서</p>
+<h3 id="lionhairdino-에-걸어-둔-workflow-동작-순서">lionhairdino 에 걸어 둔 workflow 동작 순서</h3>
 <ol type="1">
 <li>Ubuntu, Windows, MacOS 중 선택</li>
 <li>현재 워크플로우가 들어있는 저장소의 마지막 커밋 하나를 runner 로 가져온다.</li>
@@ -56,7 +56,7 @@
 <li>프로세스 끝내기 (실행하면서 생긴 프로세스들을 정리)</li>
 </ol>
 <p>처음 workflow 를 실행할 때는 40분 가까이 걸렸고, 캐싱을 사용하면서부터 3분정도의 시간이 걸린다. workflow 로그를 보면, 아직도 하스켈 설치에 1분, 캐싱에서 파일을 풀어서 설치하는데 1분정도가 걸린다. todo: 하스켈 설치 폴더도 캐싱 작업을 걸어두면 더 빨라질 것 같다.</p>
-<p>lionhairdino 사이트에 걸어 둔 workflow</p>
+<h3 id="lionhairdino-에-걸어-둔-workflow-소스">lionhairdino 에 걸어 둔 workflow 소스</h3>
 <div class="sourceCode" id="cb1"><pre class="sourceCode yml"><code class="sourceCode yaml"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="fu">name</span><span class="kw">:</span><span class="at"> Haskell CI</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a><span class="fu">on</span><span class="kw">:</span></span>
@@ -101,6 +101,13 @@
 <span id="cb1-42"><a href="#cb1-42" aria-hidden="true"></a><span class="at">        </span><span class="fu">publish_dir</span><span class="kw">:</span><span class="at"> _site</span></span>
 <span id="cb1-43"><a href="#cb1-43" aria-hidden="true"></a><span class="at">        </span><span class="fu">publish_branch</span><span class="kw">:</span><span class="at"> master  </span></span>
 <span id="cb1-44"><a href="#cb1-44" aria-hidden="true"></a><span class="at">        </span><span class="fu">External_repository</span><span class="kw">:</span><span class="at"> lionhairdino/lionhairdino.github.io</span></span></code></pre></div>
+<h3 id="hakyll-을-쓰는-블로그를-위한-github-설정">Hakyll 을 쓰는 블로그를 위한 Github 설정</h3>
+<p>두 개의 저장소를 만든다. - siteSource (private) - lionhairdino.github.io (public)</p>
+<p>sitSource 저장소에 workflow 를 걸어 두는데, 작업 말미에 결과를 lionhairdino.github.io 저장소에 커밋하려면 보안을 위해 ssh 키 쌍을 등록해 둬야 한다. (peaceiris/actions-gh-pages 액션을 보면 workflow 를 걸어 둔 저장소와 같은 저장소로 커밋할 때는 github_token 을 쓰고, 다른 저장소에 커밋할 때는 deploy_key 를 쓴다. https://github.com/peaceiris/actions-gh-pages#%EF%B8%8F-create-ssh-deploy-key)</p>
+<p>siteSource 에 public 을, lionhairdino.github.io 에 private 를 등록한다. - ssh 키 생성 https://help.github.com/en/github/authenticating-to-github/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent#generating-a-new-ssh-key</p>
+<ul>
+<li>키 등록 https://developer.github.com/v3/guides/managing-deploy-keys/#deploy-keys</li>
+</ul>
 
 <div id="disqus_thread"></div>
 <script>
