@@ -26,30 +26,40 @@
     
 </div>
 
-<p>원래 수학에서 쓰이는 뜻은 조건을 만족하는 모든 값 forall 조건을 만족하는 최소 하나 이상의 값 exists x</p>
+<p>“a 가 무슨 타입이야?”<br> “몰라” vs “어떤 타입도 될 수 있어”<br></p>
+<p>원래 수학에서 쓰이는 뜻은<br> 조건을 만족하는 모든 값 forall<br> 조건을 만족하는 최소 하나 이상의 값 exists x <br></p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="dt">ScopedTypeVariables</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="dt">RankNTypes</span><span class="op">/</span><span class="dt">Rank2Types</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a><span class="dt">ExistentialQuantificatio</span></span></code></pre></div>
-<p>forall 이 쓰이는 경우는 세 가지 확장을 켰을 때다. 여기서는 data 선언할 때 보이는 forall 만 다룬다.</p>
-<p>이 확장을 켜면, 여러 타입들을 뭉뚱그려 하나의 타입으로 취급할 수 있다.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="ot">{-# LANGUAGE ExistentialQuantification #-}</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a><span class="kw">data</span> <span class="dt">T'</span> <span class="ot">=</span> <span class="kw">forall</span> a<span class="op">.</span> <span class="dt">Show</span> a <span class="ot">=&gt;</span> <span class="dt">MkT'</span> a</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a>heteroList' <span class="ot">=</span> [<span class="dt">MkT'</span> <span class="dv">5</span>, <span class="dt">MkT'</span> (), <span class="dt">MkT'</span> <span class="dt">True</span>, <span class="dt">MkT'</span> <span class="st">&quot;Sartre&quot;</span>]</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a>main <span class="ot">=</span> <span class="fu">mapM_</span> (\(<span class="dt">MkT'</span> x) <span class="ot">-&gt;</span> <span class="fu">print</span> x) heteroList'</span></code></pre></div>
+<p>forall 이 쓰이는 경우는 세 가지 확장을 켰을 때다. 여기서는 data 선언할 때 보이는 forall 만 다룹니다.</p>
+<p>이 확장을 켜면, 여러 타입들을 뭉뚱그려 하나의 타입으로 취급할 수 있습니다. 좀 더 학문적으로 얘기하면, 여러 타입을 추상화한 타입을 만들 수 있다고 말할 수 있습니다.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="co">-- hetero 는 그리스어로 other, different 를 의미한다.</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a><span class="ot">{-# LANGUAGE ExistentialQuantification #-}</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a><span class="kw">data</span> <span class="dt">T'</span> <span class="ot">=</span> <span class="kw">forall</span> a<span class="op">.</span> <span class="dt">Show</span> a <span class="ot">=&gt;</span> <span class="dt">MkT'</span> a</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a>heteroList' <span class="ot">=</span> [<span class="dt">MkT'</span> <span class="dv">5</span>, <span class="dt">MkT'</span> (), <span class="dt">MkT'</span> <span class="dt">True</span>, <span class="dt">MkT'</span> <span class="st">&quot;Sartre&quot;</span>]</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a>main <span class="ot">=</span> <span class="fu">mapM_</span> (\(<span class="dt">MkT'</span> x) <span class="ot">-&gt;</span> <span class="fu">print</span> x) heteroList'</span></code></pre></div>
 <p>위 소스에서 forall 을 빼면</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="fu">error</span><span class="op">:</span> <span class="dt">Not</span> <span class="kw">in</span> scope<span class="op">:</span> <span class="kw">type</span> variable ‘a’</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a><span class="dv">2</span> <span class="op">|</span> <span class="kw">data</span> <span class="dt">T'</span> <span class="ot">=</span> <span class="dt">Show</span> a <span class="ot">=&gt;</span> <span class="dt">MkT'</span> a</span></code></pre></div>
-<p>이런 오류가 난다.</p>
-<p>forall 을 쓰면 5, (), True, “Sartre” 를 모두 다룰 수 있는 MkT’ 이라는 타입을 만들 수 있다. 모든 타입을 다 받아들이게 하면 실용적인 코드로는 별 쓸 일이 없다. 하지만 여기에 Show a 라는 제약(한정자라 번역할까?)을 주면 모든 타입이 아닌, show 함수를 적용할 수 있는 타입으로 대상이 축소 된다. 이런식으로 쓰면 실용 코드로 쓰일 수 있다.</p>
-<p>뭔가 동적으로 타입이 결정되는 것 같다. 타입을 받는 곳에 “a” 를 넘기면 [Char] 타입이 되고, ‘a’ 를 넘기면 Char 타입이 된다. 나중에 어떤 값이 들어가냐에 따라 동적으로 타입이 결정될 필요가 있을때도 쓰일 수 있겠다.</p>
-<p>existentially quantified 란 말은, 동적으로만 초기화 될 수 있는 타입 변수를 가지고 있다와 갈은 말이라고 한다. 무슨 말일까?</p>
-<p>영단어 뜻 existentially 실체론적으로, 실존(주의)적으로 quantified 뭔가를 울타리 안에 가두는, 한정, 제약 느낌. 타입을 정할 순 없지만, 타입 클래스를 한정할 순 있다.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="kw">data</span> <span class="dt">S</span> <span class="ot">=</span> <span class="kw">forall</span> a<span class="op">.</span> <span class="dt">Show</span> a <span class="ot">=&gt;</span> <span class="dt">S</span> a</span></code></pre></div>
-<p>a 가 무슨 타입이라고 정한다는 말이 아니라, a 는 Show 의 인스턴스여야 한다는 말이다. 타입이 속한 클래스를 정해서 타입을 한정 한다. 이걸 GADT 문법으로 표현하면,</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="ot">{-# LANGUAGE GADTs #-}</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a><span class="kw">data</span> <span class="dt">S</span> <span class="kw">where</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a>    <span class="dt">S</span><span class="ot"> ::</span> <span class="dt">Show</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">S</span></span></code></pre></div>
+<p>오류가 납니다. a가 뭔지 전혀 모르겠다는 오류입니다.</p>
+<p>타입 서명을 써 줄 때 반드시 무슨 타입인지 써줘야 합니다. 컴파일러는 어떤 타입을 쓸 건지를 프로그래머한테 물어 봅니다. 그럼, 프로그래머는 타입 서명으로 대답하게 되는데, 어떤식으로든 항상 대답을 해야합니다. a 라고만 (뭐든 소문자로 시작하면 다 폴리모픽을 의미합니다.) 써 주면, 컴파일러의 요청에 아무런 대답을 안하는 것과 마찬가지입니다.</p>
+<p>여기다 forall a 로 한정해 주면, 그 때서야 <br> “응, 그건 모든 타입이 다 될 수 있어” <br> 라고 대답 해주는 것과 같습니다. 그럼, 컴파일러는 <br> “응, 그러면 나중에 구체 타입이 결정되겠군” <br> 하고 넘어갑니다. 다른 말로 하면, 타입 체크를 뒤로 미룬다고도 볼 수 있습니다. 타입 추론 시점에 대한 확장으로 볼 수 있습니다.</p>
+<p>forall 을 쓰면 5, (), True, “Sartre” 를 모두 다룰 수 있는 MkT’ 이라는 타입을 만들 수 있습니다. Show a 라는 제약(한정자라 번역할까?)을 주면 모든 타입이 아닌, show 함수를 적용할 수 있는 타입(달리 표현하면, Show 클래스에 속한 타입)으로 대상이 축소 됩니다.</p>
+<p>forall 폴리모픽 변수를 만나면, 컴파일 타임에 코드 조합에 따라 컴파일러가 구체 타입을 결정합니다. 타입을 받는 곳에 “a” 를 넘어가는 상황을 만나면 [Char] 타입이 되고, ‘a’ 를 만나면 Char 타입으로 추론됩니다.</p>
+<p>영단어 뜻<br> existentially 실체론적으로, 실존(주의)적으로<br> quantified 뭔가를 울타리 안에 가두는, 한정, 제약<br></p>
+<p>정리하면,</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="kw">data</span> <span class="dt">S</span> a <span class="ot">=</span> <span class="dt">S</span> a</span></code></pre></div>
+<p>오른쪽 a 를 만나면, 컴파일러가 물어봅니다. “이 건 무슨 타입이야?”<br> “나중에 매개 변수(왼쪽 a)로 오는 거 보고 결정할가야” 라고 답해 준것과 같습니다.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="kw">data</span> <span class="dt">S</span> <span class="ot">=</span> <span class="dt">S</span> a</span></code></pre></div>
+<p>이렇게 하면 컴파일러가 물어 볼 때, 아무런 대답을 안하는 것과 같습니다. 오류가 납니다.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="kw">data</span> <span class="dt">S</span> <span class="ot">=</span> <span class="kw">forall</span> a<span class="op">.</span> <span class="dt">Show</span> a <span class="ot">=&gt;</span> <span class="dt">S</span> a</span></code></pre></div>
+<p>“a가 폴리모픽”이라고 답하고, “a는 Show 클래스에 속한 타입이야” 라고 대답 하는겁니다. “매개 변수로 받지 않아도 나중에 애매하지 않게 타입이 결정될거야” 라고 대답하는 옵션입니다. 대답을 듣고, 컴파일러는 타입 추론을 나중으로 미룹니다.</p>
+<p>이걸 GADT 문법으로 표현하면, forall 을 생략해도 같은 의미입니다.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a><span class="ot">{-# LANGUAGE GADTs #-}</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a><span class="kw">data</span> <span class="dt">S</span> <span class="kw">where</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true"></a>    <span class="dt">S</span><span class="ot"> ::</span> <span class="dt">Show</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">S</span></span></code></pre></div>
+<p><a href="https://en.wikibooks.org/wiki/Haskell/Existentially_quantified_types" class="uri">https://en.wikibooks.org/wiki/Haskell/Existentially_quantified_types</a></p>
 
 <div id="disqus_thread"></div>
 <script>

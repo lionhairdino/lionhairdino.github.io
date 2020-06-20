@@ -26,15 +26,15 @@
     
 </div>
 
-<p><a href="https://jproyo.github.io/posts/2019-03-17-tagless-final-haskell.html" class="uri">https://jproyo.github.io/posts/2019-03-17-tagless-final-haskell.html</a></p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a>λx<span class="op">.</span>x<span class="op">&gt;</span> <span class="op">:</span>set <span class="op">-</span><span class="dt">XTypeApplications</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a>λx<span class="op">.</span>x<span class="op">&gt;</span> <span class="op">:</span>t requestData <span class="st">&quot;john&quot;</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a>requestData <span class="st">&quot;john&quot;</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a><span class="ot">  ::</span> (<span class="dt">Data.Cache</span> m, <span class="dt">DataSource</span> m, <span class="dt">Data.Logging</span> m) <span class="ot">=&gt;</span> m [<span class="dt">DataResult</span>]</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a>λx<span class="op">.</span>x<span class="op">&gt;</span> <span class="op">:</span>t requestData <span class="op">@</span><span class="dt">NotInCache</span> <span class="st">&quot;john&quot;</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a>requestData <span class="op">@</span><span class="dt">NotInCache</span> <span class="st">&quot;john&quot;</span><span class="ot"> ::</span> <span class="dt">NotInCache</span> [<span class="dt">DataResult</span>]</span></code></pre></div>
-<p>requestData 함수가 m 컨텍스트에 있는데, m 을 임시로 NotInCache 컨텍스트로 실행하고 싶을 때 <span class="citation" data-cites="를">@를</span> 붙여, 폴리모픽 함수를 특정 컨텍스트에서 실행할 수 있다.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="ot">some ::</span> <span class="dt">Num</span> n <span class="ot">=&gt;</span> n <span class="ot">-&gt;</span> n</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a>some x <span class="ot">=</span> x <span class="op">+</span> x</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a><span class="op">&gt;</span> <span class="op">:</span>set <span class="op">-</span><span class="dt">XTypeApplications</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a><span class="op">&gt;</span> some <span class="op">@</span><span class="dt">Int</span> <span class="dv">1</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a><span class="dv">2</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a><span class="op">&gt;</span> some <span class="op">@</span><span class="dt">Double</span> <span class="dv">1</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a><span class="fl">2.0</span></span></code></pre></div>
+<p>some 함수가 n 컨텍스트에 있는데, n 을 임시로 특정 타입 컨텍스트로 실행하고 싶을 때 <span class="citation" data-cites="를">@를</span> 붙여, 폴리모픽 함수를 특정 컨텍스트에서 실행할 수 있다.</p>
 <p>확장별로 포스팅한 후에 어느 정도 쌓이면 한 포스트로 묶도록 하자.</p>
 
 <div id="disqus_thread"></div>
