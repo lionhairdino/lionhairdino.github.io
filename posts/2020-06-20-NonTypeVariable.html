@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>lionhairdino - Non type-variable argument in the constraint</title>
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+    </head>
+    <body>
+        <div id="header">
+            <div id="logo">
+                <a href="../">lionhairdino</a>
+            </div>
+            <div id="navigation">
+                <a href="../about.html">About</a>
+                <a href="../archive.html">Archive</a>
+            </div>
+        </div>
+
+        <div id="content">
+            <h1>Non type-variable argument in the constraint</h1>
+
+            <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+<div class="info">
+    Posted on June 20, 2020
+    
+</div>
+
+<p>에러가 읽기 어려울 땐, :type 을 써서 단계마다 타입을 추적하면 도움이 됩니다. 일부러 간단한 구문을 에러가 나도록 해서 메시지를 따라가봤습니다. 아직 검정이 안된 정리입니다. 틀리게 따라가는 부분이 보인다면 댓글 부탁드립니다.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="op">&gt;</span> <span class="fu">fmap</span> ((<span class="op">+</span><span class="dv">1</span>) <span class="op">.</span> <span class="fu">fst</span>) (<span class="dt">Just</span> <span class="dv">1</span>, <span class="dv">100</span>) </span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a><span class="op">&lt;</span>interactive<span class="op">&gt;:</span><span class="dv">5</span><span class="op">:</span><span class="dv">1</span><span class="op">:</span> <span class="fu">error</span><span class="op">:</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a>    • <span class="dt">Non</span> <span class="kw">type</span><span class="op">-</span>variable argument <span class="kw">in</span> the constraint<span class="op">:</span> <span class="dt">Num</span> (b1, b2)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a>    <span class="op">...</span></span></code></pre></div>
+<p>fst 함수를 튜플 (Just 1, 100) 에 적용해서 나온 Just 1 에 fmap (+1)을 적용해서 Just 2 를 결과로 예상했지만, 아래와 같은 오류를 만났습니다.<br> 타입 제약에 타입 변수가 아닌 인자가 있다?<br></p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="op">&gt;</span> <span class="op">:</span>t <span class="fu">fmap</span> ((<span class="op">+</span><span class="dv">1</span>) <span class="op">.</span> <span class="fu">fst</span>) (<span class="dt">Just</span> <span class="dv">1</span>, <span class="dv">100</span>) </span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a><span class="fu">fmap</span> ((<span class="op">+</span><span class="dv">1</span>) <span class="op">.</span> <span class="fu">fst</span>) (<span class="dt">Just</span> <span class="dv">1</span>, <span class="dv">100</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a><span class="ot">  ::</span> (<span class="dt">Num</span> b1, <span class="dt">Num</span> a, <span class="dt">Num</span> (b1, b2)) <span class="ot">=&gt;</span> (<span class="dt">Maybe</span> a, b1)</span></code></pre></div>
+<p>=&gt; 왼쪽의 타입 제약constraint을 보면 Num (b1, b2) 가 보입니다. GHC는 왜 이런 제약이 있다고 추론했을까요?</p>
+<ol type="1">
+<li><p>fmap 은 어떤 인스턴스의 fmap 을 선택했을까요?<br> fmap 의 두 번째 인자 (,) 를 보고, 튜플의 fmap 을 선택했습니다.<br> fmap :: (a0 -&gt; b) -&gt; (a, a0) -&gt; (a,b)<br></p></li>
+<li><p>fmap 첫 번째 매개 변수의 타입은 a0 -&gt; b<br> &gt; :t (+1) . fst <br> (+1) . fst :: Num c =&gt; (c, b) -&gt; c <br> a0 는 (c,b) 가 되고, b 는 c 라고 추론합니다.<br></p></li>
+<li><p>fmap 두 번째 매개 변수의 타입은 (a, a0)<br> (Just 1, 100) 인자가 들어왔으니, a 는 Just 1, a0 는 100<br> 위에서 a0 는 튜플로 추론됐고, 여기서는 100을 보고 Num 클래스 소속이라고 추론 됐습니다.<br> 100 은 Int 나 Double 이 아니고 Num a =&gt; a 입니다.<br></p></li>
+<li><p>Num (,) 이라고 추론 됐습니다. (,) 인스턴스가 없다는 오류가 날 것 같기도 한데, 그 이전에 Num a =&gt; a 에서 a 에 튜플이 들어갑니다. 제약에는 타입 클래스만 올 수 있습니다. a, b 같은 타입 변수가 아니라 생성자 (,)가 들어왔기 때문에 non type-variable argument 란 오류가 납니다.</p></li>
+</ol>
+<p>아래처럼 바꿨더니 이 번에 다른 오류가 납니다.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="op">&gt;</span> <span class="fu">fmap</span> (<span class="op">+</span><span class="dv">1</span>) <span class="op">.</span> <span class="fu">fst</span> (<span class="dt">Just</span> <span class="dv">1</span>, <span class="dv">100</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a><span class="op">&lt;</span>interactive<span class="op">&gt;:</span><span class="dv">13</span><span class="op">:</span><span class="dv">13</span><span class="op">:</span> <span class="fu">error</span><span class="op">:</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a>    • <span class="dt">Couldn't</span> match expected <span class="kw">type</span> ‘a <span class="ot">-&gt;</span> f b’</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a>                  with actual <span class="kw">type</span> ‘<span class="dt">Maybe</span> <span class="dt">Integer</span>’</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a>    • <span class="dt">Possible</span> cause<span class="op">:</span> ‘fst’ is applied to too many arguments</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a>      <span class="dt">In</span> the second argument <span class="kw">of</span> ‘(<span class="op">.</span>)’, namely ‘fst (<span class="dt">Just</span> <span class="dv">1</span>, <span class="dv">100</span>)’</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true"></a>      <span class="dt">In</span> the expression<span class="op">:</span> <span class="fu">fmap</span> (<span class="op">+</span> <span class="dv">1</span>) <span class="op">.</span> <span class="fu">fst</span> (<span class="dt">Just</span> <span class="dv">1</span>, <span class="dv">100</span>)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true"></a>      <span class="dt">In</span> an equation for ‘it’<span class="op">:</span> it <span class="ot">=</span> <span class="fu">fmap</span> (<span class="op">+</span> <span class="dv">1</span>) <span class="op">.</span> <span class="fu">fst</span> (<span class="dt">Just</span> <span class="dv">1</span>, <span class="dv">100</span>)</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true"></a>    • <span class="dt">Relevant</span> bindings include</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true"></a><span class="ot">      it ::</span> a <span class="ot">-&gt;</span> f b (bound at <span class="op">&lt;</span>interactive<span class="op">&gt;:</span><span class="dv">53</span><span class="op">:</span><span class="dv">1</span>)</span></code></pre></div>
+<p>역시 타입 추적부터 해보겠습니다.<br> 1. 이 번엔 :t 로 보려고 해도 같은 오류가 나서, 이 방법으로 힌트를 얻을 수 없습니다.</p>
+<ol type="1">
+<li>구문이 실행되는 순서로 쪼개어 봅시다.<br> 값에 함수를 적용하는게 가장 우선 순위가 높습니다. 말하자면 공백이 가장 높은 연산자입니다.</li>
+</ol>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="op">+</span> 는 <span class="kw">infixl</span> <span class="dv">6</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a><span class="op">.</span> 은 <span class="kw">infixr</span> <span class="dv">9</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a><span class="co">-- 아래처럼 괄호 없이 써도 연산자 우선 순위가 있어 제대로 계산됩니다.</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a><span class="op">&gt;</span> (<span class="op">+</span>) <span class="dv">1</span> <span class="op">.</span> (<span class="op">+</span>) <span class="dv">2</span> <span class="op">$</span> <span class="dv">3</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a><span class="dv">6</span> </span></code></pre></div>
+<ol type="1">
+<li>에러 중에 it :: a -&gt; f b 가 보입니다. 전체의 타입이 a -&gt; f b 라고 추론했다는데 왜 그렇게 했을까요?</li>
+</ol>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a> <span class="fu">fmap</span> (<span class="op">+</span><span class="dv">1</span>)      (<span class="op">.</span> <span class="fu">fst</span> (<span class="dt">Just</span> <span class="dv">1</span>, <span class="dv">100</span>))  <span class="co">-- (x)</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a>(<span class="fu">fmap</span> (<span class="op">+</span><span class="dv">1</span>))  <span class="op">.</span>  (<span class="fu">fst</span> (<span class="dt">Just</span> <span class="dv">1</span>, <span class="dv">100</span>)) <span class="co">-- (.) 의 우선순위가 높습니다.</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a>(<span class="op">.</span>) 은 (b <span class="ot">-&gt;</span> c) <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> c</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true"></a><span class="fu">fmap</span> 은 <span class="dt">Functor</span> f <span class="ot">=&gt;</span> (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> f a <span class="ot">-&gt;</span> f b <span class="op">&lt;</span>br<span class="op">&gt;</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true"></a>(b <span class="ot">-&gt;</span> c) 가 <span class="fu">fmap</span> (<span class="op">+</span><span class="dv">1</span>)<span class="ot"> ::</span> (functor f, <span class="dt">Num</span> b) <span class="ot">=&gt;</span> f b <span class="ot">-&gt;</span> f b</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true"></a>b 자리에 f b, c 자리에 f b 로 추론하고</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true"></a>그럼 두 번째 함수인 a <span class="ot">-&gt;</span> b 는 a <span class="ot">-&gt;</span> f b 라 추론합니다<span class="op">.</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true"></a>그런데, 두 번째 함수는 (<span class="fu">fst</span> (<span class="dt">Just</span> <span class="dv">1</span>, <span class="dv">100</span>))<span class="ot"> ::</span> <span class="dt">Num</span> a <span class="ot">=&gt;</span> <span class="dt">Maybe</span> a</span></code></pre></div>
+<p>그래서 a -&gt; f b 와 Maybe a 가 매칭이 안된다는 오류가 납니다.</p>
+<p>(실제 타입으로 Maybe a 가 아니라 Maybe Integer 가 나온건 Num 클래스의 디폴트 타입이 Integer 라서 그렇습니다. 숫자 리터럴을 별다른 추론 단서가 없다면 Integer 로 추론됩니다. <a href="https://kseo.github.io/posts/2017-01-04-type-defaulting-in-haskell.html" class="uri">https://kseo.github.io/posts/2017-01-04-type-defaulting-in-haskell.html</a>)</p>
+
+<div id="disqus_thread"></div>
+<script>
+
+var disqus_config = function () {
+this.page.url = 'https://lionhairdino.github.io/posts/2020-06-20-NonTypeVariable.html';
+this.page.identifier = 'posts/2020-06-20-NonTypeVariable.markdown';
+};
+(function() {
+var d = document, s = d.createElement('script');
+s.src = 'https://lionhairdino.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+                            
+        </div>
+        <div id="footer">
+            Site proudly generated by
+            <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+    </body>
+</html>
