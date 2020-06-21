@@ -72,6 +72,7 @@
 <span id="cb4-9"><a href="#cb4-9" aria-hidden="true"></a>그런데, 두 번째 함수는 (<span class="fu">fst</span> (<span class="dt">Just</span> <span class="dv">1</span>, <span class="dv">100</span>)) 에서 <span class="dt">Num</span> a <span class="ot">=&gt;</span> <span class="dt">Maybe</span> a 로 추론됩니다<span class="op">.</span></span></code></pre></div>
 <p>그래서 a -&gt; f b 와 Maybe a 가 매칭이 안된다는 에러가 납니다.</p>
 <hr />
+<p>[1] 괄호 없는 표현식의 실행 순서</p>
 <p>:info 명령어로 우선 순위를 볼 수 있습니다. prefix 적용은 따로 우선 순위 표현이 없는데, 중위 연산자와 섞어 쓸 때면 우선순위가 10이라고 보면 되겠습니다. infix 만 우선 순위가 있습니다. 그리고 또 한가지, 중위 연산자는 함수를 넘기는 곳에 인자로 쓰일 수 없습니다. 괄호로 감싸서 prefix 로 만들어 넘겨야 합니다.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="co">-- . 은 infixr 9</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a><span class="co">-- $ 는 infixr 0</span></span>
@@ -84,6 +85,7 @@
 <span id="cb5-9"><a href="#cb5-9" aria-hidden="true"></a><span class="dv">3</span></span>
 <span id="cb5-10"><a href="#cb5-10" aria-hidden="true"></a><span class="op">&gt;</span> <span class="fu">fmap</span> (<span class="op">+</span><span class="dv">1</span>) <span class="op">.</span> <span class="fu">fmap</span> (<span class="op">+</span><span class="dv">2</span>) <span class="op">$</span> [<span class="dv">1</span>,<span class="dv">2</span>]</span>
 <span id="cb5-11"><a href="#cb5-11" aria-hidden="true"></a>[<span class="dv">4</span>,<span class="dv">5</span>]</span></code></pre></div>
+<p>[2] 실제 타입으로 Maybe a가 아니라 Maybe Integer가 나온건 Num 클래스의 디폴트 타입이 Integer라서 그렇습니다. 숫자 리터럴은 별다른 추론 단서가 없다면 Integer로 추론됩니다.<br> <a href="https://kseo.github.io/posts/2017-01-04-type-defaulting-in-haskell.html" class="uri">https://kseo.github.io/posts/2017-01-04-type-defaulting-in-haskell.html</a></p>
 
 <div id="disqus_thread"></div>
 <script>
