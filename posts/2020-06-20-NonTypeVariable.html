@@ -12,8 +12,8 @@
                 <a href="../">lionhairdino</a>
             </div>
             <div id="navigation">
-                <a href="../about.html">About</a>
-                <a href="../archive.html">Archive</a>
+                <a href="../about.html">about</a>
+                <a href="../archive.html">archive</a>
             </div>
         </div>
 
@@ -26,7 +26,7 @@
     
 </div>
 
-<p>에러가 읽기 어려울 땐, :type 을 써서 단계마다 타입을 추적하면 도움이 됩니다. 일부러 간단한 구문을 에러가 나도록 해서 메시지를 따라가봤습니다.</p>
+<p>에러가 읽기 어려울 땐, :type 을 써서 단계마다 타입을 추적하면 도움이 됩니다. 일부러 간단한 구문을 에러가 나도록 해서 메시지를 따라가 봤습니다.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="op">&gt;</span> <span class="fu">fmap</span> ((<span class="op">+</span><span class="dv">1</span>) <span class="op">.</span> <span class="fu">fst</span>) (<span class="dt">Just</span> <span class="dv">1</span>, <span class="dv">100</span>) </span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a><span class="op">&lt;</span>interactive<span class="op">&gt;:</span><span class="dv">5</span><span class="op">:</span><span class="dv">1</span><span class="op">:</span> <span class="fu">error</span><span class="op">:</span></span>
@@ -44,7 +44,7 @@
 <li><p>fmap 두 번째 매개 변수의 타입은 (a, a0)<br> (Just 1, 100) 인자가 들어왔으니, a 는 Just 1, a0 는 100<br> 위에서 a0 는 튜플로 추론됐고, 여기서는 100을 보고 Num 클래스 소속이라고 추론 됐습니다.<br> 100 은 Int 나 Double 이 아니고 Num a =&gt; a 입니다.<br></p></li>
 <li><p>Num (,) 이라고 추론 됐습니다. (,) 인스턴스가 없다는 에러가 날 것 같기도 한데, 그 이전에 Num a =&gt; a 에서 a 에 튜플이 들어갑니다. 제약에는 타입 클래스만 올 수 있습니다. a, b 같은 타입 변수가 아니라 생성자 (,)가 들어왔기 때문에 non type-variable argument 란 에러가 납니다.</p></li>
 </ol>
-<p>에러는 괄호를 잘 못 씌워서 원하는 대로 함수 적용이 이루어지지 않았는데, 에러는 “제약에 클래스가 타입 변수가 아닌게 들어갔다” 입니다.</p>
+<p>에러는 괄호를 잘 못 씌워서 원하는 대로 함수 적용이 이루어지지 않았는데, 에러는 “제약에 타입 변수가 아닌게 들어왔다” 입니다. 꽤 오랫동안 봐야 통찰이 생길 것 같은 연결 고리입니다.</p>
 <p><br><br><br></p>
 <p>아래처럼 바꿨더니 이 번에 다른 에러가 납니다.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="op">&gt;</span> <span class="fu">fmap</span> (<span class="op">+</span><span class="dv">1</span>) <span class="op">.</span> <span class="fu">fst</span> (<span class="dt">Just</span> <span class="dv">1</span>, <span class="dv">100</span>)</span>
@@ -82,7 +82,7 @@
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a><span class="co">-- 아래처럼 괄호 없이 써도 연산자 우선 순위가 있어 제대로 계산됩니다.</span></span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a><span class="op">&gt;</span> add x y <span class="ot">=</span> x <span class="op">+</span> y</span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true"></a><span class="op">&gt;</span> add <span class="dv">1</span> <span class="op">.</span> add <span class="dv">2</span> <span class="op">$</span> <span class="dv">3</span> </span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true"></a><span class="co">-- . 보다 앞에 add가 우선 실행되고, 중위 연산자 동작을 하기 전 뒤에 add를 먼저 실행합니다. 그리고 나서 . 연산자를 실행합니다.</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true"></a><span class="co">-- . 보다 앞에 add가 우선 실행되고, 중위 연산자 .이 동작하기 전 뒤에 add를 먼저 실행합니다. 그리고 나서 . 연산자를 실행합니다.</span></span>
 <span id="cb5-7"><a href="#cb5-7" aria-hidden="true"></a><span class="dv">6</span></span>
 <span id="cb5-8"><a href="#cb5-8" aria-hidden="true"></a><span class="op">&gt;</span> <span class="dv">1</span> <span class="op">+</span> add <span class="dv">1</span></span>
 <span id="cb5-9"><a href="#cb5-9" aria-hidden="true"></a><span class="dv">3</span></span>
