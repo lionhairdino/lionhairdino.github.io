@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <title>lionhairdino - 모나드로 가기 전 알아 둘 개념 및 용어</title>
+        <title>lionhairdino - 모나드로 가기 전</title>
         <meta name="description" content="Haskell,하스켈,해스클">
         <link rel="stylesheet" type="text/css" href="../css/default.css" />
         <meta property="og:type" content="website">
@@ -23,7 +23,7 @@
         </div>
 
         <div id="content">
-            <h1>모나드로 가기 전 알아 둘 개념 및 용어</h1>
+            <h1>모나드로 가기 전</h1>
 
             <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
 <div class="info">
@@ -65,8 +65,7 @@
 <p>join 성격의 Natural Transformation이 있다면, 펑크터를 연결 할 수 있습니다. 다시 말해 컴포지션 할 수 있습니다.</p>
 <p>a -&gt; m b 함수를 컴포지션 하려면 join이 필요합니다. 다른 타입의 컴포지션과 달리 왜그리 중요한 역할을 하게 됐을까요?</p>
 <h3 id="왜-a---m-b-타입-함수가-특별할까">왜 a -&gt; m b 타입 함수가 특별할까?</h3>
-<p>m a -&gt; m b 타입으로 함수를 만들면 복잡한 개념 없이 품고 품게composition 할 수 있지 않을까 생각이 듭니다. 하지만, m 컨텍스트에서 m 컨텍스트로 가면 품는 동안 반드시 m 컨텍스트가 발현된다는 보장이 없습니다. fmap이 동작하거나, 패턴 매칭이 나와야지만 Side effect가 나옵니다. m a 와 a -&gt; m b 함수를 받으면 m a 에서 m 을 벗겨내는 작업이 있어야만 a -&gt; m b 함수를 적용할 수 있습니다. 다시 말해, <em>컨텍스트가 반드시 발현</em>됩니다.</p>
-<p>특별히 이 타입의 함수들이 모나드에 쓰일 때 “액션”이라 부릅니다.</p>
+<p>m a -&gt; m b 타입[2]으로 함수를 만들면 복잡한 개념 없이 품고 품게composition 할 수 있지 않을까 생각이 듭니다. 하지만, m 컨텍스트에서 m 컨텍스트로 가면 품는 동안 반드시 m 컨텍스트가 발현된다는 보장이 없습니다. fmap이 동작하거나, 패턴 매칭이 나와야지만 Side effect가 나옵니다. m a 와 a -&gt; m b 함수를 받으면 m a 에서 m 을 벗겨내는 작업이 있어야만 a -&gt; m b 함수를 적용할 수 있습니다. 다시 말해, <em>컨텍스트가 반드시 발현</em>됩니다.</p>
 <h3 id="kleighsly-카테고리">Kleighsly 카테고리</h3>
 <p>a -&gt; b 와 b -&gt; c 함수는 (.)으로 composition 할 수 있습니다.<br />
 a -&gt; m b 와 b -&gt; m c 함수는 (&gt;=&gt;) 으로 composition 할 수 있습니다.</p>
@@ -78,7 +77,8 @@ a -&gt; m b 와 b -&gt; m c 함수는 (&gt;=&gt;) 으로 composition 할 수 있
 <h3 id="모나드가-왜-수많은-난제들을-해결할까">모나드가 왜 수많은 난제들을 해결할까?</h3>
 <p>함수가 함수를 품을때마다 반드시 fmap이 한 번씩 동작합니다. 체이닝할 때 매 번 뭔가 작업을 반복적으로 해야 한다면 딱 어울리는 패턴입니다.</p>
 <p>Maybe는 컴포지션할 때마다 매 번 “Nothing 인지 검사하고”<br />
-Status는 컴포지션할 때마다 매 번 “상태값을 액션에 넣어줘야 하고” Writer는 컴포지션할 때마다 매 번 “로그 ‘같은’ 값들을 계속 누적하고”<br />
+Status는 컴포지션할 때마다 매 번 “상태값을 액션에 넣어줘야 하고”<br />
+Writer는 컴포지션할 때마다 매 번 “로그 ‘같은’ 값들을 계속 누적하고”<br />
 IO는 매 번 “Status처럼 런타임 상태값을 계속 끌고 다녀야 하고”<br />
 …</p>
 <p>그리고 또 한가지,<br />
@@ -88,8 +88,10 @@ IO는 매 번 “Status처럼 런타임 상태값을 계속 끌고 다녀야 하
 <h3 id="컨텍스트">컨텍스트</h3>
 <p>문장과 문장 사이, 행간으로 번역하기도 하고, 맥락이라고 번역하기도 하는데, 무언가 명시적으로 언급하진 않았지만 현재 작업을 할 때 영향을 미치는 환경, 상황 같은 걸 말합니다. 코딩에서는 어떤 모양으로 컨텍스트가 나타날까요? 같은 성격의 작업을 할 때마다 항상 반복해서 실행되는 코드가 바로 컨텍스트입니다.</p>
 <p>“컨텍스트를 이용해서 Side effect가 있는 함수와 같은 결과를 만들어낸다”라고 말해야지, “컨텍스트는 side effect를 의미한다”라고 하면 틀린 말입니다.</p>
-<h2 id="컨텍스트가-동작하도록-약속되어-있는-타입을-embellish-타입-또는-fancy-타입이라고-부기도-합니다.">컨텍스트가 동작하도록 약속되어 있는 타입을 embellish 타입, 또는 fancy 타입이라고 부기도 합니다.</h2>
+<hr />
 <p>[1] 가끔 Binary 함수를 이진 함수라 번역한 걸 만나는데, 이항 함수가 더 어울립니다. 두 개의 매개 변수를 가진 함수를 말합니다. unary는 단항, nullary는 매개 변수가 없는, “매개 변수가 몇 개인가?” = “arity가 몇이야?”</p>
+<p>[2] 특별히 이 타입의 함수들이 모나드에 쓰일 때 “액션”이라 부릅니다.</p>
+<p>[3] 컨텍스트가 동작하도록 약속되어 있는 타입을 embellish 타입, 또는 fancy 타입이라고 부기도 합니다.</p>
 
 <div id="disqus_thread"></div>
 <script>
