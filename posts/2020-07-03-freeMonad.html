@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>lionhairdino - Free 모나드</title>
+        <meta name="description" content="Haskell,하스켈,해스클">
+        <meta charset="UTF-8">
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <meta property="og:type" content="website">
+        <meta property="og:title" content="lionhairdino">
+        <meta property="og:description" content="Haskell,하스켈,해스클">
+        <meta property="og:url" content="https://lionhairdino.github.io">
+    </head>
+    <body>
+        <div id="header">
+            <div id="logo">
+                <a href="../">lionhairdino</a>
+            </div>
+            <div id="navigation">
+                <a href="../about.html">about</a>
+                <!--<a href="/archive.html">archive</a>-->
+            </div>
+        </div>
+
+        <div id="content">
+            <h1>Free 모나드</h1>
+
+            <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+<div class="info">
+    Posted on July  3, 2020
+    
+</div>
+
+<p>Free 모나드가 어떤 패턴인지 보기전에 목표부터 적겠습니다.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a>  <span class="dt">Act1</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a>  <span class="dt">Act2</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a>  <span class="dt">Act3</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a>  <span class="op">...</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a>  <span class="dt">Done</span></span></code></pre></div>
+<p>이렇게 할 일을 직관적으로 코드에 표현하는게 목표입니다. (할 일을 명령형 프로그램 비슷하게 늘어 놓는게 목표입니다.)</p>
+<p>Free 모나드 정의입니다.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="kw">data</span> <span class="dt">Free</span> f r <span class="ot">=</span> <span class="dt">Free</span> (f (<span class="dt">Free</span> f r)) <span class="op">|</span> <span class="dt">Pure</span> r</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a><span class="kw">instance</span> (<span class="dt">Functor</span> f) <span class="ot">=&gt;</span> <span class="dt">Monad</span> (<span class="dt">Free</span> f) <span class="kw">where</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a>    <span class="fu">return</span> a <span class="ot">=</span> <span class="dt">Pure</span> a</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a>    (<span class="dt">Free</span> x) <span class="op">&gt;&gt;=</span> g <span class="ot">=</span> <span class="dt">Free</span> (<span class="fu">fmap</span> (<span class="op">&gt;&gt;=</span> g) x)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a>    (<span class="dt">Pure</span> r) <span class="op">&gt;&gt;=</span> g <span class="ot">=</span> g r</span></code></pre></div>
+<p>바인드를 직관적으로 해석해 보면</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="co">-- 오른 쪽 Free의 안 쪽 것만 보면</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a>(<span class="fu">fmap</span> (<span class="op">&gt;&gt;=</span> g) x)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a><span class="co">-- x는 Free x로 받은 것에서 Free를 떼어낸 것</span></span></code></pre></div>
+<p>위의 x는 펑크터입니다. x는 f (<em>Free f r</em>) 모양입니다. GHC는 펑크터f 인스턴스의 fmap을 선택합니다. 펑크터 안에 들어 있는 값 <em>Free f r</em> 에 다시 바인드를 적용합니다.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="co">-- Free x는 Free (f (Free f r)) 값이거나, Pure r 값이다.</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a><span class="co">-- Free값일 때 x 와 (f (Free f r)) 이 매칭된다.</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a>(<span class="dt">Free</span> f r) <span class="op">&gt;&gt;=</span> g</span></code></pre></div>
+<p>여기의 바인드는 다시 Free를 받으므로, GHC는 다시 Free 바인드를 선택합니다. Free값을 받으면 안 쪽의 값에다가 다시 바인드를 먹입니다. 언제까지? Pure값을 만날 때까지 계속합니다.</p>
+<p>일단 재귀가 등장하면 생각이 복잡해집니다. 재귀가 무한대로 가면 더욱 따라가기가 불편해집니다. 재귀를 보면 딱 한 단계만 진행하거나, 어떤 조건하에서 끝난다는 걸 알고 읽으면 도움이 됩니다. 여기서는 Pure를 만나면 끝납니다.</p>
+<p>위 바인드를 정리해 보면 <em>(Free타입 A)와 (Free타입 B를 돌려주는 함수)가 만나면 A의 가장 안쪽에 B를 붙이는 작업</em>을 합니다.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="co">-- 실제 코드는 모두 Free지만, 설명하기 위해 편의상 Free에 번호를 붙이겠습니다.</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a><span class="dt">Free1</span>(<span class="op">..</span>(<span class="dt">Free2</span><span class="op">..</span>(<span class="op">Pure..</span>))) <span class="op">&gt;&gt;=</span> (\_<span class="ot">-&gt;</span><span class="dt">Free3</span>(<span class="op">..</span>(<span class="dt">Free4</span><span class="op">..</span>(<span class="op">Pure..</span>))))</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a><span class="co">-- 결과는</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true"></a><span class="dt">Free1</span>(<span class="op">..</span>(<span class="dt">Free2</span><span class="op">..</span>(<span class="dt">Free3</span><span class="op">..</span>(<span class="dt">Free4</span><span class="op">..</span>(<span class="op">Pure..</span>)))))</span></code></pre></div>
+<p>대부분 위와 같은 값을 만나고, 여기에 바인드로 f를 적용하면 Free가 몇 번 감싸져 있든 안쪽까지 들어가 Pure r 에 도달해서 r에 함수를 적용합니다. 적용하는 함수는 리턴 타입이 Free 타입이니, <em>결과는 Free로 더 많이 감싼 형태</em>가 됩니다. 어떤 펑크터가 됐든 Free로 감싸서 Free타입으로 만들면 .. 이라 표시된 자리에 펑크터 값이 들어갑니다.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="co">-- Act1하고 Act2하는 작업이든</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a><span class="co">-- Act1하고 Act2하고 Act1하는 작업이든</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a><span class="co">-- Act가 몇 번이 반복되든 모두 같은 타입으로 만드는 방법은 재귀를 이용하면 됩니다.</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true"></a><span class="co">-- 리스트가 재귀로 선언 되어 </span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true"></a><span class="co">-- [],[0,1],[3,4,...] 이런 모양들을 모두 같은 리스트 타입으로 볼 수 있는 것과 비슷합니다. (주석 [1] 참고)</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true"></a><span class="co">-- 나중에 Free타입이 들어 올 자리 next를 추가합니다.</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true"></a><span class="kw">data</span> <span class="dt">Act</span> next <span class="ot">=</span> <span class="dt">Act1</span> next <span class="op">|</span> <span class="dt">Act2</span> next <span class="op">|</span> <span class="dt">Done</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true"></a><span class="co">-- Free 정의를 보면 functor를 받게 되어있는데, 바인드 안 쪽을 보면 fmap을 부릅니다. 펑크터로 만들어야 한다는 얘깁니다.</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true"></a></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true"></a><span class="kw">instance</span> <span class="dt">Functor</span> <span class="dt">Act</span> <span class="kw">where</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true"></a>  <span class="fu">fmap</span> f (<span class="dt">Act1</span> next) <span class="ot">=</span> <span class="dt">Act1</span> (f next)</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true"></a>  <span class="fu">fmap</span> f (<span class="dt">Act2</span> next) <span class="ot">=</span> <span class="dt">Act2</span> (f next)</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true"></a>  <span class="fu">fmap</span> f <span class="dt">Done</span> <span class="ot">=</span> <span class="dt">Done</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true"></a></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true"></a><span class="co">-- 위 Act 타입을 Free로 감싸놓습니다.</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true"></a>act1 <span class="ot">=</span> <span class="dt">Free</span> (<span class="dt">Act1</span> (<span class="dt">Pure</span> ()))</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true"></a>act2 <span class="ot">=</span> <span class="dt">Free</span> (<span class="dt">Act2</span> (<span class="dt">Pure</span> ()))</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true"></a>done <span class="ot">=</span> <span class="dt">Free</span> (<span class="dt">Done</span>          )</span></code></pre></div>
+<p>act1, act2, act2, act1, act2, done 순서로 작업을 해야 된다면</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a><span class="dt">Free</span>(<span class="dt">Act1</span> (<span class="dt">Free</span>(<span class="dt">Act2</span> (<span class="dt">Free</span>(<span class="dt">Act2</span> (<span class="dt">Free</span>(<span class="dt">Act1</span> (<span class="dt">Free</span>(<span class="dt">Act2</span> (<span class="dt">Free</span> <span class="dt">Done</span>))))))))))   </span></code></pre></div>
+<p>이렇게 써야 합니다. 작업을 연결해서 표시할 수 있게 되긴 했지만 복잡합니다. 하지만 Free는 모나드입니다! 바인드가 잘 정의되어 있어 이렇게 쓰지 않고, 이들을 모두 바인드로 연결해도 똑같은 코드입니다.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a>act1 <span class="op">&gt;&gt;=</span> (\_ <span class="ot">-&gt;</span> act2) <span class="op">&gt;&gt;=</span> (\_ <span class="ot">-&gt;</span> act2) <span class="op">&gt;&gt;=</span> (\_ <span class="ot">-&gt;</span> act1) <span class="op">&gt;&gt;=</span> (\_ <span class="ot">-&gt;</span> act2) <span class="op">&gt;&gt;=</span> (\_ <span class="ot">-&gt;</span> done)</span></code></pre></div>
+<p>Free는 모나드이므로 바인드로 do 구문을 숨기면</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a><span class="kw">do</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true"></a>  act1</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true"></a>  act2</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true"></a>  act2</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true"></a>  act1</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true"></a>  act2</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true"></a>  done</span></code></pre></div>
+<p>이렇게 이쁘게 적을 수 있습니다. 더 나아가</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"></a>actProc1 <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true"></a>  act1</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true"></a>  act2</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true"></a></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true"></a>actProc2 <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true"></a>  act2</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true"></a>  act1</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true"></a>  act2</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true"></a></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true"></a><span class="kw">do</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true"></a>  actProc1</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true"></a>  actProc2</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true"></a>  done</span></code></pre></div>
+<p>이렇게 적을 수도 있습니다. 딱 봐도 DSL(Domain Specific Language)을 만드는데 유용해 보이지 않나요? 실제로 DSL을 만들기 위해 많이 씁니다.</p>
+<p>사실 모든 모나드의 목표는 품고 품는 구조로 만드는 겁니다.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true"></a><span class="op">SomeMonad..</span>(<span class="op">SomeMonad..</span>(<span class="op">SomeMonad..</span>(<span class="op">SomeMonad..</span>(<span class="op">SomeMonad..</span>))))</span></code></pre></div>
+<p>.. 부분에서 어떤 작업을 하느냐에 따라 모나드 성격이 결정됩니다. Free 모나드 패턴은 ..부분에 동작하는 코드를 넣지 않고, 명세서 항목같은 걸 넣어두고 나중에 이 구조를 한 꺼풀씩 벗겨내는 함수에 넘겨서 실제 명세서 항목에 따른 작업을 하도록 합니다. 이런 코드를 보통 인터프리터라고 부릅니다.</p>
+<p>정리하면,</p>
+<ol type="1">
+<li>작업을, Free 타입이 들어올 자리를 가진 대수 타입으로 만들고,</li>
+<li>이 타입을 펑크터로 만들고,</li>
+<li>작업과 매칭되는 Free 타입을 만들어</li>
+<li>Free 모나드의 do 구문으로 작업 목록을 만들어 놓으면</li>
+<li>나중에 인터프리터에 넘겨 작업 목록을 실행한다.</li>
+</ol>
+<p>가 “Free 모나드 패턴”입니다.</p>
+<hr />
+<p>[1] 함수의 재귀와 데이터의 재귀<br />
+함수의 재귀는 함수안에서 함수를 부르고, 부른 함수에서 또 함수를 부르는데, 데이터 재귀는 그런 뜻이 아닙니다. 함수 재귀는 한 번 실행되기 시작하면 끝나는 조건을 만나기 전에는 계속 반복 실행하는데, 데이터 재귀는 실행의 개념이 아닙니다.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true"></a><span class="dt">List</span> a <span class="ot">=</span> <span class="dt">Empty</span> <span class="op">|</span> <span class="dt">Con</span> a (<span class="dt">List</span> a)</span></code></pre></div>
+<p>는 다음과 같은 형태가 될 수 있다는 뜻이지, 데이터 생성자 Con안에서 타입 생성자 List를 만났다고 또 “실행”을 하는게 아닙니다.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true"></a><span class="dt">Con</span> a (<span class="dt">Empty</span>)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true"></a><span class="dt">Con</span> a (<span class="dt">Con</span> a (<span class="dt">Empty</span>))</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true"></a><span class="dt">Con</span> a (<span class="dt">Con</span> a (<span class="dt">Con</span> a (<span class="dt">Empty</span>)))</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true"></a><span class="op">...</span></span></code></pre></div>
+<p>이런 모양 모두 리스트 타입이 될 수 있다는 뜻입니다. 데이터 선언 자체에는 반드시 Empty 값으로 끝난다는 제약은 없지만, 실제 코드에서 의미있는 값들은 대부분 마감되는 형태로 나타납니다. (Lazy를 이용해서 무한 반복되는 모양이 나올 때는 마감 여부를 알 필요가 없고, 앞에 몇 개만 쓴다든지 하는 경우가 있긴 있습니다.)</p>
+<p>데이터 재귀를 만나면 머릿속에서 무한 “호출”을 하지 마시고, 그런 “모양이 올 수도 있다”라고 해석하면 됩니다.</p>
+
+<div id="disqus_thread"></div>
+<script>
+
+var disqus_config = function () {
+this.page.url = 'https://lionhairdino.github.io/posts/2020-07-03-freeMonad.html';
+this.page.identifier = 'posts/2020-07-03-freeMonad.markdown';
+};
+(function() {
+var d = document, s = d.createElement('script');
+s.src = 'https://lionhairdino.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+                            
+        </div>
+        <div id="footer">
+            Site proudly generated by
+            <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+    </body>
+</html>
