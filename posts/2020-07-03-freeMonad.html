@@ -70,19 +70,21 @@
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a><span class="co">-- Act가 몇 번이 반복되든 모두 같은 타입으로 만드는 방법은 재귀를 이용하면 됩니다.</span></span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true"></a><span class="co">-- 리스트가 재귀로 선언 되어 </span></span>
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true"></a><span class="co">-- [],[0,1],[3,4,...] 이런 모양들을 모두 같은 리스트 타입으로 볼 수 있는 것과 비슷합니다. (주석 [1] 참고)</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true"></a><span class="co">-- 나중에 Free타입이 들어 올 자리 next를 추가합니다.</span></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true"></a><span class="kw">data</span> <span class="dt">Act</span> next <span class="ot">=</span> <span class="dt">Act1</span> next <span class="op">|</span> <span class="dt">Act2</span> next <span class="op">|</span> <span class="dt">Done</span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true"></a></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true"></a><span class="co">-- Free 정의를 보면 functor를 받게 되어있는데, 바인드 안 쪽을 보면 fmap을 부릅니다. 펑크터로 만들어야 한다는 얘깁니다.</span></span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true"></a><span class="kw">instance</span> <span class="dt">Functor</span> <span class="dt">Act</span> <span class="kw">where</span></span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true"></a>  <span class="fu">fmap</span> f (<span class="dt">Act1</span> next) <span class="ot">=</span> <span class="dt">Act1</span> (f next)</span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true"></a>  <span class="fu">fmap</span> f (<span class="dt">Act2</span> next) <span class="ot">=</span> <span class="dt">Act2</span> (f next)</span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true"></a>  <span class="fu">fmap</span> f <span class="dt">Done</span> <span class="ot">=</span> <span class="dt">Done</span></span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true"></a></span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true"></a><span class="co">-- 위 Act 타입을 Free로 감싸놓습니다.</span></span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true"></a>act1 <span class="ot">=</span> <span class="dt">Free</span> (<span class="dt">Act1</span> (<span class="dt">Pure</span> ()))</span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true"></a>act2 <span class="ot">=</span> <span class="dt">Free</span> (<span class="dt">Act2</span> (<span class="dt">Pure</span> ()))</span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true"></a>done <span class="ot">=</span> <span class="dt">Free</span> (<span class="dt">Done</span>          )</span></code></pre></div>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true"></a><span class="co">--</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true"></a><span class="co">-- 나중에 Free타입이 들어 올 자리 next를 추가합니다.</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true"></a><span class="co">-- Act 타입 단독으로 재귀적으로 표현되는게 아니라, Free로 감쌀 때 next를 이용해 재귀적으로 표현됩니다. </span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true"></a><span class="kw">data</span> <span class="dt">Act</span> next <span class="ot">=</span> <span class="dt">Act1</span> next <span class="op">|</span> <span class="dt">Act2</span> next <span class="op">|</span> <span class="dt">Done</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true"></a></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true"></a><span class="co">-- Free 정의를 보면 functor를 받게 되어있는데, 바인드 안 쪽을 보면 fmap을 부릅니다. 펑크터로 만들어야 한다는 얘깁니다.</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true"></a><span class="kw">instance</span> <span class="dt">Functor</span> <span class="dt">Act</span> <span class="kw">where</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true"></a>  <span class="fu">fmap</span> f (<span class="dt">Act1</span> next) <span class="ot">=</span> <span class="dt">Act1</span> (f next)</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true"></a>  <span class="fu">fmap</span> f (<span class="dt">Act2</span> next) <span class="ot">=</span> <span class="dt">Act2</span> (f next)</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true"></a>  <span class="fu">fmap</span> f <span class="dt">Done</span> <span class="ot">=</span> <span class="dt">Done</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true"></a></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true"></a><span class="co">-- 위 Act 타입을 Free로 감싸놓습니다.</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true"></a>act1 <span class="ot">=</span> <span class="dt">Free</span> (<span class="dt">Act1</span> (<span class="dt">Pure</span> ()))</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true"></a>act2 <span class="ot">=</span> <span class="dt">Free</span> (<span class="dt">Act2</span> (<span class="dt">Pure</span> ()))</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true"></a>done <span class="ot">=</span> <span class="dt">Free</span> (<span class="dt">Done</span>          )</span></code></pre></div>
 <p>이제 act1, act2, act2, act1, act2, done 순서로 작업을 해야 된다면</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a><span class="dt">Free</span>(<span class="dt">Act1</span> (<span class="dt">Free</span>(<span class="dt">Act2</span> (<span class="dt">Free</span>(<span class="dt">Act2</span> (<span class="dt">Free</span>(<span class="dt">Act1</span> (<span class="dt">Free</span>(<span class="dt">Act2</span> (<span class="dt">Free</span> <span class="dt">Done</span>))))))))))   </span></code></pre></div>
 <p>이렇게 쓰면 됩니다. 작업을 연결해서 표시할 수 있게 되긴 했는데 좀 복잡합니다. 하지만 Free는 모나드입니다! 바인드가 잘 정의되어 있어 이렇게 쓰지 않고, 이들을 모두 바인드로 연결해도 똑같은 코드입니다.</p>
