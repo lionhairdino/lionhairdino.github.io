@@ -48,10 +48,10 @@
 <li><a href="#naturalTransformation">Natural Transformation</a></li>
 <li><a href="#endofunctor">엔도펑크터 Endofunctor</a></li>
 <li><a href="#endofunctorMonoid">“A monad is just a monoid in the category of endofunctor”</a></li>
+<li><a href="#kleisly">Kleisly 카테고리</a></li>
 <li><a href="#composition">연속으로 컴포지션 하려면 모노이달 카테고리의 모노이드가 돼야 한다.</a></li>
 <li><a href="#action">왜 a -&gt; m b 타입 함수가 특별할까?</a></li>
 <li><a href="#context">컨텍스트 Context</a></li>
-<li><a href="#kleisly">Kleisly 카테고리</a></li>
 <li><a href="#impure">비순수 작업에 관여하는 부분만 떼어내 보면 모나드가 아니라 펑크터의 속성이다.</a></li>
 <li><a href="#justOneCase">상태를 넘기는 영리한 방법이야?</a></li>
 <li><a href="#manyProblems">모나드가 왜 수많은 난제들을 해결할까?</a></li>
@@ -129,7 +129,7 @@
 
 </div>
 <h3 id="a-monad-is-just-a-monoid-in-the-category-of-endofunctor">“A monad is just a monoid in the category of endofunctor”</h3>
-<p><em>검증 필요</em><br />
+<p><em>검증 필요 - 명시적으로 kleisly arrow를 엔도펑크터로 표시하고, 아래같이 풀어 낸 자료는 아직 보진 못했습니다. 정확한 이해와 해석이 아닐 수 있습니다.</em><br />
 모나드로 가는 길은 여러 길이 있는데, bind에서 가는 길, join 과 return 에서 가는 길, &gt;=&gt; 에서 가는 길이 있습니다. 여기서는 &gt;=&gt; 에서 출발해 보겠습니다.</p>
 <p>endofunc1 :: a -&gt; m b<br />
 endofunc2 :: b -&gt; m c<br />
@@ -139,7 +139,7 @@ a , b, c 는 폴리모픽을 뜻하므로 대표 타입으로 a -&gt; m b 로 �
 <p>오브젝트는 단 하나만 있습니다. (오브젝트가 하나만 있는 카테고리를 모노이달 카테고리라 부릅니다.)<br />
 모피즘을 합성하는 (a -&gt; m b) -&gt; (a -&gt; m b) -&gt; (a -&gt; m b) 타입 이항 함수가 있어야 합니다.<br />
 항등 함수는 m 타입 생성자입니다.</p>
-<p>카테고리가 되기 위한 조건들 중 이항 함수만 살펴 보겠습니다.</p>
+<p>카테고리가 되기 위한 위 조건들 중 이항 함수만 살펴 보겠습니다.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="ot">binding ::</span> (a <span class="ot">-&gt;</span> m b) <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> m b) <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> m b)   </span></code></pre></div>
 <p>그럼 모든 모피즘들, 다시 말해 이 구조에 있는 모든 endofunc들은</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a>binding func1 func2</span>
@@ -150,7 +150,10 @@ a , b, c 는 폴리모픽을 뜻하므로 대표 타입으로 a -&gt; m b 로 �
 <p>“엔도펑크터의 모노이달 카테고리”(오브젝트가 하나만 있는 카테고리)의 모노이드로 만들기 위해 &gt;=&gt; 을 추가하면, 모피즘을 합성 할 수 있습니다. &gt;=&gt; 는 join 과 return 으로 표현 할 수 있습니다.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a>f <span class="op">&gt;=&gt;</span> g <span class="ot">=</span> join <span class="op">.</span> <span class="fu">fmap</span> g <span class="op">.</span> f</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a><span class="co">-- 또는</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a>f <span class="op">&gt;=&gt;</span> g <span class="ot">=</span> \x <span class="ot">-&gt;</span> f x <span class="op">&gt;&gt;=</span> g</span></code></pre></div>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a>f <span class="op">&gt;=&gt;</span> g <span class="ot">=</span> \x <span class="ot">-&gt;</span> f x <span class="op">&gt;&gt;=</span> g</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a><span class="co">-- 참고</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true"></a>x <span class="op">&gt;&gt;=</span> f <span class="ot">=</span> join (<span class="fu">fmap</span> f x)</span></code></pre></div>
 <p>join과 return이 없으면 모노이드 구조가 아니지만, 추가해서 모노이드 구조가 되는 걸 모나드라 합니다. 엔도펑크터 + return + join 이 있는 “구조”를 모나드라 합니다. 결국, 모나드는 엔도펑크터의 모노이달 카테고리의 모노이드입니다.</p>
 <p><em>컴포지션을 하기 위해, 모노이드 구조를 만드는게 목적</em>입니다. 엔도펑크터 카테고리를 모노이드로 만들려고 join, return을 추가합니다.</p>
 <p>※ 하스켈에서 모나드 정의는 fmap, return, bind (이 건 join이나 Kleisly (&gt;=&gt;)로 표현되기도 합니다.)가 정의되어 있는 타입입니다. fmap은 펑크터에 정의되어 있는데, 모나드가 돠려면 펑크터여야 하기 때문에 여기서는 필요 조건에 함께 적어놨습니다.</p>
