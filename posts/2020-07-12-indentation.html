@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>lionhairdino - 하스켈 소스 들여쓰기</title>
+        <meta name="description" content="Haskell,하스켈,해스클">
+        <meta charset="UTF-8">
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <meta property="og:type" content="website">
+        <meta property="og:title" content="lionhairdino">
+        <meta property="og:description" content="Haskell,하스켈,해스클">
+        <meta property="og:url" content="https://lionhairdino.github.io">
+    </head>
+    <body>
+        <div id="header">
+            <div id="logo">
+                <a href="../">lionhairdino</a>
+            </div>
+            <div id="navigation">
+                <a href="../about.html">about</a>
+                <!--<a href="/archive.html">archive</a>-->
+            </div>
+        </div>
+
+        <div id="content">
+            <h1>하스켈 소스 들여쓰기</h1>
+
+            <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+<div class="info">
+    Posted on July 12, 2020
+    
+</div>
+
+<p><a href="https://en.wikibooks.org/wiki/Haskell/Indentation" class="uri">https://en.wikibooks.org/wiki/Haskell/Indentation</a></p>
+<p>들여 쓰기가 의미를 가지는 언어를 쓰는게 처음이라 은근히 헤매게 만든 요소였습니다. 딱 두 가지 규칙만 알면 거의 헤매지 않을 수 있습니다.</p>
+<p>같은 레벨에 있는 수식들은 모두 같은 들여쓰기값을 가져야 합니다.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="co">-- error </span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="kw">let</span> x <span class="ot">=</span> a</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a>  y <span class="ot">=</span> b</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a><span class="co">-- error</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a><span class="kw">let</span> x <span class="ot">=</span> a</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a>     y <span class="ot">=</span> b</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a><span class="co">-- ok</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a><span class="kw">let</span> x <span class="ot">=</span> a</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a>    y <span class="ot">=</span> b</span></code></pre></div>
+<p>얼핏 보면, 표현식expression의 일부라면 시작보다 몇 칸이든 들여쓰기만 하면 연결된 수식이라 판단 해 줄 것 같은데, 그렇지 않습니다. 딸린 수식은 첫 번째로 나온 딸린 수식의 들여쓰기와 나머지 두 번째, 세 번째 딸린 수식들이 들여쓰기가 같아야 합니다. 여기서 첫 번째 딸린 수식의 들여쓰기를 보는 방법만 알면 거의 헤매지 않습니다.</p>
+<p>x = b 이전에 공백 하나 있다고 들여쓰기가 한 칸인게 아니라 <em>(1)let까지 포함해서 들여쓰기로 판단</em>합니다. let + 공백 하나 해서 총 4칸 들여 쓰기를 한 상태입니다. 그래서 위의 마지막 코드는 ok입니다. 첫 번째 딸린 수식으로 판단한다 했으니 다음의 경우도 가능합니다.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="co">-- ok</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a><span class="kw">let</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a> x <span class="ot">=</span> a</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a> x <span class="ot">=</span> b</span></code></pre></div>
+<p>첫 번째 딸린 수식은 한 칸 들여 쓰기 했으므로, 두 번째도 한 칸 들여 쓰면 ok입니다.</p>
+<p>두 번째는 한 라인에 쓰여 있는 딸린 수식의 문제입니다.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a>myFunction firstArgument secondArgument <span class="ot">=</span> <span class="kw">do</span> foo</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a>                                             bar</span></code></pre></div>
+<p>위 표현식을 판단할 때는 = 까지가 주 표현식, 여기에 딸린 표현식이 do, do에 딸린 표현식이 foo입니다.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a>myFunction firstArgument secondArgument <span class="ot">=</span> </span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a>    <span class="kw">do</span> foo</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a>       bar </span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a>myFunction firstArgument secondArgument <span class="ot">=</span> </span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true"></a>    <span class="kw">do</span> </span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true"></a>        foo</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true"></a>        bar </span></code></pre></div>
+<p>문제는 다음 들여쓰기의 판단입니다.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a>myFunction firstArgument secondArgument <span class="ot">=</span> <span class="kw">do</span> </span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a>                                            foo</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a>                                            bar</span></code></pre></div>
+<p>do가 들여 쓰기 했으니, 여기에 딸린 수식은 do보다 들여쓰기 해야 하니 위 처럼만 가능하고,</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a>myFunction firstArgument secondArgument <span class="ot">=</span> <span class="kw">do</span> </span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a>    foo</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a>    bar</span></code></pre></div>
+<p>이렇게는 안 될 것처럼 보입니다. 하지만 이 것도 ok입니다.<br />
+<em>(2)라인 시작에 있지 않은 표현식이(여기서는 do), 같은 라인에 딸린 표현식을 하나도 가지고 있지 않다면(do까지만 쓰여 있다면), 이 라인 전체를 하나의 표현식으로 보고,</em> 다음 딸린식(여기서 do의 딸린 식은 foo와 bar)은 이 라인보다만 들여쓰면 됩니다.</p>
+<p>처음엔 직관으로 넘어가려 했는데, 조건 (1), (2)는 설명을 한 번쯤 봐 둬야, 들어쓰기 때문에 헤매는 걸 줄일 수 있습니다.</p>
+
+<div id="disqus_thread"></div>
+<script>
+
+var disqus_config = function () {
+this.page.url = 'https://lionhairdino.github.io/posts/2020-07-12-indentation.html';
+this.page.identifier = 'posts/2020-07-12-indentation.markdown';
+};
+(function() {
+var d = document, s = d.createElement('script');
+s.src = 'https://lionhairdino.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+                            
+        </div>
+        <div id="footer">
+            Site proudly generated by
+            <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+    </body>
+</html>
