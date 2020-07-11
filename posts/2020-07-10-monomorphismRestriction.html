@@ -50,7 +50,7 @@
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true"></a><span class="op">&gt;</span> <span class="kw">let</span> plus <span class="ot">=</span> (<span class="op">+</span>) <span class="co">-- Restriction을 바꾸면, 재정의 후 테스트해야 합니다.</span></span>
 <span id="cb1-14"><a href="#cb1-14" aria-hidden="true"></a><span class="op">&gt;</span> plus <span class="fl">1.1</span> <span class="fl">1.1</span></span>
 <span id="cb1-15"><a href="#cb1-15" aria-hidden="true"></a><span class="fl">2.2</span></span></code></pre></div>
-<p>확장이 켜져 있는 상태에서 plus 타입이 추론되는 걸 보면, 1.1 리터럴을 보고 Fractional 클래스라고 판단하는데, 타입 서명 없이 plus를 정의하면 GHC가 알아서 type defaulting 규칙에<sup><a href="#default">1</a></sup> 따라 Num 클래스의 디폴트 타입 Integer를 적용해 Integer -&gt; Integer -&gt; Integer 타입으로 추론합니다. Fractional 클래스의 Integer 인스턴스가 없기 때문에 오류가 납니다.</p>
+<p>확장이 켜져 있는 상태에서 plus 타입이 추론되는 걸 보면, 1.1 리터럴을 보고 Fractional 클래스라고 판단하는데, 타입 서명 없이 plus를 정의하면 GHC가 알아서 type defaulting 규칙에<sup><a href="#default">[1]</a></sup> 따라 Num 클래스의 디폴트 타입 Integer를 적용해 Integer -&gt; Integer -&gt; Integer 타입으로 추론합니다. Fractional 클래스의 Integer 인스턴스가 없기 때문에 오류가 납니다.</p>
 <p>monomorphism restriction을 켜면 아래 함수 정의들의 해석이 달라집니다.</p>
 <p><a href="https://wiki.haskell.org/Monomorphism_restriction" class="uri">https://wiki.haskell.org/Monomorphism_restriction</a></p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="co">-- GHC는 f1 :: (Show x) =&gt; x -&gt; String 로 추론한다. (1)</span></span>
@@ -71,7 +71,7 @@
 <span id="cb2-16"><a href="#cb2-16" aria-hidden="true"></a>f5 <span class="ot">=</span> <span class="fu">show</span></span></code></pre></div>
 <p><em>검증 필요</em> 왜 (1)과 (2)가 다르게 추론될까요?<br />
 monomorphism restriction 때문에 다르게 추론됩니다.<br />
-(1)번은 f1을 show와 함수 바인딩<sup><a href="#binding">2</a></sup>해서 x를 추론합니다. f1은 show x 함수에 이름을 붙여 놓은겁니다. show가 그렇듯이 f1은 Show 인스턴스를 인자로 받습니다. 하지만 (2)번은 show가 아닌 -&gt; … 람다 함수에 이름을 붙여 놓은 겁니다. 여기서도 역시 하스켈은 lazy합니다. show가 실행이 필요해지기 전까지는 x가 뭔지 모르는 상태입니다. monomorphism 제한이 켜져 있는 상태에서 추론 단서가 전혀 없으면 ()로 추론합니다.<br />
+(1)번은 f1을 show와 함수 바인딩<sup><a href="#binding">[2]</a></sup>해서 x를 추론합니다. f1은 show x 함수에 이름을 붙여 놓은겁니다. show가 그렇듯이 f1은 Show 인스턴스를 인자로 받습니다. 하지만 (2)번은 show가 아닌 -&gt; … 람다 함수에 이름을 붙여 놓은 겁니다. 여기서도 역시 하스켈은 lazy합니다. show가 실행이 필요해지기 전까지는 x가 뭔지 모르는 상태입니다. monomorphism 제한이 켜져 있는 상태에서 추론 단서가 전혀 없으면 ()로 추론합니다.<br />
 그럼 (4)번은 어떻게 해석하면 될까요? (1)번에서 x는 함수 바인딩 하면서 show에 있는 매개 변수의 정보를 가져오지만, (4)번은 매개 변수는 상관없이 show 함수와 바인딩합니다.</p>
 <p>함수가 폴리모픽 매개 변수를 가지고 있을 때, 폴리모픽 변수가 한가지로 추론되지 않으면 이 함수는 한가지mono 모양morphic이 아닙니다. 여러 코드 덩어리가 준비되어 있고, 나중에 구체 타입이 결정 되면 한가지를 고르게 됩니다.</p>
 <p>monomorphic을 켜면, GHC가 함수 정의를 보고 타입을 추론할 단서(타입 서명)를 찾아 보고, 구체 타입까지 도달 못하고 클래스까지만 추론 가능하면 디폴트 규칙에 따라 함수의 타입을 결정합니다.</p>
