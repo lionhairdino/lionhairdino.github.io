@@ -48,7 +48,7 @@
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a><span class="kw">data</span> <span class="dt">Capture</span> (<span class="ot">a ::</span> <span class="op">*</span>)</span></code></pre></div>
 <p>값 생성자가 없는 타입이 어떤 의미가 있을까요? 값이 없다면 다른 값들과 어떤 연산도 못합니다. 타입만으로 영향을 줄 수 있는게 뭘까 생각해 봤습니다.</p>
 <p>프로그램은 값이 지나가는 길을 만드는 겁니다. 간단한 연산을 위한게 아니라면, 중간 중간 갈래 길을 만들어 조건에 맞게 길을 선택(분기)할 수 있게 만드는 게 프로그램입니다. 값이 없는 타입들은 다른 값들과 어울릴 수 없으나, <em>갈래 길</em>을 만드는 용도로 쓸 수 있습니다.</p>
-<p>타입으로 갈래 길을 만드는 하스켈 요소는 바로 <em>클래스와 인스턴스</em>입니다. 메소드에서 받은 인자 <em>타입에 따라 인스턴스를</em> 고를 수 있습니다. 이 요소를 적극 활용하는게 <em>Type Family</em>[1] 입니다.</p>
+<p>타입으로 갈래 길을 만드는 하스켈 요소는 바로 <em>클래스와 인스턴스</em>입니다. 메소드에서 받은 인자 <em>타입에 따라 인스턴스를</em> 고를 수 있습니다. 이 요소를 적극 활용하는게 <em>Type Family</em><sup><a href="#typeFamily">[1]</a></sup> 입니다.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="kw">type</span> famliy <span class="dt">Server</span><span class="ot"> layout ::</span> <span class="op">*</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a><span class="kw">type</span> <span class="kw">instance</span> <span class="dt">Server</span> (<span class="dt">Get</span> a) <span class="ot">=</span> <span class="dt">IO</span> a</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a><span class="kw">type</span> <span class="kw">instance</span> <span class="dt">Server</span> (a <span class="op">:&lt;|&gt;</span> b) <span class="ot">=</span> (<span class="dt">Server</span> a, <span class="dt">Server</span> b)</span>
@@ -72,6 +72,9 @@
 <p>로 구체 타입이 결정되고, HasServer (Get a) 인스턴스에 있는 route 를 부릅니다.</p>
 <p>… 계속 미완성 포스트</p>
 <hr />
+<div id="typeFamily">
+
+</div>
 <p>[1] Type Family : 타입 레벨 함수</p>
 <p>타입끼리 연산과 갈래 길을 만드는 건 Type familiy 를 통해 표현됩니다. 타입 연산은, <em>타입 매개 변수</em>를 가지고 있는 타입에 어떤 타입을 넣어주냐에 따라 <em>결과 타입이 결정</em>되는 걸 말합니다.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="kw">class</span> <span class="dt">Add</span> a b <span class="kw">where</span>  </span>

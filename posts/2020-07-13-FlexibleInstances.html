@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <title>lionhairdino - 확장 FlexibleInstances</title>
+        <title>lionhairdino - 확장 FlexibleInstances, FlexibleContexts</title>
         <meta name="description" content="Haskell,하스켈,해스클">
         <meta charset="UTF-8">
         <link rel="stylesheet" type="text/css" href="../css/default.css" />
@@ -24,7 +24,7 @@
         </div>
 
         <div id="content">
-            <h1>확장 FlexibleInstances</h1>
+            <h1>확장 FlexibleInstances, FlexibleContexts</h1>
 
             <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
 <div class="info">
@@ -32,6 +32,7 @@
     
 </div>
 
+<h3 id="flexibleinstances">FlexibleInstances</h3>
 <div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">instance</span> <span class="dt">SomeClass</span> (<span class="dt">Maybe</span> a) <span class="kw">where</span> <span class="op">...</span> <span class="co">-- o</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="kw">instance</span> <span class="dt">SomeClass</span> (<span class="dt">Maybe</span> [a]) <span class="kw">where</span> <span class="op">...</span> <span class="co">-- x</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a><span class="kw">instance</span> <span class="dt">SomeClass</span> (<span class="dt">Maybe</span> <span class="dt">Int</span>) <span class="kw">where</span> <span class="op">...</span> <span class="co">-- x</span></span></code></pre></div>
@@ -43,7 +44,19 @@ Haskell98에서 이렇게 제약을 해두었다고 하는데 왜 그럴까요?<
 <div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="kw">instance</span> (<span class="dt">Num</span> t) <span class="ot">=&gt;</span> <span class="dt">SomeC</span> [t] <span class="kw">where</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>      constraint      <span class="fu">head</span></span></code></pre></div>
 <p><a href="https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/glasgow_exts.html#extension-FlexibleInstances">haskell.org</a>의 설명에 따르면 인스턴스 헤드 부분에 여러 개의 생성자로 쌓인 타입(abitrary nested types in the instance head)이 와도 인스턴스를 만들 수 있게 해주는 확장이라고 되어 있습니다.</p>
-<p>이 확장은 TypeSynonymInstances 확장을 켜면 따라서 켜집니다.</p>
+<p>이 확장은 TypeSynonymInstances 확장을 켜면 따라서 켜지기도 합니다.</p>
+<h3 id="filexiblecontexts">FilexibleContexts</h3>
+<p>위 확장과 마찬가지로 값 생성자로 한 번 감싸져 있는 상태만 context에 올 수 있는데, 이 확장을 켜면 여러겹 쌓여 있는 타입도 올 수 있습니다.</p>
+<p><a href="http://dev.stephendiehl.com/hask/#flexibleinstances" class="uri">http://dev.stephendiehl.com/hask/#flexibleinstances</a></p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="ot">{-# LANGUAGE FlexibleContexts #-}</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a><span class="kw">class</span> <span class="dt">MyClass</span> a</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a><span class="co">-- 확장 없이는 한 번만 쌓여 있어야 한다.</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a><span class="kw">instance</span> (<span class="dt">MyClass</span> a) <span class="ot">=&gt;</span> <span class="dt">MyClass</span> (<span class="dt">Either</span> a b)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true"></a><span class="co">-- 여러겹 쌓여 있어도 ok</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true"></a><span class="kw">instance</span> (<span class="dt">MyClass</span> (<span class="dt">Maybe</span> a)) <span class="ot">=&gt;</span> <span class="dt">MyClass</span> (<span class="dt">Either</span> a b)</span></code></pre></div>
 
 <div id="disqus_thread"></div>
 <script>
