@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko" lang="ko">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>lionhairdino - 모나드 트랜스포머 - Monad Transformer</title>
+        <meta name="description" content="Haskell,하스켈,해스클">
+        <meta charset="UTF-8">
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <meta property="og:type" content="website">
+        <meta property="og:title" content="lionhairdino">
+        <meta property="og:description" content="Haskell,하스켈,해스클">
+        <meta property="og:url" content="https://lionhairdino.github.io">
+    </head>
+    <body>
+        <div id="header">
+            <div id="logo">
+                <a href="../">lionhairdino</a>
+            </div>
+            <div id="navigation">
+                <a href="../about.html">about</a>
+                <!--<a href="/archive.html">archive</a>-->
+            </div>
+        </div>
+
+        <div id="content">
+            <h1>모나드 트랜스포머 - Monad Transformer</h1>
+
+            <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+<div class="info">
+    Posted on July 16, 2020
+    
+</div>
+
+<p>이 글을 읽으시려면 IO 모나드와 Reader 모나드의 동작을 알고 있어야 합니다.</p>
+<p>라이브러리를 제외하고, IO가 없는 프로그램은 없습니다. 데이터를 받고, 처리를 하고, 출력을 해주는게 프로그램입니다. 예를 들어, 소수를 구하는 프로그램은 입력Input도 없고, 출력Ouput도 없는 것 아니냐라고 생각할 수도 있습니다. 입력은 없지만, 구한 소수를 눈에 보이지 않게 하면 의미가 없으니 결국 출력이 필요합니다. 소수를 구하는 함수 자체에는 출력이 없지만, 나중에 GHCi 등에서 함수를 부르면 결과값을 출력해주는 작업을 GHCi가 대신하게 됩니다. 결론은 IO는 반드시 필요하다는 얘기입니다.</p>
+<p>IO 모나드를 반드시 써야 하고, 모든 IO 액션들이 설정값을 필요로 하는 경우를 생각해 봅시다. 이미 IO로 체이닝한 상태인데 Reader 모나드를 쓰고 싶을 때는 어떻게 할까요? 이미 IO 액션이 (..(..(..()))) 이렇게 엮여 있는데, 액션 하나가 실행 할 때마다 Reader 속성이 발현되도록 다시 엮어야 합니다.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="ot">act1 ::</span> <span class="dt">IO</span> ()</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a>act1 <span class="ot">=</span> <span class="fu">putStrLn</span> <span class="st">&quot; 나는 OO과 영화를 봤다. &quot;</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a><span class="ot">act2 ::</span> <span class="dt">IO</span> ()</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a>act2 <span class="ot">=</span> <span class="fu">putStrLn</span> <span class="st">&quot; 나는 OO과 밥을 먹었다. &quot;</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a><span class="ot">act3 ::</span> <span class="dt">IO</span> ()</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a>act3 <span class="ot">=</span> <span class="fu">putStrLn</span> <span class="st">&quot; 나는 OO과 술을 먹었다. &quot;</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a>act <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a>  act1</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a>  act2</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true"></a>  act3</span></code></pre></div>
+<p>OO에 입력 받은 이름을 넣고 싶으면</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="ot">act1 ::</span> <span class="dt">String</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> ()</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>act1 who <span class="ot">=</span> <span class="fu">putStrLn</span> <span class="op">$</span> <span class="st">&quot;나는 &quot;</span> <span class="op">++</span> who <span class="op">++</span> <span class="st">&quot;와 영화를 봤다. &quot;</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a><span class="ot">act2 ::</span> <span class="dt">String</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> ()</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a>act2 who <span class="ot">=</span> <span class="fu">putStrLn</span> <span class="op">$</span> <span class="st">&quot;나는 &quot;</span> <span class="op">++</span> who <span class="op">++</span> <span class="st">&quot;와 밥을 먹었다. &quot;</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a><span class="ot">act3 ::</span> <span class="dt">String</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> ()</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a>act3 who <span class="ot">=</span> <span class="fu">putStrLn</span> <span class="op">$</span> <span class="st">&quot;나는 &quot;</span> <span class="op">++</span> who <span class="op">++</span> <span class="st">&quot;와 술을 먹었다. &quot;</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true"></a>act who <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true"></a>  act1 who</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true"></a>  act2 who</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true"></a>  act3 who</span></code></pre></div>
+<p>이렇게 모든 함수들에 필요한 매개 변수를 만들면 되지만, 액션 종류가 많아지고 필요한 정보가 많아지면 꽤 성가진 모양이 될 겁니다.</p>
+<p>이럴 때, 모나드 트랜스포머를 이용해서 다음처럼 구현할 수 있습니다. 아래는 좀 억지스러운 예시라 오히려 소스가 늘어났지만, 실용 프로그램에서는 대부분 줄어드는 효과도 있고, 무엇보다 유연하게 쓸 수 있다는 장점이 있습니다.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="ot">act1 ::</span> <span class="dt">ReaderT</span> <span class="dt">String</span> <span class="dt">IO</span> ()</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a>act1 <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a>  who <span class="ot">&lt;-</span> ask</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a>  liftIO <span class="op">$</span> <span class="fu">putStrLn</span> <span class="op">$</span> <span class="st">&quot;나는 &quot;</span> <span class="op">++</span> who <span class="op">++</span> <span class="st">&quot;와 영화를 봤다. &quot;</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a><span class="ot">act2 ::</span> <span class="dt">ReaderT</span> <span class="dt">String</span> <span class="dt">IO</span> ()</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a>act2 <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true"></a>  who <span class="ot">&lt;-</span> ask</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true"></a>  liftIO <span class="op">$</span> <span class="fu">putStrLn</span> <span class="op">$</span> <span class="st">&quot;나는 &quot;</span> <span class="op">++</span> who <span class="op">++</span> <span class="st">&quot;와 밥을 먹었다. &quot;</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true"></a></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true"></a><span class="ot">act3 ::</span> <span class="dt">ReaderT</span> <span class="dt">String</span> <span class="dt">IO</span> ()</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true"></a>act3 <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true"></a>  who <span class="ot">&lt;-</span> ask</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true"></a>  liftIO <span class="op">$</span> <span class="fu">putStrLn</span> <span class="op">$</span> <span class="st">&quot;나는 &quot;</span> <span class="op">++</span> who <span class="op">++</span> <span class="st">&quot;와 술을 먹었다. &quot;</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true"></a></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true"></a>act who <span class="ot">=</span> runReaderT ( <span class="kw">do</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true"></a>    act1</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true"></a>    act2</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true"></a>    act3</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true"></a>  ) who  </span></code></pre></div>
+<p>act는 IO 모나드와 Reader 모나드의 특징을 모두 가진 모나드 액션이 됐습니다. 이렇게 두 개 이상의 모나드를 섞어서 써야 할 때 모나드 트랜스포머를 씁니다.</p>
+<p>모나드의 특징은 바인드로 발현됩니다. IO 모나드와 Reader 모나드 특징 모두가 발현 되려면 <em>두 개 모나드의 바인드가 모두 실행</em>되어야 합니다.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="kw">newtype</span> <span class="dt">ReaderT</span> r innerm a <span class="ot">=</span> <span class="dt">ReaderT</span> {<span class="ot"> runReaderT ::</span> r <span class="ot">-&gt;</span> innerm a }</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a><span class="kw">instance</span> (<span class="dt">Monad</span> m) <span class="ot">=&gt;</span> <span class="dt">Monad</span> (<span class="dt">ReaderT</span> r m) <span class="kw">where</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a>  <span class="fu">return</span> <span class="ot">=</span> lift <span class="op">.</span> <span class="fu">return</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a>  rtm <span class="op">&gt;&gt;=</span> k <span class="ot">=</span> <span class="dt">ReaderT</span> <span class="op">$</span> \r <span class="ot">-&gt;</span> <span class="kw">do</span> <span class="co">--(1)</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a>                       a <span class="ot">&lt;-</span> runReaderT rtm r <span class="co">--(2)</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true"></a>                       runReaderT (k a) r <span class="co">--(3)</span></span></code></pre></div>
+<p>바인드만 살펴 보도록 하겠습니다.<br />
+바인드 정의를 보면 인스턴스 헤드에 있는 m이 보이지 않습니다. m은 do구문에 가려져 있는 바인드의 인스턴스를 선택할 때 단서로 쓰입니다. 여기서 do는 m모나드의 do입니다.<br />
+실제 act1 과 act2 를 바인딩 했을 때 무슨 일이 일어나는지 보겠습니다.</p>
+<p>do를 걷어내서 바인드가 보이게 하면</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a>act1 <span class="op">&gt;&gt;=</span> \_ <span class="ot">-&gt;</span> act2 <span class="ot">=</span></span></code></pre></div>
+<p>위 바인드 정의에 그대로 넣으면</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a>  <span class="dt">ReaderT</span> <span class="op">$</span> \r <span class="ot">-&gt;</span> <span class="kw">do</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a>            a <span class="ot">&lt;-</span> runReaderT act1 r</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a>            runReaderT ((\_ <span class="ot">-&gt;</span> act2) a) r</span></code></pre></div>
+<p>act1과 act2의 바인딩 결과는 r을 받는 함수를 ReaderT로 감싼 상태입니다.<br />
+여기에 act 함수에서처럼 runReaderT로 r을 넣어주면 그 때 실행됩니다.<br />
+여기서는 r값으로 “친구” 넣어 보겠습니다.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a>runRederT ( <span class="dt">ReaderT</span> <span class="op">$</span> \r <span class="ot">-&gt;</span> <span class="kw">do</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a>            a <span class="ot">&lt;-</span> runReaderT act1 r</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true"></a>            runReaderT ((\_ <span class="ot">-&gt;</span> act2) a) r</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true"></a>) <span class="st">&quot;친구&quot;</span></span></code></pre></div>
+<p>runReaderT는 ReaderT 안에 있는 함수를 꺼내는 작업을 합니다.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a>\r <span class="ot">-&gt;</span> <span class="kw">do</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true"></a>    a <span class="ot">&lt;-</span> runReaderT act1 r</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true"></a>    runReaderT ((\_ <span class="ot">-&gt;</span> act2) a) r</span></code></pre></div>
+<p>이 함수에 “친구”를 넣어 보겠습니다.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a>a <span class="ot">&lt;-</span> runReaderT act1 <span class="st">&quot;친구&quot;</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true"></a>runReaderT ((\_ <span class="ot">-&gt;</span> act2) a) <span class="st">&quot;친구&quot;</span></span></code></pre></div>
+<p>act1은 IO 작업 putStrLn " 나는 친구와 영화를 봤다. " 를 <em>준비</em>하고, IO ()를 리턴하면,<br />
+<em>※ 주의: 여기서 바로 실행되는게 아닙니다! 그래서 준비라고 표현했습니다.</em><br />
+&lt;-로 IO를 벗기면 a는 ()가 됩니다.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"></a>runReaderT ((\_ <span class="ot">-&gt;</span> act2) ()) <span class="st">&quot;친구&quot;</span></span></code></pre></div>
+<p>(_ -&gt; act2) 에 ()를 넣어주면 act2 만 남고</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true"></a>runReaderT act2 <span class="st">&quot;친구&quot;</span></span></code></pre></div>
+<p>act2는 IO작업 putStrLn " 나는 친구와 밥을 먹았다. "를 <em>준비</em>하고, IO ()를 리턴합니다.</p>
+<p>결론은 act1에 “친구”를 넣어 IO 액션을 만들고, 그 다음 act2에 “친구”를 넣어 IO 액션을 만들어서, 바인드의 결과는 IO 액션을 엮어 놓은 상태가 됐습니다.<br />
+IO 액션 엮음chaining은 GHCi에서 이 엮음에 realtime 환경값을 넣어주면서 실행하게 됩니다. (IO 모나드의 실행)<br />
+(이 품고 품게 엮은 모양을 뭐라 번역하면 좋을까요?)</p>
+<p>ReaderT의 바인드를 보면 두 개의 바인드가 실행되는 게 보이나요?</p>
+<p>아직은 그다지 좋은 설명이 아닌 것 같긴한데, 일단 포스팅해 놨습니다.<br />
+여기서 강조하고 싶은 건 모나드 트랜스포머의 바인드는 당연히 <em>합쳐진 모든 모나드의 바인드를 실행</em>한다 입니다.</p>
+
+<div id="disqus_thread"></div>
+<script>
+
+var disqus_config = function () {
+this.page.url = 'https://lionhairdino.github.io/posts/2020-07-16-MonadTransformer.html';
+this.page.identifier = 'posts/2020-07-16-MonadTransformer.markdown';
+};
+(function() {
+var d = document, s = d.createElement('script');
+s.src = 'https://lionhairdino.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+                            
+        </div>
+        <div id="footer">
+            Generated by
+            <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+    </body>
+</html>
