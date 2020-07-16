@@ -53,14 +53,27 @@ forall a를 오해해서 생기는 혼란입니다. a는 정해지지 않은게 
 </ol>
 <p>2번으로 해석하면 위와 같은 오류가 안나고 a를 String으로 추론해줘야 할 것 처럼 보입니다. 하지만 선언에서 <em>아무 타입이라고 선언</em>해 놨으니 함수 내부에서 String이라는 단일 타입으로 고정하면 안됩니다. 1번으로 해석해야 혼란이 덜 생깁니다.</p>
 <p>정리하면, 위 함수는 선언은 아무 타입, 함수 내부에서는 String 단일 타입으로 쓰고 있기 때문에, 선언과 정의가 맞지 않아 에러가 납니다.</p>
-<h3 id="ghc가-알아서-적당한-타입으로-추론하는-경우">GHC가 알아서 적당한 타입으로 추론하는 경우</h3>
+<h3 id="타입이-한정된-경우">타입이 한정된 경우</h3>
 <div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="dt">Eq</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> [a] <span class="ot">-&gt;</span> <span class="dt">Bool</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a><span class="fu">elem</span> _ []       <span class="ot">=</span> <span class="dt">False</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a><span class="fu">elem</span> x (y<span class="op">:</span>ys)   <span class="ot">=</span> x<span class="op">==</span>y <span class="op">||</span> <span class="fu">elem</span> x ys</span></code></pre></div>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a><span class="fu">elem</span> x (y<span class="op">:</span>ys)   <span class="ot">=</span> x <span class="op">==</span> y <span class="op">||</span> <span class="fu">elem</span> x ys</span></code></pre></div>
 <p>함수 서명에서 a는 Eq a 인스턴스가 있는 타입으로 한정됐습니다.<br />
 함수 내부에서도 == 을 만나면 a는 Eq a 인스턴스가 있는 타입으로 한정됩니다.<br />
 함수 서명과 함수 내부가 매치됩니다. 타입 추론 작업이 타입 서명을 벗어나지 않습니다.</p>
-<p>※ 타입 추론은 항상 구체 타입이 결정될 때까지 하는 게 아닙니다. 소속 타입 클래스까지만 추론해서 작업을 할 수 있으면 클래스까지만 추론합니다. 나중에 컴파일 타임에 코드 조합 과정에서 구체 타입이 필요해지면 그 때 가서 더 추론하면 됩니다.</p>
+<p>함수에서 constraint의 의미는, constraint를 추론 단서로 쓰는게 아니라,<br />
+“함수 body에서 (==)을 쓰는 걸 봐서, Eq 클래스의 인스턴스만 받는다고 constraint를 이용해 외부에 알려줘” 입니다.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="fu">length</span><span class="ot"> ::</span> [a] <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a><span class="fu">length</span> [] <span class="ot">=</span> <span class="dv">0</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a><span class="fu">length</span> (_<span class="op">:</span>xs) <span class="ot">=</span> <span class="dv">1</span> <span class="op">+</span> <span class="fu">length</span> xs</span></code></pre></div>
+<p>많은 문서에서 예시로 나오는데, elem과 마찬가지로 length 경우도 a의 구체 타입은 알 필요가 없습니다.</p>
+<p>타입 추론은 항상 구체 타입이 결정될 때까지 하는 게 아닙니다. 소속 타입 클래스까지만 추론해서 작업을 할 수 있으면 클래스까지만 추론합니다. elem에서는 (==) 메소드를 쓰니 Eq 클래스의 인스턴스까지만 확인합니다.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="fu">head</span><span class="ot"> ::</span> [a] <span class="ot">-&gt;</span> a</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a><span class="fu">head</span> (x<span class="op">:</span>_) <span class="ot">=</span> x</span></code></pre></div>
+<p>이 함수만의 작업에선 a가 무슨 타입인지 알 필요가 없습니다. 이 함수가 다른 코드와 조합할 때 a의 구체 타입이 필요해지면 그 때 가서 더 추론하면 됩니다.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="op">&gt;</span> <span class="op">:</span>t <span class="fu">head</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a><span class="fu">head</span><span class="ot"> ::</span> [a] <span class="ot">-&gt;</span> a <span class="co">-- a는 아직 추론될 필요가 없습니다.</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a><span class="op">&gt;</span> <span class="op">:</span>t (<span class="st">&quot;p&quot;</span><span class="op">++</span>)<span class="op">.</span><span class="fu">head</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true"></a>(<span class="st">&quot;p&quot;</span><span class="op">++</span>)<span class="op">.</span><span class="fu">head</span><span class="ot"> ::</span> [[<span class="dt">Char</span>]] <span class="ot">-&gt;</span> [<span class="dt">Char</span>] <span class="co">-- (&quot;p&quot;++) 함수 때문에 Char로 추론되었습니다.</span></span></code></pre></div>
 
 <div id="disqus_thread"></div>
 <script>
