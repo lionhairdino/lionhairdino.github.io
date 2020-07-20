@@ -162,6 +162,8 @@ GHC는 최종 (Monoid t) =&gt; (t, t) 로 추론합니다.</p>
 
 </div>
 <p>[3] 인스턴스 resolution 순서</p>
+<p>왜 인스턴스 resolution 부를까요? resolution은 뭔가를 구분해 내는 걸 뜻합니다. 여러 개의 인스턴스가 있을 때, 각각을 구별해서 뭔지 알게 되는 걸 resolution 이라 부를 수 있을 것 같습니다. 하는 일은 적당한 인스턴스를 찾는 걸 말합니다.<br />
+영단어 뜻 : 조직이나 단체가 투표를 해서 정한 공식적인 결정</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true"></a><span class="kw">instance</span> (<span class="dt">MyClass</span> a, <span class="dt">MyClass</span> b) <span class="ot">=&gt;</span> <span class="dt">MyClass</span> (a, b) <span class="kw">where</span></span></code></pre></div>
 <p>직관대로, 순서대로 읽으면 a가 MyClass이고, b가 MyClass일 때 (a,b)가 MyClass 인스턴스라 읽으면 될 것 같지만, GHC가 추론할때는 반대 순서로 추론합니다. head를 먼저 해석하고, 그 다음 constraint를 해석합니다.<br />
 가장 먼저 MyClass (a, b) 를 찾고, 그 다음 a가 MyClass 인스턴스인지, b가 MyClass 인스턴스인지 살펴봅니다.</p>
