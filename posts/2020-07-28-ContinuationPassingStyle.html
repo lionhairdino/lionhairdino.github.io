@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko" lang="ko">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>lionhairdino - CPS 스타일 - Continuation Passing Style</title>
+        <meta name="description" content="Haskell,하스켈,해스클">
+        <meta charset="UTF-8">
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <meta property="og:type" content="website">
+        <meta property="og:title" content="lionhairdino">
+        <meta property="og:description" content="Haskell,하스켈,해스클">
+        <meta property="og:url" content="https://lionhairdino.github.io">
+    </head>
+    <body>
+        <div id="header">
+            <div id="logo">
+                <a href="../">lionhairdino</a>
+            </div>
+            <div id="navigation">
+                <a href="../about.html">about</a>
+                <!--<a href="/archive.html">archive</a>-->
+            </div>
+        </div>
+
+        <div id="content">
+            <h1>CPS 스타일 - Continuation Passing Style</h1>
+
+            <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+<div class="info">
+    Posted on July 28, 2020
+    
+</div>
+
+<p>아이디어는 “<em>함수가 결과를 리턴하지 않고, 바로 이어질 함수를 같이 넘겨서, 항상 작업이 끝나면 이어진 함수로 넘어가도록 만들자</em>” 입니다.</p>
+<p>아래 설명에 <em>준비</em>란 말이 나오면, 언젠가 나중에 인자를 받으면 실행하게될 함수를 뜻합니다. 함수 뭉치를 바라 볼 때, 준비상태로 보면 한 결 이해가 편할 때가 있습니다.</p>
+<p><a href="../posts/2020-07-03-freeMonad.html">Free 모나드</a>와 같이 보면 모나드 개념을 얻는데 도움이 됩니다.</p>
+<h3 id="함수형에선-함수를-바꾸고-명령형에선-값을-바꾼다.">함수형에선 함수를 바꾸고, 명령형에선 값을 바꾼다.</h3>
+<p>명령형 프로그램에서는 계산이 진행될 때마다 상태를 갱신해서 최종 결과를 만들어냅니다. 함수형에서는 상태가 없기 때문에 단계별 계산이 어떻게 표현 될까요? 상태를 따로 두는게 아니라, 함수가 함수를 감싸도록 해서 상태를 그 즉시 다른 함수에 입력으로 넣어주면(<em>함수를 합쳐 놓으면</em>) 상태를 저장하는 작업이 필요 없습니다.</p>
+<p>함수란, 필요한 입력이 모두 주어지면 그 때 작업이 시작되서 결과를 만들어내는 “할 일”을 뜻합니다. 함수<em>만</em> 있을 때는 아무런 일이 일어나지 않습니다. 함수에 <em>입력을 주는 순간</em> 일은 시작됩니다.</p>
+<p>명령형에서는 값(상태)을 변화시켜 가며 작업이 진행되지만, 함수형에서는 할 일을 모두 합쳐 놓는 작업을 진행하고, 마지막에 값을 주어 작업을 시작합니다.</p>
+<p>가끔, 스포이드로 잉크 한 방울을 딱 떨어뜨리면 확 퍼지듯이, 먼저 함수를 엮어 놓고 제일 바깥쪽 함수에 인자를 넣는 순간 함수 뭉치가 주욱 실행됩니다.</p>
+<p>좀 더 구체적인 느낌이 오도록 예를 들면,</p>
+<p>(1+), (2+), (3+) 작업이 있고, 여기에 0을 넣어서 최종 결과를 받는다면,</p>
+<p>명령형에서는</p>
+<p>결과를 저장할 변수 r을 만들고, 1. 0을 받아서, 0 (1+) 을 실행해서 1을 r에 넣고, 1. r값을 꺼내서 다음 작업에 넣어주면 1 (2*) 를 실행해서 3을 r에 넣고, 1. r값을 꺼내서 다음 작업에 넣어주면 3 (3-) 을 실행해서 6을 돌려줍니다.</p>
+<p>r값을 계속 변화시켜 가며 작업을 진행합니다.</p>
+<p>함수형에서는</p>
+<ol type="1">
+<li>(1+) 작업과 (2+) 작업을 합친 작업 (1+, 2*)를 만들고,</li>
+<li>(1+ 2*) 작업과 (3-) 작업을 합친 작업 (1+, 2*, 3-)을 만들고,</li>
+<li>이 작업에 0을 넣어서 6을 만들어 돌려줍니다.</li>
+</ol>
+<p>명령형에서는 값(상태)이 변하고, 함수형에서는 함수(할 일 목록)가 변합니다.</p>
+<p>위 개념을 그대로 코드로 옮겨 보겠습니다.<br />
+(1+), (2*), (3-) 작업을 엮어 아래 모양으로 만들어야 합니다.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a>\r <span class="ot">-&gt;</span> <span class="dv">3</span><span class="op">-</span> (<span class="dv">2</span><span class="op">*</span> (<span class="dv">1</span><span class="op">+</span> r))</span></code></pre></div>
+<p><em>주의 - 여기 예시는 단순 함수 컴포지션으로 해결이 되지만, 한 단계의 결과가 바로 다음의 결과에 영향을 주는게 아닐 경우 단순 컴포지션으로 해결할 수 없습니다.</em></p>
+<p>좀 더 일반화해서, 이전 단계의 결과가 영향을 주든 안주든, 다음 작업이 이전 작업을 품는 모양을 만들기 위해, <em>이어지는 작업으로 뭘 할지 인자로 넘기도록</em> 할 수 있습니다. 작업이 끝난 후 결과를 리턴하는게 아니라, 결과를 이어지는 함수의 인자로 넘기는 모양이 됩니다. 이 걸 함수 외부에서 하는게 아니라, 함수 내부에서 항상 할 수 밖에 없게 만들면 다음과 같습니다.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a>func1 x <span class="ot">=</span> <span class="dv">1</span> <span class="op">+</span> x</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>func2 x <span class="ot">=</span> <span class="dv">2</span> <span class="op">*</span> x</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a>func3 x <span class="ot">=</span> <span class="dv">3</span> <span class="op">-</span> x</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a><span class="ot">func1_cps ::</span> <span class="dt">Num</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> r) <span class="ot">-&gt;</span> r </span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a><span class="co">-- func1_cps x nextfunc = nextfunc $ func1 x 를 람다 함수로 표기하면</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a>func1_cps x <span class="ot">=</span> \nextfunc <span class="ot">-&gt;</span> nextfunc <span class="op">$</span> func1 x</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true"></a><span class="ot">func2_cps ::</span> <span class="dt">Num</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> r) <span class="ot">-&gt;</span> r </span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true"></a>func2_cps x <span class="ot">=</span> \nextfunc <span class="ot">-&gt;</span> nextfunc <span class="op">$</span> func2 x </span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true"></a><span class="ot">func3_cps ::</span> <span class="dt">Num</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> r) <span class="ot">-&gt;</span> r </span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true"></a>func3_cps x <span class="ot">=</span> \nextfunc <span class="ot">-&gt;</span> nextfunc <span class="op">$</span> func3 x </span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true"></a></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true"></a>cps x <span class="ot">=</span> \k <span class="ot">-&gt;</span> func1_cps x (\x' <span class="ot">-&gt;</span> func2_cps x' (\x'' <span class="ot">-&gt;</span> func3_cps x'' k))</span></code></pre></div>
+<p>마지막 cps 함수 모양을 보면 람다가 람다를 품는 식으로 엮여 있는데, 액션들이 많아지면 보기 편하진 않습니다. 그런데, 품는 모양이 익숙하지 않나요? 맞습니다. 모나드입니다. 하스켈에서 늘 그렇듯, <em>역시나 모나드 패턴</em>을 써서 동일한 기능을 단순하게 표기할 수 있습니다. Control.Monad.Trans.Cont 라이브러리에 Cont 모나드가 정의되어 있습니다.</p>
+<p>※ 참고로 (a -&gt; r) -&gt; r 타입의 함수로 가장 많이 만나는 함수가 ($) 커링 상태입니다. 값을 받아서 함수를 적용하는게 아니라, 값은 이미 갖고 있고, 함수를 받으면 이 값에 적용 후 결과를 돌려주는 함수입니다.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="op">&gt;</span> (<span class="op">$</span> <span class="dv">3</span>) (<span class="op">+</span><span class="dv">2</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a><span class="dv">5</span></span></code></pre></div>
+<p>($ 2)는 함수를 받아서 2에다 적용 후 결과를 돌려줍니다.</p>
+<h3 id="cont-모나드">Cont 모나드</h3>
+<p>(a -&gt; r) -&gt; r 타입을 체이닝하기 위해 바인드를 정의하는데, GHC가 이 바인드를 고를 수 있도록 (a -&gt; r) -&gt; r 타입을 래핑해서 새로운 타입을 만들어야 합니다.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="kw">newtype</span> <span class="dt">Cont</span> r a <span class="ot">=</span> <span class="dt">Cont</span> ((a <span class="ot">-&gt;</span> r) <span class="ot">-&gt;</span> r)</span></code></pre></div>
+<p>이 타입을 엮을 바인드를 정의합니다.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="ot">cont ::</span> ((a <span class="ot">-&gt;</span> r) <span class="ot">-&gt;</span> r) <span class="ot">-&gt;</span> <span class="dt">Cont</span> r a</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a><span class="ot">runCont ::</span> <span class="dt">Cont</span> r a <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> r) <span class="ot">-&gt;</span> r</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a><span class="kw">instance</span> <span class="dt">Moand</span> (<span class="dt">Cont</span> r) <span class="kw">where</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true"></a>  <span class="fu">return</span> x <span class="ot">=</span> cont (<span class="op">$</span> x)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true"></a>  s <span class="op">&gt;&gt;=</span> f <span class="ot">=</span> cont <span class="op">$</span> \c <span class="ot">-&gt;</span> runCont s</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true"></a>                 <span class="op">$</span> \x <span class="ot">-&gt;</span> runCont (f x) c</span></code></pre></div>
+<p>Cont 모나드를 이용하면, do 표기로 람다를 품은 람다를 숨길 수 있습니다.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a>func1_cont x <span class="ot">=</span> <span class="fu">return</span> <span class="op">$</span> func1 x</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a>func2_cont x <span class="ot">=</span> <span class="fu">return</span> <span class="op">$</span> func2 x</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a>func3_cont x <span class="ot">=</span> <span class="fu">return</span> <span class="op">$</span> func3 x</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true"></a>cont x <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true"></a>  a <span class="ot">&lt;-</span> func1_cont x</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true"></a>  b <span class="ot">&lt;-</span> func2_cont a</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true"></a>  func3_cont b</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true"></a></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true"></a><span class="op">&gt;</span> runCont (cont <span class="dv">1</span>) <span class="fu">id</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true"></a><span class="op">-</span><span class="dv">1</span></span></code></pre></div>
+<p>모나드 정의를 풀어 보겠습니다. 바인드를 풀기 전에 return을 보면</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a><span class="fu">return</span> x <span class="ot">=</span> cont (<span class="op">$</span> x)</span></code></pre></div>
+<p>값을 먼저 넣어서 Cont 타입을 만들어 놓으면, 나중에 함수를 받아 값에 적용할 준비를 합니다.</p>
+<p>그럼, 다음으로 바인드를 풀어 보겠습니다.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a>s <span class="op">&gt;&gt;=</span> f <span class="ot">=</span> cont (\c <span class="ot">-&gt;</span> runCont s (\x <span class="ot">-&gt;</span> runCont (f x) c))</span></code></pre></div>
+<p>&gt;&gt;=의 첫 번째 인자 s는 Cont 타입, 두 번째 인자 f는 a -&gt; Cont r a 타입.<br />
+Cont 값을 runCont로 벗겨내면 “<em>함수를 주면 적용할 값이 있는 상태</em>”가 됩니다.<br />
+runCont s는 함수를 받을 상태가 되고, 여기에 (\x -&gt; …) 함수를 넘기면 <em>s에 들어 있는 값</em>에 (\x -&gt; …) 를 적용하게 됩니다.<br />
+f를 x에 적용하면 다시 Cont 값이 나오고,<br />
+이 걸 runCont로 다시 벗겨서 외부에서 들어 올 <em>함수를 적용할 준비</em>를 해놓습니다.<br />
+구체적으로 무슨 일을 하는지 감이 잘 오는 해석은 아닙니다.</p>
+<p>구체 값을 넣어 어떻게 진행하는지 다시 보겠습니다.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a>func1_cont <span class="dv">1</span> <span class="op">&gt;&gt;=</span> \a <span class="ot">-&gt;</span> func2_cont a</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true"></a>cont (\c <span class="ot">-&gt;</span> runCont (func1_cont <span class="dv">1</span>) (\x <span class="ot">-&gt;</span> runCont ((\a <span class="ot">-&gt;</span> func2_cont a) x) c))</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true"></a><span class="co">-- cont는 Cont 생성자 역할을 하니 잠시 접어 두고,</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true"></a>(\c <span class="ot">-&gt;</span> runCont (func1_cont <span class="dv">1</span>) (\x <span class="ot">-&gt;</span> runCont ((\a <span class="ot">-&gt;</span> func2_cont a) x) c))</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true"></a><span class="co">-- runCont (func1_cont 1) 의 결과 2를 (\x ...) 에 넣으면 ------(A)</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true"></a>(\c <span class="ot">-&gt;</span> runCont ((\a <span class="ot">-&gt;</span> func2_cont a) <span class="dv">2</span>) c)</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true"></a><span class="co">-- runCont ((\a -&gt; func2_cont a) 2) 를 풀면 </span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true"></a><span class="co">-- runCont (func2_cont 2) 의 결과는 4 ------(B)</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true"></a>(\c <span class="ot">-&gt;</span> runCont (cont (<span class="op">$</span> <span class="dv">4</span>)) c)</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true"></a>(\c <span class="ot">-&gt;</span> (<span class="op">$</span> <span class="dv">4</span>) c)</span></code></pre></div>
+<p>c로 함수를 받아 4에 적용할 준비를 마친 상태가 되었습니다. 중간 과정에 보면 (A)에서 첫 번째 액션, (B)에서 두 번째 액션이 이어서 실행되는게 보입니다. <a href="../posts/2020-07-03-freeMonad.html">Free 모나드 포스트</a>를 보신분은 비슷한 모양이 여기서도 보일겁니다. s &gt;&gt;= f 에서 f는 가장 안쪽까지 파고들어가서 적용됩니다.</p>
+<h3 id="그냥-함수-컴포지션과-뭐가-다를까">그냥 함수 컴포지션과 뭐가 다를까?</h3>
+<div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"></a><span class="ot">conts ::</span> <span class="dt">Cont</span> r <span class="dt">Integer</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true"></a>conts <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true"></a>  a <span class="ot">&lt;-</span> cont (\f <span class="ot">-&gt;</span> f <span class="dv">1</span>)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true"></a>  b <span class="ot">&lt;-</span> cont (\f <span class="ot">-&gt;</span> f <span class="dv">2</span>)</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true"></a>  <span class="fu">return</span> <span class="op">$</span> a <span class="op">+</span> b</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true"></a></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true"></a><span class="op">&gt;</span> runCont conts (<span class="op">+</span><span class="dv">2</span>)</span></code></pre></div>
+<p>결과값으로 뭐가 나올까요?<br />
+1 + 2, 2 + 2 를 더해 7이 나올까요? 아닙니다.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true"></a>a <span class="ot">&lt;-</span> cont (\f <span class="ot">-&gt;</span> f <span class="dv">1</span>) <span class="co">-- a는 1</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true"></a>b <span class="ot">&lt;-</span> cont (\f <span class="ot">-&gt;</span> f <span class="dv">2</span>) <span class="co">-- b는 2</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true"></a><span class="fu">return</span> <span class="op">$</span> a <span class="op">+</span> b <span class="co">-- ($ 3)으로 외부에서 함수를 받아 3에 적용합니다.</span></span></code></pre></div>
+<p>runCont로 (+2)를 넣어주면 ($ 3) (+2) = 5 가 됩니다.</p>
+<p>Cont 모나드를 이런식으로 쓰진 않습니다. 이해를 돕기 위해 만든 조금은 억지스러운 예시입니다.</p>
+<p>참고<br />
+<a href="https://cms2.ks.ac.kr/riet/contents/20190304/%ED%95%A8%EC%88%98%ED%98%95%20%ED%94%84%EB%A1%9C%EA%B7%B8%EB%9E%98%EB%B0%8D%EC%9D%98%20Continuation%EC%9D%84%20%EC%9D%B4%EC%9A%A9%ED%95%9C%20%ED%9D%90%EB%A6%84%EC%A0%9C%EC%96%B4.pdf">변석우님 - 함수형 프로그래밍의 Continuation을 이용한 흐름제어</a><br />
+<a href="https://en.wikibooks.org/wiki/Haskell/Continuation_passing_style" class="uri">https://en.wikibooks.org/wiki/Haskell/Continuation_passing_style</a></p>
+
+<div id="disqus_thread"></div>
+<script>
+
+var disqus_config = function () {
+this.page.url = 'https://lionhairdino.github.io/posts/2020-07-28-ContinuationPassingStyle.html';
+this.page.identifier = 'posts/2020-07-28-ContinuationPassingStyle.markdown';
+};
+(function() {
+var d = document, s = d.createElement('script');
+s.src = 'https://lionhairdino.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+                            
+        </div>
+        <div id="footer">
+            Generated by
+            <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+    </body>
+</html>
