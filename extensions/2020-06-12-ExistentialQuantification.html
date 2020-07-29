@@ -52,7 +52,7 @@
 <p>타입 서명을 써 줄 때 반드시 무슨 타입인지 써줘야 합니다. 컴파일러는 어떤 타입을 쓸 건지를 프로그래머한테 물어 봅니다. 그럼, 프로그래머는 타입 서명으로 대답하게 되는데, 어떤식으로든 항상 대답을 해야합니다. a라고만 (뭐든 소문자로 시작하면 다 폴리모픽을 의미합니다.) 써 주면, 컴파일러의 요청에 아무런 대답을 안하는 것과 마찬가지입니다.</p>
 <p>여기다 <em>forall a</em>로 한정해 주면, 그 때서야 <br> <em>“응, 그건 모든 타입이 다 될 수 있어”</em> <br> 라고 대답 해주는 것과 같습니다. 그럼, 컴파일러는 <br> “응, 그러면 나중에 구체 타입이 결정되겠군” <br> 하고 넘어갑니다. 다른 말로 하면, <em>타입 체크를 뒤로 미룬다</em>고도 볼 수 있습니다. 타입 추론 시점에 대한 확장으로 볼 수 있습니다.</p>
 <p>forall 을 쓰면 5, (), True, “Sartre” 를 모두 다룰 수 있는 MkT’ 이라는 타입을 만들 수 있습니다. Show a라는 제약(한정자)을 주면 모든 타입이 아닌, show 함수를 적용할 수 있는 타입(달리 표현하면, Show 클래스에 속한 타입)으로 대상이 축소 됩니다.</p>
-<p>forall 폴리모픽 변수를 만나면, 컴파일 타임에 코드 조합에 따라 컴파일러가 구체 타입을 결정합니다. 타입을 받는 곳에 “a” 가 넘어가는 상황을 만나면 [Char] 타입이 되고, ‘a’ 를 만나면 Char 타입으로 추론됩니다.</p>
+<p>forall 폴리모픽 변수를 만나면, 컴파일 타임에 코드 조합에 따라 컴파일러가 구체 타입을 결정합니다. 예를 들어, 타입을 받는 곳에 “a” 가 넘어가는 상황을 만나면 [Char] 타입이 되고, ‘a’ 를 만나면 Char 타입으로 추론됩니다.</p>
 <p>영단어 뜻<br> existentially 실체론적으로, 실존(주의)적으로<br> quantified 뭔가를 울타리 안에 가두는, 한정, 제약<br></p>
 <p>정리하면,</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="kw">data</span> <span class="dt">S</span> a <span class="ot">=</span> <span class="dt">S</span> a</span></code></pre></div>
@@ -60,19 +60,19 @@
 <div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="kw">data</span> <span class="dt">S</span> <span class="ot">=</span> <span class="dt">S</span> a</span></code></pre></div>
 <p>이렇게 하면 컴파일러가 물어 볼 때, 아무런 대답을 안하는 것과 같습니다. 오류가 납니다.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="kw">data</span> <span class="dt">S</span> <span class="ot">=</span> <span class="kw">forall</span> a<span class="op">.</span> <span class="dt">Show</span> a <span class="ot">=&gt;</span> <span class="dt">S</span> a</span></code></pre></div>
-<p>“a가 폴리모픽”이라고 답하고, “a는 Show 클래스에 속한 타입이야” 라고 대답 하는겁니다. “매개 변수로 받지 않아도 나중에 애매하지 않게 타입이 결정될거야” 라고 대답하는 옵션입니다. 대답을 듣고, 컴파일러는 타입 추론을 나중으로 미룹니다.</p>
+<p>“a가 폴리모픽”이라고 답하고, “a는 Show 클래스에 속한 타입이야” 라고 대답 하는겁니다. “<em>매개 변수로 받지 않아도 나중에 애매하지 않게 타입이 결정될거야</em>” 라고 대답하는 옵션입니다. 대답을 듣고, 컴파일러는 타입 추론을 나중으로 미룹니다.</p>
 <p>이걸 GADT 문법으로 표현하면, forall 을 생략해도 같은 의미입니다.</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a><span class="ot">{-# LANGUAGE GADTs #-}</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a><span class="kw">data</span> <span class="dt">S</span> <span class="kw">where</span></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true"></a>    <span class="dt">S</span><span class="ot"> ::</span> <span class="dt">Show</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">S</span></span></code></pre></div>
 <p><a href="https://en.wikibooks.org/wiki/Haskell/Existentially_quantified_types" class="uri">https://en.wikibooks.org/wiki/Haskell/Existentially_quantified_types</a></p>
 
-<div id="disqus_thread"></div>
+<div id="disqus_thread" style="padding-top:40px"></div>
 <script>
 
 var disqus_config = function () {
-this.page.url = 'https://lionhairdino.github.io/posts/2020-06-12-ExistentialQuantification.html';
-this.page.identifier = 'posts/2020-06-12-ExistentialQuantification.markdown';
+this.page.url = 'https://lionhairdino.github.io/extensions/2020-06-12-ExistentialQuantification.html';
+this.page.identifier = 'extensions/2020-06-12-ExistentialQuantification.markdown';
 };
 (function() {
 var d = document, s = d.createElement('script');

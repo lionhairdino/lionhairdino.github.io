@@ -64,15 +64,16 @@
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a><span class="ot">func1_cps ::</span> <span class="dt">Num</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> r) <span class="ot">-&gt;</span> r </span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a><span class="co">-- func1_cps x nextfunc = nextfunc $ func1 x 를 람다 함수로 표기하면</span></span>
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a>func1_cps x <span class="ot">=</span> \nextfunc <span class="ot">-&gt;</span> nextfunc <span class="op">$</span> func1 x</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a><span class="co">-- x를 받아 작업을 하고, 결과를 바로 리턴하는게 아니라, 나중에 함수를 받아서 적용할 준비가 된 상태, 즉 함수를 반환합니다.</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true"></a></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true"></a><span class="ot">func2_cps ::</span> <span class="dt">Num</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> r) <span class="ot">-&gt;</span> r </span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true"></a>func2_cps x <span class="ot">=</span> \nextfunc <span class="ot">-&gt;</span> nextfunc <span class="op">$</span> func2 x </span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true"></a></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true"></a><span class="ot">func3_cps ::</span> <span class="dt">Num</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> r) <span class="ot">-&gt;</span> r </span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true"></a>func3_cps x <span class="ot">=</span> \nextfunc <span class="ot">-&gt;</span> nextfunc <span class="op">$</span> func3 x </span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true"></a></span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true"></a>cps x <span class="ot">=</span> \k <span class="ot">-&gt;</span> func1_cps x (\x' <span class="ot">-&gt;</span> func2_cps x' (\x'' <span class="ot">-&gt;</span> func3_cps x'' k))</span></code></pre></div>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a><span class="co">-- x를 받아 작업을 하고, 결과를 바로 리턴하는게 아니라, </span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true"></a><span class="co">-- 나중에 함수를 받아서 적용할 준비가 된 상태, 즉 함수를 반환합니다.</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true"></a><span class="ot">func2_cps ::</span> <span class="dt">Num</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> r) <span class="ot">-&gt;</span> r </span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true"></a>func2_cps x <span class="ot">=</span> \nextfunc <span class="ot">-&gt;</span> nextfunc <span class="op">$</span> func2 x </span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true"></a><span class="ot">func3_cps ::</span> <span class="dt">Num</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> r) <span class="ot">-&gt;</span> r </span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true"></a>func3_cps x <span class="ot">=</span> \nextfunc <span class="ot">-&gt;</span> nextfunc <span class="op">$</span> func3 x </span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true"></a></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true"></a>cps x <span class="ot">=</span> \k <span class="ot">-&gt;</span> func1_cps x (\x' <span class="ot">-&gt;</span> func2_cps x' (\x'' <span class="ot">-&gt;</span> func3_cps x'' k))</span></code></pre></div>
 <p>마지막 cps 함수 모양을 보면 람다가 람다를 품는 식으로 엮여 있는데, 액션들이 많아지면 보기 편하진 않습니다. 그런데, 품는 모양이 익숙하지 않나요? 맞습니다. 모나드입니다. 하스켈에서 늘 그렇듯, <em>역시나 모나드 패턴</em>을 써서 동일한 기능을 단순하게 표기할 수 있습니다. 모나드로 cps를 다르게 구현하는게 아닌, 위 람다를 품은 람다를 보기 좋은 형태로 표기하는 역할만 합니다. Control.Monad.Trans.Cont 라이브러리에 Cont 모나드가 정의되어 있습니다.</p>
 <p>※ 참고로 (a -&gt; r) -&gt; r 타입의 함수로 가장 많이 만나는 함수가 ($) 커링 상태입니다. 값을 받아서 함수를 적용하는게 아니라, 값은 이미 갖고 있고, 함수를 받으면 이 값에 적용 후 결과를 돌려주는 함수입니다.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="op">&gt;</span> (<span class="op">$</span> <span class="dv">3</span>) (<span class="op">+</span><span class="dv">2</span>)</span>
@@ -144,7 +145,7 @@ f를 x에 적용하면 다시 Cont 값이 나오고,<br />
 <a href="https://cms2.ks.ac.kr/riet/contents/20190304/%ED%95%A8%EC%88%98%ED%98%95%20%ED%94%84%EB%A1%9C%EA%B7%B8%EB%9E%98%EB%B0%8D%EC%9D%98%20Continuation%EC%9D%84%20%EC%9D%B4%EC%9A%A9%ED%95%9C%20%ED%9D%90%EB%A6%84%EC%A0%9C%EC%96%B4.pdf">변석우님 - 함수형 프로그래밍의 Continuation을 이용한 흐름제어</a><br />
 <a href="https://en.wikibooks.org/wiki/Haskell/Continuation_passing_style" class="uri">https://en.wikibooks.org/wiki/Haskell/Continuation_passing_style</a></p>
 
-<div id="disqus_thread"></div>
+<div id="disqus_thread" style="padding-top:40px"></div>
 <script>
 
 var disqus_config = function () {
