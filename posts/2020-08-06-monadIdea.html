@@ -63,10 +63,10 @@
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true"></a>g2</span>
 <span id="cb3-9"><a href="#cb3-9" aria-hidden="true"></a>h3</span>
 <span id="cb3-10"><a href="#cb3-10" aria-hidden="true"></a>begin <span class="fu">or</span> end</span></code></pre></div>
-<p>품고 품었다고 다 같지 않습니다. glue의 두 매개 변수 f와 x는 독립적이지 않습니다. x를 알아야만 f를 알 수 있습니다. 하지만 glue2의 두 매개 변수 f1과 f2는 독립적입니다. 그래서 <em>실행 순서가 서로 반대</em>가 됩니다. 눈에 보이는 구조만으론 구별할 수 없습니다. 구조를 만드는 주재료로 쓰인 glue, glue2의 정의에 따라 달라집니다.</p>
+<p>품고 품었다고 다 같지 않습니다. glue의 두 매개 변수 f와 x는 독립적이지 않습니다. x를 알아야만 f를 알 수 있습니다. 하지만 glue2의 두 매개 변수 f1과 f2는 독립적입니다. 그래서 <em>실행 순서가 서로 반대</em>가 됩니다. 눈에 보이는 구조만으론 구별할 수 없습니다. 구조를 만드는 접착제로 쓰인 glue, glue2의 정의에 따라 달라집니다.</p>
 <h3 id="품을-것인가-품-속으로-들어갈-것인가">품을 것인가, 품 속으로 들어갈 것인가</h3>
 <p>새로 들어오는 작업을 가장 바깥 쪽에 둘 수도 있고, 가장 안 쪽에 품어지도록 할 수도 있습니다. Free, Cont의 경우는 가장 안 쪽에 붙이고, Reader는 바깥 쪽에 둡니다. Reader는 안 쪽부터 실행되고 Free와 Cont는 바깥 쪽부터 실행됩니다. 결국 대부분 모나드는 do구문 안에 써있는 순서대로 동작합니다.</p>
-<p>이 번에는, 정말 여러 모나드들이 모두 이 구조를 만들기 위한 것인지 한 번 살펴보겠습니다.</p>
+<p>정말 여러 모나드들이 모두 이 구조를 만들기 위한 것인지 한 번 살펴보겠습니다.</p>
 <h3 id="free-모나드의-바인드">Free 모나드의 바인드</h3>
 <div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a>(<span class="dt">Free</span> x) <span class="op">&gt;&gt;=</span> g <span class="ot">=</span> <span class="dt">Free</span> (<span class="fu">fmap</span> (<span class="op">&gt;&gt;=</span> g) x)</span></code></pre></div>
 <p>몇 겹의 Free로 쌓여 있든, 가장 안 쪽으로 들어가 g를 적용합니다. g의 결과값은 Free 타입이니 가장 안 쪽에 Free를 연결하는 효과가 생깁니다. <em>Free ..(Free ..(Free ..))</em></p>
