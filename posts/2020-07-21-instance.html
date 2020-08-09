@@ -4,12 +4,12 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <title>lionhairdino - 인스턴스instance의 의미</title>
-        <meta name="description" content="Haskell,하스켈,해스클 - 인스턴스instance의 의미">
+        <meta name="description" content="lionhairdino - 인스턴스instance의 의미">
         <meta charset="UTF-8">
         <link rel="stylesheet" type="text/css" href="../css/default.css" />
         <meta property="og:type" content="website">
-        <meta property="og:title" content="lionhairdino">
-        <meta property="og:description" content="Haskell,하스켈,해스클 - 인스턴스instance의 의미">
+        <meta property="og:title" content="인스턴스instance의 의미">
+        <meta property="og:description" content="lionhairdino - 인스턴스instance의 의미">
         <meta property="og:url" content="https://lionhairdino.github.io">
     </head>
     <body>
@@ -31,7 +31,7 @@
     
 </div>
 
-<h4 id="클래스-정의를-어떤-식으로-읽어야-좋을까요">클래스 정의를 어떤 식으로 읽어야 좋을까요?</h4>
+<h3 id="클래스-정의를-어떤-식으로-읽어야-좋을까요">클래스 정의를 어떤 식으로 읽어야 좋을까요?</h3>
 <div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">class</span> <span class="dt">HasName</span> a <span class="kw">where</span>    </span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="ot">  getName ::</span> a <span class="ot">-&gt;</span> <span class="dt">String</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a></span>
@@ -44,7 +44,7 @@
 “Player 타입을 만나면 getName 메소드를 가져올 HasName 인스턴스가 있다.”</p>
 <p>“클래스는 성격을 선언해 놓고, 클래스의 성격을 인스턴스로 구현한다.”</p>
 <p>“인자로 받은 타입에 따라, 다른 작업을 하는 같은 이름의 함수method를 만든다.”</p>
-<h4 id="타입-테이블은-아무것도-바뀌지-않습니다.">타입 테이블은 아무것도 바뀌지 않습니다.</h4>
+<h3 id="타입-테이블은-아무것도-바뀌지-않습니다.">타입 테이블은 아무것도 바뀌지 않습니다.</h3>
 <p><em>아마도 논리적인 설계는 다음과 비슷할 겁니다. (주의: 실제 테이블 모양이 이렇다는 얘기가 아닙니다.)</em></p>
 <p>인스턴스로 지정되는 타입은 사실 <em>“타입” 자체는 아무것도 바뀌지 않습니다.</em> 코드 조립을 위해 GHC가 관리하는 타입 테이블은 아무것도 바뀌지 않습니다. GHC가 코드 조립 중 메소드를 맞닥뜨렸을 때 메소드 테이블에서 “타입”을 키로 메소드를 선택합니다. 이 키 역할을 해주는 타입을 인스턴스 헤드에 써줍니다. 아마도 다음과 비슷하게 설계되어 있을겁니다.</p>
 <p>getName 메소드 테이블 <em>추정</em></p>
@@ -55,7 +55,7 @@ Villain  Villain용 getName
 MyType   MyType용 getName
 ...</code></pre>
 <p>위 소스에서는 getName 메소드가 여러 개 있고, 이 중 하나를 선택하는 키로 쓰이는게 Player, Villain 타입입니다.</p>
-<h4 id="그럼-이렇게-constraint가-있는-경우는-어떻게-읽을까요">그럼 이렇게 constraint가 있는 경우는 어떻게 읽을까요?</h4>
+<h3 id="그럼-이렇게-constraint가-있는-경우는-어떻게-읽을까요">그럼 이렇게 constraint가 있는 경우는 어떻게 읽을까요?</h3>
 <div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="kw">instance</span> (<span class="dt">Eq</span> a) <span class="ot">=&gt;</span> <span class="dt">Eq</span> (<span class="dt">Tree</span> a) <span class="kw">where</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a>  (<span class="op">==</span>) <span class="op">...</span></span></code></pre></div>
 <p>(Tree a)타입을 Eq 클래스의 인스턴스로 만드는데, Tree가 감싸고 있는게 Eq의 인스턴스여야 합니다. 다시 말해, 아무 (Tree a)타입을 만났다고 모두 이 인스턴스로 코드 조립을 할 수 있는게 아닙니다. a타입을 위한 (==)가 있을 경우만, 이 인스턴스의 메소드로 해결할 수 있습니다. 최종 코드 조립을 할 때는 구체 타입을 알아야 하는데 a는 무슨 타입일까요?</p>

@@ -4,12 +4,12 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <title>lionhairdino - Free 모나드 패턴</title>
-        <meta name="description" content="Haskell,하스켈,해스클 - Free 모나드 패턴">
+        <meta name="description" content="lionhairdino - Free 모나드 패턴">
         <meta charset="UTF-8">
         <link rel="stylesheet" type="text/css" href="../css/default.css" />
         <meta property="og:type" content="website">
-        <meta property="og:title" content="lionhairdino">
-        <meta property="og:description" content="Haskell,하스켈,해스클 - Free 모나드 패턴">
+        <meta property="og:title" content="Free 모나드 패턴">
+        <meta property="og:description" content="lionhairdino - Free 모나드 패턴">
         <meta property="og:url" content="https://lionhairdino.github.io">
     </head>
     <body>
@@ -38,7 +38,7 @@
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a>  <span class="op">...</span></span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a>  <span class="dt">Done</span></span></code></pre></div>
 <p>이렇게 할 일을 직관적으로 코드에 표현하는게 목적입니다. (할 일을 명령형 프로그램 비슷하게 늘어 놓는게 목적입니다.)</p>
-<h3 id="free-모나드">Free 모나드</h3>
+<h2 id="free-모나드">Free 모나드</h2>
 <div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="kw">data</span> <span class="dt">Free</span> f r <span class="ot">=</span> <span class="dt">Free</span> (f (<span class="dt">Free</span> f r)) <span class="op">|</span> <span class="dt">Pure</span> r</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a><span class="kw">instance</span> (<span class="dt">Functor</span> f) <span class="ot">=&gt;</span> <span class="dt">Monad</span> (<span class="dt">Free</span> f) <span class="kw">where</span></span>
@@ -63,7 +63,7 @@
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true"></a><span class="dt">Free1</span><span class="op">..</span>(<span class="dt">Free2</span><span class="op">..</span>(<span class="dt">Free3</span><span class="op">..</span>(<span class="dt">Free4</span><span class="op">..</span>(<span class="op">Pure..</span>))))</span></code></pre></div>
 <p>대부분 Free(..(Free..))와 같은 값을 만나고, 여기에 바인드로 (_ -&gt; Free …) 함수를 적용하면 Free가 몇 번 감싸져 있든 안쪽까지 들어가 Pure r에 도달해서 r에 함수를 적용하므로 가장 안쪽에 이어 붙이는 효과가 납니다. 적용하는 함수는 리턴 타입이 Free 타입이니, <em>결과는 Free 속에 Free를 넣은 형태</em>가 됩니다.</p>
 <p>어떤 펑크터가 됐든 Free로 감싸서 Free타입으로 만들면 .. 이라 표시된 자리에 펑크터 값이 들어갑니다.</p>
-<h3 id="free-모나드-패턴">Free 모나드 패턴</h3>
+<h2 id="free-모나드-패턴">Free 모나드 패턴</h2>
 <div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="co">-- Act1하고 Act2하는 작업이든</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a><span class="co">-- Act1하고 Act2하고 Act1하는 작업이든</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a><span class="co">-- Act가 몇 번이 반복되든 모두 같은 타입으로 만드는 방법은 재귀를 이용하면 됩니다.</span></span>

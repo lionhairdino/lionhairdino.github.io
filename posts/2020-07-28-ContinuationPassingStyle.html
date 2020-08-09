@@ -4,12 +4,12 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <title>lionhairdino - CPS 스타일 - Continuation Passing Style</title>
-        <meta name="description" content="Haskell,하스켈,해스클 - CPS 스타일 - Continuation Passing Style">
+        <meta name="description" content="lionhairdino - CPS 스타일 - Continuation Passing Style">
         <meta charset="UTF-8">
         <link rel="stylesheet" type="text/css" href="../css/default.css" />
         <meta property="og:type" content="website">
-        <meta property="og:title" content="lionhairdino">
-        <meta property="og:description" content="Haskell,하스켈,해스클 - CPS 스타일 - Continuation Passing Style">
+        <meta property="og:title" content="CPS 스타일 - Continuation Passing Style">
+        <meta property="og:description" content="lionhairdino - CPS 스타일 - Continuation Passing Style">
         <meta property="og:url" content="https://lionhairdino.github.io">
     </head>
     <body>
@@ -34,7 +34,7 @@
 <p>아이디어는 “<em>함수가 결과를 리턴하지 않고, 바로 이어질 함수를 같이 넘겨서, 항상 작업이 끝나면 이어진 함수로 넘어가도록 만들자</em>” 입니다.</p>
 <p>아래 설명에 <em>준비</em>란 말이 나오면, 언젠가 나중에 인자를 받으면 실행하게될 함수를 뜻합니다. 함수 뭉치를 바라 볼 때, 준비상태로 보면 한 결 이해가 편할 때가 있습니다.</p>
 <p><a href="../posts/2020-07-03-freeMonad.html">Free 모나드</a>와 같이 보면 모나드 개념을 얻는데 도움이 됩니다.</p>
-<h3 id="함수형에선-함수를-바꾸고-명령형에선-값을-바꾼다.">함수형에선 함수를 바꾸고, 명령형에선 값을 바꾼다.</h3>
+<h2 id="함수형에선-함수를-바꾸고-명령형에선-값을-바꾼다.">함수형에선 함수를 바꾸고, 명령형에선 값을 바꾼다.</h2>
 <p>명령형 프로그램에서는 계산이 진행될 때마다 상태를 갱신해서 최종 결과를 만들어냅니다. 함수형에서는 상태가 없기 때문에 단계별 계산이 어떻게 표현 될까요? 상태를 따로 두는게 아니라, 함수가 함수를 감싸도록 해서 상태를 그 즉시 다른 함수에 입력으로 넣어주면(<em>함수를 합쳐 놓으면</em>) 상태를 저장하는 작업이 필요 없습니다.</p>
 <p>함수란, 필요한 입력이 모두 주어지면 그 때 작업이 시작되서 결과를 만들어내는 “할 일”을 뜻합니다. 함수<em>만</em> 있을 때는 아무런 일이 일어나지 않습니다. 함수에 <em>입력을 주는 순간</em> 일은 시작됩니다.</p>
 <p>명령형에서는 값(상태)을 변화시켜 가며 작업이 진행되지만, 함수형에서는 할 일을 모두 합쳐 놓는 작업을 진행하고, 마지막에 값을 주어 작업을 시작합니다.</p>
@@ -88,7 +88,7 @@
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a><span class="dv">5</span></span></code></pre></div>
 <p>($ 2)는 함수를 받아서 2에다 적용 후 결과를 돌려줍니다.<br />
 Cont 모나드의 return이 이 함수를 이용해 정의되어 있습니다.</p>
-<h3 id="cont-모나드">Cont 모나드</h3>
+<h2 id="cont-모나드">Cont 모나드</h2>
 <p>(a -&gt; r) -&gt; r 타입을 체이닝(품고 품게)하기 위해 바인드를 정의하는데, GHC가 이 바인드를 고를 수 있도록 (a -&gt; r) -&gt; r 타입을 래핑해서 새로운 타입을 만들어야 합니다.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="kw">newtype</span> <span class="dt">Cont</span> r a <span class="ot">=</span> <span class="dt">Cont</span> ((a <span class="ot">-&gt;</span> r) <span class="ot">-&gt;</span> r)</span></code></pre></div>
 <p>이 타입을 엮을 바인드를 정의합니다.</p>
@@ -139,7 +139,7 @@ f를 x에 적용하면 다시 Cont 값이 나오고,<br />
 <span id="cb10-7"><a href="#cb10-7" aria-hidden="true"></a>cont (\c <span class="ot">-&gt;</span> runCont (cont (<span class="op">$</span> <span class="dv">4</span>)) c)</span>
 <span id="cb10-8"><a href="#cb10-8" aria-hidden="true"></a>cont (\c <span class="ot">-&gt;</span> (<span class="op">$</span> <span class="dv">4</span>) c)</span></code></pre></div>
 <p>c로 함수를 받아 4에 적용할 준비를 마친 상태가 되었습니다. 중간 과정에 보면 (A)에서 첫 번째 액션, (B)에서 두 번째 액션이 이어서 준비되는게 보입니다. <a href="../posts/2020-07-03-freeMonad.html">Free 모나드 포스트</a>를 보신분은 비슷한 모양이 여기서도 보일겁니다.</p>
-<h3 id="그냥-함수-모나드와-뭐가-다를까">그냥 함수 모나드와 뭐가 다를까?</h3>
+<h2 id="그냥-함수-모나드와-뭐가-다를까">그냥 함수 모나드와 뭐가 다를까?</h2>
 <p>함수 모나드</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true"></a>comp <span class="ot">=</span> <span class="kw">do</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true"></a>  a <span class="ot">&lt;-</span> (\f <span class="ot">-&gt;</span> f <span class="dv">1</span>)</span>
@@ -184,7 +184,7 @@ f를 x에 적용하면 다시 Cont 값이 나오고,<br />
 <span id="cb14-15"><a href="#cb14-15" aria-hidden="true"></a>\c <span class="ot">-&gt;</span> runCont ( cont <span class="op">$</span> \c2 <span class="ot">-&gt;</span> c2 (<span class="dv">1</span> <span class="op">+</span> <span class="dv">2</span>) ) c </span>
 <span id="cb14-16"><a href="#cb14-16" aria-hidden="true"></a>\c <span class="ot">-&gt;</span> <span class="op">$</span> c (<span class="dv">1</span> <span class="op">+</span> <span class="dv">2</span>) <span class="co">--c2에 c가 들어갑니다.</span></span></code></pre></div>
 <p>Cont 모나드를 이런식으로 쓰진 않습니다. 이해를 돕기 위해 만든 조금은 억지스러운 예시입니다.</p>
-<h3 id="callcc">callCC</h3>
+<h2 id="callcc">callCC</h2>
 <p>Cont 모나드를 익힐 때 callCC가 걸림돌이었습니다.</p>
 <div class="sourceCode" id="cb15"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true"></a><span class="ot">callCC ::</span> ((a <span class="ot">-&gt;</span> <span class="dt">ContT</span> r m b) <span class="ot">-&gt;</span> <span class="dt">ContT</span> r m a) <span class="ot">-&gt;</span> <span class="dt">ContT</span> r m a</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true"></a>callCC f <span class="ot">=</span> <span class="dt">ContT</span> <span class="op">$</span> \c <span class="ot">-&gt;</span> runContT (f (\x <span class="ot">-&gt;</span> <span class="dt">ContT</span> <span class="op">$</span> \_ <span class="ot">-&gt;</span> c x)) c</span>
@@ -227,7 +227,7 @@ f를 x에 적용하면 다시 Cont 값이 나오고,<br />
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true"></a>                                   <span class="op">^^^^^^^^^^^^^^^^^^^^^^^^</span></span></code></pre></div>
 <p>f는 continuation을 만드는 함수를 받는데, 여기에 continuation을 버리는 모양을 만드는 함수를 넘깁니다. a값을 받으면 cont $ \_ -&gt; h a 을 만듭니다. 보통 다른 continuation 들은 cont $ \h -&gt; h a 모양으로 인자로 받은 함수를 내부에 적용하면서 continuation을 이어가는데, 여기선 \_ 로 받아서 버립니다.</p>
 <p>원래 작업은 \k -&gt; do k “first”; return “second” 인데, 여기 k에 (\a -&gt; cont $ \_ -&gt;h a)를 넣어 작업을 변형합니다. k가 실행되면 continuation을 끊게 되고, k가 실행되지 않으면 return “second”가 실행됩니다.</p>
-<h3 id="break">Break!</h3>
+<h2 id="break">Break!</h2>
 <p>callCC가 조건에 따라 continuation을 끊는break 코드입니다.</p>
 <div class="sourceCode" id="cb23"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true"></a><span class="kw">import</span> <span class="dt">Control.Monad.Cont</span></span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true"></a><span class="kw">import</span> <span class="dt">Control.Monad.Cont.Class</span></span>
@@ -272,7 +272,6 @@ f를 x에 적용하면 다시 Cont 값이 나오고,<br />
 <p>참고<br />
 <a href="https://cms2.ks.ac.kr/riet/contents/20190304/%ED%95%A8%EC%88%98%ED%98%95%20%ED%94%84%EB%A1%9C%EA%B7%B8%EB%9E%98%EB%B0%8D%EC%9D%98%20Continuation%EC%9D%84%20%EC%9D%B4%EC%9A%A9%ED%95%9C%20%ED%9D%90%EB%A6%84%EC%A0%9C%EC%96%B4.pdf">변석우님 - 함수형 프로그래밍의 Continuation을 이용한 흐름제어</a><br />
 <a href="https://en.wikibooks.org/wiki/Haskell/Continuation_passing_style" class="uri">https://en.wikibooks.org/wiki/Haskell/Continuation_passing_style</a><br />
-<a href="http://blog.tpleyer.de/posts/2019-02-02-callCC-in-Haskell.html" class="uri">http://blog.tpleyer.de/posts/2019-02-02-callCC-in-Haskell.html</a><br />
 <a href="http://guruma.github.io/posts/2018-11-18-Continuation-Concept/" class="uri">http://guruma.github.io/posts/2018-11-18-Continuation-Concept/</a></p>
 
 <div id="disqus_thread" style="padding-top:40px"></div>

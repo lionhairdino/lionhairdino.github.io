@@ -4,12 +4,12 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <title>lionhairdino - Has type class 패턴, mtl 스타일</title>
-        <meta name="description" content="Haskell,하스켈,해스클 - Has type class 패턴, mtl 스타일">
+        <meta name="description" content="lionhairdino - Has type class 패턴, mtl 스타일">
         <meta charset="UTF-8">
         <link rel="stylesheet" type="text/css" href="../css/default.css" />
         <meta property="og:type" content="website">
-        <meta property="og:title" content="lionhairdino">
-        <meta property="og:description" content="Haskell,하스켈,해스클 - Has type class 패턴, mtl 스타일">
+        <meta property="og:title" content="Has type class 패턴, mtl 스타일">
+        <meta property="og:description" content="lionhairdino - Has type class 패턴, mtl 스타일">
         <meta property="og:url" content="https://lionhairdino.github.io">
     </head>
     <body>
@@ -32,7 +32,7 @@
 </div>
 
 <p>이 글을 읽으시려면 Monad Transformer를 먼저 알고 있어야 합니다.</p>
-<h3 id="클래스-인스턴스-constraint-has-type-class-패턴">클래스 + 인스턴스 + constraint, Has type class 패턴</h3>
+<h2 id="클래스-인스턴스-constraint-has-type-class-패턴">클래스 + 인스턴스 + constraint, Has type class 패턴</h2>
 <p><em>클래스와 인스턴스를 사용하면 선언과 구현을 분리</em> 할 수 있습니다. 먼저 선언해서 사용하고, 실제 구현체는 나중에 정해 줄 수 있습니다.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">newtype</span> <span class="dt">Player</span> <span class="ot">=</span> <span class="dt">Player</span> {<span class="ot"> name ::</span> <span class="dt">String</span> }    </span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="kw">newtype</span> <span class="dt">Villain</span> <span class="ot">=</span> <span class="dt">Villain</span> {<span class="ot"> nickname ::</span> <span class="dt">String</span> }    </span>
@@ -56,7 +56,7 @@
 <p>정리하면, Player -&gt; IO () 는 Player 타입만 받아 들이지만,<br />
 HasName a =&gt; a 는 a가 <em>뭐든간에 HasName 인스턴스이기만 하면</em> 받아 들일 수 있습니다.</p>
 <p>여기서 쓰인 아이디어를 모나드 트랜스포머와 붙여서 사용할 수 있습니다.</p>
-<h3 id="mtl-라이브러리-monad-transformer-library">mtl 라이브러리 Monad Transformer Library</h3>
+<h2 id="mtl-라이브러리-monad-transformer-library">mtl 라이브러리 Monad Transformer Library</h2>
 <div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="kw">newtype</span> <span class="dt">AppM</span> a <span class="ot">=</span> <span class="dt">ReaderT</span> <span class="dt">Env</span> (<span class="dt">LoggingT</span> <span class="dt">IO</span>) a</span></code></pre></div>
 <p>이렇게 몇 겹으로 쌓은 모나드 트랜스포머를 쓸 때, 특정 층에 있는 모나드의 메소드를 쓴다고 생각해 봅시다. ReaderT가 어느 층에 있는지, LoggingT가 어느층에 있는지 알아야 합니다. lift를 몇 번을 써서 해당 층에 도달할지 다 기억한다는 건 매우 비효율적입니다. 이럴 때를 위해 mtl이 필요합니다.</p>
 <p>모나드 트랜스포머를 여러겹 쌓은 걸 모나드 트랜스포머 스택이라고 합니다. 소스상 모양은 품고 품은 모양인데, 이 바닥 사람들은 수직으로 쌓아 올린 메타포를 즐겨 사용하나 봅니다. AppM 의 경우 가장 아래 IO, 그 위에 LoggingT, 그 위에 ReaderT를 쌓아 올린 스택으로 바라봅니다. 그래서 IO모나드에 있는 액션을 AppM층에서 사용하려면, 끌어 올린다lift는 표현을 씁니다.</p>
@@ -73,7 +73,7 @@ HasName a =&gt; a 는 a가 <em>뭐든간에 HasName 인스턴스이기만 하면
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a>    ask <span class="ot">=</span> reader <span class="fu">id</span></span></code></pre></div>
 <div class="line-block">m -&gt; r 문법은 주석 참고 <sup><a href="#funcdep">[1]</a></sup></div>
 <p>Has클래스에서 봤던 아이디어처럼, 한 가지 타입만 ask를 쓸 수 있는게 아니라, MonadReader r m =&gt; … constraint를 만족하는 여러 타입들도 ask를 쓸 수 있게 됩니다.</p>
-<h3 id="혹시-monadreader의-ask-정의가-궁금한-적-없나요">혹시 MonadReader의 ask 정의가 궁금한 적 없나요?</h3>
+<h2 id="혹시-monadreader의-ask-정의가-궁금한-적-없나요">혹시 MonadReader의 ask 정의가 궁금한 적 없나요?</h2>
 <p><a href="https://hackage.haskell.org/package/transformers-0.5.6.2/docs/src/Control.Monad.Trans.Reader.html#ask" class="uri">https://hackage.haskell.org/package/transformers-0.5.6.2/docs/src/Control.Monad.Trans.Reader.html#ask</a><br />
 여기 ask는 클래스의 메소드로 정의되어 있는 게 아닙니다.<br />
 Control.Monad.Trans.Reader 모듈의 일반 함수입니다.</p>
@@ -88,7 +88,7 @@ return r 이되고<br />
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true"></a><span class="ot">    ask   ::</span> m r</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true"></a>    ask <span class="ot">=</span> reader <span class="fu">id</span></span></code></pre></div>
 <p>그리고, 많이 쓰이는 트랜스포머들의 인스턴스를 미리 정의해 두었습니다.</p>
-<h3 id="readert와-어떻게-어울려지나-볼까요">ReaderT와 어떻게 어울려지나 볼까요?</h3>
+<h2 id="readert와-어떻게-어울려지나-볼까요">ReaderT와 어떻게 어울려지나 볼까요?</h2>
 <div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a><span class="kw">import</span> <span class="kw">qualified</span> <span class="dt">Control.Monad.Trans.Reader</span> <span class="kw">as</span> <span class="dt">ReaderT</span> (ask, local, reader)</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true"></a><span class="op">...</span></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true"></a><span class="kw">instance</span> <span class="dt">Monad</span> m <span class="ot">=&gt;</span> <span class="dt">MonadReader</span> r (<span class="dt">ReaderT</span> r m) <span class="kw">where</span></span>
