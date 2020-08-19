@@ -42,9 +42,10 @@ Weight Int</code></pre>
 <p>이렇게 래핑해서 각 각 다른 타입으로 만들고, 나이를 다루는 함수는 Int가 아닌 Age Int를 받도록 만들고, 키는 Height Int, 몸무게는 Weight Int 를 받도록 만들면 다른 뜻을 지닌 값이 들어오는 걸 막을 수 있습니다.</p>
 <p>하지만, 이들은 타입 안정성을 위해 래핑한 것으로 성질은 Int와 다를게 없습니다. 코드 조립(type-checker)할 때만 써먹고, 런타임엔 필요 없는 정보입니다. 컴파일 타임에만 구별되고, 효율성을 위해 런타임에는 사라지게 래핑할 방법이 필요합니다.</p>
 <p>이럴 때 newtype을 씁니다.</p>
-<p>data는 새로운 데이터 타입을 만들고, type은 기존에 있는 타입에 별명만 만들고,<br />
+<p>data는 새로운 데이터 타입을 만들고,<br />
+type은 기존에 있는 타입의 별명만 만들고,<br />
 newtype은 컴파일 타임에는 새로운 타입인 것처럼 동작하고, 런타임에는 기존 타입과 같은 동작을 합니다.</p>
-<p>왜 하나의 필드만 있는 하나의 생성자만 newtype으로 선언할 수 있을까요? 아마도 <em>런타임에 생성자를 지울 때 필요한 규칙</em>일 겁니다. (정확히 내부 동작 설명이 있는 자료를 아직 못 찾았습니다.) 런타임에 타입 생성자는 지워지고, 래핑해 둔 필드만 살아남으니, 생성자도 하나이고, 필드도 하나여야 명확합니다.</p>
+<p>왜 하나의 필드만 있는 하나의 생성자만 newtype으로 선언할 수 있을까요? 아마도 <em>런타임에 생성자를 지울 때 필요한 규칙</em>일 겁니다. (정확히 내부 동작 설명이 있는 자료를 아직 못 찾았습니다.) 런타임에 타입 생성자는 지워지고, 래핑해 둔 필드만 살아남으니, 필드가 곧 타입의 의미와 같아야isomorphic 합니다. 당연히 생성자도 하나이고, 필드도 하나여야 명확하게 연결할 수 있습니다.</p>
 <p>특정 용도로 쓰기 위해 Int를 다음과 같이 래핑하면</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="kw">newtype</span> <span class="dt">Age</span> <span class="ot">=</span> <span class="dt">Age</span> {<span class="ot"> getAge ::</span> <span class="dt">Int</span> } <span class="kw">deriving</span> <span class="dt">Show</span></span></code></pre></div>
 <p>Age 타입의 성질은 Int와 같습니다. 런타임에 생성자 Age는 사라지고 필드 Int만 남습니다.</p>
@@ -59,7 +60,7 @@ newtype은 컴파일 타임에는 새로운 타입인 것처럼 동작하고, �
 <span id="cb4-9"><a href="#cb4-9" aria-hidden="true"></a><span class="op">&gt;</span> valSum</span>
 <span id="cb4-10"><a href="#cb4-10" aria-hidden="true"></a><span class="dv">3</span></span></code></pre></div>
 <p>런타임에는 valSum = 1 + 2 로 바뀝니다.</p>
-<p>생일이 지나 나이를 + 1year 하거나, 많이 먹고 살쪄서 + 1kg을 한다면 그냥 (+)를 쓰지 못하는 상황입니다. 타입 안전성을 위해 래핑하면 지겹게 만나게 될 문제입니다. (+)를 새로 정의할까요? 그럼 (-)도, (*)도.. 관련 함수들을 모두 다시 정의해야 합니다. 이런 문제를 해결하기 위해 딱인 이론이 바로 펑크터입니다. 그런데 펑크터로 만들어도 런타임에 생성자와 필드가 사라질 수 있을까요? 펑크터를 적용한 것과 아닌 것의 바이너리 코드가 같을까요?</p>
+<p>생일이 지나 나이를 + 1year 하거나, 많이 먹고 살쪄서 + 1kg을 한다면 그냥 (+)를 쓰지 못하는 상황입니다. 타입 안전성을 위해 래핑하면 지겹게 만나게 될 문제입니다. (+)를 새로 정의할까요? 그럼 (-)도, (*)도… 관련 함수들을 모두 다시 정의해야 합니다. 이런 문제를 해결하기 위해 딱인 이론이 바로 펑크터입니다. 그런데 펑크터로 만들어도 런타임에 생성자와 필드가 사라질 수 있을까요? 펑크터를 적용한 것과 아닌 것의 바이너리 코드가 같을까요?</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="op">&gt;</span> (<span class="op">+</span><span class="dv">1</span>) <span class="dv">1</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a><span class="op">&gt;</span> <span class="fu">fmap</span> (<span class="op">+</span><span class="dv">1</span>) val1</span></code></pre></div>
 <p>두 개가 같은 바이너리로 나와야 할 것 같은데, 두 번째 줄에서 GHC가 쉽게 버릴 수 있는 조각들이 안 보입니다. 런타임에 생성자가 지워진다는 말은 Age를 만나면 무조건 Int로 바뀌는게 아닙니다. 필드 접근자accessor getAge를 만나야 생성자를 지울 수 있습니다. 위 fmap 적용에서 지워지는게 아니라 fmap 안에서 생성자가 지워집니다. Age를 펑크터의 인스턴스로 만들려면 fmap을 다음처럼 정의합니다.</p>
