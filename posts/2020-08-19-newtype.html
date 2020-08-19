@@ -44,9 +44,9 @@ Weight Int</code></pre>
 <p>이럴 때 newtype을 씁니다.</p>
 <p>data는 새로운 데이터 타입을 만들고, type은 기존에 있는 타입에 별명만 만들고,<br />
 newtype은 컴파일 타임에는 새로운 타입인 것처럼 동작하고, 런타임에는 기존 타입과 같은 동작을 합니다.</p>
-<p>왜 하나의 필드만 있는 하나의 생성자만 newtype으로 선언할 수 있을까요? 아마도 런타임에 생성자를 지울 때 필요한 규칙일 겁니다. (정확히 내부 동작 설명이 있는 자료를 아직 못 찾았습니다.) 런타임에 타입 생성자는 지워지고, 래핑해 둔 필드만 살아남으니, 생성자도 하나이고, 필드도 하나여야 명확합니다.</p>
+<p>왜 하나의 필드만 있는 하나의 생성자만 newtype으로 선언할 수 있을까요? 아마도 <em>런타임에 생성자를 지울 때 필요한 규칙</em>일 겁니다. (정확히 내부 동작 설명이 있는 자료를 아직 못 찾았습니다.) 런타임에 타입 생성자는 지워지고, 래핑해 둔 필드만 살아남으니, 생성자도 하나이고, 필드도 하나여야 명확합니다.</p>
 <p>특정 용도로 쓰기 위해 Int를 다음과 같이 래핑하면</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="kw">data</span> <span class="dt">Age</span> <span class="ot">=</span> <span class="dt">Age</span> {<span class="ot"> getAge ::</span> <span class="dt">Int</span> } <span class="kw">deriving</span> <span class="dt">Show</span></span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="kw">newtype</span> <span class="dt">Age</span> <span class="ot">=</span> <span class="dt">Age</span> {<span class="ot"> getAge ::</span> <span class="dt">Int</span> } <span class="kw">deriving</span> <span class="dt">Show</span></span></code></pre></div>
 <p>Age 타입의 성질은 Int와 같습니다. 런타임에 생성자 Age는 사라지고 필드 Int만 남습니다.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="ot">val1 ::</span> <span class="dt">Age</span> <span class="dt">Int</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a>val1 <span class="ot">=</span> <span class="dt">Age</span> <span class="dv">1</span></span>
