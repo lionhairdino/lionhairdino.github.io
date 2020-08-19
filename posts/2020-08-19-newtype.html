@@ -3,13 +3,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko" lang="ko">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <title>lionhairdino - 2020-08-19-newtype</title>
-        <meta name="description" content="lionhairdino - 2020-08-19-newtype">
+        <title>lionhairdino - newtype은 왜 필드 하나만 갖는 생성자 하나만 있는 타입일까?</title>
+        <meta name="description" content="lionhairdino - newtype은 왜 필드 하나만 갖는 생성자 하나만 있는 타입일까?">
         <meta charset="UTF-8">
         <link rel="stylesheet" type="text/css" href="../css/default.css" />
         <meta property="og:type" content="website">
-        <meta property="og:title" content="2020-08-19-newtype">
-        <meta property="og:description" content="lionhairdino - 2020-08-19-newtype">
+        <meta property="og:title" content="newtype은 왜 필드 하나만 갖는 생성자 하나만 있는 타입일까?">
+        <meta property="og:description" content="lionhairdino - newtype은 왜 필드 하나만 갖는 생성자 하나만 있는 타입일까?">
         <meta property="og:url" content="https://lionhairdino.github.io">
     </head>
     <body>
@@ -23,7 +23,7 @@
         </div>
 
         <div id="content">
-            <h1>2020-08-19-newtype</h1>
+            <h1>newtype은 왜 필드 하나만 갖는 생성자 하나만 있는 타입일까?</h1>
 
             <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
 <div class="info">
@@ -46,30 +46,30 @@ Weight Int</code></pre>
 newtype은 컴파일 타임에는 새로운 타입인 것처럼 동작하고, 런타임에는 기존 타입과 같은 동작을 합니다.</p>
 <p>왜 하나의 필드만 있는 하나의 생성자만 newtype으로 선언할 수 있을까요? 아마도 런타임에 생성자를 지울 때 필요한 규칙일 겁니다. (정확히 내부 동작 설명이 있는 자료를 아직 못 찾았습니다.) 런타임에 타입 생성자는 지워지고, 래핑해 둔 필드만 살아남으니, 생성자도 하나이고, 필드도 하나여야 명확합니다.</p>
 <p>특정 용도로 쓰기 위해 Int를 다음과 같이 래핑하면</p>
-<p>data Age = Age { getAge :: Int } deriving Show</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="kw">data</span> <span class="dt">Age</span> <span class="ot">=</span> <span class="dt">Age</span> {<span class="ot"> getAge ::</span> <span class="dt">Int</span> } <span class="kw">deriving</span> <span class="dt">Show</span></span></code></pre></div>
 <p>Age 타입의 성질은 Int와 같습니다. 런타임에 생성자 Age는 사라지고 필드 Int만 남습니다.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="ot">val1 ::</span> <span class="dt">Age</span> <span class="dt">Int</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a>val1 <span class="ot">=</span> <span class="dt">Age</span> <span class="dv">1</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a><span class="ot">val2 ::</span> <span class="dt">Age</span> <span class="dt">Int</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a>val2 <span class="ot">=</span> <span class="dt">Age</span> <span class="dv">2</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a>valSum <span class="ot">=</span> getAge val1 <span class="op">+</span> getAge val2</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true"></a></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true"></a><span class="op">&gt;</span> valSum</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true"></a><span class="dv">3</span></span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="ot">val1 ::</span> <span class="dt">Age</span> <span class="dt">Int</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a>val1 <span class="ot">=</span> <span class="dt">Age</span> <span class="dv">1</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a><span class="ot">val2 ::</span> <span class="dt">Age</span> <span class="dt">Int</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a>val2 <span class="ot">=</span> <span class="dt">Age</span> <span class="dv">2</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true"></a>valSum <span class="ot">=</span> getAge val1 <span class="op">+</span> getAge val2</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true"></a></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true"></a><span class="op">&gt;</span> valSum</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true"></a><span class="dv">3</span></span></code></pre></div>
 <p>런타임에는 valSum = 1 + 2 로 바뀝니다.</p>
 <p>생일이 지나 나이를 + 1year 하거나, 많이 먹고 살쪄서 + 1kg을 한다면 그냥 (+)를 쓰지 못하는 상황입니다. 타입 안전성을 위해 래핑하면 지겹게 만나게 될 문제입니다. (+)를 새로 정의할까요? 그럼 (-)도, (*)도.. 관련 함수들을 모두 다시 정의해야 합니다. 이런 문제를 해결하기 위해 딱인 이론이 바로 펑크터입니다. 그런데 펑크터로 만들어도 런타임에 생성자와 필드가 사라질 수 있을까요? 펑크터를 적용한 것과 아닌 것의 바이너리 코드가 같을까요?</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="op">&gt;</span> (<span class="op">+</span><span class="dv">1</span>) <span class="dv">1</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a><span class="op">&gt;</span> <span class="fu">fmap</span> (<span class="op">+</span><span class="dv">1</span>) val1</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="op">&gt;</span> (<span class="op">+</span><span class="dv">1</span>) <span class="dv">1</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a><span class="op">&gt;</span> <span class="fu">fmap</span> (<span class="op">+</span><span class="dv">1</span>) val1</span></code></pre></div>
 <p>두 개가 같은 바이너리로 나와야 할 것 같은데, 두 번째 줄에서 GHC가 쉽게 버릴 수 있는 조각들이 안 보입니다. 런타임에 생성자가 지워진다는 말은 Age를 만나면 무조건 Int로 바뀌는게 아닙니다. 필드 접근자accessor getAge를 만나야 생성자를 지울 수 있습니다. 위 fmap 적용에서 지워지는게 아니라 fmap 안에서 생성자가 지워집니다. Age를 펑크터의 인스턴스로 만들려면 fmap을 다음처럼 정의합니다.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="kw">instance</span> <span class="dt">Functor</span> <span class="dt">Age</span> <span class="kw">where</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a>  <span class="fu">fmap</span> f ag <span class="ot">=</span> <span class="dt">Age</span> <span class="op">$</span> f (getAge ag)</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="kw">instance</span> <span class="dt">Functor</span> <span class="dt">Age</span> <span class="kw">where</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a>  <span class="fu">fmap</span> f ag <span class="ot">=</span> <span class="dt">Age</span> <span class="op">$</span> f (getAge ag)</span></code></pre></div>
 <p>바로 getAge ag 부분이 런타임에 Int 타입으로 바뀌는 부분입니다.</p>
-<p>보통 펑크터나 모나드 등의 인스턴스로 만들려고 할 때, 바인드나 fmap을 고르는 키로 쓰일 타입을 newtype으로 정의합니다.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="kw">newtype</span> <span class="dt">State</span> s a <span class="ot">=</span> <span class="dt">State</span> {<span class="ot"> runState ::</span> s <span class="ot">-&gt;</span> (a, s) }</span></code></pre></div>
+<p>보통 펑크터나 모나드 등의 인스턴스로 만들려고 할 때, <em>바인드나 fmap을 고르는 키로 쓰일 타입</em>을 newtype으로 정의합니다.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a><span class="kw">newtype</span> <span class="dt">State</span> s a <span class="ot">=</span> <span class="dt">State</span> {<span class="ot"> runState ::</span> s <span class="ot">-&gt;</span> (a, s) }</span></code></pre></div>
 <p>GHC가</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a><span class="dt">State</span> s <span class="op">...</span> <span class="op">&gt;&gt;=</span> <span class="op">...</span></span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a><span class="dt">State</span> s <span class="op">...</span> <span class="op">&gt;&gt;=</span> <span class="op">...</span></span></code></pre></div>
 <p>를 만나면 State s 를 키로 하는 인스턴스의 바인드를 가져오게 됩니다. 런타임에는 s -&gt; (a, s) 만 남습니다. 그럼 State 타입에 runState를 적용하는 구문들이 모두 사라진다는 얘기입니다.</p>
 
 <div id="disqus_thread" style="padding-top:40px"></div>

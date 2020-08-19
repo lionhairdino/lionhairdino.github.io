@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko" lang="ko">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>lionhairdino - 확장 TypeFamilies - 타입 함수</title>
+        <meta name="description" content="lionhairdino - 확장 TypeFamilies - 타입 함수">
+        <meta charset="UTF-8">
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <meta property="og:type" content="website">
+        <meta property="og:title" content="확장 TypeFamilies - 타입 함수">
+        <meta property="og:description" content="lionhairdino - 확장 TypeFamilies - 타입 함수">
+        <meta property="og:url" content="https://lionhairdino.github.io">
+    </head>
+    <body>
+        <div id="header">
+            <div id="logo"> </div>
+            <div id="navigation">
+                <a href="../">lionhairdino</a> 
+                <a href="../about.html">about</a>
+                <!--<a href="/archive.html">archive</a>-->
+            </div>
+        </div>
+
+        <div id="content">
+            <h1>확장 TypeFamilies - 타입 함수</h1>
+
+            <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+<div class="info">
+    Posted on August 19, 2020
+    
+</div>
+
+<h2 id="타입-함수">타입 함수</h2>
+<p>하스켈은 엄격하게 타입을 검사하는 언어인데, 폴리모픽하게 함수들을 만들다 보면, 프로그래머가 명시적으로 지정하지 않아도 하스켈이 때에 따라 타입 추론을 달리 했으면 할 때가 있습니다. 한 두개의 타입만 정해지면 함수에서 쓰이는 여러 타입들을 알아서 적당한 타입으로 바꿔 주는게 필요합니다.</p>
+<p>예를 들면 다음처럼 인스턴스에 따라 method의 결과 타입이 다른 게 필요할 수 있습니다.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">instance</span> <span class="dt">SomeClass</span> <span class="dt">TypeA</span> <span class="kw">where</span><span class="op">...</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="ot">  method ::</span> <span class="dt">TypeA</span> <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a><span class="kw">instance</span> <span class="dt">SomeClass</span> <span class="dt">TypeB</span> <span class="kw">where</span><span class="op">...</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a><span class="ot">  method ::</span> <span class="dt">TypeB</span> <span class="ot">-&gt;</span> <span class="dt">Double</span></span></code></pre></div>
+<p>좀 더 추상적으로 얘기하면 “타입에 따라 타입이 결정”되는 기능이 필요합니다. TypeA일 때는 Int, TypeB일 때는 Double. 값에 따라 값이 결정되는 걸 함수라고 합니다. 타입에 따라 타입이 결정되니, 타입 레벨 프로그래밍에서 <em>타입 함수</em>로 쓰입니다.</p>
+<h2 id="type-synonym-family">Type Synonym Family</h2>
+<p>일반 type 구문과 마찬가지로 새 타입을 만들진 않습니다. 때에 따라 다른 것과 연결될 수 있는 별명을 만든다고 볼 수 있습니다.</p>
+<p>class 내부에서 쓰일 수도 있고,(스탠다드 하스켈에서는 class 안에서 type 선언이 쓰이지 않으므로, class 안에서 family를 선언할 땐 family를 빼도 확장으로 다룹니다.)</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="kw">class</span> <span class="dt">SomeClass</span> a b <span class="kw">where</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>  <span class="kw">type</span> <span class="dt">VarType</span> a b</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a><span class="ot">  method ::</span> a <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> <span class="dt">VarType</span> a b</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a><span class="kw">instance</span> <span class="dt">SomeClass</span> <span class="dt">A</span> <span class="dt">B</span> <span class="kw">where</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a>  <span class="kw">type</span> <span class="dt">VarType</span> <span class="dt">A</span> <span class="dt">B</span> <span class="ot">=</span> <span class="dt">B</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a><span class="co">-- 보통 인스턴스에서 타입 선언을 하진 않습니다. (instanceSigs 확장 참고)</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a><span class="co">-- Type Family를 쓰면 아래 처럼 선언한 것과 같은 상황이 됩니다.</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true"></a><span class="ot">  method ::</span> <span class="dt">A</span> <span class="ot">-&gt;</span> <span class="dt">B</span> <span class="ot">-&gt;</span> <span class="dt">B</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true"></a><span class="kw">instance</span> <span class="dt">SomeClass</span> <span class="dt">B</span> <span class="dt">A</span> <span class="kw">where</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true"></a>  <span class="kw">type</span> <span class="dt">VarType</span> <span class="dt">B</span> <span class="dt">A</span> <span class="ot">=</span> <span class="dt">A</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true"></a><span class="ot">  method ::</span> <span class="dt">B</span> <span class="ot">-&gt;</span> <span class="dt">A</span> <span class="ot">-&gt;</span> <span class="dt">A</span></span></code></pre></div>
+<p>단독으로 쓰일 수도 있습니다.(일반 type선언과 구별하기 위해 family를 꼭 써줘야 합니다.)</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="kw">type</span> <span class="kw">family</span> <span class="dt">VarType</span> a b <span class="kw">where</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a>  <span class="dt">VarType</span> <span class="dt">A</span> <span class="dt">B</span> <span class="ot">=</span> <span class="dt">B</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a>  <span class="dt">VarType</span> <span class="dt">B</span> <span class="dt">A</span> <span class="ot">=</span> <span class="dt">A</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a><span class="co">-- 위와 같이 한 곳에서 정의할 수도 있고,</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a><span class="co">-- 아래 같이 instance 구문을 써서 정의할 수도 있습니다.</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a><span class="co">-- instance를 쓰면, 한 곳에서 한 번에 정의할 필요가 없어 좀 더 유연하게 쓸 수 있습니다.</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true"></a><span class="kw">type</span> <span class="kw">family</span> <span class="dt">VarType</span> a<span class="ot"> b ::</span> <span class="op">*</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true"></a><span class="kw">type</span> <span class="kw">instance</span> <span class="dt">VarType</span> <span class="dt">A</span> <span class="dt">B</span> <span class="ot">=</span> <span class="dt">B</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true"></a><span class="kw">type</span> <span class="kw">instance</span> <span class="dt">VarType</span> <span class="dt">B</span> <span class="dt">A</span> <span class="ot">=</span> <span class="dt">A</span></span></code></pre></div>
+<p>클래스 내부에서 쓰든 단독으로 쓰든, 타입 패밀리로 정의해 두면, 코드 중에 나오는 VarType a b 타입은 GHC가 알아서 실제 타입으로 바꿉니다.</p>
+<h2 id="data-family">Data Family</h2>
+<p>위와 다르게 타입 인자에 따라 새로운 타입을 만듭니다.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="kw">data</span> <span class="kw">family</span> <span class="dt">XList</span> a</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a><span class="kw">data</span> <span class="kw">instance</span> <span class="dt">XList</span> <span class="dt">Char</span> <span class="ot">=</span> <span class="dt">XCons</span> <span class="op">!</span><span class="dt">Char</span> <span class="op">!</span>(<span class="dt">XList</span> <span class="dt">Char</span>) <span class="op">|</span> <span class="dt">XNil</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a><span class="kw">data</span> <span class="kw">instance</span> <span class="dt">XList</span> () <span class="ot">=</span> <span class="dt">XListUnit</span> <span class="op">!</span><span class="dt">Int</span></span></code></pre></div>
+<p>마찬가지로 코드 중에 XList a를 만나면 a에 따라 GHC가 실제 타입으로 바꿉니다.</p>
+<p>패밀리의 인스턴스로 선언한다고 코드 조립할 때 패밀리끼리 어떤 연관성을 가지는 건 아닙니다. 조립할 때, 패밀리 중 하나의 타입으로 결정됩니다. 결국 인스턴스들은 모두 다른 타입입니다. 그래서 아래같이 값생성자 패턴 매칭을 할 수 없습니다.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="kw">data</span> <span class="kw">family</span> <span class="dt">T</span> a</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a><span class="kw">data</span> <span class="kw">instance</span> <span class="dt">T</span> <span class="dt">Int</span> <span class="ot">=</span> <span class="dt">A</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a><span class="kw">data</span> <span class="kw">instance</span> <span class="dt">T</span> <span class="dt">Char</span> <span class="ot">=</span> <span class="dt">B</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a><span class="ot">foo ::</span> <span class="dt">T</span> a <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true"></a>foo <span class="dt">A</span> <span class="ot">=</span> <span class="dv">1</span> <span class="co">-- 에러</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true"></a>foo <span class="dt">B</span> <span class="ot">=</span> <span class="dv">2</span> <span class="co">-- 에러</span></span></code></pre></div>
+<p>foo는 타입에 따라 다른 동작을 합니다. 타입에 따라 다른 동작을 하려면? 맞습니다. 클래스와 인스턴스를 이용하면 됩니다.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="kw">class</span> <span class="dt">Foo</span> a <span class="kw">where</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a><span class="ot">  foo ::</span> <span class="dt">T</span> a <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a><span class="kw">instance</span> <span class="dt">Foo</span> <span class="dt">Int</span> <span class="kw">where</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true"></a>  foo <span class="dt">A</span> <span class="ot">=</span> <span class="dv">1</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true"></a><span class="kw">instance</span> <span class="dt">Foo</span> <span class="dt">Char</span> <span class="kw">where</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true"></a>  foo <span class="dt">B</span> <span class="ot">=</span> <span class="dv">2</span></span></code></pre></div>
+<p>동일한 표현을 GADT 할 수도 있는데, 차이점은 Type Family는 열려 있는 상태라 언제든지 instance를 추가할 수 있습니다. 다른 모듈에서 추가한다든지 하는 것도 가능합니다.</p>
+<p>(functional dependencies)[/extensions/2020-07-29-MultiParamTypeClasses.html]로 구현한 것들을 type family로 표현할 수도 있습니다.</p>
+<p>참고<br />
+<a href="http://cdepillabout.github.io/haskell-type-families-presentation/index-en.html#/" class="uri">http://cdepillabout.github.io/haskell-type-families-presentation/index-en.html#/</a><br />
+<a href="https://www.servant.dev/posts/2018-07-12-servant-dsl-typelevel.html" class="uri">https://www.servant.dev/posts/2018-07-12-servant-dsl-typelevel.html</a><br />
+<a href="https://wiki.haskell.org/GHC/Type_families" class="uri">https://wiki.haskell.org/GHC/Type_families</a><br />
+<a href="http://www.mchaver.com/posts/2017-06-21-type-families.html" class="uri">http://www.mchaver.com/posts/2017-06-21-type-families.html</a></p>
+
+<div id="disqus_thread" style="padding-top:40px"></div>
+<script>
+
+var disqus_config = function () {
+this.page.url = 'https://lionhairdino.github.io/extensions/2020-08-19-TypeFamilies.html';
+this.page.identifier = 'extensions/2020-08-19-TypeFamilies.markdown';
+};
+(function() {
+var d = document, s = d.createElement('script');
+s.src = 'https://lionhairdino.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+                            
+        </div>
+        <div id="footer">
+            © 2020 lionhairdino. All rights reserved. Generated by <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+    </body>
+</html>
