@@ -32,17 +32,62 @@
 </div>
 
 <p>기본 아이디어는 “<em>똑같은 문장을 써놓고 때에 따라 다르게 번역하고 싶다</em>” 입니다. 하스켈에서 이렇게 할 수 있는 문법이 바로 <em>클래스와 인스턴스</em>입니다. 구체 타입을 지정하지 않고, 클래스 제약을 걸어두고 메소드를 쓰면, 실제 실행되는 메소드 구현체는 나중에 GHC가 추론 단서들을 보고 고르게 됩니다. 예를 들면 getData라 메소드를 선언해서 사용하고, 이 메소드가 때로는 database에서 값을 가져오고, 때로는 file에서 값을 가져오게 하고 싶을 때 같은 경우를 말합니다.</p>
-<p>eDSL(embedded Domain Specific Language)[1]을 모두 클래스의 메소드로 정의해 놓고, 나중에 인스턴스를 바꿔서 적용 가능하게 해 놓는 걸 tagless final style 이라 부릅니다. Free 모나드를 같은 목적으로 쓰는 경우가 많은데, Free 모나드에 비해 장점은 런타임에 인터프리팅되는게 아니라, GHC가 컴파일 타임에 코드 조합에 따라 인스턴스를 골라서 컴파일 하니 퍼포먼스측면에서 장점이 있습니다.<br />
-mtl 스타일에 익숙하다면, mtl과 아이디어는 같다고 보면 됩니다. 실용 코드에서는 application monad[2] 안에서 mtl에 얹혀서 tagless final을 사용합니다.</p>
-<p>DSL에 들어 있는 명령어들을, 나중에 인터프리터를 만나 실제 실행될 코드를 고르도록 하는 표식 정도의 의미로 tag라고 부르고 이런 표식없이 컴파일 타임에 바로 DSL을 실행 코드로 바꿔서 컴파일 한다는 의미에서 tagless라 부르는게 아닐까 합니다. tagless final이라 이름 붙인 이유를 아시는 분은 댓글 부탁드립니다.</p>
-<p>Reference:<br />
+<p>eDSL(embedded Domain Specific Language)<sup><a href="#edsl">[1]</a></sup>을 모두 클래스의 메소드로 정의해 놓고, 나중에 인스턴스를 바꿔서 적용 가능하게 해 놓는 걸 tagless final style 이라 부릅니다. <a href="../posts/2020-07-03-freeMonad.html">Free 모나드</a>를 같은 목적으로 쓰는 경우가 많은데, Free 모나드에 비해 장점은 런타임에 인터프리팅되는게 아니라, GHC가 컴파일 타임에 코드 조합에 따라 인스턴스를 골라서 컴파일 하니 퍼포먼스측면에서 장점이 있습니다.<br />
+mtl 스타일에 익숙하다면, mtl과 아이디어는 같다고 보면 됩니다. 실용 코드에서는 application monad<sup><a href="#app">[2]</a></sup> 안에서 mtl에 얹혀 tagless final을 사용합니다.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">class</span> <span class="dt">Monad</span> m <span class="ot">=&gt;</span> <span class="dt">EDSL</span> m <span class="kw">where</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="ot">  command1 ::</span> <span class="op">...</span> <span class="ot">-&gt;</span> m ()</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a><span class="ot">  command2 ::</span> <span class="op">...</span> <span class="ot">-&gt;</span> m ()</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a><span class="ot">  command3 ::</span> <span class="op">...</span> <span class="ot">-&gt;</span> m ()</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a><span class="ot">embeddedProgram ::</span> <span class="dt">EDSL</span> m <span class="ot">=&gt;</span> m ()</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a>embeddedProgram <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a>  command1</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a>  commadn2</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a>  command1</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a>  command2</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a>  command3</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true"></a>  <span class="op">...</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true"></a><span class="kw">data</span> <span class="dt">Config</span> <span class="ot">=</span> <span class="dt">Config</span> {<span class="ot"> c1::</span><span class="dt">Integer</span>,<span class="ot"> c2::</span><span class="dt">String</span> }</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true"></a><span class="co">-- 첫 번째 인터프리터</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true"></a><span class="kw">newtype</span> <span class="dt">AppM</span> a <span class="ot">=</span> <span class="dt">AppM</span> {<span class="ot"> runAppM ::</span> <span class="dt">ReaderT</span> <span class="dt">Config</span> <span class="dt">IO</span> a }</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true"></a>  <span class="kw">deriving</span> (<span class="dt">Functor</span>, <span class="dt">Applicative</span>, <span class="dt">Monad</span>, <span class="dt">MonadIO</span>, <span class="dt">MonadReader</span> <span class="dt">Config</span>)</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true"></a></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true"></a><span class="kw">instance</span> <span class="dt">EDSL</span> <span class="dt">AppM</span> <span class="kw">where</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true"></a>  command1 <span class="ot">=</span> <span class="kw">do</span> c1 <span class="ot">&lt;-</span> asks c1; c2 <span class="ot">&lt;-</span> asks c2; <span class="op">...</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true"></a>  command2 <span class="ot">=</span> <span class="kw">do</span> c1 <span class="ot">&lt;-</span> asks c1; c2 <span class="ot">&lt;-</span> asks c2; <span class="op">...</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true"></a>  command3 <span class="ot">=</span> <span class="op">...</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true"></a></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true"></a><span class="co">-- 두 번째 인터프리터</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true"></a><span class="kw">newtype</span> <span class="dt">AppM2</span> a <span class="ot">=</span> <span class="dt">AppM</span> {<span class="ot"> runAppM2 ::</span> <span class="dt">ReaderT</span> <span class="dt">Config</span> <span class="dt">IO</span> a }</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true"></a>  <span class="kw">deriving</span> (<span class="dt">Functor</span>, <span class="dt">Applicative</span>, <span class="dt">Monad</span>, <span class="dt">MonadIO</span>, <span class="dt">MonadReader</span> <span class="dt">Config</span>)</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true"></a></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true"></a><span class="kw">instance</span> <span class="dt">EDSL</span> <span class="dt">AppM2</span> <span class="kw">where</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true"></a>  command1 <span class="ot">=</span> <span class="op">...</span> </span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true"></a>  command2 <span class="ot">=</span> <span class="op">...</span></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true"></a>  command3 <span class="ot">=</span> <span class="op">...</span></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true"></a></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true"></a></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true"></a>main <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true"></a>  runReaderT (runAppM embeddedProgram) (<span class="dt">Config</span> <span class="dv">100</span> <span class="st">&quot;some&quot;</span>)</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true"></a>  runReaderT (runAppM2 embeddedProgram) (<span class="dt">Config</span> <span class="dv">100</span> <span class="st">&quot;some&quot;</span>)</span></code></pre></div>
+<p><em>embeddedProgram에는 구현체는 없이 작업명만 나열해 놓은 상태입니다.</em> 구체 동작은 EDSL 인스턴스 정의해서 구현됩니다.</p>
+<p>DSL에 들어 있는 명령어들을, 나중에 인터프리터를 만나 실제 실행될 코드를 고르도록 하는 표식 정도의 의미로 tag라 부르고 이런 표식없이 컴파일 타임에 바로 DSL을 실행 코드로 바꿔서 컴파일 한다는 의미에서 tagless라 부르는게 아닐까 합니다. tagless final이라 이름 붙인 이유를 아시는 분은 댓글 부탁드립니다.</p>
+<p>참고<br />
 <a href="https://serokell.io/blog/tagless-final" class="uri">https://serokell.io/blog/tagless-final</a></p>
 <hr />
+<div id="edsl">
+
+</div>
 <p>[1] eDSL (embedded Domain Specific Language)<br />
-요리 레시피처럼 할 일들을 순서대로 주욱 기록해 두는 것과 비슷합니다. 실제 실행 코드로 조합하는게 아닌, 작업에 붙여 놓은 작업명을 DSL이라 보면 됩니다. 어디선가는 작업명에 맞는 실행 코드를 가져와서 실행하게 될텐데 Free 모나드는 런타임에, tagless final은 컴파일 타임에 인터프리팅이 일어납니다. 크게 보면 프로그래밍 언어 자체가 DSL이긴 하지만, 보통은 언어내embedded에서 사용자가 정의한 태그들로, 나중에 인터프리팅 단계를 거쳐 실행 코드로 바뀌는 것들을 뜻하는 좁은 의미로 쓰입니다.</p>
-<p>하스켈에서는, 어떤 사람들은 do 표현이 가능한 정도로만 DSL이라 부르기도 하고, 어떤 사람들은 메소드들로 AST(Abstraction Syntax Tree)를 정의해야만 DSL이라 부르기도 합니다.</p>
+요리 레시피처럼 할 일들을 순서대로 주욱 기록해 두는 것과 비슷합니다. 실제 실행 코드로 조합하는게 아닌, 작업에 붙여 놓은 작업명을 DSL이라 보면 됩니다. 어디선가는 작업명에 맞는 실행 코드를 가져와서 실행하게 될텐데 Free 모나드는 런타임에, tagless final은 컴파일 타임에 인터프리팅이 일어납니다.</p>
+<p>크게 보면 프로그래밍 언어 자체가 DSL이긴 하지만, 보통 언어내embedded에서 사용자가 정의한 태그들로, 나중에 인터프리팅 단계를 거쳐 실행 코드로 바뀌는 것들을 뜻하는 좁은 의미로 쓰입니다.</p>
+<p>하스켈에선, 어떤 사람들은 do 표현이 가능한 정도로만 DSL이라 부르기도 하고, 어떤 사람들은 메소드들로 AST(Abstraction Syntax Tree)를 정의해야만 DSL이라 부르기도 합니다.</p>
+<div id="app">
+
+</div>
 <p>[2] Application Monad<br />
-Tagless final 스타일에서, 한 모나드 안에서 DSL을 조합해서(보통 do 표현을 이용해서) 쓰게되는데, 이 때의 모나드를 application monad라 부릅니다.</p>
+특정 모나드를 가리키는게 아니라 Tagless final 스타일에서, 한 모나드(예시 코드의 AppM 모나드)안에서 DSL을 조합해서 쓰게되는데, 이 때의 모나드를 application monad라 부릅니다.</p>
 
 <div id="disqus_thread" style="padding-top:40px"></div>
 <script>
