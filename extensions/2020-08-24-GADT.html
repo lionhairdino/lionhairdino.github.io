@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko" lang="ko">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>lionhairdino - 확장 GADT</title>
+        <meta name="description" content="lionhairdino - 확장 GADT">
+        <meta charset="UTF-8">
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <meta property="og:type" content="website">
+        <meta property="og:title" content="확장 GADT">
+        <meta property="og:description" content="lionhairdino - 확장 GADT">
+        <meta property="og:url" content="https://lionhairdino.github.io">
+    </head>
+    <body>
+        <div id="header">
+            <div id="logo"> </div>
+            <div id="navigation">
+                <a href="../">lionhairdino</a> 
+                <a href="../about.html">about</a>
+                <!--<a href="/archive.html">archive</a>-->
+            </div>
+        </div>
+
+        <div id="content">
+            <h1>확장 GADT</h1>
+
+            <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+<div class="info">
+    Posted on August 24, 2020
+    
+</div>
+
+<h2 id="타입-매개-변수-해석">타입 매개 변수 해석</h2>
+<p>먼저 Sum 형태의 타입에서 타입 매개 변수가 어떻게 쓰이는지 살펴 보겠습니다.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">data</span> <span class="dt">Some</span> a <span class="ot">=</span> <span class="dt">A</span> a</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a>            <span class="op">|</span> <span class="dt">B</span> <span class="dt">Int</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a>            <span class="op">|</span> <span class="dt">C</span> <span class="dt">Bool</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a><span class="op">&gt;</span> <span class="op">:</span>t <span class="dt">B</span> <span class="dv">7</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a><span class="dt">B</span> <span class="dv">7</span><span class="ot"> ::</span> <span class="dt">Some</span> a</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a><span class="op">&gt;</span> <span class="op">:</span>t <span class="dt">C</span> <span class="dt">True</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a><span class="dt">C</span> <span class="dt">True</span><span class="ot"> ::</span> <span class="dt">Some</span> a</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a><span class="ot">func ::</span> <span class="dt">Some</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Bool</span> </span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a>func x <span class="ot">=</span> <span class="dt">True</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true"></a><span class="op">&gt;</span> func (<span class="dt">C</span> <span class="dt">True</span>) <span class="co">-- GHC가 알아서 Some Int 타입으로 추론합니다.</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true"></a><span class="dt">True</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true"></a></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true"></a><span class="ot">val1 ::</span> <span class="dt">Some</span> <span class="dt">Bool</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true"></a>val1 <span class="ot">=</span> <span class="dt">B</span> <span class="dv">5</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true"></a></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true"></a><span class="op">&gt;</span> func val1</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true"></a><span class="fu">error</span><span class="op">:</span> <span class="dt">Couldn't</span> match <span class="kw">type</span> ‘<span class="dt">Bool</span>’ with ‘<span class="dt">Int</span>’</span></code></pre></div>
+<h2 id="sum-형태의-대수-타입">Sum 형태의 대수 타입</h2>
+<p>보통 Sum 형태의 타입은 여러 타입들을 합쳐서 같은 부류로 취급할 때 씁니다.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="kw">data</span> <span class="dt">Expr</span> a <span class="ot">=</span> <span class="dt">I</span> <span class="dt">Int</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>            <span class="op">|</span> <span class="dt">B</span> <span class="dt">Bool</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a>            <span class="op">|</span> <span class="dt">Add</span> (<span class="dt">Expr</span> a) (<span class="dt">Expr</span> a)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a>            <span class="op">|</span> <span class="dt">Mul</span> (<span class="dt">Expr</span> a) (<span class="dt">Expr</span> a)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a>            <span class="op">|</span> <span class="dt">Eq</span>  (<span class="dt">Expr</span> a) (<span class="dt">Expr</span> a)</span></code></pre></div>
+<p>Expr 타입을 받는 함수는 I, B, Add, Mul, Eq 값을 받을 수 있습니다. 타입 모둠에 Expr이란 이름을 붙여 놓은 것과 같습니다. 그런데 Add 값은 Expr 타입 두 개를 받는데, <em>모든 Expr 타입을 받는게 아니라</em> B와 Eq는 빼고 받아야 합니다. 나중에 인터프리터에서 구별해도 되지만, 컴파일 단계에서 걸러내길 원합니다.</p>
+<p>이럴 때, GADT 확장을 씁니다. Add는 인자로 Expr Int 타입만 받도록 하고싶습니다.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="co">-- Add가 Expr a가 아닌 Expr Int를 받도록 바꿨습니다.</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a><span class="kw">data</span> <span class="dt">Expr</span> a <span class="ot">=</span> <span class="op">...</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a>            <span class="op">|</span> <span class="dt">Add</span> (<span class="dt">Expr</span> <span class="dt">Int</span>) (<span class="dt">Expr</span> <span class="dt">Int</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a>            <span class="op">...</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a><span class="op">&gt;</span> <span class="op">:</span>t <span class="dt">Add</span> (<span class="dt">I</span> <span class="dv">3</span>) (<span class="dt">B</span> <span class="dt">True</span>)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a><span class="dt">Add</span> (<span class="dt">I</span> <span class="dv">3</span>) (<span class="dt">B</span> <span class="dt">True</span>)<span class="ot"> ::</span> <span class="dt">Expr</span> a</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true"></a><span class="co">-- 그래도 여전히 B True 같은 값을 받아도 오류가 나지 않습니다. </span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true"></a><span class="co">-- B True를 Expr Int 타입으로 추론해도 문제가 없기 때문입니다.</span></span></code></pre></div>
+<h2 id="gadt---값-생성자별로-구체-타입을-다르게-하기">GADT - 값 생성자별로 구체 타입을 다르게 하기</h2>
+<p>Generalized Algebraic Data Types</p>
+<p>GADT를 쓰면 각 값생성자들의 리턴 타입을 다르게 지정할 수 있습니다.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="ot">{-# LANGUAGE GADTs #-}</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a><span class="kw">data</span> <span class="dt">Expr</span> a <span class="kw">where</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a>  <span class="dt">I</span><span class="ot">   ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Expr</span> <span class="dt">Int</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a>  <span class="dt">B</span><span class="ot">   ::</span> <span class="dt">Bool</span> <span class="ot">-&gt;</span> <span class="dt">Expr</span> <span class="dt">Bool</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true"></a>  <span class="dt">Add</span><span class="ot"> ::</span> <span class="dt">Expr</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Expr</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Expr</span> <span class="dt">Int</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true"></a>  <span class="dt">Mul</span><span class="ot"> ::</span> <span class="dt">Expr</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Expr</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Expr</span> <span class="dt">Int</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true"></a>  <span class="dt">Eq</span><span class="ot">  ::</span> <span class="dt">Eq</span> a <span class="ot">=&gt;</span> <span class="dt">Expr</span> a <span class="ot">-&gt;</span> <span class="dt">Expr</span> a <span class="ot">-&gt;</span> <span class="dt">Expr</span> <span class="dt">Bool</span></span></code></pre></div>
+<p>얼핏 보면 GADT 없이도 Add (Expr Int) (Expr Int) 라고 선언하면 될 것처럼 보이지만, B나 Eq 값의 타입이 <em>Expr a</em>가 아니라 <em>Expr Bool</em>이어야만 Add에서 걸러 낼 수 있습니다. 그럴려면 값생성자들의 결과 타입을 폴리모픽이 아닌, 구체 타입으로 지정할 수 있어야 합니다. I, Add, Mul은 Expr Int타입이고, B,Eq는 Expr Bool 타입으로 지정하면 컴파일 단계에서 타입 체크를 할 수 있습니다.</p>
+<p>실제 사용 예는 타입 레벨 프로그래밍을 다루는 포스트에서 다루도록 하겠습니다.</p>
+<p>※ 팬텀 타입 실제 데이터를 위한 타입이 아니라, 타입 체커를 위한 타입 매개 변수를 팬텀 타입이라 부릅니다. I, Add, Mul 모두 결과가 Expr Int 이지만, 내부에 가지고 있는 값이 Int만을 뜻하는게 아니라, Add나 Mul같은 수식일 수도 있습니다. 여기서 Int는 타입 체커를 위한 표식입니다.</p>
+<p>※ 값 생성자는 값을 만들 때 쓰이고, <em>desconstruct하기 위해 패턴 매칭할 때</em> 쓰입니다. Int를 Maybe Int로 만들 때 Just가 쓰이고, Just 안에 들어 있는 Int를 꺼낼 때 Just로 패턴매칭합니다.</p>
+
+<div id="disqus_thread" style="padding-top:40px"></div>
+<script>
+
+var disqus_config = function () {
+this.page.url = 'https://lionhairdino.github.io/extensions/2020-08-24-GADT.html';
+this.page.identifier = 'extensions/2020-08-24-GADT.markdown';
+};
+(function() {
+var d = document, s = d.createElement('script');
+s.src = 'https://lionhairdino.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+                            
+        </div>
+        <div id="footer">
+            © 2020 lionhairdino. All rights reserved. Generated by <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+    </body>
+</html>
