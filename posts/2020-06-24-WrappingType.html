@@ -3,13 +3,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko" lang="ko">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <title>lionhairdino - Int 와 Maybe Int의 차이. (값을 래핑하는 이유)</title>
-        <meta name="description" content="lionhairdino - Int 와 Maybe Int의 차이. (값을 래핑하는 이유)">
+        <title>lionhairdino - Int 와 Maybe Int의 차이. (값을 감싸는wrapping 이유)</title>
+        <meta name="description" content="lionhairdino - Int 와 Maybe Int의 차이. (값을 감싸는wrapping 이유)">
         <meta charset="UTF-8">
         <link rel="stylesheet" type="text/css" href="../css/default.css" />
         <meta property="og:type" content="website">
-        <meta property="og:title" content="Int 와 Maybe Int의 차이. (값을 래핑하는 이유)">
-        <meta property="og:description" content="lionhairdino - Int 와 Maybe Int의 차이. (값을 래핑하는 이유)">
+        <meta property="og:title" content="Int 와 Maybe Int의 차이. (값을 감싸는wrapping 이유)">
+        <meta property="og:description" content="lionhairdino - Int 와 Maybe Int의 차이. (값을 감싸는wrapping 이유)">
         <meta property="og:url" content="https://lionhairdino.github.io">
     </head>
     <body>
@@ -23,7 +23,7 @@
         </div>
 
         <div id="content">
-            <h1>Int 와 Maybe Int의 차이. (값을 래핑하는 이유)</h1>
+            <h1>Int 와 Maybe Int의 차이. (값을 감싸는wrapping 이유)</h1>
 
             <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
 <div class="info">
@@ -42,19 +42,35 @@
 <p>Maybe Int는 평범한 정수가 아닙니다. 어떤 절차를 거치면 정수를 줄 <em>준비</em>라고 볼 수 있습니다. Maybe를 벗겨내는 절차 없인 그저 준비만 하고 있는 상태기 때문에 다른 정수들과 어울릴(연산할) 수 없습니다. Int는 정수고, Maybe Int는 <em>정수를 줄 준비</em>입니다.<br />
 Reader env Int 는 env를 받아서 어떤 처리를 한 다음 Int를 돌려줄 준비를 한 상태입니다. 생성자나 함수를 <em>준비</em>로 해석하는게 언제나 들어 맞는지는 아직 확신이 서진 않지만, 래핑에 래핑에 래핑을 만나 복잡해 보일 때 <em>준비</em>로 해석하면 도움이 될 때가 있습니다.</p>
 <h2 id="타입-클래스">타입 클래스</h2>
-<p>타입을 래핑하는 또 다른 목적은, 같이 쓰일 함수를 고르는 작업을 위해서입니다. <em>타입 클래스와 인스턴스</em>를 쓰면, 타입에 따른 함수를 고를 수(분기) 있습니다. 함수를 실행할 때, 또 한 번 분기가 일어난다고 볼 수 있습니다. [1]</p>
+<p>타입을 래핑하는 또 다른 목적은, 같이 쓰일 함수를 고르는 작업을 위해서입니다. <em>타입 클래스와 인스턴스</em>를 쓰면, 타입에 따른 함수를 고를 수(분기) 있습니다. 함수를 실행할 때, 또 한 번 분기가 일어난다고 볼 수 있습니다. <sup><a href="#relation">[1]</a></sup></p>
 <p>이 포스트의 결론은, 래핑 a는</p>
 <ol type="1">
 <li>갈래 길(코드의 분기)을 내포하고 있거나,</li>
 <li>준비 상태를 뜻하거나,</li>
 <li>특정 함수셋(군)을 고르기 위한 태그입니다.</li>
 </ol>
+<p>2020.10.6 추가<br />
+## 감싼 타입에 함수 적용 타입을 감싸 또 다른 타입을 만드는 작업이 필요한 이유를 좀 더 선명하게 알아야 합니다. 유독 함수형에서만 일어나는 일은 아닙니다. 프로그래밍을 하다 보면 같은 속성을 가지지만 구조는 다른 경우, 역으로 다른 속성을 가지지만 구조는 같은 경우들을 만납니다. 퍼포먼스 때문일 때도 있고, 안전성을 위해서일 때도 있고, 논리를 따라가는 인간의 기억력을 보조해주기 위해서일 때도 있습니다. 감싸면서 정보를 추가하거나, 다른 것과 구별되도록 합니다. 이렇게 감싼 타입에 함수를 적용하는 방식은 대부분</p>
+<ol type="1">
+<li>감싼 걸 풀어내고</li>
+<li>안에 들어 있는 값에 함수를 적용</li>
+<li>그런 후에 다시 감싼 타입으로 만듭니다.</li>
+</ol>
+<p>이런 작업은 모든 감싼 타입에서 일어납니다. 모든 감싼 타입 마다 일일이 푸는 방법을 기억해야 합니다. 여기까지 생각이 미치면, 추상화 작업을 해서 뇌의 부하를 줄여줘야겠다는 생각이 들게 됩니다. 푸는 작업을 fmap 한가지로 추상화하자고 약속을 정한게 바로 펑크터입니다.</p>
+<p>하스켈에서 함수 하나 하나는 모두 독립적이며, 보통 Lazy하기 때문에 언제 실행될지도 모릅니다. 이런 상태에서 프로그램의 흐름<sup><a href="#main">[2]</a></sup>을 만들어내기 위해 함수가 함수를 감싸는composition 방법을 씁니다. (보통 composition을 합성이라 번역하는데, 딱 적합하다는 생각이 들지 않습니다. f . g 의 결과는 g를 적용한 후 f를 적용한다는 개념인데, 합성과는 좀 달리 느껴집니다. 조합이란 말이 더 어울리는 것 같기도 합니다.) 웬만하면 composition이 가능해야 여기 저기 쓰임새가 생깁니다. a -&gt; b , b -&gt; c 함수를 compostion 하려면 그냥 (.)을 쓰면 되고, m a -&gt; m b, m b -&gt; m c 도 (.)을 쓰면 됩니다. 그럼 a -&gt; m b, b -&gt; m c 함수는 어떻게 composition하면 될까요? 여기도 모나드를 이해하기 위한 시작점 중에 하나입니다.</p>
 <hr />
+<div id="relation">
+
+</div>
 <p>[1] 타입에 따라 인스턴스를 고르니, 타입과 함수를 연관 짓는 함수로 볼 수 있습니다. 어떤 것과 어떤 것을 연관 지어 놓는 걸 함수라고 하는데, 어떤 것을 연관 짓냐에 따라 이름을 달리 붙여 놨습니다.</p>
 <p>타입과 타입을 매핑 = 함수<br />
 타입과 함수를 매핑 = 타입 클래스<br />
 함수와 함수를 매핑 = 펑크터<br />
 펑크터와 펑크터를 매핑 = Natural Transform</p>
+<div id="main">
+
+</div>
+<p>[2] main 함수에서 흐름이 시작되는데, main 함수 자체가 &gt;&gt;= 로 엮어 놓은 함수 compostion입니다.</p>
 
 <div id="disqus_thread" style="padding-top:40px"></div>
 <script>

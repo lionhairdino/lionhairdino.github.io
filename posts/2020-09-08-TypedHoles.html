@@ -67,13 +67,15 @@
 <p>(1)은 Num 클래스까지만 추론됐고, (2)는 Integer 까지 추론됐습니다. monomorphismRestriction 확장을 끄거나 켜도 결과는 같습니다.</p>
 <p>ghc에서 몇 몇 클래스들은, 클래스까지만 추론된 후 더 이상 추론 단서가 없다면 디폴트 타입으로 추론합니다. 홀은 runReader 함수가 두 번째 인자로 1을 받는 걸 보고 Num r =&gt; Reader r a 로 추론을 끝내지 않고 Reader Integer a까지 갔습니다.</p>
 <p>컴파일 할 때와, GHCi에서 타입 체커 동작이 다릅니다. GHCi는 타입 디폴트 규칙을 numeric에만 한정하지 않고, Show, Eq, Ord 클래스까지 확장합니다. 일정한 동작을 보이면 좋겠는데, 때에 따라 다르다 하니 좀 까다롭습니다.</p>
-<p>어떤 때에 디폴트 동작이 일어나는지 좀 더 명확해지면 내용을 추가하도록 하겠습니다.</p>
+<p>어떤 때에 디폴트 추론이 일어나는지 좀 더 명확해지면 내용을 추가하도록 하겠습니다.</p>
 <hr />
 <p>디폴트 타입 정보를 보는 명령어 :type +d</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="op">&gt;</span> <span class="op">:</span><span class="kw">type</span> <span class="op">+</span>d <span class="dv">1</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a><span class="dv">1</span><span class="ot"> ::</span> <span class="dt">Integer</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a><span class="op">&gt;</span> <span class="op">:</span><span class="kw">type</span> <span class="op">+</span>d <span class="fl">1.0</span></span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a><span class="fl">1.0</span><span class="ot"> ::</span> <span class="dt">Double</span></span></code></pre></div>
+<p>default 구문으로 Num 클래스의 디폴트값을 지정해 줄 수 있습니다. default 구문을 써주지 않으면<br />
+default (Integer, Double) 로 지정한 것으로 간주합니다.</p>
 
 <div id="disqus_thread" style="padding-top:40px"></div>
 <script>
