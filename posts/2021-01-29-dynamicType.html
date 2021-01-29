@@ -3,14 +3,15 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko" lang="ko">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>lionhairdino - 코드 조립</title>
-        <meta name="description" content="lionhairdino - 코드 조립">
-        <meta charset="UTF-8">
+        <meta name="description" content="lionhairdino - 코드 조립" />
+        <meta charset="UTF-8" />
         <link rel="stylesheet" type="text/css" href="../css/default.css" />
-        <meta property="og:type" content="website">
-        <meta property="og:title" content="코드 조립">
-        <meta property="og:description" content="lionhairdino - 코드 조립">
-        <meta property="og:url" content="https://lionhairdino.github.io">
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="코드 조립" />
+        <meta property="og:description" content="lionhairdino - 코드 조립" />
+        <meta property="og:url" content="https://lionhairdino.github.io" />
     </head>
     <body>
         <div id="header">
@@ -35,7 +36,7 @@
 하스켈은 런타임이 아니라, 컴파일 타임에 타입을 유추합니다. 여기서 C++이나, C등을 베이스로 배웠던 사람은 컴파일 타임에 일어나는 코드 조립 과정을 간과하기 쉽습니다.<br />
 컴파일러가 적당한 코드 조각을 고를 수 있도록 하면, 정적 타입 언어지만 좀 더 추상적인 표현이 가능해집니다.<br />
 최종 바이너리로 바꾸기 위해 타입 지정이 전혀 없는 상태에서 출발하는 경우는 없으며, 일부 이미 지정된 타입들을 단서로 코드를 조립하게 되는데, 이 때 쓰이는 언어 요소가 바로 클래스와 인스턴스입니다. 함수에 넘어 온 인자 타입에 따라 같은 이름으로 되어 있는 여러 함수들 중 하나를 고를 때 쓰입니다.</p>
-<p><a href="../posts/2020-07-21-instance.html">인스턴스instance의 의미</a>포스트와 중복되는 내용이 있습니다. 사람에 따라 편한 문서가 다를 것 같아 그대로 두었습니다.</p>
+<p><a href="../posts/2020-07-21-instance.html">인스턴스instance의 의미</a> 포스트와 중복되는 내용이 있습니다. 사람에 따라 편한 문서가 다를 것 같아 그대로 두었습니다.</p>
 <h2 id="클래스와-인스턴스">클래스와 인스턴스</h2>
 <p>하스켈에서 클래스는 여러 함수 선언을 묶어 놓은 셋set의 이름이라고 볼 수 있습니다. 클래스의 인스턴스를 만든다는 건 새로운 객체를 생성하는게 아니라, 선언되어 있는 함수셋을 구현하는 겁니다.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">class</span> <span class="dt">SomeC</span> a <span class="kw">where</span></span>
@@ -72,7 +73,7 @@
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a></span>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a>main <span class="ot">=</span> <span class="kw">do</span></span>
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a>  runReaderT func1 <span class="dv">1</span></span></code></pre></div>
-<p>func1 의 do 안에는 한 구문이 실행될 때마다 bind가 실행됩니다. 이 bind를 어떤 인스턴스에서 가져올지 결과 타입에 따라 결정합니다. 특별한 문법 요소가 있는 게 아니라, 인자에 따라 함수를 고르는 알고리즘만 작용합니다. do를 풀어 쓰면</p>
+<p>func1의 do 안에는 한 구문이 실행될 때마다 bind가 실행됩니다. 이 bind를 어떤 인스턴스에서 가져올지 결과 타입에 따라 결정합니다. 특별한 문법 요소가 있는 게 아니라, 인자에 따라 함수를 고르는 알고리즘만 작용합니다. do를 풀어 쓰면</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a>liftIO <span class="op">$</span> <span class="fu">putStrLn</span> <span class="st">&quot;Ok1&quot;</span> <span class="op">&gt;&gt;=</span> \_ <span class="ot">-&gt;</span> liftIO <span class="op">$</span> <span class="fu">putStrLn</span> <span class="st">&quot;Ok2&quot;</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a><span class="co">----------(1)----------     -------------(2)-------------</span></span></code></pre></div>
 <p>(1)과 (2)의 타입을 보고 &gt;&gt;= 를 고르게 됩니다.<br />
