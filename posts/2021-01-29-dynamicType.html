@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko" lang="ko">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>lionhairdino - 코드 조립</title>
+        <meta name="description" content="lionhairdino - 코드 조립">
+        <meta charset="UTF-8">
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <meta property="og:type" content="website">
+        <meta property="og:title" content="코드 조립">
+        <meta property="og:description" content="lionhairdino - 코드 조립">
+        <meta property="og:url" content="https://lionhairdino.github.io">
+    </head>
+    <body>
+        <div id="header">
+            <div id="logo"> </div>
+            <div id="navigation">
+                <a href="../">lionhairdino</a> 
+                <a href="../about.html">about</a>
+                <!--<a href="/archive.html">archive</a>-->
+            </div>
+        </div>
+
+        <div id="content">
+            <h1>코드 조립</h1>
+
+            <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+<div class="info">
+    Posted on January 29, 2021
+    
+</div>
+
+<p>정적 타입은 타입을 모두 지정해 주면서 코드를 작성해야 하고, 동적 타입은 코드에는 타입 지정을 하지 않고, 런타임이 알아서 적당한 타입을 골라가며 프로그램을 실행합니다. 하스켈은 정적 타입이지만, 동적 타입처럼 타입 지정을 명시적으로 하지 않을 때가 많습니다. 그럼 하스켈도 런타임이 타입을 유추하나? 라고 의심할 수 있는데, 그럼 정적 타입 언어라고 부르지 않았을 겁니다.<br />
+하스켈은 런타임이 아니라, 컴파일 타임에 타입을 유추합니다. 여기서 C++이나, C등을 베이스로 배웠던 사람은 컴파일 타임에 일어나는 코드 조립 과정을 간과하기 쉽습니다.<br />
+컴파일러가 적당한 코드 조각을 고를 수 있도록 하면, 정적 타입 언어지만 좀 더 추상적인 표현이 가능해집니다.<br />
+최종 바이너리로 바꾸기 위해 타입 지정이 전혀 없는 상태에서 출발하는 경우는 없으며, 일부 이미 지정된 타입들을 단서로 코드를 조립하게 되는데, 이 때 쓰이는 언어 요소가 바로 클래스와 인스턴스입니다. 함수에 넘어 온 인자 타입에 따라 같은 이름으로 되어 있는 여러 함수들 중 하나를 고를 때 쓰입니다.</p>
+<p><a href="../posts/2020-07-21-instance.html">인스턴스instance의 의미</a>포스트와 중복되는 내용이 있습니다. 사람에 따라 편한 문서가 다를 것 같아 그대로 두었습니다.</p>
+<h2 id="클래스와-인스턴스">클래스와 인스턴스</h2>
+<p>하스켈에서 클래스는 여러 함수 선언을 묶어 놓은 셋set의 이름이라고 볼 수 있습니다. 클래스의 인스턴스를 만든다는 건 새로운 객체를 생성하는게 아니라, 선언되어 있는 함수셋을 구현하는 겁니다.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">class</span> <span class="dt">SomeC</span> a <span class="kw">where</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="ot">    func1 ::</span> a <span class="ot">-&gt;</span> a</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a><span class="ot">    func2 ::</span> <span class="op">...</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a><span class="kw">instance</span> <span class="dt">SomeC</span> <span class="dt">Int</span> <span class="kw">where</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a>    func1 x <span class="ot">=</span> <span class="op">...</span> <span class="co">-- (1)</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a>    func2 y <span class="ot">=</span> <span class="op">...</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a><span class="kw">instance</span> <span class="dt">SomeC</span> <span class="dt">Float</span> <span class="kw">where</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a>    func1 x <span class="ot">=</span> <span class="op">...</span> <span class="co">-- (2)</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a>    func2 y <span class="ot">=</span> <span class="op">...</span></span></code></pre></div>
+<p>보통 Int를 SomeC의 인스턴스로 만든다고 표현하는데, OOP에 익숙한 생각으로 보면, Int나 Float를 변형하거나, 무언가 추가하는 느낌이 들 수 있습니다. 저는 이 느낌 때문에 첨음에는 부드럽게 넘어가지 못했습니다.</p>
+<p>class를 풀어서 얘기하면, 어떤 대상의 class만 알면 성격이나 성질 일부를 알 수 있게 하는 용도입니다. 뭔가를 성격에 따라 나눈다는 의미의 영어 단어 class로 생각하면 OOP나 하스켈이나 의미가 다른 게 아니긴 합니다. OOP에서, 오브젝트가 어떤 클래스의 인스턴스라면, 해당 오브젝트에는 클래스에서 선언한 구현체가 “들어” 있습니다. 하지만 하스켈에서는 인스턴스 안에 “들어”있는게 오브젝트가 아니라 함수입니다.</p>
+<p>SomeC는 코드 조립할 때 쓰일 코드 조각 “종류”의 이름입니다.(하나의 조각이 아니라 조각의 “종류(부류)”의 이름입니다.) GHC가 컴파일 할 때, func1 함수를 만나면 두 개의 인스턴스 각 각에 들어있는 (1),(2) 중 하나를 골라서 조립 조각으로 사용합니다. 둘 중에 어느 인스턴스의 func1을 가져올까요? 바로 이 선택을 위한 태그(또는 키) 역할을 하는게 Int와 Float입니다. func1이 받은 인자 타입이 Int라면 (1)번 코드를 가져오고, func1이 받은 인자가 Float 타입이면 (2)번 코드를 가져옵니다. 말로 표현하면</p>
+<p>“Int를 SomeC의 인스턴스로 만든다”</p>
+<p>보다</p>
+<p><em>“Int를 키로하는 SomeC의 인스턴스를 만든다”</em></p>
+<p>는 표현이 좀 더 설명적이고, 오해의 소지가 줄어들긴 합니다. 하지만, 매뉴얼 등에 이렇게 쓰인 건 아직 보지 못했습니다.</p>
+<h2 id="함수-서명signature">함수 서명signature</h2>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="ot">func1 ::</span> <span class="dt">MaybeT</span> <span class="dt">IO</span> ()</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>func1 <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a>    liftIO <span class="op">$</span> <span class="fu">putStrLn</span> <span class="st">&quot;OK1&quot;</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a>    liftIO <span class="op">$</span> <span class="fu">putStrLn</span> <span class="st">&quot;OK2&quot;</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a>main <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a>  runMaybeT func1 </span></code></pre></div>
+<p>위 코드의 func1의 타입을 아래와 같이 바꾼다는 건 무슨 뜻일까요?</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="ot">func1 ::</span> <span class="dt">ReaderT</span> <span class="dt">Int</span> <span class="dt">IO</span> ()</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a>func1 <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a>    liftIO <span class="op">$</span> <span class="fu">putStrLn</span> <span class="st">&quot;OK1&quot;</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a>    liftIO <span class="op">$</span> <span class="fu">putStrLn</span> <span class="st">&quot;OK2&quot;</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a>main <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a>  runReaderT func1 <span class="dv">1</span></span></code></pre></div>
+<p>func1 의 do 안에는 한 구문이 실행될 때마다 bind가 실행됩니다. 이 bind를 어떤 인스턴스에서 가져올지 결과 타입에 따라 결정합니다. 특별한 문법 요소가 있는 게 아니라, 인자에 따라 함수를 고르는 알고리즘만 작용합니다. do를 풀어 쓰면</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a>liftIO <span class="op">$</span> <span class="fu">putStrLn</span> <span class="st">&quot;Ok1&quot;</span> <span class="op">&gt;&gt;=</span> \_ <span class="ot">-&gt;</span> liftIO <span class="op">$</span> <span class="fu">putStrLn</span> <span class="st">&quot;Ok2&quot;</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a><span class="co">----------(1)----------     -------------(2)-------------</span></span></code></pre></div>
+<p>(1)과 (2)의 타입을 보고 &gt;&gt;= 를 고르게 됩니다.<br />
+보통 서명은 컴파일러에게 먼저 알려주는 규격정도 느낌인데, 결과적으로 <em>함수 서명을 바꾸면 함수 몸체의 최종 바이너리가 바뀝니다.</em></p>
+<p>하스켈에서 타입 서명은 코드 조립을 위해서만 존재합니다. 코드 조립이 끝나서 바이너리로 넘어가면 타입 정보는 사라집니다.</p>
+<p>OOP스런 클래스 생각을 완전히 버려야 나중에 에러 메시지를 읽을 때도 덜 헤매게 됩니다. 수많은 에러 메시지들이 대부분 타입과 관련이 있습니다.</p>
+
+<div id="disqus_thread" style="padding-top:40px"></div>
+<script>
+
+var disqus_config = function () {
+this.page.url = 'https://lionhairdino.github.io/posts/2021-01-29-dynamicType.html';
+this.page.identifier = 'posts/2021-01-29-dynamicType.markdown';
+};
+(function() {
+var d = document, s = d.createElement('script');
+s.src = 'https://lionhairdino.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+                            
+        </div>
+        <div id="footer">
+            © 2020 lionhairdino. All rights reserved. Generated by <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+    </body>
+</html>
