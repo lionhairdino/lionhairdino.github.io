@@ -32,9 +32,9 @@
     
 </div>
 
-<p>모나드 스택들에서 허우적대다 쉴 겸 눈에 바로 결과물이 보이는 웹 관련 라이브러리들을 봐 둘까 하고 봤다가 Type Level Programming 을 공부하도록 이끈 라이브러리입니다. Yui, JQuery 쯤에서 웹 관련 작업이 끊겨서, React도 모르는 상황에서 보니, 예시 코드를 봐도 뭘 위한 것인지 알게 되는데 좀 시간이 걸렸습니다.</p>
+<p>모나드 스택들에서 허우적대다, 쉴 겸 눈에 바로 결과물이 보이는 웹 관련 라이브러리들을 봐 둘까 하고 봤다가 Type Level Programming 을 공부하도록 이끈 라이브러리입니다. Yui, JQuery 쯤에서 웹 관련 작업이 끊겨서, React도 모르는 상황에서 보니, 예시 코드를 봐도 뭘 위한 것인지 알게 되는데 좀 시간이 걸렸습니다.</p>
 <p>Servant가 하는 일은, http 리소스 요청과 하스켈 함수를 매칭 시켜주는 역할입니다. 매칭된 함수가 결과를 뱉으면, 이 결과를 요청자에게 보내는 일은 Servant backend로 쓰이고 있는 WAI 라이브러리가 담당합니다. URL과 헤더를 파싱할 때, 타입 레벨 프로그래밍 패턴을 이용해서 안전성을 높인 라이브러입니다.</p>
-<p>Servant 동작을 이해하는데 많은 도움을 준 포스트입니다. 이 포스트에서 일부 코드를 가져와 조금 가져와 풀어 봤습니다.</p>
+<p>Servant 동작을 이해하는데 많은 도움을 준 포스트입니다. 이 포스트에서 일부 코드를 조금 가져와 풀어 봤습니다.</p>
 <p>Implementing a minimal version of haskell-servant - Andres Löh<br />
 <a href="https://www.well-typed.com/blog/2015/11/implementing-a-minimal-version-of-haskell-servant/" class="uri">https://www.well-typed.com/blog/2015/11/implementing-a-minimal-version-of-haskell-servant/</a></p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">data</span> <span class="dt">Get</span> (<span class="ot">a ::</span> <span class="op">*</span>)</span>
@@ -70,13 +70,14 @@
 <p>serve 함수를 콜할 때 들어온 layout 에 따라 Server layout 타입이 결정됩니다. Server (Get a) 가 들어왔다면 route 의 타입은</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="ot">route ::</span> <span class="dt">Proxy</span> (<span class="dt">Get</span> a) <span class="ot">-&gt;</span> <span class="dt">IO</span> a <span class="ot">-&gt;</span> [<span class="dt">String</span>] <span class="ot">-&gt;</span> <span class="dt">Maybe</span> (<span class="dt">IO</span> <span class="dt">String</span>)</span></code></pre></div>
 <p>로 구체 타입이 결정되고, HasServer (Get a) 인스턴스에 있는 route 를 부릅니다.</p>
-<p>… 계속 미완성 포스트</p>
+<p>… 계속<br />
+미완성 포스트</p>
 <hr />
 <div id="typeFamily">
 
 </div>
 <p>[1] Type Family : 타입 레벨 함수</p>
-<p>타입끼리 연산과 갈래 길을 만드는 건 Type familiy 를 통해 표현됩니다. 타입 연산은, <em>타입 매개 변수</em>를 가지고 있는 타입에 어떤 타입을 넣어주냐에 따라 <em>결과 타입이 결정</em>되는 걸 말합니다.</p>
+<p>타입끼리 연산과 갈래 길을 만드는 건 Type familiy를 통해 표현됩니다. 타입 연산은, <em>타입 매개 변수</em>를 가지고 있는 타입에 어떤 타입을 넣어주냐에 따라 <em>결과 타입이 결정</em>되는 걸 말합니다.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="kw">class</span> <span class="dt">Add</span> a b <span class="kw">where</span>  </span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a>    <span class="kw">type</span> <span class="dt">SumTy</span> a b</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a><span class="ot">    plus ::</span> a <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> <span class="dt">SumTy</span> a b</span>
