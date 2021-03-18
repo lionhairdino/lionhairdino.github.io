@@ -1,0 +1,43 @@
+name: Haskell CI
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build-deploy:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-haskell@v1
+      with:
+        ghc-version: '8.8.3'
+        cabal-version: '3.2.0'
+
+    - name: Cache
+      uses: actions/cache@v2
+      env:
+        cache-name: cache-cabal
+      with:
+        path: ~/.cabal
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/*.cabal') }}-${{ hashFiles('**/cabal.project') }}
+        restore-keys: |
+          ${{ runner.os }}-build-${{ env.cache-name }}-
+          ${{ runner.os }}-build-
+          ${{ runner.os }}-
+    - name: Install dependencies
+      run: 
+        cabal install --only-dependencies --overwrite-policy=always
+    - name: Build
+      run: cabal build
+    - name: Build Site
+      run: cabal exec lionhairdino build
+    - name: Deploy
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        deploy_key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
+        publish_dir: _site
+        publish_branch: master  
+        External_repository: lionhairdino/lionhairdino.github.io
