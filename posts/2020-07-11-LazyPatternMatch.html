@@ -34,25 +34,25 @@
 
 <p><a href="https://wiki.haskell.org/Lazy_pattern_match" class="uri">https://wiki.haskell.org/Lazy_pattern_match</a></p>
 <p>문법</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">let</span> (a,b) <span class="ot">=</span> p <span class="co">-- 이 경우만 ~가 없어도 lazy 패턴 매칭</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a>func <span class="op">~</span>p <span class="ot">=</span> <span class="op">...</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a><span class="kw">case</span> p <span class="kw">of</span> <span class="op">~</span>(a,b) <span class="ot">-&gt;</span> <span class="op">...</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a>(\<span class="op">~</span>(a,b) <span class="ot">-&gt;</span> <span class="op">...</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> (a,b) <span class="ot">=</span> p <span class="co">-- 이 경우만 ~가 없어도 lazy 패턴 매칭</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>func <span class="op">~</span>p <span class="ot">=</span> <span class="op">...</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="kw">case</span> p <span class="kw">of</span> <span class="op">~</span>(a,b) <span class="ot">-&gt;</span> <span class="op">...</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>(\<span class="op">~</span>(a,b) <span class="ot">-&gt;</span> <span class="op">...</span>)</span></code></pre></div>
 <p>틸드 <em>~</em> 를 패턴에 붙여주면, 나중에 필요할 때 매칭합니다. 보통 패턴 매칭과 비교하면,</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a>func (a,b) <span class="ot">=</span> <span class="op">...</span> <span class="co">-- 튜플 생성자와 바로 매칭</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>func <span class="op">~</span>(a,b) <span class="ot">=</span> <span class="op">...</span> <span class="co">-- 바로 튜플과 매칭하는게 아니라, 나중에 body에서 필요할 때 매칭</span></span></code></pre></div>
-<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a>func <span class="op">~</span>(a,b) <span class="ot">=</span> g a b</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a><span class="co">-- 이렇게 쓴 건 아래와 같은 의미</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a>func p <span class="ot">=</span> g (<span class="fu">fst</span> p) (<span class="fu">snd</span> p)</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>func (a,b) <span class="ot">=</span> <span class="op">...</span> <span class="co">-- 튜플 생성자와 바로 매칭</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>func <span class="op">~</span>(a,b) <span class="ot">=</span> <span class="op">...</span> <span class="co">-- 바로 튜플과 매칭하는게 아니라, 나중에 body에서 필요할 때 매칭</span></span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>func <span class="op">~</span>(a,b) <span class="ot">=</span> g a b</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- 이렇게 쓴 건 아래와 같은 의미</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>func p <span class="ot">=</span> g (<span class="fu">fst</span> p) (<span class="fu">snd</span> p)</span></code></pre></div>
 <p>p는 바로 튜플로 매칭하지 않고 있다가, fst를 만나면 튜플로 매칭합니다.</p>
 <p>주의</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="ot">func ::</span> [a] <span class="ot">-&gt;</span> [a]</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a>func <span class="op">~</span>(x<span class="op">:</span>xs) <span class="ot">=</span> x<span class="op">:</span>xs</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a>func [] <span class="ot">=</span> []</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ot">func ::</span> [a] <span class="ot">-&gt;</span> [a]</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>func <span class="op">~</span>(x<span class="op">:</span>xs) <span class="ot">=</span> x<span class="op">:</span>xs</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>func [] <span class="ot">=</span> []</span></code></pre></div>
 <p>Lazy 패턴을 먼저 매칭하면 두 번째 나온 빈 리스트도 Lazy 패턴에서 매칭되므로 마지막 [] 패턴일 때 정의가 필요 없다는 경고가 나옵니다.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a>func <span class="op">~</span>(x<span class="op">:</span>xs) <span class="ot">=</span> x<span class="op">:</span>xs</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a><span class="co">-- 위 패턴을 접근자accessor 로 풀어 쓰면</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a>func p <span class="ot">=</span> <span class="fu">head</span> p <span class="op">:</span> <span class="fu">tail</span> p</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>func <span class="op">~</span>(x<span class="op">:</span>xs) <span class="ot">=</span> x<span class="op">:</span>xs</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- 위 패턴을 접근자accessor 로 풀어 쓰면</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>func p <span class="ot">=</span> <span class="fu">head</span> p <span class="op">:</span> <span class="fu">tail</span> p</span></code></pre></div>
 <p>빈 리스트 검사를 하지 않은 상태에서 head와 tail에 넘겨지므로 위험한 모양이 됩니다.</p>
 <p>아마도 Lazy 패턴은 퍼포먼스가 필요할 때 쓸 것 같습니다. 두 개 이상의 값 생성자를 가진 타입과 Lazy 패턴 매칭을 하는 건 피하는게 좋다고 합니다.</p>
 

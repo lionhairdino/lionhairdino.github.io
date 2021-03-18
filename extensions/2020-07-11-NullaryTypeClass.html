@@ -35,20 +35,20 @@
 <p>타입 매개 변수가 하나도 없는 타입 클래스를 만들려면 필요한 확장입니다.</p>
 <p>함수 컨텍스트에 클래스를 걸어두고, 함수에서 클래스에 있는 메소드를 사용하면 실제 메소드 구현체는 나중에 결정됩니다. 여러 개의 인스턴스 중 고르기 위한게 아니라, <em>선언과 정의를 분리하는 용도로</em> <em>타입 클래스 + 인스턴스</em>를 사용합니다. 분리 용도로만 쓰니 인스턴스를 여러 개 만들 필요가 없습니다. 인스턴스를 여러 개 만들 때는 타입 매개 변수에 따라 여러 개의 인스턴스들을 만들게 되는데, 매개 변수가 없기 때문에 <em>인스턴스를 여러 개 만들 수 없고, 단 하나만</em> 만들 수 있습니다.</p>
 <p>라이브러리 코드가 아래와 같다면</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="ot">{-# LANGUAGE NullaryTypeClasses #-}</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="co">-- 이렇게 클래스를 만들어서 logMessage란 메소드를 선언해서</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a><span class="kw">class</span> <span class="dt">Logger</span> <span class="kw">where</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a><span class="ot">  logMessage ::</span> <span class="dt">String</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> ()</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a><span class="co">-- 라이브러리 함수에서 사용합니다.</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a><span class="ot">someLibFunc ::</span> <span class="dt">Logger</span> <span class="ot">=&gt;</span> <span class="dt">IO</span> ()</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a>someLibFunc <span class="ot">=</span> <span class="kw">do</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a>    <span class="op">...</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a>    logMessage <span class="st">&quot;Some Log&quot;</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a>    <span class="op">...</span></span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ot">{-# LANGUAGE NullaryTypeClasses #-}</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- 이렇게 클래스를 만들어서 logMessage란 메소드를 선언해서</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">Logger</span> <span class="kw">where</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="ot">  logMessage ::</span> <span class="dt">String</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> ()</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co">-- 라이브러리 함수에서 사용합니다.</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="ot">someLibFunc ::</span> <span class="dt">Logger</span> <span class="ot">=&gt;</span> <span class="dt">IO</span> ()</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>someLibFunc <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="op">...</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    logMessage <span class="st">&quot;Some Log&quot;</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="op">...</span></span></code></pre></div>
 <p>그럼 실제 logMessage의 구현체는 라이브러리를 쓰는 사용자가 다음처럼 인스턴스를 만들어 지정해 줄 수 있습니다.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="kw">instance</span> <span class="dt">Logger</span> <span class="kw">where</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>    logMessage t <span class="ot">=</span> <span class="fu">putStrLn</span> t</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Logger</span> <span class="kw">where</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    logMessage t <span class="ot">=</span> <span class="fu">putStrLn</span> t</span></code></pre></div>
 <p>라이브러리에 매개 변수가 하나도 없는 클래스가 보이면, <em>함수를 선언만해서 미리 쓸테니</em>, 실제 구현체는 사용자가 입 맛에 맞는 인스턴스를 만들어 넘기라는 얘기입니다.</p>
 <p>참고<br />
 <a href="https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/glasgow_exts.html#extension-NullaryTypeClasses" class="uri">https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/glasgow_exts.html#extension-NullaryTypeClasses</a><br />

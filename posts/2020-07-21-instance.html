@@ -37,13 +37,13 @@
 “클래스는 성격을 선언해 놓고, 클래스의 성격을 인스턴스로 구현한다.”</p>
 <p>객체지향OOP에서의 인스턴스와는 다른 의미입니다. OOP에서는 객체 설계도에 해당하는 클래스를 선언하고, 이 설계도에 따라 만든 구현체를 인스턴스로 표현하는데, 하스켈에서 클래스는 몇 개의 함수 선언을 묶어놓은 셋set 의미입니다. 이 함수 선언들을 특정 데이터 타입에 맞게 구현한 것을 인스턴스로 부릅니다.</p>
 <h2 id="클래스-정의를-어떤-식으로-읽어야-좋을까요">클래스 정의를 어떤 식으로 읽어야 좋을까요?</h2>
-<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">class</span> <span class="dt">HasName</span> a <span class="kw">where</span>    </span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="ot">  getName ::</span> a <span class="ot">-&gt;</span> <span class="dt">String</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a><span class="ot">  getPower ::</span> a <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a><span class="kw">instance</span> <span class="dt">HasName</span> <span class="dt">Player</span> <span class="kw">where</span>    </span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a>  getName x <span class="ot">=</span> <span class="st">&quot;Player : &quot;</span> <span class="op">++</span> name x    </span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a>  <span class="op">...</span></span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">HasName</span> a <span class="kw">where</span>    </span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ot">  getName ::</span> a <span class="ot">-&gt;</span> <span class="dt">String</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ot">  getPower ::</span> a <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">HasName</span> <span class="dt">Player</span> <span class="kw">where</span>    </span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  getName x <span class="ot">=</span> <span class="st">&quot;Player : &quot;</span> <span class="op">++</span> name x    </span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="op">...</span></span></code></pre></div>
 <p>“a type a is an instance of the class HasName”<br />
 “a는 HasName 클래스의 인스턴스”</p>
 <p>“Player는 HasName의 인스턴스이다.”<br />
@@ -51,18 +51,18 @@
 “Player 타입을 만나면 getName 메소드를 가져올 HasName 인스턴스가 있다.”</p>
 <p>대체로 위와 같은 해석이 많이 쓰이는데, 해석만 봐서는 마치 Player가 HasName의 구현체처럼 느껴지지 않나요?</p>
 <h2 id="클래스는-메소드-셋의-이름입니다.">클래스는 메소드 셋의 이름입니다.</h2>
-<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="kw">class</span> <span class="dt">Convertible</span> a b <span class="op">|</span> a <span class="ot">-&gt;</span> b <span class="kw">where</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a><span class="ot">  convert ::</span> a <span class="ot">-&gt;</span> b</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a><span class="ot">  union ::</span> a <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> a</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a><span class="kw">instance</span> <span class="dt">Convertible</span> <span class="dt">Int</span> <span class="dt">Char</span> <span class="kw">where</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a>  convert <span class="ot">=</span> <span class="op">...</span> </span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a>  union <span class="ot">=</span> <span class="op">...</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true"></a></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true"></a><span class="kw">instance</span> <span class="dt">Convertible</span> <span class="dt">Char</span> <span class="dt">Int</span> <span class="kw">where</span></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true"></a>  convert <span class="ot">=</span> <span class="op">...</span></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true"></a>  union <span class="ot">=</span> <span class="op">...</span></span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">Convertible</span> a b <span class="op">|</span> a <span class="ot">-&gt;</span> b <span class="kw">where</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ot">  convert ::</span> a <span class="ot">-&gt;</span> b</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ot">  union ::</span> a <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> a</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Convertible</span> <span class="dt">Int</span> <span class="dt">Char</span> <span class="kw">where</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  convert <span class="ot">=</span> <span class="op">...</span> </span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  union <span class="ot">=</span> <span class="op">...</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Convertible</span> <span class="dt">Char</span> <span class="dt">Int</span> <span class="kw">where</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  convert <span class="ot">=</span> <span class="op">...</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  union <span class="ot">=</span> <span class="op">...</span></span></code></pre></div>
 <p>HasName Player 처럼 헤드에 매개 변수가 하나만 있을 때는 “Player는 HasName의 인스턴스이다”란 해석이 그럭 저럭 넘어갈만 한데, “Int Char는 Convertible의 인스턴스이다”란 해석은 저한테는 직관적으로 와닿지 않습니다. 저와 비슷한 느낌이 오는 분들은 다음처럼 해석하면 도움이 됩니다.</p>
 <p>인스턴스를 선언하는 건 메소드 셋set을 준비하는 겁니다. Convertible은 convert, union으로 이루어진 메소드 셋의 이름같은 겁니다. 인스턴스 헤드에 쓰여 있는 Char와 Int는 여러 메소드 셋 중에 하나를 선택할 때 쓰이는 <em>키key</em>입니다. Char와 Int는 구현체를 뜻하는게 아니라, 구현체를 고를 때 다른 구현체와 구별하기 위한 key를 뜻합니다.</p>
 <p>“instance Convertible Int Char 선언은 Convertible의 새로운 메소드 셋(convert,union) 한 벌을 추가하고, 이 메소드 셋의 키는 Int Char 로 지정한다.”</p>
@@ -79,8 +79,8 @@ MyType   MyType용 getName
 ...</code></pre>
 <p>위 소스에서는 getName 메소드가 여러 개 있고, 이 중 하나를 선택하는 키로 쓰이는게 Player, Villain 타입입니다.</p>
 <h2 id="그럼-이렇게-constraint가-있는-경우는-어떻게-읽을까요">그럼 이렇게 constraint가 있는 경우는 어떻게 읽을까요?</h2>
-<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="kw">instance</span> (<span class="dt">Eq</span> a) <span class="ot">=&gt;</span> <span class="dt">Eq</span> (<span class="dt">Tree</span> a) <span class="kw">where</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a>  (<span class="op">==</span>) <span class="op">...</span></span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> (<span class="dt">Eq</span> a) <span class="ot">=&gt;</span> <span class="dt">Eq</span> (<span class="dt">Tree</span> a) <span class="kw">where</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  (<span class="op">==</span>) <span class="op">...</span></span></code></pre></div>
 <p>(Tree a)타입을 Eq 클래스의 인스턴스로 만드는데, Tree가 감싸고 있는게 Eq의 인스턴스여야 합니다. 다시 말해, 아무 (Tree a)타입을 만났다고 모두 이 인스턴스로 코드 조립을 할 수 있는게 아닙니다. a타입을 위한 (==)가 있을 경우만, 이 인스턴스의 메소드로 해결할 수 있습니다. 최종 코드 조립을 할 때는 구체 타입을 알아야 하는데 a는 무슨 타입일까요?</p>
 <p><em>코드 조립할 때, 항상 구체 타입까지 알아야 하는 건 아닙니다.</em><br />
 <em>여기선 구체 타입까지 고정해 놓지 않았습니다.</em></p>
@@ -99,52 +99,52 @@ Float               Float용 (==)
 Tree                Tree용 (==)</code></pre>
 <p>그럼 constraint는 언제 영향을 줄까요? 다음 테스트로 짐작할 수 있습니다.<br />
 만일 Eq 인스턴스가 아닌 타입 a를 가진 Tree를 인자로 (==)를 부르면 어떤 에러가 날까요? <em>Eq (Tree a)</em>가 없다는 에러가 날까요? 아니면 <em>Eq a</em>가 없다는 에러가 날까요?</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a><span class="kw">import</span> <span class="dt">Data.Tree</span>                       </span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a>    </span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true"></a><span class="kw">data</span> <span class="dt">NoEq</span> <span class="ot">=</span> <span class="dt">NoEq</span>    </span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true"></a>                                           </span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true"></a><span class="ot">treeA ::</span> <span class="dt">Tree</span> <span class="dt">NoEq</span>                             </span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true"></a>treeA <span class="ot">=</span> <span class="dt">Node</span> <span class="dt">NoEq</span> []             </span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true"></a>                                 </span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true"></a><span class="ot">treeB ::</span> <span class="dt">Tree</span> <span class="dt">NoEq</span>               </span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true"></a>treeB <span class="ot">=</span> <span class="dt">Node</span> <span class="dt">NoEq</span> [] </span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true"></a></span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true"></a><span class="op">&gt;</span> treeA <span class="op">==</span> treeB</span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true"></a></span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true"></a><span class="op">&lt;</span>interactive<span class="op">&gt;:</span><span class="dv">21</span><span class="op">:</span><span class="dv">1</span><span class="op">:</span> <span class="fu">error</span><span class="op">:</span></span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true"></a>    • <span class="dt">No</span> <span class="kw">instance</span> for (<span class="dt">Eq</span> <span class="dt">NoEq</span>) arising from a use <span class="kw">of</span> ‘<span class="op">==</span>’</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Data.Tree</span>                       </span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">NoEq</span> <span class="ot">=</span> <span class="dt">NoEq</span>    </span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>                                           </span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="ot">treeA ::</span> <span class="dt">Tree</span> <span class="dt">NoEq</span>                             </span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>treeA <span class="ot">=</span> <span class="dt">Node</span> <span class="dt">NoEq</span> []             </span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>                                 </span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="ot">treeB ::</span> <span class="dt">Tree</span> <span class="dt">NoEq</span>               </span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>treeB <span class="ot">=</span> <span class="dt">Node</span> <span class="dt">NoEq</span> [] </span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> treeA <span class="op">==</span> treeB</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>interactive<span class="op">&gt;:</span><span class="dv">21</span><span class="op">:</span><span class="dv">1</span><span class="op">:</span> <span class="fu">error</span><span class="op">:</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>    • <span class="dt">No</span> <span class="kw">instance</span> for (<span class="dt">Eq</span> <span class="dt">NoEq</span>) arising from a use <span class="kw">of</span> ‘<span class="op">==</span>’</span></code></pre></div>
 <p>위 에러로 Tree 인스턴스는 찾았지만 (==)의 constraint인 Eq a =&gt; 를 풀지 못해 발생한 에러임을 알 수 있습니다.<br />
 다른 방향에서 접근해서 설명하면, <em>constraint만 다른 인스턴스는 정의할 수 없다는 것과 같은 말</em>입니다.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a><span class="kw">instance</span> (<span class="dt">Eq</span> a) <span class="ot">=&gt;</span> <span class="dt">SomeClass</span> a <span class="kw">where</span> <span class="op">...</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true"></a><span class="kw">instance</span> (<span class="dt">Show</span> a) <span class="ot">=&gt;</span> <span class="dt">SomeClass</span> a <span class="kw">where</span> <span class="op">...</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true"></a></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true"></a><span class="fu">error</span><span class="op">:</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true"></a>  <span class="dt">Duplicate</span> <span class="kw">instance</span> declaration<span class="op">:</span> <span class="op">...</span></span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> (<span class="dt">Eq</span> a) <span class="ot">=&gt;</span> <span class="dt">SomeClass</span> a <span class="kw">where</span> <span class="op">...</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> (<span class="dt">Show</span> a) <span class="ot">=&gt;</span> <span class="dt">SomeClass</span> a <span class="kw">where</span> <span class="op">...</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="fu">error</span><span class="op">:</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">Duplicate</span> <span class="kw">instance</span> declaration<span class="op">:</span> <span class="op">...</span></span></code></pre></div>
 <p>이렇게 정의할 수 없다는 말입니다.</p>
 <p>아래와 같이 정의하면</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a><span class="kw">import</span> <span class="dt">Data.Tree</span>   </span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true"></a></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true"></a><span class="kw">data</span> <span class="dt">YesEq</span> <span class="ot">=</span> <span class="dt">YesEq</span>              </span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true"></a></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true"></a><span class="kw">instance</span> <span class="dt">Eq</span> <span class="dt">YesEq</span> <span class="kw">where</span> </span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true"></a>  <span class="dt">YesEq</span> <span class="op">==</span> <span class="dt">YesEq</span> <span class="ot">=</span> <span class="dt">True</span>          </span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true"></a></span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true"></a><span class="kw">instance</span> <span class="dt">Eq</span> (<span class="dt">Tree</span> <span class="dt">YesEq</span>) <span class="kw">where</span></span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true"></a>  <span class="dt">Node</span> x [] <span class="op">==</span> <span class="dt">Node</span> y [] <span class="ot">=</span> x <span class="op">==</span> y</span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true"></a></span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true"></a><span class="kw">instance</span><span class="op">.</span>hs<span class="op">:</span><span class="dv">9</span><span class="op">:</span><span class="dv">10</span><span class="op">:</span> <span class="fu">error</span><span class="op">:</span></span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true"></a>    • <span class="dt">Illegal</span> <span class="kw">instance</span> declaration for ‘<span class="dt">Eq</span> (<span class="dt">Tree</span> <span class="dt">YesEq</span>)’</span>
-<span id="cb9-13"><a href="#cb9-13" aria-hidden="true"></a>        (<span class="dt">All</span> <span class="kw">instance</span> types must be <span class="kw">of</span> the form (<span class="dt">T</span> a1 <span class="op">...</span> an)</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Data.Tree</span>   </span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">YesEq</span> <span class="ot">=</span> <span class="dt">YesEq</span>              </span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Eq</span> <span class="dt">YesEq</span> <span class="kw">where</span> </span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">YesEq</span> <span class="op">==</span> <span class="dt">YesEq</span> <span class="ot">=</span> <span class="dt">True</span>          </span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Eq</span> (<span class="dt">Tree</span> <span class="dt">YesEq</span>) <span class="kw">where</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  <span class="dt">Node</span> x [] <span class="op">==</span> <span class="dt">Node</span> y [] <span class="ot">=</span> x <span class="op">==</span> y</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span><span class="op">.</span>hs<span class="op">:</span><span class="dv">9</span><span class="op">:</span><span class="dv">10</span><span class="op">:</span> <span class="fu">error</span><span class="op">:</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>    • <span class="dt">Illegal</span> <span class="kw">instance</span> declaration for ‘<span class="dt">Eq</span> (<span class="dt">Tree</span> <span class="dt">YesEq</span>)’</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>        (<span class="dt">All</span> <span class="kw">instance</span> types must be <span class="kw">of</span> the form (<span class="dt">T</span> a1 <span class="op">...</span> an)</span></code></pre></div>
 <p>Tree a 처럼 써야지 Tree YesEq 처럼 구체 타입을 써 줄수 없다는 에러입니다.<br />
 FlexibleInstances 확장을 켜면</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"></a><span class="ot">{-# LANGUAGE FlexibleInstances #-}</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true"></a><span class="op">...</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true"></a><span class="kw">instance</span><span class="op">.</span>hs<span class="op">:</span><span class="dv">10</span><span class="op">:</span><span class="dv">10</span><span class="op">:</span> <span class="fu">error</span><span class="op">:</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true"></a>    • <span class="dt">Overlapping</span> instances for <span class="dt">Eq</span> (<span class="dt">Tree</span> <span class="dt">YesEq</span>)</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true"></a>        arising from a use <span class="kw">of</span> ‘<span class="op">GHC.Classes.$</span>dm<span class="op">/=</span>’</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true"></a>      <span class="dt">Matching</span> instances<span class="op">:</span></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true"></a>        <span class="kw">instance</span> <span class="dt">Eq</span> a <span class="ot">=&gt;</span> <span class="dt">Eq</span> (<span class="dt">Tree</span> a) <span class="co">-- Defined in ‘Data.Tree’</span></span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true"></a>        <span class="kw">instance</span> <span class="dt">Eq</span> (<span class="dt">Tree</span> <span class="dt">YesEq</span>) <span class="co">-- Defined at instance.hs:10:10</span></span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ot">{-# LANGUAGE FlexibleInstances #-}</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="op">...</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span><span class="op">.</span>hs<span class="op">:</span><span class="dv">10</span><span class="op">:</span><span class="dv">10</span><span class="op">:</span> <span class="fu">error</span><span class="op">:</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    • <span class="dt">Overlapping</span> instances for <span class="dt">Eq</span> (<span class="dt">Tree</span> <span class="dt">YesEq</span>)</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>        arising from a use <span class="kw">of</span> ‘<span class="op">GHC.Classes.$</span>dm<span class="op">/=</span>’</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>      <span class="dt">Matching</span> instances<span class="op">:</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>        <span class="kw">instance</span> <span class="dt">Eq</span> a <span class="ot">=&gt;</span> <span class="dt">Eq</span> (<span class="dt">Tree</span> a) <span class="co">-- Defined in ‘Data.Tree’</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>        <span class="kw">instance</span> <span class="dt">Eq</span> (<span class="dt">Tree</span> <span class="dt">YesEq</span>) <span class="co">-- Defined at instance.hs:10:10</span></span></code></pre></div>
 <p>Data.Tree 모듈에 Tree가 Eq 인스턴스를 가질 때 매칭하는 인스턴스가 이미 정의되어 있기 때문에 중복overlapping이라는 에러입니다. <em>“왜 FlexibleInstances를 켰는데도 Tree YesEq가 중복이라는 에러가 나지?”</em> 라고 오해할 수 있습니다.<br />
 FlexibleInstances 확장을 켜줬으니 구체 타입까지 써줘도 될 것 같은데, 이미 Data.Tree에 정의되어 있는 instance가 <em>폴리모픽 Tree a</em>로 정의되어 있기 때문에 둘 다 매칭되기 때문에 나는 오류입니다. <a href="../posts/2020-07-13-FlexibleInstances.html">FlexibleInstances 포스트</a>를 참고하세요.</p>
 <p>참고<br />

@@ -42,20 +42,20 @@ OverloadedStrings 확장을 켜면 리터럴은 IsString a =&gt; a 타입입니�
 <p>하나의 구체 타입이 아닙니다. a는 IsString의 인스턴스이기만 하면 모두 ok입니다. Text도, ByteString도 모두 IsString의 인스턴스이기 때문에 리터럴은 String, Text, ByteString 모두 될 수 있다는 얘기입니다.</p>
 <h2 id="타입-추론">타입 추론</h2>
 <p>리터럴만 보고는 구체 타입을 결정할 수 없습니다. 타입 서명이나 조립된 코드들을 보고 GHC가 추론하게 됩니다. 참고로 GHCi에서 테스트 하려면 디폴트가 OverloadedStrings 확장을 켠 상태이므로 끄려면 :set -XNoOverloadedStrings 확장을 켜야 합니다.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="ot">{-# LANGUAGE OverloadedStrings #-}</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="kw">import</span> <span class="dt">Data.Text</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a>a <span class="ot">=</span> <span class="st">&quot;Hello World&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ot">{-# LANGUAGE OverloadedStrings #-}</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Data.Text</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>a <span class="ot">=</span> <span class="st">&quot;Hello World&quot;</span></span></code></pre></div>
 <p>a의 타입은 구체 타입이 아니라 IsString a =&gt; a 타입입니다. “<em>구체 타입은 나중에 상황봐서 결정할게</em>”라는 얘기입니다.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="ot">a ::</span> <span class="dt">Text</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>a <span class="ot">=</span> <span class="st">&quot;Hello World&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ot">a ::</span> <span class="dt">Text</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>a <span class="ot">=</span> <span class="st">&quot;Hello World&quot;</span></span></code></pre></div>
 <p>이렇게 타입 서명에서 명시적으로 지정해 주면 a는 Text 타입으로 추론됩니다.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="ot">func ::</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> ()</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a>func t <span class="ot">=</span> <span class="fu">putStrLn</span> <span class="st">&quot;ok&quot;</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a><span class="op">&gt;</span> func <span class="st">&quot;Hello World&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ot">func ::</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> ()</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>func t <span class="ot">=</span> <span class="fu">putStrLn</span> <span class="st">&quot;ok&quot;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> func <span class="st">&quot;Hello World&quot;</span></span></code></pre></div>
 <p>코드를 조립하며 만난 func함수의 타입을 보고 리터럴 “Hello World”를 Text 타입으로 추론합니다. 확장이 꺼져 있으면 에러가 납니다.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="dt">Couldn't</span> match expected <span class="kw">type</span> ‘<span class="dt">Text</span>’ with actual <span class="kw">type</span> ‘[<span class="dt">Char</span>]’</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Couldn't</span> match expected <span class="kw">type</span> ‘<span class="dt">Text</span>’ with actual <span class="kw">type</span> ‘[<span class="dt">Char</span>]’</span></code></pre></div>
 
 <div id="disqus_thread" style="padding-top:40px"></div>
 <script>

@@ -35,77 +35,77 @@
 <p>이 글을 읽으시려면 Monad Transformer를 먼저 알고 있어야 합니다.</p>
 <h2 id="클래스-인스턴스-constraint-has-type-class-패턴">클래스 + 인스턴스 + constraint, Has type class 패턴</h2>
 <p><em>클래스와 인스턴스를 사용하면 선언과 구현을 분리</em> 할 수 있습니다. 먼저 선언해서 사용하고, 실제 구현체는 나중에 정해 줄 수 있습니다.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">newtype</span> <span class="dt">Player</span> <span class="ot">=</span> <span class="dt">Player</span> {<span class="ot"> name ::</span> <span class="dt">String</span> }    </span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="kw">newtype</span> <span class="dt">Villain</span> <span class="ot">=</span> <span class="dt">Villain</span> {<span class="ot"> nickname ::</span> <span class="dt">String</span> }    </span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a>    </span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a><span class="ot">showNameDirectParam ::</span> <span class="dt">Player</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> ()    </span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a>showNameDirectParam p <span class="ot">=</span> <span class="fu">putStrLn</span> <span class="op">$</span> <span class="st">&quot;Player : &quot;</span> <span class="op">++</span> (name p)    </span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">Player</span> <span class="ot">=</span> <span class="dt">Player</span> {<span class="ot"> name ::</span> <span class="dt">String</span> }    </span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">Villain</span> <span class="ot">=</span> <span class="dt">Villain</span> {<span class="ot"> nickname ::</span> <span class="dt">String</span> }    </span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="ot">showNameDirectParam ::</span> <span class="dt">Player</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> ()    </span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>showNameDirectParam p <span class="ot">=</span> <span class="fu">putStrLn</span> <span class="op">$</span> <span class="st">&quot;Player : &quot;</span> <span class="op">++</span> (name p)    </span></code></pre></div>
 <p>함수에서 Player 타입을 다이렉트로 받으면, 이 함수가 Player 타입에 종속됐다고 말합니다.<br />
 이렇게 직접적으로 타입을 넘기지 않고, 클래스와 constraint를 이용하면</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="kw">class</span> <span class="dt">HasName</span> a <span class="kw">where</span>    </span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a><span class="ot">  getName ::</span> a <span class="ot">-&gt;</span> <span class="dt">String</span>    </span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a>    </span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a><span class="ot">showName ::</span> <span class="dt">HasName</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">IO</span> ()    </span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a>showName x <span class="ot">=</span> <span class="fu">putStrLn</span> <span class="op">$</span> getName x    </span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">HasName</span> a <span class="kw">where</span>    </span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ot">  getName ::</span> a <span class="ot">-&gt;</span> <span class="dt">String</span>    </span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="ot">showName ::</span> <span class="dt">HasName</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">IO</span> ()    </span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>showName x <span class="ot">=</span> <span class="fu">putStrLn</span> <span class="op">$</span> getName x    </span></code></pre></div>
 <p>일단 showName 내에서는 getName으로 name값을 가져올거라 전제하고, 코드에서 마음대로 활용하고, 실제 구현체는 나중에 인스턴스를 통해 만들어 주면 됩니다.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="kw">instance</span> <span class="dt">HasName</span> <span class="dt">Player</span> <span class="kw">where</span>    </span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a>  getName x <span class="ot">=</span> <span class="st">&quot;Player : &quot;</span> <span class="op">++</span> name x    </span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a>    </span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a><span class="kw">instance</span> <span class="dt">HasName</span> <span class="dt">Villain</span> <span class="kw">where</span>    </span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a>  getName x <span class="ot">=</span> <span class="st">&quot;Villain : &quot;</span> <span class="op">++</span> nickname x    </span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">HasName</span> <span class="dt">Player</span> <span class="kw">where</span>    </span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  getName x <span class="ot">=</span> <span class="st">&quot;Player : &quot;</span> <span class="op">++</span> name x    </span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">HasName</span> <span class="dt">Villain</span> <span class="kw">where</span>    </span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  getName x <span class="ot">=</span> <span class="st">&quot;Villain : &quot;</span> <span class="op">++</span> nickname x    </span></code></pre></div>
 <p>이렇게 클래스를 활용하는 걸 Has type class 패턴이라 부릅니다.</p>
 <p>정리하면, Player -&gt; IO () 는 Player 타입만 받아 들이지만,<br />
 HasName a =&gt; a 는 a가 <em>뭐든간에 HasName 인스턴스이기만 하면</em> 받아 들일 수 있습니다.</p>
 <p>여기서 쓰인 아이디어를 모나드 트랜스포머와 붙여서 사용할 수 있습니다.</p>
 <h2 id="mtl-라이브러리-monad-transformer-library">mtl 라이브러리 Monad Transformer Library</h2>
-<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="kw">newtype</span> <span class="dt">AppM</span> a <span class="ot">=</span> <span class="dt">ReaderT</span> <span class="dt">Env</span> (<span class="dt">LoggingT</span> <span class="dt">IO</span>) a</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">AppM</span> a <span class="ot">=</span> <span class="dt">ReaderT</span> <span class="dt">Env</span> (<span class="dt">LoggingT</span> <span class="dt">IO</span>) a</span></code></pre></div>
 <p>이렇게 몇 겹으로 쌓은 모나드 트랜스포머를 쓸 때, 특정 층에 있는 모나드의 메소드를 쓴다고 생각해 봅시다. ReaderT가 어느 층에 있는지, LoggingT가 어느층에 있는지 알아야 합니다. lift를 몇 번을 써서 해당 층에 도달할지 다 기억한다는 건 매우 비효율적입니다. 이럴 때를 위해 mtl이 필요합니다.</p>
 <p>모나드 트랜스포머를 여러겹 쌓은 걸 모나드 트랜스포머 스택이라고 합니다. 소스상 모양은 품고 품은 모양인데, 이 바닥 사람들은 수직으로 쌓아 올린 메타포를 즐겨 사용하나 봅니다. AppM 의 경우 가장 아래 IO, 그 위에 LoggingT, 그 위에 ReaderT를 쌓아 올린 스택으로 바라봅니다. 그래서 IO모나드에 있는 액션을 AppM층에서 사용하려면, 끌어 올린다lift는 표현을 씁니다.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="co">-- m a 액션을 t m a 액션으로 끌어 올려 줍니다.</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a><span class="kw">class</span> <span class="dt">MonadTrans</span> t <span class="kw">where</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a><span class="ot">  lift ::</span> <span class="dt">Monad</span> m <span class="ot">=&gt;</span> m a <span class="ot">-&gt;</span> t m a</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- m a 액션을 t m a 액션으로 끌어 올려 줍니다.</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">MonadTrans</span> t <span class="kw">where</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="ot">  lift ::</span> <span class="dt">Monad</span> m <span class="ot">=&gt;</span> m a <span class="ot">-&gt;</span> t m a</span></code></pre></div>
 <p>많이 쓰이는 대부분의 트랜스포머(ListT, MaybeT, ExceptT, ReaderT …)들은 모두 MonadTrans의 인스턴스로 라이브러리에 미리 정의되어 있습니다.<br />
 <a href="https://hackage.haskell.org/package/transformers-0.5.6.2/docs/Control-Monad-Trans-Class.html#t:MonadTrans" class="uri">https://hackage.haskell.org/package/transformers-0.5.6.2/docs/Control-Monad-Trans-Class.html#t:MonadTrans</a></p>
 <p>트랜스포머 안에 들어있는 모나드의 액션을 실행하려면 lift를 써서 트랜스포머층으로 끌어 올립니다.</p>
 <p>mtl에는, Monad Transformer만 있는게 아니라, Monad Transformer와 같이 쓸 라이브러리들(MonadReader, MonadState, MonadIO, …)도 같이 있습니다.</p>
 <p>그 중 MonadReader를 살펴 보겠습니다.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="kw">class</span> <span class="dt">Monad</span> m <span class="ot">=&gt;</span> <span class="dt">MonadReader</span> r m <span class="op">|</span> m <span class="ot">-&gt;</span> r <span class="kw">where</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a><span class="ot">    ask   ::</span> m r</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a>    ask <span class="ot">=</span> reader <span class="fu">id</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">Monad</span> m <span class="ot">=&gt;</span> <span class="dt">MonadReader</span> r m <span class="op">|</span> m <span class="ot">-&gt;</span> r <span class="kw">where</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ot">    ask   ::</span> m r</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    ask <span class="ot">=</span> reader <span class="fu">id</span></span></code></pre></div>
 <div class="line-block">m -&gt; r 문법은 주석 참고 <sup><a href="#funcdep">[1]</a></sup></div>
 <p>Has클래스에서 봤던 아이디어처럼, 한 가지 타입만 ask를 쓸 수 있는게 아니라, MonadReader r m =&gt; … constraint를 만족하는 여러 타입들도 ask를 쓸 수 있게 됩니다.</p>
 <h2 id="혹시-monadreader의-ask-정의가-궁금한-적-없나요">혹시 MonadReader의 ask 정의가 궁금한 적 없나요?</h2>
 <p><a href="https://hackage.haskell.org/package/transformers-0.5.6.2/docs/src/Control.Monad.Trans.Reader.html#ask" class="uri">https://hackage.haskell.org/package/transformers-0.5.6.2/docs/src/Control.Monad.Trans.Reader.html#ask</a><br />
 여기 ask는 클래스의 메소드로 정의되어 있는 게 아닙니다.<br />
 Control.Monad.Trans.Reader 모듈의 일반 함수입니다.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a><span class="ot">ask ::</span> (<span class="dt">Monad</span> m) <span class="ot">=&gt;</span> <span class="dt">ReaderT</span> r m r</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a>ask <span class="ot">=</span> <span class="dt">ReaderT</span> <span class="fu">return</span></span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ot">ask ::</span> (<span class="dt">Monad</span> m) <span class="ot">=&gt;</span> <span class="dt">ReaderT</span> r m r</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>ask <span class="ot">=</span> <span class="dt">ReaderT</span> <span class="fu">return</span></span></code></pre></div>
 <p>ReaderT 액션이므로 runReaderT로 return을 꺼내고 r을 넣어주면<br />
 return r 이되고<br />
 보통 env &lt;- ask 를 쓰니 &lt;- 로 return으로 씌운 생성자가 벗겨지면 r만 env로 들어갑니다.<br />
 <em>하지만 이 ask는 ReaderT 컨텍스트에서만 사용할 수 있습니다.</em></p>
 <p>MonadReader 클래스는 ask 메소드를 가지고 있습니다.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a><span class="kw">class</span> <span class="dt">Monad</span> m <span class="ot">=&gt;</span> <span class="dt">MonadReader</span> r m <span class="op">|</span> m <span class="ot">-&gt;</span> r <span class="kw">where</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true"></a><span class="ot">    ask   ::</span> m r</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true"></a>    ask <span class="ot">=</span> reader <span class="fu">id</span></span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">Monad</span> m <span class="ot">=&gt;</span> <span class="dt">MonadReader</span> r m <span class="op">|</span> m <span class="ot">-&gt;</span> r <span class="kw">where</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="ot">    ask   ::</span> m r</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    ask <span class="ot">=</span> reader <span class="fu">id</span></span></code></pre></div>
 <p>그리고, 많이 쓰이는 트랜스포머들의 인스턴스를 미리 정의해 두었습니다.</p>
 <h2 id="readert와-어떻게-어울려지나-볼까요">ReaderT와 어떻게 어울려지나 볼까요?</h2>
-<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a><span class="kw">import</span> <span class="kw">qualified</span> <span class="dt">Control.Monad.Trans.Reader</span> <span class="kw">as</span> <span class="dt">ReaderT</span> (ask, local, reader)</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true"></a><span class="op">...</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true"></a><span class="kw">instance</span> <span class="dt">Monad</span> m <span class="ot">=&gt;</span> <span class="dt">MonadReader</span> r (<span class="dt">ReaderT</span> r m) <span class="kw">where</span></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true"></a>    ask <span class="ot">=</span> ReaderT.ask</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="kw">qualified</span> <span class="dt">Control.Monad.Trans.Reader</span> <span class="kw">as</span> <span class="dt">ReaderT</span> (ask, local, reader)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="op">...</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Monad</span> m <span class="ot">=&gt;</span> <span class="dt">MonadReader</span> r (<span class="dt">ReaderT</span> r m) <span class="kw">where</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    ask <span class="ot">=</span> ReaderT.ask</span></code></pre></div>
 <p>오른 쪽의 ask는 바로 위의 ReaderT의 ask입니다.</p>
 <p>다른 인스턴스를 보면</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"></a><span class="kw">instance</span> <span class="dt">MonadReader</span> r m <span class="ot">=&gt;</span> <span class="dt">MonadReader</span> r (<span class="dt">MaybeT</span> m) <span class="kw">where</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true"></a>    ask   <span class="ot">=</span> lift ask</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">MonadReader</span> r m <span class="ot">=&gt;</span> <span class="dt">MonadReader</span> r (<span class="dt">MaybeT</span> m) <span class="kw">where</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    ask   <span class="ot">=</span> lift ask</span></code></pre></div>
 <p>여기서 오른쪽 ask는 어떤 ask일까요? m의 ask입니다.</p>
 <p>m이 구체적으로 뭔지 몰라도 MonadReader r m 인스턴스가 있다는 것만 압니다.</p>
 <p>함수를 ReaderT 타입을 직접적으로 받게 하지 않고, 다음처럼 constraint를 활용하면</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true"></a><span class="co">-- m이 모나드인지는 어떻게 알까요? MonadReader 클래스 서명을 보면 Monad m =&gt; 이 있습니다.</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true"></a><span class="ot">someFunc ::</span> <span class="dt">MonadReader</span> r m <span class="ot">=&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> m</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true"></a>someFunc n <span class="ot">=</span> <span class="kw">do</span></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true"></a>                ask</span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true"></a>                n <span class="op">...</span></span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- m이 모나드인지는 어떻게 알까요? MonadReader 클래스 서명을 보면 Monad m =&gt; 이 있습니다.</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="ot">someFunc ::</span> <span class="dt">MonadReader</span> r m <span class="ot">=&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> m</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>someFunc n <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>                ask</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>                n <span class="op">...</span></span></code></pre></div>
 <p><em>이 함수는 딱 ReaderT만 받는게 아니라, 어떤 모나드든 MonadReader 인스턴스이기만 하면 다 받을 수 있습니다. 그런데, 실용 프로그램에서 자주 만나게 되는 모나드 트랜스포머용 인스턴스를 미리 선언해 뒀기 때문에, 대부분의 경우 모나드 트랜스포머 스택 어느 층에든 ReaderT만 있으면 받을 수 있는 함수가 됩니다.</em></p>
 <p><a href="https://hackage.haskell.org/package/mtl-2.2.2/docs/src/Control.Monad.Reader.Class.html#MonadReader" class="uri">https://hackage.haskell.org/package/mtl-2.2.2/docs/src/Control.Monad.Reader.Class.html#MonadReader</a></p>
 <hr />

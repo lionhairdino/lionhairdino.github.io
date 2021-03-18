@@ -32,37 +32,37 @@
     
 </div>
 
-<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="ot">someFunc ::</span> <span class="dt">MonadIO</span> m <span class="ot">=&gt;</span> m ()</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a>someFunc <span class="ot">=</span> <span class="kw">do</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a>  a <span class="ot">&lt;-</span> ask</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a>  liftIO <span class="op">$</span> <span class="fu">print</span> a</span></code></pre></div>
-<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="dt">Couldn't</span> match <span class="kw">type</span> ‘m’ with ‘<span class="dt">ReaderT</span> a0 m0’</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>      ‘m’ is a rigid <span class="kw">type</span> variable bound by <span class="op">...</span></span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ot">someFunc ::</span> <span class="dt">MonadIO</span> m <span class="ot">=&gt;</span> m ()</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>someFunc <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  a <span class="ot">&lt;-</span> ask</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  liftIO <span class="op">$</span> <span class="fu">print</span> a</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Couldn't</span> match <span class="kw">type</span> ‘m’ with ‘<span class="dt">ReaderT</span> a0 m0’</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>      ‘m’ is a rigid <span class="kw">type</span> variable bound by <span class="op">...</span></span></code></pre></div>
 <p>ask 메소드는 ReaderT 타입을 다루는 MonadReader 인스턴스를 찾는데, someFunc 의 컨텍스트 m 이 그런 인스턴스라는 정보가 없습니다.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="ot">someFunc ::</span> (<span class="dt">MonadIO</span> m, <span class="dt">MonadReader</span> r m) <span class="ot">=&gt;</span> m ()</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a>someFunc <span class="ot">=</span> <span class="kw">do</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a>  a <span class="ot">&lt;-</span> ask</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a>  liftIO <span class="op">$</span> <span class="fu">print</span> a</span></code></pre></div>
-<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a>    • <span class="dt">Could</span> <span class="fu">not</span> deduce (<span class="dt">Show</span> r) arising from a use <span class="kw">of</span> ‘print’</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a>      from the context<span class="op">:</span> (<span class="dt">MonadIO</span> m, <span class="dt">MonadReader</span> r m)</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a>        bound by the <span class="kw">type</span> signature for<span class="op">:</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a><span class="ot">                   someFunc ::</span> <span class="kw">forall</span> (<span class="ot">m ::</span> <span class="op">*</span> <span class="ot">-&gt;</span> <span class="op">*</span>) r<span class="op">.</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a>                               (<span class="dt">MonadIO</span> m, <span class="dt">MonadReader</span> r m) <span class="ot">=&gt;</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true"></a>                               m ()</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true"></a>        at testClass<span class="op">.</span>hs<span class="op">:</span><span class="dv">5</span><span class="op">:</span><span class="dv">1</span><span class="op">-</span><span class="dv">48</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true"></a>      <span class="dt">Possible</span> fix<span class="op">:</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true"></a>        add (<span class="dt">Show</span> r) to the context <span class="kw">of</span></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true"></a>          the <span class="kw">type</span> signature for<span class="op">:</span></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true"></a><span class="ot">            someFunc ::</span> <span class="kw">forall</span> (<span class="ot">m ::</span> <span class="op">*</span> <span class="ot">-&gt;</span> <span class="op">*</span>) r<span class="op">.</span></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true"></a>                        (<span class="dt">MonadIO</span> m, <span class="dt">MonadReader</span> r m) <span class="ot">=&gt;</span></span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true"></a>                        m ()</span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true"></a>    • <span class="dt">In</span> the second argument <span class="kw">of</span> ‘(<span class="op">$</span>)’, namely ‘print a’</span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true"></a>      <span class="dt">In</span> a stmt <span class="kw">of</span> a 'do' block<span class="op">:</span> liftIO <span class="op">$</span> <span class="fu">print</span> a</span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true"></a>      <span class="dt">In</span> the expression<span class="op">:</span></span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true"></a>        <span class="kw">do</span> a <span class="ot">&lt;-</span> ask</span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true"></a>           liftIO <span class="op">$</span> <span class="fu">print</span> a</span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true"></a>  <span class="op">|</span></span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true"></a><span class="dv">8</span> <span class="op">|</span>   liftIO <span class="op">$</span> <span class="fu">print</span> a</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ot">someFunc ::</span> (<span class="dt">MonadIO</span> m, <span class="dt">MonadReader</span> r m) <span class="ot">=&gt;</span> m ()</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>someFunc <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  a <span class="ot">&lt;-</span> ask</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  liftIO <span class="op">$</span> <span class="fu">print</span> a</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>    • <span class="dt">Could</span> <span class="fu">not</span> deduce (<span class="dt">Show</span> r) arising from a use <span class="kw">of</span> ‘print’</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>      from the context<span class="op">:</span> (<span class="dt">MonadIO</span> m, <span class="dt">MonadReader</span> r m)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        bound by the <span class="kw">type</span> signature for<span class="op">:</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="ot">                   someFunc ::</span> <span class="kw">forall</span> (<span class="ot">m ::</span> <span class="op">*</span> <span class="ot">-&gt;</span> <span class="op">*</span>) r<span class="op">.</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>                               (<span class="dt">MonadIO</span> m, <span class="dt">MonadReader</span> r m) <span class="ot">=&gt;</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>                               m ()</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>        at testClass<span class="op">.</span>hs<span class="op">:</span><span class="dv">5</span><span class="op">:</span><span class="dv">1</span><span class="op">-</span><span class="dv">48</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>      <span class="dt">Possible</span> fix<span class="op">:</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>        add (<span class="dt">Show</span> r) to the context <span class="kw">of</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>          the <span class="kw">type</span> signature for<span class="op">:</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="ot">            someFunc ::</span> <span class="kw">forall</span> (<span class="ot">m ::</span> <span class="op">*</span> <span class="ot">-&gt;</span> <span class="op">*</span>) r<span class="op">.</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>                        (<span class="dt">MonadIO</span> m, <span class="dt">MonadReader</span> r m) <span class="ot">=&gt;</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>                        m ()</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    • <span class="dt">In</span> the second argument <span class="kw">of</span> ‘(<span class="op">$</span>)’, namely ‘print a’</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>      <span class="dt">In</span> a stmt <span class="kw">of</span> a 'do' block<span class="op">:</span> liftIO <span class="op">$</span> <span class="fu">print</span> a</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>      <span class="dt">In</span> the expression<span class="op">:</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>        <span class="kw">do</span> a <span class="ot">&lt;-</span> ask</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>           liftIO <span class="op">$</span> <span class="fu">print</span> a</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>  <span class="op">|</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="dv">8</span> <span class="op">|</span>   liftIO <span class="op">$</span> <span class="fu">print</span> a</span></code></pre></div>
 <p>a 타입을 다루는 Show 인스턴스가 있어야 하는데, a 타입에 대한 정보가 없습니다. Could not deduce (Show r) arising from a use of ‘print’ print 함수를 실행하려니, r 이 Show 의 인스턴스라고 추론할 수 있어야 하는데, 그럴 정보가 없다는 뜻입니다.</p>
 <p>위 둘 간의 차이는 첫 번째 에러는 <em>m, ReaderT 두 타입의 문제</em>고, 두 번째 에러는 <em>Show 클래스와 r 타입</em>의 문제입니다.</p>
 

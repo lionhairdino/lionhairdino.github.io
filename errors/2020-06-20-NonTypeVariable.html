@@ -33,16 +33,16 @@
 </div>
 
 <p>에러가 읽기 어려울 땐, <em>:type</em> 을 써서 단계마다 타입을 추적하면 도움이 됩니다. 일부러 간단한 구문을 에러가 나도록 해서 메시지를 따라가 봤습니다.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="op">&gt;</span> <span class="fu">fmap</span> ((<span class="op">+</span><span class="dv">1</span>) <span class="op">.</span> <span class="fu">fst</span>) (<span class="dt">Just</span> <span class="dv">1</span>, <span class="dv">100</span>) </span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a><span class="op">&lt;</span>interactive<span class="op">&gt;:</span><span class="dv">5</span><span class="op">:</span><span class="dv">1</span><span class="op">:</span> <span class="fu">error</span><span class="op">:</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a>    • <span class="dt">Non</span> <span class="kw">type</span><span class="op">-</span>variable argument <span class="kw">in</span> the constraint<span class="op">:</span> <span class="dt">Num</span> (b1, b2)</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a>    <span class="op">...</span></span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="fu">fmap</span> ((<span class="op">+</span><span class="dv">1</span>) <span class="op">.</span> <span class="fu">fst</span>) (<span class="dt">Just</span> <span class="dv">1</span>, <span class="dv">100</span>) </span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>interactive<span class="op">&gt;:</span><span class="dv">5</span><span class="op">:</span><span class="dv">1</span><span class="op">:</span> <span class="fu">error</span><span class="op">:</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    • <span class="dt">Non</span> <span class="kw">type</span><span class="op">-</span>variable argument <span class="kw">in</span> the constraint<span class="op">:</span> <span class="dt">Num</span> (b1, b2)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">...</span></span></code></pre></div>
 <p>fst 함수를 튜플 (Just 1, 100) 에 적용해서 나온 Just 1 에 fmap (+1)을 적용해서 Just 2 를 결과로 예상했지만, 위와 같은 에러를 만났습니다.</p>
 <p>타입 제약에 타입 변수가 아닌 인자가 있다?</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="op">&gt;</span> <span class="op">:</span>t <span class="fu">fmap</span> ((<span class="op">+</span><span class="dv">1</span>) <span class="op">.</span> <span class="fu">fst</span>) (<span class="dt">Just</span> <span class="dv">1</span>, <span class="dv">100</span>) </span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a><span class="fu">fmap</span> ((<span class="op">+</span><span class="dv">1</span>) <span class="op">.</span> <span class="fu">fst</span>) (<span class="dt">Just</span> <span class="dv">1</span>, <span class="dv">100</span>)</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a><span class="ot">  ::</span> (<span class="dt">Num</span> b1, <span class="dt">Num</span> a, <span class="dt">Num</span> (b1, b2)) <span class="ot">=&gt;</span> (<span class="dt">Maybe</span> a, b1)</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="op">:</span>t <span class="fu">fmap</span> ((<span class="op">+</span><span class="dv">1</span>) <span class="op">.</span> <span class="fu">fst</span>) (<span class="dt">Just</span> <span class="dv">1</span>, <span class="dv">100</span>) </span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">fmap</span> ((<span class="op">+</span><span class="dv">1</span>) <span class="op">.</span> <span class="fu">fst</span>) (<span class="dt">Just</span> <span class="dv">1</span>, <span class="dv">100</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ot">  ::</span> (<span class="dt">Num</span> b1, <span class="dt">Num</span> a, <span class="dt">Num</span> (b1, b2)) <span class="ot">=&gt;</span> (<span class="dt">Maybe</span> a, b1)</span></code></pre></div>
 <p>=&gt; 왼쪽의 타입 제약constraint을 보면 Num (b1, b2) 가 보입니다. GHC는 왜 이런 제약이 있다고 추론했을까요?</p>
 <ol type="1">
 <li><p>fmap 은 어떤 인스턴스의 fmap 을 선택했을까요?<br> fmap 의 두 번째 인자 (,) 를 보고, 튜플의 fmap 을 선택했습니다.<br> fmap :: (a0 -&gt; b) -&gt; (a, a0) -&gt; (a,b)<br></p></li>
@@ -53,48 +53,48 @@
 <p>에러는 괄호를 잘 못 씌워서 원하는 대로 함수 적용이 이루어지지 않았는데, 에러 메시지는 <em>“제약에 타입 변수가 아닌게 들어왔다”</em> 입니다. 꽤 오랫동안 봐야 통찰이 생길 것 같은 연결 고리입니다.</p>
 <p><br><br><br></p>
 <p>아래처럼 바꿨더니 이 번에 다른 에러가 납니다.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="op">&gt;</span> <span class="fu">fmap</span> (<span class="op">+</span><span class="dv">1</span>) <span class="op">.</span> <span class="fu">fst</span> (<span class="dt">Just</span> <span class="dv">1</span>, <span class="dv">100</span>)</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a><span class="op">&lt;</span>interactive<span class="op">&gt;:</span><span class="dv">13</span><span class="op">:</span><span class="dv">13</span><span class="op">:</span> <span class="fu">error</span><span class="op">:</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a>    • <span class="dt">Couldn't</span> match expected <span class="kw">type</span> ‘a <span class="ot">-&gt;</span> f b’</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a>                  with actual <span class="kw">type</span> ‘<span class="dt">Maybe</span> <span class="dt">Integer</span>’ <span class="co">---- [2]</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a>    • <span class="dt">Possible</span> cause<span class="op">:</span> ‘fst’ is applied to too many arguments</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a>      <span class="dt">In</span> the second argument <span class="kw">of</span> ‘(<span class="op">.</span>)’, namely ‘fst (<span class="dt">Just</span> <span class="dv">1</span>, <span class="dv">100</span>)’</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true"></a>      <span class="dt">In</span> the expression<span class="op">:</span> <span class="fu">fmap</span> (<span class="op">+</span> <span class="dv">1</span>) <span class="op">.</span> <span class="fu">fst</span> (<span class="dt">Just</span> <span class="dv">1</span>, <span class="dv">100</span>)</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true"></a>      <span class="dt">In</span> an equation for ‘it’<span class="op">:</span> it <span class="ot">=</span> <span class="fu">fmap</span> (<span class="op">+</span> <span class="dv">1</span>) <span class="op">.</span> <span class="fu">fst</span> (<span class="dt">Just</span> <span class="dv">1</span>, <span class="dv">100</span>)</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true"></a>    • <span class="dt">Relevant</span> bindings include</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true"></a><span class="ot">      it ::</span> a <span class="ot">-&gt;</span> f b (bound at <span class="op">&lt;</span>interactive<span class="op">&gt;:</span><span class="dv">53</span><span class="op">:</span><span class="dv">1</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="fu">fmap</span> (<span class="op">+</span><span class="dv">1</span>) <span class="op">.</span> <span class="fu">fst</span> (<span class="dt">Just</span> <span class="dv">1</span>, <span class="dv">100</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>interactive<span class="op">&gt;:</span><span class="dv">13</span><span class="op">:</span><span class="dv">13</span><span class="op">:</span> <span class="fu">error</span><span class="op">:</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    • <span class="dt">Couldn't</span> match expected <span class="kw">type</span> ‘a <span class="ot">-&gt;</span> f b’</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>                  with actual <span class="kw">type</span> ‘<span class="dt">Maybe</span> <span class="dt">Integer</span>’ <span class="co">---- [2]</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    • <span class="dt">Possible</span> cause<span class="op">:</span> ‘fst’ is applied to too many arguments</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>      <span class="dt">In</span> the second argument <span class="kw">of</span> ‘(<span class="op">.</span>)’, namely ‘fst (<span class="dt">Just</span> <span class="dv">1</span>, <span class="dv">100</span>)’</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>      <span class="dt">In</span> the expression<span class="op">:</span> <span class="fu">fmap</span> (<span class="op">+</span> <span class="dv">1</span>) <span class="op">.</span> <span class="fu">fst</span> (<span class="dt">Just</span> <span class="dv">1</span>, <span class="dv">100</span>)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>      <span class="dt">In</span> an equation for ‘it’<span class="op">:</span> it <span class="ot">=</span> <span class="fu">fmap</span> (<span class="op">+</span> <span class="dv">1</span>) <span class="op">.</span> <span class="fu">fst</span> (<span class="dt">Just</span> <span class="dv">1</span>, <span class="dv">100</span>)</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    • <span class="dt">Relevant</span> bindings include</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="ot">      it ::</span> a <span class="ot">-&gt;</span> f b (bound at <span class="op">&lt;</span>interactive<span class="op">&gt;:</span><span class="dv">53</span><span class="op">:</span><span class="dv">1</span>)</span></code></pre></div>
 <ol type="1">
 <li>이 번엔 :t 로 보려고 해도 같은 에러가 나서, 이 방법으로 힌트를 얻을 수 없습니다.</li>
 <li>구문이 실행되는 순서로 쪼개어 봅시다.<br></li>
 <li>에러 중에 it :: a -&gt; f b 가 보입니다. 전체의 표현식이 a -&gt; f b 라고 추론했다는데 왜 그렇게 했을까요?</li>
 </ol>
-<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a> <span class="fu">fmap</span> (<span class="op">+</span><span class="dv">1</span>)      (<span class="op">.</span> <span class="fu">fst</span> (<span class="dt">Just</span> <span class="dv">1</span>, <span class="dv">100</span>))  <span class="co">-- 이렇게 나눠지지 않습니다. </span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a>(<span class="fu">fmap</span> (<span class="op">+</span><span class="dv">1</span>))  <span class="op">.</span>  (<span class="fu">fst</span> (<span class="dt">Just</span> <span class="dv">1</span>, <span class="dv">100</span>)) <span class="co">-- 이렇게 나눌 수 있습니다. (.) 의 우선순위가 높습니다. ---- [1]</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a><span class="ot">(.) ::</span> (b <span class="ot">-&gt;</span> c) <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> c</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a><span class="fu">fmap</span><span class="ot"> ::</span> <span class="dt">Functor</span> f <span class="ot">=&gt;</span> (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> f a <span class="ot">-&gt;</span> f b</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true"></a>(b <span class="ot">-&gt;</span> c) 가 <span class="fu">fmap</span> (<span class="op">+</span><span class="dv">1</span>)<span class="ot"> ::</span> (functor f, <span class="dt">Num</span> b) <span class="ot">=&gt;</span> f b <span class="ot">-&gt;</span> f b</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true"></a>b 자리에 f b, c 자리에 f b 로 추론하고</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true"></a>그럼 두 번째 함수인 a <span class="ot">-&gt;</span> b 는 a <span class="ot">-&gt;</span> f b 라 추론합니다<span class="op">.</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true"></a>그런데, 두 번째 함수는 (<span class="fu">fst</span> (<span class="dt">Just</span> <span class="dv">1</span>, <span class="dv">100</span>)) 에서 <span class="dt">Num</span> a <span class="ot">=&gt;</span> <span class="dt">Maybe</span> a 로 추론됩니다<span class="op">.</span></span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a> <span class="fu">fmap</span> (<span class="op">+</span><span class="dv">1</span>)      (<span class="op">.</span> <span class="fu">fst</span> (<span class="dt">Just</span> <span class="dv">1</span>, <span class="dv">100</span>))  <span class="co">-- 이렇게 나눠지지 않습니다. </span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>(<span class="fu">fmap</span> (<span class="op">+</span><span class="dv">1</span>))  <span class="op">.</span>  (<span class="fu">fst</span> (<span class="dt">Just</span> <span class="dv">1</span>, <span class="dv">100</span>)) <span class="co">-- 이렇게 나눌 수 있습니다. (.) 의 우선순위가 높습니다. ---- [1]</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="ot">(.) ::</span> (b <span class="ot">-&gt;</span> c) <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> c</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="fu">fmap</span><span class="ot"> ::</span> <span class="dt">Functor</span> f <span class="ot">=&gt;</span> (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> f a <span class="ot">-&gt;</span> f b</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>(b <span class="ot">-&gt;</span> c) 가 <span class="fu">fmap</span> (<span class="op">+</span><span class="dv">1</span>)<span class="ot"> ::</span> (functor f, <span class="dt">Num</span> b) <span class="ot">=&gt;</span> f b <span class="ot">-&gt;</span> f b</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>b 자리에 f b, c 자리에 f b 로 추론하고</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>그럼 두 번째 함수인 a <span class="ot">-&gt;</span> b 는 a <span class="ot">-&gt;</span> f b 라 추론합니다<span class="op">.</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>그런데, 두 번째 함수는 (<span class="fu">fst</span> (<span class="dt">Just</span> <span class="dv">1</span>, <span class="dv">100</span>)) 에서 <span class="dt">Num</span> a <span class="ot">=&gt;</span> <span class="dt">Maybe</span> a 로 추론됩니다<span class="op">.</span></span></code></pre></div>
 <p>그래서 a -&gt; f b 와 Maybe a 가 매칭이 안된다는 에러가 납니다.</p>
 <p>에러는 괄호를 잘 못 씌워서 원하는 대로 함수 적용이 이루어지지 않았는데, 에러 메시지는 <em>“타입 매칭 실패”</em> 입니다. 에러에 대한 경험을 키우는 것 말고, 별다른 이해 방법이 없어 보입니다. GHC 입장에서 생각하고, 타입 추론을 생각하며 에러를 따라 가는 훈련이 필요합니다.</p>
 <hr />
 <p>[1] 괄호 없는 표현식의 실행 순서</p>
 <p>:info 명령어로 우선 순위를 볼 수 있습니다. prefix 적용은 따로 우선 순위 표현이 없는데, 중위 연산자와 섞어 쓸 때면 우선순위가 10이라고 보면 되겠습니다. infix 만 우선 순위가 있습니다. 그리고 또 한가지, 중위 연산자는 함수를 넘기는 곳에 인자로 쓰일 수 없습니다. 괄호로 감싸서 prefix 로 만들어 넘겨야 합니다.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="co">-- . 은 infixr 9</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a><span class="co">-- $ 는 infixr 0</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a><span class="co">-- 아래처럼 괄호 없이 써도 연산자 우선 순위가 있어 제대로 계산됩니다.</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a><span class="op">&gt;</span> add x y <span class="ot">=</span> x <span class="op">+</span> y</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true"></a><span class="op">&gt;</span> add <span class="dv">1</span> <span class="op">.</span> add <span class="dv">2</span> <span class="op">$</span> <span class="dv">3</span> </span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true"></a><span class="co">-- . 보다 앞에 add가 우선 실행되고, 중위 연산자 .이 동작하기 전 뒤에 add를 먼저 실행합니다.</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true"></a><span class="co">-- 그리고 나서 . 연산자를 실행합니다.</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true"></a><span class="dv">6</span></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true"></a><span class="op">&gt;</span> <span class="dv">1</span> <span class="op">+</span> add <span class="dv">1</span></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true"></a><span class="dv">3</span></span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true"></a><span class="op">&gt;</span> <span class="fu">fmap</span> (<span class="op">+</span><span class="dv">1</span>) <span class="op">.</span> <span class="fu">fmap</span> (<span class="op">+</span><span class="dv">2</span>) <span class="op">$</span> [<span class="dv">1</span>,<span class="dv">2</span>]</span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true"></a>[<span class="dv">4</span>,<span class="dv">5</span>]</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- . 은 infixr 9</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- $ 는 infixr 0</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- 아래처럼 괄호 없이 써도 연산자 우선 순위가 있어 제대로 계산됩니다.</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> add x y <span class="ot">=</span> x <span class="op">+</span> y</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> add <span class="dv">1</span> <span class="op">.</span> add <span class="dv">2</span> <span class="op">$</span> <span class="dv">3</span> </span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co">-- . 보다 앞에 add가 우선 실행되고, 중위 연산자 .이 동작하기 전 뒤에 add를 먼저 실행합니다.</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co">-- 그리고 나서 . 연산자를 실행합니다.</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="dv">6</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="dv">1</span> <span class="op">+</span> add <span class="dv">1</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="fu">fmap</span> (<span class="op">+</span><span class="dv">1</span>) <span class="op">.</span> <span class="fu">fmap</span> (<span class="op">+</span><span class="dv">2</span>) <span class="op">$</span> [<span class="dv">1</span>,<span class="dv">2</span>]</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>[<span class="dv">4</span>,<span class="dv">5</span>]</span></code></pre></div>
 <p>[2] 실제 타입으로 Maybe a가 아니라 Maybe Integer가 나온건 Num 클래스의 디폴트 타입이 Integer라서 그렇습니다. 숫자 리터럴은 별다른 추론 단서가 없다면 Integer로 추론됩니다.<br> <a href="https://kseo.github.io/posts/2017-01-04-type-defaulting-in-haskell.html" class="uri">https://kseo.github.io/posts/2017-01-04-type-defaulting-in-haskell.html</a></p>
 
 <div id="disqus_thread" style="padding-top:40px"></div>

@@ -34,52 +34,52 @@
 
 <p>수학적인 배경 지식없이 순수하게 코드 모양만 보고, 모나드와 친해지기 위해 생각해 본 내용입니다. 이게 모나드를 이해하는데 도움이 될지 어떨지는 아직 잘 모르겠습니다. 일단 올려두겠습니다.</p>
 <p>대부분 모나드의 목표는 다음과 같은 구조를 만드는 겁니다.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a>funcs <span class="ot">=</span> (<span class="op">..</span>(<span class="op">..</span>(<span class="op">..</span>(<span class="op">..</span>))))</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="co">-- $ 연산자로 표현하면 </span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a>funcs <span class="ot">=</span> <span class="op">..</span> <span class="op">$</span> <span class="op">..</span> <span class="op">$</span> <span class="op">..</span> <span class="op">$</span> <span class="op">..</span></span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>funcs <span class="ot">=</span> (<span class="op">..</span>(<span class="op">..</span>(<span class="op">..</span>(<span class="op">..</span>))))</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- $ 연산자로 표현하면 </span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>funcs <span class="ot">=</span> <span class="op">..</span> <span class="op">$</span> <span class="op">..</span> <span class="op">$</span> <span class="op">..</span> <span class="op">$</span> <span class="op">..</span></span></code></pre></div>
 <p>함수형에서 작업을 순차적으로 실행하려면 이 구조로 만드는 수 밖에 없습니다. 그런데 모양은 같은데 실행 순서가 이랬다 저랬다 합니다.</p>
 <h2 id="품고-품은-상태의-실행-순서는">품고 품은 상태의 실행 순서는?</h2>
-<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a>f1 <span class="ot">=</span> \_ <span class="ot">-&gt;</span> <span class="fu">putStrLn</span> <span class="st">&quot;f1&quot;</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>g2 <span class="ot">=</span> \_ <span class="ot">-&gt;</span> <span class="fu">putStrLn</span> <span class="st">&quot;g2&quot;</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a>h3 <span class="ot">=</span> \_ <span class="ot">-&gt;</span> <span class="fu">putStrLn</span> <span class="st">&quot;h3&quot;</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a><span class="ot">glue ::</span> (() <span class="ot">-&gt;</span> <span class="dt">IO</span> ()) <span class="ot">-&gt;</span> <span class="dt">IO</span> () <span class="ot">-&gt;</span> <span class="dt">IO</span> () </span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a>glue f x <span class="ot">=</span> <span class="kw">do</span> </span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a>    unwrapx <span class="ot">&lt;-</span> x</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a>    f unwrapx </span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true"></a></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true"></a><span class="op">&gt;</span> glue f (glue g (glue h (<span class="fu">putStrLn</span> <span class="st">&quot;begin or end&quot;</span>)))</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true"></a>begin <span class="fu">or</span> end</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true"></a>h3</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true"></a>g2</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true"></a>f1</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>f1 <span class="ot">=</span> \_ <span class="ot">-&gt;</span> <span class="fu">putStrLn</span> <span class="st">&quot;f1&quot;</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>g2 <span class="ot">=</span> \_ <span class="ot">-&gt;</span> <span class="fu">putStrLn</span> <span class="st">&quot;g2&quot;</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>h3 <span class="ot">=</span> \_ <span class="ot">-&gt;</span> <span class="fu">putStrLn</span> <span class="st">&quot;h3&quot;</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="ot">glue ::</span> (() <span class="ot">-&gt;</span> <span class="dt">IO</span> ()) <span class="ot">-&gt;</span> <span class="dt">IO</span> () <span class="ot">-&gt;</span> <span class="dt">IO</span> () </span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>glue f x <span class="ot">=</span> <span class="kw">do</span> </span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    unwrapx <span class="ot">&lt;-</span> x</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    f unwrapx </span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> glue f (glue g (glue h (<span class="fu">putStrLn</span> <span class="st">&quot;begin or end&quot;</span>)))</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>begin <span class="fu">or</span> end</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>h3</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>g2</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>f1</span></code></pre></div>
 <p>괄호 안부터 실행됩니다. 그럼 다음 코드도 h가 가장 먼저 실행될까요?</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="ot">glue2 ::</span> (() <span class="ot">-&gt;</span> <span class="dt">IO</span> ()) <span class="ot">-&gt;</span> (() <span class="ot">-&gt;</span> <span class="dt">IO</span> ()) <span class="ot">-&gt;</span> <span class="dt">IO</span> () </span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a>glue2 f1 f2 <span class="ot">=</span> <span class="kw">do</span> </span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a>    f1 ()</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a>    f2 ()</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a><span class="op">&gt;</span> glue2 f (\_ <span class="ot">-&gt;</span> glue2 g (\_ <span class="ot">-&gt;</span> glue2 h (\_ <span class="ot">-&gt;</span> <span class="fu">putStrLn</span> <span class="st">&quot;begin or end&quot;</span>)))</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a>f1</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true"></a>g2</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true"></a>h3</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true"></a>begin <span class="fu">or</span> end</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ot">glue2 ::</span> (() <span class="ot">-&gt;</span> <span class="dt">IO</span> ()) <span class="ot">-&gt;</span> (() <span class="ot">-&gt;</span> <span class="dt">IO</span> ()) <span class="ot">-&gt;</span> <span class="dt">IO</span> () </span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>glue2 f1 f2 <span class="ot">=</span> <span class="kw">do</span> </span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    f1 ()</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    f2 ()</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> glue2 f (\_ <span class="ot">-&gt;</span> glue2 g (\_ <span class="ot">-&gt;</span> glue2 h (\_ <span class="ot">-&gt;</span> <span class="fu">putStrLn</span> <span class="st">&quot;begin or end&quot;</span>)))</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>f1</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>g2</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>h3</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>begin <span class="fu">or</span> end</span></code></pre></div>
 <p>품고 품었다고 다 같지 않습니다. glue의 두 매개 변수 f와 x는 독립적이지 않습니다. x를 알아야만 f를 알 수 있습니다. 하지만 glue2의 두 매개 변수 f1과 f2는 독립적입니다. 그래서 <em>실행 순서가 서로 반대</em>가 됩니다. 눈에 보이는 구조만으론 구별할 수 없습니다. 구조를 만드는 접착제로 쓰인 glue, glue2의 정의에 따라 달라집니다.</p>
 <h2 id="품을-것인가-품-속으로-들어갈-것인가">품을 것인가, 품 속으로 들어갈 것인가</h2>
 <p>새로 들어오는 작업을 가장 바깥 쪽에 둘 수도 있고, 가장 안 쪽에 품어지도록 할 수도 있습니다. Free, Cont의 경우는 가장 안 쪽에 붙이고, Reader는 바깥 쪽에 둡니다. Reader는 안 쪽부터 실행되고 Free와 Cont는 바깥 쪽부터 실행됩니다. 결국 대부분 모나드는 do구문 안에 써있는 순서대로 동작합니다.</p>
 <p>정말 여러 모나드들이 모두 이 구조를 만들기 위한 것인지 한 번 살펴보겠습니다.</p>
 <h2 id="free-모나드의-바인드">Free 모나드의 바인드</h2>
-<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a>(<span class="dt">Free</span> x) <span class="op">&gt;&gt;=</span> g <span class="ot">=</span> <span class="dt">Free</span> (<span class="fu">fmap</span> (<span class="op">&gt;&gt;=</span> g) x)</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>(<span class="dt">Free</span> x) <span class="op">&gt;&gt;=</span> g <span class="ot">=</span> <span class="dt">Free</span> (<span class="fu">fmap</span> (<span class="op">&gt;&gt;=</span> g) x)</span></code></pre></div>
 <p>몇 겹의 Free로 쌓여 있든, 가장 안 쪽으로 들어가 g를 적용합니다. g의 결과값은 Free 타입이니 가장 안 쪽에 Free를 연결하는 효과가 생깁니다. <em>Free ..(Free ..(Free ..))</em></p>
 <h2 id="cont-모나드의-바인드">Cont 모나드의 바인드</h2>
-<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a>s <span class="op">&gt;&gt;=</span> f <span class="ot">=</span> cont <span class="op">$</span> \c <span class="ot">-&gt;</span> runCont s <span class="op">$</span> \x <span class="ot">-&gt;</span> runCont (f x) c</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>s <span class="op">&gt;&gt;=</span> f <span class="ot">=</span> cont <span class="op">$</span> \c <span class="ot">-&gt;</span> runCont s <span class="op">$</span> \x <span class="ot">-&gt;</span> runCont (f x) c</span></code></pre></div>
 <p>runCont는 Cont를 벗겨내는 역할을 하는데, 여기선 읽기 편하게 runCont s를 그냥 s로 표기하고, cont는 다시 Cont로 만드는 생성자로 잠시 빼고 읽어 보겠습니다.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a>\c <span class="ot">-&gt;</span> s <span class="op">$</span>      \x <span class="ot">-&gt;</span> (f x) c</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>\c <span class="ot">-&gt;</span> s <span class="op">$</span>      \x <span class="ot">-&gt;</span> (f x) c</span></code></pre></div>
 <p>s 후 다음 작업이 f 이고, 그 다음 작업이 c 입니다. 코드 모양대로 표현하면 <em>s .. (f .. (c ..))</em></p>
 <h2 id="reader-모나드의-바인드">Reader 모나드의 바인드</h2>
-<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a>m <span class="op">&gt;&gt;=</span> k <span class="ot">=</span> <span class="dt">Reader</span> <span class="op">$</span> \r <span class="ot">-&gt;</span> runReader (k (runReader m r)) r </span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>m <span class="op">&gt;&gt;=</span> k <span class="ot">=</span> <span class="dt">Reader</span> <span class="op">$</span> \r <span class="ot">-&gt;</span> runReader (k (runReader m r)) r </span></code></pre></div>
 <p>핵심만 보기 위해 몇가지 바꿔서 보겠습니다. runReader는 Reader를 벗겨내는 동작과 Reader는 생성자로 잠시 빼고 읽으면</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a>\r <span class="ot">-&gt;</span> k (m r) r </span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>\r <span class="ot">-&gt;</span> k (m r) r </span></code></pre></div>
 <p>r을 받아 m을 적용 후 결과를 k에 넘겨주는데, r도 또 넘겨 줍니다. <em>k (m …) …</em></p>
 
 <div id="disqus_thread" style="padding-top:40px"></div>
