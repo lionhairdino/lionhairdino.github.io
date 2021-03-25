@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko" lang="ko">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>lionhairdino - Async 시작</title>
+        <meta name="description" content="lionhairdino - Async 시작" />
+        <meta charset="UTF-8" />
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="Async 시작" />
+        <meta property="og:description" content="lionhairdino - 하스켈 함수형 프로그래밍, 타입 이론, 모노이드, 모나드, 동적 타입 언어의 코드 조립" />
+        <meta property="og:url" content="https://lionhairdino.github.io" />
+    </head>
+    <body>
+        <div id="header">
+            <div id="logo"> </div>
+            <div id="navigation">
+                <a href="../">lionhairdino</a> 
+                <a href="../about.html">about</a>
+                <!--<a href="/archive.html">archive</a>-->
+            </div>
+        </div>
+
+        <div id="content">
+            <h1>Async 시작</h1>
+
+            <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+<div class="info">
+    Posted on March 25, 2021
+    
+</div>
+
+<p>왜 그냥 fork를 쓰지 않고, async가 필요한지 알아 보겠습니다.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ot">forkIO ::</span> <span class="dt">IO</span> () <span class="ot">-&gt;</span> <span class="dt">IO</span> <span class="dt">ThreadId</span></span></code></pre></div>
+<p>forkIO는 받는 작업이 IO a 가 아니라, IO () 입니다. 결과값이 없는 IO작업만 받습니다.<br />
+하스켈에선 한 쓰레드에서 다른 쓰레드의 결과값에 접근할 수 없습니다. 그러니 당연히 결과값이 없는 IO () 작업만 받으면 됩니다.<br />
+그럼, <em>결과값이 필요한 IO a 작업은 어떻게 fork 시킬까요?</em></p>
+<p>기본 아이디어는 IO a의 결과값 a타입값을 받아 올 MVar 변수를 만들어, 원래 IO 작업의 결과를 거기에 넣는 작업을 만드는 것입니다.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Control.Concurrent</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Control.Concurrent.STM</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">-- IO () 타입이 아니기 때문에 바로 fork 할 수 없습니다.</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="ot">oneChar ::</span> <span class="dt">IO</span> <span class="dt">Char</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>oneChar <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    c <span class="ot">&lt;-</span> <span class="fu">getChar</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span> c</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co">-- oneChar 를 fork해서 실행한다면 결과겂을 어떻게 받아 올까요?</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co">-- 애초에 fork 는 IO () 타입 작업만 받으니, 이대로는 fork 할 수 없습니다.</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="co">-- 아래와 같이 원래 작업을 부르는 IO () 타입의 작업을 만듭니다.</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co">-- MVar 성격의 변수를 받아 작업 결과를 그 MVar에 넣는 작업만 하니, 결과 타입은 IO () 입니다.</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="ot">oneCharFork ::</span> <span class="dt">TMVar</span> <span class="dt">Char</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> ()</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>oneCharFork resultVar <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    result <span class="ot">&lt;-</span> oneChar</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    atomically <span class="op">$</span> putTMVar resultVar result</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>    v <span class="ot">&lt;-</span> newEmptyTMVarIO</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    tid <span class="ot">&lt;-</span> forkIO (oneCharFork v)  <span class="co">-- fork할 때, 외부에서 만든 MVar를 같이 넘깁니다.</span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    r <span class="ot">&lt;-</span> atomically (readTMVar v)</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>    <span class="fu">putChar</span> r</span></code></pre></div>
+<p>위와 같이 작업하면 다른 쓰레드의 결과값을 받아 올 수 있습니다. 소통 채널로 MVar를 쓰는 형태로 만들 수 밖에 없습니다.</p>
+<p>async 함수도 같은 아이디어로 되어 있고, 예외 핸들링을 위해 mask로 짜여져 있습니다. 그리고, 나중에 결과값에 접근 할 수 있도록 MVar 변수와 쓰레드 ID를 묶은 Async값을 만들어 리턴합니다. 이제 나중에 Async 안에 들어있는 MVar 값에 Read를 걸어두면, 결과값을 가져올 수 있고, 쓰레드가 종료하는 걸 알아낼 수도 있습니다.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ot">async ::</span> <span class="dt">IO</span> a <span class="ot">-&gt;</span> <span class="dt">IO</span> (<span class="dt">Async</span> a)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>async action <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  m <span class="ot">&lt;-</span> newEmptyVar</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  t <span class="ot">&lt;-</span> mask <span class="op">$</span> \restore <span class="ot">-&gt;</span> forkIO</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    (<span class="kw">do</span> <span class="co">-- 원래 IO a 였던 액션을 IO () 으로 바꾸고, 타입 a 값은 MVar에 담아 놓습니다.</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>      r <span class="ot">&lt;-</span> try (restore action)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>      putMVar m r</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span> (<span class="dt">Async</span> t m)</span></code></pre></div>
+<p>Async 작업 체인을 만드는 withAsync의 구현을 보면,</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ot">withAsync ::</span> <span class="dt">IO</span> a <span class="ot">-&gt;</span> (<span class="dt">Async</span> a <span class="ot">-&gt;</span> <span class="dt">IO</span> b) <span class="ot">-&gt;</span> <span class="dt">IO</span> b</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>withAsync <span class="ot">=</span> inline withAsyncUsing rawForkIO</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- bracket 을 써서 구현해도 되지만 느리다. 그래서 여기선 hand-coding 했다고 한다.</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="ot">withAsyncUsing ::</span> (<span class="dt">IO</span> () <span class="ot">-&gt;</span> <span class="dt">IO</span> <span class="dt">ThreadId</span>) <span class="ot">-&gt;</span> <span class="dt">IO</span> a <span class="ot">-&gt;</span> (<span class="dt">Async</span> a <span class="ot">-&gt;</span> <span class="dt">IO</span> b) <span class="ot">-&gt;</span> <span class="dt">IO</span> b</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>withAsyncUsing doFork <span class="ot">=</span> \action inner <span class="ot">-&gt;</span> <span class="kw">do</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  var <span class="ot">&lt;-</span> newEmptyTMVarIO</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  mask <span class="op">$</span> \restore <span class="ot">-&gt;</span> <span class="kw">do</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    t <span class="ot">&lt;-</span> doFork <span class="op">$</span> try (restore action) <span class="op">&gt;&gt;=</span> atomically <span class="op">.</span> putTMVar var <span class="co">-- 이 부분이 async 구현이랑 같다.</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> a <span class="ot">=</span> <span class="dt">Async</span> t (readTMVar var)</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    r <span class="ot">&lt;-</span> restore (inner a) <span class="ot">`catchAll`</span> \e <span class="ot">-&gt;</span> <span class="kw">do</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>      uninterruptibleCancel a</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>      throwIO e</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    uninterruptibleCancel a</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span> r</span></code></pre></div>
+
+<div id="disqus_thread" style="padding-top:40px"></div>
+<script>
+
+var disqus_config = function () {
+this.page.url = 'https://lionhairdino.github.io/posts/2021-03-25-async.html';
+this.page.identifier = 'posts/2021-03-25-async.markdown';
+};
+(function() {
+var d = document, s = d.createElement('script');
+s.src = 'https://lionhairdino.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+                            
+        </div>
+        <div id="footer">
+            © 2021 lionhairdino. All rights reserved. Generated by <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+    </body>
+</html>
