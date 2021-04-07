@@ -47,8 +47,8 @@
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    c <span class="ot">&lt;-</span> <span class="fu">getChar</span></span>
 <span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span> c</span>
 <span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co">-- oneChar 를 fork해서 실행한다면 결과겂을 어떻게 받아 올까요?</span></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co">-- 애초에 fork 는 IO () 타입 작업만 받으니, 이대로는 fork 할 수 없습니다.</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co">-- oneChar 를 fork해서 실행한다면 결과값을 어떻게 받아 올까요?</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co">-- 애초에 fork 는 IO () 타입 작업만 받으니, 이대로는 fork할 수 없습니다.</span></span>
 <span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="co">-- 아래와 같이 원래 작업을 부르는 IO () 타입의 작업을 만듭니다.</span></span>
 <span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co">-- MVar 성격의 변수를 받아 작업 결과를 그 MVar에 넣는 작업만 하니, 결과 타입은 IO () 입니다.</span></span>
@@ -77,18 +77,21 @@
 <p>Async 작업 체인을 만드는 withAsync의 구현을 보면,</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ot">withAsync ::</span> <span class="dt">IO</span> a <span class="ot">-&gt;</span> (<span class="dt">Async</span> a <span class="ot">-&gt;</span> <span class="dt">IO</span> b) <span class="ot">-&gt;</span> <span class="dt">IO</span> b</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>withAsync <span class="ot">=</span> inline withAsyncUsing rawForkIO</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- bracket 을 써서 구현해도 되지만 느리다. 그래서 여기선 hand-coding 했다고 한다.</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- bracket 을 써서 구현해도 되지만 느려서 hand-coding 했다고 합니다.</span></span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="ot">withAsyncUsing ::</span> (<span class="dt">IO</span> () <span class="ot">-&gt;</span> <span class="dt">IO</span> <span class="dt">ThreadId</span>) <span class="ot">-&gt;</span> <span class="dt">IO</span> a <span class="ot">-&gt;</span> (<span class="dt">Async</span> a <span class="ot">-&gt;</span> <span class="dt">IO</span> b) <span class="ot">-&gt;</span> <span class="dt">IO</span> b</span>
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>withAsyncUsing doFork <span class="ot">=</span> \action inner <span class="ot">-&gt;</span> <span class="kw">do</span></span>
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  var <span class="ot">&lt;-</span> newEmptyTMVarIO</span>
 <span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  mask <span class="op">$</span> \restore <span class="ot">-&gt;</span> <span class="kw">do</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    t <span class="ot">&lt;-</span> doFork <span class="op">$</span> try (restore action) <span class="op">&gt;&gt;=</span> atomically <span class="op">.</span> putTMVar var <span class="co">-- 이 부분이 async 구현이랑 같다.</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    t <span class="ot">&lt;-</span> doFork <span class="op">$</span> try (restore action) <span class="op">&gt;&gt;=</span> atomically <span class="op">.</span> putTMVar var <span class="co">-- 이 부분이 async 구현이랑 같습니다.</span></span>
 <span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> a <span class="ot">=</span> <span class="dt">Async</span> t (readTMVar var)</span>
 <span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    r <span class="ot">&lt;-</span> restore (inner a) <span class="ot">`catchAll`</span> \e <span class="ot">-&gt;</span> <span class="kw">do</span></span>
 <span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>      uninterruptibleCancel a</span>
 <span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>      throwIO e</span>
 <span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    uninterruptibleCancel a</span>
 <span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span> r</span></code></pre></div>
+<hr />
+<p><a href="https://www.fpcomplete.com/haskell/library/async/">fpcomplete async 문서</a><br />
+<a href="https://hackage.haskell.org/package/async-2.2.3/docs/src/Control.Concurrent.Async.html#withAsync">withAsync 실제 소스</a></p>
 
 <div id="disqus_thread" style="padding-top:40px"></div>
 <script>
