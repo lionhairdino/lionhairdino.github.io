@@ -92,7 +92,7 @@ z</code></pre>
 <pre><code>λ&lt;name&gt;.(&lt;expression&gt; &lt;name&gt;)</code></pre>
 <p>이렇게 바운드 되어 있는 변수에 &lt;expression&gt;을 적용하는 모양은 그냥 아래와 같이 함수만 적어 놓은 것과 같습니다.</p>
 <pre><code>&lt;expression&gt;</code></pre>
-<p>하스켈로 말하면 (-&gt; f x) 1 은 그냥 f 1 과 같다는 말입니다. 이렇게 간단한 표현으로 바꾸는 걸 eta reduction이라 합니다.</p>
+<p>하스켈로 말하면 (\x -&gt; f x) 1 은 그냥 f 1 과 같다는 말입니다. 이렇게 간단한 표현으로 바꾸는 걸 eta reduction이라 합니다.</p>
 <h3 id="combinators">Combinators</h3>
 <p>Free 변수가 없는 람다식을 컴비네이터라 부릅니다. 인자를 combine 한다는 의미로 이름 붙여졌습니다. 단어 뜻은 결합을 의미하는데, 이게 인자와 결합할 수 없는 변수는 없다란 뜻과 바로 연결되진 않네요. 여하튼 하스켈 문서에서 수시로 컴비네이터란 말이 등장하는데, Free 변수가 없다란 말로도 쓰이지만, 어떤 함수의 목적을 달성하기 위해 내부에서 조합해서 쓰이게 되는 비슷한 성격들의 함수들을 컴비네이터라 부르기도 합니다. 예를 들어 parsec에서 숫자 파서, 문자열 파서… 들을 조합해서 원하는 파싱을 할 때, 이들 파서 하나 하나를 컴비네이터라 부릅니다.</p>
 <h3 id="beta-normal-form">Beta Normal Form</h3>
@@ -127,26 +127,13 @@ z</code></pre>
 λfirst.λsecond.first
 --두 번째 인자를 고르는 함수
 λfirst.λsecond.second</code></pre>
-<table style="width:5%;">
-<colgroup>
-<col style="width: 5%" />
-</colgroup>
-<tbody>
-<tr class="odd">
-<td>※재밌는 건, 천 번째 인자를 고르는 함수를 Identity 함수에 적용하면 두 번째 인자를 고르는 함수가 됩니다.</td>
-</tr>
-<tr class="even">
-<td>~~~ (λfirst.λsecond.first) (λx.x) λsecond.(λx.x) ~~~</td>
-</tr>
-<tr class="odd">
-<td>alpha equivalence 특성을 이용해 second를 first로 x를 second로 바꿔서 표기하면</td>
-</tr>
-<tr class="even">
-<td>~~~ λfirst.λsecond.second ~~~</td>
-</tr>
-</tbody>
-</table>
-<p>그 다음, 이 함수들에 적용할 튜플 함수를 만들면 ~~~ λfirst.λsecond.λfunc.((func first) second) ~~~</p>
+<p>※재밌는 건, 천 번째 인자를 고르는 함수를 Identity 함수에 적용하면 두 번째 인자를 고르는 함수가 됩니다.</p>
+<pre><code>(λfirst.λsecond.first) (λx.x)
+λsecond.(λx.x)</code></pre>
+<p>alpha equivalence 특성을 이용해 second를 first로 x를 second로 바꿔서 표기하면</p>
+<pre><code>λfirst.λsecond.second</code></pre>
+<p>그 다음, 이 함수들에 적용할 튜플 함수를 만들면</p>
+<pre><code>λfirst.λsecond.λfunc.((func first) second)</code></pre>
 <p>이 함수에 두 개의 인자를 주면, 두 개의 인자를 “가지고 있는” 함수가 됩니다.</p>
 <pre><code>λfirst.λsecond.λfunc.((func first) second) (λx.1) (λx.2)
 λfunc.((func (λx.1)) (λx.2)) </code></pre>
@@ -181,7 +168,8 @@ z</code></pre>
 <p>참고<br />
 AN INTRODUCTION TO FUNCTIONAL PROGRAMMING THROUGH LAMBDA CALCULUS - Greg Michaelson<br />
 HASKELL pROGRAMMING FROM FIRST PRINCIPLES - Christopher Allen, Julie Moronuki</p>
-<p><span class="citation" data-cites="todo">@todo</span>: 1. 람다 대수학 용어를 아는 것을 넘어, 람다 대수학이 컴퓨터 동작과 잘 맞아 떨어지는 이유를 생각해 보자.</p>
+<p><span class="citation" data-cites="todo">@todo</span><br />
+1. 람다 대수학 용어를 아는 것을 넘어, 람다 대수학이 컴퓨터 동작과 잘 맞아 떨어지는 이유를 생각해 보자.</p>
 <ol type="1">
 <li><p>전자 회로와 굉장히 비슷한 느낌이 든다. 전자 회로는 전기가 흐르면서 갈 길을 정하거나 증폭하거나 버리면서 회로가 구성된다. 전기는 어딘가에 머무르지 않는다. 함수형에서는? 함수를 엮어 엮어 길을 만들어 놓고, 나중에 전기 스위치를 On 하듯이 데이터를 넣어주는 순간, 회로가 동작하듯 함수 뭉치가 작동해서 결과가 나온다. 개념만으론 비슷한 정도가 아닌 같은 개념으로 보인다.</p></li>
 <li><p>함수를 함수에 적용(고차 함수)하므로써 얻는 이득이 뭘까? 왜 그런 생각을 하게 됐을까?</p></li>
@@ -191,8 +179,8 @@ HASKELL pROGRAMMING FROM FIRST PRINCIPLES - Christopher Allen, Julie Moronuki</p
 <script>
 
 var disqus_config = function () {
-this.page.url = 'https://lionhairdino.github.io/posts/2021-04-08-lambda.html';
-this.page.identifier = 'posts/2021-04-08-lambda.markdown';
+this.page.url = 'https://lionhairdino.github.io/posts/2021-04-08-lambdaCalculus.html';
+this.page.identifier = 'posts/2021-04-08-lambdaCalculus.markdown';
 };
 (function() {
 var d = document, s = d.createElement('script');
