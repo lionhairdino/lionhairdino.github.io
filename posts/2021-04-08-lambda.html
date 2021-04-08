@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko" lang="ko">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>lionhairdino - 하스켈로 가기 전 필수 코스 - 람다 대수학 기본 용어</title>
+        <meta name="description" content="lionhairdino - 하스켈로 가기 전 필수 코스 - 람다 대수학 기본 용어" />
+        <meta charset="UTF-8" />
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="하스켈로 가기 전 필수 코스 - 람다 대수학 기본 용어" />
+        <meta property="og:description" content="lionhairdino - 하스켈 함수형 프로그래밍, 타입 이론, 모노이드, 모나드, 동적 타입 언어의 코드 조립" />
+        <meta property="og:url" content="https://lionhairdino.github.io" />
+    </head>
+    <body>
+        <div id="header">
+            <div id="logo"> </div>
+            <div id="navigation">
+                <a href="../">lionhairdino</a> 
+                <a href="../about.html">about</a>
+                <!--<a href="/archive.html">archive</a>-->
+            </div>
+        </div>
+
+        <div id="content">
+            <h1>하스켈로 가기 전 필수 코스 - 람다 대수학 기본 용어</h1>
+
+            <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+<div class="info">
+    Posted on April  8, 2021
+    
+</div>
+
+<p>카테고리를 오브젝트로 보고, 카테고리끼리 연산을 펑크터로 정한 다음 집합과 일반 수로 다뤘던 개념들을 이들로만 표현하는 걸 Category theory라 불렀습니다. (Category 대수학이라 불러도 되지 않았을까요. 수학 비전공자라 theory를 붙인 이유는 잘 모르겠습니다.) 이 보다 전에 오브젝트를 함수로 보고, 함수끼리의 연산을 정하고, 일반 수들로 표현한 수식들을 함수로 표현하는 방법이 만들어졌습니다. 바로 람다 대수학입니다.</p>
+<p>하스켈 자료들을 보면 특별한 언급없이 람다 대수학 용어들이 자주 쓰입니다. 깊이 있게 들어가진 않아도 기본 용어들은 알아두면 문서를 보는데 도움이 됩니다.</p>
+<p>그리고, 고차 함수를 적극 활용하는 스타일을 익히기 위해 봐야 될 것 같긴 한데, 람다 대수학을 봤다고 머리가 확 바뀌진 않는 것 같습니다. 그저 함수만으로 세상을 표현할 수도 있구나 정도의 감탄만 나오고 또 하나의 벽이 생긴 느낌도 있습니다.</p>
+<p>어쨌든, 하스켈 문서들을 매끄럽게 읽으려면 반드시 먼저 봐야하는 이론입니다.</p>
+<p>여기 내용은 AN INTRODUCTION TO FUNCTIONAL PROGRAMMING THROUGH LAMBDA CALCULUS - Greg Michaelson 앞 부분의 몇 챕터를 요약한 것입니다.</p>
+<h2 id="기본-용어">기본 용어</h2>
+<h3 id="expression">Expression</h3>
+<p>variables : 변수. 함수로 들어오는 길을 의미한다.<br />
+arguments : 입력 값<br />
+abstractions : 함수 head + body 로 구분하여 부른다.<br />
+expressions : 한 번 이상 abstraction 으로 싸여져 있는 식</p>
+<pre><code>𝜆x   .    x
+^^^^   ^^^^
+head   body</code></pre>
+<h3 id="bound-variables">Bound variables</h3>
+<p>head에 있는 변수 x를 parameter라 하고, body에 있는 모든 x에 bind되어 있다 말합니다. 이 때 body에 나오는 x를 bound variable이라 합니다. ※ parameter를 통해 넣어 준 값을 arguments라 합니다.</p>
+<h3 id="alpha-equivalence">Alpha equivalence</h3>
+<pre><code>𝜆x.x
+𝜆d.d
+𝜆z.z</code></pre>
+<p>x 나 d, z가 특별한 의미를 가지는게 아닙니다. 위 세 개는 같은 함수입니다. 이 걸 alpha equivalence라 부릅니다.</p>
+<h3 id="beta-reduction">Beta reduction</h3>
+<p>함수에 인자를 넣어주는 걸, 인자에 함수를 적용(apply a function to an argument)한다라 말하기도 합니다. 이렇게 넣어 준 값(reduce가 필요한 expression일 수도 있고, 더 이상 reduce할 필요 없는 expression, 즉 값일 수도 있습니다.)으로 abstaction의 body에 있는 bound 변수를 대체하고, 헤드를 지우는 작업을 beta reduction이라 합니다.</p>
+<p>지금까지 함수를 가지고 항상 해오던 작업들에 명확한 이름을 지어주기 위한 용어들입니다.</p>
+<pre><code>(𝜆x.x) 2
+2</code></pre>
+<p>함수 적용은 위와 같이 표기합니다. 위 예는 입력값을 그대로 뱉어내는 identity 함수입니다.</p>
+<pre><code>(𝜆x.x)(𝜆y.y)z</code></pre>
+<p>함수 적용은 왼쪽 우선(left associative)입니다. 위 식은 아래와 같이 괄호로 감쌌다고 보면 됩니다.</p>
+<pre><code>((𝜆x.x)(𝜆y.y))z
+(𝜆y.y)z
+z</code></pre>
+<p>이제 용어들을 알았으니, 용어들을 이용해 작업을 설명하면 “head(또는 lambda)가 남아있지 않을 때까지 beta reduction을 계속 반복한다”라고 말합니다.</p>
+<h3 id="free-variables">Free variables</h3>
+<pre><code>𝜆x.xy</code></pre>
+<p>y 처럼 head에 없는 변수를 free 변수라고합니다.</p>
+<pre><code>(𝜆x.xy)z</code></pre>
+<p>z를 x에 넣어 주면 zy로 beta reduction은 끝납니다. 한 가지 주의할 점은 alpha equivalence는 free 변수에는 적용되지 않습니다.</p>
+<pre><code>𝜆x.xz
+𝜆x.xy</code></pre>
+<p>두 개는 같은 함수가 아닙니다. 아래와 같이 bound 변수를 바꾸는 건 의미상 차이가 없는 alpha equivalence입니다.</p>
+<pre><code>𝜆x.xz
+𝜆y.yz</code></pre>
+<p>그런데 문서를 읽는 동안 혼란스러웠던 점이 있습니다.</p>
+<pre><code>λf.(f λx.x)</code></pre>
+<p>f는 head에 묶여 있으니, bound 변수입니다. 하지만, 아래와 같이 head를 떼어내고 body만 두고 볼 때는 free라 말합니다.</p>
+<pre><code>(f λx.x)</code></pre>
+<p><em>head까지 포함되어 있는 식</em>에서는 bound라고 하지만, head없이 body만 떼어내서 말할 때는, 어디 head에 묶여 있을지, 어디에도 묶여있지 않을지 알 수 없습니다. 이 때 f는 free입니다.</p>
+<p>만일 free변수와 bound변수가 이름이 겹칠 때는 혼동을 막기 위해 bound변수를 alpha equivalence를 적용(alpha conversion이라 부릅니다)해서 이름을 바꿔서 풉니다.</p>
+<pre><code>((λfunc.λarg.(func arg) arg) boing) =&gt;
+(λarg.(arg arg) boing) =&gt;
+(boing boing)  ---------------- (x) arg 해석을 잘 못 했습니다.</code></pre>
+<p>혼동을 막기 위해 bound되어 있는 arg를 arg1로 바꾸었습니다.</p>
+<pre><code>((λfunc.λarg1.(func arg1) arg) boing) =&gt;
+(λarg1.(arg arg1) boing) =&gt;
+(arg boing) ----------------- (o) 제대로 풀었습니다.</code></pre>
+<h3 id="eta-reduction">Eta reduction</h3>
+<pre><code>λ&lt;name&gt;.(&lt;expression&gt; &lt;name&gt;)</code></pre>
+<p>이렇게 바운드 되어 있는 변수에 &lt;expression&gt;을 적용하는 모양은 그냥 아래와 같이 함수만 적어 놓은 것과 같습니다.</p>
+<pre><code>&lt;expression&gt;</code></pre>
+<p>하스켈로 말하면 (-&gt; f x) 1 은 그냥 f 1 과 같다는 말입니다. 이렇게 간단한 표현으로 바꾸는 걸 eta reduction이라 합니다.</p>
+<h3 id="combinators">Combinators</h3>
+<p>Free 변수가 없는 람다식을 컴비네이터라 부릅니다. 인자를 combine 한다는 의미로 이름 붙여졌습니다. 단어 뜻은 결합을 의미하는데, 이게 인자와 결합할 수 없는 변수는 없다란 뜻과 바로 연결되진 않네요. 여하튼 하스켈 문서에서 수시로 컴비네이터란 말이 등장하는데, Free 변수가 없다란 말로도 쓰이지만, 어떤 함수의 목적을 달성하기 위해 내부에서 조합해서 쓰이게 되는 비슷한 성격들의 함수들을 컴비네이터라 부르기도 합니다. 예를 들어 parsec에서 숫자 파서, 문자열 파서… 들을 조합해서 원하는 파싱을 할 때, 이들 파서 하나 하나를 컴비네이터라 부릅니다.</p>
+<h3 id="beta-normal-form">Beta Normal Form</h3>
+<p>더 이상 beta reduce 할 게 없는 상태</p>
+<h3 id="여러-개의-arguments">여러 개의 arguments</h3>
+<pre><code>𝜆xy.xy</code></pre>
+<p>parameter가 여러 개일때는 왼쪽부터 beta reduction 합니다. 아래와 같이 괄호가 있다고 생각하면 됩니다.</p>
+<pre><code>𝜆x.(𝜆y.xy)
+(𝜆x.(𝜆y.xy)) 1 2
+(𝜆y.1y) 2
+12</code></pre>
+<h2 id="람다-함수-스타일로만-프로그래밍-구조를-만드는-게-가능할까">람다 함수 스타일로만 프로그래밍 구조를 만드는 게 가능할까?</h2>
+<p>전자 회로에 쓰이는 부품을 만들 듯, 특정 동작을 하는 함수들을 만들어 회로를 설계하는 것과 비슷해 보입니다. 모든 부품(함수)들의 정의를 살펴 보면 좋겠지만, 여기서는 그럴 수도 있겠다 정도의 감만 생기는게 목표입니다.</p>
+<h3 id="identity-function">Identity function</h3>
+<pre><code>λx.x</code></pre>
+<h3 id="self-application-function">Self application function</h3>
+<p>재귀를 이용한 무한 루프</p>
+<pre><code>λs.(s s)
+
+(λs.(s s) λs.(s s))</code></pre>
+<p>이렇게 reduction이 끝나지 않는 걸 divergence라 부릅니다.</p>
+<h3 id="function-application-function">Function application function</h3>
+<pre><code>λfunc.λarg.(func arg)</code></pre>
+<pre><code>((λfunc.λarg.(func arg) λx.x) λs.(s s))
+((λarg.((λx.x) arg)) λs.(s s))
+((λarg.(arg)) λs.(s s))
+(λs.(s s))</code></pre>
+<h3 id="튜플">튜플</h3>
+<p>튜플을 만들어 내는 함수를 만들어 봅시다. 흔히 봤던 (a,b) 이런 외적인 모양이 아니라 튜플의 속성을 띄는 것이면 모양은 상관 없습니다. 첫 번째 값을 따로 꺼내거나, 두 번째 값을 따로 꺼낼 수 있는 걸 튜플의 속성이라 볼 수 있습니다.</p>
+<p>먼저 첫 번째 값, 두 번째 값을 꺼내는 함수를 만들면</p>
+<pre><code>--첫 번째 인자를 고르는 함수
+λfirst.λsecond.first
+--두 번째 인자를 고르는 함수
+λfirst.λsecond.second</code></pre>
+<table style="width:5%;">
+<colgroup>
+<col style="width: 5%" />
+</colgroup>
+<tbody>
+<tr class="odd">
+<td>※재밌는 건, 천 번째 인자를 고르는 함수를 Identity 함수에 적용하면 두 번째 인자를 고르는 함수가 됩니다.</td>
+</tr>
+<tr class="even">
+<td>~~~ (λfirst.λsecond.first) (λx.x) λsecond.(λx.x) ~~~</td>
+</tr>
+<tr class="odd">
+<td>alpha equivalence 특성을 이용해 second를 first로 x를 second로 바꿔서 표기하면</td>
+</tr>
+<tr class="even">
+<td>~~~ λfirst.λsecond.second ~~~</td>
+</tr>
+</tbody>
+</table>
+<p>그 다음, 이 함수들에 적용할 튜플 함수를 만들면 ~~~ λfirst.λsecond.λfunc.((func first) second) ~~~</p>
+<p>이 함수에 두 개의 인자를 주면, 두 개의 인자를 “가지고 있는” 함수가 됩니다.</p>
+<pre><code>λfirst.λsecond.λfunc.((func first) second) (λx.1) (λx.2)
+λfunc.((func (λx.1)) (λx.2)) </code></pre>
+<p>이 함수를 첫 번째 인자를 고르는 함수에 적용하면</p>
+<pre><code>λfunc.((func (x.1)) (λx.2)) λfirst.λsecond.first
+λfirst.λsecond.first (λx.1) (λx.2)
+(λx.1)</code></pre>
+<p>두 번째 인자를 고르는 함수에 적용하면</p>
+<pre><code>λfunc.((func (x.1)) (λx.2)) λfirst.λsecond.second
+λfirst.λsecond.first (λx.1) (λx.2)
+(λx.2)</code></pre>
+<p>이렇게 튜플 속성을 함수로 표현했습니다.</p>
+<h3 id="분기문">분기문</h3>
+<p>함수만으로 분기문을 어떻게 만들까요? 이 글에서는 여기까지만 살펴 보겠습니다. 모든 걸 함수로 표기하면 얻는 잇점이 뭘까 더 생각해보고, 생각의 진전이 있을 때 이어가도록 하겠습니다.</p>
+<p>True가 들어 왔을 때와 False가 들어 왔을 때 가는 길이 다르게 해야 합니다. True, False 일 때 길을 고르는 함수를 정의하기 전에, 당연히 <em>True와 False를 함수로 정의</em>해야 합니다. _ -&gt; True, _ -&gt; False … 쯤으로 생각하는게 아닙니다. True와 False를 쓸 함수들을 생각해서 속성을 떠올려야 합니다. 어떤 함수를 True에 적용할 때와 False에 적용할 때 다른 값이 나오게 하면 됩니다.</p>
+<p>True를 select_first로, False를 select_second로 표현하기로 하고, 조건문은 다음과 같이 정의합니다.</p>
+<pre><code>λe1.λe2.λc.((c e1) e2)</code></pre>
+<p>여기에 True, False 에 따라 실행할 식 2개를 먼저 넣어줍니다.</p>
+<pre><code>((λe1.λe2.λc.((c e1) e2) &lt;expression1&gt;) &lt;expression2&gt;) =&gt;
+(λe2.λc.((c &lt;expression1&gt;) e2) &lt;expression2&gt;) =&gt;
+λc.((c &lt;expression1&gt;) &lt;expression2&gt;)</code></pre>
+<p>이제 이 함수를 True (select_first) 에 적용하면,</p>
+<pre><code>(λc.((c &lt;expression1&gt;) &lt;expression2&gt;) select_first) =&gt;
+((select_first &lt;expression1&gt;) &lt;expression2&gt;) =&gt; ... =&gt;
+&lt;expression1&gt;</code></pre>
+<p>False (select_second) 에 적용하면</p>
+<pre><code>(λc.((c &lt;expression1&gt;) &lt;expression2&gt;) select_second) =&gt;
+((select_second &lt;expression1&gt;) &lt;expression2&gt;) =&gt; ... =&gt;
+&lt;expression2&gt;</code></pre>
+<p>조건에 따라 다른 결과를 만드는 함수를 만들었습니다. 함수로 이런 생각을 했다는 게 신기하긴 합니다.</p>
+<hr />
+<p>참고<br />
+AN INTRODUCTION TO FUNCTIONAL PROGRAMMING THROUGH LAMBDA CALCULUS - Greg Michaelson<br />
+HASKELL pROGRAMMING FROM FIRST PRINCIPLES - Christopher Allen, Julie Moronuki</p>
+<p><span class="citation" data-cites="todo">@todo</span>: 1. 람다 대수학 용어를 아는 것을 넘어, 람다 대수학이 컴퓨터 동작과 잘 맞아 떨어지는 이유를 생각해 보자.</p>
+<ol type="1">
+<li><p>전자 회로와 굉장히 비슷한 느낌이 든다. 전자 회로는 전기가 흐르면서 갈 길을 정하거나 증폭하거나 버리면서 회로가 구성된다. 전기는 어딘가에 머무르지 않는다. 함수형에서는? 함수를 엮어 엮어 길을 만들어 놓고, 나중에 전기 스위치를 On 하듯이 데이터를 넣어주는 순간, 회로가 동작하듯 함수 뭉치가 작동해서 결과가 나온다. 개념만으론 비슷한 정도가 아닌 같은 개념으로 보인다.</p></li>
+<li><p>함수를 함수에 적용(고차 함수)하므로써 얻는 이득이 뭘까? 왜 그런 생각을 하게 됐을까?</p></li>
+</ol>
+
+<div id="disqus_thread" style="padding-top:40px"></div>
+<script>
+
+var disqus_config = function () {
+this.page.url = 'https://lionhairdino.github.io/posts/2021-04-08-lambda.html';
+this.page.identifier = 'posts/2021-04-08-lambda.markdown';
+};
+(function() {
+var d = document, s = d.createElement('script');
+s.src = 'https://lionhairdino.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+                            
+        </div>
+        <div id="footer">
+            © 2021 lionhairdino. All rights reserved. Generated by <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+    </body>
+</html>
