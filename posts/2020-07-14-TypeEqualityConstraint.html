@@ -91,10 +91,10 @@ Monoid t =&gt; PairOf t b0 까지는 추론했는데, b0가 뭔지 모른다는a
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="ot">obtuseMempty ::</span> <span class="dt">Monoid</span> t <span class="ot">=&gt;</span> t</span>
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>obtuseMempty <span class="ot">=</span> <span class="fu">fst</span> thePair </span></code></pre></div>
-<p>a ~ b 는 a와 b가 같다는 뜻이 들어가면 에러가 나지 않습니다. 어차피 두 개다 a a 란 뜻인 것 같은데 왜 그럴까요?<br />
-Pair a a 라고 쓴 것과 a ~ b =&gt; Pair a b 는 다르게 작업이 진행됩니다. a a 인 경우는 인스턴스를 찾을 때 두 개 인자가 같은 타입인 경우만 매칭 되는데, a b 는 일단 인자가 두 개인 것과 매칭됩니다. 그 다음 b를 a와 같은 타입으로 추론합니다. a ~ b 를 constraint에 넣어서 a와 b가 같다는 정보를 head에서 constraint로 옮겼습니다. 인스턴스 resolution은 head 해석 후 constraint로 가니 두 개가 같아야 한다는 정보는 나중으로 미뤘다는 얘기입니다.<sup><a href="#resolution">[3]</a></sup><br />
-이 번에는 (t, b0)로 추론한 후, 인스턴스를 찾으니 Pair a b 와 매칭에 성공하고, b0를 a와 같은 타입으로 추론합니다. <em>a ~ b 의 뜻은 “b가 당장 뭔지 몰라도 돼, 나중에 b는 a와 같은 타입으로 추론할거야”</em> 란 뜻입니다.<br />
-GHC는 최종 (Monoid t) =&gt; (t, t) 로 추론합니다.</p>
+<p><code>a ~ b</code> 는 a와 b가 같다는 뜻이 들어가면 에러가 나지 않습니다. 어차피 두 개다 a a 란 뜻인 것 같은데 왜 그럴까요?<br />
+Pair a a 라고 쓴 것과 <code>a ~ b =&gt; Pair a b</code> 는 다르게 작업이 진행됩니다. a a 인 경우는 인스턴스를 찾을 때 두 개 인자가 같은 타입인 경우만 매칭 되는데, a b 는 일단 인자가 두 개인 것과 매칭됩니다. 그 다음 b를 a와 같은 타입으로 추론합니다. <code>a ~ b</code> 를 constraint에 넣어서 a와 b가 같다는 정보를 head에서 constraint로 옮겼습니다. 인스턴스 resolution은 head 해석 후 constraint로 가니 두 개가 같아야 한다는 정보는 나중으로 미뤘다는 얘기입니다.<sup><a href="#resolution">[3]</a></sup><br />
+이 번에는 (t, b0)로 추론한 후, 인스턴스를 찾으니 Pair a b 와 매칭에 성공하고, b0를 a와 같은 타입으로 추론합니다. <em><code>a ~ b</code> 의 뜻은 “b가 당장 뭔지 몰라도 돼, 나중에 b는 a와 같은 타입으로 추론할거야”</em> 란 뜻입니다.<br />
+GHC는 최종 <code>(Monoid t) =&gt; (t, t)</code> 로 추론합니다.</p>
 <h2 id="constraint를-이용한-선언과-타입-지정-선언-비교">constraint를 이용한 선언과 타입 지정 선언 비교</h2>
 <p><a href="https://memo.barrucadu.co.uk/tilde-instance-pattern.html" class="uri">https://memo.barrucadu.co.uk/tilde-instance-pattern.html</a> 발췌</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ot">{-# Language FlexibleInstances #-}</span></span>

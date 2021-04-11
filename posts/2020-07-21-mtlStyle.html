@@ -54,8 +54,8 @@
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">HasName</span> <span class="dt">Villain</span> <span class="kw">where</span>    </span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  getName x <span class="ot">=</span> <span class="st">&quot;Villain : &quot;</span> <span class="op">++</span> nickname x    </span></code></pre></div>
 <p>이렇게 클래스를 활용하는 걸 Has type class 패턴이라 부릅니다.</p>
-<p>정리하면, Player -&gt; IO () 는 Player 타입만 받아 들이지만,<br />
-HasName a =&gt; a 는 a가 <em>뭐든간에 HasName 인스턴스이기만 하면</em> 받아 들일 수 있습니다.</p>
+<p>정리하면, <code>Player -&gt; IO ()</code> 는 Player 타입만 받아 들이지만,<br />
+<code>HasName a =&gt; a</code> 는 a가 <em>뭐든간에 HasName 인스턴스이기만 하면</em> 받아 들일 수 있습니다.</p>
 <p>여기서 쓰인 아이디어를 모나드 트랜스포머와 붙여서 사용할 수 있습니다.</p>
 <h2 id="mtl-라이브러리-monad-transformer-library">mtl 라이브러리 Monad Transformer Library</h2>
 <div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">AppM</span> a <span class="ot">=</span> <span class="dt">ReaderT</span> <span class="dt">Env</span> (<span class="dt">LoggingT</span> <span class="dt">IO</span>) a</span></code></pre></div>
@@ -82,7 +82,7 @@ Control.Monad.Trans.Reader 모듈의 일반 함수입니다.</p>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>ask <span class="ot">=</span> <span class="dt">ReaderT</span> <span class="fu">return</span></span></code></pre></div>
 <p>ReaderT 액션이므로 runReaderT로 return을 꺼내고 r을 넣어주면<br />
 return r 이되고<br />
-보통 env &lt;- ask 를 쓰니 &lt;- 로 return으로 씌운 생성자가 벗겨지면 r만 env로 들어갑니다.<br />
+보통 <code>env &lt;- ask</code> 를 쓰니 &lt;- 로 return으로 씌운 생성자가 벗겨지면 r만 env로 들어갑니다.<br />
 <em>하지만 이 ask는 ReaderT 컨텍스트에서만 사용할 수 있습니다.</em></p>
 <p>MonadReader 클래스는 ask 메소드를 가지고 있습니다.</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">Monad</span> m <span class="ot">=&gt;</span> <span class="dt">MonadReader</span> r m <span class="op">|</span> m <span class="ot">-&gt;</span> r <span class="kw">where</span></span>

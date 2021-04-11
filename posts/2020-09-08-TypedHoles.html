@@ -49,7 +49,7 @@
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> code <span class="ot">=</span> _ <span class="op">:</span> _</span>
 <span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co">-- 결과는 위와 같습니다.</span></span></code></pre></div>
-<p>(:) 함수가 인자 두 개를 받는데, 첫 번째는 a로 두 번째는 [a]로 추론하는 걸 볼 수 있습니다. 결과가 a, [a]등으로 폴리모픽한 모습이어서 전혀 추론하지 않은 것처럼 오해할 수 있습니다. <em>타입 추론은 항상 구체 타입까지 추론하는게 아닙니다.</em><br />
+<p><code>(:)</code> 함수가 인자 두 개를 받는데, 첫 번째는 a로 두 번째는 [a]로 추론하는 걸 볼 수 있습니다. 결과가 a, [a]등으로 폴리모픽한 모습이어서 전혀 추론하지 않은 것처럼 오해할 수 있습니다. <em>타입 추론은 항상 구체 타입까지 추론하는게 아닙니다.</em><br />
 여기서는 cons의 결과로 [a] 타입이라 추론했고, 첫 번째 인자는 이 리스트 속에 들어있는 a와 같아야만 한다고 추론한 겁니다. 예를 들어 첫 번째 인자가 Int고, 두 번째 인자가 [Char] 이런식이면 안된다는 정보까진 추론한 겁니다. 구체 타입은 아직 모르고, 두 인자간의 관계까지만 추론한 상태라고 볼 수 있습니다.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="kw">import</span> <span class="dt">Control.Monad.Reader</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -66,7 +66,7 @@
 <span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="op">:</span>t runReader</span>
 <span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="ot">runReader ::</span> <span class="dt">Reader</span> r a <span class="ot">-&gt;</span> r <span class="ot">-&gt;</span> a</span></code></pre></div>
 <p>(1)은 Num 클래스까지만 추론됐고, (2)는 Integer 까지 추론됐습니다. monomorphismRestriction 확장을 끄거나 켜도 결과는 같습니다.</p>
-<p>ghc에서 몇 몇 클래스들은, 클래스까지만 추론된 후 더 이상 추론 단서가 없다면 디폴트 타입으로 추론합니다. 홀은 runReader 함수가 두 번째 인자로 1을 받는 걸 보고 Num r =&gt; Reader r a 로 추론을 끝내지 않고 Reader Integer a까지 갔습니다.</p>
+<p>ghc에서 몇 몇 클래스들은, 클래스까지만 추론된 후 더 이상 추론 단서가 없다면 디폴트 타입으로 추론합니다. 홀은 runReader 함수가 두 번째 인자로 1을 받는 걸 보고 <code>Num r =&gt; Reader r a</code> 로 추론을 끝내지 않고 Reader Integer a까지 갔습니다.</p>
 <p>컴파일 할 때와, GHCi에서 타입 체커 동작이 다릅니다. GHCi는 타입 디폴트 규칙을 numeric에만 한정하지 않고, Show, Eq, Ord 클래스까지 확장합니다. 일정한 동작을 보이면 좋겠는데, 때에 따라 다르다 하니 좀 까다롭습니다.</p>
 <p>어떤 때에 디폴트 추론이 일어나는지 좀 더 명확해지면 내용을 추가하도록 하겠습니다.</p>
 <hr />

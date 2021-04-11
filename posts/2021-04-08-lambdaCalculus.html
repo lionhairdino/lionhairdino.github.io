@@ -92,7 +92,7 @@ z</code></pre>
 <pre><code>λ&lt;name&gt;.(&lt;expression&gt; &lt;name&gt;)</code></pre>
 <p>이렇게 바운드 되어 있는 변수에 &lt;expression&gt;을 적용하는 모양은 그냥 아래와 같이 함수만 적어 놓은 것과 같습니다.</p>
 <pre><code>&lt;expression&gt;</code></pre>
-<p>하스켈로 말하면 (\x -&gt; f x) 1 은 그냥 f 1 과 같다는 말입니다. 이렇게 간단한 표현으로 바꾸는 걸 eta reduction이라 합니다.</p>
+<p>하스켈로 말하면 <code>(\x -&gt; f x)</code> 1 은 그냥 f 1 과 같다는 말입니다. 이렇게 간단한 표현으로 바꾸는 걸 eta reduction이라 합니다.</p>
 <h3 id="combinators">Combinators</h3>
 <p>Free 변수가 없는 람다식을 컴비네이터라 부릅니다. 인자를 combine 한다는 의미로 이름 붙여졌습니다. 단어 뜻은 결합을 의미하는데, 이게 인자와 결합할 수 없는 변수는 없다란 뜻과 바로 연결되진 않네요. 여하튼 하스켈 문서에서 수시로 컴비네이터란 말이 등장하는데, Free 변수가 없다란 말로도 쓰이지만, 어떤 함수의 목적을 달성하기 위해 내부에서 조합해서 쓰이게 되는 비슷한 성격들의 함수들을 컴비네이터라 부르기도 합니다. 예를 들어 parsec에서 숫자 파서, 문자열 파서… 들을 조합해서 원하는 파싱을 할 때, 이들 파서 하나 하나를 컴비네이터라 부릅니다.</p>
 <h3 id="beta-normal-form">Beta Normal Form</h3>
@@ -148,7 +148,7 @@ z</code></pre>
 <p>이렇게 튜플 속성을 함수로 표현했습니다.</p>
 <h3 id="분기문">분기문</h3>
 <p>함수만으로 분기문을 어떻게 만들까요? 이 글에서는 여기까지만 살펴 보겠습니다. 모든 걸 함수로 표기하면 얻는 잇점이 뭘까 더 생각해보고, 생각의 진전이 있을 때 이어가도록 하겠습니다.</p>
-<p>True가 들어 왔을 때와 False가 들어 왔을 때 가는 길이 다르게 해야 합니다. True, False 일 때 길을 고르는 함수를 정의하기 전에, 당연히 <em>True와 False를 함수로 정의</em>해야 합니다. \_ -&gt; True, \_ -&gt; False … 쯤으로 생각하는게 아닙니다. True와 False를 쓸 함수들을 생각해서 속성을 떠올려야 합니다. 어떤 함수를 True에 적용할 때와 False에 적용할 때 다른 값이 나오게 하면 됩니다.</p>
+<p>True가 들어 왔을 때와 False가 들어 왔을 때 가는 길이 다르게 해야 합니다. True, False 일 때 길을 고르는 함수를 정의하기 전에, 당연히 <em>True와 False를 함수로 정의</em>해야 합니다. <code>\_ -&gt; True</code>, <code>\_ -&gt; False</code> … 쯤으로 생각하는게 아닙니다. True와 False를 쓸 함수들을 생각해서 속성을 떠올려야 합니다. 어떤 함수를 True에 적용할 때와 False에 적용할 때 다른 값이 나오게 하면 됩니다.</p>
 <p>True를 select_first로, False를 select_second로 표현하기로 하고, 조건문은 다음과 같이 정의합니다.</p>
 <pre><code>λe1.λe2.λc.((c e1) e2)</code></pre>
 <p>여기에 True, False 에 따라 실행할 식 2개를 먼저 넣어줍니다.</p>

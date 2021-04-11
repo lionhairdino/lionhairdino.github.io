@@ -138,11 +138,11 @@
 <p>소스 카테고리와 결과 카테고리가 같은 펑크터를 엔도펑크터라 합니다. Hask 카테고리(하스켈)에서 만나는 펑크터들은 결과가 Hask를 벗어나지 않기 때문에 모두 엔도펑크터입니다.</p>
 <p>[1,2] 는 리스트 펑크터입니다. Functor의 리스트 인스턴스에 있는 fmap으로 (+5)를 적용하면</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fmap</span> (<span class="op">+</span><span class="dv">5</span>) [<span class="dv">1</span>,<span class="dv">2</span>] <span class="ot">=</span> [<span class="dv">6</span>,<span class="dv">7</span>] </span></code></pre></div>
-<p>결과는 다시 리스트 펑크터입니다. 리스트를 카테고리로 볼 수도 있고, Hask 안의 한 오브젝트로 볼 수도 있습니다. Hask -&gt; Hask 로 보든 List -&gt; List 로 보든, 어떻게 보든 자기 카테고리로 다시 돌아오니 엔도펑크터입니다. 카테고리 이론 말고, 하스켈에서는 fmap을 가진 타입을 펑크터라 하는데, Hask를 벗어나는 경우는 없으니, 하스켈에서 만나는 펑크터는 모두 엔도펑크터라 불러도 됩니다.</p>
+<p>결과는 다시 리스트 펑크터입니다. 리스트를 카테고리로 볼 수도 있고, Hask 안의 한 오브젝트로 볼 수도 있습니다. <code>Hask -&gt; Hask</code> 로 보든 <code>List -&gt; List</code> 로 보든, 어떻게 보든 자기 카테고리로 다시 돌아오니 엔도펑크터입니다. 카테고리 이론 말고, 하스켈에서는 fmap을 가진 타입을 펑크터라 하는데, Hask를 벗어나는 경우는 없으니, 하스켈에서 만나는 펑크터는 모두 엔도펑크터라 불러도 됩니다.</p>
 <p>Some 타입을 정의하고, Some 타입의 컴포지션을 잘 정의하면 Some 카테고리로 볼 수도 있습니다. Maybe 카테고리, List 카테고리… 등 타입 하나가 컴포지션만 잘 정의되어 있으면 하나의 카테고리로 볼 수도 있습니다.</p>
 <p>카테고리 안의 일부 오브젝트가 새로운 카테고리를 형성하기도 하고, 한 카테고리에 속한 오브젝트가 다른 카테고리에 속하는 것도 가능합니다. 카테고리는 조건이 몇 개 없는 굉장히 추상적인 구조입니다.</p>
-<p>a -&gt; m b 타입은 함수일까요, 펑크터일까요, Natural Transformation 일까요? 세 개 다 맞습니다. a 타입에서 m b 타입으로 가는 함수로 볼 수 있고, a 카테고리의 구조를 유지하면서 m b 카테고리로 연결하는 펑크터로 볼 수도 있고, a 앞에 Id 펑크터가 생략됐다고 보고(Id a -&gt; m b) Id 펑크터에서 m 펑크터로 가는 Natural Transformation으로 볼 수도 있습니다. <em>검증 필요</em></p>
-<p>모나드를 얘기할 때는 a -&gt; m b 는 엔도펑크터로 봅니다. m은 fmap을 가지고 있는 펑크터 타입입니다.</p>
+<p><code>a -&gt; m b</code> 타입은 함수일까요, 펑크터일까요, Natural Transformation 일까요? 세 개 다 맞습니다. a 타입에서 m b 타입으로 가는 함수로 볼 수 있고, a 카테고리의 구조를 유지하면서 m b 카테고리로 연결하는 펑크터로 볼 수도 있고, a 앞에 Id 펑크터가 생략됐다고 보고(<code>Id a -&gt; m b</code>) Id 펑크터에서 m 펑크터로 가는 Natural Transformation으로 볼 수도 있습니다. <em>검증 필요</em></p>
+<p>모나드를 얘기할 때는 <code>a -&gt; m b</code> 는 엔도펑크터로 봅니다. m은 fmap을 가지고 있는 펑크터 타입입니다.</p>
 <div id="endofunctorMonoid">
 
 </div>
@@ -152,7 +152,7 @@
 <p>endofunc1 :: a -&gt; m b<br />
 endofunc2 :: b -&gt; m c<br />
 …<br />
-a , b, c 는 폴리모픽을 뜻하므로 대표 타입으로 a -&gt; m b 로 표기하겠습니다.</p>
+a , b, c 는 폴리모픽을 뜻하므로 대표 타입으로 <code>a -&gt; m b</code> 로 표기하겠습니다.</p>
 <p>이런 엔도펑크터들이 있을 때, 엔도펑크터 하나 하나를 오브젝트로 보는 게 아니라, 오브젝트는 하나의 점으로 두고, endofunc1, endofunc2 …을 모피즘으로 삼아 모노이달 카테고리(오브젝트가 하나만 있는 카테고리)에서 모노이드를 만들어 보겠습니다.</p>
 <p>오브젝트는 단 하나만 있습니다.<br />
 모피즘을 합성하는 composition :: (a -&gt; m b) -&gt; (a -&gt; m b) -&gt; (a -&gt; m b) 타입 이항 함수가 있어야 합니다.<br />
