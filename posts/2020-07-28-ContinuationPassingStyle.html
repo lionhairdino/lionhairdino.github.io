@@ -124,9 +124,9 @@ Cont 모나드의 return이 이 함수를 이용해 정의되어 있습니다.</
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- 설명하기 좋게 함수, 변수명을 바꾸면</span></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>cps x <span class="ot">=</span> \lastFunc <span class="ot">-&gt;</span> func1_cps x (\func1Result <span class="ot">-&gt;</span> func2_cps func1Result lastFunc)</span></code></pre></div>
 <p>바인드 정의가 조금 감이 오지 않나요?</p>
-<p>&gt;&gt;=의 첫 번째 인자 s는 Cont 타입, 두 번째 인자 f는 a -&gt; Cont r a 타입.<br />
+<p><code>&gt;&gt;=</code>의 첫 번째 인자 s는 Cont 타입, 두 번째 인자 f는 <code>a -&gt; Cont r a</code> 타입.<br />
 Cont 값을 runCont로 벗겨내면 “<em>나중에 함수를 받아서 적용할 값이 있는 상태</em>”가 됩니다.<br />
-runCont s는 함수를 받을 상태가 되고, 여기에 (\x -&gt; …) 함수를 넘기면 <em>s에 들어 있는 값</em>에 (\x -&gt; …) 를 적용하게 됩니다.<br />
+runCont s는 함수를 받을 상태가 되고, 여기에 <code>(\x -&gt; ...)</code> 함수를 넘기면 <em>s에 들어 있는 값</em>에 <code>(\x -&gt; ...)</code> 를 적용하게 됩니다.<br />
 f를 x에 적용하면 다시 Cont 값이 나오고,<br />
 이 걸 runCont로 다시 벗겨서 외부에서 들어 올 <em>함수를 적용할 준비</em>를 해놓습니다.<br />
 구체적으로 무슨 일을 하는지 감이 잘 오는 해석은 아닙니다.</p>
@@ -163,8 +163,8 @@ f를 x에 적용하면 다시 Cont 값이 나오고,<br />
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>b <span class="ot">&lt;-</span> cont (\f <span class="ot">-&gt;</span> f <span class="dv">2</span>) <span class="co">-- b는 2</span></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="fu">return</span> <span class="op">$</span> a <span class="op">+</span> b <span class="co">-- ($ 3)으로 외부에서 함수를 받아 3에 적용합니다.</span></span></code></pre></div>
 <p>runCont로 (+2)를 넣어주면 ($ 3) (+2) = 5 가 됩니다.</p>
-<p>예를 들어 f x = x + 1을 cps 액션으로 만들면, f x = return $ x + 1<br />
-이 액션은 x + 1 이라는 작업을 하고 결과를 나중에 받는 함수에 넘길 준비를 합니다.<br />
+<p>예를 들어 <code>f x = x + 1</code>을 cps 액션으로 만들면, <code>f x = return $ x + 1</code><br />
+이 액션은 <code>x + 1</code> 이라는 작업을 하고 결과를 나중에 받는 함수에 넘길 준비를 합니다.<br />
 위 예시는 따로 작업은 없고, 상수 1, 상수 2를 가지고 있을 뿐입니다. 그래서 a에는 1, b에는 2가 들어갑니다.</p>
 <p><em>runCont로 넣어준 함수는 모든 액션들에 적용되는게 아니라, 마지막에 실행되는 함수입니다.</em></p>
 <p>cont 모나드 액션은 함수(다음에 할 작업)를 받아 적용할 인자들을 준비하는 것과 같습니다. cont모나드의 바인드는 이들 액션을 품고 품은 모양으로 만드는 역할을 합니다. 실제 바인드가 동작하는 모습을 보면 순서대로 작업이 실행되는게 보입니다.</p>
@@ -196,7 +196,7 @@ f를 x에 적용하면 다시 Cont 값이 나오고,<br />
 <p>Cont 체인에 놓여 있는 액션은 순서대로 실행됩니다. 그런데 callCC로 감싸면 실행 흐름이 달라집니다. <em>callCC가 상황에 따라 continuation을 끊습니다.</em> 어떻게 그럴까요?</p>
 <p>callCC가 받는 인자 f의 타입은</p>
 <div class="sourceCode" id="cb16"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="ot">f ::</span> (a <span class="ot">-&gt;</span> <span class="dt">Cont</span> r b) <span class="ot">-&gt;</span> <span class="dt">Cont</span> r a </span></code></pre></div>
-<p>Cont 값을 만드는 함수를 받아서 Cont 값을 돌려 줍니다. (a -&gt; Cont r b) 함수에 a만 넣어줘도 Cont 값이 나오는데, 왜 한 번 더 감쌌을까요? 보통 a와 a -&gt; b 함수를 같이 받아 필터를 거친 후 함수를 적용하곤 하는데, f는 a를 받지 않습니다. 함수만 받으면 Cont 값이 나오므로, “f안에 a가 있다”고 짐작할 수 있습니다. callCC는 <em>함수만 받으면 Cont 값을 만들 준비가 되어 있는 함수</em>를 인자로 받습니다. 아래 예시의 (\k ..) 함수들입니다. k로 a -&gt; Cont r b 함수를 받을겁니다.</p>
+<p>Cont 값을 만드는 함수를 받아서 Cont 값을 돌려 줍니다. <code>(a -&gt; Cont r b)</code> 함수에 a만 넣어줘도 Cont 값이 나오는데, 왜 한 번 더 감쌌을까요? 보통 a와 <code>a -&gt; b</code> 함수를 같이 받아 필터를 거친 후 함수를 적용하곤 하는데, f는 a를 받지 않습니다. 함수만 받으면 Cont 값이 나오므로, “f안에 a가 있다”고 짐작할 수 있습니다. callCC는 <em>함수만 받으면 Cont 값을 만들 준비가 되어 있는 함수</em>를 인자로 받습니다. 아래 예시의 <code>(\k ..)</code> 함수들입니다. k로 <code>a -&gt; Cont r b</code> 함수를 받을겁니다.</p>
 <div class="sourceCode" id="cb17"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> runCont ( callCC <span class="op">$</span> \k <span class="ot">-&gt;</span> cont (\f <span class="ot">-&gt;</span> f <span class="st">&quot;ok&quot;</span>) ) <span class="fu">id</span></span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;ok&quot;</span></span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> runCont ( callCC <span class="op">$</span> \k <span class="ot">-&gt;</span> k <span class="st">&quot;ok&quot;</span>) <span class="fu">id</span></span>
@@ -205,9 +205,9 @@ f를 x에 적용하면 다시 Cont 값이 나오고,<br />
 <span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;first end&quot;</span></span>
 <span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> runCont ( callCC <span class="op">$</span> \k <span class="ot">-&gt;</span> <span class="kw">do</span> <span class="fu">return</span> <span class="st">&quot;first&quot;</span>; <span class="fu">return</span> <span class="st">&quot;second&quot;</span> ) (<span class="op">++</span> <span class="st">&quot; end&quot;</span>)</span>
 <span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;second end&quot;</span></span></code></pre></div>
-<p>first end 결과가 나온 코드를 보면, return “second”는 실행되지 않습니다. <em>아이디어는 continuation을 받아서 버리는 겁니다.</em> 아마도 callCC 중에 \_ -&gt; .. 모양의 코드가 있을 거라 짐작할 수 있습니다. callCC를 풀어 보겠습니다. callCC 정의에 (\k ..) 함수를 넣으면</p>
+<p>first end 결과가 나온 코드를 보면, return “second”는 실행되지 않습니다. <em>아이디어는 continuation을 받아서 버리는 겁니다.</em> 아마도 callCC 중에 <code>\_ -&gt; ...</code> 모양의 코드가 있을 거라 짐작할 수 있습니다. callCC를 풀어 보겠습니다. callCC 정의에 <code>(\k ..)</code> 함수를 넣으면</p>
 <div class="sourceCode" id="cb18"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>cont <span class="op">$</span> \h <span class="ot">-&gt;</span> runCont ((\k <span class="ot">-&gt;</span> <span class="kw">do</span> k <span class="st">&quot;first&quot;</span>; <span class="fu">return</span> <span class="st">&quot;second&quot;</span>) (\a <span class="ot">-&gt;</span> cont <span class="op">$</span> \_ <span class="ot">-&gt;</span> h a)) h</span></code></pre></div>
-<p><em>k에 (\a -&gt; cont $ \_ -&gt; h a) :: a -&gt; Cont r b 를 넣으면</em></p>
+<p><em>k에 <code>(\a -&gt; cont $ \_ -&gt; h a) :: a -&gt; Cont r b</code> 를 넣으면</em></p>
 <div class="sourceCode" id="cb19"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>cont <span class="op">$</span> \h <span class="ot">-&gt;</span> runCont (<span class="kw">do</span> (\a <span class="ot">-&gt;</span> cont <span class="op">$</span> \_ <span class="ot">-&gt;</span> h a) <span class="st">&quot;first&quot;</span>; <span class="fu">return</span> <span class="st">&quot;second&quot;</span>) h</span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>cont <span class="op">$</span> \h <span class="ot">-&gt;</span> runCont (<span class="kw">do</span> cont <span class="op">$</span> \_ <span class="ot">-&gt;</span> h <span class="st">&quot;first&quot;</span>; <span class="fu">return</span> <span class="st">&quot;second&quot;</span>) h</span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>                         <span class="op">^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</span></span></code></pre></div>
@@ -226,8 +226,8 @@ f를 x에 적용하면 다시 Cont 값이 나오고,<br />
 <p>정리하면, callCC는 “continuation을 만드는 함수를 받아서 continuation을 만들어내는 작업”을 인자로 받습니다. callCC 정의를 보면</p>
 <div class="sourceCode" id="cb22"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>callCC f <span class="ot">=</span> cont <span class="op">$</span> \h <span class="ot">-&gt;</span> runCont (f (\a <span class="ot">-&gt;</span> cont <span class="op">$</span> \_ <span class="ot">-&gt;</span> h a)) h</span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>                                   <span class="op">^^^^^^^^^^^^^^^^^^^^^^^^</span></span></code></pre></div>
-<p>f는 continuation을 만드는 함수를 받는데, 여기에 continuation을 버리는 모양을 만드는 함수를 넘깁니다. a값을 받으면 cont $ \_ -&gt; h a 을 만듭니다. 보통 다른 continuation 들은 cont $ \h -&gt; h a 모양으로 인자로 받은 함수를 내부에 적용하면서 continuation을 이어가는데, 여기선 \_ 로 받아서 버립니다.</p>
-<p>원래 작업은 \k -&gt; do k “first”; return “second” 인데, 여기 k에 (\a -&gt; cont $ \_ -&gt;h a)를 넣어 작업을 변형합니다. k가 실행되면 continuation을 끊게 되고, k가 실행되지 않으면 return “second”가 실행됩니다.</p>
+<p>f는 continuation을 만드는 함수를 받는데, 여기에 continuation을 버리는 모양을 만드는 함수를 넘깁니다. a값을 받으면 <code>cont $ \_ -&gt; h a</code> 을 만듭니다. 보통 다른 continuation 들은 <code>cont $ \h -&gt; h a</code> 모양으로 인자로 받은 함수를 내부에 적용하면서 continuation을 이어가는데, 여기선 <code>\_</code> 로 받아서 버립니다.</p>
+<p>원래 작업은 <code>\k -&gt; do k "first"; return "second"</code> 인데, 여기 k에 <code>(\a -&gt; cont $ \_ -&gt;h a)</code>를 넣어 작업을 변형합니다. k가 실행되면 continuation을 끊게 되고, k가 실행되지 않으면 return “second”가 실행됩니다.</p>
 <h2 id="break">Break!</h2>
 <p>callCC가 조건에 따라 continuation을 끊는break 코드입니다.</p>
 <div class="sourceCode" id="cb23"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Control.Monad.Cont</span></span>
