@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko" lang="ko">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>lionhairdino - 클래스 제약 Class Constraint</title>
+        <meta name="description" content="lionhairdino - 클래스 제약 Class Constraint" />
+        <meta charset="UTF-8" />
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="클래스 제약 Class Constraint" />
+        <meta property="og:description" content="lionhairdino - 하스켈 함수형 프로그래밍, 타입 이론, 모노이드, 모나드, 동적 타입 언어의 코드 조립" />
+        <meta property="og:url" content="https://lionhairdino.github.io" />
+    </head>
+    <body>
+        <div id="header">
+            <div id="logo"> </div>
+            <div id="navigation">
+                <a href="../">lionhairdino</a> 
+                <a href="../about.html">about</a>
+                <!--<a href="/archive.html">archive</a>-->
+            </div>
+        </div>
+
+        <div id="content">
+            <h1>클래스 제약 Class Constraint</h1>
+
+            <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+<div class="info">
+    Posted on April 13, 2021
+    
+</div>
+
+<p>GHC는 매개 변수parameter의 타입을 추론 단서로 조립할 코드를 찾습니다.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Control.Monad.IO.Class</span> ( <span class="dt">MonadIO</span>(..) )</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Control.Monad.Reader</span> ( <span class="dt">MonadReader</span>, runReaderT )</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="ot">func ::</span> (<span class="dt">MonadReader</span> cfg m, <span class="dt">MonadIO</span> m) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> m ()</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>func _ <span class="ot">=</span> liftIO <span class="op">$</span> <span class="fu">putStrLn</span> <span class="st">&quot;ok&quot;</span> </span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    runReaderT (func <span class="st">&quot;aa&quot;</span>) <span class="st">&quot;config&quot;</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    runReaderT (func <span class="dv">1</span>) <span class="st">&quot;config&quot;</span></span></code></pre></div>
+<p>함수 선언부에 있는 제약 <code>(MonadReader cfg m, MonadIO m) =&gt;</code> 는 뭘 의미할까요?<br />
+함수 리턴 타입 m 이 의미하는 건 뭘까요?</p>
+<ol type="1">
+<li>파라메터가 소문자인 건 하스켈이 코드를 조립할 때 알아서 적당한 구체 타입으로 고른다입니다.</li>
+<li>제약에 들어 있는 건 타입이 아니라 클래스입니다. 지금 정의하고 있는 함수내에서 그 클래스에 들어있는 메소드를 쓰겠다는 말입니다. <em>구체 인스턴스는 아직 모르더라도 말입니다.</em></li>
+</ol>
+<p>“함수내에서 제약에 있는 클래스의 메소드를 쓸테니, 나중에 코드 조립할 때 클래스의 인스턴스에서 구체 코드를 가져오면 돼” 란 뜻입니다.</p>
+<h2 id="클래스까지-추론">클래스까지 추론</h2>
+<pre><code>class ClassA a where
+    method1 :: a -&gt; a -&gt; a
+    method1 a1 a2 = a1
+
+instance ClassA Int where
+    method1 a b = a
+
+func :: Int
+func = method1 1 2
+
+main :: IO ()
+main = do
+    print $ func </code></pre>
+<ol type="1">
+<li>func 안에서 method1을 썼는데, func의 리턴값이 Int이므로 method1의 리턴값도 Int로 추론</li>
+<li>method1의 매개 변수 타입은 리턴 타입과 같으므로 Int Int 로 추론</li>
+<li>그럼 instance ClassA Int 에 있는 method1을 실행하면 된다까지 추론합니다.</li>
+</ol>
+<p>func 선언에는 ClassA 클래스 제약( <code>func :: ClassA a =&gt; a</code> )이 없는데, 왜 에러가 나지 않을까요?</p>
+<h2 id="클래스까지-추론한-것-같긴-한데-에러">클래스까지 추론한 것 같긴 한데 에러</h2>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Control.Monad.IO.Class</span> ( <span class="dt">MonadIO</span>(..) )</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Control.Monad.Reader</span> ( <span class="dt">MonadReader</span>, runReaderT )</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co">--func :: (MonadReader cfg m ,MonadIO m) =&gt; a -&gt; m ()</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="ot">func ::</span> (<span class="dt">MonadReader</span> cfg m)  <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> m ()</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>func _ <span class="ot">=</span> liftIO <span class="op">$</span> <span class="fu">putStrLn</span> <span class="st">&quot;ok&quot;</span> </span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    runReaderT (func <span class="dv">1</span>) <span class="st">&quot;config&quot;</span></span></code></pre></div>
+<pre><code>    • Could not deduce (MonadIO m) arising from a use of ‘liftIO’
+      from the context: MonadReader cfg m
+        bound by the type signature for:
+                   func :: forall cfg (m :: * -&gt; *) a. MonadReader cfg m =&gt; a -&gt; m ()
+        at /home/jacoo/haskell/justStudy/namespace.hs:5:1-4</code></pre>
+<p>이 경우는 liftIO를 보고 MonadIO 클래스까지 추론한 것 같긴 한데 에러가 납니다. 무슨 차이일까요? 왜 여기서는 MonadIO 클래스까지 추론deduce하지 못한다고 할까요? 뭔지 모른다는 게 아니라 MonadIO 라고 콕 찝기까지 하는데 왜 추론하지 못할까요?</p>
+<p><em>에러를 잘 보면 <code>MonadIO</code> 를 풀지 못하는게 아니라, <code>MonadIO m</code>을 풀지 못한다는 에러입니다.</em></p>
+<p>에러를 풀어 쓰면 “함수내에서 liftIO를 쓴다. liftIO를 쓰는 걸로 봐선 MonadIO m인데, m이 뭔지 알아야 구체 코드를 가져 올 수 있는데, (MonadIO m)을 못 풀겠어.” 입니다.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">MonadIO</span> <span class="dt">IO</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">MonadIO</span> m <span class="ot">=&gt;</span> <span class="dt">MonadIO</span> (<span class="dt">IdentityT</span> m)	 </span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">MonadIO</span> m <span class="ot">=&gt;</span> <span class="dt">MonadIO</span> (<span class="dt">ListT</span> m)	 </span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">MonadIO</span> m <span class="ot">=&gt;</span> <span class="dt">MonadIO</span> (<span class="dt">MaybeT</span> m)	 </span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">MonadIO</span> m <span class="ot">=&gt;</span> <span class="dt">MonadIO</span> (<span class="dt">ContT</span> r m)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="op">...</span></span></code></pre></div>
+<p>이 많은 인스턴스 중 하나를 고르려면 m을 알아야 합니다. func 정의만 봐서는 m이 뭔지 알 수가 없습니다. 나중에 main에서 쓰인 걸 보면 m이 IO구나 알수 있지만, GHC가 그 때까지 기다려 주지 않습니다.</p>
+<h2 id="클래스-제약의-실용적인-뜻">클래스 제약의 실용적인 뜻</h2>
+<p>클래스 제약에 <code>MonadIO m =&gt;</code> 를 써주면. 지금은 클래스까지만 알려주고 나중에 구체 타입을 추론하라고 *미루는 효과”가 있습니다.</p>
+<p><em>클래스 제약은 구체 타입 추론을 뒤로 미루기 위해 써주는 겁니다.</em></p>
+<p>“구체 타입은 아직 뭔지 모르지만, 일단 OO클래스에 있는 메소드를 쓸테니, 나중에 코드 조립할 때 OO클래스의 인스턴스로 구체 타입을 결정해” 입니다.</p>
+<p>GHC가 되어 <code>runReaderT (func "aa") "config"</code> 코드를 해석해 보면</p>
+<ol type="1">
+<li>func “aa” 의 타입은 runReaderT를 먹이는 걸 봐서 ReaderT String mo 타입일거야.</li>
+<li>func 의 리턴 타입 m 을 ReaderT String mo 타입으로 추론하고,</li>
+<li>ask 는 <code>instance Monad m =&gt; MonadReader r (ReaderT r mo)</code> 인스턴스에서 가져오면 되고,</li>
+<li>liftIO 는 <code>instance MonadIO m =&gt; MonadIO (ReaderT r mo)</code> 인스턴스에서 가져오면 되고,</li>
+<li>mo 는 현재 main :: IO () 컨텍스트 있으니 IO 모나드로 추론해서,</li>
+<li>func의 리턴 타입 m () 는 ReaderT String IO () 으로 추론한다.</li>
+</ol>
+<hr />
+<p>[1] MonadIO 클래스 정의</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> (<span class="dt">Monad</span> m) <span class="ot">=&gt;</span> <span class="dt">MonadIO</span> m <span class="kw">where</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">-- | Lift a computation from the 'IO' monad.</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="ot">    liftIO ::</span> <span class="dt">IO</span> a <span class="ot">-&gt;</span> m a</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">MonadIO</span> <span class="dt">IO</span> <span class="kw">where</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    liftIO <span class="ot">=</span> <span class="fu">id</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="op">...</span></span></code></pre></div>
+<p>MonadReader 클래스 정의</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">Monad</span> m <span class="ot">=&gt;</span> <span class="dt">MonadReader</span> r m <span class="op">|</span> m <span class="ot">-&gt;</span> r <span class="kw">where</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="ot">    ask   ::</span> m r</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    ask <span class="ot">=</span> reader <span class="fu">id</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="ot">    local ::</span> (r <span class="ot">-&gt;</span> r) <span class="ot">-&gt;</span> m a <span class="ot">-&gt;</span> m a</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="ot">    reader ::</span> (r <span class="ot">-&gt;</span> a) <span class="ot">-&gt;</span> m a</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    reader f <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>      r <span class="ot">&lt;-</span> ask</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>      <span class="fu">return</span> (f r)</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="co">-- asks는 클래스 메소드가 아님에 주의해 주세요.</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="ot">asks ::</span> <span class="dt">MonadReader</span> r m</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>    <span class="ot">=&gt;</span> (r <span class="ot">-&gt;</span> a) <span class="ot">-&gt;</span> m a</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>asks <span class="ot">=</span> reader</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">MonadReader</span> r ((<span class="ot">-&gt;</span>) r) <span class="kw">where</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>    ask       <span class="ot">=</span> <span class="fu">id</span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>    local f m <span class="ot">=</span> m <span class="op">.</span> f</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>    reader    <span class="ot">=</span> <span class="fu">id</span></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a><span class="op">...</span></span></code></pre></div>
+<p>[2] 클래스의 네임스페이스</p>
+<pre><code>class ClassA a where
+    method1 :: a -&gt; a -&gt; a
+    method1 a1 a2 = a1
+
+class ClassB a where
+    method1:: a -&gt; a -&gt; a
+    method1 a1 a2 = a1</code></pre>
+<p>위와 같이 메소드를 같은 이름으로 정의하면 <code>Multiple declarations of ‘method1’</code> 에러가 납니다. 클래스가 네임스페이스를 독립해서 가지고 있는게 아닙니다.</p>
+<p>[3] <a href="http://learnyouahaskell.com/types-and-typeclasses" class="uri">http://learnyouahaskell.com/types-and-typeclasses</a></p>
+
+<div id="disqus_thread" style="padding-top:40px"></div>
+<script>
+
+var disqus_config = function () {
+this.page.url = 'https://lionhairdino.github.io/posts/2021-04-13-class_constraint.html';
+this.page.identifier = 'posts/2021-04-13-class_constraint.markdown';
+};
+(function() {
+var d = document, s = d.createElement('script');
+s.src = 'https://lionhairdino.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+                            
+        </div>
+        <div id="footer">
+            © 2021 lionhairdino. All rights reserved. Generated by <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+    </body>
+</html>
