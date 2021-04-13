@@ -4,14 +4,15 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>lionhairdino - 모나드 트랜스포머 - Monad Transformer</title>
-        <meta name="description" content="lionhairdino - 모나드 트랜스포머 - Monad Transformer" />
+        <title>lionhairdino - 모나드 트랜스포머 - Monad Transformer 그리고 MTL</title>
+        <meta name="description" content="lionhairdino - 모나드 트랜스포머 - Monad Transformer 그리고 MTL" />
         <meta charset="UTF-8" />
         <link rel="stylesheet" type="text/css" href="../css/default.css" />
         <meta property="og:type" content="website" />
-        <meta property="og:title" content="모나드 트랜스포머 - Monad Transformer" />
+        <meta property="og:title" content="모나드 트랜스포머 - Monad Transformer 그리고 MTL" />
         <meta property="og:description" content="lionhairdino - 하스켈 함수형 프로그래밍, 타입 이론, 모노이드, 모나드, 동적 타입 언어의 코드 조립" />
         <meta property="og:url" content="https://lionhairdino.github.io" />
+<meta name="keywords" content="모나드 트랜스포머, Monad Transformer, MTL, 결과 타입 다형성">
     </head>
     <body>
         <div id="header">
@@ -24,7 +25,7 @@
         </div>
 
         <div id="content">
-            <h1>모나드 트랜스포머 - Monad Transformer</h1>
+            <h1>모나드 트랜스포머 - Monad Transformer 그리고 MTL</h1>
 
             <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
 <div class="info">
@@ -128,6 +129,67 @@ IO 액션 엮음chaining은 GHCi에서 이 엮음에 realworld 환경값을 넣�
 <p>ReaderT의 바인드를 보면 두 개의 바인드가 실행되는 게 보이나요?</p>
 <p>아직은 그다지 좋은 설명이 아닌 것 같긴한데, 일단 포스팅해 놨습니다.<br />
 여기서 강조하고 싶은 건 모나드 트랜스포머의 바인드는 당연히 <em>합쳐진 모든 모나드의 바인드를 실행</em>한다 입니다.</p>
+<h2 id="mtl">MTL</h2>
+<p>act1의 리턴 타입을 GHC에게 떠넘기는 방법이 있습니다. Reader와 IO가 섞여 있는 걸 ReaderT String IO () 같이 고정된 타입으로 만들지 않고, GHC가 알아서 타입을 결정하게 만들면 좀 더 유연한 코드가 됩니다. 꼭 ReaderT String IO () 컨텍스트에서만 동작하는게 아니라, MonadReader 인스턴스이고, MonadIO 인스턴스이기만 하면, 어떤 컨텍스트에서건 불러다 쓸 수 있게 됩니다. 어떻게 이렇게 동작할 수 있는지 <a href="../posts/2021-04-13-class_constraint.html">클래스 제약</a> 포스트를 보면 도움이 됩니다.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ot">{-# Language FlexibleContexts #-}</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Control.Monad.IO.Class</span> ( <span class="dt">MonadIO</span>(..) )</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Control.Monad.Reader</span> ( <span class="dt">MonadReader</span>, <span class="dt">ReaderT</span>, runReaderT, ask )</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="ot">act1 ::</span> (<span class="dt">MonadReader</span> <span class="dt">String</span> m, <span class="dt">MonadIO</span> m) <span class="ot">=&gt;</span> m ()</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>act1 <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  who <span class="ot">&lt;-</span> ask</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>  liftIO <span class="op">$</span> <span class="fu">putStrLn</span> <span class="op">$</span> <span class="st">&quot;나는 &quot;</span> <span class="op">++</span> who <span class="op">++</span> <span class="st">&quot;와 영화를 봤다. &quot;</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a><span class="co">--act2 :: (MonadReader String m, MonadIO m) =&gt; m ()</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a><span class="ot">act2 ::</span> <span class="dt">ReaderT</span> <span class="dt">String</span> <span class="dt">IO</span> ()</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>act2 <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>  who <span class="ot">&lt;-</span> ask</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>  liftIO <span class="op">$</span> <span class="fu">putStrLn</span> <span class="op">$</span> <span class="st">&quot;나는 &quot;</span> <span class="op">++</span> who <span class="op">++</span> <span class="st">&quot;와 밥을 먹었다. &quot;</span></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a><span class="ot">act3 ::</span> (<span class="dt">MonadReader</span> <span class="dt">String</span> m, <span class="dt">MonadIO</span> m) <span class="ot">=&gt;</span> m ()</span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>act3 <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>  who <span class="ot">&lt;-</span> ask</span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>  liftIO <span class="op">$</span> <span class="fu">putStrLn</span> <span class="op">$</span> <span class="st">&quot;나는 &quot;</span> <span class="op">++</span> who <span class="op">++</span> <span class="st">&quot;와 술을 먹었다. &quot;</span></span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a><span class="ot">act ::</span> <span class="dt">String</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> ()</span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>act who <span class="ot">=</span> runReaderT ( <span class="kw">do</span></span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>    act1</span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a>    act2</span>
+<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a>    act3</span>
+<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a>  ) who </span>
+<span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-29"><a href="#cb12-29" aria-hidden="true" tabindex="-1"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span>
+<span id="cb12-30"><a href="#cb12-30" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="kw">do</span> act <span class="st">&quot;친구</span></span></code></pre></div>
+<p>act1, act2, act3 함수들을 모두 ReaderT 컨텍스트 안에서 사용 가능합니다. parameteric 다형성, ad-hoc 다형성처럼 결과 타입에 정해지지 않은 타입 m을 써주는 것에 대한 용어가 있을 것 같은데, 따로 이름은 찾지 못했습니다.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="ot">{-# Language FlexibleContexts #-}</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Control.Monad.IO.Class</span> ( <span class="dt">MonadIO</span>(..) )</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Control.Monad.Reader</span> ( <span class="dt">MonadReader</span>, <span class="dt">ReaderT</span>, runReaderT, ask )</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="co">-- act1 :: IO () 이렇게 타입을 고정하면 IO 컨텍스트에서만 act1을 부를 수 있습니다.</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="ot">act1 ::</span> (<span class="dt">MonadIO</span> m) <span class="ot">=&gt;</span> m ()</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>act1 <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>  liftIO <span class="op">$</span> <span class="fu">putStrLn</span> <span class="op">$</span> <span class="st">&quot;어떤 컨텍스트 안에서든 쓸 수 있어요.&quot;</span> </span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a><span class="ot">act2 ::</span> (<span class="dt">MonadReader</span> <span class="dt">Int</span> m, <span class="dt">MonadIO</span> m) <span class="ot">=&gt;</span> m ()</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>act2 <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>    num <span class="ot">&lt;-</span> ask</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>    liftIO <span class="op">$</span> <span class="fu">print</span> num</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a><span class="ot">act3 ::</span> (<span class="dt">MonadReader</span> <span class="dt">Int</span> m) <span class="ot">=&gt;</span> m ()</span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>act3 <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>    num <span class="ot">&lt;-</span> ask</span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span> ()</span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a><span class="ot">acts ::</span> <span class="dt">ReaderT</span> <span class="dt">Int</span> <span class="dt">IO</span> ()</span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>acts <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>    act1</span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a>    act2</span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a>    act3</span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span>
+<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="kw">do</span> liftIO <span class="op">$</span> runReaderT acts <span class="dv">1</span></span></code></pre></div>
 
 <div id="disqus_thread" style="padding-top:40px"></div>
 <script>
