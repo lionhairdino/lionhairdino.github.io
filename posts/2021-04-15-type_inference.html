@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko" lang="ko">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>lionhairdino - 타입 추론 Type inference</title>
+        <meta name="description" content="lionhairdino - 타입 추론 Type inference" />
+        <meta charset="UTF-8" />
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="타입 추론 Type inference" />
+        <meta property="og:description" content="lionhairdino - 하스켈 함수형 프로그래밍, 타입 이론, 모노이드, 모나드, 동적 타입 언어의 코드 조립" />
+        <meta property="og:url" content="https://lionhairdino.github.io" />
+<meta name="keywords" content="타입 추론, 클래스 제약, Type Inference, polymorphism">
+    </head>
+    <body>
+        <div id="header">
+            <div id="logo"> </div>
+            <div id="navigation">
+                <a href="../">lionhairdino</a> 
+                <a href="../about.html">about</a>
+                <!--<a href="/archive.html">archive</a>-->
+            </div>
+        </div>
+
+        <div id="content">
+            <h1>타입 추론 Type inference</h1>
+
+            <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+<div class="info">
+    Posted on April 15, 2021
+    
+</div>
+
+<p>하스켈이 가진 꽤 멋진 특징인데, 이게 또 익숙해지기 전까지는 머리를 아프게 합니다. 하스켈은 초반에는 타입 추론과의 전쟁인 것 같습니다. 나중에는 친구가 될지 어쩔지 모르지만, 지금까지는 전쟁중임에 틀림 없습니다.</p>
+<h2 id="다른-부품과의-접점을-보고-타입을-결정하진-않아">다른 부품과의 접점을 보고 타입을 결정하진 않아</h2>
+<p>아래 코드를 보면 GHC가 알아서 추론할 수 있을 것처럼 보입니다.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ot">func ::</span> a <span class="ot">-&gt;</span> a</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>func x <span class="ot">=</span> x <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- (+)는 인스턴스가 여러가지 있습니다.</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="ot">intFunc ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>intFunc x <span class="ot">=</span> x <span class="op">+</span> <span class="dv">2</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co">-- func와 intFunc가 &quot;만난다면&quot; 추론이 될 것 같지 않나요?</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">print</span> <span class="op">$</span> func ( intFunc <span class="dv">1</span>)</span></code></pre></div>
+<p>func에 intFunc 결과값 Int 타입이 넘어가니, a타입은 GHC가 Int로 추론할 것 같은데, 에러가 납니다.</p>
+<pre><code>    • No instance for (Num a) arising from a use of ‘+’
+ ... 
+2 | func x = x + 1</code></pre>
+<p>다른 함수와 만나기 전에는 어느 인스턴스의 (+)를 고를지 알 수 없습니다. 항상 적당한 다른 함수와 꼭 만난다고 가정할 수 없습니다. 단독으로도 모호성이 없는 코드여야 합니다. 나중에 조립할 때 타입을 결정할 수 있다면 좀 더 유연하지 않을까요?</p>
+<h2 id="클래스는-미리-알려줄게-구체적인-코드는-나중에-결정해">클래스는 미리 알려줄게, 구체적인 코드는 나중에 결정해</h2>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ot">func ::</span> <span class="dt">Num</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> a</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="op">...</span></span></code></pre></div>
+<p>Num 이라는 클래스를 알려주면 GHC는 불만 없이 다음으로 넘어갑니다. 나중에 조립할 때 GHC가 Num 인스턴스가 넘어오는지 살펴 보기로 하고 넘어 갑니다. 저는 이 걸 구체 코드 결정을 <em>“뒤로 미룬다”</em>고 표현합니다. []</p>
+<h2 id="항상-완벽한-구체-타입을-알아야-하는-건-아니다">항상 완벽한 구체 타입을 알아야 하는 건 아니다</h2>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ot">func ::</span> [a] <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>func xs <span class="ot">=</span> <span class="fu">length</span> xs</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">print</span> <span class="op">$</span> func [<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>]</span></code></pre></div>
+<p>첫 번째 논리대로 하면, func 정의 단독으로 a에 대한 어떤 힌트가 있어야 합니다. 하지만 에러가 나지 않습니다. 위의 첫 번째 예는 (+)란 함수가 모호해서 나는 에러였습니다. 여기선 모호한 게 없습니다. length 함수가 모호하지 않습니다.<br />
+참고 - <a href="../posts/2021-04-13-class_constraint.html">클래스 제약 포스트</a> ~~~ haskell &gt; :t length length :: Foldable t =&gt; t a -&gt; Int ~~~</p>
+<p>length 함수는 리스트 구조가 됐든, 트리 구조가 됐든… Foldable 클래스의 인스턴스이기만 하면 받아들입니다. 안에 들어 있는 a타입은 뭔지 모르지만 foldable이 가능한 [] 리스트 구조임은 명시했으니, 전체적으로 모호한게 없는 상태입니다. 아래는 또 다는 예시입니다. 가장 바깥 타입 생성자(여기서는 Maybe)만 명시해 주면 모호하지 않은 경우입니다.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ot">isJust         ::</span> <span class="dt">Maybe</span> a <span class="ot">-&gt;</span> <span class="dt">Bool</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>isJust <span class="dt">Nothing</span> <span class="ot">=</span> <span class="dt">False</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>isJust _       <span class="ot">=</span> <span class="dt">True</span></span></code></pre></div>
+<p>위 Maybe a에서 a타입은 알 필요가 없습니다. 가장 바깥만 알면 됩니다.</p>
+
+<div id="disqus_thread" style="padding-top:40px"></div>
+<script>
+
+var disqus_config = function () {
+this.page.url = 'https://lionhairdino.github.io/posts/2021-04-15-type_inference.html';
+this.page.identifier = 'posts/2021-04-15-type_inference.markdown';
+};
+(function() {
+var d = document, s = d.createElement('script');
+s.src = 'https://lionhairdino.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+                            
+        </div>
+        <div id="footer">
+            © 2021 lionhairdino. All rights reserved. Generated by <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+    </body>
+</html>
