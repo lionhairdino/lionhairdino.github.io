@@ -55,7 +55,7 @@
 <h2 id="클래스는-미리-알려줄게-구체적인-코드는-나중에-결정해">클래스는 미리 알려줄게, 구체적인 코드는 나중에 결정해</h2>
 <div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ot">func ::</span> <span class="dt">Num</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> a</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="op">...</span></span></code></pre></div>
-<p>Num 이라는 클래스를 알려주면 GHC는 불만 없이 다음으로 넘어갑니다. 나중에 조립할 때 GHC가 Num 인스턴스가 넘어오는지 살펴 보기로 하고 넘어 갑니다. 저는 이 걸 구체 코드 결정을 <em>“뒤로 미룬다”</em>고 표현합니다. []</p>
+<p>Num 이라는 클래스를 알려주면 GHC는 불만 없이 다음으로 넘어갑니다. 나중에 조립할 때 GHC가 Num 인스턴스가 넘어오는지 살펴 보기로 하고 넘어 갑니다. 저는 이 걸 구체 코드 결정을 <em>“뒤로 미룬다”</em>고 표현합니다.</p>
 <h2 id="항상-완벽한-구체-타입을-알아야-하는-건-아니다">항상 완벽한 구체 타입을 알아야 하는 건 아니다</h2>
 <div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ot">func ::</span> [a] <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>func xs <span class="ot">=</span> <span class="fu">length</span> xs</span>
@@ -64,11 +64,13 @@
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="kw">do</span></span>
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">print</span> <span class="op">$</span> func [<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>]</span></code></pre></div>
 <p>첫 번째 논리대로 하면, func 정의 단독으로 a에 대한 어떤 힌트가 있어야 합니다. 하지만 에러가 나지 않습니다. 위의 첫 번째 예는 (+)란 함수가 모호해서 나는 에러였습니다. 여기선 모호한 게 없습니다. length 함수가 모호하지 않습니다.<br />
-참고 - <a href="../posts/2021-04-13-class_constraint.html">클래스 제약 포스트</a> ~~~ haskell &gt; :t length length :: Foldable t =&gt; t a -&gt; Int ~~~</p>
-<p>length 함수는 리스트 구조가 됐든, 트리 구조가 됐든… Foldable 클래스의 인스턴스이기만 하면 받아들입니다. 안에 들어 있는 a타입은 뭔지 모르지만 foldable이 가능한 [] 리스트 구조임은 명시했으니, 전체적으로 모호한게 없는 상태입니다. 아래는 또 다는 예시입니다. 가장 바깥 타입 생성자(여기서는 Maybe)만 명시해 주면 모호하지 않은 경우입니다.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ot">isJust         ::</span> <span class="dt">Maybe</span> a <span class="ot">-&gt;</span> <span class="dt">Bool</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>isJust <span class="dt">Nothing</span> <span class="ot">=</span> <span class="dt">False</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>isJust _       <span class="ot">=</span> <span class="dt">True</span></span></code></pre></div>
+참고 - <a href="../posts/2021-04-13-class_constraint.html">클래스 제약 포스트</a></p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="op">:</span>t <span class="fu">length</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span><span class="ot"> ::</span> <span class="dt">Foldable</span> t <span class="ot">=&gt;</span> t a <span class="ot">-&gt;</span> <span class="dt">Int</span></span></code></pre></div>
+<p>length 함수는 리스트 구조가 됐든, 트리 구조가 됐든… Foldable 클래스의 인스턴스이기만 하면 받아들입니다. 안에 들어 있는 a타입은 뭔지 모르지만 foldable이 가능한 [] 리스트 구조임은 명시했으니, 전체적으로 모호한게 없는 상태입니다. 아래는 또 다른 예시입니다. 가장 바깥 타입 생성자(여기서는 Maybe)만 명시해 주면 모호하지 않습니다.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ot">isJust         ::</span> <span class="dt">Maybe</span> a <span class="ot">-&gt;</span> <span class="dt">Bool</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>isJust <span class="dt">Nothing</span> <span class="ot">=</span> <span class="dt">False</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>isJust _       <span class="ot">=</span> <span class="dt">True</span></span></code></pre></div>
 <p>위 Maybe a에서 a타입은 알 필요가 없습니다. 가장 바깥만 알면 됩니다.</p>
 
 <div id="disqus_thread" style="padding-top:40px"></div>
