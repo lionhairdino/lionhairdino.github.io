@@ -4,15 +4,15 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>lionhairdino - 모나드 트랜스포머 - Monad Transformer 그리고 MTL</title>
-        <meta name="description" content="lionhairdino - 모나드 트랜스포머 - Monad Transformer 그리고 MTL" />
+        <title>lionhairdino - 모나드 트랜스포머 - Monad Transformer 그리고 mtl</title>
+        <meta name="description" content="lionhairdino - 모나드 트랜스포머 - Monad Transformer 그리고 mtl" />
         <meta charset="UTF-8" />
         <link rel="stylesheet" type="text/css" href="../css/default.css" />
         <meta property="og:type" content="website" />
-        <meta property="og:title" content="모나드 트랜스포머 - Monad Transformer 그리고 MTL" />
+        <meta property="og:title" content="모나드 트랜스포머 - Monad Transformer 그리고 mtl" />
         <meta property="og:description" content="lionhairdino - 하스켈 함수형 프로그래밍, 타입 이론, 모노이드, 모나드, 동적 타입 언어의 코드 조립" />
         <meta property="og:url" content="https://lionhairdino.github.io" />
-<meta name="keywords" content="모나드 트랜스포머, Monad Transformer, MTL, 결과 타입 다형성">
+<meta name="keywords" content="모나드 트랜스포머, Monad Transformer, mtl, 결과 타입 다형성">
     </head>
     <body>
         <div id="header">
@@ -25,7 +25,7 @@
         </div>
 
         <div id="content">
-            <h1>모나드 트랜스포머 - Monad Transformer 그리고 MTL</h1>
+            <h1>모나드 트랜스포머 - Monad Transformer 그리고 mtl</h1>
 
             <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
 <div class="info">
@@ -129,7 +129,7 @@ IO 액션 엮음chaining은 GHCi에서 이 엮음에 realworld 환경값을 넣�
 <p>ReaderT의 바인드를 보면 두 개의 바인드가 실행되는 게 보이나요?</p>
 <p>아직은 그다지 좋은 설명이 아닌 것 같긴한데, 일단 포스팅해 놨습니다.<br />
 여기서 강조하고 싶은 건 모나드 트랜스포머의 바인드는 당연히 <em>합쳐진 모든 모나드의 바인드를 실행</em>한다 입니다.</p>
-<h2 id="mtl">MTL</h2>
+<h2 id="mtl">mtl</h2>
 <h3 id="return-type-polymorphic">Return Type Polymorphic</h3>
 <p><code>act1</code>의 리턴 타입을 하드 코딩하지 않고, GHC에게 떠넘기는 방법이 있습니다. Reader와 IO가 섞여 있는 걸 <code>ReaderT String IO ()</code> 같이 고정된 타입으로 만들지 않고, GHC가 알아서 타입을 결정하게 만들면 좀 더 유연하게 쓸 수 있습니다. 꼭 <code>ReaderT String IO ()</code> 컨텍스트에서만 동작하는게 아니라, MonadReader 인스턴스이고, MonadIO 인스턴스이기만 하면, 어떤 컨텍스트에서건 불러다 쓸 수 있게 됩니다. 어떻게 이렇게 동작할 수 있는지 <a href="../posts/2021-04-13-class_constraint.html">클래스 제약</a> 포스트를 보면 도움이 됩니다.</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ot">{-# Language FlexibleContexts #-}</span></span>
@@ -169,28 +169,29 @@ IO 액션 엮음chaining은 GHCi에서 이 엮음에 realworld 환경값을 넣�
 <span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Control.Monad.Reader</span> ( <span class="dt">MonadReader</span>, <span class="dt">ReaderT</span>, runReaderT, ask )</span>
 <span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="co">-- act1 :: IO () 이렇게 타입을 고정하면 IO 컨텍스트에서만 act1을 부를 수 있습니다.</span></span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="ot">act1 ::</span> (<span class="dt">MonadIO</span> m) <span class="ot">=&gt;</span> m ()</span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>act1 <span class="ot">=</span> <span class="kw">do</span></span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>  liftIO <span class="op">$</span> <span class="fu">putStrLn</span> <span class="op">$</span> <span class="st">&quot;어떤 컨텍스트 안에서든 쓸 수 있어요.&quot;</span> </span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a><span class="ot">act2 ::</span> (<span class="dt">MonadReader</span> <span class="dt">Int</span> m, <span class="dt">MonadIO</span> m) <span class="ot">=&gt;</span> m ()</span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>act2 <span class="ot">=</span> <span class="kw">do</span></span>
-<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>    num <span class="ot">&lt;-</span> ask</span>
-<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>    liftIO <span class="op">$</span> <span class="fu">print</span> num</span>
-<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a><span class="ot">act3 ::</span> (<span class="dt">MonadReader</span> <span class="dt">Int</span> m) <span class="ot">=&gt;</span> m ()</span>
-<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>act3 <span class="ot">=</span> <span class="kw">do</span></span>
-<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>    num <span class="ot">&lt;-</span> ask</span>
-<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span> ()</span>
-<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a><span class="ot">acts ::</span> <span class="dt">ReaderT</span> <span class="dt">Int</span> <span class="dt">IO</span> ()</span>
-<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>acts <span class="ot">=</span> <span class="kw">do</span></span>
-<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>    act1</span>
-<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a>    act2</span>
-<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a>    act3</span>
-<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span>
-<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="kw">do</span> liftIO <span class="op">$</span> runReaderT acts <span class="dv">1</span></span></code></pre></div>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="co">-- MonadIO m =&gt; 으로 지정하면 IO 컨텍스트에서 불러 쓸 수 있고, ReaderT Int IO 컨텍스트에서도 그대로 불러 쓸 수 있습니다.</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="ot">act1 ::</span> (<span class="dt">MonadIO</span> m) <span class="ot">=&gt;</span> m ()</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>act1 <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>  liftIO <span class="op">$</span> <span class="fu">putStrLn</span> <span class="op">$</span> <span class="st">&quot;어떤 컨텍스트 안에서든 쓸 수 있어요.&quot;</span> </span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a><span class="ot">act2 ::</span> (<span class="dt">MonadReader</span> <span class="dt">Int</span> m, <span class="dt">MonadIO</span> m) <span class="ot">=&gt;</span> m ()</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>act2 <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>    num <span class="ot">&lt;-</span> ask</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>    liftIO <span class="op">$</span> <span class="fu">print</span> num</span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a><span class="ot">act3 ::</span> (<span class="dt">MonadReader</span> <span class="dt">Int</span> m) <span class="ot">=&gt;</span> m ()</span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>act3 <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>    num <span class="ot">&lt;-</span> ask</span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span> ()</span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a><span class="ot">acts ::</span> <span class="dt">ReaderT</span> <span class="dt">Int</span> <span class="dt">IO</span> ()</span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>acts <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a>    act1</span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a>    act2</span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a>    act3</span>
+<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span>
+<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="kw">do</span> liftIO <span class="op">$</span> runReaderT acts <span class="dv">1</span></span></code></pre></div>
 <p>act1, act2, act3 모두 <code>ReaderT</code>로 추론되고,<br />
 act1의 조립 조건 <code>(MonadIO m) =&gt;</code> 을 만족하는 <code>instance MonadIO ReaderT...</code>가 있으니 OK<br />
 act2의 조립 조건 <code>(MonadReader Int m, MonadIO m) =&gt;</code> 을 만족하는 <code>instance MonadReader ReaderT...</code>, <code>instance MonadIO ReaderT...</code>가 있으니 OK<br />
@@ -229,6 +230,7 @@ act3의 조립 조건 <code>(MonadReader Int m) =&gt;</code> 을 만족하는 <c
 <span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>    local <span class="ot">=</span> ReaderT.local</span>
 <span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>    reader <span class="ot">=</span> ReaderT.reader</span></code></pre></div>
 <p>(3)번 ask를 실행하게 됩니다. 조금 복잡하지만 결론은 <em>GHC가 알아서 ask구현을 찾아 갔습니다.</em> 모나드 스택의 몇 번째 층에 ReaderT가 있든, GHC가 알아서 ask구현을 찾아 갈 수 있습니다. 이게 <em>mtl의 핵심 아이디어</em>입니다.</p>
+<p>참고 - <a href="../posts/2020-07-21-mtlStyle.html">Has Type class 패턴 포스트</a></p>
 
 <div id="disqus_thread" style="padding-top:40px"></div>
 <script>
