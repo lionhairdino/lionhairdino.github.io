@@ -130,7 +130,8 @@ IO 액션 엮음chaining은 GHCi에서 이 엮음에 realworld 환경값을 넣�
 <p>아직은 그다지 좋은 설명이 아닌 것 같긴한데, 일단 포스팅해 놨습니다.<br />
 여기서 강조하고 싶은 건 모나드 트랜스포머의 바인드는 당연히 <em>합쳐진 모든 모나드의 바인드를 실행</em>한다 입니다.</p>
 <h2 id="mtl">MTL</h2>
-<p>act1의 리턴 타입을 GHC에게 떠넘기는 방법이 있습니다. Reader와 IO가 섞여 있는 걸 ReaderT String IO () 같이 고정된 타입으로 만들지 않고, GHC가 알아서 타입을 결정하게 만들면 좀 더 유연한 코드가 됩니다. 꼭 ReaderT String IO () 컨텍스트에서만 동작하는게 아니라, MonadReader 인스턴스이고, MonadIO 인스턴스이기만 하면, 어떤 컨텍스트에서건 불러다 쓸 수 있게 됩니다. 어떻게 이렇게 동작할 수 있는지 <a href="../posts/2021-04-13-class_constraint.html">클래스 제약</a> 포스트를 보면 도움이 됩니다.</p>
+<h3 id="return-type-polymorphic">Return Type Polymorphic</h3>
+<p><code>act1</code>의 리턴 타입을 하드 코딩하지 않고, GHC에게 떠넘기는 방법이 있습니다. Reader와 IO가 섞여 있는 걸 <code>ReaderT String IO ()</code> 같이 고정된 타입으로 만들지 않고, GHC가 알아서 타입을 결정하게 만들면 좀 더 유연하게 쓸 수 있습니다. 꼭 <code>ReaderT String IO ()</code> 컨텍스트에서만 동작하는게 아니라, MonadReader 인스턴스이고, MonadIO 인스턴스이기만 하면, 어떤 컨텍스트에서건 불러다 쓸 수 있게 됩니다. 어떻게 이렇게 동작할 수 있는지 <a href="../posts/2021-04-13-class_constraint.html">클래스 제약</a> 포스트를 보면 도움이 됩니다.</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ot">{-# Language FlexibleContexts #-}</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Control.Monad.IO.Class</span> ( <span class="dt">MonadIO</span>(..) )</span>
@@ -161,7 +162,7 @@ IO 액션 엮음chaining은 GHCi에서 이 엮음에 realworld 환경값을 넣�
 <span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb12-29"><a href="#cb12-29" aria-hidden="true" tabindex="-1"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span>
 <span id="cb12-30"><a href="#cb12-30" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="kw">do</span> act <span class="st">&quot;친구</span></span></code></pre></div>
-<p>act1, act2, act3 함수들을 모두 ReaderT 컨텍스트 안에서 사용 가능합니다. act1과 act2는 결과 타입이 달라 보이지만, GHC가 나중에 추론해서 act1도 act3도 ReaderT String IO ()로 맞춰지게 됩니다. parameteric 다형성, ad-hoc 다형성처럼 결과 타입에 정해지지 않은 타입 m을 써주는 것에 대한 용어가 있을 것 같은데, 따로 이름은 찾지 못했고, 그냥 Return type polymorphic 이라 부르는 것 같습니다.</p>
+<p><code>act1</code>, <code>act2</code>, <code>act3</code> 함수들을 모두 <code>ReaderT</code> 컨텍스트 안에서 사용 가능합니다. <code>act1</code> ,<code>act3</code>과 <code>act2</code>는 결과 타입이 달라 보이지만, GHC가 나중에 추론해서 <code>act1</code>도 <code>act3</code>도 <code>ReaderT String IO ()</code>로 맞춰지게 됩니다. parameteric 다형성, ad-hoc 다형성처럼 결과 타입에 정해지지 않은 타입 m을 써주는 것에 대한 용어가 있을 것 같은데, 따로 이름은 찾지 못했고, 그냥 <em>Return type polymorphic</em> 이라 부르는 것 같습니다.</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="ot">{-# Language FlexibleContexts #-}</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Control.Monad.IO.Class</span> ( <span class="dt">MonadIO</span>(..) )</span>
@@ -194,8 +195,40 @@ IO 액션 엮음chaining은 GHCi에서 이 엮음에 realworld 환경값을 넣�
 act1의 조립 조건 <code>(MonadIO m) =&gt;</code> 을 만족하는 <code>instance MonadIO ReaderT...</code>가 있으니 OK<br />
 act2의 조립 조건 <code>(MonadReader Int m, MonadIO m) =&gt;</code> 을 만족하는 <code>instance MonadReader ReaderT...</code>, <code>instance MonadIO ReaderT...</code>가 있으니 OK<br />
 act3의 조립 조건 <code>(MonadReader Int m) =&gt;</code> 을 만족하는 <code>instance MonadReader ReaderT...</code>가 있으니 OK</p>
-<p>미리 준비되어 있는 MonadReader의 인스턴스는 MaybeT, ListT, WriterT, StateT, IdentityT, ExceptT, ErrorT, ContT, ReaderT, RWST 용 인스턴스가 있습니다. acts의 리턴 타입(또는 컨텍스트라 말하기도 합니다.)이 ReaderT 타입이니, act2의 타입도 ReaderT 타입으로 추론하고, ReaderT용 ask를 가져옵니다. <a href="https://hackage.haskell.org/package/mtl-2.2.2/docs/Control-Monad-Reader.html#g:1" class="uri">https://hackage.haskell.org/package/mtl-2.2.2/docs/Control-Monad-Reader.html#g:1</a></p>
+<p>미리 준비되어 있는 MonadReader의 인스턴스는 MaybeT, ListT, WriterT, StateT, IdentityT, ExceptT, ErrorT, ContT, ReaderT, RWST 용 인스턴스가 있습니다. acts의 리턴 타입(또는 컨텍스트라 말하기도 합니다.)이 ReaderT 타입이니, act2의 타입도 ReaderT 타입으로 추론하고, ReaderT용 ask를 가져옵니다.<br />
+<a href="https://hackage.haskell.org/package/mtl-2.2.2/docs/Control-Monad-Reader.html#g:1" class="uri">https://hackage.haskell.org/package/mtl-2.2.2/docs/Control-Monad-Reader.html#g:1</a></p>
 <p>미리 준비되어 있는 MonadIO의 인스턴스는 MonadIO쪽에서 선언되어 있지 않고, ReaderT나 WriterT… 각각에서 볼 수 있습니다. <a href="https://hackage.haskell.org/package/mtl-2.2.2/docs/Control-Monad-Reader.html#g:3" class="uri">https://hackage.haskell.org/package/mtl-2.2.2/docs/Control-Monad-Reader.html#g:3</a></p>
+<p>main 을 다음과 같이 쓰면 ReaderT 타입은 보이지 않아 처음에는 다른 컨텍스트로 오해할 수도 있지만, runReaderT를 보고 알 수 있습니다.</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> liftIO <span class="op">$</span> runReaderT ( <span class="kw">do</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>           act1</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>           act2</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>           act3 </span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>       ) </span></code></pre></div>
+<h3 id="mtl-핵심-아이디어">mtl 핵심 아이디어</h3>
+<p>모나드 트랜스포머를 3개 이상 겹치기 시작하면 상황이 복잡해지기 시작합니다. 예를 들어 <code>ListT</code>, <code>ReaderT</code>,<code>LoggerT</code>, <code>IO</code> 의 성격이 모두 들어 있는 컨텍스트 안에서 <code>ask</code>를 실행하려면 <code>ReaderT</code>가 몇 번째로 쌓여 있는지 알아야 실행할 수 있습니다. 모나드 트랜스포머는 모두 <code>MonadTrans</code>의 인스턴스여서 <code>lift</code> 메소드를 가지고 있습니다. <code>lift</code> 함수를 이용하면 모나드 스택에서 실행할 수 있습니다. 그런데 쌓아 올린 모양에 따라 <code>lift . ask</code> 로 실행해야 하는지, <code>lift . lift . ask</code> 로 실행해야 하는지 알아야 합니다.</p>
+<p>※ 이렇게 몇 개의 모나드 트랜스포머로 쌓여 있는 걸 <em>모나드 스택</em>이라 부릅니다.</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">Monad</span> m <span class="ot">=&gt;</span> <span class="dt">MonadReader</span> r m <span class="op">|</span> m <span class="ot">-&gt;</span> r <span class="kw">where</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="ot">    ask ::</span> m r</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    ask <span class="ot">=</span> reader <span class="fu">id</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">...</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="ot">    reader ::</span> (r <span class="ot">-&gt;</span> a) <span class="ot">-&gt;</span> m a</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>    reader f <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>       r <span class="ot">&lt;-</span> ask <span class="co">------------ (1)</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>       <span class="fu">return</span> (f r)</span></code></pre></div>
+<p>(1)번 ask는 어떤 ask가 실행될까요? <code>reader</code> 메소드는 <code>m a</code> 컨텍스트에 있습니다. 모나드 <code>m</code>에 있는 <code>ask</code>를 실행할거라 예상할 수 있습니다. 만일 <code>m</code>이 <code>ListT</code>이면</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">MonadReader</span> r m <span class="ot">=&gt;</span> <span class="dt">MonadReader</span> r (<span class="dt">ListT</span> m) <span class="kw">where</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>    ask<span class="co">--(1)   </span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>       <span class="ot">=</span> lift ask <span class="co">---------- (2)</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    local <span class="ot">=</span> mapListT <span class="op">.</span> local</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    reader <span class="ot">=</span> lift <span class="op">.</span> reader</span></code></pre></div>
+<p><code>MonadReader r (ListT m)</code> 인스턴스에 있는 <code>ask</code>를 실행합니다. 그럼 (2)번은 어디에 있는 <code>ask</code>일까요? <code>ask</code> 선언에 따라 <code>lift ask</code> 는 <code>(ListT m)</code> 타입이고, 그럼 ask는 리프팅 되어 <code>(ListT m)</code> 타입이니 <code>m</code>타입입니다. <code>m</code> 타입이 <code>ReaderT</code> 타입이라면</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Monad</span> m <span class="ot">=&gt;</span> <span class="dt">MonadReader</span> r (<span class="dt">ReaderT</span> r m) <span class="kw">where</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    ask<span class="co">--(2) </span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>       <span class="ot">=</span> ReaderT.ask <span class="co">--------- (3)</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>    local <span class="ot">=</span> ReaderT.local</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>    reader <span class="ot">=</span> ReaderT.reader</span></code></pre></div>
+<p>(3)번 ask를 실행하게 됩니다. 조금 복잡하지만 결론은 <em>GHC가 알아서 ask구현을 찾아 갔습니다.</em> 모나드 스택의 몇 번째 층에 ReaderT가 있든, GHC가 알아서 ask구현을 찾아 갈 수 있습니다. 이게 <em>mtl의 핵심 아이디어</em>입니다.</p>
 
 <div id="disqus_thread" style="padding-top:40px"></div>
 <script>
