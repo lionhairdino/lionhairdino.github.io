@@ -161,7 +161,7 @@ IO 액션 엮음chaining은 GHCi에서 이 엮음에 realworld 환경값을 넣�
 <span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb12-29"><a href="#cb12-29" aria-hidden="true" tabindex="-1"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span>
 <span id="cb12-30"><a href="#cb12-30" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="kw">do</span> act <span class="st">&quot;친구</span></span></code></pre></div>
-<p>act1, act2, act3 함수들을 모두 ReaderT 컨텍스트 안에서 사용 가능합니다. parameteric 다형성, ad-hoc 다형성처럼 결과 타입에 정해지지 않은 타입 m을 써주는 것에 대한 용어가 있을 것 같은데, 따로 이름은 찾지 못했습니다.</p>
+<p>act1, act2, act3 함수들을 모두 ReaderT 컨텍스트 안에서 사용 가능합니다. act1과 act2는 결과 타입이 달라 보이지만, GHC가 나중에 추론해서 act1도 act3도 ReaderT String IO ()로 맞춰지게 됩니다. parameteric 다형성, ad-hoc 다형성처럼 결과 타입에 정해지지 않은 타입 m을 써주는 것에 대한 용어가 있을 것 같은데, 따로 이름은 찾지 못했고, 그냥 Return type polymorphic 이라 부르는 것 같습니다.</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="ot">{-# Language FlexibleContexts #-}</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Control.Monad.IO.Class</span> ( <span class="dt">MonadIO</span>(..) )</span>
@@ -190,6 +190,12 @@ IO 액션 엮음chaining은 GHCi에서 이 엮음에 realworld 환경값을 넣�
 <span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span>
 <span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="kw">do</span> liftIO <span class="op">$</span> runReaderT acts <span class="dv">1</span></span></code></pre></div>
+<p>act1, act2, act3 모두 <code>ReaderT</code>로 추론되고,<br />
+act1의 조립 조건 <code>(MonadIO m) =&gt;</code> 을 만족하는 <code>instance MonadIO ReaderT...</code>가 있으니 OK<br />
+act2의 조립 조건 <code>(MonadReader Int m, MonadIO m) =&gt;</code> 을 만족하는 <code>instance MonadReader ReaderT...</code>, <code>instance MonadIO ReaderT...</code>가 있으니 OK<br />
+act3의 조립 조건 <code>(MonadReader Int m) =&gt;</code> 을 만족하는 <code>instance MonadReader ReaderT...</code>가 있으니 OK</p>
+<p>미리 준비되어 있는 MonadReader의 인스턴스는 MaybeT, ListT, WriterT, StateT, IdentityT, ExceptT, ErrorT, ContT, ReaderT, RWST 용 인스턴스가 있습니다. acts의 리턴 타입(또는 컨텍스트라 말하기도 합니다.)이 ReaderT 타입이니, act2의 타입도 ReaderT 타입으로 추론하고, ReaderT용 ask를 가져옵니다. <a href="https://hackage.haskell.org/package/mtl-2.2.2/docs/Control-Monad-Reader.html#g:1" class="uri">https://hackage.haskell.org/package/mtl-2.2.2/docs/Control-Monad-Reader.html#g:1</a></p>
+<p>미리 준비되어 있는 MonadIO의 인스턴스는 MonadIO쪽에서 선언되어 있지 않고, ReaderT나 WriterT… 각각에서 볼 수 있습니다. <a href="https://hackage.haskell.org/package/mtl-2.2.2/docs/Control-Monad-Reader.html#g:3" class="uri">https://hackage.haskell.org/package/mtl-2.2.2/docs/Control-Monad-Reader.html#g:3</a></p>
 
 <div id="disqus_thread" style="padding-top:40px"></div>
 <script>

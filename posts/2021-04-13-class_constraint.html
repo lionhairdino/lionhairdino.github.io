@@ -98,7 +98,8 @@
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">MonadIO</span> m <span class="ot">=&gt;</span> <span class="dt">MonadIO</span> (<span class="dt">MaybeT</span> m)	 </span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">MonadIO</span> m <span class="ot">=&gt;</span> <span class="dt">MonadIO</span> (<span class="dt">ContT</span> r m)</span>
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="op">...</span></span></code></pre></div>
-<p>이 많은 인스턴스 중 하나를 고르려면 m을 알아야 합니다. func 정의만 봐서는 m이 뭔지 알 수가 없습니다. 나중에 main에서 쓰인 걸 보면 m이 IO구나 알수 있지만, GHC가 그 때까지 기다려 주지 않습니다. 가장 미룰 수 있을 때까지 미뤘다가 추론해주면 좋을 것 같긴 한데, 그럼 실행 코드와 결합하기 전 라이브러리 코드 같은 것들은 버그가 있을 확률이 올라가지 않을까 추측해 봅니다.</p>
+<p>이 많은 인스턴스 중 하나를 고르려면 m을 알아야 합니다. func 정의만 봐서는 m이 뭔지 알 수가 없습니다. 나중에 main에서 쓰인 걸 보면 m이 IO구나 알수 있지만, GHC가 그 때까지 기다려 주지 않습니다. 가장 미룰 수 있을 때까지 미뤘다가 추론해주면 좋을 것 같긴 한데, 그럼 실행 코드와 결합하기 전 라이브러리 코드 같은 것들은 버그가 있을 확률이 올라가지 않을까 추측해 봅니다.<br />
+참고 - <a href="../posts/2021-04-15-type_inference.html">타입 추론 포스트</a></p>
 <h2 id="클래스-제약의-실용적인-뜻">클래스 제약의 실용적인 뜻</h2>
 <p>클래스 제약에 <code>MonadIO m =&gt;</code> 를 써주면. 지금은 클래스까지만 알려주고 나중에 구체 타입을 추론하라고 *미루는 효과”가 있습니다.</p>
 <p><em>클래스 제약은 구체 타입 추론을 뒤로 미루기 위해 써주는 겁니다.</em></p>
@@ -112,6 +113,7 @@
 <li>mo 는 현재 main :: IO () 컨텍스트 있으니 IO 모나드로 추론해서,</li>
 <li>func의 리턴 타입 m () 는 ReaderT String IO () 으로 추론한다.</li>
 </ol>
+<p>참고 - <a href="../posts/2020-07-16-MonadTransformer.html">모나드 트랜스포머 포스트</a></p>
 <hr />
 <p>[1] MonadIO 클래스 정의</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> (<span class="dt">Monad</span> m) <span class="ot">=&gt;</span> <span class="dt">MonadIO</span> m <span class="kw">where</span></span>
