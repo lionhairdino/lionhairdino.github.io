@@ -121,8 +121,7 @@
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="ot">    liftIO ::</span> <span class="dt">IO</span> a <span class="ot">-&gt;</span> m a</span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">MonadIO</span> <span class="dt">IO</span> <span class="kw">where</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    liftIO <span class="ot">=</span> <span class="fu">id</span></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="op">...</span></span></code></pre></div>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    liftIO <span class="ot">=</span> <span class="fu">id</span></span></code></pre></div>
 <p>MonadReader 클래스 정의</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">Monad</span> m <span class="ot">=&gt;</span> <span class="dt">MonadReader</span> r m <span class="op">|</span> m <span class="ot">-&gt;</span> r <span class="kw">where</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="ot">    ask   ::</span> m r</span>
@@ -142,16 +141,15 @@
 <span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">MonadReader</span> r ((<span class="ot">-&gt;</span>) r) <span class="kw">where</span></span>
 <span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>    ask       <span class="ot">=</span> <span class="fu">id</span></span>
 <span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>    local f m <span class="ot">=</span> m <span class="op">.</span> f</span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>    reader    <span class="ot">=</span> <span class="fu">id</span></span>
-<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a><span class="op">...</span></span></code></pre></div>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>    reader    <span class="ot">=</span> <span class="fu">id</span></span></code></pre></div>
 <p>[2] 클래스의 네임스페이스</p>
-<pre><code>class ClassA a where
-    method1 :: a -&gt; a -&gt; a
-    method1 a1 a2 = a1
-
-class ClassB a where
-    method1:: a -&gt; a -&gt; a
-    method1 a1 a2 = a1</code></pre>
+<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">ClassA</span> a <span class="kw">where</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="ot">    method1 ::</span> a <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> a</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    method1 a1 a2 <span class="ot">=</span> a1</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">ClassB</span> a <span class="kw">where</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="ot">    method1::</span> a <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> a</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    method1 a1 a2 <span class="ot">=</span> a1</span></code></pre></div>
 <p>위와 같이 메소드를 같은 이름으로 정의하면 <code>Multiple declarations of ‘method1’</code> 에러가 납니다. 클래스가 네임스페이스를 독립해서 가지고 있는게 아닙니다.</p>
 <p>[3] <a href="http://learnyouahaskell.com/types-and-typeclasses" class="uri">http://learnyouahaskell.com/types-and-typeclasses</a></p>
 
