@@ -33,7 +33,7 @@
     
 </div>
 
-<p>수학에서 fixed point는 f a = a를 만족하는 a를 말합니다. 그래프로 얘기하면 y = x 그래프와 만나는 점들을 fixed point 또는 fix point라고 합니다. 이게 실용 세계에서는 어떤 의미로 쓰일까요? 수학적 용도는 다음과 같이 근사치를 구할 때 쓸 수 있습니다.</p>
+<p>수학에서 fixed point는 <code>f a = a</code>를 만족하는 <code>a</code>를 말합니다. 그래프로 얘기하면 <code>y = x</code> 그래프와 만나는 점들을 fixed point 또는 fix point라고 합니다. 이게 실용 세계에서는 어떤 의미로 쓰일까요? 수학적 용도는 다음과 같이 근사치를 구할 때 쓸 수 있습니다.</p>
 <p><a href="https://medium.com/@cdsmithus/fixpoints-in-haskell-294096a9fc10" class="uri">https://medium.com/@cdsmithus/fixpoints-in-haskell-294096a9fc10</a></p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ot">fixpoint ::</span> <span class="dt">Eq</span> a <span class="ot">=&gt;</span> (a <span class="ot">-&gt;</span> a) <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> a</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>fixpoint f x</span>
@@ -46,7 +46,7 @@
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span>
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="fu">print</span> (mySqrt <span class="dv">10</span>)</span></code></pre></div>
-<p>여기서는 루트값이 구해지는 알고리즘[1]보다 fixpoint가 <em>함수f를 반복해서 부르는 것</em>에 주의를 기울여 주세요.</p>
+<p>여기서는 루트값이 구해지는 알고리즘<sup><a href="#root">[1]</a></sup>보다 fixpoint가 <em>함수f를 반복해서 부르는 것</em>에 주의를 기울여 주세요.</p>
 <p>하스켈에서는 “fixed point 값을 찾는 함수”로 fix 함수가 있습니다. (단, 정의를 보면 위 fixpoint 함수와 다르게 엔딩 조건이 없습니다.) 팩토리얼을 구하는 fix 활용을 보겠습니다.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- fix 함수 정의</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>fix f <span class="ot">=</span> f (fix f)</span>
@@ -75,21 +75,27 @@
 <span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="ot">=</span> <span class="dv">5</span> <span class="op">*</span> <span class="dv">4</span> <span class="op">*</span> <span class="dv">3</span> <span class="op">*</span> <span class="dv">2</span> <span class="op">*</span> <span class="dv">1</span> <span class="op">*</span> <span class="dv">1</span></span></code></pre></div>
 <p>어째서 이런 결과가 나왔을까요? fix 함수를 말로 풀어 보면, 받은 함수를 <em>품고 품는 모양</em>으로(인자로 자기 자신을 넘기는 모양) 무한 반복해주는 함수입니다. 무한 반복해주는 함수지만 fix에 넘기는 함수에 엔딩 조건을 두었습니다. (n == 0 then 1) n이 0일 때는 받은 함수를 호출하지 않고 끝냅니다. fixed point가 없는 함수를 적당한 값에서 반복을 멈추게 해준 건 fix 함수의 특징이 아닙니다. fix 함수의 특징은 fixed point가 나올때까지 무한 반복입니다.</p>
 <p>람다 함수의 고정점을 찾을 때 fix를 쓴다라고 얘기해도 되지만, 프로그래머에게 더 익숙한 표현은 다음과 같습니다.</p>
-<p>함수를 인자로 받는 람다 함수를 fix에 넘겨주면 반복해서 실행됩니다. 이 특성을 이용해서 <em>람다 함수 무한 반복</em>에 쓰입니다. 람다 함수는 따로 바인딩되어 있는 이름이 없어 재귀적으로 다시 부를 방법이 없습니다. 그럴 때 fix를 쓸 수 있습니다. <code>fix (\a -&gt; ...a)</code> 란 람다 함수를 반복할 때 쓰는 관용구idiom입니다.</p>
+<p>함수를 인자로 받는 람다 함수를 <code>fix</code>에 넘겨주면 반복해서 실행됩니다. 이 특성을 이용해서 <em>람다 함수 무한 반복</em>에 쓰입니다. 람다 함수는 따로 바인딩되어 있는 이름이 없어 재귀적으로 다시 부를 방법이 없습니다. 그럴 때 <code>fix</code>를 쓸 수 있습니다. <code>fix (\a -&gt; ...a)</code> 란 람다 함수를 반복할 때 쓰는 관용구idiom입니다.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>forkIO <span class="op">$</span> fix <span class="op">$</span> \loop <span class="ot">-&gt;</span> <span class="kw">do</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    (_,msg) <span class="ot">&lt;-</span> readChan chan</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    loop</span></code></pre></div>
-<p>\loop -&gt; … 를 반복하는 코드입니다. 센스있게 람다 함수의 매개 변수 이름을 loop로 지었습니다.</p>
+<p><code>\loop -&gt; ...</code> 를 반복하는 코드입니다. 센스있게 람다 함수의 매개 변수 이름을 <code>loop</code>로 지었습니다.</p>
 <hr />
-<p>[1] 왜 루트값 근사치를 계산하는지는 바빌로니안 메소드 알고리즘을 참고하세요.<br />
+<div id="#root">
+
+</div>
+<p>[1] 루트값 근사치를 구하는 바빌로니안 메소드 알고리즘을 참고하세요.<br />
 <a href="https://en.wikipedia.org/wiki/Methods_of_computing_square_roots#Babylonian_method" class="uri">https://en.wikipedia.org/wiki/Methods_of_computing_square_roots#Babylonian_method</a></p>
-<p>[2] where 절에서 선언한 함수 where절의 무한 루프가 눈에 잘 안들어오면 아래를 보세요.</p>
-<p>where 절에서 선언한 함수는 where 절에서 사용 가능합니다.</p>
+<div id="where">
+
+</div>
+<p>[2] where 절에서 선언한 함수 <code>where</code>절의 무한 루프가 눈에 잘 안들어오면 아래를 보세요.</p>
+<p><code>where</code>절에서 선언한 함수는 <code>where</code>절에서 사용 가능합니다.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>func a <span class="ot">=</span> wherefunc a</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">where</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>      wherefunc x <span class="ot">=</span> wherefunc2 x <span class="op">+</span> <span class="dv">1</span></span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>      wherefunc2 x <span class="ot">=</span> x <span class="op">+</span> <span class="dv">1</span></span></code></pre></div>
-<p>where x = f x 에서 f x 에 있는 x는 where 절에서 선언한 x입니다. 다시 말 해 f (f x) 이므로 x에 또 f x를 넣으면 f (f (f …))</p>
+<p><code>where x = f x</code> 에서 <code>f x</code> 에 있는 <code>x</code>는 <code>where</code>절에서 선언한 <code>x</code>입니다. 다시 말 해 <code>f (f x)</code> 이므로 <code>x</code>에 또 <code>f x</code>를 넣으면 <code>f (f (f ...))</code></p>
 
 <div id="disqus_thread" style="padding-top:40px"></div>
 <script>
