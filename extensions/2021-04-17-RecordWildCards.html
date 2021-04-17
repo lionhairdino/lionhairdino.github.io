@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko" lang="ko">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>lionhairdino - 확장 RecordWildCards</title>
+        <meta name="description" content="lionhairdino - 확장 RecordWildCards" />
+        <meta charset="UTF-8" />
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="확장 RecordWildCards" />
+        <meta property="og:description" content="lionhairdino - 하스켈 함수형 프로그래밍, 타입 이론, 모노이드, 모나드, 동적 타입 언어의 코드 조립" />
+        <meta property="og:url" content="https://lionhairdino.github.io" />
+
+    </head>
+    <body>
+        <div id="header">
+            <div id="logo"> </div>
+            <div id="navigation">
+                <a href="../">lionhairdino</a> 
+                <a href="../about.html">about</a>
+                <!--<a href="/archive.html">archive</a>-->
+            </div>
+        </div>
+
+        <div id="content">
+            <h1>확장 RecordWildCards</h1>
+
+            <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+<div class="info">
+    Posted on April 17, 2021
+    
+</div>
+
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ot">{-# LANGUAGE RecordWildCards #-}</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Some</span> <span class="ot">=</span> <span class="dt">Some</span> {<span class="ot"> field1 ::</span> <span class="dt">Int</span> </span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>                 ,<span class="ot"> field2 ::</span> <span class="dt">Int</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>                 }</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="ot">func ::</span> <span class="dt">Some</span> <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>func full<span class="op">@</span><span class="dt">Some</span>{<span class="op">..</span>} <span class="ot">=</span> field1 <span class="op">+</span> field2 <span class="op">+</span> func2 full</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="ot">func2 ::</span> <span class="dt">Some</span> <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>func2 some <span class="ot">=</span> field1 some <span class="op">*</span> field2 some</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> sVal <span class="ot">=</span> <span class="dt">Some</span> <span class="dv">1</span> <span class="dv">2</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">print</span> <span class="op">$</span> func sVa</span></code></pre></div>
+<p>레코드의 필드값에 접근 할 때, 보통 func2처럼 <code>field1 some</code> 필드명<sup>[1]</sup> 뒤에 매개 변수를 써줘야 하는데, RecordWildCard 확장을 켜고, 매개 변수에 <code>{..}</code> 를 붙여주면 필드명을 바로 값처럼 사용할 수 있습니다. ’@’는 필드로 쪼개기 전, 원래 값을 가리키고 싶을 때 씁니다.</p>
+<hr />
+<p>[1] 레코드 타입의 필드 이름은 필드값을 가져올 때 함수와 다를게 없습니다. <code>Some</code> ’타입값 <code>someval</code> 에서 field1 값을 꺼내려면 <code>field1 someval</code> 이렇게 쓰면 됩니다. 이럴 때는 필드명을 접근자accessor로 부르기도 합니다.</p>
+
+<div id="disqus_thread" style="padding-top:40px"></div>
+<script>
+
+var disqus_config = function () {
+this.page.url = 'https://lionhairdino.github.io/extensions/2021-04-17-RecordWildCards.html';
+this.page.identifier = 'extensions/2021-04-17-RecordWildCards.markdown';
+};
+(function() {
+var d = document, s = d.createElement('script');
+s.src = 'https://lionhairdino.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+                            
+        </div>
+        <div id="footer">
+            © 2021 lionhairdino. All rights reserved. Generated by <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+    </body>
+</html>
