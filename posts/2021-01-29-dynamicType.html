@@ -74,10 +74,10 @@
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="kw">do</span></span>
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  runReaderT func1 <span class="dv">1</span></span></code></pre></div>
-<p>func1의 do 안에는 한 구문이 실행될 때마다 bind가 실행됩니다. 이 bind를 어떤 인스턴스에서 가져올지 결과 타입에 따라 결정합니다. 특별한 문법 요소가 있는 게 아니라, 인자에 따라 함수를 고르는 알고리즘만 작용합니다. do를 풀어 쓰면</p>
+<p>func1의 do 안에는 한 구문이 실행될 때마다 bind가 실행됩니다. 이 bind를 어떤 인스턴스에서 가져올지 결과 타입에 따라 결정합니다. 특별한 문법 요소가 있는 게 아니라, 인자에 따라 함수를 고르는 알고리즘만 작용합니다. ( liftIO도 폴리모픽한 메소드로 어떤 인스턴스를 쓸 건지 결과 타입으로 고릅니다. 여기서는 눈에 보이지 않는 bind를 꺼내 살펴보겠습니다. ) do를 풀어 쓰면</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>liftIO <span class="op">$</span> <span class="fu">putStrLn</span> <span class="st">&quot;Ok1&quot;</span> <span class="op">&gt;&gt;=</span> \_ <span class="ot">-&gt;</span> liftIO <span class="op">$</span> <span class="fu">putStrLn</span> <span class="st">&quot;Ok2&quot;</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co">----------(1)----------     -------------(2)-------------</span></span></code></pre></div>
-<p>(1)과 (2)의 타입을 보고 &gt;&gt;= 를 고르게 됩니다.<br />
+<p>(1)과 (2)의 타입을 보고 <code>&gt;&gt;=</code> 를 고르게 됩니다.<br />
 함수 서명을 컴파일러가 타입 매칭할 때 필요한 정보 정도로 오해하기도 하는데, 서명이 바뀌면 함수 내부에서 쓰고 있는 폴리모픽 함수의 인스턴스가 바뀌어 결국, <em>함수 서명을 바꾸면 함수 몸체의 최종 바이너리가 바뀝니다.</em></p>
 <p>하스켈에서 타입 서명은 컴파일 타임에 타입 매칭과 코드 조립을 위해서 존재합니다. 코드 조립이 끝나서 바이너리로 넘어가면 타입 정보는 사라집니다.</p>
 <p>OOP스런 클래스 생각을 완전히 버려야 나중에 에러 메시지를 읽을 때도 덜 헤매게 됩니다. 수많은 에러 메시지들이 대부분 타입과 관련이 있습니다.</p>
