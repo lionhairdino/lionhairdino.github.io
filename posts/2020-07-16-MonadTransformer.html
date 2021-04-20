@@ -241,14 +241,17 @@ act3의 조립 조건 <code>(MonadReader Int m) =&gt;</code> 을 만족하는 <c
 <pre><code>    • No instance for (MonadReader IO)
         arising from a use of ‘somefunc</code></pre>
 <p><code>somefunc</code>에선 Return Type Polymorphic과 constraint를 이용해 타입 추론을 뒤로 미뤘습니다. 나중에 <code>somefunc</code>가 불릴 컨텍스트가 <code>MonadIO</code>, <code>MonadReader</code> 인스턴스인지 체크해야 합니다. 지금 코드는 IO 컨텍스트 안에서 불렀습니다. 그럼 <code>instance MonadIO IO</code> , <code>instance MonadReader c IO</code> 가 있어야 하는데, <code>instance MonadReader IO</code> 는 정의되어 있지 않다는 에러입니다. <code>MonadReader</code> 쪽을 보면 실제로 <code>IO</code> 인스턴스는 정의되어 있지 않습니다.</p>
-<p>※ 그럼 <code>MonadReader</code>는 다른 트랜스포머들은 모두 정의해 놨는데, 왜 IO는 정의해놓지 않았을까요? <code>MonadReader</code>는 <code>ask</code>메소드를 계층에 상관없이 편리하게 쓰기 위해 정의한 클래스입니다. <em>어떤 트랜스포머로 쌓여 있든, 결국 ReaderT모나드의 ask를 찾아 갈 수 있게 만들어 놓은 겁니다.</em> <code>IO</code>나 <code>Reader</code>, <code>Writer</code> 같은 모나드를 위한게 아니라, <code>ReaderT</code>, <code>WriterT</code> 갈은 모나드 트랜스포머를 위한 겁니다.</p>
-<p>※ 그럼 IO의 트랜스포머 IOT는 왜 없을까요?<br />
-http://h2.jaguarpaw.co.uk/posts/io-transformer/<br />
-정리되면 내용을 추가하도록 하겠습니다.</p>
+<p>※ 그럼 <code>MonadReader</code>는 다른 트랜스포머용 인스턴스는 모두 정의해 놨는데, 왜 IO는 정의해놓지 않았을까요? <code>MonadReader</code>는 <code>ask</code>메소드를 계층에 상관없이 편리하게 쓰기 위해 정의한 클래스입니다. <em>어떤 트랜스포머로 쌓여 있든, 결국 ReaderT모나드의 ask등의 메소드를 찾아 갈 수 있게 만들어 놓은 겁니다.</em> <code>IO</code>는 모나드 스택에서 항상 바닥에 있는 모나드이므로 <code>IO</code>까지 도달하면 더 진행할 수 가 없습니다. 만일 <code>IOT</code>같은 <code>IO</code> 트랜스포머가 있다면 얘기는 달라질 겁니다.</p>
+<p>※ 그럼 <code>MonadIO IO</code> 인스턴스가 없다는 에러는 왜 안 났을까요?</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">MonadIO</span> <span class="dt">IO</span> <span class="kw">where</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    liftIO <span class="ot">=</span> <span class="fu">id</span></span></code></pre></div>
+<p><code>Monad IO</code> 인스턴스는 정의 되어있습니다.</p>
+<p>※ IO의 트랜스포머 IOT는 왜 없을까요?<br />
+http://h2.jaguarpaw.co.uk/posts/io-transformer/</p>
 <h2 id="에러-수정">에러 수정</h2>
 <p>다른 부분 수정없이 <code>runReaderT</code>로 환경값을 먹이면 컴파일 됩니다. 왜 그럴까요?</p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> runReaderT somefunc <span class="op">...</span> 환경값 <span class="op">...</span></span></code></pre></div>
-<p><code>runReaderT</code>는 <code>ReaderT</code>를 받으니, GHC는 <code>somefunc</code>가 <code>ReaderT</code>타입일거라 추론합니다. GHC가 추적에 이용한 단서는 <code>MonadReader</code> 인스턴스이면 OK라 했습니다. <code>ReaderT</code>는 <code>MonadReader</code>의 인스턴스이니 문제가 없습니다. <code>runReaderT</code>로 <code>ReaderT</code>를 벗겨내면 만나는 컨텍스트는 <code>main :: IO ()</code> 이니, <code>ReaderT</code> 안에 들어 있는 모나드는 <code>IO</code>입니다. somefunc의 리턴 타입 m 추론이 끝났습니다. <em>타입이 모호하지 않게 타입 지정을 해 준게 아니라, 타입 추론이 막히지 않도록 단서를 추가</em>해 준 거라 봐도 됩니다.</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> runReaderT somefunc <span class="op">...</span> 환경값 <span class="op">...</span></span></code></pre></div>
+<p><code>runReaderT</code>는 <code>ReaderT</code>를 받으니, GHC는 <code>somefunc</code>가 <code>ReaderT</code>타입일거라 추론합니다. GHC가 추적에 이용한 단서는 <code>MonadReader</code> 인스턴스이면 OK라 했습니다. <code>ReaderT</code>는 <code>MonadReader</code>의 인스턴스이니 문제가 없습니다. <code>runReaderT</code>로 <code>ReaderT</code>를 벗겨내면 만나는 컨텍스트는 <code>main :: IO ()</code> 이니, <code>ReaderT</code> 안에 들어 있는 모나드는 <code>IO</code>입니다. <code>somefunc</code>의 리턴 타입 <code>m</code> 추론이 끝났습니다. <em>타입이 모호하지 않게 타입 지정을 해 준게 아니라, 타입 추론이 막히지 않도록 단서를 추가</em>해 준 거라 봐도 됩니다.</p>
 
 <div id="disqus_thread" style="padding-top:40px"></div>
 <script>
