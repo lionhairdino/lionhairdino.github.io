@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko" lang="ko">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>lionhairdino - 타입 추론 과정 따라가기</title>
+        <meta name="description" content="lionhairdino - 타입 추론 과정 따라가기" />
+        <meta charset="UTF-8" />
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="타입 추론 과정 따라가기" />
+        <meta property="og:description" content="lionhairdino - 하스켈 함수형 프로그래밍, 타입 이론, 모노이드, 모나드, 동적 타입 언어의 코드 조립" />
+        <meta property="og:url" content="https://lionhairdino.github.io" />
+<meta name="keywords" content="타입 추론, type inference, forall, constraint, type match, functional dependeny, 의존성">
+    </head>
+    <body>
+        <div id="header">
+            <div id="logo"> </div>
+            <div id="navigation">
+                <a href="../">lionhairdino</a> 
+                <a href="../about.html">about</a>
+                <!--<a href="/archive.html">archive</a>-->
+            </div>
+        </div>
+
+        <div id="content">
+            <h1>타입 추론 과정 따라가기</h1>
+
+            <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+<div class="info">
+    Posted on April 22, 2021
+    
+</div>
+
+<p>소문자로 쓰여 있는 건, 무조건 나중에 “필요한 만큼” 구체 타입으로 추론됩니다.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Control.Monad.Reader</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Data.Function</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="ot">func1 ::</span> m ()</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>func1 <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  cfg <span class="ot">&lt;-</span> ask</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span> ()</span></code></pre></div>
+<p>아래와 같은 에러가 납니다.</p>
+<pre><code>    • No instance for (Monad m) arising from a do statement
+      Possible fix:
+        add (Monad m) to the context of
+          the type signature for:
+            func1 :: forall (m :: * -&gt; *). m ()
+...
+8 |   cfg &lt;- ask
+
+    • Ambiguous type variable ‘a0’ arising from a use of ‘ask’
+      prevents the constraint ‘(MonadReader a0 m)’ from being solved.
+      Relevant bindings include
+        func1 :: m ()
+      Probable fix: use a type annotation to specify what ‘a0’ should be.
+      These potential instances exist:
+        instance [safe] Monad m =&gt; MonadReader r (ReaderT r m)
+          -- Defined in ‘Control.Monad.Reader.Class’
+        ...plus 13 instances involving out-of-scope types
+        (use -fprint-potential-instances to see them all)
+...
+8 |   cfg &lt;- ask
+</code></pre>
+<p><code>func1</code>이 <code>do</code>를 쓰니 <code>Monad</code>입니다. 하지만 서명에는 <code>Monad</code>란 얘기가 없습니다. 나중에 다른 코드와 조립될 때, <code>m</code>이 <code>Monad</code> 인스턴스인지 꼭 확인하라고, 제약(또는 컨텍스트)에 <code>Monad m</code>을 추가합니다. 두 번째 에러는 아래를 추가한 후 보겠습니다.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ot">func1 ::</span> (<span class="dt">Monad</span> m) <span class="ot">=&gt;</span> m ()</span></code></pre></div>
+<p>다시 컴파일 하면,</p>
+<pre><code>    • Could not deduce (MonadReader a0 m) arising from a use of ‘ask’
+      from the context: Monad m
+        bound by the type signature for:
+                   func1 :: forall (m :: * -&gt; *). Monad m =&gt; m ()
+      The type variable ‘a0’ is ambiguous
+      Relevant bindings include
+        func1 :: m ()
+          (bound at /home/jacoo/gitProjects/lionhairdino/workroom/test.hs:7:1)
+      These potential instances exist:
+        instance [safe] Monad m =&gt; MonadReader r (ReaderT r m)
+          -- Defined in ‘Control.Monad.Reader.Class’
+        ...plus 13 instances involving out-of-scope types
+        (use -fprint-potential-instances to see them all)
+...
+8 |   cfg &lt;- ask</code></pre>
+<p><code>ask</code>를 쓰는 걸로 봐서 <code>m</code>은 <code>MonadReader a m</code> 인스턴스일텐데, 서명에는 관련 정보가 없습니다.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ot">func1 ::</span> (<span class="dt">Monad</span> m, <span class="dt">MonadReader</span> c m) <span class="ot">=&gt;</span> m ()</span></code></pre></div>
+<p>이렇게 하면 일단 컴파일 성공입니다. 함수 내부에서 특정 타입을 쓰도록 바꾸고 타입 추론을 더 살펴 보겠습니다.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ot">func1 ::</span> (<span class="dt">Monad</span> m, <span class="dt">MonadReader</span> c m) <span class="ot">=&gt;</span> m a</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>func1 <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  cfg <span class="ot">&lt;-</span> ask</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span> <span class="op">$</span> cfg <span class="op">+</span> <span class="dv">1</span></span></code></pre></div>
+<pre><code>    • Couldn't match type ‘c’ with ‘a’
+        arising from a functional dependency between constraints:
+          ‘MonadReader a m’
+            arising from a use of ‘ask’
+          ‘MonadReader c m’
+            arising from the type signature for:
+                           func1 :: forall (m :: * -&gt; *) c a. (Monad m, MonadReader c m) =&gt; m a
+      ‘c’ is a rigid type variable bound by
+        the type signature for:
+          func1 :: forall (m :: * -&gt; *) c a. (Monad m, MonadReader c m) =&gt; m a
+      ‘a’ is a rigid type variable bound by
+        the type signature for:
+          func1 :: forall (m :: * -&gt; *) c a. (Monad m, MonadReader c m) =&gt; m a
+8 |   cfg &lt;- ask
+~~
+
+`a`와 `c`는 rigid type입니다. 참고 - [rigid type variable](/errors/2020-07-15-rigidTypeVariable.html)   
+forall c, 즉 모든 타입의 a와 c로 정해졌습니다. 서명에 a와 c는 어떤 제약도 없으므로 어떤 타입이든 들어 올 수 있습니다. 함수 내부에서도 어떤 타입이 들어와도 처리할 수 있어야 합니다.
+
+~~~ haskell
+class Monad m =&gt; MonadReader r m | m -&gt; r where
+ask :: m r </code></pre>
+<p><code>ask</code>는 <code>m r</code> 타입입니다. <code>ask</code>의 결과값은 <code>func1</code> 함수의 결과값과 타입이 같을테니 <code>m a</code>일 겁니다. 함수내에서는 <code>r</code>과 <code>a</code>가 같은 값으로 처리되고 있지만, <em>서명에는 둘 이 같다는 정보가 없습니다.</em> <code>MonadReader</code> 서명을 보면 <code>m -&gt; r</code> 즉 <code>m</code>이 정해지면 <code>r</code>은 따라서 고정되는 functional dependency가 있습니다. <code>r</code>은 <code>m</code>이 바뀌지 않으면 고정입니다. 무슨 말이냐 하면, <code>m</code>이 <code>IO</code>로 추론되고 <code>r</code>이 한 번 <code>Int</code>로 추론 됐다면, <code>MonadReader Int IO</code>로 추론되고, 한 컨텍스트 안에서 <code>MonadReader Bool IO</code> 같은 타입으로 추론할 수 없습니다. 에러를 그대로 번역하면</p>
+<p><code>MonadReader r m</code>에서 <code>r</code>은 타입 서명에 있는 제약에서 <code>c</code>로 한 번 추론됐으니, 결과 타입때문에 추론된 <code>MonadReader a m</code>의 <code>a</code>와 매칭 할 수 없다는 얘기입니다.</p>
+<p>그럼 GHC의 추론에 의존하지 않고, <code>r</code>을 <code>Int</code>로 고정해 봅시다.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ot">func1 ::</span> (<span class="dt">Monad</span> m, <span class="dt">MonadReader</span> <span class="dt">Int</span> m) <span class="ot">=&gt;</span> m <span class="dt">Int</span></span></code></pre></div>
+<pre><code>    • Non type-variable argument in the constraint: MonadReader Int m
+      (Use FlexibleContexts to permit this)
+    • In the type signature:
+        func1 :: (Monad m, MonadReader Int m) =&gt; m Int
+6 | func1 :: (Monad m, MonadReader Int m) =&gt; m Int</code></pre>
+<p>제약constraint에는 구체 타입을 적어 줄 수 없습니다. 구체 타입 지정을 위해 언어 확장을 켭니다. 참고 <a href="../extensions/2020-07-13-FlexibleInstances.html">FlexibleContexts</a></p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ot">{-# LANGUAGE FlexibleContexts #-}</span></span></code></pre></div>
+<p><em>타입 서명과 함수 내부에서 쓰는 타입이 일치</em>해야 합니다.</p>
+<ol type="1">
+<li>Int를 받는다고 해놓고, 함수 내부에서는 Double이 필요한 코드가 있을 때</li>
+<li><em>서명에서는 아무거나</em> 받는다고 해놓고, <em>내부에서는 특정 타입</em>만 가능한 코드로 되어 있을 때</li>
+</ol>
+<p>이러면 Couldn’t match type 에러가 납니다. 1번이 별 어려움이 없는 말이지만, 2번은 가끔 혼동을 줄 때가 있습니다. 어려운 명제로 얘기하지 않고, 코드 실행 입장으로 생각하면 쉽게 이해가 갑니다. 서명에는 아무 타입, 내부에서는 MonadReader 인스턴스만 가능하다고 하면, GHC가 서명만 보고 코드 조립을 성사(컴파일)시켜 놓으면, 나중에 문제가 생길거라 추측할 수 있습니다.</p>
+
+<div id="disqus_thread" style="padding-top:40px"></div>
+<script>
+
+var disqus_config = function () {
+this.page.url = 'https://lionhairdino.github.io/posts/2021-04-22-type_Inference_trace.html';
+this.page.identifier = 'posts/2021-04-22-type_Inference_trace.markdown';
+};
+(function() {
+var d = document, s = d.createElement('script');
+s.src = 'https://lionhairdino.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+                            
+        </div>
+        <div id="footer">
+            © 2021 lionhairdino. All rights reserved. Generated by <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+    </body>
+</html>
