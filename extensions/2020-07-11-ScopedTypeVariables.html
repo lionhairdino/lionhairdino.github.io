@@ -54,6 +54,20 @@
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">where</span></span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="ot">      ida ::</span> b <span class="ot">-&gt;</span> b <span class="co">-- 여기 b는 타입 서명의 b와 전혀 관계 없는 b입니다. b가 뭔지는 GHC가 알아서 추론합니다.</span></span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>      ida <span class="ot">=</span> <span class="fu">id</span></span></code></pre></div>
+<p>함수 서명에 있는 타입의 유효 범위를 정하기도 하지만, 패턴 매칭할 때 타입을 지정할 필요가 있을 때도 쓰입니다.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ot">{-# LANGUAGE ScopedTypeVariables #-}</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ot">{-# LANGUAGE FlexibleContexts #-}</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Control.Monad.Reader</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="ot">func1 ::</span> (<span class="dt">MonadIO</span> m, <span class="dt">MonadReader</span> <span class="dt">Int</span> m) <span class="ot">=&gt;</span> m ()</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co">--func1 :: m ()</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>func1 <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="ot">  a ::</span> <span class="dt">Int</span> <span class="ot">&lt;-</span> ask</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  liftIO <span class="op">$</span> <span class="fu">print</span> a</span></code></pre></div>
+<p>위 예시는 좀 억지스러운데, 아직 실전에서 필요한 경우를 못 만났습니다. 위 <code>a :: Int &lt;- ask</code> 부분은 <code>:: Int</code>가 없어도 컴파일됩니다. 아마도 복잡한 코드에서 명시적으로 타입을 표기하고 싶을 때 쓰지 않을까 싶습니다.</p>
+<hr />
+<p>[1] <a href="https://opentutorials.org/course/2063/11682">남현욱님의 ScopedTypeVariables</a></p>
 
 <div id="disqus_thread" style="padding-top:40px"></div>
 <script>
