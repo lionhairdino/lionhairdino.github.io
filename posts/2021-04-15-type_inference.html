@@ -4,12 +4,12 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>lionhairdino - 타입 추론 Type inference</title>
-        <meta name="description" content="lionhairdino - 타입 추론 Type inference" />
+        <title>lionhairdino - 타입 추론 - 함수 서명과 몸체의 타입 매칭</title>
+        <meta name="description" content="lionhairdino - 타입 추론 - 함수 서명과 몸체의 타입 매칭" />
         <meta charset="UTF-8" />
         <link rel="stylesheet" type="text/css" href="../css/default.css" />
         <meta property="og:type" content="website" />
-        <meta property="og:title" content="타입 추론 Type inference" />
+        <meta property="og:title" content="타입 추론 - 함수 서명과 몸체의 타입 매칭" />
         <meta property="og:description" content="lionhairdino - 하스켈 함수형 프로그래밍, 타입 이론, 모노이드, 모나드, 동적 타입 언어의 코드 조립" />
         <meta property="og:url" content="https://lionhairdino.github.io" />
 <meta name="keywords" content="타입 추론, 클래스 제약, Type Inference, polymorphism">
@@ -25,7 +25,7 @@
         </div>
 
         <div id="content">
-            <h1>타입 추론 Type inference</h1>
+            <h1>타입 추론 - 함수 서명과 몸체의 타입 매칭</h1>
 
             <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
 <div class="info">
@@ -33,7 +33,7 @@
     
 </div>
 
-<p>하스켈이 가진 꽤 멋진 특징인데, 이게 또 익숙해지기 전까지는 머리를 아프게 합니다. 하스켈은 초반에는 타입 추론과의 전쟁인 것 같습니다. 나중에는 친구가 될지 어쩔지 모르지만, 지금까지는 전쟁중임에 틀림 없습니다.</p>
+<p>타입 추론은 하스켈이 가진 굉장히 멋진 특징인데, 이게 또 익숙해지기 전까지는 머리를 아프게 합니다. 하스켈 공부 초반에는 타입 추론과의 전쟁인 것 같습니다. 나중에는 친구가 될지 어쩔지 모르지만, 저는 아직까지는 전쟁 중인 것 같습니다.</p>
 <h2 id="다른-함수와-만나기-전에">다른 함수와 만나기 전에</h2>
 <p>아래 코드를 보면 GHC가 알아서 추론할 수 있을 것처럼 보입니다.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ot">func ::</span> a <span class="ot">-&gt;</span> a</span>
@@ -51,11 +51,16 @@
 <pre><code>    • No instance for (Num a) arising from a use of ‘+’
  ... 
 2 | func x = x + 1</code></pre>
-<p>나중에 다른 함수와 만나서 추론될 때, Num 클래스의 메소드 <code>(+)</code>를 가진 타입으로 추론될지 장담할 수 없습니다. 항상 적당한 함수와 꼭 만난다고 가정하면 안됩니다. 단독으로도 원하지 않는 타입이 들어 오는 걸 막을 수 있어야 합니다.</p>
+<p>나중에 다른 함수와 만나서 추론될 때, Num 클래스의 메소드 <code>(+)</code>를 가진 타입으로 추론될지 장담할 수 없습니다. 항상 적당한 함수와 꼭 만난다고 가정하면 안됩니다. 일단은 함수 혼자서 원하지 않는 타입이 들어 오는 걸 막을 수 있어야 합니다. func함수에는 반드시 Num 클래스만 들어오게 하는 안전 장치가 있어야 합니다. 타입 추론할 때, 다른 함수와 만나는 접점으로 타입을 추론하는 것보다 먼저 각각의 함수들이 <em>서명과 몸체의 타입이 일치</em>하는지 봅니다. 정리하면,</p>
+<ol type="1">
+<li>각각의 함수마다 서명과 몸체의 타입이 일치하는지 보고</li>
+<li>그 다음 다른 함수와 매칭을 살핍니다.</li>
+</ol>
+<p>※ 에러의 구체적인 뜻 참고 - <a href="../errors/2020-06-12-couldNotMatch.html">컴파일 에러 읽기 포스트</a></p>
 <h2 id="클래스는-미리-알려줄게-구체적인-코드는-나중에-결정해">클래스는 미리 알려줄게, 구체적인 코드는 나중에 결정해</h2>
 <div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ot">func ::</span> <span class="dt">Num</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> a</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="op">...</span></span></code></pre></div>
-<p><code>Num</code>이라는 클래스를 알려주면 GHC는 불만 없이 다음으로 넘어갑니다. 나중에 조립할 때 GHC가 <code>Num</code> 인스턴스가 넘어오는지 살펴 보기로 하고 넘어 갑니다. 저는 이 걸 구체 코드 결정을 <em>“뒤로 미룬다”</em>고 표현합니다.</p>
+<p><code>Num</code>이라는 클래스를 알려주면 GHC는 불만 없이 다음으로 넘어갑니다. 나중에 조립할 때 GHC가 <code>Num</code> 인스턴스가 넘어오는지 살펴 보기로 약속하고 넘어 가는 겁니다. 저는 이 걸 구체 코드 결정을 <em>“뒤로 미룬다”</em>고 표현합니다. 반드시 특정 타입에서 돌아가는 코드가 아닌 특정 종류class의 타입에서 돌아가는 코드라면 constraint를 통해 종류를 알려주고, 언젠가 다른 함수나 컨텍스트를 만나면 구체 타입이 결정되게 할 때 constraint를 씁니다.</p>
 <h2 id="항상-완벽한-구체-타입을-알아야-하는-건-아니다">항상 완벽한 구체 타입을 알아야 하는 건 아니다</h2>
 <div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ot">func ::</span> [a] <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>func xs <span class="ot">=</span> <span class="fu">length</span> xs</span>
@@ -64,7 +69,7 @@
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="kw">do</span></span>
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">print</span> <span class="op">$</span> func [<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>]</span></code></pre></div>
 <p>첫 번째 논리대로 하면, func 정의 단독으로 a에 대한 어떤 힌트가 있어야 할 것 같습니다. 하지만 에러가 나지 않습니다. 위의 첫 번째 예는 특정 클래스의 메소드 <code>(+)</code>를 써서 나는 에러였습니다. 여기선 특정 클래스의 메소드가 없습니다. length 함수는 <code>[]</code>까지만 알면 모호하지 않습니다.<br />
-참고 - <a href="../posts/2021-04-13-class_constraint.html">클래스 제약 포스트</a></p>
+※ 참고 - <a href="../posts/2021-04-13-class_constraint.html">클래스 제약 포스트</a></p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="op">:</span>t <span class="fu">length</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span><span class="ot"> ::</span> <span class="dt">Foldable</span> t <span class="ot">=&gt;</span> t a <span class="ot">-&gt;</span> <span class="dt">Int</span></span></code></pre></div>
 <p><code>length</code> 함수는 리스트 구조가 됐든, 트리 구조가 됐든… <code>Foldable</code> 클래스의 인스턴스이기만 하면 받아들입니다. 안에 들어 있는 <code>a</code>타입은 뭔지 모르지만 <code>foldable</code>이 가능한 [] 리스트 구조임은 <em>명시</em>했으니, 필요한 정보는 다 있는 상태입니다. 아래는 또 다른 예시입니다. 가장 바깥 타입 생성자(여기서는 Maybe)만 명시해 주면 모호하지 않습니다.</p>
@@ -72,6 +77,7 @@
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>isJust <span class="dt">Nothing</span> <span class="ot">=</span> <span class="dt">False</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>isJust _       <span class="ot">=</span> <span class="dt">True</span></span></code></pre></div>
 <p>위 <code>Maybe a</code>에서 <code>a</code>타입은 알 필요가 없습니다. 가장 바깥만 알면 됩니다. 항상 완벽한 구체 타입을 알아야 하는게 아니라, 필요한 만큼만 알면 됩니다.</p>
+<p>여기 내용과 꼭 관련된 건 아니지만, 가끔은 완전히 구체 타입까지 알아내서 다르게 동작해야 할 필요가 있습니다. 그럴 때 FlexibleInstances 확장을 씁니다. ※ 참고 - <a href="../extensions/2020-07-13-FlexibleInstances.html">확장 FlexibleInstances 포스트</a></p>
 
 <div id="disqus_thread" style="padding-top:40px"></div>
 <script>

@@ -86,10 +86,10 @@
 <ol type="1">
 <li>startTracker는 runTracker의 인자로 들어가니, TrackerM m 타입으로 추론,<br />
 </li>
-<li>runTracker로 벗겨서 나온 컨텍스트가 main :: IO ()이니 TrackerM IO로 추론,</li>
+<li>runTracker로 벗겨지면 만날 컨텍스트가 main :: IO ()이니 TrackerM IO로 추론,</li>
 <li>최종 startTracker는 TrackerM IO () 타입으로 추론됩니다.</li>
 </ol>
-<p>그럼 <code>startTracker</code>의 제약사항을 만족하는지 봅니다.</p>
+<p>startTracker를 선언할 때, 나중에 들어오는 타입이 따라야만 하는 Constraint를 적어두었습니다. 그럼, 추론된 타입이 <code>startTracker</code>의 제약사항을 만족하는지 봅니다.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="dt">MonadIO</span> (<span class="dt">TrackerM</span> <span class="dt">IO</span>), <span class="co">-- (A) deriving MonadIO이 있으니 통과</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="dt">MonadLogger</span> (<span class="dt">Tracker</span> <span class="dt">IO</span>), <span class="co">-- (C) instance MonadLogger (Tracker M)이 있으니 통과</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="dt">MonadReader</span> <span class="dt">TrackerConfig</span> (<span class="dt">TrackerM</span> <span class="dt">IO</span>), <span class="co">-- (A) deriving에 MonadReader TrackConfig 있으니 통과</span></span>
