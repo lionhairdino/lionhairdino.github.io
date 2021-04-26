@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko" lang="ko">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>lionhairdino - 컴파일 에러 읽기 - no smaller than the instance head</title>
+        <meta name="description" content="lionhairdino - 컴파일 에러 읽기 - no smaller than the instance head" />
+        <meta charset="UTF-8" />
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="컴파일 에러 읽기 - no smaller than the instance head" />
+        <meta property="og:description" content="lionhairdino - 하스켈 함수형 프로그래밍, 타입 이론, 모노이드, 모나드, 동적 타입 언어의 코드 조립" />
+        <meta property="og:url" content="https://lionhairdino.github.io" />
+<meta name="keywords" content="error, smaller, instance head, 무한 타입 체크, UndecidableInstances">
+    </head>
+    <body>
+        <div id="header">
+            <div id="logo"> </div>
+            <div id="navigation">
+                <a href="../">lionhairdino</a> 
+                <a href="../about.html">about</a>
+                <!--<a href="/archive.html">archive</a>-->
+            </div>
+        </div>
+
+        <div id="content">
+            <h1>컴파일 에러 읽기 - no smaller than the instance head</h1>
+
+            <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+<div class="info">
+    Posted on April 26, 2021
+    
+</div>
+
+<p>이 포스트는 정확히 이해한 내용이 아니라 <em>추측만 가득합니다. 의심하면서 읽어주세요</em></p>
+<h2 id="타입-하나를-위한게-아닌-클래스를-위한-인스턴스">타입 하나를 위한게 아닌, 클래스를 위한 인스턴스</h2>
+<p>특정 타입을 위한 인스턴스가 아니라, 특정 종류(클래스)의 타입을 위한 인스턴스를 만드는게 가능할까요? 예를 들면 <code>Num a</code> 클래스의 모든 인스턴스들을 위한 타입, 즉 클래스를 위한 인스턴스를 만들려고 합니다.</p>
+<p><code>ClassA</code> 클래스를 정의하고, 모든 <code>Num a</code> 인스턴스들을 위한 인스턴스를 정의해 봤습니다.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">ClassA</span> a <span class="kw">where</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ot">    method1 ::</span> a <span class="ot">-&gt;</span> a</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    method1 a1 <span class="ot">=</span> a1</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Num</span> a <span class="ot">=&gt;</span> <span class="dt">ClassA</span> a <span class="kw">where</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    method1 x <span class="ot">=</span> x </span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="ot">func ::</span> (<span class="dt">Num</span> a, <span class="dt">ClassA</span> a, <span class="dt">Show</span> a) <span class="ot">=&gt;</span> a </span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>func <span class="ot">=</span> method1 <span class="dv">1</span> </span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">print</span> <span class="op">$</span> func </span></code></pre></div>
+<p>컴파일 하면 다음과 같은 에러가 납니다.</p>
+<pre><code>    • The constraint ‘Num a’
+        is no smaller than the instance head ‘ClassA a’
+      (Use UndecidableInstances to permit this)
+    • In the instance declaration for ‘ClassA a’
+5 | instance Num a =&gt; ClassA a where</code></pre>
+<p>“Num a 제약이 인스턴스 head 보다 작지 않다”<br />
+뭐가 작다는 얘기일까요? 뭐가, 작다고 얘기해주면 좋을 텐데, 그저 no smaller라고 나오니 당황스럽습니다.</p>
+<p>타입 추론에서 뭔가 작다고 얘기할 때는 값을 생성하기 위한 생성자 수와 관계가 있습니다. 생성자가 많이 감싸고 있으면 크고, 생성자가 적게 감싸고 있으면 작다고 표현합니다. 예를 들면, <code>[Just 1]</code>은 <code>Just</code>와 <code>[]</code> 생성자가 필요합니다. <code>Just 1</code>은 <code>Just</code> 하나만 있으면 됩니다.</p>
+<p>예를 들어 보면,</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">Monad</span> m <span class="ot">=&gt;</span> <span class="dt">MonadReader</span> r m <span class="op">|</span> m <span class="ot">-&gt;</span> r <span class="kw">where</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Monad</span> m <span class="ot">=&gt;</span> <span class="dt">MonadReader</span> r (<span class="dt">ReaderT</span> r m) <span class="kw">where</span></span></code></pre></div>
+<p>인스턴스 헤드는 <code>m</code>을 감싼 <code>ReaderT</code>를 <code>MonadReader</code>로 감싸고 있습니다. 제약<code>constraint</code>에는 <code>Monad m</code> 한 번만 감싸고 있습니다. 이럴 때 제약이 헤드보다 “작다”라고 표현한다고 합니다. 더 많은 생성자로 감싼 걸 왜 크기로 표현했는지는 자료를 찾지 못했습니다.</p>
+<p><code>ClassA</code>는 <code>a</code>를 한 번 감싸고 있고, 제약에 있는 <code>Num</code>도 <code>a</code>를 한 번 감싸고 있습니다. 이러면 안된다는 에러입니다. 왜 안될까요? 문제를 단순화 시켜 아래 코드부터 보겠습니다.</p>
+<h2 id="모든forall-타입을-위한-인스턴스">모든forall 타입을 위한 인스턴스</h2>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">ClassA</span> a </span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="ot">somefunc ::</span> (<span class="dt">ClassA</span> a) <span class="ot">=&gt;</span> a</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>somefunc <span class="ot">=</span> method1</span></code></pre></div>
+<p>이 함수의 타입으로 추론될 수 있는 타입은 뭘까요? <code>ClassA</code>로 제약을 걸어 두었지만, 인스턴스 선언에 <code>instance ClassA a</code>로 모든a의 인스턴스가 존재하니 a는 어떤 타입이 들어와도 되는 상태입니다. 예를 들어 나중에 <code>a</code>에 <code>Int</code>가 들어오면 <code>ClassA Int</code> 인스턴스를 찾는데, 이 건 <code>Instance ClassA a</code>와 매치될겁니다.</p>
+<pre><code>test.hs:8:9: warning: [-Wsimplifiable-class-constraints]
+    • The constraint ‘ClassA a’ matches an instance declaration
+      instance ClassA a -- Defined at test.hs:5:10
+      This makes type inference for inner bindings fragile;
+        either use MonoLocalBinds, or simplify it using the instance
+    • In the type signature: func :: (ClassA a) =&gt; a
+8 | func :: (ClassA a) =&gt; a </code></pre>
+<p>내부 바인딩을 위한 타입 추론이 깨질fragile 위험이 있다고 합니다. 헤드와 제약이 완전히 같을 때 나오는 에러인 것 같습니다. 보통은 제약에 <code>Monad m =&gt;</code> 이라 하면, 나중에 <code>m</code>으로 들어오는 타입에 따라 인스턴스를 고릅니다. <code>m</code>에 <code>IO</code>가 들어오면 <code>instance Monad IO</code>를 선택합니다. 만일 인스턴스가 <code>instance Monad m</code>이 있다면, <code>m</code>에 뭐가 들어오든 이 인스턴스를 선택하게 됩니다. 혹시 다른 인스턴스들이 있다면 모두 무효화 시키기 때문에 위험하단 얘기일까요?</p>
+<p>※ 내부 바인딩, 외부 바인딩이 뭘까요? 람다 대수학에서 <code>(\x -&gt; ((\y -&gt; y + 1) 1) + 2) 2</code> 이런 abstraction에서 <code>\y</code>를 내부 바인딩이라 부르는 것 같습니다. 여기선 <code>ClassA</code>를 매칭하는 걸 외부 바인딩, <code>a</code>를 매칭하는 걸 내부 바인딩쯤으로 여기는 게 아닐까요? 그래서 내부 <code>a</code>를 위한 여러 인스턴스로 <code>instance Monad IO</code>, <code>instance Monad Maybe</code>… 등이 있더라도 모두 무시 되고, 모드 <code>instance Monad m</code>에 매치되므로 <em>내부 바인딩이 깨질 위험</em>이 있다고 한게 아닐까요? 일단 모든<code>forall</code> 타입에 대한 인스턴스를 이렇게 처리한다고 알고 다음으로 넘어 가겠습니다.</p>
+<h2 id="무한-타입-체크">무한 타입 체크</h2>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> (<span class="dt">Num</span> a) <span class="ot">=&gt;</span> <span class="dt">ClassA</span> a <span class="co">------ (1)</span></span></code></pre></div>
+<p>이를 피하기 위해, 모든 타입이 아닌 <code>Num a</code> 클래스의 인스턴스로 범위를 좁혀 보겠습니다. 모든 <code>forall a. Num a</code> 는 <code>Num a</code>의 모든 인스턴스를 말합니다. [<code>Int</code>, <code>Intger</code>, <code>Word</code>, <code>Float</code>, <code>Double</code> …]를 위한 <code>ClassA</code> 인스턴스란 말입니다. 나중에 “<code>Num a</code> 컨텍스트속에서 <code>method1</code>을 만나면 이 인스턴스에 있는 <code>method1</code>을 불러라* 입니다. 하지만, UndecidableInstances 확장 없이는 이렇게 정의할 수 없다고 합니다. 왜 컨텍스트와 <em>헤드</em>의 크기가 같으면 안될까요? Paterson Condition 때문에 그렇다는데, 패터슨 조건이 뭔지 나오는 자료는 많은데, 왜 그게 필요한지 알려주는”간단한" 자료를 못 찾았습니다.<br />
+<a href="https://ghc.gitlab.haskell.org/ghc/doc/users_guide/exts/instances.html#instance-termination-rules">Instance termination rules</a></p>
+<p>stackoverflow에서 검색하면 무한 타입 체킹을 피하기 위한 조치라고 나옵니다. 왜 무한 타입 체킹이 일어날 수 있다는 걸까요? 이 조건이 있으면 반드시 무한 루프가 발생한다는 얘기가 아니라, 그럴 수도 있다는 얘기니 일어날 수 있는 상황을 끼워 맞춰 보겠습니다.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> (<span class="dt">ClassA</span> a) <span class="ot">=&gt;</span> <span class="dt">Num</span> a <span class="co">------ (2)</span></span></code></pre></div>
+<p>만일 (1)번 정의가 있는 상태에서 추가로 (2)번 인스턴스 정의가 추가 된다면 (일부러라기보다 라이브러리를 쓰는 사용자가 추가한다거나…)</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ot">func ::</span> (<span class="dt">ClassA</span> a) <span class="ot">=&gt;</span> a</span></code></pre></div>
+<p>나중에 <code>func</code>의 <code>a</code>로 <code>Int</code>가 들어오는 상황이 생기면,</p>
+<ol type="1">
+<li><ol type="1">
+<li><code>instance (Num a) =&gt; ClassA a</code>와 매칭되고,<br />
+</li>
+</ol></li>
+<li><code>a</code>가 <code>Num</code> 인스턴스가 있는지 찾을테니,<br />
+</li>
+<li><ol start="2" type="1">
+<li><code>instance (ClassA a) =&gt; Num a</code>와 매칭됩니다.<br />
+</li>
+</ol></li>
+<li>그럼 다시 (1)과 매칭되고, 다시 (2)와 매칭되고….</li>
+</ol>
+<p>이렇게 무한 체킹에 빠질 헛점이 존재합니다. 그럼 제약보다는 헤드에서 조건이 크게 만들어 보겠습니다.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> (<span class="dt">Num</span> a) <span class="ot">=&gt;</span> <span class="dt">ClassA</span> (<span class="dt">Maybe</span> a)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> (<span class="dt">Ord</span> a) <span class="ot">=&gt;</span> <span class="dt">ClassA</span> (<span class="dt">Monad</span> m)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> (<span class="dt">ClassA</span> a) <span class="ot">=&gt;</span> <span class="dt">Num</span> (<span class="dt">Maybe</span> a)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> (<span class="dt">ClassA</span> a) <span class="ot">=&gt;</span> <span class="dt">Ord</span> (<span class="dt">Monad</span> m)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="op">...</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="co">-- instance (Num a) =&gt; ClassA a 인스턴스나,</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="co">-- instance (ClassA a) =&gt; Maybe a 란 인스턴스를 만들 수 없습니다.</span></span></code></pre></div>
+<p>– 헤드가 반드시 더 생성자로 감싸져 있어야 하니, 타입과 헤드 서로 자리를 바꿔 무한 체킹 조건을 만들 수가 없습니다.</p>
+<p>이래서, 제약보다 헤드가 항상 크게 만들어 무한 타입 체킹이 생길 일을 미연에 방지한다는 뜻 아닐까요? 역시나 무한 체킹 절차가 돌아가는 작업 자체를 설명한 자료는 못찾았습니다.</p>
+<p>패터슨 조건 Paterson Conditions :</p>
+<p>컨텍스트의 각 클래스 제약 <code>( C t1 ... tn )</code>은<br />
+타입 변수는 헤드에서 보다 제약에서 더 등장해서는 안된다.<br />
+제약은 헤드보다 더 적은 생성자와 변수를 가지고 있어야 한다.<br />
+제약에 타입 함수가 있으면 안된다.</p>
+<p>인스턴스 매칭을 시도할 때 두 개 이상의 인스턴스와 매칭될 확률이 있는건 상관없다고 합니다. 중복 매칭이 되면 그 때서야 에러를 뱉습니다. 위와 같은 작업이 필요하고, 사용자가 주의를 기울인다면 UndecidableInstances 확장을 켜고 인스턴스를 만들 수 있습니다.</p>
+<p>언제 이런게 필요할까 싶은데, 가장 간단한 예로 같은 동작을 하는 다른 이름의 클래스를 만들 때 쓰인다고 합니다.</p>
+<p>https://stackoverflow.com/questions/3213490/how-do-i-write-if-typeclass-a-then-a-is-also-an-instance-of-b-by-this-definit</p>
+<h2 id="인스턴스를-찾는-작업instance-resolution">인스턴스를 찾는 작업Instance Resolution</h2>
+<p>“헤드 매칭 이후에 제약이 쓰인다.”</p>
+<p>코드에서 만난 constraint -&gt; 헤드와 패턴 매칭 -&gt; 컨텍스트와 패턴 매칭</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> (<span class="dt">Num</span> a) <span class="ot">=&gt;</span> <span class="dt">ClassA</span> a <span class="kw">where</span> <span class="op">...</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="ot">func ::</span> (<span class="dt">ClassA</span> a) <span class="ot">=&gt;</span> a</span></code></pre></div>
+<p><code>ClassA a =&gt; a</code>를 만나 제약 <code>ClassA a</code>와 매칭되는 인스턴스를 찾습니다. 헤드만 매칭하니 <code>Num a =&gt; ClassA a</code>를 찾았습니다. 이렇게 찾은 <code>a</code>가 <code>Num a</code>클래스를 따라야 한다고 하니, <code>Num a</code>와 매칭 되는 인스턴스를 찾습니다.</p>
+<p>만약 <code>Int</code>가 들어왔다 치면, <code>ClassA Int</code>를 찾을테고, 이건 <code>(Num a) =&gt; ClassA a</code> 와 매칭되고, <code>Int</code>는 <code>Num</code>의 인스턴스여야 하는 조건을 만족하니, OK입니다.</p>
+
+<div id="disqus_thread" style="padding-top:40px"></div>
+<script>
+
+var disqus_config = function () {
+this.page.url = 'https://lionhairdino.github.io/errors/2021-04-26-smaller.html';
+this.page.identifier = 'errors/2021-04-26-smaller.markdown';
+};
+(function() {
+var d = document, s = d.createElement('script');
+s.src = 'https://lionhairdino.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+                            
+        </div>
+        <div id="footer">
+            © 2021 lionhairdino. All rights reserved. Generated by <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+    </body>
+</html>
