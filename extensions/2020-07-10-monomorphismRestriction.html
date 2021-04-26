@@ -51,7 +51,7 @@
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="kw">let</span> plus <span class="ot">=</span> (<span class="op">+</span>) <span class="co">-- Restriction을 바꾸면, 재정의 후 테스트해야 합니다.</span></span>
 <span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> plus <span class="fl">1.1</span> <span class="fl">1.1</span></span>
 <span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="fl">2.2</span></span></code></pre></div>
-<p>확장이 켜져 있는 상태에서 plus 타입이 추론되는 걸 보면, 1.1 리터럴을 보고 Fractional 클래스라고 판단하는데, 타입 서명 없이 plus를 정의하면 GHC가 알아서 type defaulting 규칙에<sup><a href="#default">[1]</a></sup> 따라 Num 클래스의 디폴트 타입 Integer를 적용해 Integer -&gt; Integer -&gt; Integer 타입으로 추론합니다. Fractional 클래스의 Integer 인스턴스가 없기 때문에 오류가 납니다.</p>
+<p>확장이 켜져 있는 상태에서 <code>plus</code> 타입이 추론되는 걸 보면, <code>1.1</code> 리터럴을 보고 <code>Fractional</code> 클래스라고 판단하는데, 타입 서명 없이 <code>plus</code>를 정의하면 GHC가 알아서 type defaulting 규칙에<sup><a href="#default">[1]</a></sup> 따라 <code>Num</code> 클래스의 디폴트 타입 <code>Integer</code>를 적용해 <code>Integer -&gt; Integer -&gt; Integer</code> 타입으로 추론합니다. <code>Fractional</code> 클래스의 <code>Integer</code> 인스턴스가 없기 때문에 오류가 납니다.</p>
 <p>monomorphism restriction을 켜면 아래 함수 정의들의 해석이 달라집니다.</p>
 <p><a href="https://wiki.haskell.org/Monomorphism_restriction" class="uri">https://wiki.haskell.org/Monomorphism_restriction</a></p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- GHC는 f1 :: (Show x) =&gt; x -&gt; String 로 추론한다. (1)</span></span>
@@ -72,8 +72,8 @@
 <span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>f5 <span class="ot">=</span> <span class="fu">show</span></span></code></pre></div>
 <p><em>검증 필요</em> 왜 (1)과 (2)가 다르게 추론될까요?<br />
 monomorphism restriction 때문에 다르게 추론됩니다.<br />
-(1)번은 f1을 show와 함수 바인딩<sup><a href="#binding">[2]</a></sup>해서 x를 추론합니다. f1은 show x 함수에 이름을 붙여 놓은겁니다. show가 그렇듯이 f1은 Show 인스턴스를 인자로 받습니다. 하지만 (2)번은 show가 아닌 -&gt; … 람다 함수에 이름을 붙여 놓은 겁니다. 여기서도 역시 하스켈은 lazy합니다. show가 실행이 필요해지기 전까지는 x가 뭔지 모르는 상태입니다. monomorphism 제한이 켜져 있는 상태에서 추론 단서가 전혀 없으면 ()로 추론합니다.<br />
-그럼 (4)번은 어떻게 해석하면 될까요? (1)번에서 x는 함수 바인딩 하면서 show에 있는 매개 변수의 정보를 가져오지만, (4)번은 매개 변수는 상관없이 show 함수와 바인딩합니다.</p>
+(1)번은 <code>f1</code>을 <code>show</code>와 함수 바인딩<sup><a href="#binding">[2]</a></sup>해서 <code>x</code>를 추론합니다. <code>f1</code>은 <code>show x</code> 함수에 이름을 붙여 놓은겁니다. <code>show</code>가 그렇듯이 <code>f1</code>은 <code>Show</code> 인스턴스를 인자로 받습니다. 하지만 (2)번은 <code>show</code>가 아닌 <code>\x -&gt; ...</code> 람다 함수에 이름을 붙여 놓은 겁니다. 여기서도 역시 하스켈은 lazy합니다. <code>show</code>가 실행이 필요해지기 전까지는 <code>x</code>가 뭔지 모르는 상태입니다. monomorphism 제한이 켜져 있는 상태에서 추론 단서가 전혀 없으면 ()로 추론합니다.<br />
+그럼 (4)번은 어떻게 해석하면 될까요? (1)번에서 <code>x</code>는 함수 바인딩 하면서 <code>show</code>에 있는 매개 변수의 정보를 가져오지만, (4)번은 매개 변수는 상관없이 <code>show</code> 함수와 바인딩합니다.</p>
 <p>함수가 폴리모픽 매개 변수를 가지고 있을 때, 폴리모픽 변수가 한가지로 추론되지 않으면 이 함수는 한가지mono 모양morphic이 아닙니다. 여러 코드 덩어리가 준비되어 있고, 나중에 구체 타입이 결정 되면 한가지를 고르게 됩니다.</p>
 <p>monomorphic을 켜면, GHC가 함수 정의를 보고 타입을 추론할 단서(타입 서명)를 찾아 보고, 구체 타입까지 도달 못하고 클래스까지만 추론 가능하면 디폴트 규칙에 따라 함수의 타입을 결정합니다.</p>
 <p>monomorphic을 끄면, GHC는 클래스까지만 추론되면 그대로 두고, 구체 타입은 나중에 코드 조합에 따라 결정합니다.</p>
@@ -95,13 +95,13 @@ Prelude numeric 클래스들만 디폴트값을 갖고 있고, 사용자 정의 
 
 </div>
 <p>[2] <a href="https://www.haskell.org/onlinereport/haskell2010/haskellch4.html#x10-830004.4.3" class="uri">https://www.haskell.org/onlinereport/haskell2010/haskellch4.html#x10-830004.4.3</a><br />
-코드에 임시로 이름을 붙여 놓는 걸 바인딩이라 합니다. 모듈(함수)의 최상위 레벨이나, let절, where절등에서 바인딩할 수 있습니다.</p>
+코드에 임시로 이름을 붙여 놓는 걸 바인딩이라 합니다. 모듈(함수)의 최상위 레벨이나, <code>let</code>절, <code>where</code>절등에서 바인딩할 수 있습니다.</p>
 <h3 id="함수-바인딩">함수 바인딩</h3>
 <div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>someFunc (<span class="dt">Just</span> x) <span class="ot">=</span> <span class="op">...</span>작업 코드</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>someFunc <span class="dt">Nothing</span> <span class="ot">=</span> <span class="op">...</span>작업 코드</span></code></pre></div>
-<p>function 바인딩은 someFunc란 이름을 작업 코드의 결과값에 붙이는 작업입니다. 매개 변수 자리에 들어오는 값과 비교할 패턴이 있을 경우 패턴 바인딩이 일어납니다.</p>
+<p>function 바인딩은 <code>someFunc</code>란 이름을 작업 코드의 결과값에 붙이는 작업입니다. 매개 변수 자리에 들어오는 값과 비교할 패턴이 있을 경우 패턴 바인딩이 일어납니다.</p>
 <h3 id="패턴-바인딩">패턴 바인딩</h3>
-<p>매개 변수를 통해 들어온 값에 이름을 붙이는 작업입니다. 예를 들어 매개 변수를 통해 Just 5 가 들어오면 Just x 란 패턴과 매칭해서 5를 x와 바인딩합니다.</p>
+<p>매개 변수를 통해 들어온 값에 이름을 붙이는 작업입니다. 예를 들어 매개 변수를 통해 <code>Just 5</code>가 들어오면 <code>Just x</code>란 패턴과 매칭해서 <code>5</code>를 <code>x</code>와 바인딩합니다.</p>
 <p>※ 위 링크의 문서를 보면</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- (##) 이란 연산을 정의하고 아래같이 써주면?</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>a <span class="op">##</span> b <span class="op">:</span> xs <span class="ot">=</span> <span class="op">...</span></span></code></pre></div>
