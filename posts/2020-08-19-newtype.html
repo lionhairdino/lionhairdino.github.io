@@ -33,7 +33,8 @@
     
 </div>
 
-<p>어렵게 얘기하면 같은 성질의 것인데, 프로그램 로직속에서 다른 데이터로 취급하는 방법이라 할 수 있고, 쉽게 말하면 다음과 같습니다.</p>
+<h2 id="소스에선-다른-타입-하지만-바이너리에선-같은-타입">소스에선 다른 타입, 하지만 바이너리에선 같은 타입</h2>
+<p>어렵게 얘기하면 같은 성질의 것인데, 프로그램 로직속에서 다른 데이터로 취급하는 방법이라 할 수 있습니다. 예를 들면,</p>
 <pre><code>나이: 숫자,
 키: 숫자,
 몸무게: 숫자</code></pre>
@@ -41,16 +42,19 @@
 <pre><code>Age Int
 Height Int
 Weight Int</code></pre>
-<p>이렇게 래핑해서 각 각 다른 타입으로 만들고, 나이를 다루는 함수는 Int가 아닌 Age Int를 받도록 만들고, 키는 Height Int, 몸무게는 Weight Int 를 받도록 만들면 다른 뜻을 지닌 값이 들어오는 걸 막을 수 있습니다.</p>
-<p>하지만, 이들은 타입 안정성을 위해 래핑한 것으로 성질은 Int와 다를게 없습니다. 코드 조립(type-checker)할 때만 써먹고, 런타임엔 필요 없는 정보입니다. 컴파일 타임에만 구별되고, 효율성을 위해 런타임에는 사라지게 래핑할 방법이 필요합니다.</p>
-<p>이럴 때 newtype을 씁니다.</p>
-<p>data는 새로운 데이터 타입을 만들고,<br />
-type은 기존에 있는 타입의 별명만 만들고,<br />
-newtype은 컴파일 타임에는 새로운 타입인 것처럼 동작하고, 런타임에는 기존 타입과 같은 동작을 합니다.</p>
-<p>왜 하나의 필드만 있는 하나의 생성자만 newtype으로 선언할 수 있을까요? 아마도 <em>런타임에 생성자를 지울 때 필요한 규칙</em>일 겁니다. (정확히 내부 동작 설명이 있는 자료를 아직 못 찾았습니다.) 런타임에 타입 생성자는 지워지고, 래핑해 둔 필드만 살아남으니, 필드가 곧 타입의 의미와 같아야isomorphic 합니다. 당연히 생성자도 하나이고, 필드도 하나여야 명확하게 연결할 수 있습니다.</p>
-<p>특정 용도로 쓰기 위해 Int를 다음과 같이 래핑하면</p>
+<p>이렇게 래핑해서 각 각 다른 타입으로 만들고, 나이를 다루는 함수는 <code>Int</code>가 아닌 <code>Age Int</code>를 받도록 만들고, 키는 <code>Height Int</code>, 몸무게는 <code>Weight Int</code>를 받도록 만들면 다른 뜻을 지닌 값이 들어오는 걸 막을 수 있습니다.</p>
+<p>하지만, 이들은 타입 안정성을 위해 래핑한 것으로 본질은 <code>Int</code>와 다를게 없습니다. 코드 조립(type-checker)할 때만 써먹고, 런타임엔 필요 없는 정보입니다. 컴파일 타임에만 구별되고, 효율성을 위해 런타임에는 사라지게 래핑할 방법이 필요합니다.</p>
+<p>이럴 때 <code>newtype</code>을 씁니다.</p>
+<figure>
+<img src="../images/newtype.png" alt="성의를 봐서 컴파일 타임에만 속아줍니다." /><figcaption aria-hidden="true">성의를 봐서 컴파일 타임에만 속아줍니다.</figcaption>
+</figure>
+<p><code>data</code>는 새로운 데이터 타입을 만들고,<br />
+<code>type</code>은 기존에 있는 타입의 별명만 만들고, (컴파일 타임에도 같은 타입으로 취급합니다. 예를 들어 <code>type SameType = String</code> 이라 하면, <code>SameType</code>이 들어갈 자리에 <code>String</code>을 넣어도 컴파일러는 불만이 없습니다. 그야말로 단순 별명일 뿐입니다.)<br />
+<code>newtype</code>은 컴파일 타임에는 새로운 타입인 것처럼 동작하고, 런타임에는 기존 타입과 같은 동작을 합니다.</p>
+<p>왜 하나의 필드만 있는 하나의 생성자만 <code>newtype</code>으로 선언할 수 있을까요? 아마도 <em>런타임에 생성자를 지울 때 필요한 규칙</em>일 겁니다. (정확히 내부 동작 설명이 있는 자료를 아직 못 찾았습니다.) 런타임에 타입 생성자와 값 생성자는 지워지고, 래핑해 둔 필드만 살아남으니, 필드가 곧 타입의 의미와 같아야isomorphic 합니다. 당연히 생성자도 하나이고, 필드도 하나여야 명확하게 연결할 수 있습니다.</p>
+<p>특정 용도로 쓰기 위해 <code>Int</code>를 다음과 같이 래핑하면</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">Age</span> <span class="ot">=</span> <span class="dt">Age</span> {<span class="ot"> getAge ::</span> <span class="dt">Int</span> } <span class="kw">deriving</span> <span class="dt">Show</span></span></code></pre></div>
-<p>Age 타입의 성질은 Int와 같습니다. 런타임에 생성자 Age는 사라지고 필드 Int만 남습니다.</p>
+<p><code>Age</code> 타입의 본질은 <code>Int</code>와 같습니다. 런타임에 생성자 <code>Age</code>는 사라지고 필드 <code>Int</code>만 남습니다.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ot">val1 ::</span> <span class="dt">Age</span> <span class="dt">Int</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>val1 <span class="ot">=</span> <span class="dt">Age</span> <span class="dv">1</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -61,19 +65,37 @@ newtype은 컴파일 타임에는 새로운 타입인 것처럼 동작하고, �
 <span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> valSum</span>
 <span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span></span></code></pre></div>
-<p>런타임에는 valSum = 1 + 2 로 바뀝니다.</p>
-<p>생일이 지나 나이를 + 1year 하거나, 많이 먹고 살쪄서 + 1kg을 한다면 그냥 (+)를 쓰지 못하는 상황입니다. 타입 안전성을 위해 래핑하면 지겹게 만나게 될 문제입니다. (+)를 새로 정의할까요? 그럼 (-)도, (*)도… 관련 함수들을 모두 다시 정의해야 합니다. 이런 문제를 해결하기 위해 딱인 이론이 바로 펑크터입니다. 그런데 펑크터로 만들어도 런타임에 생성자와 필드가 사라질 수 있을까요? 펑크터를 적용한 것과 아닌 것의 바이너리 코드가 같을까요?</p>
+<p>런타임에는 <code>valSum = 1 + 2</code> 로 바뀝니다.</p>
+<h2 id="래핑-타입들을-위한-fmap">래핑 타입들을 위한 fmap</h2>
+<p>생일이 지나 나이를 + 1year 하거나, 많이 먹고 살쪄서 + 1kg을 한다면 그냥 <code>(+)</code>를 쓰지 못하는 상황입니다. 타입 안전성을 위해 래핑하면 지겹게 만나게 될 문제입니다. <code>(+)</code>를 새로 정의할까요? 그럼 <code>(-)</code>도, <code>(*)</code>도… 관련 함수들을 모두 다시 정의해야 합니다. 이런 문제를 해결하기 위해 딱인 이론이 바로 펑크터입니다. 그런데 펑크터로 만들어도 런타임에 생성자와 필드가 사라질 수 있을까요? 펑크터를 적용한 것과 아닌 것의 바이너리 코드가 같을까요?</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> (<span class="op">+</span><span class="dv">1</span>) <span class="dv">1</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="fu">fmap</span> (<span class="op">+</span><span class="dv">1</span>) val1</span></code></pre></div>
-<p>두 개가 같은 바이너리로 나와야 할 것 같은데, 두 번째 줄에서 GHC가 쉽게 버릴 수 있는 조각들이 안 보입니다. 런타임에 생성자가 지워진다는 말은 Age를 만나면 무조건 Int로 바뀌는게 아닙니다. 필드 접근자accessor getAge를 만나야 생성자를 지울 수 있습니다. 위 fmap 적용에서 지워지는게 아니라 fmap 안에서 생성자가 지워집니다. Age를 펑크터의 인스턴스로 만들려면 fmap을 다음처럼 정의합니다.</p>
+<p>두 개가 같은 바이너리로 나와야 할 것 같은데, 두 번째 줄에서 GHC가 쉽게 버릴 수 있는 조각들이 안 보입니다. 런타임에 생성자가 지워진다는 말은 <code>Age</code>를 만나면 무조건 <code>Int</code>로 바뀌는게 아닙니다. 필드 접근자accessor <code>getAge</code>를 만나야 생성자를 지울 수 있습니다. 위 <code>fmap</code> 적용에서 지워지는게 아니라 <code>fmap</code> 안에서 생성자가 지워집니다. <code>Age</code>를 펑크터의 인스턴스로 만들려면 <code>fmap</code>을 다음처럼 정의합니다.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Functor</span> <span class="dt">Age</span> <span class="kw">where</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmap</span> f ag <span class="ot">=</span> <span class="dt">Age</span> <span class="op">$</span> f (getAge ag)</span></code></pre></div>
-<p>바로 getAge ag 부분이 런타임에 Int 타입으로 바뀌는 부분입니다.</p>
+<p>바로 <code>getAge ag</code> 부분이 런타임에 <code>Int</code> 타입으로 바뀌는 부분입니다. - 아직 확실한 자료는 못찾았는데, 결국은 fmap으로 Age에 적용하는 구문들은 단순 f Int 형태로 바뀔거라 생각합니다. (fmap까지 이렇게 최적화를 해준다고 명시적으로 쓰여있는 문서를 아직 못 찾아서 ’생각합니다’라고 끝맺었습니다.)</p>
 <p>보통 펑크터나 모나드 등의 인스턴스로 만들려고 할 때, <em>바인드나 fmap을 고르는 키로 쓰일 타입</em>을 newtype으로 정의합니다.</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">State</span> s a <span class="ot">=</span> <span class="dt">State</span> {<span class="ot"> runState ::</span> s <span class="ot">-&gt;</span> (a, s) }</span></code></pre></div>
 <p>GHC가</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="dt">State</span> s <span class="op">...</span> <span class="op">&gt;&gt;=</span> <span class="op">...</span></span></code></pre></div>
 <p>를 만나면 State s 를 키로 하는 인스턴스의 바인드를 가져오게 됩니다. 런타임에는 s -&gt; (a, s) 만 남습니다. 그럼 State 타입에 runState를 적용하는 구문들이 모두 사라진다는 얘기입니다.</p>
+<h2 id="그런데-원래-하스켈의-모든-타입-정보는-런타임에-사라지지-않나">그런데, 원래 하스켈의 모든 타입 정보는 런타임에 사라지지 않나?</h2>
+<p>맞습니다. 그럼, 패턴 매칭할 때는 어떻게 하나요? 예를 들면 <code>Just</code>, <code>Nothing</code>을 구별해서 패턴 매칭을 해야 되는데, 타입이 사라지면 안될 것처럼 보입니다. <code>Just</code>, <code>Nothing</code>은 타입이 아닙니다. 이들의 타입은 <code>Maybe a</code> 타입입니다. <code>Just</code>와 <code>Nothing</code>은 값 생성자value constructor입니다. 런타임에도 값 생성자는 사라지지 않습니다. 하나의 생성자만 있는 타입을 <code>data</code>로 선언하면 별도의 값 생성자를 유지하지만, <code>newtype</code>으로 선언한 타입은 값 생성자까지도 원래의 타입과 동일한 걸 쓰게되어 별도로 값 생성자를 만들어내지 않아도 됩니다. 본문에서 얘기한대로 보통 타입 클래스와 인스턴스를 활용하기 위해 <code>newtype</code>을 자주 씁니다. 매개 변수 타입을 키로 인스턴스를 골라내니,</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Int</span> <span class="co">-----(A)</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">TwinInt</span> <span class="ot">=</span> <span class="dt">TwinInt</span> {<span class="ot"> getTwinInt ::</span> <span class="dt">Int</span> } <span class="co">-----(B)</span></span></code></pre></div>
+<p>A와 B는 다른 타입으로 취급하고 인스턴스를 고를 수 있습니다. <em>클래스 인스턴스 선택 작업은 런타임이 아니라, 컴파일 타임에 필요한 작업입니다.</em> 컴파일 타임만 통과하고 나면 런타임에서 <code>TwinInt</code>와 <code>Int</code>는 완전히 동일한 타입입니다. 코드 조각을 골라 내기 위해 TwinInt를 쓰고, 조각을 고른 후에는 버립니다. <em>별도의 값 생성자 TwinInt가 런타임엔 없습니다.</em> <sup>[1]</sup></p>
+<p>문법에 한 요소를 추가할 정도로 퍼포먼스에 영향이 있는지는 모르겠습니다. 아주 빈번하게 <code>newtype</code>이 사용되긴 하니, 영향이 있지 않을까요?</p>
+<hr />
+<p>[1] Bottom값에 대해 이해한 후 다음 사이트를 보세요. https://wiki.haskell.org/Newtype</p>
+<p>하스켈의 모든 함수는 리턴 값이 반드시 있어야 합니다. 그럼 무한히 루프를 도는 함수는 “리턴 값”이 뭘까요? 이럴 때 리턴 값을 “Bottom”이라 표시합니다. 모든 타입들은 무한 루프의 결과 타입이 될 수 있으니, 모든 타입들에 <code>Bottom</code>값을 정의합니다. 예를 들어 하스켈 내부에 정의된 진짜 <code>Bool</code> 타입은 3가지 값을 가지고 있습니다.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Bool</span> <span class="ot">=</span> <span class="dt">True</span> <span class="op">|</span> <span class="dt">False</span> <span class="op">|</span> <span class="dt">Bottom</span></span></code></pre></div>
+<p>어떤 함수의 리턴 타입을 <code>Bool</code>이라 써주면, 이 함수의 리턴 값은 <code>True</code>, <code>False</code>, <code>Bottom</code>이 될수 있다는 말입니다. <code>Any</code> 타입은 눈에 보이지 않지만, 내부적으론 다음과 같이 정의됩니다.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- wiki.haskell.org/Newtype 에서 발췌</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Any</span> <span class="ot">=</span> <span class="dt">Any</span> {<span class="op">...</span> <span class="dt">Bool</span> <span class="op">...</span>} <span class="op">|</span> <span class="dt">Bottom</span> </span></code></pre></div>
+<p><code>Any</code> 타입의 <code>Bottom</code>값이 새로 생겼습니다.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">case</span> x <span class="kw">of</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">Any</span> _ <span class="ot">-&gt;</span> ()</span></code></pre></div>
+<p><code>x</code>에 <code>Any</code> 타입의 값이 들어갈 경우 <code>x</code>는 <code>Any True</code>, <code>Any False</code>, <code>Any Bottom</code>, <code>Bottom</code> 4가지 형태의 값이 들어갈 수 있습니다. 아예 <code>Any</code> 값 생성자와 매칭이 안되는 <code>Bottom</code>이란 경우의 수가 존재합니다. <code>_</code> (hole)로 버릴지라도 <code>x</code>값을 평가해 봐야 합니다. 하지만 <code>newtype</code>으로 선언하면 <code>Any True</code>, <code>Any False</code>, <code>Any Bottom</code> 3가지 경우만 보면 됩니다. 그럼 위와 같은 패턴 매칭은 모두 <code>Any</code>에 걸려들테니 <code>_</code> (hole)부분을 평가할 필요가 없어집니다. 패턴 매칭에 있는 newtype에서 정의한 값 생성자는 하는 일이 없습니다. 그냥 떼어내고 읽어도 됩니다.</p>
 
 <div id="disqus_thread" style="padding-top:40px"></div>
 <script>
