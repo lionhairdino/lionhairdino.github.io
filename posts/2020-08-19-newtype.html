@@ -12,7 +12,7 @@
         <meta property="og:title" content="newtype은 왜 필드 하나만 갖는 생성자 하나만 있는 타입일까?" />
         <meta property="og:description" content="lionhairdino - 하스켈 함수형 프로그래밍, 타입 이론, 모노이드, 모나드, 동적 타입 언어의 코드 조립" />
         <meta property="og:url" content="https://lionhairdino.github.io" />
-<meta name="keywords" content="newtype">
+<meta name="keywords" content="newtype, type, data, bottom">
     </head>
     <body>
         <div id="header">
@@ -48,9 +48,13 @@ Weight Int</code></pre>
 <figure>
 <img src="../images/newtype.png" alt="성의를 봐서 컴파일 타임에만 속아줍니다." /><figcaption aria-hidden="true">성의를 봐서 컴파일 타임에만 속아줍니다.</figcaption>
 </figure>
-<p><code>data</code>는 새로운 데이터 타입을 만들고,<br />
-<code>type</code>은 기존에 있는 타입의 별명만 만들고, (컴파일 타임에도 같은 타입으로 취급합니다. 예를 들어 <code>type SameType = String</code> 이라 하면, <code>SameType</code>이 들어갈 자리에 <code>String</code>을 넣어도 컴파일러는 불만이 없습니다. 그야말로 단순 별명일 뿐입니다.)<br />
-<code>newtype</code>은 컴파일 타임에는 새로운 타입인 것처럼 동작하고, 런타임에는 기존 타입과 같은 동작을 합니다.</p>
+<ul>
+<li><code>data</code>는 새로운 데이터 타입을 만들고,<br />
+</li>
+<li><code>type</code>은 기존에 있는 타입의 별명만 만들고, (컴파일 타임에도 같은 타입으로 취급합니다. 예를 들어 <code>type SameType = String</code> 이라 하면, <code>SameType</code>이 들어갈 자리에 <code>String</code>을 넣어도 컴파일러는 불만이 없습니다. 그야말로 단순 별명일 뿐입니다.)<br />
+</li>
+<li><code>newtype</code>은 컴파일 타임에는 새로운 타입인 것처럼 동작하고, 런타임에는 기존 타입과 같은 동작을 합니다.</li>
+</ul>
 <p>왜 하나의 필드만 있는 하나의 생성자만 <code>newtype</code>으로 선언할 수 있을까요? 아마도 <em>런타임에 생성자를 지울 때 필요한 규칙</em>일 겁니다. (정확히 내부 동작 설명이 있는 자료를 아직 못 찾았습니다.) 런타임에 타입 생성자와 값 생성자는 지워지고, 래핑해 둔 필드만 살아남으니, 필드가 곧 타입의 의미와 같아야isomorphic 합니다. 당연히 생성자도 하나이고, 필드도 하나여야 명확하게 연결할 수 있습니다.</p>
 <p>특정 용도로 쓰기 위해 <code>Int</code>를 다음과 같이 래핑하면</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">Age</span> <span class="ot">=</span> <span class="dt">Age</span> {<span class="ot"> getAge ::</span> <span class="dt">Int</span> } <span class="kw">deriving</span> <span class="dt">Show</span></span></code></pre></div>
@@ -86,16 +90,17 @@ Weight Int</code></pre>
 <p>A와 B는 다른 타입으로 취급하고 인스턴스를 고를 수 있습니다. <em>클래스 인스턴스 선택 작업은 런타임이 아니라, 컴파일 타임에 필요한 작업입니다.</em> 컴파일 타임만 통과하고 나면 런타임에서 <code>TwinInt</code>와 <code>Int</code>는 완전히 동일한 타입입니다. 코드 조각을 골라 내기 위해 TwinInt를 쓰고, 조각을 고른 후에는 버립니다. <em>별도의 값 생성자 TwinInt가 런타임엔 없습니다.</em> <sup>[1]</sup></p>
 <p>문법에 한 요소를 추가할 정도로 퍼포먼스에 영향이 있는지는 모르겠습니다. 아주 빈번하게 <code>newtype</code>이 사용되긴 하니, 영향이 있지 않을까요?</p>
 <hr />
-<p>[1] Bottom값에 대해 이해한 후 다음 사이트를 보세요. https://wiki.haskell.org/Newtype</p>
+<p>[1] Bottom값에 대해 이해한 후 다음 사이트를 보세요.<br />
+https://wiki.haskell.org/Newtype</p>
 <p>하스켈의 모든 함수는 리턴 값이 반드시 있어야 합니다. 그럼 무한히 루프를 도는 함수는 “리턴 값”이 뭘까요? 이럴 때 리턴 값을 “Bottom”이라 표시합니다. 모든 타입들은 무한 루프의 결과 타입이 될 수 있으니, 모든 타입들에 <code>Bottom</code>값을 정의합니다. 예를 들어 하스켈 내부에 정의된 진짜 <code>Bool</code> 타입은 3가지 값을 가지고 있습니다.</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Bool</span> <span class="ot">=</span> <span class="dt">True</span> <span class="op">|</span> <span class="dt">False</span> <span class="op">|</span> <span class="dt">Bottom</span></span></code></pre></div>
-<p>어떤 함수의 리턴 타입을 <code>Bool</code>이라 써주면, 이 함수의 리턴 값은 <code>True</code>, <code>False</code>, <code>Bottom</code>이 될수 있다는 말입니다. <code>Any</code> 타입은 눈에 보이지 않지만, 내부적으론 다음과 같이 정의됩니다.</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- wiki.haskell.org/Newtype 에서 발췌</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Any</span> <span class="ot">=</span> <span class="dt">Any</span> {<span class="op">...</span> <span class="dt">Bool</span> <span class="op">...</span>} <span class="op">|</span> <span class="dt">Bottom</span> </span></code></pre></div>
+<p>어떤 함수의 리턴 타입을 <code>Bool</code>이라 써주면, 이 함수의 리턴 값은 <code>True</code>, <code>False</code>, <code>Bottom</code>이 될수 있다는 말입니다. <code>Any</code> 타입은 눈에 보이지 않지만, 내부적으론 다음과 같이 정의됩니다. 위 하스켈 위키 사이트에서 가져온 소스에 Bottom울 명확히 표시하면</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Any</span> <span class="ot">=</span> <span class="dt">Any</span> {<span class="op">...</span> <span class="dt">Bool</span> <span class="op">...</span>} <span class="op">|</span> <span class="dt">Bottom</span> </span></code></pre></div>
 <p><code>Any</code> 타입의 <code>Bottom</code>값이 새로 생겼습니다.</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">case</span> x <span class="kw">of</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">Any</span> _ <span class="ot">-&gt;</span> ()</span></code></pre></div>
 <p><code>x</code>에 <code>Any</code> 타입의 값이 들어갈 경우 <code>x</code>는 <code>Any True</code>, <code>Any False</code>, <code>Any Bottom</code>, <code>Bottom</code> 4가지 형태의 값이 들어갈 수 있습니다. 아예 <code>Any</code> 값 생성자와 매칭이 안되는 <code>Bottom</code>이란 경우의 수가 존재합니다. <code>_</code> (hole)로 버릴지라도 <code>x</code>값을 평가해 봐야 합니다. 하지만 <code>newtype</code>으로 선언하면 <code>Any True</code>, <code>Any False</code>, <code>Any Bottom</code> 3가지 경우만 보면 됩니다. 그럼 위와 같은 패턴 매칭은 모두 <code>Any</code>에 걸려들테니 <code>_</code> (hole)부분을 평가할 필요가 없어집니다. 패턴 매칭에 있는 newtype에서 정의한 값 생성자는 하는 일이 없습니다. 그냥 떼어내고 읽어도 됩니다.</p>
+<p>내부를 들여다 보면 복잡하긴 한데, newtype으로 선언한 타입은 런타임에 완전히 감싸고 있는 타입과 완전히 같게 처리한다고 생각하면 됩니다.</p>
 
 <div id="disqus_thread" style="padding-top:40px"></div>
 <script>
