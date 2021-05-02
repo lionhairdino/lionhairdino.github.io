@@ -34,6 +34,9 @@
 </div>
 
 <p>수학적인 배경 지식없이 순수하게 코드 모양만 보고, 모나드와 친해지기 위해 생각해 본 내용입니다. 이게 모나드를 이해하는데 도움이 될지 어떨지는 아직 잘 모르겠습니다. 일단 올려두겠습니다.</p>
+<figure>
+<img src="../images/composition.png" alt="클로저는 살아 있다" /><figcaption aria-hidden="true">클로저는 살아 있다</figcaption>
+</figure>
 <p>대부분 모나드의 목표는 다음과 같은 구조를 만드는 겁니다.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>funcs <span class="ot">=</span> (<span class="op">..</span>(<span class="op">..</span>(<span class="op">..</span>(<span class="op">..</span>))))</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- $ 연산자로 표현하면 </span></span>
@@ -66,6 +69,9 @@
 <span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>h3</span>
 <span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>begin <span class="fu">or</span> end</span></code></pre></div>
 <p>품고 품었다고 다 같지 않습니다. glue의 두 매개 변수 f와 x는 독립적이지 않습니다. x를 알아야만 f를 알 수 있습니다. 하지만 glue2의 두 매개 변수 f1과 f2는 독립적입니다. 그래서 <em>실행 순서가 서로 반대</em>가 됩니다. 눈에 보이는 구조만으론 구별할 수 없습니다. 구조를 만드는 접착제로 쓰인 glue, glue2의 정의에 따라 달라집니다.</p>
+<p>2021.5.1 추가<br />
+glue와 glue2는 IO컨텍스트에 있으므로 실행 순서를 지정해 놨다고 보면 됩니다. glue는 두 번째 인자 &gt;&gt;= _ -&gt; 첫 번째 인자<br />
+glue2는 첫 번째 인자 &gt;&gt;= _ -&gt; 두 번째 인자</p>
 <h2 id="품을-것인가-품-속으로-들어갈-것인가">품을 것인가, 품 속으로 들어갈 것인가</h2>
 <p>새로 들어오는 작업을 가장 바깥 쪽에 둘 수도 있고, 가장 안 쪽에 품어지도록 할 수도 있습니다. Free, Cont의 경우는 가장 안 쪽에 붙이고, Reader는 바깥 쪽에 둡니다. Reader는 안 쪽부터 실행되고 Free와 Cont는 바깥 쪽부터 실행됩니다. 결국 대부분 모나드는 do구문 안에 써있는 순서대로 동작합니다.</p>
 <p>정말 여러 모나드들이 모두 이 구조를 만들기 위한 것인지 한 번 살펴보겠습니다.</p>
