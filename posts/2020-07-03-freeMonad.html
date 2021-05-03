@@ -64,13 +64,13 @@
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co">-- 결과는</span></span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="dt">Free1</span><span class="op">..</span>(<span class="dt">Free2</span><span class="op">..</span>(<span class="dt">Free3</span><span class="op">..</span>(<span class="dt">Free4</span><span class="op">..</span>(<span class="op">Pure..</span>))))</span></code></pre></div>
 <p>대부분 Free(..(Free..))와 같은 값을 만나고, 여기에 바인드로 <code>(\_ -&gt; Free ...)</code> 함수를 적용하면 Free가 몇 번 감싸져 있든 안쪽까지 들어가 Pure r에 도달해서 r에 함수를 적용하므로 가장 안쪽에 이어 붙이는 효과가 납니다. 적용하는 함수는 리턴 타입이 Free 타입이니, <em>결과는 Free 속에 Free를 넣은 형태</em>가 됩니다.</p>
+<p>어떤 펑크터가 됐든 Free로 감싸서 Free타입으로 만들면 .. 이라 표시된 자리에 펑크터 값이 들어갑니다.</p>
 <figure>
 <img src="../images/freeMonad.png" alt="공짜로?Free 모나드 되기" /><figcaption aria-hidden="true">공짜로?Free 모나드 되기</figcaption>
 </figure>
-<p>어떤 펑크터가 됐든 Free로 감싸서 Free타입으로 만들면 .. 이라 표시된 자리에 펑크터 값이 들어갑니다.</p>
 <h2 id="free-모나드-패턴">Free 모나드 패턴</h2>
-<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- Act1하고 Act2하는 작업이든</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- Act1하고 Act2하고 Act1하는 작업이든</span></span>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- Act1하고 Act2하는 작업이든...</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- Act1하고 Act2하고 Act1하는 작업이든...</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- Act가 몇 번이 반복되든 모두 같은 타입으로 만드는 방법은 재귀를 이용하면 됩니다.</span></span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co">-- 리스트가 재귀로 선언 되어 </span></span>
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co">-- [],[0,1],[3,4,...] 이런 모양들을 모두 같은 리스트 타입으로 볼 수 있는 것과 비슷합니다. (주석 [1] 참고)</span></span>
@@ -116,22 +116,21 @@
 <span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>  actProc2</span>
 <span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>  done</span></code></pre></div>
 <p>이렇게 적을 수도 있습니다. 딱 봐도 DSL(Domain Specific Language)을 만드는데 유용해 보이지 않나요? 실제로 DSL을 만들기 위해 많이 씁니다.</p>
-<p>사실 모든 모나드의 목적은 품고 품는 구조로 만드는 겁니다.</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="op">SomeMonad..</span>(<span class="op">SomeMonad..</span>(<span class="op">SomeMonad..</span>(<span class="op">SomeMonad..</span>(<span class="op">SomeMonad..</span>))))</span></code></pre></div>
-<p>.. 부분에서 어떤 작업을 하느냐에 따라 모나드 성격이 결정됩니다. Free 모나드 패턴은 ..부분에 동작하는 코드를 넣지 않고, 명세서 항목같은 걸 넣어두고 나중에 이 구조를 한 꺼풀씩 벗겨내는 함수에 넘겨서 실제 명세서 항목에 따른 작업을 하도록 합니다. 이런 코드를 보통 인터프리터라고 부릅니다.</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- 인터프리터 예시</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="ot">showFree ::</span> <span class="dt">Free</span> <span class="dt">Act</span> () <span class="ot">-&gt;</span> <span class="dt">String</span></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>showFree (<span class="dt">Free</span> (<span class="dt">Act1</span> next)) <span class="ot">=</span> <span class="st">&quot;act1 &quot;</span> <span class="op">++</span> showFree next</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>showFree (<span class="dt">Free</span> (<span class="dt">Act2</span> next)) <span class="ot">=</span> <span class="st">&quot;act2 &quot;</span> <span class="op">++</span> showFree next</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>showFree (<span class="dt">Free</span> (<span class="dt">Done</span>     )) <span class="ot">=</span> <span class="st">&quot;done &quot;</span></span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> showFree acts</span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;act1 act2 act2 act1 act2 done &quot;</span></span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="co">-- 바인드 구문과 함수 연결 표현이 같은 구문인지 확인</span></span>
-<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a><span class="co">-- 아래 구문이 가장 확실한 프리모나드 동작 설명이 아닐까요</span></span>
-<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> showFree (<span class="dt">Free</span>(<span class="dt">Act1</span> (<span class="dt">Free</span>(<span class="dt">Act2</span> (<span class="dt">Free</span>(<span class="dt">Act2</span> (<span class="dt">Free</span>(<span class="dt">Act1</span> (<span class="dt">Free</span>(<span class="dt">Act2</span> (<span class="dt">Free</span> <span class="dt">Done</span>)))))))))))</span>
-<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;act1 act2 act2 act1 act2 done &quot;</span></span></code></pre></div>
+<p>사실 모든 모나드의 목적은 품고 품는 구조로 만드는 겁니다.<br />
+참고 - <a href="../posts/2020-08-06-monadIdea.html">모나드 체인이 목표하는 코드 모양과 실행 순서</a> ~~~ haskell SomeMonad..(SomeMonad..(SomeMonad..(SomeMonad..(SomeMonad..)))) ~~~ .. 부분에서 어떤 작업을 하느냐에 따라 모나드 성격이 결정됩니다. Free 모나드 패턴은 ..부분에 동작하는 코드를 넣지 않고, 명세서 항목같은 걸 넣어두고 나중에 이 구조를 한 꺼풀씩 벗겨내는 함수에 넘겨서 실제 명세서 항목에 따른 작업을 하도록 합니다. 이런 코드를 보통 인터프리터라고 부릅니다.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- 인터프리터 예시</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="ot">showFree ::</span> <span class="dt">Free</span> <span class="dt">Act</span> () <span class="ot">-&gt;</span> <span class="dt">String</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>showFree (<span class="dt">Free</span> (<span class="dt">Act1</span> next)) <span class="ot">=</span> <span class="st">&quot;act1 &quot;</span> <span class="op">++</span> showFree next</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>showFree (<span class="dt">Free</span> (<span class="dt">Act2</span> next)) <span class="ot">=</span> <span class="st">&quot;act2 &quot;</span> <span class="op">++</span> showFree next</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>showFree (<span class="dt">Free</span> (<span class="dt">Done</span>     )) <span class="ot">=</span> <span class="st">&quot;done &quot;</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> showFree acts</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;act1 act2 act2 act1 act2 done &quot;</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="co">-- 바인드 구문과 함수 연결 표현이 같은 구문인지 확인</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="co">-- 아래 구문이 가장 확실한 프리모나드 동작 설명이 아닐까요</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> showFree (<span class="dt">Free</span>(<span class="dt">Act1</span> (<span class="dt">Free</span>(<span class="dt">Act2</span> (<span class="dt">Free</span>(<span class="dt">Act2</span> (<span class="dt">Free</span>(<span class="dt">Act1</span> (<span class="dt">Free</span>(<span class="dt">Act2</span> (<span class="dt">Free</span> <span class="dt">Done</span>)))))))))))</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;act1 act2 act2 act1 act2 done &quot;</span></span></code></pre></div>
 <p>정리하면,</p>
 <ol type="1">
 <li>작업을, Free 타입이 들어올 자리를 가진 대수 타입으로 만들고,</li>
@@ -144,14 +143,69 @@
 <hr />
 <p>[1] 함수의 재귀와 데이터의 재귀<br />
 함수의 재귀는 함수안에서 함수를 부르고, 부른 함수에서 또 함수를 부르는데, 데이터 재귀는 그런 뜻이 아닙니다. 함수 재귀는 한 번 실행되기 시작하면 끝나는 조건을 만나기 전에는 계속 반복 실행하는데, 데이터 재귀는 실행의 개념이 아닙니다.</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="dt">List</span> a <span class="ot">=</span> <span class="dt">Empty</span> <span class="op">|</span> <span class="dt">Con</span> a (<span class="dt">List</span> a)</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="dt">List</span> a <span class="ot">=</span> <span class="dt">Empty</span> <span class="op">|</span> <span class="dt">Con</span> a (<span class="dt">List</span> a)</span></code></pre></div>
 <p>는 다음과 같은 형태가 될 수 있다는 뜻이지, 데이터 생성자 Con안에서 타입 생성자 List를 만났다고 또 “실행”을 하는게 아닙니다.</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Con</span> a (<span class="dt">Empty</span>)</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="dt">Con</span> a (<span class="dt">Con</span> a (<span class="dt">Empty</span>))</span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="dt">Con</span> a (<span class="dt">Con</span> a (<span class="dt">Con</span> a (<span class="dt">Empty</span>)))</span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="op">...</span></span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Con</span> a (<span class="dt">Empty</span>)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="dt">Con</span> a (<span class="dt">Con</span> a (<span class="dt">Empty</span>))</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="dt">Con</span> a (<span class="dt">Con</span> a (<span class="dt">Con</span> a (<span class="dt">Empty</span>)))</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="op">...</span></span></code></pre></div>
 <p>이런 모양 모두 리스트 타입이 될 수 있다는 뜻입니다. 데이터 선언 자체에는 반드시 Empty 값으로 끝난다는 제약은 없지만, 실제 코드에서 의미있는 값들은 대부분 마감되는 형태로 나타납니다. (Lazy를 이용해서 무한 반복되는 모양이 나올 때는 마감 여부를 알 필요가 없고, 앞에 몇 개만 쓴다든지 하는 경우가 있긴 있습니다.)</p>
 <p>데이터 재귀를 만나면 머릿속에서 무한 “호출”을 하지 마시고, 그런 “모양이 올 수도 있다”라고 해석하면 됩니다.</p>
+<p>[2] 진짜 펑크터를 넘기면 원하는 모나드 동작을 하는지 테스트 해봤습니다.</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Data.Functor</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Control.Monad.Free</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co">{- </span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="co">Maybe와 같은 MyMaybe를 정의하는데, 펑크터까지만 만들어 두고, </span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="co">Free를 씌워서 모나드 동작을 하는지 살펴봤습니다.</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="co">참고 : Maybe 모나드 정의</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="co">return :: a -&gt; Maybe a</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="co">return x  = Just x</span></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a><span class="co">(&gt;&gt;=) :: Maybe a -&gt; (a -&gt; Maybe b) -&gt; Maybe b</span></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a><span class="co">(&gt;&gt;=) m g = case m of</span></span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a><span class="co">                Nothing -&gt; Nothing</span></span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a><span class="co">                Just x  -&gt; g x</span></span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a><span class="co">-}</span></span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">MyMaybe</span> a <span class="ot">=</span> <span class="dt">MyJust</span> a <span class="op">|</span> <span class="dt">MyNothing</span> </span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a><span class="co">-- 펑크터까지만</span></span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Functor</span> <span class="dt">MyMaybe</span> <span class="kw">where</span></span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a>    <span class="fu">fmap</span> f (<span class="dt">MyJust</span> x) <span class="ot">=</span> <span class="dt">MyJust</span> ( f x )</span>
+<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a>    <span class="fu">fmap</span> f <span class="dt">MyNothing</span> <span class="ot">=</span> <span class="dt">MyNothing</span></span>
+<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a><span class="ot">exFuncPositive ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Free</span> <span class="dt">MyMaybe</span> <span class="dt">Int</span></span>
+<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a>exFuncPositive x <span class="op">|</span> x <span class="op">&gt;</span> <span class="dv">0</span> <span class="ot">=</span> <span class="dt">Pure</span> x</span>
+<span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a>               <span class="op">|</span> <span class="fu">otherwise</span> <span class="ot">=</span> <span class="dt">Free</span> <span class="dt">MyNothing</span></span>
+<span id="cb14-29"><a href="#cb14-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-30"><a href="#cb14-30" aria-hidden="true" tabindex="-1"></a><span class="ot">exFuncEven ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Free</span> <span class="dt">MyMaybe</span> <span class="dt">Int</span></span>
+<span id="cb14-31"><a href="#cb14-31" aria-hidden="true" tabindex="-1"></a>exFuncEven x <span class="op">|</span> x <span class="ot">`mod`</span> <span class="dv">2</span> <span class="op">==</span> <span class="dv">0</span> <span class="ot">=</span> <span class="dt">Pure</span> x </span>
+<span id="cb14-32"><a href="#cb14-32" aria-hidden="true" tabindex="-1"></a>           <span class="op">|</span> <span class="fu">otherwise</span> <span class="ot">=</span> <span class="dt">Free</span> <span class="dt">MyNothing</span></span>
+<span id="cb14-33"><a href="#cb14-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-34"><a href="#cb14-34" aria-hidden="true" tabindex="-1"></a><span class="ot">exFunc3x ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Free</span> <span class="dt">MyMaybe</span> <span class="dt">Int</span></span>
+<span id="cb14-35"><a href="#cb14-35" aria-hidden="true" tabindex="-1"></a>exFunc3x x <span class="op">|</span> x <span class="ot">`mod`</span> <span class="dv">3</span> <span class="op">==</span> <span class="dv">0</span> <span class="ot">=</span> <span class="dt">Pure</span> x</span>
+<span id="cb14-36"><a href="#cb14-36" aria-hidden="true" tabindex="-1"></a>         <span class="op">|</span> <span class="fu">otherwise</span> <span class="ot">=</span> <span class="dt">Free</span> <span class="dt">MyNothing</span></span>
+<span id="cb14-37"><a href="#cb14-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-38"><a href="#cb14-38" aria-hidden="true" tabindex="-1"></a><span class="ot">func ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Free</span> <span class="dt">MyMaybe</span> <span class="dt">Int</span></span>
+<span id="cb14-39"><a href="#cb14-39" aria-hidden="true" tabindex="-1"></a>func x <span class="ot">=</span> <span class="kw">do</span> <span class="co">-- 모나드 동작</span></span>
+<span id="cb14-40"><a href="#cb14-40" aria-hidden="true" tabindex="-1"></a>    v1 <span class="ot">&lt;-</span> exFuncPositive x</span>
+<span id="cb14-41"><a href="#cb14-41" aria-hidden="true" tabindex="-1"></a>    v2 <span class="ot">&lt;-</span> exFuncEven v1</span>
+<span id="cb14-42"><a href="#cb14-42" aria-hidden="true" tabindex="-1"></a>    exFunc3x v2</span>
+<span id="cb14-43"><a href="#cb14-43" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb14-44"><a href="#cb14-44" aria-hidden="true" tabindex="-1"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span>
+<span id="cb14-45"><a href="#cb14-45" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> loop</span>
+<span id="cb14-46"><a href="#cb14-46" aria-hidden="true" tabindex="-1"></a>     <span class="kw">where</span>  </span>
+<span id="cb14-47"><a href="#cb14-47" aria-hidden="true" tabindex="-1"></a>       loop <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb14-48"><a href="#cb14-48" aria-hidden="true" tabindex="-1"></a>        a <span class="ot">&lt;-</span> <span class="fu">getLine</span></span>
+<span id="cb14-49"><a href="#cb14-49" aria-hidden="true" tabindex="-1"></a>        <span class="kw">case</span> func (<span class="fu">read</span> a) <span class="kw">of</span></span>
+<span id="cb14-50"><a href="#cb14-50" aria-hidden="true" tabindex="-1"></a>            (<span class="dt">Pure</span> x) <span class="ot">-&gt;</span> <span class="fu">print</span> x</span>
+<span id="cb14-51"><a href="#cb14-51" aria-hidden="true" tabindex="-1"></a>            <span class="dt">Free</span> <span class="dt">MyNothing</span> <span class="ot">-&gt;</span> <span class="fu">putStrLn</span> <span class="st">&quot;MyNothing&quot;</span></span>
+<span id="cb14-52"><a href="#cb14-52" aria-hidden="true" tabindex="-1"></a>            _ <span class="ot">-&gt;</span> <span class="fu">putStrLn</span> <span class="st">&quot;?&quot;</span></span>
+<span id="cb14-53"><a href="#cb14-53" aria-hidden="true" tabindex="-1"></a>        loop</span></code></pre></div>
+<p>따로 예외 처리는 안했습니다. 2의 배수, 3의 배수, 2와 3의 공배수를 입력해 보세요. <code>func</code> 함수가 <code>Maybe</code> 모나드와 같은 동작을 합니다. 타입과 값을 써 줄 때 <code>Free</code>의 생성자를 계속 끌고 다니는 불편함은 있지만 모나드를 얻긴 했습니다. 그런데, 웬지 아주 공짜Free같은 느낌은 아닌데요.</p>
 
 <div id="disqus_thread" style="padding-top:40px"></div>
 <script>
