@@ -61,6 +61,25 @@ Reader env Int 는 env를 받아서 어떤 처리를 한 다음 Int를 돌려줄
 </ol>
 <p>이런 작업은 모든 감싼 타입에서 일어납니다. 모든 감싼 타입 마다 일일이 푸는 방법을 기억해야 합니다. 여기까지 생각이 미치면, 추상화 작업을 해서 뇌의 부하를 줄여줘야겠다는 생각이 들게 됩니다. 푸는 작업을 fmap 한가지로 추상화하자고 약속을 정한게 바로 펑크터입니다.</p>
 <p>하스켈에서 함수 하나 하나는 모두 독립적이며, 보통 Lazy하기 때문에 언제 실행될지도 모릅니다. 이런 상태에서 프로그램의 흐름<sup><a href="#main">[2]</a></sup>을 만들어내기 위해 함수가 함수를 감싸는composition 방법을 씁니다. (보통 composition을 합성이라 번역하는데, 딱 적합하다는 생각이 들지 않습니다. f . g 의 결과는 g를 적용한 후 f를 적용한다는 개념인데, 합성과는 좀 달리 느껴집니다. 조합이란 말이 더 어울리는 것 같기도 합니다.) 웬만하면 composition이 가능해야 여기 저기 쓰임새가 생깁니다. <code>a -&gt; b</code> , <code>b -&gt; c</code> 함수를 compostion 하려면 그냥 (.)을 쓰면 되고, <code>m a -&gt; m b</code>, <code>m b -&gt; m c</code> 도 (.)을 쓰면 됩니다. 그럼 <code>a -&gt; m b</code>, <code>b -&gt; m c</code> 함수는 어떻게 composition하면 될까요? 여기도 모나드를 이해하기 위한 시작점 중에 하나입니다.</p>
+<p>2021.5.9 추가</p>
+<h3 id="값-생성자-패턴-매칭">값 생성자 패턴 매칭</h3>
+<p><code>a -&gt; f b</code> 해석</p>
+<p><code>a</code>를 받아 작업을 한 후 <code>f b</code>의 결과를 만드는데, <code>b</code>가 아니라 <code>f b</code>인건 반드시 어떤 값 생성자로 감싸져 있다는 뜻입니다.(카인드로 얘기하면 <code>* -&gt; *</code>) 값 생성자로 감싸져 있으면 무슨일이 생길까요? 값 생성자로 감싸는 이유는 값 생성자를 벗겨낼 때 어떤 작업을 반드시 하게끔 하기 위해서 입니다. 벗겨낼 때 반드시 하는 작업을 컨텍스트라 부릅니다. 유심히 볼 동작은 값 생성자로 감쌀때가 아닙니다. 값 생성자와 패턴 매칭으로 풀어낼 때 비로소 컨텍스트가 발현됩니다. 그리고 또 한가지, 값 생성자를 벗겨 낼 때는 옆에 있는 함수와 뭔가를 하기 위해서 벗겨냅니다. 혼자만 컨텍스트를 확인하는 건 의미가 없습니다. 컨텍스트를 확인 후 다른 함수와의 동작을 결정지을 필요가 있을 때 값 생성자를 벗겨 냅니다.</p>
+<p><code>* -&gt; *</code> 카인드를 만났을 때 해석하는 용어를 알았으니 적용해서 읽어 보겠습니다.</p>
+<p><code>f</code>컨텍스트로 만드는 함수를 받아, <code>t</code>컨텍스트 안에 들어 있는 <code>a</code>에 적용해서 <code>f</code>컨텍스트 ( <code>t</code>컨텍스트 <code>a</code>)를 만든다. <code>f</code>와 <code>t</code>를 구체 타입으로 바꿔서 읽어 보겠습니다. <code>Maybe</code>를 만드는 함수를 받아, <code>[a]</code>에 적용해서 Maybe <code>[a]</code>를 만듭니다. 보통 하스켈 문서들이 여기서 설명을 끝내서 난감하게 만듭니다. 왜 이런 작업을 할까요? 실제 코딩하다 보면 만나는 상황을 상상해봐야 합니다.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ot">func ::</span> a <span class="ot">-&gt;</span> <span class="dt">Maybe</span> a</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>func <span class="op">|</span> x <span class="op">&gt;</span> <span class="dv">0</span> <span class="ot">=</span> <span class="dt">Just</span> x</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>     <span class="op">|</span> _ <span class="ot">=</span> <span class="dt">Nothing</span></span></code></pre></div>
+<p>이 함수를 적용해야 하는 대상들이 하나가 아니라서 리스트에 담아두었다면, 어떻게 적용할까요? <code>fmap</code>, <code>traverse</code> 둘 모두 가능합니다.<br />
+전체가 아닌 각각이 별도의 의미를 가진다면 <code>fmap</code>으로 각각의 값들을 <code>Maybe</code>값들로 바꾸어 놓고 다시 리스트로 싸놓으면 되고,<br />
+모두 양수일 때만 의미가 있다면, 바로 이 때 <code>traverse</code>를 등장시키면 됩니다. 함수를 적용하되, <code>Maybe</code> 컨텍스트를 발현하겠다는 말입니다.</p>
+<p>리스트의 <code>fs &lt;*&gt; xs</code> applicative 정의는 앞에 것도 컨텍스트를 벗겨내고, 뒤에 것도 컨텍스트를 벗겨내서 <code>f x</code> 값을 모으겠다는 말입니다.</p>
+<p>컨텍스트 발현<br />
+컨텍스트 실행<br />
+컨텍스트를 벗겨내고</p>
+<p>이게 다 같은 말로 쓰입니다.</p>
+<h3 id="함수-같은-값-생성자">함수 같은 값 생성자</h3>
+<p><code>Maybe Int</code>는 <code>Just Int</code>값 아니면 <code>Nothing</code>값이 될 수 있습니다. <code>Int</code>값을 <code>Just Int</code>로 만들려면, 그냥 <code>Just</code>로 감싸면 됩니다. 마치 <code>Just</code>가 인자로 <code>Int</code>를 받아 <code>Just Int</code>가 되는 함수 같습니다. 하지만, 일반 함수와 다르게 값 생성자는 <em>패턴 매칭</em>에 쓰일 수 있습니다. 이게 헛갈릴까 싶지만 처음 공부할때 혼동하는 경우가 있습니다.</p>
 <hr />
 <div id="relation">
 

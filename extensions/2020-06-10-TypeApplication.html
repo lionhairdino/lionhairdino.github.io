@@ -42,6 +42,29 @@
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> some <span class="op">@</span><span class="dt">Double</span> <span class="dv">1</span></span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fl">2.0</span></span></code></pre></div>
 <p>some 함수가 n 컨텍스트에 있는데, n 을 임시로 특정 타입 컨텍스트로 실행하고 싶을 때 <span class="citation" data-cites="를">@를</span> 붙여, 폴리모픽 함수를 특정 컨텍스트에서 실행할 수 있습니다.</p>
+<p>2021.5.8</p>
+<p>타입 서명을 명시적으로 써줄 때와 차이를 보입니다.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Prelude</span><span class="op">&gt;</span> <span class="op">:</span>set <span class="op">-</span><span class="dt">XTypeApplications</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="dt">Prelude</span><span class="op">&gt;</span> some x <span class="ot">=</span> x <span class="op">+</span> x</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="dt">Prelude</span><span class="op">&gt;</span> some <span class="op">@</span><span class="dt">Int</span> <span class="dv">1</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>interactive<span class="op">&gt;:</span><span class="dv">5</span><span class="op">:</span><span class="dv">1</span><span class="op">:</span> <span class="fu">error</span><span class="op">:</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    • <span class="dt">Cannot</span> apply expression <span class="kw">of</span> <span class="kw">type</span> ‘a0 <span class="ot">-&gt;</span> a0’</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>      to a visible <span class="kw">type</span> argument ‘<span class="dt">Int</span>’</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    • <span class="dt">In</span> the expression<span class="op">:</span> some <span class="op">@</span><span class="dt">Int</span> <span class="dv">1</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>      <span class="dt">In</span> an equation for ‘it’<span class="op">:</span> it <span class="ot">=</span> some <span class="op">@</span><span class="dt">Int</span> <span class="dv">1</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="dt">Prelude</span><span class="op">&gt;</span> <span class="op">:</span>t some</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="ot">some ::</span> <span class="dt">Num</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> a</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Prelude</span><span class="op">&gt;</span> <span class="op">:</span>{</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="dt">Prelude</span><span class="op">|</span><span class="ot"> some ::</span> <span class="dt">Num</span> n <span class="ot">=&gt;</span> n <span class="ot">-&gt;</span> n</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="dt">Prelude</span><span class="op">|</span> some x <span class="ot">=</span> x <span class="op">+</span> x</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="dt">Prelude</span><span class="op">|</span> <span class="op">:</span>}</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="dt">Prelude</span><span class="op">&gt;</span> some <span class="op">@</span><span class="dt">Int</span> <span class="dv">1</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="dt">Prelude</span><span class="op">&gt;</span> <span class="op">:</span>t some</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="ot">some ::</span> <span class="dt">Num</span> n <span class="ot">=&gt;</span> n <span class="ot">-&gt;</span> n</span></code></pre></div>
+<p>https://stackoverflow.com/questions/53106334/why-doesnt-ghci-allow-type-arguments-for-this-version-of-join 왜!그런지는 모르지만, TypeApplication은 명시적으로 타입 서명을 적어 준 정의에 대해서만 동작한다고 합니다. 관련 이유를 알아내려면 또 논문을 한가득 읽어야 되나 봅니다. 애플리케이션 제작에 필요한 것부터 익히기 위해 이 것 또한 지금은 넘어가야 할 것 같습니다.</p>
 
 <div id="disqus_thread" style="padding-top:40px"></div>
 <script>
