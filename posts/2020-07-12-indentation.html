@@ -72,7 +72,7 @@
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> x <span class="ot">=</span> a</span>
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    y <span class="ot">=</span> b</span></code></pre></div>
 <p>얼핏 보면, 표현식expression의 일부라면 시작보다 몇 칸이든 들여쓰기만 하면 연결된 표현식이라 판단 해 줄 것 같은데, 그렇지 않습니다. 딸린 표현식은 첫 번째로 나온 딸린 표현식의 들여쓰기와 나머지 두 번째, 세 번째 딸린 표현식들이 들여쓰기가 같아야 합니다. 여기서 첫 번째 딸린 표현식의 들여쓰기를 보는 방법만 알면 거의 헤매지 않습니다.</p>
-<p>x = b 이전에 공백 하나 있다고 들여쓰기가 한 칸인게 아니라 <em>(1)let까지 포함해서 들여쓰기로 판단</em>합니다. let + 공백 하나 해서 총 4칸 들여 쓰기를 한 상태입니다. 그래서 위의 마지막 코드는 ok입니다. 첫 번째 딸린 표현식으로 판단한다 했으니 다음의 경우도 가능합니다.</p>
+<p><code>x = b</code> 이전에 공백 하나 있다고 들여쓰기가 한 칸인게 아니라 <em>(1)let까지 포함해서 들여쓰기로 판단</em>합니다. <code>let</code> + 공백 하나 해서 총 4칸 들여 쓰기를 한 상태입니다. 그래서 위의 마지막 코드는 ok입니다. 첫 번째 딸린 표현식으로 판단한다 했으니 다음의 경우도 가능합니다.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- ok</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a> x <span class="ot">=</span> a</span>
@@ -81,7 +81,7 @@
 <p>두 번째는 한 라인에 쓰여 있는 딸린 표현식의 문제입니다.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>myFunction firstArgument secondArgument <span class="ot">=</span> <span class="kw">do</span> foo</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>                                             bar</span></code></pre></div>
-<p>위 표현식을 판단할 때는 = 까지가 주 표현식, 여기에 딸린 표현식이 do, do에 딸린 표현식이 foo입니다.</p>
+<p>위 표현식을 판단할 때는 <code>=</code> 까지가 주 표현식, 여기에 딸린 표현식이 <code>do</code>, <code>do</code>에 딸린 표현식이 <code>foo</code>입니다.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>myFunction firstArgument secondArgument <span class="ot">=</span> </span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">do</span> foo</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>       bar </span>
@@ -94,12 +94,12 @@
 <div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>myFunction firstArgument secondArgument <span class="ot">=</span> <span class="kw">do</span> </span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>                                            foo</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>                                            bar</span></code></pre></div>
-<p>do가 들여 쓰기 했으니, 여기에 딸린 표현식은 do보다 들여쓰기 해야 하니 위 처럼만 가능하고,</p>
+<p><code>do</code>가 들여 쓰기 했으니, 여기에 딸린 표현식은 do보다 들여쓰기 해야 하니 위 처럼만 가능하고,</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>myFunction firstArgument secondArgument <span class="ot">=</span> <span class="kw">do</span> </span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    foo</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    bar</span></code></pre></div>
 <p>이렇게는 안 될 것처럼 보입니다. 하지만 이 것도 ok입니다.<br />
-<em>(2)라인 시작에 있지 않은 표현식이(여기서는 do), 같은 라인에 딸린 표현식을 하나도 가지고 있지 않다면(do까지만 쓰여 있다면), 이 라인 전체를 하나의 표현식으로 보고,</em> 다음 딸린식(여기서 do의 딸린 식은 foo와 bar)은 이 라인보다만 들여쓰면 됩니다.</p>
+<em>(2)라인 시작에 있지 않은 표현식이(여기서는 do), 같은 라인에 딸린 표현식을 하나도 가지고 있지 않다면(do까지만 쓰여 있다면), 이 라인 전체를 하나의 표현식으로 보고,</em> 다음 딸린식(여기서 <code>do</code>의 딸린 식은 <code>foo</code>와 <code>bar</code>)은 이 라인보다만 들여쓰면 됩니다.</p>
 <p>처음엔 직관으로 넘어가려 했는데, 조건 (1), (2)는 설명을 한 번쯤 봐 둬야, 들어쓰기 때문에 헤매는 걸 줄일 수 있습니다.</p>
 
 <div id="disqus_thread" style="padding-top:40px"></div>
