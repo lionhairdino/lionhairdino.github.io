@@ -57,9 +57,22 @@
     
 </div>
 
-<p>이 글을 읽으시려면 IO 모나드와 Reader 모나드의 동작을 알고 있어야 합니다.</p>
-<p>라이브러리를 제외하고, IO가 없는 프로그램은 없습니다. 데이터를 받고, 처리를 하고, 출력을 해주는게 프로그램입니다. 예를 들어, 소수를 구하는 프로그램은 입력Input도 없고, 출력Ouput도 없는 것 아니냐라고 생각할 수도 있습니다. 입력은 없지만, 구한 소수를 눈에 보이지 않게 하면 의미가 없으니 결국 출력이 필요합니다. 소수를 구하는 함수 자체에는 출력이 없지만, 나중에 GHCi 등에서 함수를 부르면 결과값을 출력해주는 작업을 GHCi가 대신하게 됩니다. 결론은 IO는 반드시 필요하다는 얘기입니다.</p>
-<p>IO 모나드를 반드시 써야 하고, 모든 IO 액션들이 설정값을 필요로 하는 경우를 생각해 봅시다. 이미 IO로 체이닝한 상태인데 Reader 모나드를 쓰고 싶을 때는 어떻게 할까요? 이미 IO 액션이 (..(..(..()))) 이렇게 엮여 있는데, 액션 하나가 실행 할 때마다 Reader 속성이 발현되도록 다시 엮어야 합니다.</p>
+<p>이 글을 읽으시려면 <code>IO</code> 모나드와 <code>Reader</code> 모나드의 동작을 알고 있어야 합니다.</p>
+<h3 id="목차">목차</h3>
+<ul>
+<li><a href="#io">IO</a></li>
+<li><a href="#io-위에-reader">IO 위에 Reader</a></li>
+<li><a href="#mtl">mtl</a>
+<ul>
+<li><a href="#return-type-polymorphic">Return Type Polymorphic</a></li>
+<li><a href="#mtl-핵심-아이디어">mtl 핵심 아이디어</a></li>
+</ul></li>
+<li><a href="#자주-만나는-에러-no-instance">자주 만나는 에러 No instance</a></li>
+<li><a href="#에러-수정">에러 수정</a></li>
+</ul>
+<p>라이브러리를 제외하고, <code>IO</code>가 없는 프로그램은 없습니다. 데이터를 받고, 처리를 하고, 출력을 해주는게 프로그램입니다. 예를 들어, 소수를 구하는 프로그램은 입력Input도 없고, 출력Ouput도 없는 것 아니냐라고 생각할 수도 있습니다. 입력은 없지만, 구한 소수를 눈에 보이지 않게 하면 의미가 없으니 결국 출력이 필요합니다. 소수를 구하는 함수 자체에는 출력이 없지만, 나중에 GHCi 등에서 함수를 부르면 결과값을 출력해주는 작업을 GHCi가 대신하게 됩니다. 어찌 됐든 결론은, 언젠가 <code>IO</code>는 반드시 필요하다는 얘기입니다.</p>
+<h2 id="io">IO</h2>
+<p><code>IO</code> 모나드를 반드시 써야 하고, 모든 <code>IO</code> 액션들이 설정값을 필요로 하는 경우를 생각해 봅시다. 이미 <code>IO</code>로 체이닝한 상태인데 <code>Reader</code> 모나드를 쓰고 싶을 때는 어떻게 할까요? 이미 <code>IO</code> 액션이 <code>(..(..(..())))</code> 이렇게 엮여 있는데, 액션 하나가 실행 할 때마다 <code>Reader</code> 속성이 발현되도록 다시 엮어야 합니다.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ot">act1 ::</span> <span class="dt">IO</span> ()</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>act1 <span class="ot">=</span> <span class="fu">putStrLn</span> <span class="st">&quot; 나는 OO과 영화를 봤다. &quot;</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -88,6 +101,7 @@
 <span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  act2 who</span>
 <span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>  act3 who</span></code></pre></div>
 <p>이렇게 모든 함수들에 필요한 매개 변수를 만들면 되지만, 액션 종류가 많아지고 필요한 정보가 많아지면 꽤 성가진 모양이 될 겁니다.</p>
+<h2 id="io-위에-reader">IO 위에 Reader</h2>
 <p>이럴 때, 모나드 트랜스포머를 이용해서 다음처럼 구현할 수 있습니다. 아래는 좀 억지스러운 예시라 오히려 소스가 늘어났지만, 실용 프로그램에서는 대부분 줄어드는 효과도 있고, 무엇보다 유연하게 쓸 수 있다는 장점이 있습니다.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ot">act1 ::</span> <span class="dt">ReaderT</span> <span class="dt">String</span> <span class="dt">IO</span> ()</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>act1 <span class="ot">=</span> <span class="kw">do</span></span>
@@ -109,8 +123,8 @@
 <span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>    act2</span>
 <span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>    act3</span>
 <span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>  ) who  </span></code></pre></div>
-<p>act는 IO 모나드와 Reader 모나드의 특징을 모두 가진 모나드 액션이 됐습니다. 이렇게 두 개 이상의 모나드를 섞어서 써야 할 때 모나드 트랜스포머를 씁니다.</p>
-<p>모나드의 특징은 바인드로 발현됩니다. IO 모나드와 Reader 모나드 특징 모두가 발현 되려면 <em>두 모나드의 바인드가 모두 실행</em>되어야 합니다.</p>
+<p><code>act</code>는 <code>IO</code> 모나드와 <code>Reader</code> 모나드의 특징을 모두 가진 모나드 액션이 됐습니다. 이렇게 두 개 이상의 모나드를 섞어서 써야 할 때 모나드 트랜스포머를 씁니다.</p>
+<p>모나드의 특징은 바인드로 발현됩니다. <code>IO</code> 모나드와 <code>Reader</code> 모나드 특징 모두가 발현 되려면 <em>두 모나드의 바인드가 모두 실행</em>되어야 합니다.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">ReaderT</span> r innerm a <span class="ot">=</span> <span class="dt">ReaderT</span> {<span class="ot"> runReaderT ::</span> r <span class="ot">-&gt;</span> innerm a }</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> (<span class="dt">Monad</span> m) <span class="ot">=&gt;</span> <span class="dt">Monad</span> (<span class="dt">ReaderT</span> r m) <span class="kw">where</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span> <span class="ot">=</span> lift <span class="op">.</span> <span class="fu">return</span></span>
@@ -118,23 +132,23 @@
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>                       a <span class="ot">&lt;-</span> runReaderT rtm r</span>
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>                       runReaderT (k a) r</span></code></pre></div>
 <p>바인드만 살펴 보도록 하겠습니다.<br />
-바인드 정의를 보면 인스턴스 헤드에 있는 m이 보이지 않습니다. m은 (1)do구문에 가려져 있는 바인드의 인스턴스를 선택할 때 단서로 쓰입니다. 여기서 do는 m모나드의 do입니다.<br />
-실제 act1 과 act2 를 바인딩 했을 때 무슨 일이 일어나는지 보겠습니다.</p>
-<p>do를 걷어내서 바인드가 보이게 하면</p>
+바인드 정의를 보면 인스턴스 헤드에 있는 <code>m</code>이 보이지 않습니다. <code>m</code>은 (1) <code>do</code>구문에 가려져 있는 바인드의 인스턴스를 선택할 때 단서로 쓰입니다. 여기서 <code>do</code>는 <code>m</code>모나드의 <code>do</code>입니다.<br />
+실제 <code>act1</code> 과 <code>act2</code> 를 바인딩 했을 때 무슨 일이 일어나는지 보겠습니다.</p>
+<p><code>do</code>를 걷어내서 바인드가 보이게 하면</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>act1 <span class="op">&gt;&gt;=</span> \_ <span class="ot">-&gt;</span> act2 <span class="ot">=</span></span></code></pre></div>
 <p>위 바인드 정의에 그대로 넣으면</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>  <span class="dt">ReaderT</span> <span class="op">$</span> \r <span class="ot">-&gt;</span> <span class="kw">do</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>            a <span class="ot">&lt;-</span> runReaderT act1 r <span class="co">---(1)</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>            runReaderT ((\_ <span class="ot">-&gt;</span> act2) a) r <span class="co">---(2)</span></span></code></pre></div>
-<p>act1과 act2의 바인딩 결과는 r을 받는 함수를 ReaderT로 감싼 상태입니다.<br />
-여기에 act 함수에서처럼 runReaderT로 r을 넣어주면 그 때 실행됩니다.<br />
-(1)번과 (2)번 사이에는 m의 bind가 숨어 있습니다.</p>
-<p>여기서는 r값으로 “친구” 넣어 보겠습니다.</p>
+<p><code>act1</code>과 <code>act2</code>의 바인딩 결과는 <code>r</code>을 받는 함수를 <code>ReaderT</code>로 감싼 상태입니다.<br />
+여기에 <code>act</code> 함수에서처럼 <code>runReaderT</code>로 <code>r</code>을 넣어주면 그 때 실행됩니다.<br />
+(1)번과 (2)번 사이에는 <code>m</code>의 <code>bind</code>가 숨어 있습니다.</p>
+<p>여기서는 <code>r</code>값으로 “친구” 넣어 보겠습니다.</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>runRederT ( <span class="dt">ReaderT</span> <span class="op">$</span> \r <span class="ot">-&gt;</span> <span class="kw">do</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>            a <span class="ot">&lt;-</span> runReaderT act1 r</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>            runReaderT ((\_ <span class="ot">-&gt;</span> act2) a) r</span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>) <span class="st">&quot;친구&quot;</span></span></code></pre></div>
-<p>runReaderT는 ReaderT 안에 있는 함수를 꺼내는 작업을 합니다.</p>
+<p><code>runReaderT</code>는 <code>ReaderT</code> 안에 있는 함수를 꺼내는 작업을 합니다.</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>\r <span class="ot">-&gt;</span> <span class="kw">do</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    a <span class="ot">&lt;-</span> runReaderT act1 r</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    runReaderT ((\_ <span class="ot">-&gt;</span> act2) a) r</span></code></pre></div>
@@ -142,17 +156,17 @@
 <div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>a <span class="ot">&lt;-</span> runReaderT act1 <span class="st">&quot;친구&quot;</span> <span class="co">--- (1)</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>runReaderT ((\_ <span class="ot">-&gt;</span> act2) a) <span class="st">&quot;친구&quot;</span> <span class="co">---(2)</span></span></code></pre></div>
 <ol type="1">
-<li><p>act1은 IO 작업 putStrLn " 나는 친구와 영화를 봤다. " 를 <em>준비</em>하고, IO ()를 리턴하면,<br />
+<li><p><code>act1</code>은 <code>IO</code> 작업 <code>putStrLn " 나는 친구와 영화를 봤다. "</code> 를 <em>준비</em>하고, <code>IO ()</code>를 리턴하면,<br />
 <em>※ 주의: 여기서 바로 실행되는게 아닙니다! 그래서 준비라고 표현했습니다.</em><br />
-&lt;-로 IO를 벗기면 a는 ()가 됩니다.</p></li>
-<li><p>안 쪽의 람다 함수(_ -&gt; act2)에 ()를 넣어주면 act2 만 남고</p></li>
+<code>&lt;-</code>로 <code>IO</code>를 벗기면 <code>a</code>는 <code>()</code>가 됩니다.</p></li>
+<li><p>안 쪽의 람다 함수<code>(\_ -&gt; act2)</code>에 <code>()</code>를 넣어주면 <code>act2</code> 만 남고</p></li>
 </ol>
 <div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>runReaderT act2 <span class="st">&quot;친구&quot;</span></span></code></pre></div>
-<p>act2는 IO작업 putStrLn " 나는 친구와 밥을 먹었다. "를 <em>준비</em>하고, IO ()를 리턴합니다.</p>
-<p>결론은 act1에 “친구”를 넣어 IO 액션을 만들고, 그 다음 act2에 “친구”를 넣어 IO 액션을 만들어서, 바인드의 결과는 IO 액션을 엮어 놓은 상태가 됐습니다.<br />
-IO 액션 엮음chaining은 GHCi에서 이 엮음에 realworld 환경값을 넣어주면서 실행하게 됩니다. (IO 모나드의 실행)<br />
+<p><code>act2</code>는 <code>IO</code>작업 <code>putStrLn " 나는 친구와 밥을 먹었다. "</code>를 <em>준비</em>하고, <code>IO ()</code>를 리턴합니다.</p>
+<p>결론은 <code>act1</code>에 <code>"친구"</code>를 넣어 <code>IO</code> 액션을 만들고, 그 다음 <code>act2</code>에 <code>"친구"</code>를 넣어 <code>IO</code> 액션을 만들어서, 바인드의 결과는 <code>IO</code> 액션을 엮어 놓은 상태가 됐습니다.<br />
+<code>IO</code> 액션 엮음chaining은 GHCi에서 이 엮음에 realworld 환경값을 넣어주면서 실행하게 됩니다. (<code>IO</code> 모나드의 실행)<br />
 (이 품고 품게 엮은 모양을 뭐라 번역하면 좋을까요?)</p>
-<p>ReaderT의 바인드를 보면 두 개의 바인드가 실행되는 게 보이나요?</p>
+<p><code>ReaderT</code>의 바인드를 보면 두 개의 바인드가 실행되는 게 보이나요?</p>
 <p>아직은 그다지 좋은 설명이 아닌 것 같긴한데, 일단 포스팅해 놨습니다.<br />
 여기서 강조하고 싶은 건 모나드 트랜스포머의 바인드는 당연히 <em>합쳐진 모든 모나드의 바인드를 실행</em>한다 입니다.</p>
 <h2 id="mtl">mtl</h2>
@@ -218,14 +232,14 @@ IO 액션 엮음chaining은 GHCi에서 이 엮음에 realworld 환경값을 넣�
 <span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span>
 <span id="cb12-29"><a href="#cb12-29" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="kw">do</span> liftIO <span class="op">$</span> runReaderT acts <span class="dv">1</span></span></code></pre></div>
-<p>act1, act2, act3 모두 <code>ReaderT</code>로 추론되고,<br />
-act1의 조립 조건 <code>(MonadIO m) =&gt;</code> 을 만족하는 <code>instance MonadIO ReaderT...</code>가 있으니 OK<br />
-act2의 조립 조건 <code>(MonadReader Int m, MonadIO m) =&gt;</code> 을 만족하는 <code>instance MonadReader ReaderT...</code>, <code>instance MonadIO ReaderT...</code>가 있으니 OK<br />
-act3의 조립 조건 <code>(MonadReader Int m) =&gt;</code> 을 만족하는 <code>instance MonadReader ReaderT...</code>가 있으니 OK</p>
-<p>미리 준비되어 있는 MonadReader의 인스턴스는 MaybeT, ListT, WriterT, StateT, IdentityT, ExceptT, ErrorT, ContT, ReaderT, RWST 용 인스턴스가 있습니다. acts의 리턴 타입(또는 컨텍스트라 말하기도 합니다.)이 ReaderT 타입이니, act2의 타입도 ReaderT 타입으로 추론하고, ReaderT용 ask를 가져옵니다.<br />
+<p><code>act1</code>, <code>act2</code>, <code>act3</code> 모두 <code>ReaderT</code>로 추론되고,<br />
+<code>act1</code>의 조립 조건 <code>(MonadIO m) =&gt;</code> 을 만족하는 <code>instance MonadIO ReaderT...</code>가 있으니 OK<br />
+<code>act2</code>의 조립 조건 <code>(MonadReader Int m, MonadIO m) =&gt;</code> 을 만족하는 <code>instance MonadReader ReaderT...</code>, <code>instance MonadIO ReaderT...</code>가 있으니 OK<br />
+<code>act3</code>의 조립 조건 <code>(MonadReader Int m) =&gt;</code> 을 만족하는 <code>instance MonadReader ReaderT...</code>가 있으니 OK</p>
+<p>미리 준비되어 있는 <code>MonadReader</code>의 인스턴스는 <code>MaybeT</code>, <code>ListT</code>, <code>WriterT</code>, <code>StateT</code>, <code>IdentityT</code>, <code>ExceptT</code>, <code>ErrorT</code>, <code>ContT</code>, <code>ReaderT</code>, <code>RWST</code> 용 인스턴스가 있습니다. <code>acts</code>의 리턴 타입(또는 컨텍스트라 말하기도 합니다.)이 <code>ReaderT</code> 타입이니, <code>act2</code>의 타입도 <code>ReaderT</code> 타입으로 추론하고, <code>ReaderT</code>용 <code>ask</code>를 가져옵니다.<br />
 <a href="https://hackage.haskell.org/package/mtl-2.2.2/docs/Control-Monad-Reader.html#g:1" class="uri">https://hackage.haskell.org/package/mtl-2.2.2/docs/Control-Monad-Reader.html#g:1</a></p>
-<p>미리 준비되어 있는 MonadIO의 인스턴스는 MonadIO쪽에서 선언되어 있지 않고, ReaderT나 WriterT… 각각에서 볼 수 있습니다. <a href="https://hackage.haskell.org/package/mtl-2.2.2/docs/Control-Monad-Reader.html#g:3" class="uri">https://hackage.haskell.org/package/mtl-2.2.2/docs/Control-Monad-Reader.html#g:3</a></p>
-<p>main 을 다음과 같이 쓰면 ReaderT 타입은 보이지 않아 처음에는 다른 컨텍스트로 오해할 수도 있지만, runReaderT를 보고 알 수 있습니다.</p>
+<p>미리 준비되어 있는 <code>MonadIO</code>의 인스턴스는 <code>MonadIO</code>쪽에서 선언되어 있지 않고, <code>ReaderT</code>나 <code>WriterT...</code> 각각에서 볼 수 있습니다. <a href="https://hackage.haskell.org/package/mtl-2.2.2/docs/Control-Monad-Reader.html#g:3" class="uri">https://hackage.haskell.org/package/mtl-2.2.2/docs/Control-Monad-Reader.html#g:3</a></p>
+<p><code>main</code> 을 다음과 같이 쓰면 <code>ReaderT</code> 타입은 보이지 않아 처음에는 다른 컨텍스트로 오해할 수도 있지만, <code>runReaderT</code>를 보고 알 수 있습니다.</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> liftIO <span class="op">$</span> runReaderT ( <span class="kw">do</span></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>           act1</span>
@@ -246,7 +260,7 @@ act3의 조립 조건 <code>(MonadReader Int m) =&gt;</code> 을 만족하는 <c
 <span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    reader f <span class="ot">=</span> <span class="kw">do</span></span>
 <span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>       r <span class="ot">&lt;-</span> ask <span class="co">------------ (1)</span></span>
 <span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>       <span class="fu">return</span> (f r)</span></code></pre></div>
-<p>(1)번 ask는 어떤 ask가 실행될까요? <code>reader</code> 메소드는 <code>m a</code> 컨텍스트에 있습니다. 모나드 <code>m</code>에 있는 <code>ask</code>를 실행할거라 예상할 수 있습니다. 만일 <code>m</code>이 <code>ListT</code>이면</p>
+<p>(1)번 <code>ask</code>는 어떤 <code>ask</code>가 실행될까요? <code>reader</code> 메소드는 <code>m a</code> 컨텍스트에 있습니다. 모나드 <code>m</code>에 있는 <code>ask</code>를 실행할거라 예상할 수 있습니다. 만일 <code>m</code>이 <code>ListT</code>이면</p>
 <div class="sourceCode" id="cb15"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">MonadReader</span> r m <span class="ot">=&gt;</span> <span class="dt">MonadReader</span> r (<span class="dt">ListT</span> m) <span class="kw">where</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    ask<span class="co">--(1)   </span></span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>       <span class="ot">=</span> lift ask <span class="co">---------- (2)</span></span>
@@ -258,7 +272,7 @@ act3의 조립 조건 <code>(MonadReader Int m) =&gt;</code> 을 만족하는 <c
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>       <span class="ot">=</span> ReaderT.ask <span class="co">--------- (3)</span></span>
 <span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    local <span class="ot">=</span> ReaderT.local</span>
 <span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    reader <span class="ot">=</span> ReaderT.reader</span></code></pre></div>
-<p>(3)번 ask를 실행하게 됩니다. 조금 복잡하지만 결론은 <em>GHC가 알아서 ask구현을 찾아 갔습니다.</em> 모나드 스택의 몇 번째 층에 ReaderT가 있든, GHC가 알아서 ask구현을 찾아 갈 수 있습니다. 이게 <em>mtl의 핵심 아이디어</em>입니다.</p>
+<p>(3)번 <code>ask</code>를 실행하게 됩니다. 조금 복잡하지만 결론은 <em>GHC가 알아서 ask구현을 찾아 갔습니다.</em> 모나드 스택의 몇 번째 층에 <code>ReaderT</code>가 있든, GHC가 알아서 <code>ask</code>구현을 찾아 갈 수 있습니다. 이게 <em>mtl의 핵심 아이디어</em>입니다.</p>
 <p>참고 - <a href="../posts/2020-07-21-mtlStyle.html">Has Type class 패턴 포스트</a></p>
 <h2 id="자주-만나는-에러-no-instance">자주 만나는 에러 No instance</h2>
 <div class="sourceCode" id="cb17"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="ot">somefunc ::</span> (<span class="dt">MonadIO</span> m, <span class="dt">MonadReader</span> c m) <span class="ot">=&gt;</span> <span class="op">...</span> <span class="ot">-&gt;</span> m ()</span>
@@ -270,12 +284,12 @@ act3의 조립 조건 <code>(MonadReader Int m) =&gt;</code> 을 만족하는 <c
 <pre><code>    • No instance for (MonadReader IO)
         arising from a use of ‘somefunc</code></pre>
 <p><code>somefunc</code>에선 Return Type Polymorphic과 constraint를 이용해 타입 추론을 뒤로 미뤘습니다. 나중에 <code>somefunc</code>가 불릴 컨텍스트가 <code>MonadIO</code>, <code>MonadReader</code> 인스턴스인지 체크해야 합니다. 지금 코드는 IO 컨텍스트 안에서 불렀습니다. 그럼 <code>instance MonadIO IO</code> , <code>instance MonadReader c IO</code> 가 있어야 하는데, <code>instance MonadReader IO</code> 는 정의되어 있지 않다는 에러입니다. <code>MonadReader</code> 쪽을 보면 실제로 <code>IO</code> 인스턴스는 정의되어 있지 않습니다.</p>
-<p>※ 그럼 <code>MonadReader</code>는 다른 트랜스포머용 인스턴스는 모두 정의해 놨는데, 왜 IO는 정의해놓지 않았을까요? <code>MonadReader</code>는 <code>ask</code>메소드를 계층에 상관없이 편리하게 쓰기 위해 정의한 클래스입니다. <em>어떤 트랜스포머로 쌓여 있든, 결국 ReaderT모나드의 ask등의 메소드를 찾아 갈 수 있게 만들어 놓은 겁니다.</em> <code>IO</code>는 모나드 스택에서 항상 바닥에 있는 모나드이므로 <code>IO</code>까지 도달하면 더 진행할 수 가 없습니다. 만일 <code>IOT</code>같은 <code>IO</code> 트랜스포머가 있다면 얘기는 달라질 겁니다.</p>
+<p>※ 그럼 <code>MonadReader</code>는 다른 트랜스포머용 인스턴스는 모두 정의해 놨는데, 왜 <code>IO</code>는 정의해놓지 않았을까요? <code>MonadReader</code>는 <code>ask</code>메소드를 계층에 상관없이 편리하게 쓰기 위해 정의한 클래스입니다. <em>어떤 트랜스포머로 쌓여 있든, 결국 ReaderT모나드의 ask등의 메소드를 찾아 갈 수 있게 만들어 놓은 겁니다.</em> <code>IO</code>는 모나드 스택에서 항상 바닥에 있는 모나드이므로 <code>IO</code>까지 도달하면 더 진행할 수 가 없습니다. 만일 <code>IOT</code>같은 <code>IO</code> 트랜스포머가 있다면 얘기는 달라질 겁니다.</p>
 <p>※ 그럼 <code>MonadIO IO</code> 인스턴스가 없다는 에러는 왜 안 났을까요?</p>
 <div class="sourceCode" id="cb19"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">MonadIO</span> <span class="dt">IO</span> <span class="kw">where</span></span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>    liftIO <span class="ot">=</span> <span class="fu">id</span></span></code></pre></div>
 <p><code>Monad IO</code> 인스턴스는 정의 되어있습니다.</p>
-<p>※ IO의 트랜스포머 IOT는 왜 없을까요?<br />
+<p>※ <code>IO</code>의 트랜스포머 <code>IOT</code>는 왜 없을까요?<br />
 http://h2.jaguarpaw.co.uk/posts/io-transformer/</p>
 <h2 id="에러-수정">에러 수정</h2>
 <p>다른 부분 수정없이 <code>runReaderT</code>로 환경값을 먹이면 컴파일 됩니다. 왜 그럴까요?</p>
