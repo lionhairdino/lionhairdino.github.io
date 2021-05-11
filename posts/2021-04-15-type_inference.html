@@ -75,7 +75,7 @@
 <pre><code>    • No instance for (Num a) arising from a use of ‘+’
  ... 
 2 | func x = x + 1</code></pre>
-<p>나중에 다른 함수와 만나서 추론될 때, Num 클래스의 메소드 <code>(+)</code>를 가진 타입으로 추론될지 장담할 수 없습니다. 항상 적당한 함수와 꼭 만난다고 가정하면 안됩니다. 일단은 함수 혼자서 원하지 않는 타입이 들어 오는 걸 막을 수 있어야 합니다. func함수에는 반드시 Num 클래스만 들어오게 하는 안전 장치가 있어야 합니다. 타입 추론할 때, 다른 함수와 만나는 접점으로 타입을 추론하는 것보다 먼저 각각의 함수들이 <em>서명과 몸체의 타입이 일치</em>하는지 봅니다. 정리하면,</p>
+<p>나중에 다른 함수와 만나서 추론될 때, <code>Num</code> 클래스의 메소드 <code>(+)</code>를 가진 타입으로 추론될지 장담할 수 없습니다. 항상 적당한 함수와 꼭 만난다고 가정하면 안됩니다. 일단은 함수 혼자서 원하지 않는 타입이 들어 오는 걸 막을 수 있어야 합니다. <code>func</code>함수에는 반드시 <code>Num</code> 클래스만 들어오게 하는 안전 장치가 있어야 합니다. 타입 추론할 때, 다른 함수와 만나는 접점으로 타입을 추론하는 것보다 먼저 각각의 함수들이 <em>서명과 몸체의 타입이 일치</em>하는지 봅니다. 정리하면,</p>
 <ol type="1">
 <li>각각의 함수마다 서명과 몸체의 타입이 일치하는지 보고</li>
 <li>그 다음 다른 함수와 매칭을 살핍니다.</li>
@@ -92,16 +92,16 @@
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span>
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="kw">do</span></span>
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">print</span> <span class="op">$</span> func [<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>]</span></code></pre></div>
-<p>첫 번째 논리대로 하면, func 정의 단독으로 a에 대한 어떤 힌트가 있어야 할 것 같습니다. 하지만 에러가 나지 않습니다. 위의 첫 번째 예는 특정 클래스의 메소드 <code>(+)</code>를 써서 나는 에러였습니다. 여기선 특정 클래스의 메소드가 없습니다. length 함수는 <code>[]</code>까지만 알면 모호하지 않습니다.<br />
+<p>첫 번째 논리대로 하면, <code>func</code> 정의 단독으로 <code>a</code>에 대한 어떤 힌트가 있어야 할 것 같습니다. 하지만 에러가 나지 않습니다. 위의 첫 번째 예는 특정 클래스의 메소드 <code>(+)</code>를 써서 나는 에러였습니다. 여기선 특정 클래스의 메소드가 없습니다. length 함수는 <code>[]</code>까지만 알면 모호하지 않습니다.<br />
 ※ 참고 - <a href="../posts/2021-04-13-class_constraint.html">클래스 제약 포스트</a></p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="op">:</span>t <span class="fu">length</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span><span class="ot"> ::</span> <span class="dt">Foldable</span> t <span class="ot">=&gt;</span> t a <span class="ot">-&gt;</span> <span class="dt">Int</span></span></code></pre></div>
-<p><code>length</code> 함수는 리스트 구조가 됐든, 트리 구조가 됐든… <code>Foldable</code> 클래스의 인스턴스이기만 하면 받아들입니다. 안에 들어 있는 <code>a</code>타입은 뭔지 모르지만 <code>foldable</code>이 가능한 [] 리스트 구조임은 <em>명시</em>했으니, 필요한 정보는 다 있는 상태입니다. 아래는 또 다른 예시입니다. 가장 바깥 타입 생성자(여기서는 Maybe)만 명시해 주면 모호하지 않습니다.</p>
+<p><code>length</code> 함수는 리스트 구조가 됐든, 트리 구조가 됐든… <code>Foldable</code> 클래스의 인스턴스이기만 하면 받아들입니다. 안에 들어 있는 <code>a</code>타입은 뭔지 모르지만 <code>foldable</code>이 가능한 <code>[]</code> 리스트 구조임은 <em>명시</em>했으니, 필요한 정보는 다 있는 상태입니다. 아래는 또 다른 예시입니다. 가장 바깥 타입 생성자(여기서는 Maybe)만 명시해 주면 모호하지 않습니다.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ot">isJust         ::</span> <span class="dt">Maybe</span> a <span class="ot">-&gt;</span> <span class="dt">Bool</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>isJust <span class="dt">Nothing</span> <span class="ot">=</span> <span class="dt">False</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>isJust _       <span class="ot">=</span> <span class="dt">True</span></span></code></pre></div>
 <p>위 <code>Maybe a</code>에서 <code>a</code>타입은 알 필요가 없습니다. 가장 바깥만 알면 됩니다. 항상 완벽한 구체 타입을 알아야 하는게 아니라, 필요한 만큼만 알면 됩니다.</p>
-<p>여기 내용과 꼭 관련된 건 아니지만, 가끔은 완전히 구체 타입까지 알아내서 다르게 동작해야 할 필요가 있습니다. 그럴 때 FlexibleInstances 확장을 씁니다. ※ 참고 - <a href="../extensions/2020-07-13-FlexibleInstances.html">확장 FlexibleInstances 포스트</a></p>
+<p>여기 내용과 꼭 관련된 건 아니지만, 가끔은 완전히 구체 타입까지 알아내서 다르게 동작해야 할 필요가 있습니다. 그럴 때 <code>FlexibleInstances</code> 확장을 씁니다. ※ 참고 - <a href="../extensions/2020-07-13-FlexibleInstances.html">확장 FlexibleInstances 포스트</a></p>
 
 <div id="disqus_thread" style="padding-top:40px"></div>
 <script>

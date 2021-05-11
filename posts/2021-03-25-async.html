@@ -57,13 +57,13 @@
     
 </div>
 
-<p>왜 그냥 fork를 쓰지 않고, async가 필요한지 알아 보겠습니다.</p>
+<p>왜 그냥 <code>fork</code>를 쓰지 않고, <code>async</code>가 필요한지 알아 보겠습니다.</p>
 <h2 id="io-a-결과값-받아오기">IO a 결과값 받아오기</h2>
 <div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ot">forkIO ::</span> <span class="dt">IO</span> () <span class="ot">-&gt;</span> <span class="dt">IO</span> <span class="dt">ThreadId</span></span></code></pre></div>
-<p>forkIO는 받는 작업이 IO a 가 아니라, IO () 입니다. 결과값이 없는 IO작업만 받습니다.<br />
-하스켈에선 한 쓰레드에서 다른 쓰레드의 결과값에 바로 접근할 수 없습니다. 그러니 당연히 결과값이 없는 IO () 작업만 받으면 됩니다.<br />
+<p><code>forkIO</code>는 받는 작업이 <code>IO a</code> 가 아니라, <code>IO ()</code> 입니다. 결과값이 없는 <code>IO</code>작업만 받습니다.<br />
+하스켈에선 한 쓰레드에서 다른 쓰레드의 결과값에 바로 접근할 수 없습니다. 그러니 당연히 결과값이 없는 <code>IO ()</code> 작업만 받으면 됩니다.<br />
 그럼, <em>결과값이 필요한 IO a 작업은 어떻게 fork 시킬까요?</em></p>
-<p>기본 아이디어는 IO a의 결과값 a타입 값을 받아 올 MVar 변수를 만들어, IO 작업의 결과를 거기에 넣는 작업을 만드는 것입니다.</p>
+<p>기본 아이디어는 <code>IO a</code>의 결과값 <code>a</code>타입 값을 받아 올 <code>MVar</code> 변수를 만들어, <code>IO</code> 작업의 결과를 거기에 넣는 작업을 만드는 것입니다.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Control.Concurrent</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Control.Concurrent.STM</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -89,8 +89,8 @@
 <span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    tid <span class="ot">&lt;-</span> forkIO (oneCharFork v)  <span class="co">-- fork할 때, 외부에서 만든 MVar를 같이 넘깁니다.</span></span>
 <span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    r <span class="ot">&lt;-</span> atomically (readTMVar v)</span>
 <span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>    <span class="fu">putChar</span> r</span></code></pre></div>
-<p>위와 같이 작업하면 다른 쓰레드의 결과값을 받아 올 수 있습니다. 소통 채널로 MVar를 쓰는 형태로 만들 수 밖에 없습니다.</p>
-<p>async 함수도 같은 아이디어로 되어 있고, 예외 핸들링을 위해 mask로 짜여져 있습니다. 그리고, 나중에 결과값에 접근 할 수 있도록 MVar 변수와 쓰레드 ID를 묶은 Async값을 만들어 리턴합니다. 이제 나중에 Async 안에 들어있는 MVar 값에 Read를 걸어두면, 결과값을 가져올 수 있고, 쓰레드가 종료하는 걸 알아낼 수도 있습니다.</p>
+<p>위와 같이 작업하면 다른 쓰레드의 결과값을 받아 올 수 있습니다. 소통 채널로 <code>MVar</code>를 쓰는 형태로 만들 수 밖에 없습니다.</p>
+<p><code>async</code> 함수도 같은 아이디어로 되어 있고, 예외 핸들링을 위해 <code>mask</code>로 짜여져 있습니다. 그리고, 나중에 결과값에 접근 할 수 있도록 <code>MVar</code> 변수와 쓰레드 ID를 묶은 <code>Async</code>값을 만들어 리턴합니다. 이제 나중에 <code>Async</code> 안에 들어있는 <code>MVar</code> 값에 <code>Read</code>를 걸어두면, 결과값을 가져올 수 있고, 쓰레드가 종료하는 걸 알아낼 수도 있습니다.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ot">async ::</span> <span class="dt">IO</span> a <span class="ot">-&gt;</span> <span class="dt">IO</span> (<span class="dt">Async</span> a)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>async action <span class="ot">=</span> <span class="kw">do</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  m <span class="ot">&lt;-</span> newEmptyVar</span>
@@ -100,7 +100,7 @@
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>      putMVar m r</span>
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    )</span>
 <span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span> (<span class="dt">Async</span> t m)</span></code></pre></div>
-<p>Async 작업 체인을 만드는 withAsync의 구현을 보면,</p>
+<p><code>Async</code> 작업 체인을 만드는 <code>withAsync</code>의 구현을 보면,</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ot">withAsync ::</span> <span class="dt">IO</span> a <span class="ot">-&gt;</span> (<span class="dt">Async</span> a <span class="ot">-&gt;</span> <span class="dt">IO</span> b) <span class="ot">-&gt;</span> <span class="dt">IO</span> b</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>withAsync <span class="ot">=</span> inline withAsyncUsing rawForkIO</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- bracket을 써서 구현해도 되지만 느려서 hand-coding 했다고 합니다.</span></span>

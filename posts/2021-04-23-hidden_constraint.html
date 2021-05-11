@@ -67,7 +67,7 @@
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>        ch <span class="ot">&lt;-</span> getConsoleCenterChan</span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>        liftIO <span class="op">$</span> atomically <span class="op">$</span> writeTChan ch msg</span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="op">...</span></span></code></pre></div>
-<p>콘솔에 메시지를 보내는 쓰레드들은 HasConsole 클래스의 인스턴로 만들도록 했습니다.<br />
+<p>콘솔에 메시지를 보내는 쓰레드들은 <code>HasConsole</code> 클래스의 인스턴로 만들도록 했습니다.<br />
 아래 <code>TrackerM</code>을 <code>HasConsole</code>의 인스턴스로 만들었습니다.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="op">...</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">TrackerM</span> m a <span class="ot">=</span> <span class="dt">TrackerM</span> {<span class="ot"> runTrackerM ::</span> <span class="dt">ReaderT</span> <span class="dt">TrackerConfig</span> (<span class="dt">LoggingT</span> m) a }</span>
@@ -108,12 +108,12 @@
       In the first argument of ‘withAsync’, namely
         ‘(runTracker trackerCfg startTracker)’</code></pre>
 <ol type="1">
-<li>startTracker는 runTracker의 인자로 들어가니, TrackerM m 타입으로 추론,<br />
+<li><code>startTracker</code>는 <code>runTracker</code>의 인자로 들어가니, <code>TrackerM m</code> 타입으로 추론,<br />
 </li>
-<li>runTracker로 벗겨지면 만날 컨텍스트가 main :: IO ()이니 TrackerM IO로 추론,</li>
-<li>최종 startTracker는 TrackerM IO () 타입으로 추론됩니다.</li>
+<li><code>runTracker</code>로 벗겨지면 만날 컨텍스트가 <code>main :: IO ()</code>이니 <code>TrackerM IO</code>로 추론,</li>
+<li>최종 <code>startTracker</code>는 <code>TrackerM IO ()</code> 타입으로 추론됩니다.</li>
 </ol>
-<p>startTracker를 선언할 때, 나중에 들어오는 타입이 따라야만 하는 Constraint를 적어두었습니다. 그럼, 추론된 타입이 <code>startTracker</code>의 제약사항을 만족하는지 봅니다.</p>
+<p><code>startTracker</code>를 선언할 때, 나중에 들어오는 타입이 따라야만 하는 Constraint를 적어두었습니다. 그럼, 추론된 타입이 <code>startTracker</code>의 제약사항을 만족하는지 봅니다.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="dt">MonadIO</span> (<span class="dt">TrackerM</span> <span class="dt">IO</span>), <span class="co">-- (A) deriving MonadIO이 있으니 통과</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="dt">MonadLogger</span> (<span class="dt">Tracker</span> <span class="dt">IO</span>), <span class="co">-- (C) instance MonadLogger (Tracker M)이 있으니 통과</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="dt">MonadReader</span> <span class="dt">TrackerConfig</span> (<span class="dt">TrackerM</span> <span class="dt">IO</span>), <span class="co">-- (A) deriving에 MonadReader TrackConfig 있으니 통과</span></span>
@@ -123,7 +123,7 @@
 <div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> (<span class="dt">MonadIO</span> m, <span class="dt">MonadLogger</span> m) <span class="ot">=&gt;</span> <span class="dt">MonadLogger</span> (<span class="dt">TrackerM</span> m) <span class="kw">where</span></span></code></pre></div>
 <p><code>TrackerM</code>에 쌓여 있는 <code>m</code>이 <code>MonadLogger</code> 인스턴스여야 한다는 굳이 필요 없는 제약 조건이 들어가 있었습니다.<br />
 <code>startTracker</code>를 사용use하면서 <code>TrackerM IO</code>로 추론한 후, <code>MonadLogger (Tracker m)</code> 인스턴스를 살펴보니 <code>TrackerM</code>에 쌓여 있는 <code>m</code>, 즉 여기선 <code>IO</code>가 <code>(MonadLogger m)=&gt;</code> 때문에 <code>MonadLooger</code>의 인스턴스여야 한다는 결론에 도달합니다.</p>
-<p>GHC는 타입이 정해지지 않은 소문자 a가 보이면</p>
+<p>GHC는 타입이 정해지지 않은 소문자가 보이면</p>
 <ol type="1">
 <li>함수에 인자로 넘어 가면, 함수의 인자 타입으로 추론합니다.</li>
 <li>또는 어떤 컨텍스트에서 불리고 있다면, 해당 컨텍스트로 추론합니다.</li>
