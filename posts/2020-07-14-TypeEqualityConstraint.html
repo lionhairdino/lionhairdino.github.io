@@ -79,120 +79,116 @@
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="ot">                   obtuseMempty ::</span> <span class="kw">forall</span> t<span class="op">.</span> <span class="dt">Monoid</span> t <span class="ot">=&gt;</span> t</span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>        at <span class="kw">type</span><span class="op">.</span>hs<span class="op">:</span><span class="dv">12</span><span class="op">:</span><span class="dv">1</span><span class="op">-</span><span class="dv">29</span></span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>      <span class="dt">The</span> <span class="kw">type</span> variable ‘b0’ is ambiguous</span></code></pre></div>
-<p>GHC가 인스턴스를 찾을 때는 constraint는 일단 제쳐두고, head로<sup><a href="#constraintHead">[1]</a></sup> 먼저 찾고, 그 다음 constraint를 봅니다.<br />
-obtuseMempty 함수는 Monoid 인스턴스를 리턴합니다. thePair 메소드는 모노이드 인스턴스의 튜플이니 여기서 fst로 첫 번째 걸 꺼내면 모노이드가 나올거라 예상할 수 있습니다. 왜 튜플의 두 번째 요소가 뭔지 모르겠다는 오류가 나왔을까요?<br />
-(Monoid a) =&gt; PairOf a a 에서 constraint를 보고 앞의 a와 뒤의 a가 같은 것으로 추론해줄 것 같은데 그렇지 않습니다. 같은 a를 받는다는 <em>매칭 조건</em>이지<sup><a href="#constraint">[2]</a></sup>, <em>추론 단서</em>가 아닙니다.</p>
+<p>GHC가 인스턴스를 찾을 때는 constraint는 일단 제쳐두고, head로<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> 먼저 찾고, 그 다음 constraint를 봅니다.<br />
+obtuseMempty 함수는 Monoid 인스턴스를 리턴합니다. thePair 메소드는 모노이드 인스턴스의 튜플이니 여기서 <code>fst</code>로 첫 번째 걸 꺼내면 모노이드가 나올거라 예상할 수 있습니다. 왜 튜플의 두 번째 요소가 뭔지 모르겠다는 오류가 나왔을까요?<br />
+<code>(Monoid a) =&gt; PairOf a a</code> 에서 constraint를 보고 앞의 <code>a</code>와 뒤의 <code>a</code>가 같은 것으로 추론해줄 것 같은데 그렇지 않습니다. 같은 <code>a</code>를 받는다는 <em>매칭 조건</em>이지<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>, <em>추론 단서</em>가 아닙니다.</p>
 <p>GHC가 되어 추론해 봅시다.<br />
 어떤 instance의 thePair를 부를지 결정해야 합니다. (준비 되어 있는 인스턴스는 모노이드 인스턴스 두 개를 받는 인스턴스만 준비되어 있습니다.)<br />
-thePair 메소드를 찾으려면 PairOf a a 인스턴스를 찾는 단서인 a타입을 추론해야 합니다.<br />
-thePair에서 fst로 첫 번째 걸 꺼낸 게 obtuseMempty의 리턴 타입이니 첫 번째는 모노이드로 추론합니다.<br />
+<code>thePair</code> 메소드를 찾으려면 <code>PairOf a a</code> 인스턴스를 찾는 단서인 <code>a</code>타입을 추론해야 합니다.<br />
+<code>thePair</code>에서 <code>fst</code>로 첫 번째 걸 꺼낸 게 <code>obtuseMempty</code>의 리턴 타입이니 첫 번째는 모노이드로 추론합니다.<br />
 그럼 두 번째는 뭘로 추론할까요? 두 번째 관련 단서가 젼혀 없습니다.<br />
-Monoid t =&gt; PairOf t b0 까지는 추론했는데, b0가 뭔지 모른다는ambiguous 에러입니다.</p>
-<p>그럼 다음처럼 b도 모노이드로 추론할 수 있는 단서가 있을때는 어떻게 될까요?</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>obtuseMempty <span class="ot">=</span> <span class="fu">mappend</span> (<span class="fu">fst</span> thePair) (<span class="fu">snd</span> thePair)</span></code></pre></div>
+<code>Monoid t =&gt; PairOf t b0</code> 까지는 추론했는데, <code>b0</code>가 뭔지 모른다는ambiguous 에러입니다.</p>
+<p>그럼 다음처럼 <code>b</code>도 모노이드로 추론할 수 있는 단서가 있을때는 어떻게 될까요?</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>obtuseMempty <span class="ot">=</span> <span class="fu">mappend</span> (<span class="fu">fst</span> thePair) (<span class="fu">snd</span> thePair)</span></code></pre></div>
 <p>거의 비슷하지만 이번엔 b0도 모르고 a0도 모르겠다는 에러가 납니다.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    • <span class="dt">Could</span> <span class="fu">not</span> deduce (<span class="dt">PairOf</span> t b0) arising from a use <span class="kw">of</span> ‘thePair’<span class="op">...</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>      <span class="dt">The</span> <span class="kw">type</span> variable ‘b0’ is ambiguous<span class="op">...</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>   <span class="op">|</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="dv">13</span> <span class="op">|</span> obtuseMempty <span class="ot">=</span> <span class="fu">mappend</span> (<span class="fu">fst</span> thePair) (<span class="fu">snd</span> thePair)</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>   <span class="op">|</span>                             <span class="op">^^^^^^^</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    • <span class="dt">Could</span> <span class="fu">not</span> deduce (<span class="dt">PairOf</span> a0 t) arising from a use <span class="kw">of</span> ‘thePair’<span class="op">...</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>      <span class="dt">The</span> <span class="kw">type</span> variable ‘a0’ is ambiguous<span class="op">...</span></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>   <span class="op">|</span></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="dv">13</span> <span class="op">|</span> obtuseMempty <span class="ot">=</span> <span class="fu">mappend</span> (<span class="fu">fst</span> thePair) (<span class="fu">snd</span> thePair)</span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>   <span class="op">|</span>                                           <span class="op">^^^^^^^</span></span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    • <span class="dt">Could</span> <span class="fu">not</span> deduce (<span class="dt">PairOf</span> t b0) arising from a use <span class="kw">of</span> ‘thePair’<span class="op">...</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>      <span class="dt">The</span> <span class="kw">type</span> variable ‘b0’ is ambiguous<span class="op">...</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>   <span class="op">|</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="dv">13</span> <span class="op">|</span> obtuseMempty <span class="ot">=</span> <span class="fu">mappend</span> (<span class="fu">fst</span> thePair) (<span class="fu">snd</span> thePair)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>   <span class="op">|</span>                             <span class="op">^^^^^^^</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    • <span class="dt">Could</span> <span class="fu">not</span> deduce (<span class="dt">PairOf</span> a0 t) arising from a use <span class="kw">of</span> ‘thePair’<span class="op">...</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>      <span class="dt">The</span> <span class="kw">type</span> variable ‘a0’ is ambiguous<span class="op">...</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>   <span class="op">|</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="dv">13</span> <span class="op">|</span> obtuseMempty <span class="ot">=</span> <span class="fu">mappend</span> (<span class="fu">fst</span> thePair) (<span class="fu">snd</span> thePair)</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>   <span class="op">|</span>                                           <span class="op">^^^^^^^</span></span></code></pre></div>
 <p>두 개다 추론할 단서가 있는데 왜 그럴까요?<br />
 <em>fst thePair 와 snd thePair 에 있는 thePair는 같은 거란 단서는 없습니다.</em><br />
 그럼 두 개가 같을 경우는 어떻게 될까요?</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>obtuseMempty <span class="ot">=</span> <span class="kw">let</span> p <span class="ot">=</span> thePair                                   </span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>               <span class="kw">in</span> <span class="fu">mappend</span> (<span class="fu">fst</span> p) (<span class="fu">snd</span> p) </span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>obtuseMempty <span class="ot">=</span> <span class="kw">let</span> p <span class="ot">=</span> thePair                                   </span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>               <span class="kw">in</span> <span class="fu">mappend</span> (<span class="fu">fst</span> p) (<span class="fu">snd</span> p) </span></code></pre></div>
 <p>ok입니다.</p>
-<p>같은 모노이드 인스턴스로 이루어진 튜플을 만나면 PairOf클래스의 Monoid a =&gt; PairOf a a 에 있는 thePair 메소드를 찾을 수 있습니다.</p>
+<p>같은 모노이드 인스턴스로 이루어진 튜플을 만나면 <code>PairOf</code>클래스의 <code>Monoid a =&gt; PairOf a a</code>에 있는 <code>thePair</code> 메소드를 찾을 수 있습니다.</p>
 <h2 id="equality-constraint">equality constraint ~</h2>
-<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> (<span class="dt">Monoid</span> a, a <span class="op">~</span> b) <span class="ot">=&gt;</span> <span class="dt">PairOf</span> a b <span class="kw">where</span>    </span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    thePair <span class="ot">=</span> (<span class="fu">mempty</span>, <span class="fu">mempty</span>)</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="ot">obtuseMempty ::</span> <span class="dt">Monoid</span> t <span class="ot">=&gt;</span> t</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>obtuseMempty <span class="ot">=</span> <span class="fu">fst</span> thePair </span></code></pre></div>
-<p><code>a ~ b</code> 는 a와 b가 같다는 뜻이 들어가면 에러가 나지 않습니다. 어차피 두 개다 a a 란 뜻인 것 같은데 왜 그럴까요?<br />
-Pair a a 라고 쓴 것과 <code>a ~ b =&gt; Pair a b</code> 는 다르게 작업이 진행됩니다. a a 인 경우는 인스턴스를 찾을 때 두 개 인자가 같은 타입인 경우만 매칭 되는데, a b 는 일단 인자가 두 개인 것과 매칭됩니다. 그 다음 b를 a와 같은 타입으로 추론합니다. <code>a ~ b</code> 를 constraint에 넣어서 a와 b가 같다는 정보를 head에서 constraint로 옮겼습니다. 인스턴스 resolution은 head 해석 후 constraint로 가니 두 개가 같아야 한다는 정보는 나중으로 미뤘다는 얘기입니다.<sup><a href="#resolution">[3]</a></sup><br />
-이 번에는 (t, b0)로 추론한 후, 인스턴스를 찾으니 Pair a b 와 매칭에 성공하고, b0를 a와 같은 타입으로 추론합니다. <em><code>a ~ b</code> 의 뜻은 “b가 당장 뭔지 몰라도 돼, 나중에 b는 a와 같은 타입으로 추론할거야”</em> 란 뜻입니다.<br />
+<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> (<span class="dt">Monoid</span> a, a <span class="op">~</span> b) <span class="ot">=&gt;</span> <span class="dt">PairOf</span> a b <span class="kw">where</span>    </span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    thePair <span class="ot">=</span> (<span class="fu">mempty</span>, <span class="fu">mempty</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="ot">obtuseMempty ::</span> <span class="dt">Monoid</span> t <span class="ot">=&gt;</span> t</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>obtuseMempty <span class="ot">=</span> <span class="fu">fst</span> thePair </span></code></pre></div>
+<p><code>a ~ b</code> 는 <code>a</code>와 <code>b</code>가 같다는 뜻이 들어가면 에러가 나지 않습니다. 어차피 두 개다 <code>a a</code> 란 뜻인 것 같은데 왜 그럴까요?<br />
+<code>Pair a a</code> 라고 쓴 것과 <code>a ~ b =&gt; Pair a b</code> 는 다르게 작업이 진행됩니다. <code>a a</code> 인 경우는 인스턴스를 찾을 때 두 개 인자가 같은 타입인 경우만 매칭 되는데, <code>a b</code> 는 일단 인자가 두 개인 것과 매칭됩니다. 그 다음 <code>b</code>를 <code>a</code>와 같은 타입으로 추론합니다. <code>a ~ b</code> 를 constraint에 넣어서 <code>a</code>와 <code>b</code>가 같다는 정보를 head에서 constraint로 옮겼습니다. 인스턴스 resolution은 head 해석 후 constraint로 가니 두 개가 같아야 한다는 정보는 나중으로 미뤘다는 얘기입니다.<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a><br />
+이 번에는 <code>(t, b0)</code>로 추론한 후, 인스턴스를 찾으니 <code>Pair a b</code>와 매칭에 성공하고, <code>b0</code>를 <code>a</code>와 같은 타입으로 추론합니다. <em><code>a ~ b</code> 의 뜻은 “b가 당장 뭔지 몰라도 돼, 나중에 b는 a와 같은 타입으로 추론할거야”</em> 란 뜻입니다.<br />
 GHC는 최종 <code>(Monoid t) =&gt; (t, t)</code> 로 추론합니다.</p>
 <h2 id="constraint를-이용한-선언과-타입-지정-선언-비교">constraint를 이용한 선언과 타입 지정 선언 비교</h2>
 <p><a href="https://memo.barrucadu.co.uk/tilde-instance-pattern.html" class="uri">https://memo.barrucadu.co.uk/tilde-instance-pattern.html</a> 발췌</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ot">{-# Language FlexibleInstances #-}</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="ot">{-# Language FlexibleContexts #-}</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="ot">{-# Language GADTs #-}</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="ot">{-# Language TypeFamilies #-}</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">WrappedFunctor</span> f a <span class="ot">=</span> <span class="dt">WrappedFunctor</span> (f a) <span class="kw">deriving</span> <span class="dt">Show</span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Functor</span> (<span class="dt">WrappedFunctor</span> <span class="dt">Maybe</span>) <span class="kw">where</span> <span class="co">-- (1)</span></span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmap</span> f (<span class="dt">WrappedFunctor</span> fa) <span class="ot">=</span> <span class="dt">WrappedFunctor</span> (<span class="fu">fmap</span> f fa)</span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> (f <span class="op">~</span> <span class="dt">Maybe</span>)<span class="ot">=&gt;</span> <span class="dt">Functor</span> (<span class="dt">WrappedFunctor</span> f) <span class="kw">where</span> <span class="co">-- (2)</span></span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmap</span> f (<span class="dt">WrappedFunctor</span> fa) <span class="ot">=</span> <span class="dt">WrappedFunctor</span> (<span class="fu">fmap</span> f fa)</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ot">{-# Language FlexibleInstances #-}</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="ot">{-# Language FlexibleContexts #-}</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="ot">{-# Language GADTs #-}</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="ot">{-# Language TypeFamilies #-}</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">WrappedFunctor</span> f a <span class="ot">=</span> <span class="dt">WrappedFunctor</span> (f a) <span class="kw">deriving</span> <span class="dt">Show</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Functor</span> (<span class="dt">WrappedFunctor</span> <span class="dt">Maybe</span>) <span class="kw">where</span> <span class="co">-- (1)</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmap</span> f (<span class="dt">WrappedFunctor</span> fa) <span class="ot">=</span> <span class="dt">WrappedFunctor</span> (<span class="fu">fmap</span> f fa)</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> (f <span class="op">~</span> <span class="dt">Maybe</span>)<span class="ot">=&gt;</span> <span class="dt">Functor</span> (<span class="dt">WrappedFunctor</span> f) <span class="kw">where</span> <span class="co">-- (2)</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmap</span> f (<span class="dt">WrappedFunctor</span> fa) <span class="ot">=</span> <span class="dt">WrappedFunctor</span> (<span class="fu">fmap</span> f fa)</span></code></pre></div>
 <p>((1), (2) 동시에 정의하면 Overlap 됐다고 에러가 납니다. 하나씩만 정의해서 테스트 하세요.)</p>
 <p>(1)번으로 정의하면</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="op">:</span>t <span class="fu">fmap</span> (<span class="op">+</span><span class="dv">1</span>) (<span class="dt">WrappedFunctor</span> (<span class="fu">pure</span> <span class="dv">3</span>))</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="ot">  ::</span> (<span class="dt">Num</span> b, <span class="dt">Applicative</span> f, <span class="dt">Functor</span> (<span class="dt">WrappedFunctor</span> f)) <span class="ot">=&gt;</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>     <span class="dt">WrappedFunctor</span> f b</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="fu">fmap</span> (<span class="op">+</span><span class="dv">1</span>) (<span class="dt">WrappedFunctor</span> (<span class="fu">pure</span> <span class="dv">3</span>))</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="fu">error</span><span class="op">:</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    • <span class="dt">Ambiguous</span> <span class="kw">type</span> variable ‘f0’ arising from a use <span class="kw">of</span> ‘print’<span class="op">...</span></span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="op">:</span>t <span class="fu">fmap</span> (<span class="op">+</span><span class="dv">1</span>) (<span class="dt">WrappedFunctor</span> (<span class="fu">pure</span> <span class="dv">3</span>))</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="ot">  ::</span> (<span class="dt">Num</span> b, <span class="dt">Applicative</span> f, <span class="dt">Functor</span> (<span class="dt">WrappedFunctor</span> f)) <span class="ot">=&gt;</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>     <span class="dt">WrappedFunctor</span> f b</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="fu">fmap</span> (<span class="op">+</span><span class="dv">1</span>) (<span class="dt">WrappedFunctor</span> (<span class="fu">pure</span> <span class="dv">3</span>))</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="fu">error</span><span class="op">:</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    • <span class="dt">Ambiguous</span> <span class="kw">type</span> variable ‘f0’ arising from a use <span class="kw">of</span> ‘print’<span class="op">...</span></span></code></pre></div>
 <p>Maybe로 추론됐을 때만 (1)번 인스턴스와 매치되기 때문에, 위 구문은 어떤 인스턴스와도 매치되지 않은 상태입니다.</p>
 <p>(2)번으로 정의하면</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="op">:</span>t <span class="fu">fmap</span> (<span class="op">+</span><span class="dv">1</span>) (<span class="dt">WrappedFunctor</span> (<span class="fu">pure</span> <span class="dv">3</span>))</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="ot">  ::</span> <span class="dt">Num</span> b <span class="ot">=&gt;</span> <span class="dt">WrappedFunctor</span> <span class="dt">Maybe</span> b</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="fu">fmap</span> (<span class="op">+</span><span class="dv">1</span>) (<span class="dt">WrappedFunctor</span> (<span class="fu">pure</span> <span class="dv">3</span>))</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="dt">WrappedFunctor</span> (<span class="dt">Just</span> <span class="dv">4</span>)</span></code></pre></div>
-<p>Pure 3 을 만나도, 이걸 (2)번과 매칭에 성공하고, f를 Maybe로 추론합니다.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="op">:</span>t <span class="fu">fmap</span> (<span class="op">+</span><span class="dv">1</span>) (<span class="dt">WrappedFunctor</span> (<span class="fu">pure</span> <span class="dv">3</span>))</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="ot">  ::</span> <span class="dt">Num</span> b <span class="ot">=&gt;</span> <span class="dt">WrappedFunctor</span> <span class="dt">Maybe</span> b</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="fu">fmap</span> (<span class="op">+</span><span class="dv">1</span>) (<span class="dt">WrappedFunctor</span> (<span class="fu">pure</span> <span class="dv">3</span>))</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="dt">WrappedFunctor</span> (<span class="dt">Just</span> <span class="dv">4</span>)</span></code></pre></div>
+<p><code>Pure 3</code>을 만나도, 이걸 (2)번과 매칭에 성공하고, <code>f</code>를 <code>Maybe</code>로 추론합니다.</p>
 <p>정리하면 constraint를 써서 정의하면 <em>Maybe일수도 있는 걸 만나면 Maybe로 추론</em>할 수 있습니다.<br />
 <em>~는 constraint에 타입 추론 절차 하나를 심어 놨다</em>고 보면 됩니다.</p>
 <p>실제 코딩에서는 하나의 인스턴스만 필요할 때, 알아서 한가지로 추론되길 바랄 때 쓰는 트릭이라고 합니다.</p>
 <h2 id="참고">참고</h2>
 <ol type="1">
-<li><p><a href="../posts/2020-07-14-TypeEqualityConstraint.html">Lazy 패턴 매치</a>에서도 ~가 보이는데, 보통 <em>~</em>가 쓰일 때는 그냥 같은게 아니라, <em>어떤 절차나 추론을 거치고 나면 같아질 때</em>를 의미합니다.</p></li>
+<li><p><a href="../posts/2020-07-14-TypeEqualityConstraint.html">Lazy 패턴 매치</a>에서도 <code>~</code>가 보이는데, 보통 <code>~</code>가 쓰일 때는 그냥 같은게 아니라, <em>어떤 절차나 추론을 거치고 나면 같아질 때</em>를 의미합니다.</p></li>
 <li><p>어떤 값으로 추론되는지 볼 때 hole을 이용하면 도움이 됩니다.</p></li>
 </ol>
-<div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="op">:</span>t <span class="fu">fst</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">fst</span><span class="ot"> ::</span> (a, b) <span class="ot">-&gt;</span> a</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> </span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="op">:</span>t <span class="fu">fst</span> _</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>interactive<span class="op">&gt;:</span><span class="dv">1</span><span class="op">:</span><span class="dv">5</span><span class="op">:</span> <span class="fu">error</span><span class="op">:</span></span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    • <span class="dt">Found</span> hole<span class="op">:</span><span class="ot"> _ ::</span> (a, b0)</span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>      <span class="dt">Where</span><span class="op">:</span> ‘b0’ is an ambiguous <span class="kw">type</span> variable</span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>             ‘a’ is a rigid <span class="kw">type</span> variable bound by</span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>               the inferred <span class="kw">type</span> <span class="kw">of</span><span class="ot"> it ::</span> a</span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>               at <span class="op">&lt;</span>interactive<span class="op">&gt;:</span><span class="dv">1</span><span class="op">:</span><span class="dv">1</span></span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>    • <span class="dt">In</span> the first argument <span class="kw">of</span> ‘fst’, namely ‘_’</span>
-<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>      <span class="dt">In</span> the expression<span class="op">:</span> <span class="fu">fst</span> _</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="op">:</span>t <span class="fu">fst</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">fst</span><span class="ot"> ::</span> (a, b) <span class="ot">-&gt;</span> a</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> </span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="op">:</span>t <span class="fu">fst</span> _</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>interactive<span class="op">&gt;:</span><span class="dv">1</span><span class="op">:</span><span class="dv">5</span><span class="op">:</span> <span class="fu">error</span><span class="op">:</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>    • <span class="dt">Found</span> hole<span class="op">:</span><span class="ot"> _ ::</span> (a, b0)</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>      <span class="dt">Where</span><span class="op">:</span> ‘b0’ is an ambiguous <span class="kw">type</span> variable</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>             ‘a’ is a rigid <span class="kw">type</span> variable bound by</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>               the inferred <span class="kw">type</span> <span class="kw">of</span><span class="ot"> it ::</span> a</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>               at <span class="op">&lt;</span>interactive<span class="op">&gt;:</span><span class="dv">1</span><span class="op">:</span><span class="dv">1</span></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>    • <span class="dt">In</span> the first argument <span class="kw">of</span> ‘fst’, namely ‘_’</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>      <span class="dt">In</span> the expression<span class="op">:</span> <span class="fu">fst</span> _</span></code></pre></div>
+<section class="footnotes" role="doc-endnotes">
 <hr />
-<div id="constraintHead">
-
-</div>
-<p>[1] 인스턴스 표현식의 부분 부분을 다음처럼 부릅니다.</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> (<span class="dt">Num</span> t) <span class="ot">=&gt;</span> <span class="dt">SomeC</span> [t] <span class="kw">where</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>      constraint      <span class="fu">head</span></span></code></pre></div>
-<div id="constraint">
-
-</div>
-<p>[2] 인스턴스의 constraint는 추론 단서로 쓰이는게 아닙니다. GHC가 constraint를 보고 타입을 추론해 주는게 아니라, 이미 다른 단서들을 이용해 타입을 추론하고, 그 다음 추론된 타입이 constraint에도 부합하는지 확인합니다. 추론된 타입이 constraint 조건을 만족하지 않으면 그냥 에러입니다. 하지만, ~가 들어가면 이건 추론 단서로 쓰인다고 볼 수 있습니다.</p>
-<div id="resolution">
-
-</div>
-<p>[3] 인스턴스 resolution 순서</p>
+<ol>
+<li id="fn1" role="doc-endnote"><p>인스턴스 표현식의 부분 부분을 다음처럼 부릅니다.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> (<span class="dt">Num</span> t) <span class="ot">=&gt;</span> <span class="dt">SomeC</span> [t] <span class="kw">where</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>      constraint      <span class="fu">head</span></span></code></pre></div>
+<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></li>
+<li id="fn2" role="doc-endnote"><p>인스턴스의 constraint는 추론 단서로 쓰이는게 아닙니다. GHC가 constraint를 보고 타입을 추론해 주는게 아니라, 이미 다른 단서들을 이용해 타입을 추론하고, 그 다음 추론된 타입이 constraint에도 부합하는지 확인합니다. 추론된 타입이 constraint 조건을 만족하지 않으면 그냥 에러입니다. 하지만, ~가 들어가면 이건 추론 단서로 쓰인다고 볼 수 있습니다.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn3" role="doc-endnote"><p>인스턴스 resolution 순서</p>
 <p>왜 인스턴스 resolution 부를까요? resolution은 뭔가를 구분해 내는 걸 뜻합니다. 여러 개의 인스턴스가 있을 때, 각각을 구별해서 뭔지 알게 되는 걸 resolution 이라 부를 수 있을 것 같습니다. 하는 일은 적당한 인스턴스를 찾는 걸 말합니다.<br />
 영단어 뜻 : 조직이나 단체가 투표를 해서 정한 공식적인 결정</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> (<span class="dt">MyClass</span> a, <span class="dt">MyClass</span> b) <span class="ot">=&gt;</span> <span class="dt">MyClass</span> (a, b) <span class="kw">where</span></span></code></pre></div>
-<p>직관대로, 순서대로 읽으면 a가 MyClass이고, b가 MyClass일 때 (a,b)가 MyClass 인스턴스라 읽으면 될 것 같지만, GHC가 추론할때는 반대 순서로 추론합니다. head를 먼저 해석하고, 그 다음 constraint를 해석합니다.<br />
-가장 먼저 MyClass (a, b) 를 찾고, 그 다음 a가 MyClass 인스턴스인지, b가 MyClass 인스턴스인지 살펴봅니다.</p>
-<p>그리고, 인스턴스를 찾을 때 constraint는 영향을 주지 않습니다. head만 보고 매칭을 시도합니다.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> (<span class="dt">MyClass</span> a, <span class="dt">MyClass</span> b) <span class="ot">=&gt;</span> <span class="dt">MyClass</span> (a, b) <span class="kw">where</span></span></code></pre></div>
+<p>직관대로, 순서대로 읽으면 <code>a</code>가 <code>MyClass</code>이고, <code>b</code>가 <code>MyClass</code>일 때 <code>(a,b)</code>가 <code>MyClass</code> 인스턴스라 읽으면 될 것 같지만, GHC가 추론할때는 반대 순서로 추론합니다. head를 먼저 해석하고, 그 다음 constraint를 해석합니다.<br />
+가장 먼저 <code>MyClass (a, b)</code> 를 찾고, 그 다음 <code>a</code>가 <code>MyClass</code> 인스턴스인지, <code>b</code>가 <code>MyClass</code> 인스턴스인지 살펴봅니다.</p>
+<p>그리고, 인스턴스를 찾을 때 constraint는 영향을 주지 않습니다. head만 보고 매칭을 시도합니다.<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section>
 
 <div id="disqus_thread" style="padding-top:40px"></div>
 <script>

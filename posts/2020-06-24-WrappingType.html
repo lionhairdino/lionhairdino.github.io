@@ -71,7 +71,7 @@
 <p><code>Maybe Int</code>는 평범한 정수가 아닙니다. 어떤 절차를 거치면 정수를 줄 <em>준비</em>라고 볼 수 있습니다. <code>Maybe</code>를 벗겨내는 절차 없인 그저 준비만 하고 있는 상태기 때문에 다른 정수들과 어울릴(연산할) 수 없습니다. <code>Int</code>는 정수고, <code>Maybe Int</code>는 <em>정수를 줄 준비</em>입니다.<br />
 <code>Reader env Int</code> 는 <code>env</code>를 받아서 어떤 처리를 한 다음 <code>Int</code>를 돌려줄 준비를 한 상태입니다. 생성자나 함수를 <em>준비</em>로 해석하는게 언제나 들어 맞는지는 아직 확신이 서진 않지만, 래핑에 래핑에 래핑을 만나 복잡해 보일 때 <em>준비</em>로 해석하면 도움이 될 때가 있습니다.</p>
 <h2 id="타입-클래스">타입 클래스</h2>
-<p>타입을 래핑하는 또 다른 목적은, 같이 쓰일 함수를 고르는 작업을 위해서입니다. <em>타입 클래스와 인스턴스</em>를 쓰면, 타입에 따른 함수를 고를 수(분기) 있습니다. 함수를 실행할 때, 또 한 번 분기가 일어난다고 볼 수 있습니다. <sup><a href="#relation">[1]</a></sup></p>
+<p>타입을 래핑하는 또 다른 목적은, 같이 쓰일 함수를 고르는 작업을 위해서입니다. <em>타입 클래스와 인스턴스</em>를 쓰면, 타입에 따른 함수를 고를 수(분기) 있습니다. 함수를 실행할 때, 또 한 번 분기가 일어난다고 볼 수 있습니다. <a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
 <p>이 포스트의 결론은, 래핑 <code>a</code>는</p>
 <ol type="1">
 <li>갈래 길(코드의 분기)을 내포하고 있거나,</li>
@@ -87,7 +87,7 @@
 <li>그런 후에 다시 감싼 타입으로 만듭니다.</li>
 </ol>
 <p>이런 작업은 모든 감싼 타입에서 일어납니다. 모든 감싼 타입 마다 일일이 푸는 방법을 기억해야 합니다. 여기까지 생각이 미치면, 추상화 작업을 해서 뇌의 부하를 줄여줘야겠다는 생각이 들게 됩니다. 푸는 작업을 fmap 한가지로 추상화하자고 약속을 정한게 바로 펑크터입니다.</p>
-<p>하스켈에서 함수 하나 하나는 모두 독립적이며, 보통 Lazy하기 때문에 언제 실행될지도 모릅니다. 이런 상태에서 프로그램의 흐름<sup><a href="#main">[2]</a></sup>을 만들어내기 위해 함수가 함수를 감싸는composition 방법을 씁니다. (보통 composition을 합성이라 번역하는데, 딱 적합하다는 생각이 들지 않습니다. <code>f . g</code> 의 결과는 <code>g</code>를 적용한 후 <code>f</code>를 적용한다는 개념인데, 합성과는 좀 달리 느껴집니다. 조합이란 말이 더 어울리는 것 같기도 합니다.) 웬만하면 composition이 가능해야 여기 저기 쓰임새가 생깁니다. <code>a -&gt; b</code> , <code>b -&gt; c</code> 함수를 compostion 하려면 그냥 <code>(.)</code>을 쓰면 되고, <code>m a -&gt; m b</code>, <code>m b -&gt; m c</code> 도 <code>(.)</code>을 쓰면 됩니다. 그럼 <code>a -&gt; m b</code>, <code>b -&gt; m c</code> 함수는 어떻게 composition하면 될까요? 여기도 모나드를 이해하기 위한 시작점 중에 하나입니다.</p>
+<p>하스켈에서 함수 하나 하나는 모두 독립적이며, 보통 Lazy하기 때문에 언제 실행될지도 모릅니다. 이런 상태에서 프로그램의 흐름<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>을 만들어내기 위해 함수가 함수를 감싸는composition 방법을 씁니다. (보통 composition을 합성이라 번역하는데, 딱 적합하다는 생각이 들지 않습니다. <code>f . g</code> 의 결과는 <code>g</code>를 적용한 후 <code>f</code>를 적용한다는 개념인데, 합성과는 좀 달리 느껴집니다. 조합이란 말이 더 어울리는 것 같기도 합니다.) 웬만하면 composition이 가능해야 여기 저기 쓰임새가 생깁니다. <code>a -&gt; b</code> , <code>b -&gt; c</code> 함수를 compostion 하려면 그냥 <code>(.)</code>을 쓰면 되고, <code>m a -&gt; m b</code>, <code>m b -&gt; m c</code> 도 <code>(.)</code>을 쓰면 됩니다. 그럼 <code>a -&gt; m b</code>, <code>b -&gt; m c</code> 함수는 어떻게 composition하면 될까요? 여기도 모나드를 이해하기 위한 시작점 중에 하나입니다.</p>
 <p>2021.5.9 추가</p>
 <h2 id="값-생성자를-벗길-때-발현되는-컨텍스트">값 생성자를 벗길 때 발현되는 컨텍스트</h2>
 <p>(첫 부분의 갈래길과 중복되는 내용이 있습니다. 갈래길을 컨텍스트라 부르면 됩니다.)</p>
@@ -112,19 +112,17 @@
 <p>이게 다 같은 말로 쓰입니다.</p>
 <h2 id="함수-같은-값-생성자">함수 같은 값 생성자</h2>
 <p><code>Maybe Int</code>는 <code>Just Int</code>값 아니면 <code>Nothing</code>값이 될 수 있습니다. <code>Int</code>값을 <code>Just Int</code>로 만들려면, 그냥 <code>Just</code>로 감싸면 됩니다. 마치 <code>Just</code>가 인자로 <code>Int</code>를 받아 <code>Just Int</code>가 되는 함수 같습니다. 하지만, 일반 함수와 다르게 값 생성자는 <em>패턴 매칭</em>에 쓰일 수 있습니다. 이게 헛갈릴까 싶지만 처음 공부할때 혼동하는 경우가 있습니다.</p>
+<section class="footnotes" role="doc-endnotes">
 <hr />
-<div id="relation">
-
-</div>
-<p>[1] 타입에 따라 인스턴스를 고르니, 타입과 함수를 연관 짓는 함수로 볼 수 있습니다. 어떤 것과 어떤 것을 연관 지어 놓는 걸 함수라고 하는데, 어떤 것을 연관 짓냐에 따라 이름을 달리 붙여 놨습니다.</p>
+<ol>
+<li id="fn1" role="doc-endnote"><p>타입에 따라 인스턴스를 고르니, 타입과 함수를 연관 짓는 함수로 볼 수 있습니다. 어떤 것과 어떤 것을 연관 지어 놓는 걸 함수라고 하는데, 어떤 것을 연관 짓냐에 따라 이름을 달리 붙여 놨습니다.</p>
 <p>타입과 타입을 매핑 = 함수<br />
 타입과 함수를 매핑 = 타입 클래스<br />
 함수와 함수를 매핑 = 펑크터<br />
-펑크터와 펑크터를 매핑 = Natural Transform</p>
-<div id="main">
-
-</div>
-<p>[2] <code>main</code> 함수에서 흐름이 시작되는데, <code>main</code> 함수 자체가 <code>&gt;&gt;=</code> 로 엮어 놓은 함수 composition입니다.</p>
+펑크터와 펑크터를 매핑 = Natural Transform<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2" role="doc-endnote"><p><code>main</code> 함수에서 흐름이 시작되는데, <code>main</code> 함수 자체가 <code>&gt;&gt;=</code> 로 엮어 놓은 함수 composition입니다.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section>
 
 <div id="disqus_thread" style="padding-top:40px"></div>
 <script>

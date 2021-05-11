@@ -73,43 +73,44 @@
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Capture</span> (<span class="ot">a ::</span> <span class="op">*</span>)</span></code></pre></div>
 <p>값 생성자가 없는 타입이 어떤 의미가 있을까요? 값이 없다면 다른 값들과 어떤 연산도 못합니다. 타입만으로 영향을 줄 수 있는게 뭘까 생각해 봤습니다.</p>
 <p>프로그램은 값이 지나가는 길을 만드는 겁니다. 간단한 연산을 위한게 아니라면, 중간 중간 갈래 길을 만들어 조건에 맞게 길을 선택(분기)할 수 있게 만드는 게 프로그램입니다. 값이 없는 타입들은 다른 값들과 어울릴 수 없으나, <em>갈래 길</em>을 만드는 용도로 쓸 수 있습니다.</p>
-<p>타입으로 갈래 길을 만드는 하스켈 요소는 바로 <em>클래스와 인스턴스</em>입니다. 메소드에서 받은 인자 <em>타입에 따라 인스턴스를</em> 고를 수 있습니다. 이 요소를 적극 활용하는게 <em>Type Family</em><sup><a href="#typeFamily">[1]</a></sup> 입니다.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> famliy <span class="dt">Server</span><span class="ot"> layout ::</span> <span class="op">*</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="kw">instance</span> <span class="dt">Server</span> (<span class="dt">Get</span> a) <span class="ot">=</span> <span class="dt">IO</span> a</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="kw">instance</span> <span class="dt">Server</span> (a <span class="op">:&lt;|&gt;</span> b) <span class="ot">=</span> (<span class="dt">Server</span> a, <span class="dt">Server</span> b)</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="kw">instance</span> <span class="dt">Server</span> (a <span class="op">:&lt;|&gt;</span> b) <span class="ot">=</span> <span class="dt">Server</span> a <span class="op">:&lt;|&gt;</span> <span class="dt">Server</span> b</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="kw">instance</span> <span class="dt">Server</span> ((<span class="ot">s ::</span> <span class="dt">Symbol</span>) <span class="op">:&gt;</span> r) <span class="ot">=</span> <span class="dt">Server</span> r</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="kw">instance</span> <span class="dt">Server</span> (<span class="dt">Capture</span> a <span class="op">:&gt;</span> r) <span class="ot">=</span> a <span class="ot">-&gt;</span> <span class="dt">Server</span> r</span></code></pre></div>
+<p>타입으로 갈래 길을 만드는 하스켈 요소는 바로 <em>클래스와 인스턴스</em>입니다. 메소드에서 받은 인자 <em>타입에 따라 인스턴스를</em> 고를 수 있습니다. 이 요소를 적극 활용하는게 <em>Type Family</em><a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> 입니다.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> famliy <span class="dt">Server</span><span class="ot"> layout ::</span> <span class="op">*</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="kw">instance</span> <span class="dt">Server</span> (<span class="dt">Get</span> a) <span class="ot">=</span> <span class="dt">IO</span> a</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="kw">instance</span> <span class="dt">Server</span> (a <span class="op">:&lt;|&gt;</span> b) <span class="ot">=</span> (<span class="dt">Server</span> a, <span class="dt">Server</span> b)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="kw">instance</span> <span class="dt">Server</span> (a <span class="op">:&lt;|&gt;</span> b) <span class="ot">=</span> <span class="dt">Server</span> a <span class="op">:&lt;|&gt;</span> <span class="dt">Server</span> b</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="kw">instance</span> <span class="dt">Server</span> ((<span class="ot">s ::</span> <span class="dt">Symbol</span>) <span class="op">:&gt;</span> r) <span class="ot">=</span> <span class="dt">Server</span> r</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="kw">instance</span> <span class="dt">Server</span> (<span class="dt">Capture</span> a <span class="op">:&gt;</span> r) <span class="ot">=</span> a <span class="ot">-&gt;</span> <span class="dt">Server</span> r</span></code></pre></div>
 <p>이렇게 패밀리를 선언하면, 코드 중에 Server layout 이라 쓰고, 구체 타입은 컴파일 타임에 코드 조합에 따라 결정되도록 할 수 있습니다. 아래 route 메소드는 <em>코딩시 고정된 타입이 아니라, 컴파일 타임에 코드 조합에 따라 결정</em>하겠다는 표현입니다.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">HasServer</span> layout <span class="kw">where</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ot">  route ::</span> <span class="dt">Proxy</span> layout <span class="ot">-&gt;</span> <span class="dt">Server</span> layout <span class="ot">-&gt;</span> [<span class="dt">String</span>] <span class="ot">-&gt;</span> <span class="dt">Maybe</span> (<span class="dt">IO</span> <span class="dt">String</span>)</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="op">...</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="op">...</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="op">...</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="ot">serve ::</span> <span class="dt">HasServer</span> layout</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>      <span class="ot">=&gt;</span> <span class="dt">Proxy</span> layout <span class="ot">-&gt;</span> <span class="dt">Server</span> layout <span class="ot">-&gt;</span> [<span class="dt">String</span>] <span class="ot">-&gt;</span> <span class="dt">IO</span> <span class="dt">String</span></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>serve p h xs <span class="ot">=</span> <span class="kw">case</span> route p h xs <span class="kw">of</span></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="dt">Nothing</span> <span class="ot">-&gt;</span> <span class="fu">ioError</span> (<span class="fu">userError</span> <span class="st">&quot;404&quot;</span>)</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  <span class="dt">Just</span> m  <span class="ot">-&gt;</span> m</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">HasServer</span> layout <span class="kw">where</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ot">  route ::</span> <span class="dt">Proxy</span> layout <span class="ot">-&gt;</span> <span class="dt">Server</span> layout <span class="ot">-&gt;</span> [<span class="dt">String</span>] <span class="ot">-&gt;</span> <span class="dt">Maybe</span> (<span class="dt">IO</span> <span class="dt">String</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="op">...</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="op">...</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="op">...</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="ot">serve ::</span> <span class="dt">HasServer</span> layout</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>      <span class="ot">=&gt;</span> <span class="dt">Proxy</span> layout <span class="ot">-&gt;</span> <span class="dt">Server</span> layout <span class="ot">-&gt;</span> [<span class="dt">String</span>] <span class="ot">-&gt;</span> <span class="dt">IO</span> <span class="dt">String</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>serve p h xs <span class="ot">=</span> <span class="kw">case</span> route p h xs <span class="kw">of</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  <span class="dt">Nothing</span> <span class="ot">-&gt;</span> <span class="fu">ioError</span> (<span class="fu">userError</span> <span class="st">&quot;404&quot;</span>)</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  <span class="dt">Just</span> m  <span class="ot">-&gt;</span> m</span></code></pre></div>
 <p>serve 함수를 콜할 때 들어온 layout 에 따라 Server layout 타입이 결정됩니다. Server (Get a) 가 들어왔다면 route 의 타입은</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ot">route ::</span> <span class="dt">Proxy</span> (<span class="dt">Get</span> a) <span class="ot">-&gt;</span> <span class="dt">IO</span> a <span class="ot">-&gt;</span> [<span class="dt">String</span>] <span class="ot">-&gt;</span> <span class="dt">Maybe</span> (<span class="dt">IO</span> <span class="dt">String</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ot">route ::</span> <span class="dt">Proxy</span> (<span class="dt">Get</span> a) <span class="ot">-&gt;</span> <span class="dt">IO</span> a <span class="ot">-&gt;</span> [<span class="dt">String</span>] <span class="ot">-&gt;</span> <span class="dt">Maybe</span> (<span class="dt">IO</span> <span class="dt">String</span>)</span></code></pre></div>
 <p>로 구체 타입이 결정되고, HasServer (Get a) 인스턴스에 있는 route 를 부릅니다.</p>
 <p>… 계속<br />
 미완성 포스트</p>
+<section class="footnotes" role="doc-endnotes">
 <hr />
-<div id="typeFamily">
-
-</div>
-<p>[1] Type Family : 타입 레벨 함수</p>
-<p>타입끼리 연산과 갈래 길을 만드는 건 Type familiy를 통해 표현됩니다. 타입 연산은, <em>타입 매개 변수</em>를 가지고 있는 타입에 어떤 타입을 넣어주냐에 따라 <em>결과 타입이 결정</em>되는 걸 말합니다.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">Add</span> a b <span class="kw">where</span>  </span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">type</span> <span class="dt">SumTy</span> a b</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="ot">    plus ::</span> a <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> <span class="dt">SumTy</span> a b</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Add</span> <span class="dt">Integer</span> <span class="dt">Double</span> <span class="kw">where</span>  </span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">type</span> <span class="dt">SumTy</span> <span class="dt">Integer</span> <span class="dt">Double</span> <span class="ot">=</span> <span class="dt">Double</span></span></code></pre></div>
-<p>SumTy 타입은, 컴파일 타입에 코드 조합을 하다 Add Integer Double 인스턴스를 쓰게 되면 Double 타입이 됩니다. Type family를 쓰면, 인스턴스에 따라 메소드 시그니처를 다르게 할 수 있습니다. 인스턴스를 고를 때나, 위와 같이 메소드들의 타입을 결정을 지을 땐 값이 필요 없고, 타입만 있으면 됩니다. 값이 없는 타입이 보이면 코드 어딘가에서 이렇게 쓰겠구나 생각하면 됩니다.</p>
+<ol>
+<li id="fn1" role="doc-endnote"><p>Type Family : 타입 레벨 함수<br />
+타입끼리 연산과 갈래 길을 만드는 건 Type familiy를 통해 표현됩니다. 타입 연산은, <em>타입 매개 변수</em>를 가지고 있는 타입에 어떤 타입을 넣어주냐에 따라 <em>결과 타입이 결정</em>되는 걸 말합니다.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">Add</span> a b <span class="kw">where</span>  </span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">type</span> <span class="dt">SumTy</span> a b</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ot">    plus ::</span> a <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> <span class="dt">SumTy</span> a b</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Add</span> <span class="dt">Integer</span> <span class="dt">Double</span> <span class="kw">where</span>  </span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">type</span> <span class="dt">SumTy</span> <span class="dt">Integer</span> <span class="dt">Double</span> <span class="ot">=</span> <span class="dt">Double</span></span></code></pre></div>
+<p>SumTy 타입은, 컴파일 타입에 코드 조합을 하다 Add Integer Double 인스턴스를 쓰게 되면 Double 타입이 됩니다. Type family를 쓰면, 인스턴스에 따라 메소드 시그니처를 다르게 할 수 있습니다. 인스턴스를 고를 때나, 위와 같이 메소드들의 타입을 결정을 지을 땐 값이 필요 없고, 타입만 있으면 됩니다. 값이 없는 타입이 보이면 코드 어딘가에서 이렇게 쓰겠구나 생각하면 됩니다.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section>
 
 <div id="disqus_thread" style="padding-top:40px"></div>
 <script>
