@@ -81,7 +81,7 @@
 <span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>h3</span>
 <span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>g2</span>
 <span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>f1</span></code></pre></div>
-<p>괄호 안부터 실행됩니다. 그럼 다음 코드도 h가 가장 먼저 실행될까요?</p>
+<p>괄호 안부터 실행됩니다. 그럼 다음 코드도 <code>h</code>가 가장 먼저 실행될까요?</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ot">glue2 ::</span> (() <span class="ot">-&gt;</span> <span class="dt">IO</span> ()) <span class="ot">-&gt;</span> (() <span class="ot">-&gt;</span> <span class="dt">IO</span> ()) <span class="ot">-&gt;</span> <span class="dt">IO</span> () </span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>glue2 f1 f2 <span class="ot">=</span> <span class="kw">do</span> </span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    f1 ()</span>
@@ -92,26 +92,26 @@
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>g2</span>
 <span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>h3</span>
 <span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>begin <span class="fu">or</span> end</span></code></pre></div>
-<p>품고 품었다고 다 같지 않습니다. glue의 두 매개 변수 f와 x는 독립적이지 않습니다. x를 알아야만 f를 알 수 있습니다. 하지만 glue2의 두 매개 변수 f1과 f2는 독립적입니다. 그래서 <em>실행 순서가 서로 반대</em>가 됩니다. 눈에 보이는 구조만으론 구별할 수 없습니다. 구조를 만드는 접착제로 쓰인 glue, glue2의 정의에 따라 달라집니다.</p>
+<p>품고 품었다고 다 같지 않습니다. <code>glue</code>의 두 매개 변수 <code>f</code>와 <code>x</code>는 독립적이지 않습니다. <code>x</code>를 알아야만 <code>f</code>를 알 수 있습니다. 하지만 <code>glue2</code>의 두 매개 변수 <code>f1</code>과 <code>f2</code>는 독립적입니다. 그래서 <em>실행 순서가 서로 반대</em>가 됩니다. 눈에 보이는 구조만으론 구별할 수 없습니다. 구조를 만드는 접착제로 쓰인 <code>glue</code>, <code>glue2</code>의 정의에 따라 달라집니다.</p>
 <p>2021.5.1 추가<br />
-glue와 glue2는 IO컨텍스트에 있으므로 실행 순서를 지정해 놨다고 보면 됩니다. glue는 두 번째 인자 &gt;&gt;= _ -&gt; 첫 번째 인자<br />
-glue2는 첫 번째 인자 &gt;&gt;= _ -&gt; 두 번째 인자</p>
+<code>glue</code>와 <code>glue2</code>는 내부 구현이 <code>IO</code>컨텍스트에 있으므로 인자로 들어오는 액션의 실행 순서를 이미 지정해 놨다고 보면 됩니다. <code>glue</code>는 <code>두 번째 인자 &gt;&gt;= \_ -&gt; 첫 번째 인자</code><br />
+<code>glue2</code>는 <code>첫 번째 인자 &gt;&gt;= \_ -&gt; 두 번째 인자</code></p>
 <h2 id="품을-것인가-품-속으로-들어갈-것인가">품을 것인가, 품 속으로 들어갈 것인가</h2>
-<p>새로 들어오는 작업을 가장 바깥 쪽에 둘 수도 있고, 가장 안 쪽에 품어지도록 할 수도 있습니다. Free, Cont의 경우는 가장 안 쪽에 붙이고, Reader는 바깥 쪽에 둡니다. Reader는 안 쪽부터 실행되고 Free와 Cont는 바깥 쪽부터 실행됩니다. 결국 대부분 모나드는 do구문 안에 써있는 순서대로 동작합니다.</p>
+<p>새로 들어오는 작업을 가장 바깥 쪽에 둘 수도 있고, 가장 안 쪽에 품어지도록 할 수도 있습니다. <code>Free</code>, <code>Cont</code>의 경우는 가장 안 쪽에 붙이고, <code>Reader</code>는 바깥 쪽에 둡니다. <code>Reader</code>는 안 쪽부터 실행되고 <code>Free</code>와 <code>Cont</code>는 바깥 쪽부터 실행됩니다. 결국 대부분 모나드는 <code>do</code>구문 안에 써있는 순서대로 동작합니다.</p>
 <p>정말 여러 모나드들이 모두 이 구조를 만들기 위한 것인지 한 번 살펴보겠습니다.</p>
 <h2 id="free-모나드의-바인드">Free 모나드의 바인드</h2>
 <div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>(<span class="dt">Free</span> x) <span class="op">&gt;&gt;=</span> g <span class="ot">=</span> <span class="dt">Free</span> (<span class="fu">fmap</span> (<span class="op">&gt;&gt;=</span> g) x)</span></code></pre></div>
-<p>몇 겹의 Free로 쌓여 있든, 가장 안 쪽으로 들어가 g를 적용합니다. g의 결과값은 Free 타입이니 가장 안 쪽에 Free를 연결하는 효과가 생깁니다. <em>Free ..(Free ..(Free ..))</em></p>
+<p>몇 겹의 <code>Free</code>로 쌓여 있든, 가장 안 쪽으로 들어가 <code>g</code>를 적용합니다. <code>g</code>의 결과값은 <code>Free</code> 타입이니 가장 안 쪽에 <code>Free</code>를 연결하는 효과가 생깁니다. <em>Free ..(Free ..(Free ..))</em></p>
 <h2 id="cont-모나드의-바인드">Cont 모나드의 바인드</h2>
 <div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>s <span class="op">&gt;&gt;=</span> f <span class="ot">=</span> cont <span class="op">$</span> \c <span class="ot">-&gt;</span> runCont s <span class="op">$</span> \x <span class="ot">-&gt;</span> runCont (f x) c</span></code></pre></div>
-<p>runCont는 Cont를 벗겨내는 역할을 하는데, 여기선 읽기 편하게 runCont s를 그냥 s로 표기하고, cont는 다시 Cont로 만드는 생성자로 잠시 빼고 읽어 보겠습니다.</p>
+<p><code>runCont</code>는 <code>Cont</code>를 벗겨내는 역할을 하는데, 여기선 읽기 편하게 <code>runCont s</code>를 그냥 <code>s</code>로 표기하고, <code>cont</code>는 다시 <code>Cont</code>로 만드는 생성자로 잠시 빼고 읽어 보겠습니다.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>\c <span class="ot">-&gt;</span> s <span class="op">$</span>      \x <span class="ot">-&gt;</span> (f x) c</span></code></pre></div>
-<p>s 후 다음 작업이 f 이고, 그 다음 작업이 c 입니다. 코드 모양대로 표현하면 <em>s .. (f .. (c ..))</em></p>
+<p><code>s</code> 후 다음 작업이 <code>f</code> 이고, 그 다음 작업이 <code>c</code> 입니다. 코드 모양대로 표현하면 <em>s .. (f .. (c ..))</em></p>
 <h2 id="reader-모나드의-바인드">Reader 모나드의 바인드</h2>
 <div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>m <span class="op">&gt;&gt;=</span> k <span class="ot">=</span> <span class="dt">Reader</span> <span class="op">$</span> \r <span class="ot">-&gt;</span> runReader (k (runReader m r)) r </span></code></pre></div>
-<p>핵심만 보기 위해 몇가지 바꿔서 보겠습니다. runReader는 Reader를 벗겨내는 동작과 Reader는 생성자로 잠시 빼고 읽으면</p>
+<p>핵심만 보기 위해 몇가지 바꿔서 보겠습니다. <code>runReader</code>는 <code>Reader</code>를 벗겨내는 동작과 <code>Reader</code>는 생성자로 잠시 빼고 읽으면</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>\r <span class="ot">-&gt;</span> k (m r) r </span></code></pre></div>
-<p>r을 받아 m을 적용 후 결과를 k에 넘겨주는데, r도 또 넘겨 줍니다. <em>k (m …) …</em></p>
+<p><code>r</code>을 받아 <code>m</code>을 적용 후 결과를 <code>k</code>에 넘겨주는데, <code>r</code>도 또 넘겨 줍니다. <em>k (m …) …</em></p>
 
 <div id="disqus_thread" style="padding-top:40px"></div>
 <script>

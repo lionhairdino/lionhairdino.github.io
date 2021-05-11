@@ -57,8 +57,9 @@
     
 </div>
 
-<p>여기 글은 아래 사이트를 보기 전에 준비 운동으로 볼만한 포스트입니다.<br />
-https://www.fpcomplete.com/blog/2016/11/covariance-contravariance/</p>
+<p>여기 포스트에선 값이 아닌, <em>함수를 구조안에 가지고 있는 데이터 타입</em>을 위한 펑크터를 정의하는 연습을 하는 게 목적입니다. 함수 안에 들어있는 값에 대한 접근은 역시 매개 변수 말고는 없습니다. 고차 함수 스타일의 구조, 즉 안에 먼저 값을 가지고 있고, 함수를 기다리는 타입은 <em>넣어 줄 함수를 필요한 형태로 변형</em>해서 넣어줘야 합니다.</p>
+<p>아래 사이트를 보기 전에 준비 운동으로 볼만한 포스트입니다. 여기서 예시로 보인 소스들도 아래 사이트에 있는 소스를 이해를 돕기위해 네이밍을 다시한 정도의 소스입니다.</p>
+<p>https://www.fpcomplete.com/blog/2016/11/covariance-contravariance/</p>
 <h2 id="속성을-가지고-있는-고차-함수">속성을 가지고 있는 고차 함수</h2>
 <p><code>withRandom</code> 함수는 내부에 랜덤값을 가지고 있다가, 인자로 함수가 들어오면 랜덤값에 함수를 적용하는 함수입니다. 흔히 보이는 값을 먼저 쥐고 있고, 함수를 받으면 적용할 준비를 하는 패턴입니다.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">System.Random</span></span>
@@ -87,7 +88,7 @@ https://www.fpcomplete.com/blog/2016/11/covariance-contravariance/</p>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">fmap</span> f wv <span class="ot">=</span> <span class="op">...</span></span></code></pre></div>
 <p>아래처럼 쓰기 위한 <code>fmap</code>을 정의해야 합니다.</p>
 <pre><code>&gt; runWithValue (fmap (+1) $ fmap (+2) $ withRandom) print</code></pre>
-<p><code>callback</code>이 들어가기 전에 f와 묶여서 들어가야 합니다.</p>
+<p><code>callback</code>이 들어가기 전에 <em>f와 묶여서</em> 들어가야 합니다.</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fmap</span> f (<span class="dt">WithValue</span> wvAction) <span class="ot">=</span> <span class="dt">WithValue</span> (\callback <span class="ot">-&gt;</span> wvAction (callback <span class="op">.</span> f))</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>       <span class="op">^^^^^^^^^^^^^^^^^^^^</span>                           <span class="op">^^^^^^^^^^^^^^^^^^^^^^^</span></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co">--     패턴 매칭으로 action을 꺼내고                  액션에 callback을 넣기 전에 f와 묶어서 넣습니다.</span></span></code></pre></div>
@@ -106,7 +107,6 @@ https://www.fpcomplete.com/blog/2016/11/covariance-contravariance/</p>
 <span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="kw">do</span></span>
 <span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">flip</span> runWithValue <span class="fu">print</span> <span class="op">$</span> <span class="fu">fmap</span> (<span class="op">+</span><span class="dv">1000</span>) <span class="op">$</span> <span class="fu">fmap</span> (<span class="op">+</span><span class="dv">2000</span>) withRandom</span></code></pre></div>
 <p>※ <code>runWithValue ( ... ) print</code> 이렇게 두 번째 인자 때문에 괄호를 쓰는 걸 피하기 위해 흔히 <code>flip</code>을 써서 인자 순서를 뒤집습니다.</p>
-<p>여기 포스트에선 값이 아닌, <em>함수를 구조안에 가지고 있는 데이터 타입</em>을 위한 펑크터를 정의하는 연습을 하는 게 목적입니다. 함수 안에 들어있는 값에 대한 접근은 역시 매개 변수 말고는 없습니다. 고차 함수 스타일의 구조, 즉 안에 먼저 값을 가지고 있고, 함수를 기다리는 타입은 <em>넣어 줄 함수를 필요한 형태로 변형</em>해서 넣어줘야 합니다.</p>
 
 <div id="disqus_thread" style="padding-top:40px"></div>
 <script>
