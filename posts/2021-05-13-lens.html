@@ -74,7 +74,7 @@
 </figure>
 <h2 id="lens의-목적">Lens의 목적</h2>
 <p>예시 소스는 공식 튜토리얼에서 발췌했습니다.<br />
-https://hackage.haskell.org/package/lens-tutorial-1.0.4/docs/Control-Lens-Tutorial.html</p>
+<a href="https://hackage.haskell.org/package/lens-tutorial-1.0.4/docs/Control-Lens-Tutorial.html" class="uri">https://hackage.haskell.org/package/lens-tutorial-1.0.4/docs/Control-Lens-Tutorial.html</a></p>
 <p>우선 무엇을 위한 라이브러리인지부터 보겠습니다.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Atom</span> <span class="ot">=</span> <span class="dt">Atom</span> {<span class="ot"> _element ::</span> <span class="dt">String</span>,<span class="ot"> _point ::</span> <span class="dt">Point</span> } <span class="kw">deriving</span> (<span class="dt">Show</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Point</span> <span class="ot">=</span> <span class="dt">Point</span> {<span class="ot"> _x ::</span> <span class="dt">Double</span>,<span class="ot"> _y ::</span> <span class="dt">Double</span> } <span class="kw">deriving</span> (<span class="dt">Show</span>)</span>
@@ -252,7 +252,7 @@ Atom {_element = &quot;I am Atom&quot;, _point = Point {_x = 2.0, _y = 2.0}}</co
 <pre><code>map (    # (pointN . xN) (+1)    ) [atom1, atom2]</code></pre>
 <p>역시 map으로 잘 작동합니다. <em>왜 펑크터가 필요한 걸까요?</em></p>
 <h3 id="펑크터가-필요한-이유">펑크터가 필요한 이유</h3>
-<p>https://www.fpcomplete.com/haskell/tutorial/lens/</p>
+<p><a href="https://www.fpcomplete.com/haskell/tutorial/lens/" class="uri">https://www.fpcomplete.com/haskell/tutorial/lens/</a></p>
 <p>위 사이트에서 답을 찾았습니다. <code>over</code>, <code>view</code> 둘 다 같은 렌즈를 받도록 하기 위해서입니다. 좀 더 풀어서 얘기하면, 특정 필드의 값을 수정할 때와, 보기만 할 때 경로를 의미하는 렌즈가 다를 필요가 없으니, 이런 직관이 들어 맞도록 <code>over</code>와 <code>view</code>가 같은 타입의 렌즈를 받아야 합니다.</p>
 <p>우선 두 타입을 다르게 놓고 구현한 걸 보여 줍니다. 여기 있는 소스는 모두 fpcomplete 사이트에서 발췌했습니다.</p>
 <p>일단 목표를 코드로 설명하면,</p>
@@ -325,7 +325,7 @@ Atom {_element = &quot;I am Atom&quot;, _point = Point {_x = 2.0, _y = 2.0}}</co
 이 것도 <code>Functor</code> 스타일로 구현하면</p>
 <div class="sourceCode" id="cb44"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="ot">personAddressL ::</span> <span class="dt">LensGetter</span> <span class="dt">Person</span> <span class="dt">Address</span></span>
 <span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>personAddressL f person <span class="ot">=</span> (\address <span class="ot">-&gt;</span> person { personAddress <span class="ot">=</span> address}) <span class="op">&lt;$&gt;</span> f (personAddress person)</span></code></pre></div>
-<p>명시적인 <code>Const</code>는 사라지고, <code>LensModify</code> 때 정의한 함수와 같아 보이지 않나요?<br />
+<p><em>명시적인 Const는 사라지고</em>, <code>LensModify</code> 때 정의한 함수와 같아 보이지 않나요?<br />
 타입만 <code>LensGetter</code>냐, <code>LensModify</code>냐지 함수 본체body는 완전히 동일한 모양이 됐습니다.</p>
 <div class="sourceCode" id="cb45"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="ot">personAddressL ::</span> <span class="dt">LensGetter</span> <span class="dt">Person</span> <span class="dt">Address</span></span>
 <span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>personAddressL f person <span class="ot">=</span> (\address <span class="ot">-&gt;</span> person { personAddress <span class="ot">=</span> address}) <span class="op">&lt;$&gt;</span> f (personAddress person)</span>
