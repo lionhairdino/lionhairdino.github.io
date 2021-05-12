@@ -69,16 +69,16 @@
 <div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>func <span class="op">~</span>(a,b) <span class="ot">=</span> g a b</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- 이렇게 쓴 건 아래와 같은 의미</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>func p <span class="ot">=</span> g (<span class="fu">fst</span> p) (<span class="fu">snd</span> p)</span></code></pre></div>
-<p>p는 바로 튜플로 매칭하지 않고 있다가, fst를 만나면 튜플로 매칭합니다.</p>
+<p><code>p</code>는 바로 튜플로 매칭하지 않고 있다가, <code>fst</code>를 만나면 튜플로 매칭합니다.</p>
 <p>주의</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ot">func ::</span> [a] <span class="ot">-&gt;</span> [a]</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>func <span class="op">~</span>(x<span class="op">:</span>xs) <span class="ot">=</span> x<span class="op">:</span>xs</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>func [] <span class="ot">=</span> []</span></code></pre></div>
-<p>Lazy 패턴을 먼저 매칭하면 두 번째 나온 빈 리스트도 Lazy 패턴에서 매칭되므로 마지막 [] 패턴일 때 정의가 필요 없다는 경고가 나옵니다.</p>
+<p>Lazy 패턴을 먼저 매칭하면 두 번째 나온 빈 리스트도 Lazy 패턴에서 매칭되므로 마지막 <code>[]</code> 패턴일 때 정의가 필요 없다는 경고가 나옵니다.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>func <span class="op">~</span>(x<span class="op">:</span>xs) <span class="ot">=</span> x<span class="op">:</span>xs</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- 위 패턴을 접근자accessor 로 풀어 쓰면</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>func p <span class="ot">=</span> <span class="fu">head</span> p <span class="op">:</span> <span class="fu">tail</span> p</span></code></pre></div>
-<p>빈 리스트 검사를 하지 않은 상태에서 head와 tail에 넘겨지므로 위험한 모양이 됩니다.</p>
+<p>빈 리스트 검사를 하지 않은 상태에서 <code>head</code>와 <code>tail</code>에 넘겨지므로 위험한 모양이 됩니다.</p>
 <p>아마도 Lazy 패턴은 퍼포먼스가 필요할 때 쓸 것 같습니다. 두 개 이상의 값 생성자를 가진 타입과 Lazy 패턴 매칭을 하는 건 피하는게 좋다고 합니다.</p>
 
 <div id="disqus_thread" style="padding-top:40px"></div>

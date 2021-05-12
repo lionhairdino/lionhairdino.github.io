@@ -58,7 +58,7 @@
 </div>
 
 <p>길게 설명할 확장이 아닌 것 같습니다.</p>
-<p>함수 서명(선언)의 폴리모픽 타입의 유효 범위scope를 where절까지 확장 할 수 있습니다.</p>
+<p>함수 서명(선언)의 폴리모픽 타입의 유효 범위scope를 <code>where</code>절까지 확장 할 수 있습니다.</p>
 <p><a href="https://wiki.haskell.org/Scoped_type_variables" class="uri">https://wiki.haskell.org/Scoped_type_variables</a> 코드 발췌</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ot">{-# LANGUAGE ScopedTypeVariables #-}</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ot">mkpair1 ::</span> <span class="kw">forall</span> a b<span class="op">.</span> a <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> (a,b)</span>
@@ -66,13 +66,13 @@
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">where</span></span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="ot">      ida ::</span> a <span class="ot">-&gt;</span> a <span class="co">-- 타입 서명의 a와 같은 a입니다.</span></span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>      ida <span class="ot">=</span> <span class="fu">id</span></span></code></pre></div>
-<p>forall이 있고 없고에 따라 차이를 보면,</p>
+<p><code>forall</code>이 있고 없고에 따라 차이를 보면,</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ot">mkpair2 ::</span> <span class="kw">forall</span> a b<span class="op">.</span> a <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> (a,b)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>mkpair2 aa bb <span class="ot">=</span> (ida aa, bb)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">where</span></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="ot">      ida ::</span> b <span class="ot">-&gt;</span> b <span class="co">-- 타입 서명의 b와 같은 b이기 때문에 리턴 타입이 달라 오류입니다.</span></span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>      ida <span class="ot">=</span> <span class="fu">id</span></span></code></pre></div>
-<p>forall이 없으면</p>
+<p><code>forall</code>이 없으면</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ot">mkpair3 ::</span> a <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> (a,b)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>mkpair3 aa bb <span class="ot">=</span> (ida aa, bb)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">where</span></span>
