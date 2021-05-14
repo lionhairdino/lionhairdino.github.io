@@ -37,7 +37,9 @@
         <meta property="og:title" content="Free 모나드 패턴" />
         <meta property="og:site_name" content="Lionhairdino" />
         <meta property="og:url" content="https://lionhairdino.github.io" />
-        <meta property="og:image" content="https://lionhairdino.github.io/images/state400px.png" />
+
+<meta property="og:image" content="https://lionhairdino.github.io/images/state400px.png" />
+
 <meta name="keywords" content="free monad, monad, dsl, edsl, recursive type, 재귀 타입, 모나드, domain specific language">
     </head>
     <body>
@@ -76,7 +78,7 @@
 <div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- (1)번의 오른 쪽 Free의 안 쪽 것만 보면</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>(<span class="fu">fmap</span> (<span class="op">&gt;&gt;=</span> g) x)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- x는 왼쪽 Free x로 받은 것에서 Free를 떼어낸 것</span></span></code></pre></div>
-<p>위의 <code>x</code>는 펑크터입니다. <code>x</code>는 <code>f (*Free f r*)</code> 입니다. GHC는 펑크터<code>f</code> 인스턴스의 <code>fmap</code>을 선택합니다. 펑크터 안에 들어 있는 값 <em>Free f r</em>에 다시 바인드를 적용합니다.</p>
+<p>위의 <code>x</code>는 펑크터입니다. <code>x</code>는 f (<em>Free f r</em>) 입니다. GHC는 펑크터<code>f</code> 인스턴스의 <code>fmap</code>을 선택합니다. 펑크터 안에 들어 있는 값 <em>Free f r</em>에 다시 바인드를 적용합니다.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- Free x는 Free (f (Free f r)) 값이거나, Pure r 값</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- Free값일 때 x 와 (f (Free f r)) 이 매칭</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>(<span class="dt">Free</span> f r) <span class="op">&gt;&gt;=</span> g</span></code></pre></div>
@@ -208,15 +210,15 @@
 <span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a><span class="ot">exFuncPositive ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Free</span> <span class="dt">MyMaybe</span> <span class="dt">Int</span></span>
 <span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a>exFuncPositive x <span class="op">|</span> x <span class="op">&gt;</span> <span class="dv">0</span> <span class="ot">=</span> <span class="dt">Pure</span> x</span>
-<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a>              <span class="op">|</span> <span class="fu">otherwise</span> <span class="ot">=</span> <span class="dt">Free</span> <span class="dt">MyNothing</span></span>
+<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a>                 <span class="op">|</span> <span class="fu">otherwise</span> <span class="ot">=</span> <span class="dt">Free</span> <span class="dt">MyNothing</span></span>
 <span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a><span class="ot">exFuncEven ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Free</span> <span class="dt">MyMaybe</span> <span class="dt">Int</span></span>
 <span id="cb13-31"><a href="#cb13-31" aria-hidden="true" tabindex="-1"></a>exFuncEven x <span class="op">|</span> x <span class="ot">`mod`</span> <span class="dv">2</span> <span class="op">==</span> <span class="dv">0</span> <span class="ot">=</span> <span class="dt">Pure</span> x </span>
-<span id="cb13-32"><a href="#cb13-32" aria-hidden="true" tabindex="-1"></a>          <span class="op">|</span> <span class="fu">otherwise</span> <span class="ot">=</span> <span class="dt">Free</span> <span class="dt">MyNothing</span></span>
+<span id="cb13-32"><a href="#cb13-32" aria-hidden="true" tabindex="-1"></a>             <span class="op">|</span> <span class="fu">otherwise</span> <span class="ot">=</span> <span class="dt">Free</span> <span class="dt">MyNothing</span></span>
 <span id="cb13-33"><a href="#cb13-33" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb13-34"><a href="#cb13-34" aria-hidden="true" tabindex="-1"></a><span class="ot">exFunc3x ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Free</span> <span class="dt">MyMaybe</span> <span class="dt">Int</span></span>
 <span id="cb13-35"><a href="#cb13-35" aria-hidden="true" tabindex="-1"></a>exFunc3x x <span class="op">|</span> x <span class="ot">`mod`</span> <span class="dv">3</span> <span class="op">==</span> <span class="dv">0</span> <span class="ot">=</span> <span class="dt">Pure</span> x</span>
-<span id="cb13-36"><a href="#cb13-36" aria-hidden="true" tabindex="-1"></a>        <span class="op">|</span> <span class="fu">otherwise</span> <span class="ot">=</span> <span class="dt">Free</span> <span class="dt">MyNothing</span></span>
+<span id="cb13-36"><a href="#cb13-36" aria-hidden="true" tabindex="-1"></a>           <span class="op">|</span> <span class="fu">otherwise</span> <span class="ot">=</span> <span class="dt">Free</span> <span class="dt">MyNothing</span></span>
 <span id="cb13-37"><a href="#cb13-37" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb13-38"><a href="#cb13-38" aria-hidden="true" tabindex="-1"></a><span class="ot">func ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Free</span> <span class="dt">MyMaybe</span> <span class="dt">Int</span></span>
 <span id="cb13-39"><a href="#cb13-39" aria-hidden="true" tabindex="-1"></a>func x <span class="ot">=</span> <span class="kw">do</span> <span class="co">-- 모나드 동작</span></span>
