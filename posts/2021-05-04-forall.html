@@ -60,8 +60,8 @@
     
 </div>
 
-<p><code>forall</code>은 말 그대로 모든 타입입니다. 그런데 때에 따라 해석을 약간 다르게 해야합니다.</p>
-<p>RankNTypes 설명은 남현욱님의 설명이 좋습니다. 여기 글은 <a href="https://opentutorials.org/course/2063/11681">RankNType</a> 글을 이해한 후 생각해 볼만한 내용입니다.</p>
+<p>에러 관련 포스트들에서 몇 번 강조했는데 <code>forall</code>은 말 그대로 모든 타입입니다. 어떤 타입으로든 카멜레온처럼 변할 수 있다가 아니라, 어떤 타입도 처리할 수 있어야 한다는 뜻입니다. ( 참고 - <a href="../errors/2020-07-15-rigidTypeVariable.html">컴파일 에러 읽기 - rigid type variable</a> ) 그런데, 이 걸 명시적으로 써야 하는 경우가 있습니다. 바로 Rank 개념이 필요한 경우입니다.</p>
+<p>RankNTypes 설명은 남현욱님의 설명이 좋습니다. 여기 글은 <a href="https://opentutorials.org/course/2063/11681">RankNType</a> 글을 본 후 생각해 볼만한 내용입니다.</p>
 <p>위 사이트에서 예를 든 소스를 가져와 약간 변형해 보겠습니다.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ot">{-# LANGUAGE RankNTypes #-}</span> </span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -90,7 +90,7 @@
     • In the expression: 'a'
 7 |     print $ foo length [1,2,3,4] ['a','b','c']
   |                                   ^^^</code></pre>
-<p>왜 그럴까요? 일단, 하나는 <code>No instance</code>, 하나는 <code>Couldn't match</code> 입니다. 일단,</p>
+<p>왜 그럴까요? 일단, 하나는 <code>No instance</code>, 하나는 <code>Couldn't match</code> 입니다.</p>
 <ul>
 <li><code>No instance</code>인 이유는, 리터럴 <code>1</code>이 <code>Int</code>나 <code>Integer</code> 같이 딱 하나의 타입으로 추론되지 않고 <code>Num</code> 클래스의 인스턴스란 것 까지만 추론되었기 때문입니다.<br />
 </li>
@@ -101,35 +101,35 @@
 <ol type="1">
 <li><code>No instance</code> : 클래스는 추론됐는데, 해당 타입을 키로 하는 인스턴스는 없다.</li>
 </ol>
-<ol type="1">
+<ul>
 <li>서명 체크를 지나, 나중에 코드 조립 중 들어온 타입을 보니 <code>1</code>이 들어왔습니다.<br />
 </li>
 <li><code>1</code>이란 리터럴로 추론한 타입은 <code>Num</code> 클래스의 인스턴스입니다.<br />
 </li>
 <li>지금 정해지지 않은 타입, <code>모든 타입 a</code>가 <code>Num</code>의 인스턴스여야 한다는 말입니다. <code>a</code>는 <code>모든 타입</code>인데, <code>Num</code> 인스턴스 중 <em>모든 타입용 인스턴스</em>는 당연히 없습니다.</li>
-</ol>
+</ul>
 <ol start="2" type="1">
 <li><code>Couldn't match</code> : 특정 타입까지 추론됐는데, 다른 조건에서 추론된 타입이 일치하지 않는다.</li>
 </ol>
-<ol type="1">
+<ul>
 <li>서명 체크를 지나 , 나중에 코드 조립 중 들어온 타입을 보니 <code>'a'</code>가 들어왔습니다.<br />
 </li>
 <li><code>'a'</code>를 보고 추론할 수 있는 타입은 <code>Char</code> 하나입니다. 구체 타입 <code>Char</code>로 추론되었습니다.<br />
 </li>
 <li>지금 정해지지 않은 타입, <code>모든 a</code>는 <code>모든 타입</code>이지 아직 하나의 구체 타입이 아닙니다. <code>모든 타입</code>과 <code>Char</code>는 매치되지 않습니다.</li>
-</ol>
-<p>만일 서명에서 영향을 주는 <code>forall a</code>였다면, GHC는 “이 매개 변수에 들어오는 타입은 뭐든 상관없어. 이 함수는 어떤 타입이든 처리할 수 있어” 라고 받아들입니다. (나중에 코드 조립할 때 들어오는 타입은 <code>모든forall a 타입</code>일 필요 없습니다.)<br />
+</ul>
+<p>만일 서명에서 영향을 주는 <code>forall a</code>였다면, GHC는 “이 매개 변수에 들어오는 타입은 뭐든 상관없어. 이 함수는 어떤 타입이든 처리할 수 있어” 라고 받아들입니다. (나중에 코드 조립할 때 들어오는 타입은 <code>모든forall a 타입</code>일 필요 없습니다. <code>Int</code>가 들어와도 되고, <code>Char</code>가 들어와도, … 됩니다.)<br />
 하지만 괄호가 있으면, GHC는 “나중에 들어오는 타입이 어느 한 타입이 아니라, <code>모든 타입 forall a</code>이어야만 해”라고 받아들입니다.</p>
 <p><code>foo</code>의 첫 번째 매개 변수의 타입은 <code>forall a. [a] -&gt; Int</code> 가 아니라, <code>(forall a. [a] -&gt; Int)</code>로 괄호로 싸여져 있습니다. 서명 단계가 아니라, 조립 단계 때 <code>forall a</code>타입을 다루는 함수가 들어오는지 확인한다는 말입니다. 이 매개 변수를 통해 들어온 함수의 타입은 어느 한 타입으로 고정된 타입이 아닌 <code>forall a. [a] -&gt; Int</code> 로 고정된 타입입니다. 함수 몸체에서 쓰일 때마다 <code>forall a</code>를 끌고 다니며 독립적으로 체크한다는 말입니다. 그래서 <code>length</code>란 함수가 들어 와서 <code>f x == f y</code> 에서 쓰일 때</p>
 <ol type="1">
 <li><code>x</code>에 적용한 <code>length</code> 함수는 <code>forall a. [a] -&gt; Int</code> 타입으로 서명에서 정한 조건을 통과했으니, 이제 x의 타입에 따라 구체 타입을 추론합니다.</li>
 <li><code>y</code>에 적용한 <code>length</code> 함수도 <code>forall a. [a] -&gt; Int</code> 타입으로 여기서도 통과하고, 구체 타입을 독립적으로 추론합니다.</li>
 </ol>
-<p>아직 명확하지 않은데, 하나는 서명 체크 단계이고, 다른 하나는 코드 조립 단계로 이해하면 되지 않을까 합니다. 명확한 자료가 찾아지면 보충하도록 하겠습니다.</p>
+<p>아직 명확하지 않은데, 하나는 함수 내부와 외부가 일치하는지 보는 서명 체크 단계에 쓰이고, 다른 하나는 함수 내부 코드 조립 단계로 이해하면 되지 않을까 합니다. 명확한 자료가 찾아지면 보충하도록 하겠습니다.</p>
 <p><code>모든 타입 forall a. a</code>란 말은</p>
 <ol type="1">
-<li>서명 단계에선 “<em>어떤 타입으로 결정되어도 돼</em>”</li>
-<li>조립 단계에선 “<em>모든 타입을 다 처리할 수 있어</em>”</li>
+<li>서명 단계에선 “<em>어떤 타입으로 결정되어도 돼</em>” - “조립할 때 해당 매개 변수로 어떤 타입이 들어오든 상관 없어”</li>
+<li>내부 조립 단계에선 “<em>모든 타입을 다 처리할 수 있어</em>” -</li>
 </ol>
 <p>예를 들면,<br />
 서명 단계의 <code>forall a. a</code>란 곳으로 <code>Int</code>가 들어오면 통과할 수 있지만,<br />
