@@ -11,7 +11,7 @@
 <meta property="og:description" content="모나드 기초부터 설명하는 문서는 아닙니다. 모나드가 뭔지보다 모나드가 왜 필요한가가 더 궁금해 정리한 문서입니다." />
 
         <link rel="stylesheet" type="text/css" href="../css/default.css" />
-        <link rel="icon" href="favicon.svg" />
+        <link rel="icon" href="http://lionhairdino.github.io/favicon.svg" />
         <link rel="icon" type="image/png" href="../Lionhairdino16px.png" sizes="16x16" />
         <link rel="icon" type="image/png" href="../Lionhairdino24px.png" sizes="24x24" />
         <link rel="icon" type="image/png" href="../Lionhairdino32px.png" sizes="32x32" />
@@ -29,7 +29,7 @@
         <link rel="apple-touch-icon-precomposed" href="../Lionhairdino180px.png" sizes="180x180" />
         <link rel="icon" type="image/png" href="../Lionhairdino192px.png" sizes="192x192" />
         <link rel="manifest" href="../site.webmanifest" />
-        <link rel="mask-icon" href="../Lionhairdino_black.svg" color="#ff7500" />
+        <link rel="mask-icon" href="http://lionhairdino.github.io/Lionhairdino_black.svg" color="#ff7500" />
         <meta name="msapplication-TileImage" content="/Lionhairdino144px.png" />
         <meta name="msapplication-TileColor" content="#ff7500" />
         <meta name="theme-color" content="#ffffff" />
@@ -41,6 +41,8 @@
 <meta property="og:image" content="https://lionhairdino.github.io/images/whyMonad.png" />
 
 <meta name="keywords" content="monad, monoid, category theory, 모나드, 모노이드, 범주론, 펑크터, 어플리커티브 펑크터, applicative functor, functor, endfunctor, kleisly, closer">
+<script src="../script/copycode.js"></script>
+
     </head>
     <body>
         <div id="header">
@@ -105,7 +107,7 @@
 <p>오브젝트가 갖고 있는 어떤 속성도 관심없고, 오브젝트들끼리의 관계만 의미를 두는 이론입니다. (오브젝트는 그냥 관계의 출발점과 끝점을 표시하는 점으로만 보면 됩니다.) 하스켈은 함수를 품고 품어서 프로그램을 완성하므로, 모피즘 <a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> 합성이라는 개념과 많이 닮아 있습니다. 하스켈의 한 데이터 구조를 대상으로 하는 함수들은 합성 능력이 있어야 쓸모가 있습니다.</p>
 <p>이렇게 합성이 가능한 구조를 모노이드라 부릅니다.(조금 더 정교한 정의는 바로 아래 참조) 모노이드로 만들면 프로그래밍할 때, 합성이 가능하다는 걸 보장 받을 수 있습니다. 보통은 입출력이 같은 성격의 것들을 합성하게 되는데, 때로는 몇 가지 도구의 도움을 받으면, 성격이 약간 다른 것들 끼리도 엮을 수 있습니다. 이렇게 다른 도구의 도움으로 모노이드가 되는 구조를 모나드라 부릅니다. 이 도구들에 대한 자세한 얘기는 모노이드부터 살펴본 후에 보도록 하겠습니다.</p>
 <h2 id="왜-모노이드로-만들까">왜 모노이드로 만들까?</h2>
-<p><em>검증 필요</em><br />
+<p><em>수학의 간단한 규칙들이 프로그래밍에 어떤 모습으로 나타나는가를 설명하는 자료를 찾기 힘듭니다. 명확한 근거 없이 고민한 문제라 검증이 필요합니다</em><br />
 카테고리 이론은 집합 이론에서 나오는 모든 개념을 오브젝트들의 관계로만 정의(표현)합니다. 집합의 모노이드를 카테고리식으로 정의할 수 있습니다. 집합의 모노이드는</p>
 <ul>
 <li>항등원unit이 있고</li>
@@ -138,15 +140,15 @@
 <li>결합 법칙을 따른다면, 함수 하나 하나가 어떤 외부 요소와도 상관없이 독립적으로 자신의 일만 한다는 말입니다. 만일 함수가 외부 요소에 의존한다면 결합을 다르게 할 경우 결과가 다르게 나올 수 있습니다.<br />
 <code>1 + 2 + 3 = (1 + 2) + 3 = 1 + (2 + 3)</code><br />
 하지만 (-)는 다릅니다.<br />
-<code>1 - 2 - 3 = (1 - 2) - 3 \= 1 - (2 - 3)</code><br />
-결합 순서라는 외부 요소에 따라 함수의 동작이 영향을 받습니다. <em>검증 필요</em><br />
-</li>
-<li>항등원이 없으면 모피즘의 조합으로 모든 요소를 표현할 수 없습니다. 위 이항 함수의 설명과 같은 개념으로, 항등원이 있어야 total 함수가 될 수 있습니다. <em>검증 필요</em></li>
+<code>1 - 2 - 3 = (1 - 2) - 3 \= 1 - (2 - 3)</code></li>
 </ol>
+<p>결합 순서라는 외부 요소<em>?</em>에 따라 함수의 동작이 영향을 받습니다. <em>검증 필요</em><br />
+1. 항등원이 없으면 모피즘의 조합으로 모든 요소를 표현할 수 없습니다. 위 이항 함수의 설명과 같은 개념으로, 항등원이 있어야 total 함수가 될 수 있습니다. <em>검증 필요</em></p>
 <p><em>왜 모노이드로 만들려고 할까요?</em> 카테고리의 정의는 <code>a-&gt;b</code> , <code>b-&gt;c</code> 이면 반드시 <code>a-&gt;c</code>로 가는 함수가 존재합니다.카테고리란 말은 컴포지션을 할 수 있다라는 말입니다. 그런데, 오브젝트가 여러 개라면 그들 사이의 모피즘(함수), 컴포지션, 항등 함수를 모두 정의해야 카테고리가 됩니다. 하지만 모노이드로 만들면, 함수의 합성으로 모든 모피즘이 표현 가능하다는게 보장되므로 쉽게 카테고리가 됩니다. 하스켈의 모나드는 “카테고리로 만들려고 한다”고 말할 수 있고, 더 구체적으로 말하면 “모노이달 카테고리(오브젝트가 하나만 있는 카테고리)의 모노이드로 만들려고 한다”고 말할 수 있습니다. <em>모노이달 카테고리의 모노이드가 되면, 컴포지션을 자유롭게 할 수 있는 구조</em>가 됩니다.</p>
 <p>물론 다른 검증된 카테고리의 수학적 이론들을 적용할 수 있게 되는 효과가 있겠지만, 프로그래머에게 제일 와닿는 특징은 컴포지션입니다.</p>
 <p>※ Monoid 단어 뜻<br />
 mono는 하나를 뜻하고, oid는 비슷하지만 같지 않은 걸 뜻합니다. 이렇게 보면 하나고, 저렇게 보면 하나가 아닌 어떤 것 쯤 아닐까요. 0을 포함한 양의 정수는 더하기 연산을 쓰면 모노이드라 하는데, 모두 succ가 반복되어 있는 한 가지 모양으로 표현할 수 있고, 또는 모두 하나의 뿌리에서 나온 것들이라 표현할 수도 있다는 의미 아닐까요.</p>
+<p>(갈루아의 군론에 들어간 아이디어를 정확히 잡아내면 좋지만, 그렇게 하려면 역시나 논문의 늪으로 빠져서 전공을 바꿔야 할지도 모릅니다. 일단, 상상에서 멈추도록 하겠습니다.)</p>
 <h2 id="펑크터-펑터-함자-functor">펑크터 (펑터, 함자) Functor</h2>
 <p>카테고리와 카테고리 매핑이 펑크터</p>
 <p>하스켈에서 보면, 소스 카테고리의 모피즘을 다른 카테고리의 모피즘과 매핑하고, 소스 카테고리의 오브젝트를 다른 카테고리의 오브젝트와 매핑하는, 모피즘과 오브젝트 둘 모두를 매핑하는 걸 펑크터라 하는데, 카테고리 이론쪽에서는 오브젝트는 관심의 대상이 아니기 때문에 그냥 서로 다른 카테고리에 있느 모피즘들끼리 매핑하는 걸 펑크터라 보면 됩니다.</p>
@@ -209,14 +211,16 @@ a , b, c 는 폴리모픽을 뜻하므로 대표 타입으로 <code>a -&gt; m b<
 <code>a -&gt; m b</code> 함수를 컴포지션 하려면 <code>join</code>이 필요하다고 말할 수 있습니다.</p>
 <p>다른 타입의 컴포지션과 달리 <code>a -&gt; m b</code> 타입 함수가 왜그리 중요한 역할을 하게 됐을까요?</p>
 <h2 id="왜-a---m-b-타입-함수가-특별할까">왜 <code>a -&gt; m b</code> 타입 함수가 특별할까?</h2>
-<p><code>m a -&gt; m b</code> 타입<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a>으로 함수를 만들면 복잡한 개념 없이 품고 품게composition 할 수 있지 않을까 생각이 듭니다. 하지만, <code>m</code> 컨텍스트에서 <code>m</code> 컨텍스트로 가면 품는 동안 반드시 <code>m</code> 컨텍스트가 발현된다는 보장이 없습니다. <code>m</code>을 다루는 함수면 <code>m</code>안에 있는 건 뭔지 신경쓰지 않을 수도 있습니다. <code>fmap</code>이 동작하거나, 패턴 매칭이 나와야지만 Side effect가 드러납니다. <code>m</code>을 열어 보는 순간이 있어야 합니다. <code>m a</code> 와 <code>a -&gt; m b</code> 함수를 받으면, <code>m a</code> 에서 <code>m</code> 을 벗겨내는 작업을 해야만 <code>a -&gt; m b</code> 함수를 적용할 수 있습니다. 다시 말해, <em>컨텍스트가 반드시 발현</em>됩니다. 수학이 아닌, 순수하게 프로그래밍 입장에서 바라 봤습니다.</p>
+<p><code>m a -&gt; m b</code> 타입<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a>으로 함수를 만들면 복잡한 개념 없이 품고 품게composition 할 수 있지 않을까 생각이 듭니다. 하지만, <code>m</code> 컨텍스트에서 <code>m</code> 컨텍스트로 가면 품는 동안 반드시 <code>m</code> 컨텍스트가 발현된다는 보장이 없습니다. <code>m</code>을 다루는 함수면 <code>m</code>안에 있는 건 뭔지 신경쓰지 않을 수도 있습니다. <code>fmap</code>이 동작하거나, 패턴 매칭이 나와야지만 Side effect가 드러납니다. <code>m</code>을 열어 보는 순간이 있어야 합니다. <code>m a</code> 와 <code>a -&gt; m b</code> 함수를 받으면, <code>m a</code> 에서 <code>m</code> 을 벗겨내는 작업을 해야만 <code>a -&gt; m b</code> 함수를 적용할 수 있습니다. 다시 말해, <em>컨텍스트가 반드시 발현</em>됩니다. 수학이 아닌, 순수하게 프로그래밍 입장에서 바라 봤습니다. 참고 - <a href="https://lionhairdino.github.io/posts/2020-06-24-WrappingType.html#%EA%B0%92-%EC%83%9D%EC%84%B1%EC%9E%90%EB%A5%BC-%EB%B2%97%EA%B8%B8-%EB%95%8C-%EB%B0%9C%ED%98%84%EB%90%98%EB%8A%94-%EC%BB%A8%ED%85%8D%EC%8A%A4%ED%8A%B8">값을 감싸는 이유</a></p>
 <h2 id="컨텍스트-context">컨텍스트 Context</h2>
 <p>문장과 문장 사이, 행간으로 번역하기도 하고, 맥락이라고 번역하기도 하는데, 무언가 명시적으로 언급하진 않았지만 현재 작업을 할 때 영향을 미치는 환경, 상황 같은 걸 말합니다. 코딩에서는 어떤 모양으로 컨텍스트가 나타날까요? 같은 성격의 작업을 할 때마다 항상 반복해서 실행되는 코드가 바로 컨텍스트입니다.<a href="#fn5" class="footnote-ref" id="fnref5" role="doc-noteref"><sup>5</sup></a> 바인드 안에서 fmap을 불러 항상 컨텍스트 작업을 합니다.</p>
 <p>“컨텍스트를 이용해서 Side effect가 있는 비순수 함수와 <em>같은 결과</em>를 순수 함수로 만들어낸다”라고 말해야지, “컨텍스트는 side effect를 의미한다”라고 하면 틀린 말입니다.</p>
+<p>참고 - <a href="../posts/2020-07-02-Context.html">컨텍스트, Applicative Functor, Traversable</a></p>
 <h2 id="비순수-작업에-관여하는-부분만-떼어내-보면-모나드가-아니라-펑크터의-속성이다">비순수 작업에 관여하는 부분만 떼어내 보면 모나드가 아니라 펑크터의 속성이다</h2>
 <p>Maybe의 컨텍스트인 “Nothing일 수도 있어” 라는 컨텍스트를 처리하는 건 펑크터의 fmap이 맡습니다. fmap에서 Nothing이냐, Just냐에 따라 분기가 일어납니다. 이렇게 분기가 일어난 결과를 <em>다음 작업과 연결하는 작업을 담당하는게 모나드</em>입니다. 모나드의 bind 구현을 보면 join이 fmap을 품은 형태입니다. fmap으로 Side effect를 발현시키고 나온 결과물을 다음 액션과 연결하기 위해(타입을 맞추기 위해) join을 씌우는 모양입니다.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>x <span class="op">&gt;&gt;=</span> f     <span class="ot">=</span>     join      (<span class="fu">fmap</span> f x)</span></code></pre></div>
 <h2 id="상태를-넘기는-영리한-방법이야">상태를 넘기는 영리한 방법이야?</h2>
-<p>특정 모나드의 동작만 놓고, 이렇게 동작하는게 모나드야라고 설명한 말입니다. 사람이 앉아서 밥을 먹는 걸 봤다고, 앉아서 밥을 먹는 건 사람이야 라고 얘기하면 사람이 뭔지 알기 어렵습니다. “상태를 넘기는 걸 모나드 패턴으로 구현할 수도 있어”가 더 맞는 표현이라 생각합니다. 모나드를 특정 문제를 위한 패턴으로만 접근하면 꽤 멀리 돌아서 모나드에 도착할지도 모릅니다.</p>
+<p>특정 모나드의 동작만 놓고, 이렇게 동작하는게 모나드야라고 설명한 말입니다. 사람이 앉아서 밥을 먹는 걸 봤다고, 앉아서 밥을 먹는 건 사람이야 라고 얘기하면 사람이 뭔지 알기 어렵습니다. “상태를 넘기는 걸 모나드 패턴으로 구현할 수도 있어”가 더 맞는 표현입니다. 모나드를 특정 문제를 위한 패턴으로만 접근하면 꽤 멀리 돌아서 모나드에 도착할지도 모릅니다.</p>
 <h2 id="모나드가-왜-수많은-난제들을-해결할까">모나드가 왜 수많은 난제들을 해결할까?</h2>
 <p>함수가 함수를 품을때마다 반드시 fmap이 한 번씩 동작합니다. 체이닝할 때 매 번 뭔가 작업을 반복적으로 해야 한다면 딱 어울리는 패턴입니다.</p>
 <p>Maybe는 컴포지션할 때마다 매 번 “Nothing 인지 검사하고”<br />
@@ -228,18 +232,18 @@ IO는 컴포지션할 때마다 매 번 “Status처럼 런타임 상태값realw
 <p>그리고 또 한가지,<br />
 카테고리 이론 쪽에선 의도한게 아닐 것 같은데요, 모나드의 굉장히 중요한 성격이 있습니다. 하스켈은 Lazy한 함수들이 순차적으로 실행된다는 보장이 없습니다. 하지만 함수들이 품고 품은 상태로 엮인 상태에서, 현재 함수를 실행하려면 반드시 이전 단계 함수의 결과값이 꼭 필요한 상태가 되게 하면, 자연스럽게 함수들 사이에 실행 순서가 생깁니다. 모나드 패턴으로 엮을 때 이 효과가 자연스럽게 생깁니다. 수학에서 개념을 가져왔지만, 수학 개념에서 주목하지 않았던 특징들도 나타납니다.</p>
 <p>정리하면, 함수를 컴포지션할 때마다 항상 처리해야 하는 작업이 있다거나, 실행 순서가 지켜져야 하는 작업이라면, 모나드가 딱입니다.</p>
-<p>초창기 하스켈에는 모나드가 없었다고 하는데, 그 때는 IO 같은 작업을 어떻게 해결했을까 궁금하긴 합니다.</p>
+<p>초창기 하스켈에는 모나드가 없었다고 하는데, 그 때는 IO 같은 작업을 어떻게 해결했을까 궁금하긴 합니다. stream, continuation 등을 이용했다고 하는데, 곁가지가 또 너무 뻗칠까 당분간은 궁금함을 그냥 두기로 했습니다.</p>
 <h2 id="자신을-품고-있는-함수상위-함수의-매개-변수-값은-접근-할-수-있다-closure">자신을 품고 있는 함수(상위 함수)의 매개 변수 값은 접근 할 수 있다 Closure</h2>
 <p>람다 대수를 보면</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>𝜆x<span class="op">.</span>(𝜆y<span class="op">.</span>xy)</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>𝜆x<span class="op">.</span>(𝜆y<span class="op">.</span>xy)</span></code></pre></div>
 <p><code>𝜆y</code>를 매개 변수로 갖고 있는 함수에서 <code>𝜆x</code>에 접근 할 수 있습니다. <code>𝜆x.( ... )</code> 인 함수는 당연히 <code>𝜆x</code>를 … 에서 쓸 수 있어야 하니 당연한 결과입니다. 하스켈도 <code>\x -&gt; (\y -&gt; x + y)</code> 가 가능합니다. 매개 변수 이외에는 외부와 소통할 수 없는 함수형 프로그래밍에서의 함수에게는, 이 특징이 매우 유용하게 쓰입니다. 품고 품게 해서 엮은 함수들의 가장 바깥쪽에서 넣어 주는 인자값은, 그 함수 뭉치에서 전역값 같은 역할을 합니다.</p>
 <h2 id="엮어-놓은-액션함수-뭉치-실행run">엮어 놓은 액션(함수) 뭉치 실행(run)</h2>
-<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>monadChain <span class="ot">=</span> runReader (<span class="kw">do</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>   <span class="op">...</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>   <span class="op">...</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>   ) env</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>monadChain <span class="ot">=</span> runReader (<span class="kw">do</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>   <span class="op">...</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>   <span class="op">...</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>   ) env</span></code></pre></div>
 <p><code>(\x...(\y...(\z...)))</code> 이렇게 엮어 놓은 함수 뭉치는 블랙박스로 바라보면 <code>(\x ...)</code> 하나의 함수일 뿐입니다.</p>
-<p>do 이하 구문들은 여러 개의 bind로 품고 품게 되어 있는 함수 뭉치입니다. 아직 실행되지 않은, 언젠가 실행될 하나의 함수입니다. 이 뭉치의 가장 바깥쪽 함수에 env 를 넣어주면, 그제서야 함수 뭉치의 실행이 “시작”됩니다. 그래서 모나드들이 레코드 필드 접근자의 이름을 run~ 이라고 짓는 경우가 많습니다.</p>
+<p>do 이하 구문들은 여러 개의 bind로 품고 품게 되어 있는 함수 뭉치입니다. 아직 실행되지 않은, 언젠가 실행될 하나의 함수입니다. 이 뭉치의 가장 바깥쪽 함수에 env 를 넣어주면, 그제서야 함수 뭉치의 실행이 “시작”됩니다. 그래서 모나드들이 레코드 필드 접근자의 이름을 run~ 이라고 짓는 경우가 많습니다. 마치 골드버그 장치가 실행되는 것처럼, 전체가 동작을 시작하는 트리거를 표현하니 run~ 이란 이름이 적당해 보입니다.</p>
 <section class="footnotes" role="doc-endnotes">
 <hr />
 <ol>
@@ -252,22 +256,10 @@ IO는 컴포지션할 때마다 매 번 “Status처럼 런타임 상태값realw
 </ol>
 </section>
 
-<div id="disqus_thread" style="padding-top:40px"></div>
-<script>
-
-var disqus_config = function () {
-this.page.url = 'https://lionhairdino.github.io/posts/2020-06-24-Monad.html';
-this.page.identifier = 'posts/2020-06-24-Monad.markdown';
-};
-(function() {
-var d = document, s = d.createElement('script');
-s.src = 'https://lionhairdino.disqus.com/embed.js';
-s.setAttribute('data-timestamp', +new Date());
-(d.head || d.body).appendChild(s);
-})();
+<div class="comment">
+<script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
 </script>
-<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-                            
+</div>
         </div>
         <div id="footer">
             © 2021 lionhairdino. All rights reserved. Generated by <a href="http://jaspervdj.be/hakyll">Hakyll</a>
