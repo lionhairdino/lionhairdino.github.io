@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko" lang="ko">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+        <title>lionhairdino - 모나드 액션들간의 소통 - 상태 "개념"은 함수형에도 있다.</title>
+
+        <meta name="description" content="함수형에는 상태가 없다는 말을 자세히 풀어 보았습니다." />
+        <meta property="og:description" content="함수형에는 상태가 없다는 말을 자세히 풀어 보았습니다." />
+
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <link rel="icon" href="https://lionhairdino.github.io/favicon.svg" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino16px.png" sizes="16x16" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino24px.png" sizes="24x24" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino32px.png" sizes="32x32" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino48px.png" sizes="48x48" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino57px.png" sizes="57x57" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino60px.png" sizes="60x60" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino64px.png" sizes="64x64" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino72px.png" sizes="72x72" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino76px.png" sizes="76x76" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino114px.png" sizes="114x114" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino120px.png" sizes="120x120" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino144px.png" sizes="144x144" />
+        <link rel="shortcut icon" href="../favicon.ico" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino152px.png" sizes="152x152" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino180px.png" sizes="180x180" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino192px.png" sizes="192x192" />
+        <link rel="manifest" href="../site.webmanifest" />
+        <link rel="mask-icon" href="https://lionhairdino.github.io/Lionhairdino_black.svg" color="#ff7500" />
+        <meta name="msapplication-TileImage" content="/images/favicon/Lionhairdino144px.png" />
+        <meta name="msapplication-TileColor" content="#ff7500" />
+        <meta name="theme-color" content="#ffffff" />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="모나드 액션들간의 소통 - 상태 " 개념"은 함수형에도 있다." />
+        <meta property="og:site_name" content="Lionhairdino" />
+        <meta property="og:url" content="https://lionhairdino.github.io/posts/2021-05-18-stateless.html" />
+
+        <meta property="og:image" content="https://lionhairdino.github.io/images/state400px.png" />
+
+      <meta name="keywords" content="상태, 모나드, 람다 변수">
+<script src="../script/copycode.js"></script>
+
+    </head>
+    <body>
+        <div id="header">
+            <div id="navigation">
+                <a href="../">lionhairdino</a> 
+                <a href="../about.html">about</a>
+                <!--<a href="/archive.html">archive</a>-->
+            </div>
+        </div>
+
+        <div id="content">
+            <h1>모나드 액션들간의 소통 - 상태 "개념"은 함수형에도 있다.</h1>
+
+            <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+<div class="info">
+    Posted on May 18, 2021
+    
+</div>
+
+<p>“프로그램 전체가 같은 타입 함수들을 엮은 형태가 되어야 한다”</p>
+<p>어떻게 그럴 수 있을까요? 간단한 프로그램만 예를 들어도 불가능할 것 같은 얘기처럼 들립니다.</p>
+<p>정수를 입력 받아 두 배해서 보여주는 프로그램</p>
+<div class="line-block">입력 —&gt; IO 모나드<br />
+계산<br />
+출력 —&gt; IO 모나드</div>
+<p>계산은 IO모나드가 아닙니다. 어떻게 이 체인안에 들어가 있을 수 있을까요? 계산 함수는 IO 바인드로 묶지 못합니다. 결과 그대로는 묶지 못하지만 방법이 있습니다.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    v <span class="ot">&lt;-</span> <span class="fu">getLine</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">putStrLn</span> <span class="op">$</span> <span class="fu">show</span> <span class="op">$</span> (<span class="fu">read</span> v) <span class="op">*</span> <span class="dv">2</span></span></code></pre></div>
+<p>계산 함수 <code>(*)</code>는 <code>IO</code> 모나드 체인에서 쓸 수 있는 <code>IO</code> 모나드 타입 함수가 아닙니다. 어떻게 모나드 체인으로 들어오는지 보이나요? <code>putStrLn</code>은 문자열을 받아 <code>IO ()</code> 타입으로 바꿔주는, 다른 말로 매핑해주는 함수입니다. 계산 함수 <code>(*)</code>의 결과값을 <code>show</code> 함수를 통해 <code>String</code>으로 바꾼 후 <code>putStrLn</code>에 넘겨져서 모나드 체인으로 들어오는 모양입니다. 항상 모든 작업 절차를 <code>IO</code>로 바꿔야 하는 걸까요?</p>
+<div class="line-block">입력<br />
+2배 계산<br />
+출력<br />
+입력<br />
+3배 계산<br />
+출력<br />
+모두 더해서 출력</div>
+<p>모든 계산의 결과를 각 각 출력하려면 개별적으로 <code>putStrLn</code>을 거쳐 <code>IO ()</code>로 바꿔서 체인에 참여합니다. 그런데, 모두 더해서 출력 부분이 마음에 걸립니다. 하스켈은 상태가 없는데 어떻게 세 번의 입력을 어딘가에 모아 두었다가 모두 더해서 출력하는 게 가능할까요?</p>
+<p>처음 보면, 함수의 연결을 독립적인 절차끼리 출력을 입력으로 받는 것 쯤으로 오해합니다. 숨어 있는 바인드를 풀어 보겠습니다.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> </span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">getLine</span> <span class="op">&gt;&gt;=</span> \v1 <span class="ot">-&gt;</span> <span class="fu">putStrLn</span> (<span class="fu">show</span> (((<span class="fu">read</span> v1)<span class="ot">::</span><span class="dt">Int</span>) <span class="op">*</span> <span class="dv">2</span>))</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>            <span class="op">&gt;&gt;=</span> \_ <span class="ot">-&gt;</span> <span class="fu">getLine</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>            <span class="op">&gt;&gt;=</span> \v2 <span class="ot">-&gt;</span> <span class="fu">putStrLn</span> (<span class="fu">show</span> (((<span class="fu">read</span> v2)<span class="ot">::</span><span class="dt">Int</span>) <span class="op">*</span> <span class="dv">3</span>))</span></code></pre></div>
+<p>v1과 v2를 합하려면 다음을 끝에 추가하면 됩니다.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>            <span class="op">&gt;&gt;=</span> <span class="fu">putStrLn</span> ( (<span class="fu">read</span> v1)<span class="ot">::</span><span class="dt">Int</span> ) <span class="op">*</span> <span class="dv">2</span> <span class="op">...</span></span></code></pre></div>
+<p>또 다시 (*) 계산을 해야 합니다. 역시나 상태를 저장할 수 없어 이렇게 계산을 또 해야만 할까요?</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span>      <span class="fu">getLine</span> </span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>        <span class="op">&gt;&gt;=</span> \v1str <span class="ot">-&gt;</span> <span class="fu">return</span> (((<span class="fu">read</span> v1str)<span class="ot">::</span><span class="dt">Int</span>) <span class="op">*</span> <span class="dv">2</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        <span class="op">&gt;&gt;=</span> \v1int <span class="ot">-&gt;</span> <span class="fu">putStrLn</span> (<span class="fu">show</span> v1int)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>        <span class="op">&gt;&gt;=</span> \_ <span class="ot">-&gt;</span> <span class="fu">getLine</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>        <span class="op">&gt;&gt;=</span> \v2str <span class="ot">-&gt;</span> <span class="fu">return</span> (((<span class="fu">read</span> v2str)<span class="ot">::</span><span class="dt">Int</span>) <span class="op">*</span> <span class="dv">3</span>)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>        <span class="op">&gt;&gt;=</span> \v2int <span class="ot">-&gt;</span> <span class="fu">putStrLn</span> (<span class="fu">show</span> v2int)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>        <span class="op">&gt;&gt;=</span> \_ <span class="ot">-&gt;</span> <span class="fu">putStrLn</span> <span class="op">$</span> <span class="fu">show</span> <span class="op">$</span> v1int <span class="op">+</span> v2int</span></code></pre></div>
+<p>눈여겨 볼 게 두 가지입니다.</p>
+<ol type="1">
+<li>계산과 출력<code>putStrLn</code> 과정을 분리했는데, 계산 결과를 <code>IO</code> 체인에서 잡아두기 위해 <code>return</code>으로 <code>IO</code> 값으로 만들었습니다.</li>
+<li>람다 변수가 상태 역할을 합니다. 모든 액션의 결과는 람다 변수를 지정해주면 체인이 끝날때까지 잡아 둘 수 있습니다. 마치 이 체인내에서는 전역 변수같은 역할을 합니다. 이 다음에 연결하는 액션이 있다면 <code>\v1str</code>, <code>\v1int</code>, <code>\v2str</code>, <code>\v2int</code> 모두 쓸 수 있습니다.</li>
+</ol>
+<p>정리하면, 언제든 <code>IO</code> 체인에서 필요한 값은 <code>return</code>으로 감싸서 <em>람다 변수</em>에 넣어 놓으면 됩니다.</p>
+<p>아예 이런 테크닉을 신경쓰지 않고 람다와 모나드가 익숙해지면 당연한 것으로 받아들이는 사고 형태로 훈련이 되어야 할 것 같은데, 명령형에서 넘어 오다 보면 쉬운 일이 아닙니다. 저는 처음 상태 없이 프로그래밍 한다고 했을 때, 어떤 아이디어로 그게 가능한지 정말 궁금했습니다. 제가 생각하는 “상태”는 개념이었고, 함수형에서 없다고 하는 “상태”는 명령형에서 값을 변수(메모리)에 지정(배정)해서 가지고 있는 기능을 얘기하는 거였습니다.</p>
+
+<div class="comment">
+<script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
+</script>
+</div>
+        </div>
+        <div id="footer">
+            © 2021 lionhairdino. All rights reserved. Generated by <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+    </body>
+</html>
