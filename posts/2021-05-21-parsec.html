@@ -75,6 +75,7 @@
 <li><a href="#char-a-파서">char ‘A’ 파서</a></li>
 <li><a href="#보조-역할을-하는-고차-함수-예시">보조 역할을 하는 고차 함수 예시</a></li>
 <li><a href="#어휘lexical-분석을-위한-기본-파서-scanning을-위한-파서">어휘lexical 분석을 위한 기본 파서 (Scanning을 위한 파서)</a></li>
+<li><a href="#some-many">Some, Many</a></li>
 <li><a href="#역시-매직의-핵심-비밀은-바인드">역시 매직의 핵심 비밀은 바인드</a></li>
 </ul>
 <h2 id="파서엔-모나드가-딱이다">파서엔 모나드가 딱이다</h2>
@@ -161,7 +162,8 @@ Parser는 문자열을 받아서 어떤 작업을 한 후 튜플 리스트를 �
 <p>이 체인의 끝에 있는 최종 작업은 r1, r2, r3를 모두 사용할 수 있습니다. 액션과 액션을 바로 붙이지 않고, 접착제로 쓰이는 바인드<code>&gt;&gt;=</code>함수가 람다 변수에 결과값을 저장하도록 만드는게 모나드 패턴으로 만드는 궁극적 이유입니다.</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ot">bind      ::</span> <span class="dt">Parser</span> a <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> <span class="dt">Parser</span> b) <span class="ot">-&gt;</span> <span class="dt">Parser</span> b</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>p ‘bind‘ f <span class="ot">=</span> \inp <span class="ot">-&gt;</span> <span class="fu">concat</span> [f v inp’ <span class="op">|</span> (v,inp’) <span class="ot">&lt;-</span> p inp]</span></code></pre></div>
-<p>두 번째 인자로 받은 <code>f :: a -&gt; Parser b</code> 함수를 첫 번째 파서<code>p</code>의 결과값<code>v</code>에 적용, 결과적으로 <code>p</code>의 리턴값을 람다 변수에 두면서 바인딩하게 됩니다. 이렇게 람다 변수에 둔 값은 현재 액션에서 써먹을 수도 있고, 이 체인에 연결되어 있는 다른 액션(보통은 가장 마지막 액션)에서 써 먹을 수도 있게 됐습니다. 다른 함수들의 결과를 매개 변수로 명시적으로 받지 않아도 써먹을 수 있는 중요한 특징입니다.</p>
+<p>두 번째 인자로 받은 <code>f :: a -&gt; Parser b</code> 함수를 첫 번째 파서<code>p</code>의 결과값<code>v</code>에 적용, 결과적으로 <code>p</code>의 리턴값을 람다 변수에 두면서 바인딩하게 됩니다. 이렇게 람다 변수에 둔 값은 현재 액션에서 써먹을 수도 있고, 이 체인에 연결되어 있는 다른 액션(보통은 가장 마지막 액션)에서 써 먹을 수도 있습니다. 다른 함수들의 결과를 매개 변수로 명시적으로 받지 않아도 써먹을 수 있는 중요한 특징입니다.</p>
+<p>클로저를 어떻게 보냐에 따라, “매개 변수 이외에는 절대 정보를 받을 수 없다”는 맞는 말일수도, 틀린 말일수도 있습니다.</p>
 <h2 id="monadplus-alternative">MonadPlus, Alternative</h2>
 <div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ot">combine ::</span> <span class="dt">Parser</span> a <span class="ot">-&gt;</span> <span class="dt">Parser</span> a <span class="ot">-&gt;</span> <span class="dt">Parser</span> a</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>combine p q <span class="ot">=</span> <span class="dt">Parser</span> (\s <span class="ot">-&gt;</span> parse p s <span class="op">++</span> parse q s)</span>
@@ -183,155 +185,264 @@ Parser는 문자열을 받아서 어떤 작업을 한 후 튜플 리스트를 �
 <span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Alternative</span> <span class="dt">Parser</span> <span class="kw">where</span></span>
 <span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>  empty <span class="ot">=</span> mzero</span>
 <span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>  (<span class="op">&lt;|&gt;</span>) <span class="ot">=</span> option</span></code></pre></div>
-<p>상호 교차 재귀<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>로 매직같은 일을 하는 Alternative 클래스 참고<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a></p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- 하나 이상</span></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="ot">some ::</span> f a <span class="ot">-&gt;</span> f [a]</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>some v <span class="ot">=</span> some_v</span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span></span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>    many_v <span class="ot">=</span> some_v <span class="op">&lt;|&gt;</span> <span class="fu">pure</span> []</span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>    some_v <span class="ot">=</span> (<span class="op">:</span>) <span class="op">&lt;$&gt;</span> v <span class="op">&lt;*&gt;</span> many_v</span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="co">-- 0 이상</span></span>
-<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a><span class="ot">many ::</span> f a <span class="ot">-&gt;</span> f [a]</span>
-<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>many v <span class="ot">=</span> many_v</span>
-<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span></span>
-<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>    many_v <span class="ot">=</span> some_v <span class="op">&lt;|&gt;</span> <span class="fu">pure</span> []</span>
-<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>    some_v <span class="ot">=</span> (<span class="op">:</span>) <span class="op">&lt;$&gt;</span> v <span class="op">&lt;*&gt;</span> many_v</span></code></pre></div>
+<p>상호 교차 재귀<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>로 매직같은 일을 하는 Alternative 클래스의 메소드 <a href="#some-many">some, many</a> 기본 함수들을 훑어 본 후 보도록 하겠습니다.</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- 하나 이상</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="ot">some ::</span> f a <span class="ot">-&gt;</span> f [a]</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>some v <span class="ot">=</span> some_v</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>    many_v <span class="ot">=</span> some_v <span class="op">&lt;|&gt;</span> <span class="fu">pure</span> []</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>    some_v <span class="ot">=</span> (<span class="op">:</span>) <span class="op">&lt;$&gt;</span> v <span class="op">&lt;*&gt;</span> many_v</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="co">-- 0 이상</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="ot">many ::</span> f a <span class="ot">-&gt;</span> f [a]</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>many v <span class="ot">=</span> many_v</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>    many_v <span class="ot">=</span> some_v <span class="op">&lt;|&gt;</span> <span class="fu">pure</span> []</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>    some_v <span class="ot">=</span> (<span class="op">:</span>) <span class="op">&lt;$&gt;</span> v <span class="op">&lt;*&gt;</span> many_v</span></code></pre></div>
 <p>이 함수들을 이용해 현재 글자가 <code>predicate</code>함수(ex. <code>isDigit</code>, <code>isLetter</code>,..)를 만족하는지 확인하는 함수를 만들 수 있습니다.</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="ot">unit ::</span> a <span class="ot">-&gt;</span> <span class="dt">Parser</span> a</span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>unit a <span class="ot">=</span> <span class="dt">Parser</span> (\s <span class="ot">-&gt;</span> [(a,s)])</span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="ot">item ::</span> <span class="dt">Parser</span> <span class="dt">Char</span></span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>item <span class="ot">=</span> <span class="dt">Parser</span> <span class="op">$</span> \s <span class="ot">-&gt;</span></span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">case</span> s <span class="kw">of</span></span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>        [] <span class="ot">-&gt;</span> []</span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>        [c<span class="op">:</span>cs] <span class="ot">-&gt;</span> [(c,cs)]</span>
-<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a><span class="ot">satisfy ::</span> (<span class="dt">Char</span> <span class="ot">-&gt;</span> <span class="dt">Bool</span>) <span class="ot">-&gt;</span> <span class="dt">Parser</span> <span class="dt">Char</span></span>
-<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>satisfy p <span class="ot">=</span> item <span class="ot">`bind`</span> \c <span class="ot">-&gt;</span></span>
-<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>  <span class="kw">if</span> p c</span>
-<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>  <span class="kw">then</span> unit c <span class="co">-- Just와 닮았습니다.</span></span>
-<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>  <span class="kw">else</span> (<span class="dt">Parser</span> (\cs <span class="ot">-&gt;</span> [])) <span class="co">-- Nothing과 닮았습니다.</span></span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="ot">unit ::</span> a <span class="ot">-&gt;</span> <span class="dt">Parser</span> a</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>unit a <span class="ot">=</span> <span class="dt">Parser</span> (\s <span class="ot">-&gt;</span> [(a,s)])</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="ot">item ::</span> <span class="dt">Parser</span> <span class="dt">Char</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>item <span class="ot">=</span> <span class="dt">Parser</span> <span class="op">$</span> \s <span class="ot">-&gt;</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">case</span> s <span class="kw">of</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>        [] <span class="ot">-&gt;</span> []</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>        [c<span class="op">:</span>cs] <span class="ot">-&gt;</span> [(c,cs)]</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a><span class="ot">satisfy ::</span> (<span class="dt">Char</span> <span class="ot">-&gt;</span> <span class="dt">Bool</span>) <span class="ot">-&gt;</span> <span class="dt">Parser</span> <span class="dt">Char</span></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>satisfy p <span class="ot">=</span> item <span class="ot">`bind`</span> \c <span class="ot">-&gt;</span></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>  <span class="kw">if</span> p c</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>  <span class="kw">then</span> unit c <span class="co">-- Just와 닮았습니다.</span></span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>  <span class="kw">else</span> (<span class="dt">Parser</span> (\cs <span class="ot">-&gt;</span> [])) <span class="co">-- Nothing과 닮았습니다.</span></span></code></pre></div>
 <p>여기까지가 기본 재료들이 되는 코드입니다. 이 코드들을 재료로 고차원적인 파서들을 만들어 가게 됩니다.</p>
 <h2 id="char-a-파서">char ‘A’ 파서</h2>
-<div class="sourceCode" id="cb19"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="ot">char ::</span> <span class="dt">Char</span> <span class="ot">-&gt;</span> <span class="dt">Parser</span> <span class="dt">Char</span></span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>char c <span class="ot">=</span> satisfy (c <span class="op">==</span>)</span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>satisfy (<span class="ch">'A'</span> <span class="op">==</span>)</span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="ot">=</span> item <span class="ot">`bind`</span> \c <span class="ot">-&gt;</span> <span class="kw">if</span> (<span class="ch">'A'</span> <span class="op">==</span> c)</span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>                    <span class="kw">then</span> unit c</span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>                    <span class="kw">else</span> (<span class="dt">Parser</span> (\cs <span class="ot">-&gt;</span> []))</span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="ot">char ::</span> <span class="dt">Char</span> <span class="ot">-&gt;</span> <span class="dt">Parser</span> <span class="dt">Char</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>char c <span class="ot">=</span> satisfy (c <span class="op">==</span>)</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>satisfy (<span class="ch">'A'</span> <span class="op">==</span>)</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="ot">=</span> item <span class="ot">`bind`</span> \c <span class="ot">-&gt;</span> <span class="kw">if</span> (<span class="ch">'A'</span> <span class="op">==</span> c)</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>                    <span class="kw">then</span> unit c</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>                    <span class="kw">else</span> (<span class="dt">Parser</span> (\cs <span class="ot">-&gt;</span> []))</span></code></pre></div>
 <p><code>char 'A' &gt;&gt;= (\_ -&gt; char 'A')</code> 파서 뭉치를 <code>"AA"</code> 문자열에 적용하는 걸 풀어 보겠습니다. (여러 파서를 바인딩 해 놓은 걸 표현할 적당한 용어가 떠오르지 않습니다. 일단 투박하지만 뭉치라 표현하겠습니다.)</p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="ot">runParser ::</span> <span class="dt">Parser</span> a <span class="ot">-&gt;</span> <span class="dt">String</span> <span class="ot">-&gt;</span> a</span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>runParser m s <span class="ot">=</span></span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">case</span> parse m s <span class="kw">of</span></span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>        [(res, [])] <span class="ot">-&gt;</span> res</span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>        [(_, rs)] <span class="ot">-&gt;</span> <span class="fu">error</span> <span class="st">&quot;Parser did not consume entire stream.&quot;</span></span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>        _ <span class="ot">-&gt;</span> <span class="fu">error</span> <span class="st">&quot;Parser error.&quot;</span></span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> runParser (char <span class="ch">'A'</span>) <span class="st">&quot;AA&quot;</span></span>
-<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a><span class="kw">case</span>    \s<span class="ot">-&gt;</span> [(<span class="ch">'A'</span>,<span class="st">&quot;A&quot;</span>)]     <span class="ot">`bind`</span>      \c <span class="ot">-&gt;</span> <span class="kw">if</span> (<span class="ch">'A'</span> <span class="op">==</span> c) </span>
-<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>                 <span class="kw">then</span> unit c</span>
-<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>                 <span class="kw">else</span> (<span class="dt">Parser</span> (\cs <span class="ot">-&gt;</span> []))</span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="ot">runParser ::</span> <span class="dt">Parser</span> a <span class="ot">-&gt;</span> <span class="dt">String</span> <span class="ot">-&gt;</span> a</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>runParser m s <span class="ot">=</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">case</span> parse m s <span class="kw">of</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>        [(res, [])] <span class="ot">-&gt;</span> res</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>        [(_, rs)] <span class="ot">-&gt;</span> <span class="fu">error</span> <span class="st">&quot;Parser did not consume entire stream.&quot;</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>        _ <span class="ot">-&gt;</span> <span class="fu">error</span> <span class="st">&quot;Parser error.&quot;</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> runParser (char <span class="ch">'A'</span>) <span class="st">&quot;AA&quot;</span></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a><span class="kw">case</span>    \s<span class="ot">-&gt;</span> [(<span class="ch">'A'</span>,<span class="st">&quot;A&quot;</span>)]     <span class="ot">`bind`</span>      \c <span class="ot">-&gt;</span> <span class="kw">if</span> (<span class="ch">'A'</span> <span class="op">==</span> c) </span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>                 <span class="kw">then</span> unit c</span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>                 <span class="kw">else</span> (<span class="dt">Parser</span> (\cs <span class="ot">-&gt;</span> []))</span></code></pre></div>
 <p>일단 <code>char 'A'</code>부터 풀면,</p>
-<div class="sourceCode" id="cb21"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- item `bind` (\c -&gt;...) 를 풀면  </span></span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="fu">concatMap</span> (\(a, s') <span class="ot">-&gt;</span> (f파서 a) s') <span class="op">$</span> \s <span class="ot">-&gt;</span> item파서 <span class="st">&quot;AA&quot;</span></span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="fu">concatMap</span> (\(a, s') <span class="ot">-&gt;</span> (f파서 a) s') <span class="op">$</span> [(<span class="ch">'A'</span>,<span class="st">&quot;A&quot;</span>)] </span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="co">-- a는 'A', s'은 &quot;A&quot;</span></span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>( parse ( 결과 <span class="ch">'A'</span>를 보고 unit 파서 선택 ) <span class="st">&quot;A&quot;</span> ) </span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>( parse ( unit <span class="ch">'A'</span> ) <span class="st">&quot;A&quot;</span> ) </span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>(\s <span class="ot">-&gt;</span> [(<span class="ch">'A'</span>,s)] ) <span class="st">&quot;A&quot;</span></span>
-<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>[(<span class="ch">'A'</span>,<span class="st">&quot;A&quot;</span>)]</span></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- item `bind` (\c -&gt;...) 를 풀면  </span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">concatMap</span> (\(a, s') <span class="ot">-&gt;</span> (f파서 a) s') <span class="op">$</span> \s <span class="ot">-&gt;</span> item파서 <span class="st">&quot;AA&quot;</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="fu">concatMap</span> (\(a, s') <span class="ot">-&gt;</span> (f파서 a) s') <span class="op">$</span> [(<span class="ch">'A'</span>,<span class="st">&quot;A&quot;</span>)] </span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="co">-- a는 'A', s'은 &quot;A&quot;</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>( parse ( 결과 <span class="ch">'A'</span>를 보고 unit 파서 선택 ) <span class="st">&quot;A&quot;</span> ) </span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>( parse ( unit <span class="ch">'A'</span> ) <span class="st">&quot;A&quot;</span> ) </span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>(\s <span class="ot">-&gt;</span> [(<span class="ch">'A'</span>,s)] ) <span class="st">&quot;A&quot;</span></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>[(<span class="ch">'A'</span>,<span class="st">&quot;A&quot;</span>)]</span></code></pre></div>
 <p>첫 번째 파서 <code>char 'A'</code>가 실패하지 않았기 때문에 다음 바인딩 되어 있는 <code>char 'A'</code>에 <code>"A"</code>가 넘어갑니다.</p>
-<div class="sourceCode" id="cb22"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">concatMap</span> (\(a, s') <span class="ot">-&gt;</span> (f파서 a) s') <span class="op">$</span> \s <span class="ot">-&gt;</span> item파서 <span class="st">&quot;A&quot;</span></span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="fu">concatMap</span> (\(a, s') <span class="ot">-&gt;</span> (f파서 a) s') <span class="op">$</span> [(<span class="ch">'A'</span>,<span class="st">&quot;&quot;</span>)] </span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- a는 'A', s'은 &quot;A&quot;</span></span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>( parse ( 결과 <span class="ch">'A'</span>를 보고 unit 파서 선택 ) <span class="st">&quot;&quot;</span> ) </span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>( parse ( unit <span class="ch">'A'</span> ) <span class="st">&quot;&quot;</span> ) </span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>(\s <span class="ot">-&gt;</span> [(<span class="ch">'A'</span>,s)] ) <span class="st">&quot;&quot;</span></span>
-<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>[(<span class="ch">'A'</span>,<span class="st">&quot;&quot;</span>)]</span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">concatMap</span> (\(a, s') <span class="ot">-&gt;</span> (f파서 a) s') <span class="op">$</span> \s <span class="ot">-&gt;</span> item파서 <span class="st">&quot;A&quot;</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="fu">concatMap</span> (\(a, s') <span class="ot">-&gt;</span> (f파서 a) s') <span class="op">$</span> [(<span class="ch">'A'</span>,<span class="st">&quot;&quot;</span>)] </span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- a는 'A', s'은 &quot;A&quot;</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>( parse ( 결과 <span class="ch">'A'</span>를 보고 unit 파서 선택 ) <span class="st">&quot;&quot;</span> ) </span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>( parse ( unit <span class="ch">'A'</span> ) <span class="st">&quot;&quot;</span> ) </span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>(\s <span class="ot">-&gt;</span> [(<span class="ch">'A'</span>,s)] ) <span class="st">&quot;&quot;</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>[(<span class="ch">'A'</span>,<span class="st">&quot;&quot;</span>)]</span></code></pre></div>
 <p>만일 파서 뭉치에 <code>"BA"</code> 문자열에 적용하면</p>
-<div class="sourceCode" id="cb23"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>( parse ( (\c <span class="ot">-&gt;</span> <span class="op">...</span>) <span class="ch">'B'</span>) <span class="st">&quot;A&quot;</span> ) </span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>( parse ( <span class="dt">Parser</span> (\cs <span class="ot">-&gt;</span> [])) <span class="st">&quot;A&quot;</span> ) </span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>[]</span></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>( parse ( (\c <span class="ot">-&gt;</span> <span class="op">...</span>) <span class="ch">'B'</span>) <span class="st">&quot;A&quot;</span> ) </span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>( parse ( <span class="dt">Parser</span> (\cs <span class="ot">-&gt;</span> [])) <span class="st">&quot;A&quot;</span> ) </span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>[]</span></code></pre></div>
 <p>위 코드를 말로 표현하면, <code>char 'A'</code> 파서는</p>
 <pre><code>한 글자를 봐서 A이면 [('A',나머지 문자열)] 아니면 []   </code></pre>
 <p>작업을 하는 파서입니다.</p>
 <h2 id="보조-역할을-하는-고차-함수-예시">보조 역할을 하는 고차 함수 예시</h2>
-<p>이 섹션은 아직 내용이 부실합니다. 조금 더 훈련 후 내용을 추가하도록 하겠습니다.</p>
-<div class="sourceCode" id="cb25"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="ot">oneOf ::</span> [<span class="dt">Char</span>] <span class="ot">-&gt;</span> <span class="dt">Parser</span> <span class="dt">Char</span></span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>oneOf s <span class="ot">=</span> satisfy (<span class="fu">flip</span> <span class="fu">elem</span> s)</span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="ot">chainl ::</span> <span class="dt">Parser</span> a <span class="ot">-&gt;</span> <span class="dt">Parser</span> (a <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> a) <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Parser</span> a</span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>chainl p op a <span class="ot">=</span> (p <span class="ot">`chainl1`</span> op) <span class="op">&lt;|&gt;</span> <span class="fu">return</span> a</span>
-<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a><span class="co">-- p가 한번 이상 매치되는 걸 파싱합니다.</span></span>
-<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a><span class="ot">chainl1 ::</span> <span class="dt">Parser</span> a <span class="ot">-&gt;</span> <span class="dt">Parser</span> (a <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> a) <span class="ot">-&gt;</span> <span class="dt">Parser</span> a</span>
-<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>p <span class="ot">`chainl1`</span> op <span class="ot">=</span> <span class="kw">do</span> {aval <span class="ot">&lt;-</span> p; rest aval} <span class="co">-- 인자로 받은 파서의 실행 결과를 rest에 넘깁니다.</span></span>
-<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>                 <span class="kw">where</span> rest a <span class="ot">=</span> (<span class="kw">do</span> oper <span class="ot">&lt;-</span> op </span>
-<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>                                    b <span class="ot">&lt;-</span> p <span class="co">-- b에도 aval과 같은 값이 들어갑니다.</span></span>
-<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>                                    rest (oper a b))</span>
-<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>                                <span class="op">&lt;|&gt;</span> <span class="fu">return</span> a</span></code></pre></div>
+<p><span class="citation" data-cites="todo">@todo</span>: chainl 해석 추가할 것</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="ot">oneOf ::</span> [<span class="dt">Char</span>] <span class="ot">-&gt;</span> <span class="dt">Parser</span> <span class="dt">Char</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>oneOf s <span class="ot">=</span> satisfy (<span class="fu">flip</span> <span class="fu">elem</span> s)</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="ot">chainl ::</span> <span class="dt">Parser</span> a <span class="ot">-&gt;</span> <span class="dt">Parser</span> (a <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> a) <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Parser</span> a</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>chainl p op a <span class="ot">=</span> (p <span class="ot">`chainl1`</span> op) <span class="op">&lt;|&gt;</span> <span class="fu">return</span> a</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a><span class="co">-- p가 한번 이상 매치되는 걸 파싱합니다.</span></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a><span class="ot">chainl1 ::</span> <span class="dt">Parser</span> a <span class="ot">-&gt;</span> <span class="dt">Parser</span> (a <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> a) <span class="ot">-&gt;</span> <span class="dt">Parser</span> a</span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>p <span class="ot">`chainl1`</span> op <span class="ot">=</span> <span class="kw">do</span> {aval <span class="ot">&lt;-</span> p; rest aval} <span class="co">-- 인자로 받은 파서의 실행 결과를 rest에 넘깁니다.</span></span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>                 <span class="kw">where</span> rest a <span class="ot">=</span> (<span class="kw">do</span> oper <span class="ot">&lt;-</span> op </span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>                                    b <span class="ot">&lt;-</span> p <span class="co">-- b에도 aval과 같은 값이 들어갑니다.</span></span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>                                    rest (oper a b))</span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>                                <span class="op">&lt;|&gt;</span> <span class="fu">return</span> a</span></code></pre></div>
 <p><code>chainl</code>은 left-recursive grammar를 파싱하는데 쓰인다고 합니다.</p>
-<div class="sourceCode" id="cb26"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="ot">expr ::</span> <span class="dt">Parser</span> <span class="dt">Expr</span></span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>expr <span class="ot">=</span> term <span class="ot">`chainl1`</span> addop</span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="ot">term ::</span> <span class="dt">Parser</span> <span class="dt">Expr</span></span>
-<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>term <span class="ot">=</span> factor <span class="ot">`chainl1`</span> mulop</span></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="ot">expr ::</span> <span class="dt">Parser</span> <span class="dt">Expr</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>expr <span class="ot">=</span> term <span class="ot">`chainl1`</span> addop</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="ot">term ::</span> <span class="dt">Parser</span> <span class="dt">Expr</span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>term <span class="ot">=</span> factor <span class="ot">`chainl1`</span> mulop</span></code></pre></div>
 <p>※ GHC는 newtype으로 싸놓은 Parser를 필요할 때까지 뭔지 보지 않습니다. 안에 함수가 들어 있는지, 무슨 구조로 되어 있는지 관심이 없습니다. 그저 a를 래핑한 타입으로 봅니다. 패턴 매칭으로 벗겨져야만 함수가 드러납니다.</p>
 <h2 id="어휘lexical-분석을-위한-기본-파서-scanning을-위한-파서">어휘lexical 분석을 위한 기본 파서 (Scanning을 위한 파서)</h2>
-<div class="sourceCode" id="cb27"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- char 'A', char 'b', char '=' ...</span></span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="ot">char ::</span> <span class="dt">Char</span> <span class="ot">-&gt;</span> <span class="dt">Parser</span> <span class="dt">Char</span></span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>char c <span class="ot">=</span> satisfy (c <span class="op">==</span>)</span>
-<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a><span class="co">-- 하나 이상의 숫자를 가진 숫자열</span></span>
-<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a><span class="ot">natural ::</span> <span class="dt">Parser</span> <span class="dt">Integer</span></span>
-<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>natural <span class="ot">=</span> <span class="fu">read</span> <span class="op">&lt;$&gt;</span> some (satisfy <span class="fu">isDigit</span>)</span>
-<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a><span class="co">-- string &quot;hello&quot;</span></span>
-<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a><span class="ot">string ::</span> <span class="dt">String</span> <span class="ot">-&gt;</span> <span class="dt">Parser</span> <span class="dt">String</span></span>
-<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>string [] <span class="ot">=</span> <span class="fu">return</span> []</span>
-<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>string (c<span class="op">:</span>cs) <span class="ot">=</span> <span class="kw">do</span> { char c; string cs; <span class="fu">return</span> (c<span class="op">:</span>cs)}</span>
-<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a><span class="co">-- 공백으로 분리된 낱말</span></span>
-<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a><span class="co">-- token (string &quot;WORD&quot;)는 &quot;WORD &quot;를 파싱</span></span>
-<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a><span class="ot">token ::</span> <span class="dt">Parser</span> a <span class="ot">-&gt;</span> <span class="dt">Parser</span> a</span>
-<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a>token p <span class="ot">=</span> <span class="kw">do</span> { a <span class="ot">&lt;-</span> p; spaces ; <span class="fu">return</span> a}</span>
-<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-19"><a href="#cb27-19" aria-hidden="true" tabindex="-1"></a><span class="co">-- string과 token을 합쳐 놓은 건데, 여기서 매칭된 건 파싱 결과에 포함되지 않습니다. </span></span>
-<span id="cb27-20"><a href="#cb27-20" aria-hidden="true" tabindex="-1"></a><span class="co">-- 예약어란 의미에서 reserved입니다. </span></span>
-<span id="cb27-21"><a href="#cb27-21" aria-hidden="true" tabindex="-1"></a><span class="co">-- (SOME) 을 parens SOME으로 파싱하면 결과는 ()를 뺀 SOME입니다. </span></span>
-<span id="cb27-22"><a href="#cb27-22" aria-hidden="true" tabindex="-1"></a><span class="ot">reserved ::</span> <span class="dt">String</span> <span class="ot">-&gt;</span> <span class="dt">Parser</span> <span class="dt">String</span></span>
-<span id="cb27-23"><a href="#cb27-23" aria-hidden="true" tabindex="-1"></a>reserved s <span class="ot">=</span> token (string s)</span>
-<span id="cb27-24"><a href="#cb27-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-25"><a href="#cb27-25" aria-hidden="true" tabindex="-1"></a><span class="co">-- 공백 문자</span></span>
-<span id="cb27-26"><a href="#cb27-26" aria-hidden="true" tabindex="-1"></a><span class="ot">spaces ::</span> <span class="dt">Parser</span> <span class="dt">String</span></span>
-<span id="cb27-27"><a href="#cb27-27" aria-hidden="true" tabindex="-1"></a>spaces <span class="ot">=</span> many <span class="op">$</span> oneOf <span class="st">&quot; \n\r&quot;</span></span>
-<span id="cb27-28"><a href="#cb27-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-29"><a href="#cb27-29" aria-hidden="true" tabindex="-1"></a><span class="co">-- 숫자 하나</span></span>
-<span id="cb27-30"><a href="#cb27-30" aria-hidden="true" tabindex="-1"></a><span class="ot">digit ::</span> <span class="dt">Parser</span> <span class="dt">Char</span></span>
-<span id="cb27-31"><a href="#cb27-31" aria-hidden="true" tabindex="-1"></a>digit <span class="ot">=</span> satisfy <span class="fu">isDigit</span></span>
-<span id="cb27-32"><a href="#cb27-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-33"><a href="#cb27-33" aria-hidden="true" tabindex="-1"></a><span class="co">-- 부호 포함 숫자열</span></span>
-<span id="cb27-34"><a href="#cb27-34" aria-hidden="true" tabindex="-1"></a><span class="ot">number ::</span> <span class="dt">Parser</span> <span class="dt">Int</span></span>
-<span id="cb27-35"><a href="#cb27-35" aria-hidden="true" tabindex="-1"></a>number <span class="ot">=</span> <span class="kw">do</span></span>
-<span id="cb27-36"><a href="#cb27-36" aria-hidden="true" tabindex="-1"></a>  s <span class="ot">&lt;-</span> string <span class="st">&quot;-&quot;</span> <span class="op">&lt;|&gt;</span> <span class="fu">return</span> []</span>
-<span id="cb27-37"><a href="#cb27-37" aria-hidden="true" tabindex="-1"></a>  cs <span class="ot">&lt;-</span> some digit</span>
-<span id="cb27-38"><a href="#cb27-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span> <span class="op">$</span> <span class="fu">read</span> (s <span class="op">++</span> cs)</span>
-<span id="cb27-39"><a href="#cb27-39" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-40"><a href="#cb27-40" aria-hidden="true" tabindex="-1"></a><span class="co">-- parens (some digit) 하면</span></span>
-<span id="cb27-41"><a href="#cb27-41" aria-hidden="true" tabindex="-1"></a><span class="co">-- (11) ( 11) 은 인식하는데, (11 )은 못합니다.</span></span>
-<span id="cb27-42"><a href="#cb27-42" aria-hidden="true" tabindex="-1"></a><span class="ot">parens ::</span> <span class="dt">Parser</span> a <span class="ot">-&gt;</span> <span class="dt">Parser</span> a</span>
-<span id="cb27-43"><a href="#cb27-43" aria-hidden="true" tabindex="-1"></a>parens m <span class="ot">=</span> <span class="kw">do</span></span>
-<span id="cb27-44"><a href="#cb27-44" aria-hidden="true" tabindex="-1"></a>  reserved <span class="st">&quot;(&quot;</span></span>
-<span id="cb27-45"><a href="#cb27-45" aria-hidden="true" tabindex="-1"></a>  n <span class="ot">&lt;-</span> m</span>
-<span id="cb27-46"><a href="#cb27-46" aria-hidden="true" tabindex="-1"></a>  reserved <span class="st">&quot;)&quot;</span></span>
-<span id="cb27-47"><a href="#cb27-47" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span> n</span></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- char 'A', char 'b', char '=' ...</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="ot">char ::</span> <span class="dt">Char</span> <span class="ot">-&gt;</span> <span class="dt">Parser</span> <span class="dt">Char</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>char c <span class="ot">=</span> satisfy (c <span class="op">==</span>)</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="co">-- 하나 이상의 숫자를 가진 숫자열</span></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a><span class="ot">natural ::</span> <span class="dt">Parser</span> <span class="dt">Integer</span></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>natural <span class="ot">=</span> <span class="fu">read</span> <span class="op">&lt;$&gt;</span> some (satisfy <span class="fu">isDigit</span>)</span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a><span class="co">-- string &quot;hello&quot;</span></span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a><span class="ot">string ::</span> <span class="dt">String</span> <span class="ot">-&gt;</span> <span class="dt">Parser</span> <span class="dt">String</span></span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>string [] <span class="ot">=</span> <span class="fu">return</span> []</span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>string (c<span class="op">:</span>cs) <span class="ot">=</span> <span class="kw">do</span> { char c; string cs; <span class="fu">return</span> (c<span class="op">:</span>cs)}</span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a><span class="co">-- 공백으로 분리된 낱말</span></span>
+<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a><span class="co">-- token (string &quot;WORD&quot;)는 &quot;WORD &quot;를 파싱</span></span>
+<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a><span class="ot">token ::</span> <span class="dt">Parser</span> a <span class="ot">-&gt;</span> <span class="dt">Parser</span> a</span>
+<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a>token p <span class="ot">=</span> <span class="kw">do</span> { a <span class="ot">&lt;-</span> p; spaces ; <span class="fu">return</span> a}</span>
+<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-19"><a href="#cb25-19" aria-hidden="true" tabindex="-1"></a><span class="co">-- string과 token을 합쳐 놓은 건데, 여기서 매칭된 건 파싱 결과에 포함되지 않습니다. </span></span>
+<span id="cb25-20"><a href="#cb25-20" aria-hidden="true" tabindex="-1"></a><span class="co">-- 예약어란 의미에서 reserved입니다. </span></span>
+<span id="cb25-21"><a href="#cb25-21" aria-hidden="true" tabindex="-1"></a><span class="co">-- (SOME) 을 parens SOME으로 파싱하면 결과는 ()를 뺀 SOME입니다. </span></span>
+<span id="cb25-22"><a href="#cb25-22" aria-hidden="true" tabindex="-1"></a><span class="ot">reserved ::</span> <span class="dt">String</span> <span class="ot">-&gt;</span> <span class="dt">Parser</span> <span class="dt">String</span></span>
+<span id="cb25-23"><a href="#cb25-23" aria-hidden="true" tabindex="-1"></a>reserved s <span class="ot">=</span> token (string s)</span>
+<span id="cb25-24"><a href="#cb25-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-25"><a href="#cb25-25" aria-hidden="true" tabindex="-1"></a><span class="co">-- 공백 문자</span></span>
+<span id="cb25-26"><a href="#cb25-26" aria-hidden="true" tabindex="-1"></a><span class="ot">spaces ::</span> <span class="dt">Parser</span> <span class="dt">String</span></span>
+<span id="cb25-27"><a href="#cb25-27" aria-hidden="true" tabindex="-1"></a>spaces <span class="ot">=</span> many <span class="op">$</span> oneOf <span class="st">&quot; \n\r&quot;</span></span>
+<span id="cb25-28"><a href="#cb25-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-29"><a href="#cb25-29" aria-hidden="true" tabindex="-1"></a><span class="co">-- 숫자 하나</span></span>
+<span id="cb25-30"><a href="#cb25-30" aria-hidden="true" tabindex="-1"></a><span class="ot">digit ::</span> <span class="dt">Parser</span> <span class="dt">Char</span></span>
+<span id="cb25-31"><a href="#cb25-31" aria-hidden="true" tabindex="-1"></a>digit <span class="ot">=</span> satisfy <span class="fu">isDigit</span></span>
+<span id="cb25-32"><a href="#cb25-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-33"><a href="#cb25-33" aria-hidden="true" tabindex="-1"></a><span class="co">-- 부호 포함 숫자열</span></span>
+<span id="cb25-34"><a href="#cb25-34" aria-hidden="true" tabindex="-1"></a><span class="ot">number ::</span> <span class="dt">Parser</span> <span class="dt">Int</span></span>
+<span id="cb25-35"><a href="#cb25-35" aria-hidden="true" tabindex="-1"></a>number <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb25-36"><a href="#cb25-36" aria-hidden="true" tabindex="-1"></a>  s <span class="ot">&lt;-</span> string <span class="st">&quot;-&quot;</span> <span class="op">&lt;|&gt;</span> <span class="fu">return</span> []</span>
+<span id="cb25-37"><a href="#cb25-37" aria-hidden="true" tabindex="-1"></a>  cs <span class="ot">&lt;-</span> some digit</span>
+<span id="cb25-38"><a href="#cb25-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span> <span class="op">$</span> <span class="fu">read</span> (s <span class="op">++</span> cs)</span>
+<span id="cb25-39"><a href="#cb25-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-40"><a href="#cb25-40" aria-hidden="true" tabindex="-1"></a><span class="co">-- parens (some digit) 하면</span></span>
+<span id="cb25-41"><a href="#cb25-41" aria-hidden="true" tabindex="-1"></a><span class="co">-- (11) ( 11) 은 인식하는데, (11 )은 못합니다.</span></span>
+<span id="cb25-42"><a href="#cb25-42" aria-hidden="true" tabindex="-1"></a><span class="ot">parens ::</span> <span class="dt">Parser</span> a <span class="ot">-&gt;</span> <span class="dt">Parser</span> a</span>
+<span id="cb25-43"><a href="#cb25-43" aria-hidden="true" tabindex="-1"></a>parens m <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb25-44"><a href="#cb25-44" aria-hidden="true" tabindex="-1"></a>  reserved <span class="st">&quot;(&quot;</span></span>
+<span id="cb25-45"><a href="#cb25-45" aria-hidden="true" tabindex="-1"></a>  n <span class="ot">&lt;-</span> m</span>
+<span id="cb25-46"><a href="#cb25-46" aria-hidden="true" tabindex="-1"></a>  reserved <span class="st">&quot;)&quot;</span></span>
+<span id="cb25-47"><a href="#cb25-47" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span> n</span></code></pre></div>
+<h2 id="some-many">Some, Many</h2>
+<p>상호 재귀를 기차게 쓰는 예시입니다.<br />
+<code>Applicative</code> 클래스의 메소드 <code>some</code>, <code>many</code>를 살펴보겠습니다.<br />
+<a href="https://hackage.haskell.org/package/base-4.6.0.1/docs/src/Control-Applicative.html#%3C%2A" class="uri">https://hackage.haskell.org/package/base-4.6.0.1/docs/src/Control-Applicative.html#%3C%2A</a></p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="ot">some ::</span> f a <span class="ot">-&gt;</span> f [a]</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>some v <span class="ot">=</span> some_v</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>    many_v <span class="ot">=</span> some_v <span class="op">&lt;|&gt;</span> <span class="fu">pure</span> []</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>    some_v <span class="ot">=</span> (<span class="op">:</span>) <span class="op">&lt;$&gt;</span> v <span class="op">&lt;*&gt;</span> many_v</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a><span class="ot">many ::</span> f a <span class="ot">-&gt;</span> f [a]</span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>many v <span class="ot">=</span> many_v</span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span></span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>    many_v <span class="ot">=</span> some_v <span class="op">&lt;|&gt;</span> <span class="fu">pure</span> []</span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>    some_v <span class="ot">=</span> (<span class="op">:</span>) <span class="op">&lt;$&gt;</span> v <span class="op">&lt;*&gt;</span> many_v</span></code></pre></div>
+<p><code>some</code>에서 출발해 보겠습니다.</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>some v </span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="ot">=</span> some_v</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="ot">=</span> (<span class="op">:</span>) <span class="op">&lt;$&gt;</span> v <span class="op">&lt;*&gt;</span> many_v  <span class="co">-- (1단계)</span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="ot">=</span> (<span class="op">:</span>) <span class="op">&lt;$&gt;</span> v <span class="op">&lt;*&gt;</span> (some_v                                               <span class="op">&lt;|&gt;</span> <span class="fu">pure</span> [])  <span class="co">-- (2단계)</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a><span class="ot">=</span> (<span class="op">:</span>) <span class="op">&lt;$&gt;</span> v <span class="op">&lt;*&gt;</span> (((<span class="op">:</span>) <span class="op">&lt;$&gt;</span> v <span class="op">&lt;*&gt;</span> many_v)                               <span class="op">&lt;|&gt;</span> <span class="fu">pure</span> [])  <span class="co">-- (3단계)</span></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a><span class="ot">=</span> (<span class="op">:</span>) <span class="op">&lt;$&gt;</span> v <span class="op">&lt;*&gt;</span> (((<span class="op">:</span>) <span class="op">&lt;$&gt;</span> v <span class="op">&lt;*&gt;</span> (some_v <span class="op">&lt;|&gt;</span> <span class="fu">pure</span> []))                 <span class="op">&lt;|&gt;</span> <span class="fu">pure</span> [])</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a><span class="ot">=</span> (<span class="op">:</span>) <span class="op">&lt;$&gt;</span> v <span class="op">&lt;*&gt;</span> (((<span class="op">:</span>) <span class="op">&lt;$&gt;</span> v <span class="op">&lt;*&gt;</span> (((<span class="op">:</span>) <span class="op">&lt;$&gt;</span> v <span class="op">&lt;*&gt;</span> many_v) <span class="op">&lt;|&gt;</span> <span class="fu">pure</span> [])) <span class="op">&lt;|&gt;</span> <span class="fu">pure</span> [])</span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a><span class="ot">=</span> <span class="op">...</span></span></code></pre></div>
+<p>reduce과정이야 무식하게 따라가면 읽을 수 있긴 한데, 이 교차 재귀의 종료 조건(엣지 조건)은 뭘까요? <code>v</code>를 반복해서 붙여 놓습니다. 붙일 때마다 언제든 다음 단계로 진행하지 않을 조건 바로 <code>&lt;|&gt; pure []</code>도 계속 갈이 붙여 놓습니다. 이 함수들은 꼭 파서를 위한 함수들만은 아닌데, 파서를 만들면서 같이 나온 건 아닐까 싶습니다. 파서와 정말 찰떡인 함수들입니다. 몇 번이고 반복하다가 파서가 실패하면 <code>&lt;|&gt; pure []</code> 로 넘겨서 더 이상 진행하지 않고 결과값을 리턴합니다. <code>many_v</code> 는 <code>&lt;|&gt; pure []</code>를 붙이는 역할, <code>some_v</code>는 <code>v</code>를 리스트에 넣어두는 역할을 반복하고 있습니다. 하스켈을 공부하려면 충분히 Lazy해져야 합니다.</p>
+<figure>
+<img src="../images/mutualRecursion.png" alt="화살 주고 과녁 확인하고, 과녁 확인하고 화살 주고" /><figcaption aria-hidden="true">화살 주고 과녁 확인하고, 과녁 확인하고 화살 주고</figcaption>
+</figure>
+<p>이 파서 뭉치는 교차 재귀가 끊임 없이 되어 있어 쓸 수 있는 함수는 무한대로 준비 되어 있습니다. 하지만 함수를 꺼내 쓰다 한 번이라도 fail하면 더 이상 이 뭉치에서 함수를 꺼내지 않습니다. <em>끊임 없이 준비를 해야 하는데, 필요하면 그 때 준비를 하지, 미리 준비해 놓지 않습니다.</em> 하나를 적용한 후 fail하지 않으면, 다음 재귀를 돌려 또 함수 하나를 꺼내고, 또 꺼내고,… 그러다 fail이 나면 더 이상 진행하지 않고 결과를 리턴하는 함수 뭉치입니다.</p>
+<p>머릿속에서 시뮬레이션할 때, 딱 필요한 시점에 재귀를 한 단계만 돌리세요.</p>
+<p>어플리커티브&lt;*&gt;를 쓰는 이유는, fmap(중위 표현 &lt;$&gt;)을 쓰면 펑크터 안에서 커링된 상태가 되기 때문입니다. 참고 - <a href="../posts/2020-07-02-Context.html">컨텍스트, Applicative Functor, Traversable</a></p>
+<p>실제 파서와 같이 쓰이는 걸 해석해 보기 위해 some digit를 풀어 보겠습니다.</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Functor</span> <span class="dt">Parser</span> <span class="kw">where</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmap</span> f (<span class="dt">Parser</span> cs) <span class="ot">=</span> <span class="dt">Parser</span> (\s <span class="ot">-&gt;</span> [(f a, b) <span class="op">|</span> (a, b) <span class="ot">&lt;-</span> cs s])</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Applicative</span> <span class="dt">Parser</span> <span class="kw">where</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pure</span> <span class="ot">=</span> <span class="fu">return</span></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>  (<span class="dt">Parser</span> cs1) <span class="op">&lt;*&gt;</span> (<span class="dt">Parser</span> cs2) <span class="ot">=</span> <span class="dt">Parser</span> (\s <span class="ot">-&gt;</span> [(f a, s2) <span class="op">|</span> (f, s1) <span class="ot">&lt;-</span> cs1 s, (a, s2) <span class="ot">&lt;-</span> cs2 s1])</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Alternative</span> <span class="dt">Parser</span> <span class="kw">where</span></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a><span class="ot">  (&lt;|&gt;) ::</span> <span class="dt">Parser</span> a <span class="ot">-&gt;</span> <span class="dt">Parser</span> a <span class="ot">-&gt;</span> <span class="dt">Parser</span> a</span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>  p <span class="op">&lt;|&gt;</span> q <span class="ot">=</span> <span class="dt">Parser</span> <span class="op">$</span> \s <span class="ot">-&gt;</span></span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>    <span class="kw">case</span> parse p s <span class="kw">of</span></span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>      []     <span class="ot">-&gt;</span> parse q s</span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a>      res    <span class="ot">-&gt;</span> res</span></code></pre></div>
+<p>저는 위 정의를 유심히 보지 않고, Maybe의 정의와 비슷하겠거니 하고 그냥 읽다가 헤맸습니다. 위 정의를 먼저 잘 봐야합니다.</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>some digit</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="ot">=</span> (    (<span class="op">:</span>) <span class="op">&lt;$&gt;</span> digit <span class="op">&lt;*&gt;</span> many_v    ) <span class="st">&quot;12345&quot;</span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="ot">=</span> (    (<span class="op">:</span>) <span class="op">&lt;$&gt;</span> (\s <span class="ot">-&gt;</span> [(a,s)] 또는 \s <span class="ot">-&gt;</span> []) <span class="op">&lt;*&gt;</span> many_v ) <span class="st">&quot;12345&quot;</span></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a><span class="co">-- 일단 &lt;*&gt; many_v 앞에 것부터</span></span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>(<span class="op">:</span>) <span class="op">&lt;$&gt;</span> <span class="dt">Parser</span> (\s <span class="ot">-&gt;</span> 숫자파서) <span class="co">---------------------------------- (1번)</span></span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a><span class="ot">=</span> <span class="dt">Parser</span> (\s <span class="ot">-&gt;</span> [ ( (<span class="op">:</span>) a, b) <span class="op">|</span> (a, b) <span class="ot">&lt;-</span> 숫자파서 s])</span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a><span class="co">-- &lt;*&gt; many_v를 붙이면</span></span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a><span class="dt">Parser</span> (\s0 <span class="ot">-&gt;</span> [ ( (<span class="op">:</span>) a, b) <span class="op">|</span> (a, b) <span class="ot">&lt;-</span> 숫자파서 s0]) <span class="op">&lt;*&gt;</span> many_v</span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a><span class="ot">=</span> <span class="dt">Parser</span> (\s <span class="ot">-&gt;</span> [(f a, s2) <span class="op">|</span> (f, s1) <span class="ot">&lt;-</span> (\s0 <span class="ot">-&gt;</span> [ ( (<span class="op">:</span>) a, b) <span class="op">|</span> (a, b) <span class="ot">&lt;-</span> 숫자파서 s0]) s       </span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a>                            , (a, s2) <span class="ot">&lt;-</span> many_v s1] )</span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a><span class="co">-- s에 문자열 &quot;12345&quot;가 들어가면</span></span>
+<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a><span class="ot">=</span> [(f a, s2) <span class="op">|</span> (f, s1) <span class="ot">&lt;-</span> (\s0 <span class="ot">-&gt;</span> [ ( (<span class="op">:</span>) a, b) <span class="op">|</span> (a, b) <span class="ot">&lt;-</span> 숫자파서 s0]) <span class="st">&quot;12345&quot;</span>       </span>
+<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a>                            , (a, s2) <span class="ot">&lt;-</span> many_v s1] )</span>
+<span id="cb29-17"><a href="#cb29-17" aria-hidden="true" tabindex="-1"></a><span class="co">-- s0에 문자열 &quot;12345&quot;가 들어가면</span></span>
+<span id="cb29-18"><a href="#cb29-18" aria-hidden="true" tabindex="-1"></a><span class="ot">=</span> [(f a, s2) <span class="op">|</span> (f, s1) <span class="ot">&lt;-</span> ([ ( (<span class="op">:</span>) a, b) <span class="op">|</span> (a, b) <span class="ot">&lt;-</span> 숫자파서 <span class="st">&quot;12345&quot;</span>])        </span>
+<span id="cb29-19"><a href="#cb29-19" aria-hidden="true" tabindex="-1"></a>                            , (a, s2) <span class="ot">&lt;-</span> many_v s1] )</span>
+<span id="cb29-20"><a href="#cb29-20" aria-hidden="true" tabindex="-1"></a><span class="ot">=</span> [(f a, s2) <span class="op">|</span> (f, s1) <span class="ot">&lt;-</span> ([ ( (<span class="op">:</span>) <span class="st">&quot;1&quot;</span>, <span class="st">&quot;2345&quot;</span>) ])        </span>
+<span id="cb29-21"><a href="#cb29-21" aria-hidden="true" tabindex="-1"></a>                            , (a, s2) <span class="ot">&lt;-</span> many_v s1] )</span>
+<span id="cb29-22"><a href="#cb29-22" aria-hidden="true" tabindex="-1"></a><span class="ot">=</span> [(f a, s2) <span class="op">|</span> (f 는 (<span class="op">:</span>) <span class="st">&quot;1&quot;</span>, s1은 <span class="st">&quot;2345&quot;</span>) , (a, s2) <span class="ot">&lt;-</span> many_v <span class="st">&quot;2345&quot;</span>] </span>
+<span id="cb29-23"><a href="#cb29-23" aria-hidden="true" tabindex="-1"></a><span class="co">-- 하스켈은 Lazy하니 여기까지 와서야 many_v를 (1번) &lt;*&gt; many_v 으로 reduce 합니다.</span></span>
+<span id="cb29-24"><a href="#cb29-24" aria-hidden="true" tabindex="-1"></a><span class="ot">=</span> [   (f a, s2) <span class="op">|</span> (f 는 (<span class="op">:</span>) <span class="st">&quot;1&quot;</span>, s1은 <span class="st">&quot;2345&quot;</span>) , (a, s2) <span class="ot">&lt;-</span> </span>
+<span id="cb29-25"><a href="#cb29-25" aria-hidden="true" tabindex="-1"></a>      [(f a, s2) <span class="op">|</span> (f 는 (<span class="op">:</span>) <span class="st">&quot;2&quot;</span>, s1은 <span class="st">&quot;345&quot;</span>) , (a, s2) <span class="ot">&lt;-</span> many_v <span class="st">&quot;345&quot;</span>]</span>
+<span id="cb29-26"><a href="#cb29-26" aria-hidden="true" tabindex="-1"></a>  ] </span>
+<span id="cb29-27"><a href="#cb29-27" aria-hidden="true" tabindex="-1"></a><span class="co">-- many_v가 실패해서 &lt;|&gt; pure []를 만날 때까지 계속 적용하면</span></span>
+<span id="cb29-28"><a href="#cb29-28" aria-hidden="true" tabindex="-1"></a><span class="ot">=</span> [(f a, s2) <span class="op">|</span> (f 는 (<span class="op">:</span>) <span class="ch">'1'</span>, s1은 <span class="st">&quot;2345&quot;</span>) , (a, s2) <span class="ot">&lt;-</span> </span>
+<span id="cb29-29"><a href="#cb29-29" aria-hidden="true" tabindex="-1"></a>    [(f a, s2) <span class="op">|</span> (f 는 (<span class="op">:</span>) <span class="ch">'2'</span>, s1은 <span class="st">&quot;345&quot;</span>) , (a, s2) <span class="ot">&lt;-</span> </span>
+<span id="cb29-30"><a href="#cb29-30" aria-hidden="true" tabindex="-1"></a>      [(f a, s2) <span class="op">|</span> (f 는 (<span class="op">:</span>) <span class="ch">'3'</span>, s1은 <span class="st">&quot;45&quot;</span>) , (a, s2) <span class="ot">&lt;-</span> </span>
+<span id="cb29-31"><a href="#cb29-31" aria-hidden="true" tabindex="-1"></a>        [(f a, s2) <span class="op">|</span> (f 는 (<span class="op">:</span>) <span class="ch">'4'</span>, s1은 <span class="st">&quot;5&quot;</span>) , (a, s2) <span class="ot">&lt;-</span> </span>
+<span id="cb29-32"><a href="#cb29-32" aria-hidden="true" tabindex="-1"></a>          [(f a, s2) <span class="op">|</span> (f 는 (<span class="op">:</span>) <span class="ch">'5'</span>, s1은 <span class="st">&quot;&quot;</span>) , (a, s2) <span class="ot">&lt;-</span> many_v <span class="st">&quot;&quot;</span>] </span>
+<span id="cb29-33"><a href="#cb29-33" aria-hidden="true" tabindex="-1"></a>        ]</span>
+<span id="cb29-34"><a href="#cb29-34" aria-hidden="true" tabindex="-1"></a>      ]</span>
+<span id="cb29-35"><a href="#cb29-35" aria-hidden="true" tabindex="-1"></a>    ]</span>
+<span id="cb29-36"><a href="#cb29-36" aria-hidden="true" tabindex="-1"></a>  ] </span>
+<span id="cb29-37"><a href="#cb29-37" aria-hidden="true" tabindex="-1"></a><span class="co">-- 가장 안 쪽 many_v = some_v &lt;|&gt; pure [] 는 &quot;&quot;를 받으니, a= '', s2 = &quot;&quot;</span></span>
+<span id="cb29-38"><a href="#cb29-38" aria-hidden="true" tabindex="-1"></a><span class="co">-- (:) 프리픽스를 인픽스 형태로 쓰고, 안쪽부터 바깥으로 풀면서 나오면</span></span>
+<span id="cb29-39"><a href="#cb29-39" aria-hidden="true" tabindex="-1"></a><span class="ch">'5'</span> <span class="op">:</span> <span class="st">&quot;&quot;</span> , <span class="st">&quot;&quot;</span></span>
+<span id="cb29-40"><a href="#cb29-40" aria-hidden="true" tabindex="-1"></a><span class="ch">'4'</span> <span class="op">:</span> <span class="ch">'5'</span> <span class="op">:</span> <span class="st">&quot;&quot;</span>, <span class="st">&quot;&quot;</span></span>
+<span id="cb29-41"><a href="#cb29-41" aria-hidden="true" tabindex="-1"></a><span class="ch">'3'</span> <span class="op">:</span> <span class="ch">'4'</span> <span class="op">:</span> <span class="ch">'5'</span> <span class="op">:</span> <span class="st">&quot;&quot;</span>, <span class="st">&quot;&quot;</span></span>
+<span id="cb29-42"><a href="#cb29-42" aria-hidden="true" tabindex="-1"></a><span class="ch">'2'</span> <span class="op">:</span> <span class="ch">'3'</span> <span class="op">:</span> <span class="ch">'4'</span> <span class="op">:</span> <span class="ch">'5'</span> <span class="op">:</span> <span class="st">&quot;&quot;</span>, <span class="st">&quot;&quot;</span></span>
+<span id="cb29-43"><a href="#cb29-43" aria-hidden="true" tabindex="-1"></a><span class="ch">'1'</span> <span class="op">:</span> <span class="ch">'2'</span> <span class="op">:</span> <span class="ch">'3'</span> <span class="op">:</span> <span class="ch">'4'</span> <span class="op">:</span> <span class="ch">'5'</span> <span class="op">:</span> <span class="st">&quot;&quot;</span>, <span class="st">&quot;&quot;</span></span>
+<span id="cb29-44"><a href="#cb29-44" aria-hidden="true" tabindex="-1"></a><span class="co">-- 최종 결과는</span></span>
+<span id="cb29-45"><a href="#cb29-45" aria-hidden="true" tabindex="-1"></a>[(<span class="st">&quot;12345&quot;</span>,<span class="st">&quot;&quot;</span>)]</span>
+<span id="cb29-46"><a href="#cb29-46" aria-hidden="true" tabindex="-1"></a><span class="co">-- runParser는 튜플의 두 번째가 []이면 &quot;12345&quot;를 리턴하니</span></span>
+<span id="cb29-47"><a href="#cb29-47" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;12345&quot;</span></span></code></pre></div>
+<p>늘 그렇지만 막막한 정의를 따라 가다보면 숨도 차고, 살짝 한 숨도 나옵니다. 과연 이렇게 흘러갈 걸 다 알고, <code>&lt;$&gt;</code>, <code>&lt;*&gt;</code>, <code>&lt;|&gt;</code> … 들을 정의 했을까요? 따라가기가 쉽지 않은데, 몇 가지 핵심은 다음과 같습니다.</p>
+<ol type="1">
+<li><code>&lt;*&gt;</code> 해석을 <code>Maybe</code> 인스턴스처럼 단순하게 <code>Parser</code> 안에 걸 꺼내는 것으로 하면 안됩니다. <code>Parser</code>의 <code>Applicative</code> 인스턴스에 있는 <code>&lt;*&gt;</code>를 먼저 잘 봐 두어야 합니다.</li>
+<li>우리도 GHC만큼 충분히 Lazy해져야 합니다. <em>many_v는 그대로 두었다가 필요할 때 reduce하면 됩니다.</em></li>
+<li>처음 가진 생각은 “<code>Parser [digit : digit :....]</code> 이렇게 <code>Parser</code>가 숫자 파서들로 이루어진 <code>리스트</code>인데, 여기에 어떻게 문자열 <code>"12345"</code>를 넣어주지?” 였습니다. 이 질문의 답은<br />
+<code>(:)</code> 함수 때문에 오해해서 그렇습니다. <code>Parser</code>를 <code>&lt;*&gt;</code>로 묶으면 결과는 <code>Parser</code>입니다. <code>Parser</code> 타입이니 문자열을 받을 수 있습니다. 그럼 <code>(:)</code>는 언제 작동할까요? 파서를 반복하면서 얻은 결과들을 합쳐서 하나의 결과로 만들 때 씁니다. 파서를 리스트로 묶는게 아니라, 파서의 <em>파싱 결과를 리스트로 묶는</em> 겁니다. <code>Parser</code>에서 뿐만 아니라 어디에서든 <code>some</code>, <code>many</code>가 쓰이면 무언가를 반복하기 때문에 항상 결과를 리스트로 묶어야 합니다. 위에 고퍼 코드 중 <code>seq</code> 정의를 보면 파싱 결과를 튜플로 묶고 있습니다.</li>
+</ol>
+<div class="sourceCode" id="cb30"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>p ‘seq‘ q <span class="ot">=</span> \inp <span class="ot">-&gt;</span> [((v,w),inp’’) <span class="op">|</span> (v,inp’)  <span class="ot">&lt;-</span> p inp, (w,inp’’) <span class="ot">&lt;-</span> q inp’]</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>                      <span class="op">^^^^^</span></span></code></pre></div>
+<p>이 것과 비슷하게 <code>&lt;*&gt;</code>는 묶을 때 쓸 함수를 <code>Parser</code> 타입에서 빼내와 넣을 수 있도록 <code>f</code>로 자리를 만들어 두었습니다. <code>some</code>에서 이 자리에 <code>(:)</code>을 넣어 결과를 묶고 있습니다.</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>(<span class="dt">Parser</span> cs1) <span class="op">&lt;*&gt;</span> (<span class="dt">Parser</span> cs2) <span class="ot">=</span> <span class="dt">Parser</span> (\s <span class="ot">-&gt;</span> [(f a, s2) <span class="op">|</span> (f, s1) <span class="ot">&lt;-</span> cs1 s, (a, s2) <span class="ot">&lt;-</span> cs2 s1])</span></code></pre></div>
+<ol start="4" type="1">
+<li>무한 재귀가 바깥으로 뻗어나오다 멈추면 따라가는게 조금 더 수월한데, 여기선 안쪽으로 계속 파고 들어가고 있습니다. 안 쪽에서 언젠가 멈춰야 최종 결과가 나옵니다. 그 때까지, 파고들어가며 미뤄 두다 reduce해야 합니다. 섣불리 미리 reduce하면 그 때부터 꼬이기 시작합니다. 미뤄둔 코드 덩어리들은 꼭 필요한 정보들이 결정 될 때까지 머릿속에서 조금도 reduce하지 마세요.</li>
+</ol>
+<p>한 번 더 <code>Parser</code> 타입의 인스턴스들을 정리하면, <code>Parser</code>를 묶는(접착, 연결, …) 브로커 함수들은 <em>대부분 첫째 파서의 결과를 두 번째 파서에 넣으면서 결과값들을 어떻게 정리하는지가 조금씩 다를 뿐</em>입니다. 파서들을 묶었으니, 뒷 파서들은 항상 앞 파서들의 결과를 받아야 합니다.</p>
+<p>이제 <code>some</code>의 동작을 알았으니, 나머진 믿고 써야지요. 매 번 이렇게 함수들을 풀어서 이해하며 쓸 수는 없는 노릇입니다. 희미하게나마 함수들의 동작이 눈에 들어오면 믿고 넘어가야 합니다.</p>
 <h2 id="역시-매직의-핵심-비밀은-바인드">역시 매직의 핵심 비밀은 바인드</h2>
-<p>char 파서 안에서 한 글자를 떼어내는 <em>item 파서</em>와 <em>unit 파서를 만들어 내는 함수</em>와 바인드 했습니다. 파서와 파서끼리 바인딩하지 않는 이유는, 파서의 결과를 그대로 가지고 다음 파서로 가는 게 아니라서 그렇습니다. 파서의 결과에 따라 다음 파서를 결정할 수도 있고, 아예 파싱 포기할수도 있고, 여러가지 상황에 따른 분기가 일어납니다. 그리고 또 한가지, <code>Maybe</code>모나드와 마찬가지로, 파서가 fail하면 더 이상 다음 함수를 아예 부르지 않고, 체인을 끝내도록 되어 있습니다.</p>
-<div class="sourceCode" id="cb28"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>bind p f <span class="ot">=</span> <span class="dt">Parser</span> <span class="op">$</span> \s <span class="ot">-&gt;</span> <span class="fu">concatMap</span> (\(a, s') <span class="ot">-&gt;</span> parse (f a) s') <span class="op">$</span> parse p s</span></code></pre></div>
+<p>char 파서 안에서 한 글자를 떼어내는 <em>item 파서</em>와 <em>unit 파서를 만들어 내는 함수</em>와 바인드 했습니다. 파서와 파서끼리 바인딩하지 않는 이유는, 파서의 결과를 그대로 가지고 다음 파서로 가는 게 아니라서 그렇고, 파싱 결과를 람다 변수에 저장하기 위해서이기도 합니다. 파서의 결과에 따라 다음 파서를 결정할 수도 있고, 아예 파싱 포기할수도 있고, 여러가지 상황에 따른 분기가 일어납니다. 그리고 또 한가지, <code>Maybe</code>모나드와 마찬가지로, 파서가 fail하면 더 이상 다음 함수를 아예 부르지 않고, 체인을 끝내도록 되어 있습니다.</p>
+<div class="sourceCode" id="cb32"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>bind p f <span class="ot">=</span> <span class="dt">Parser</span> <span class="op">$</span> \s <span class="ot">-&gt;</span> <span class="fu">concatMap</span> (\(a, s') <span class="ot">-&gt;</span> parse (f a) s') <span class="op">$</span> parse p s</span></code></pre></div>
 <p>파서들이 바인딩 되어 있을 때, 어느 한 파서라도 <code>[]</code>를 리턴하면 그냥 결과는 <code>[]</code>이 됩니다. 왜 그런지 정의에 넣어 보면, <code>concatMap</code>으로 함수를 <code>[]</code>에 적용하면 더 이상 다음 파서 연결 없이 체인은 끝납니다. 정말 모나드로 구현하기 딱 좋은 문제 같은데, 처음부터 이렇게 찰떡인 걸 알고 설계하기 시작했을까요?</p>
-<p>파서로 다른 파서를 만드는 모양인데, 이런게 대수학algebra 아닌가요? 아직 파서 대수학이라 표기한 곳은 못 보긴 했는데, 문제 풀이를 이렇게 대수학 느낌으로 가는게 함수형 스타일입니다.</p>
+<p>파서로 다른 파서를 만드는 모양인데, 이런게 대수학algebra 아닌가요? 아직 파서 대수학이라 표기한 곳은 못 보긴 했는데, 문제 풀이를 이렇게 대수학 느낌으로 가는게 함수형 스타일입니다. 파서 구현이 모나드를 이용해서 정말 깔끔하고 짧게 구현됩니다. 그래서 그런지 하스켈로 만든 애플리케이션 중 파서를 충분히 활용하는 <a href="https://pandoc.org/">Pandoc</a>은 꽤 알려져 있습니다.</p>
 <figure>
 <img src="../images/pandoc.png" alt="하스켈이 낳은 아이돌 Pandoc" /><figcaption aria-hidden="true">하스켈이 낳은 아이돌 Pandoc</figcaption>
 </figure>
@@ -359,37 +470,6 @@ Parser는 문자열을 받아서 어떤 작업을 한 후 튜플 리스트를 �
 <div class="sourceCode" id="cb14"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">odd</span> <span class="dv">99</span> <span class="ot">=</span> <span class="fu">even</span> <span class="dv">98</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="op">...</span></span></code></pre></div>
 <p>어느 함수에서 <code>0</code>에 도달하냐에 따라 결과값은 <code>true | false</code> 로 달라집니다. 이게 읽는 건 충분히 Lazy하게 하다 보면 따라갈 수 있긴 있는데, 이런 구조가 떠오르긴 쉽지 않네요. 어쨌건 핵심은 Lazy입니다. 조금은 <em>무책임하게</em> 접근할 줄도 알아야 이런 아이디어가 떠오를 것 같습니다.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn3" role="doc-endnote"><p>Some, Many<br />
-상호 재귀를 기차게 쓰는 예시입니다.<br />
-<code>Applicative</code> 클래스의 메소드 <code>some</code>, <code>many</code>를 살펴보겠습니다.<br />
-<a href="https://hackage.haskell.org/package/base-4.6.0.1/docs/src/Control-Applicative.html#%3C%2A" class="uri">https://hackage.haskell.org/package/base-4.6.0.1/docs/src/Control-Applicative.html#%3C%2A</a></p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="ot">some ::</span> f a <span class="ot">-&gt;</span> f [a]</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>some v <span class="ot">=</span> some_v</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span></span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    many_v <span class="ot">=</span> some_v <span class="op">&lt;|&gt;</span> <span class="fu">pure</span> []</span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>    some_v <span class="ot">=</span> (<span class="op">:</span>) <span class="op">&lt;$&gt;</span> v <span class="op">&lt;*&gt;</span> many_v</span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="ot">many ::</span> f a <span class="ot">-&gt;</span> f [a]</span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>many v <span class="ot">=</span> many_v</span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span></span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>    many_v <span class="ot">=</span> some_v <span class="op">&lt;|&gt;</span> <span class="fu">pure</span> []</span>
-<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>    some_v <span class="ot">=</span> (<span class="op">:</span>) <span class="op">&lt;$&gt;</span> v <span class="op">&lt;*&gt;</span> many_v</span></code></pre></div>
-<p><code>some</code>에서 출발해 보겠습니다.</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>some v </span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="ot">=</span> some_v</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="ot">=</span> (<span class="op">:</span>) <span class="op">&lt;$&gt;</span> v <span class="op">&lt;*&gt;</span> many_v  <span class="co">-- (1단계)</span></span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="ot">=</span> (<span class="op">:</span>) <span class="op">&lt;$&gt;</span> v <span class="op">&lt;*&gt;</span> (some_v                                               <span class="op">&lt;|&gt;</span> <span class="fu">pure</span> [])  <span class="co">-- (2단계)</span></span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="ot">=</span> (<span class="op">:</span>) <span class="op">&lt;$&gt;</span> v <span class="op">&lt;*&gt;</span> (((<span class="op">:</span>) <span class="op">&lt;$&gt;</span> v <span class="op">&lt;*&gt;</span> many_v)                               <span class="op">&lt;|&gt;</span> <span class="fu">pure</span> [])  <span class="co">-- (3단계)</span></span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="ot">=</span> (<span class="op">:</span>) <span class="op">&lt;$&gt;</span> v <span class="op">&lt;*&gt;</span> (((<span class="op">:</span>) <span class="op">&lt;$&gt;</span> v <span class="op">&lt;*&gt;</span> (some_v <span class="op">&lt;|&gt;</span> <span class="fu">pure</span> []))                 <span class="op">&lt;|&gt;</span> <span class="fu">pure</span> [])</span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="ot">=</span> (<span class="op">:</span>) <span class="op">&lt;$&gt;</span> v <span class="op">&lt;*&gt;</span> (((<span class="op">:</span>) <span class="op">&lt;$&gt;</span> v <span class="op">&lt;*&gt;</span> (((<span class="op">:</span>) <span class="op">&lt;$&gt;</span> v <span class="op">&lt;*&gt;</span> many_v) <span class="op">&lt;|&gt;</span> <span class="fu">pure</span> [])) <span class="op">&lt;|&gt;</span> <span class="fu">pure</span> [])</span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="ot">=</span> <span class="op">...</span></span></code></pre></div>
-<p>reduce과정이야 무식하게 따라가면 읽을 수 있긴 한데, 이 교차 재귀의 종료 조건(엣지 조건)은 뭘까요? <code>v</code>를 반복해서 붙여 놓습니다. 붙일 때마다 언제든 다음 단계로 진행하지 않을 조건 바로 <code>&lt;|&gt; pure []</code>도 계속 갈이 붙여 놓습니다. 이 함수들은 꼭 파서를 위한 함수들만은 아닌데, 파서를 만들면서 같이 나온 건 아닐까 싶습니다. 파서와 정말 찰떡인 함수들입니다. 몇 번이고 반복하다가 파서가 실패하면 <code>&lt;|&gt; pure []</code> 로 넘겨서 더 이상 진행하지 않고 결과값을 리턴합니다. <code>many_v</code> 는 <code>&lt;|&gt; pure []</code>를 붙이는 역할, <code>some_v</code>는 <code>v</code>를 리스트에 넣어두는 역할을 반복하고 있습니다. 하스켈을 공부하려면 충분히 Lazy해져야 합니다.</p>
-<figure>
-<img src="../images/mutualRecursion.png" alt="화살 주고 과녁 확인하고, 과녁 확인하고 화살 주고" /><figcaption aria-hidden="true">화살 주고 과녁 확인하고, 과녁 확인하고 화살 주고</figcaption>
-</figure>
-<p>이 파서 뭉치는 교차 재귀가 끊임 없이 되어 있어 쓸 수 있는 함수는 무한대로 준비 되어 있습니다. 하지만 함수를 꺼내 쓰다 한 번이라도 fail하면 더 이상 이 뭉치에서 함수를 꺼내지 않습니다. <em>끊임 없이 준비를 해야 하는데, 필요하면 그 때 준비를 하지, 미리 준비해 놓지 않습니다.</em> 하나를 적용한 후 fail하지 않으면, 다음 재귀를 돌려 또 함수 하나를 꺼내고, 또 꺼내고,… 그러다 fail이 나면 더 이상 진행하지 않고 결과를 리턴하는 함수 뭉치입니다.</p>
-<p>머릿속에서 시뮬레이션할 때, 딱 필요한 시점에 재귀를 한 단계만 돌리세요.</p>
-<p>어플리커티브&lt;*&gt;를 쓰는 이유는, fmap(중위 표현 &lt;$&gt;)을 쓰면 펑크터 안에서 커링된 상태가 되기 때문입니다. 참고 - <a href="../posts/2020-07-02-Context.html">컨텍스트, Applicative Functor, Traversable</a><a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section>
 
