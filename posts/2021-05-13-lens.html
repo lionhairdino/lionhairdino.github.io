@@ -236,7 +236,7 @@ traverse :: (Traversable t, Applicative f) =&gt; (a -&gt; f b) -&gt; t a -&gt; f
 <p>이제 traverse와 컴포지션 모양이 나오는 걸 이해했으니, 다음은 펌크터로 넘어가겠습니다.</p>
 <h2 id="왜-펑크터가-들어가-있을까요">왜 펑크터가 들어가 있을까요?</h2>
 <h3 id="펑크터-없이-구현">펑크터 없이 구현</h3>
-<p><code>Atom</code>안 있는 <code>Point</code>, <code>Point</code> 안에 있는 <code>x</code>에 접근해서 <code>(+1)</code> 하는 작업을 하는데 왜 <code>Double -&gt; Double</code> 함수가 아니라 <code>Double -&gt; f Double</code> 함수를 받을까요? 어디서 나온 펑크터일까요? 그러지만 않았다면 <code>map</code>을 적용해도 됐을텐데요.</p>
+<p><code>Atom</code>안에 있는 <code>Point</code>, <code>Point</code> 안에 있는 <code>x</code>에 접근해서 <code>(+1)</code> 하는 작업을 하는데 왜 <code>Double -&gt; Double</code> 함수가 아니라 <code>Double -&gt; f Double</code> 함수를 받을까요? 어디서 나온 펑크터일까요? 그러지만 않았다면 <code>map</code>을 적용해도 됐을텐데요.</p>
 <p>펑크터를 안쓰고 구현하면 어떤 모양이 될까 해보겠습니다.</p>
 <div class="sourceCode" id="cb29"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="ot">pointN ::</span> (<span class="dt">Point</span> <span class="ot">-&gt;</span> <span class="dt">Point</span>) <span class="ot">-&gt;</span> <span class="dt">Atom</span> <span class="ot">-&gt;</span> <span class="dt">Atom</span></span>
 <span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>pointN k at <span class="ot">=</span> at { _point <span class="ot">=</span> k (_point at) }</span>
@@ -370,7 +370,7 @@ Atom {_element = &quot;I am Atom&quot;, _point = Point {_x = 2.0, _y = 2.0}}</co
 <p><code>Lens</code> 타입 안에 들어 있는 <code>Functor f</code>는<br />
 <code>over</code> 안에서 인자 <code>lens</code>에 <code>runIdentity</code>를 쓰는 걸 보고 GHC가 알아서 <code>Identity</code>로 추론하고,<br />
 <code>view</code> 안세서 인자 <code>lens</code>에 <code>getConst</code>를 쓰는 걸 보고 GHC가 알아서 <code>Const</code>로 추론합니다.</p>
-<p><code>Lens</code> 타입 서명을 보면 <code>forall f. Functor f =&gt;</code> 나중에 어떤 펑크터든 될 수 있다고 선언했습니다. <code>personAddressL</code> 렌즈의 <code>&lt;$&gt;</code>는 <code>over</code><a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>에서 쓰이는 실제 코드와 <code>view</code>에 쓰이는 실제 코드가 다른 겁니다. <code>Lens</code>를 <em>하나의 코드로 해결</em>한다는 말이 아닙니다. <em>실제 가져 올 코드는 GHC가 추론하도록 열어두고, 프로그래머는 같은 코드 모양을 쓰겠다</em>가 펑크터를 쓴 목적입니다.</p>
+<p><code>Lens</code> 타입 서명을 보면 <code>forall f. Functor f =&gt;</code> 나중에 어떤 펑크터든 될 수 있다고 선언했습니다. <code>personAddressL</code> 렌즈의 <code>&lt;$&gt;</code>는 <code>over</code><a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>에서 쓰이는 실제 코드와 <code>view</code>에 쓰이는 실제 코드가 다른 겁니다. <code>Lens</code>를 <em>하나의 코드로 해결한다는 말이 아닙니다. 실제 가져 올 코드는 GHC가 추론하도록 열어두고, 프로그래머는 같은 코드 모양을 쓰겠다</em>가 펑크터를 쓴 목적입니다.</p>
 <p>제작자가 어떻게 <code>Const</code>와 <code>Identity</code> 펑크터를 떠올렸을까 신기합니다.</p>
 <p><code>(a -&gt; a) -&gt; s -&gt; s</code> 타입을, 어떤 조건이 맞으면 <code>s -&gt; a</code> 타입이 되게 해야 됩니다.<br />
 타입 서명을 <code>(a -&gt; Const a p) -&gt; (s -&gt; Const a p)</code> 이렇게 바꾸고, 이 타입의 렌즈를 가져다 쓰는 <code>view</code>쪽에서 <code>Const</code>를 적당히 적용해서 <code>s -&gt; a</code>를 뽑아내야 합니다. 서명에서 치고 들어간게 아니라, <code>Const</code> 값 생성자를 넘기는 트릭을 먼저 떠올렸을까요?</p>
@@ -380,11 +380,11 @@ Atom {_element = &quot;I am Atom&quot;, _point = Point {_x = 2.0, _y = 2.0}}</co
 <li id="fn1" role="doc-endnote"><p>실제 <code>over</code> 정의</p>
 <div class="sourceCode" id="cb47"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="ot">over ::</span> <span class="dt">ASetter</span> s t a b <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> s <span class="ot">-&gt;</span> t</span>
 <span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>over l f <span class="ot">=</span> runIdentity <span class="op">#.</span> l (<span class="dt">Identity</span> <span class="op">#.</span> f)</span>
-<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- 매개 변수가 3개여야 하는데 두 개면 하나만 포인트 프리겠지?</span></span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- 매개 변수가 3개여야 하는데 두 개면 하나만 포인트 프리로 보면 됩니다.</span></span>
 <span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>( <span class="op">#.</span> )<span class="ot"> ::</span> <span class="dt">Coercible</span> c b <span class="ot">=&gt;</span> (b <span class="ot">-&gt;</span> c) <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> c)</span>
 <span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a>( <span class="op">#.</span> ) _ <span class="ot">=</span> coerce (\x <span class="ot">-&gt; x ::</span> b)<span class="ot"> ::</span> <span class="kw">forall</span> a b<span class="op">.</span> <span class="dt">Coercible</span> b a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> b</span></code></pre></div>
-<p>Coercible - 단어 뜻: 강제할 수 있는 <code>coerce</code> : 같은 표현representation을 가진 타입의 값들을 런타임 오버헤드 없이 서로 안전하게 변환할 때 씁니다. 가장 간단한 경우가, <code>newtype</code>의 구체 타입에서 추상 타입으로 갈 때 <code>newtype</code> 생성자를 대신해서 쓸 수 있일 뿐 아니라, <code>newtype</code>의 리스트를 구체 타입들의 리스트로 바꿀 때 쓸 수 있다고 합니다.</p>
-<p>깊이가 점점 깊어져, <code>coerce</code>는 <code>a</code>를 받아 <code>b</code>로 변환하는 함수정도로만 알고 지나가겠습니다.</p>
+<p>Coercible - 단어 뜻: 강제할 수 있는 <code>coerce</code> : 같은 표현representation을 가진 타입의 값들을 런타임 오버헤드 없이 서로 안전하게 변환할 때 씁니다. 가장 간단한 경우가, <code>newtype</code>의 구체 타입에서 추상 타입으로 갈 때 <code>newtype</code> 생성자를 대신해서 쓸 수 있을 뿐 아니라, <code>newtype</code>의 리스트를 구체 타입들의 리스트로 바꿀 때 쓸 수 있다고 합니다.</p>
+<p>깊이가 점점 깊어져, <code>coerce</code>는 <code>a</code>를 받아 <code>b</code>로 변환하는 함수정도로만 알고 지나 가겠습니다.</p>
 <p><code>( #. )</code>는 함수 두개를 받는 컴포지션과 서명이 비슷한데, 받는 인자 순서가 반대입니다.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section>
