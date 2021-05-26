@@ -343,9 +343,12 @@ Parser는 문자열을 받아서 어떤 작업을 한 후 튜플 리스트를 �
 <span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a><span class="op">...</span>rest (((term <span class="op">+</span> term) <span class="op">+</span> term) <span class="op">+</span> term)<span class="op">...</span></span>
 <span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a><span class="op">...</span></span></code></pre></div>
 <p>위의 expr 파서 모양과 동일함을 알 수 있습니다.</p>
-<p>Q. 어차피 파싱 함수가 한 번 매칭을 하면 <code>lookahead</code>가 다음으로 넘어가는데, 단순히 재귀를 돌리는 것과 무슨 차이가 있을까요? A. 매칭을 호출했다고 <code>lookahead</code>를 다음으로 보내지 않습니다. 매칭 작업을 완료하면 넘어가지만, 매칭을 완료하기 전에 재귀 호출을 하면 <code>lookahead</code>는 다음으로 넘어가지 않습니다.</p>
-<p>Q. <code>Some term</code>을 부르는 것과 무슨 차이일까요? A. <code>Some term</code>에는 연산자가 빠져 있습니다. <code>runParser (some expr) "123(345)"</code></p>
-<p>Q. 그럼 <code>term</code> 과 <code>many (+ term)</code>을 붙이는 건 어떨까요? A. 가능합니다. 하지만 코드가 더 줄어들거나 보기 좋진 않네요.</p>
+<p>Q. 어차피 파싱 함수가 한 번 매칭을 하면 <code>lookahead</code>가 다음으로 넘어가는데, 단순히 재귀를 돌리는 것과 무슨 차이가 있을까요?<br />
+A. 매칭을 호출했다고 <code>lookahead</code>를 다음으로 보내지 않습니다. 매칭 작업을 완료하면 넘어가지만, 매칭을 완료하기 전에 재귀 호출을 하면 <code>lookahead</code>는 다음으로 넘어가지 않습니다.</p>
+<p>Q. <code>Some term</code>을 부르는 것과 무슨 차이일까요?<br />
+A. <code>Some term</code>에는 연산자가 빠져 있습니다. <code>runParser (some expr) "123(345)"</code> 이런 경우 매칭은 되나, 중간에 연산자가 있는 토큰열은 매칭되지 않습니다.</p>
+<p>Q. 그럼 <code>term</code> 과 <code>many (+ term)</code>을 붙이는 건 어떨까요?<br />
+A. 가능합니다. 이해한게 맞는지 확인하기 위해 에러에 에러, 에러산을 넘어 만들긴 했는데, 코드가 더 줄어들거나 보기 좋진 않네요.</p>
 <div class="sourceCode" id="cb31"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="ot">chainl1 ::</span> <span class="dt">Parser</span> a <span class="ot">-&gt;</span> <span class="dt">Parser</span> (a <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> a) <span class="ot">-&gt;</span> <span class="dt">Parser</span> a</span>
 <span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>chainl1 p op <span class="ot">=</span> <span class="kw">do</span> </span>
 <span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>    r <span class="ot">&lt;-</span> p</span>
@@ -356,10 +359,10 @@ Parser는 문자열을 받아서 어떤 작업을 한 후 튜플 리스트를 �
 <span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span> <span class="op">$</span> ( (<span class="fu">foldl</span> (<span class="fu">flip</span> (<span class="op">$</span>)) r1 r2) ) <span class="co">-- int + int + int</span></span>
 <span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>    ) <span class="op">&lt;|&gt;</span> <span class="fu">return</span> r1</span></code></pre></div>
 <p>※ GHC는 <code>newtype</code>으로 싸놓은 <code>Parser</code>를 필요할 때까지 뭔지 보지 않습니다. 안에 함수가 들어 있는지, 무슨 구조로 되어 있는지 관심이 없습니다. 그저 a를 래핑한 타입으로 봅니다. 패턴 매칭으로 벗겨져야만 함수가 드러납니다.</p>
-<p>※ 설마 이런 오해를 할까 싶은 오해도 합니다. <code>Parser (a -&gt; a -&gt; a)</code> 에서 <code>Parser</code>를 벗겨내면 <code>(a -&gt; a -&gt; a)</code>가 나올까요? 선언에 쓰여있는 <code>Parser (a -&gt; a -&gt; a)</code>는 값이 아니라 타입입니다. 이 타입에서 <code>Parser</code>를 벗겨내면</p>
+<p>※ 설마 이런 오해를 할까 싶은 오해도 합니다. <code>Parser (a -&gt; a -&gt; a)</code> 에서 <code>Parser</code>를 벗겨내면 <code>(a -&gt; a -&gt; a)</code>가 나올까요? 선언에 쓰여있는 <code>Parser (a -&gt; a -&gt; a)</code>는 값이 아니라 <em>타입 생성자</em>입니다. 이 타입의 값에서 <em>값 생성자</em> <code>Parser</code>를 벗겨내면</p>
 <div class="sourceCode" id="cb32"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="dt">String</span> <span class="ot">-&gt;</span> [ (  (a <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> a)  , <span class="dt">String</span>) ] </span></code></pre></div>
-<p>타입의 값이 나옵니다.</p>
-<p>타입 생성자가 아닌 값 생성자 <code>Parser</code>가 값을 만들려면 <code>String -&gt; [(a, String)]</code> 타입의 함수를 인자로 줘야 합니다.</p>
+<p>타입의 값이 나옵니다. 굳이 <code>(a -&gt; a -&gt; a)</code>를 이 구조안에 우겨 넣을까요? <code>Parser</code> 컨텍스트를 유지하기 위해서입니다.</p>
+<p>타입 생성자가 아닌 값 생성자 <code>Parser</code>로 값을 만들려면 <code>String -&gt; [(a, String)]</code> 타입의 함수를 인자로 줘야 합니다.</p>
 <h2 id="어휘lexical-분석을-위한-기본-파서-scanning을-위한-파서">어휘lexical 분석을 위한 기본 파서 (Scanning을 위한 파서)</h2>
 <div class="sourceCode" id="cb33"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- char 'A', char 'b', char '=' ...</span></span>
 <span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="ot">char ::</span> <span class="dt">Char</span> <span class="ot">-&gt;</span> <span class="dt">Parser</span> <span class="dt">Char</span></span>
