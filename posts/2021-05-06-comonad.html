@@ -115,8 +115,8 @@ MakeConfig [&quot;-default&quot;,&quot;-opt2&quot;]</code></pre>
 <span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>opt2' builder <span class="ot">=</span> \options <span class="ot">-&gt;</span> builder ([<span class="st">&quot;-opt2&quot;</span>] <span class="op">++</span> options)</span></code></pre></div>
 <p>이미 가지고 있던 속성에 인자로 받아 온 함수를 적용했는데, 이 걸 바로 실행하지 않고, 인자 하나를 더 받을때까지 실행을 미루기 위해 (나) 방식으로 만들어 놓습니다.</p>
 <p><code>Builder -&gt; Config</code>였던 타입이 <code>Builder -&gt; Builder</code>가 되어, 옵션 체인을 만들 수 있도록 입출력 타입이 같게 되었습니다.</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>            builder  [<span class="st">&quot;-opt1&quot;</span>, <span class="st">&quot;-opt1-1&quot;</span>] <span class="co">------------ opt1 결과가 Config 타입</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>\options <span class="ot">-&gt;</span> builder ([<span class="st">&quot;-opt1&quot;</span>, <span class="st">&quot;-opt1-1&quot;</span>] <span class="op">++</span> options) <span class="co">----------- opt' 결과가 Builder 타입 = [Options] -&gt; Config</span></span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>            builder  [<span class="st">&quot;-opt1&quot;</span>, <span class="st">&quot;-opt1-1&quot;</span>] <span class="co">-- opt1 결과가 Config 타입</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>\options <span class="ot">-&gt;</span> builder ([<span class="st">&quot;-opt1&quot;</span>, <span class="st">&quot;-opt1-1&quot;</span>] <span class="op">++</span> options) <span class="co">-- opt' 결과가 Builder 타입 = [Options] -&gt; Config</span></span></code></pre></div>
 <p>그리고, 더 이상 연결할 옵션이 없을 때 완성된 <code>Config</code>를 뽑아내기 위해 <code>extract</code>를 만듭니다.</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ot">extract ::</span> <span class="dt">Builder</span> <span class="ot">-&gt;</span> <span class="dt">Config</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>extract builder <span class="ot">=</span> builder []</span></code></pre></div>
@@ -126,12 +126,14 @@ MakeConfig [&quot;-default&quot;,&quot;-opt1&quot;,&quot;-opt1-1&quot;,&quot;-op
 <p>이렇게 <code>opt</code>를 <code>opt'</code>으로 만들면 체인이 가능하게 됩니다. 그럼 만약 기존 코드가 이미 <code>opt</code> 스타일로 많이 만들어졌다면, 일일이 <code>Builder</code> 리턴 타입으로 바꾸는 것보다 변환 함수를 하나 만들어 쓰는게 좋습니다. 헛갈리지 않게 opt1과 opt2의 람다 변수 이름을 바꿔 놓겠습니다.</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>opt1 <span class="ot">=</span> \bf <span class="ot">-&gt;</span> bf [<span class="st">&quot;-opt1&quot;</span>, <span class="st">&quot;-opt1-1&quot;</span>]</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>opt2 <span class="ot">=</span> \bf <span class="ot">-&gt;</span> bf [<span class="st">&quot;-opt2&quot;</span>]</span></code></pre></div>
-<p><code>opt1</code> 안에 들어 있는 옵션과 <code>opt2</code> 안에 들어 있는 옵션을 묶어 놓고, 바깥에서 들어온 <code>builder</code>를 적용하는 모양이 되어야 합니다. 처음엔 함수를 변형한다고 하니, 함수를 어떻게 해체해야 하는지 난감했습니다. <em>opt1 함수를 변형하는 방법 중 하나는 어떤 함수를 넣어 정보를 해체하는 겁니다.</em> 변형된 모양은</p>
+<p><code>opt1</code> 안에 들어 있는 옵션과 <code>opt2</code> 안에 들어 있는 옵션을 묶어 놓고, 바깥에서 들어온 <code>builder</code>를 적용하는 모양이 되어야 합니다. 처음엔 함수를 변형한다고 하니, 함수를 어떻게 해체해야 하는지 난감했습니다. <em>opt1 함수를 변형하는 방법 중 하나는 어떤 함수를 넣어 정보를 해체하는 겁니다.</em></p>
+<h2 id="완성되어-있는-고차-함수-내부를-조작하려면">완성되어 있는 고차 함수 내부를 조작하려면?</h2>
+<p>함수가 외부와 소통하는 방법은 매개 변수뿐이 없습니다. 값을 주고 받을 때 뿐만 아니라, 함수 동작을 조작할때도 이용할 수 있는 통로는 매개 변수뿐이 없습니다. 안 쪽에 들어가서 변형시켜 놓을 함수(가)를 매개 변수에 넣어주면 됩니다. 변형된 모양은</p>
 <pre class="hasekll"><code>\o -&gt; \builder -&gt; ... builder ( ... )  </code></pre>
 <p>빌더 타입이어야 합니다.</p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>\builder <span class="ot">-&gt;</span> \o2 <span class="ot">-&gt;</span>     (\bf <span class="ot">-&gt;</span> bf [<span class="st">&quot;-opt1&quot;</span>,<span class="st">&quot;-opt1-1&quot;</span>])      (\o1 <span class="ot">-&gt;</span> builder (o1 <span class="op">++</span> o2))</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>                       <span class="op">^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</span>      <span class="op">^^^^^^^^^^^^^^^^^^^^^^^^^^^</span></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>                                   original                 o1을 뽑아 o2와 합치는 함수</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>                                   original                 o1을 뽑아 o2와 합치는 함수 <span class="co">-- (가)</span></span>
 <span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>\builder <span class="ot">-&gt;</span> \o2 <span class="ot">-&gt;</span>     builder ([<span class="st">&quot;-opt1&quot;</span>,<span class="st">&quot;-opt1-1&quot;</span>] <span class="op">++</span> o2) </span></code></pre></div>
 <p><code>\o1</code>으로 <code>opt1</code>이 가진 옵션을 뽑아내 나중에 들어 올 <code>o2</code>와 합쳐 놓습니다. 위에서 본 <code>opt1'</code>과 같은 모양이 나왔습니다. 변형해 주는 함수를 <code>extend</code>라 이름 붙이면 다음과 같이 정리할 수 있습니다.</p>
 <div class="sourceCode" id="cb15"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>extend original <span class="ot">=</span> \builder <span class="ot">-&gt;</span> \o2 <span class="ot">-&gt;</span> original (\o1 <span class="ot">-&gt;</span> builder (o1 <span class="op">++</span> o2)) </span>
@@ -152,6 +154,8 @@ MakeConfig [&quot;-default&quot;,&quot;-opt1&quot;,&quot;-opt1-1&quot;,&quot;-op
 <p>가브리엘 곤잘레즈 글의 첫 번째 섹션의 소스 코드를 옮겨서 풀어 봤는데, 읽고 나니 원 글이 훨씬 나아 보입니다. 여기 글은 <code>extend</code> 정의가 쉽게 이해가지 않을 때 보충해서 보면 좋을 것 같습니다.</p>
 <p>수학적으로 모나드의 듀얼이라 하고 시작하는 순간부터, 또 한번의 모나드 전쟁이 생기진 않을까 두려워집니다. 이론적인 바탕보다 먼저 코드로 풀이한 후 접근하는 게 편한 분들도 있을 겁니다. 모나드만큼 여기 저기 쓰이는 패턴은 아닙니다. 원 글에 따르면 하스켈에서 모나드가 명령형 프로그래밍 비슷한 모양을 보여준다면, 코모나드는 OOP스런 모양을 보여주는 패턴이라 합니다.</p>
 <p>나중에 코모나드와 연관된 글을 더 올리도록 하고, 여기서는 <code>w a -&gt; b</code> 함수 연결(엮는 것)을 어떻게 하는지 보는 정도로 만족하고 넘어가겠습니다. 모나드도 특정 형태의 함수를 엮는 방법이고, 코모나드도 특정 형태의 함수를 엮는 방법입니다.</p>
+<p><code>w a</code>로 표기한 이유는 <code>w</code>가 모나드의 <code>m</code>을 거꾸로 놓았다는 뜻에서 <code>w</code>를 쓴다고 합니다.</p>
+<p>동작은 알겠는데, 이게 왜 모나드의 듀얼, 코모나드란 이름을 가졌을까요? 사실, 이런 건 궁금해하지 않고 넘어가도 되는데, 이런데서 머뭇거리는게 좋은 건지 나쁜 건지 모르겠습니다. 모나드는 <code>a -&gt; m a</code> 액션을 엮는 패턴이었습니다. 여기서 화살표를 반대로 한 걸 듀얼이라 한다는데, 이게 가지는 실용적인 의미가 뭘까요?</p>
 
 <div class="comment">
 <script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
