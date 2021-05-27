@@ -39,7 +39,7 @@
 
         <meta property="og:image" content="https://lionhairdino.github.io/images/state400px.png" />
 
-      <meta name="keywords" content="상태, 모나드, 람다 변수">
+      <meta name="keywords" content="상태, 모나드, 람다 변수, Statless">
 <script src="../script/copycode.js"></script>
 
     </head>
@@ -86,7 +86,7 @@
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>            <span class="op">&gt;&gt;=</span> \_ <span class="ot">-&gt;</span> <span class="fu">getLine</span></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>            <span class="op">&gt;&gt;=</span> \v2 <span class="ot">-&gt;</span> <span class="fu">putStrLn</span> (<span class="fu">show</span> (((<span class="fu">read</span> v2)<span class="ot">::</span><span class="dt">Int</span>) <span class="op">*</span> <span class="dv">3</span>))</span></code></pre></div>
 <p>v1과 v2를 합하려면 다음을 끝에 추가하면 됩니다.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>            <span class="op">&gt;&gt;=</span> <span class="fu">putStrLn</span> ( (<span class="fu">read</span> v1)<span class="ot">::</span><span class="dt">Int</span> ) <span class="op">*</span> <span class="dv">2</span> <span class="op">...</span></span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>        <span class="op">&gt;&gt;=</span> \_ <span class="ot">-&gt;</span> <span class="fu">print</span> ( ((<span class="fu">read</span> v1)<span class="ot">::</span><span class="dt">Int</span>) <span class="op">*</span> <span class="dv">2</span> <span class="op">+</span> ((<span class="fu">read</span> v2)<span class="ot">::</span><span class="dt">Int</span>) <span class="op">*</span> <span class="dv">3</span>  )</span></code></pre></div>
 <p>또 다시 (*) 계산을 해야 합니다. 역시나 상태를 저장할 수 없어 이렇게 계산을 또 해야만 할까요?</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span>      <span class="fu">getLine</span> </span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>        <span class="op">&gt;&gt;=</span> \v1str <span class="ot">-&gt;</span> <span class="fu">return</span> (((<span class="fu">read</span> v1str)<span class="ot">::</span><span class="dt">Int</span>) <span class="op">*</span> <span class="dv">2</span>)</span>
@@ -98,7 +98,7 @@
 <p>눈여겨 볼 게 두 가지입니다.</p>
 <ol type="1">
 <li>계산과 출력<code>putStrLn</code> 과정을 분리했는데, 계산 결과를 <code>IO</code> 체인에서 잡아두기 위해 <code>return</code>으로 <code>IO</code> 값으로 만들었습니다.</li>
-<li>람다 변수가 상태 역할을 합니다. 모든 액션의 결과는 람다 변수를 지정해주면 체인이 끝날때까지 잡아 둘 수 있습니다. 마치 이 체인내에서는 전역 변수같은 역할을 합니다. 이 다음에 연결하는 액션이 있다면 <code>\v1str</code>, <code>\v1int</code>, <code>\v2str</code>, <code>\v2int</code> 모두 쓸 수 있습니다.</li>
+<li>람다 변수(람다식 헤드에 있는 매개 변수)가 상태 역할을 합니다. 각 라인의 람다 변수는 바로 이전 액션의 결과값을 받습니다. 액션의 결과는 람다 변수에 넣어 두면 체인이 끝날때까지 잡아 둘 수 있습니다. 마치 이 체인내에서는 전역 변수같은 역할을 합니다. 이 다음에 연결하는 액션이 있다면 <code>\v1str</code>, <code>\v1int</code>, <code>\v2str</code>, <code>\v2int</code>를 모두 쓸 수 있습니다.</li>
 </ol>
 <p>정리하면, 언제든 <code>IO</code> 체인에서 필요한 값은 <code>return</code>으로 감싸서 <em>람다 변수</em>에 넣어 놓으면 됩니다.</p>
 <p>아예 이런 테크닉을 신경쓰지 않고 람다와 모나드가 익숙해지면 당연한 것으로 받아들이는 사고 형태로 훈련이 되어야 할 것 같은데, 명령형에서 넘어 오다 보면 쉬운 일이 아닙니다. 저는 처음 상태 없이 프로그래밍 한다고 했을 때, 어떤 아이디어로 그게 가능한지 정말 궁금했습니다. 제가 생각하는 “상태”는 개념이었고, 함수형에서 없다고 하는 “상태”는 명령형에서 값을 변수(메모리)에 지정(배정)해서 가지고 있는 기능을 얘기하는 거였습니다.</p>
