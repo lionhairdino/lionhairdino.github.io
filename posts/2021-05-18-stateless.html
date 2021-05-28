@@ -81,20 +81,20 @@
 모두 더해서 출력</div>
 <p>모든 계산의 결과를 각 각 출력하려면 개별적으로 <code>putStrLn</code>을 거쳐 <code>IO ()</code>로 바꿔서 체인에 참여합니다. 그런데, 모두 더해서 출력 부분이 마음에 걸립니다. 하스켈은 상태가 없는데 어떻게 세 번의 입력을 어딘가에 모아 두었다가 모두 더해서 출력하는 게 가능할까요?</p>
 <p>처음 보면, 함수의 연결을 독립적인 절차끼리 출력을 입력으로 받는 것 쯤으로 오해합니다. 숨어 있는 바인드를 풀어 보겠습니다.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> </span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">getLine</span> <span class="op">&gt;&gt;=</span> \v1 <span class="ot">-&gt;</span> <span class="fu">putStrLn</span> (<span class="fu">show</span> (((<span class="fu">read</span> v1)<span class="ot">::</span><span class="dt">Int</span>) <span class="op">*</span> <span class="dv">2</span>))</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>            <span class="op">&gt;&gt;=</span> \_ <span class="ot">-&gt;</span> <span class="fu">getLine</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>            <span class="op">&gt;&gt;=</span> \v2 <span class="ot">-&gt;</span> <span class="fu">putStrLn</span> (<span class="fu">show</span> (((<span class="fu">read</span> v2)<span class="ot">::</span><span class="dt">Int</span>) <span class="op">*</span> <span class="dv">3</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span>      <span class="fu">getLine</span> </span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>        <span class="op">&gt;&gt;=</span> \v1 <span class="ot">-&gt;</span> <span class="fu">putStrLn</span> (<span class="fu">show</span> (((<span class="fu">read</span> v1)<span class="ot">::</span><span class="dt">Int</span>) <span class="op">*</span> <span class="dv">2</span>))</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>        <span class="op">&gt;&gt;=</span> \_ <span class="ot">-&gt;</span> <span class="fu">getLine</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>        <span class="op">&gt;&gt;=</span> \v2 <span class="ot">-&gt;</span> <span class="fu">putStrLn</span> (<span class="fu">show</span> (((<span class="fu">read</span> v2)<span class="ot">::</span><span class="dt">Int</span>) <span class="op">*</span> <span class="dv">3</span>))</span></code></pre></div>
 <p>v1과 v2를 합하려면 다음을 끝에 추가하면 됩니다.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>        <span class="op">&gt;&gt;=</span> \_ <span class="ot">-&gt;</span> <span class="fu">print</span> ( ((<span class="fu">read</span> v1)<span class="ot">::</span><span class="dt">Int</span>) <span class="op">*</span> <span class="dv">2</span> <span class="op">+</span> ((<span class="fu">read</span> v2)<span class="ot">::</span><span class="dt">Int</span>) <span class="op">*</span> <span class="dv">3</span>  )</span></code></pre></div>
 <p>또 다시 (*) 계산을 해야 합니다. 역시나 상태를 저장할 수 없어 이렇게 계산을 또 해야만 할까요?</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span>      <span class="fu">getLine</span> </span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>        <span class="op">&gt;&gt;=</span> \v1str <span class="ot">-&gt;</span> <span class="fu">return</span> (((<span class="fu">read</span> v1str)<span class="ot">::</span><span class="dt">Int</span>) <span class="op">*</span> <span class="dv">2</span>)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        <span class="op">&gt;&gt;=</span> \v1int <span class="ot">-&gt;</span> <span class="fu">putStrLn</span> (<span class="fu">show</span> v1int)</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>        <span class="op">&gt;&gt;=</span> \_ <span class="ot">-&gt;</span> <span class="fu">getLine</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>        <span class="op">&gt;&gt;=</span> \_ <span class="ot">-&gt;</span> <span class="fu">getLine</span> </span>
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>        <span class="op">&gt;&gt;=</span> \v2str <span class="ot">-&gt;</span> <span class="fu">return</span> (((<span class="fu">read</span> v2str)<span class="ot">::</span><span class="dt">Int</span>) <span class="op">*</span> <span class="dv">3</span>)</span>
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>        <span class="op">&gt;&gt;=</span> \v2int <span class="ot">-&gt;</span> <span class="fu">putStrLn</span> (<span class="fu">show</span> v2int)</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>        <span class="op">&gt;&gt;=</span> \_ <span class="ot">-&gt;</span> <span class="fu">putStrLn</span> <span class="op">$</span> <span class="fu">show</span> <span class="op">$</span> v1int <span class="op">+</span> v2int</span></code></pre></div>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>        <span class="op">&gt;&gt;=</span> \_ <span class="ot">-&gt;</span> <span class="fu">putStrLn</span> <span class="op">$</span> v1str <span class="op">&lt;&gt;</span> <span class="st">&quot; * 2 + &quot;</span> <span class="op">&lt;&gt;</span> v2str <span class="op">&lt;&gt;</span> <span class="st">&quot; * 3 = &quot;</span> <span class="op">&lt;&gt;</span> (<span class="fu">show</span> <span class="op">$</span> v1int <span class="op">+</span> v2int)</span></code></pre></div>
 <p>눈여겨 볼 게 두 가지입니다.</p>
 <ol type="1">
 <li>계산과 출력<code>putStrLn</code> 과정을 분리했는데, 계산 결과를 <code>IO</code> 체인에서 잡아두기 위해 <code>return</code>으로 <code>IO</code> 값으로 만들었습니다.</li>
@@ -102,7 +102,14 @@
 </ol>
 <p>정리하면, 언제든 <code>IO</code> 체인에서 필요한 값은 <code>return</code>으로 감싸서 <em>람다 변수</em>에 넣어 놓으면 됩니다.</p>
 <p>아예 이런 테크닉을 신경쓰지 않고 람다와 모나드가 익숙해지면 당연한 것으로 받아들이는 사고 형태로 훈련이 되어야 할 것 같은데, 명령형에서 넘어 오다 보면 쉬운 일이 아닙니다. 저는 처음 상태 없이 프로그래밍 한다고 했을 때, 어떤 아이디어로 그게 가능한지 정말 궁금했습니다. 제가 생각하는 “상태”는 개념이었고, 함수형에서 없다고 하는 “상태”는 명령형에서 값을 변수(메모리)에 지정(배정)해서 가지고 있는 기능을 얘기하는 거였습니다.</p>
-<p>곰곰히 생각하니, 알론조 처치도 같은 이유에서 람다 변수의 스코프를 정하지 않았을까요? 함수형이라도 수학처럼 입력값과 출력을 대응만 한다면, 구조를 만들기가 어려워 함수를 엮으면서 어딘가에는 정보를 둘 곳이 필요하지 않았을까 하는 생각이 듭니다. 어디까지나 추측입니다.</p>
+<p>곰곰히 생각하니, 알론조 처치도 같은 이유에서 람다 변수의 스코프를 정하지 않았을까요? 함수형이라도 수학처럼 입력값과 출력을 대응만 한다면, 구조를 만들기가 어려워 함수를 엮으면서 어딘가에는 정보를 둘 곳이 필요하지 않았을까 하는 추측을 해봅니다.</p>
+<p>생각이 여기에 다다르니, 대부분 익숙해서 뜻을 찾아본 적도 없을 것 같은 단어, ’구조’가 뭘까란 생각이 듭니다. 바로 이전 함수와만 관계를 갖는 것도 구조고(1대1 구조라 이름 붙이겠습니다.), 여러 함수들의 상태를 어딘가에 두었다가 가져다 쓸 수 있도록 해서 여러 함수와 관계를 만들어 내는 것도 구조(다 대 1)입니다. 위에서 구조를 만들기 어려웠다라고 얘기한 부분의 구조는 다 대 1 구조를 말합니다. 람다 변수를 이용해서 다 대 1 구조를 만들어, 여러 함수들을 이용해 복잡한 구조를 만드는게 가능하다란 말입니다. 람다 대수 정식 텍스트에는 이런 언급이 있는지 궁금합니다.</p>
+<p>구조 構造 Structure 꾸밈새 만듦새<br />
+네이버 사전 뜻 : 각 부분(部分)이나 요소(要素)들을 모아 어떤 전체(全體)를 짜 이룸.<br />
+구글 사전 뜻 : the arrangement of and <em>relations</em> between the parts or elements of something complex.<br />
+영어 해설 쪽에 제가 생각한 명확한 뜻이 보입니다. 구성원(요소,원소…)들간에 어떤 <em>관계</em>를 가지고 있느냐를 구조라 말합니다.</p>
+<p>람다 변수를 이용해 함수들간의 구조를 만들어 가는게 함수형 프로그래밍입니다. 람다 변수는 람다 함수를 명시적으로 써서 드러나는 경우도 있고, 이름 있는 함수들의 인자로 가려져 있는 경우도 있습니다.</p>
+<p>다른 포스트에서도 강조, 또 강조했지만 <em>람다 변수 개념이 함수형 구조를 만드는 근간(또는 도구)</em>입니다.</p>
 
 <div class="comment">
 <script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
