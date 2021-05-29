@@ -62,8 +62,10 @@
 </div>
 
 <p><a href="https://en.wikibooks.org/wiki/Haskell/Indentation" class="uri">https://en.wikibooks.org/wiki/Haskell/Indentation</a></p>
-<p>들여 쓰기가 의미를 가지는 언어를 쓰는게 처음이라 은근히 헤매게 만든 요소였습니다.</p>
-<p>아직 <em>(1)끝나지 않은 표현식을 줄바꿈을 해서 계속 할 때는 현재 표현식의 시작보다는 들여 쓰기</em> 해야합니다. 그 다음, <em>(2)같은 레벨에 있는 딸린 표현식들은 모두 같은 들여 쓰기값</em>을 가져야 합니다.</p>
+<p>※ 에디터들의 탭tab 옵션을 스페이스로 채워 넣는 것으로 바꿔야 합니다. ex) vim의 경우 set expandtab ※ 여기 포스트는 코드 블록의 폰트가 고정폭이 나와야 하는데, 모바일 사파리등에선 제대로 폰트가 나오지 않아 띄어쓰기 숫자가 정확히 눈에 들어오지 않는 경우가 있습니다. 고정폭monospace 폰트가 나오는 환경에서 봐야합니다.</p>
+<p>들여 쓰기가 의미를 가지는 언어를 쓰는게 처음이라 은근히 헤매게 만든 요소였습니다. 내가 작성할 때 복잡하다면, 전통적인 레이아웃이 의미가 없는 스타일, 즉 <code>{</code>,<code>}</code>,<code>;</code>으로 레이아웃을 무시하게 할 수도 있지만, 다른 하스켈러들은 대부분 레이아웃을 이용합니다. 상식을 벗어나는 규칙이 없긴 한데, 완전히 직관으로만 알 수 없는 규칙도 있습니다. 한 번쯤은 보고 지나가야 합니다.</p>
+<h2 id="위키북스에-나온-풀이">위키북스에 나온 풀이</h2>
+<p>아직 <em>(1)끝나지 않은 표현식을 줄바꿈을 해서 이어 갈 때는 현재 표현식의 시작보다는 들여 쓰기</em> 해야합니다. 그 다음, <em>(2)같은 레벨에 있는 딸린 표현식들은 모두 같은 들여 쓰기값</em>을 가져야 합니다.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- error</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> x <span class="ot">=</span> a</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  y <span class="ot">=</span> b</span></code></pre></div>
@@ -123,15 +125,77 @@
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    myPrint</span>
 <span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span> myPrint <span class="ot">=</span> </span>
 <span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>         <span class="fu">putStrLn</span> <span class="st">&quot;ok&quot;</span> <span class="co">-- 한 칸이라도 myPrint 함수명보다는 들여 쓰기 해야합니다.</span></span></code></pre></div>
-<p>일단, (1)번 규칙을 적용하면, <code>where</code>까지도 들여 쓰기에 포함해서 봐야하니, <code>myPrint</code>의 <code>m</code>보다는 들여 쓰기 해야합니다. 하지만, <code>do</code>를 써주면 함수명과 동일한 시작점까진 됩니다.</p>
+<p>일단, (1)번 규칙을 적용하면, <code>where</code>까지도 들여 쓰기에 포함해서 봐야하니, <code>myPrint</code>의 첫 글자 <code>m</code>보다는 들여 쓰기 해야합니다. 하지만, <code>do</code>를 써주면 함수명과 동일한 시작점까진 됩니다.</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- ok</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="kw">do</span></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    myPrint</span>
 <span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span> myPrint <span class="ot">=</span> <span class="kw">do</span> </span>
 <span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>        <span class="fu">putStrLn</span> <span class="st">&quot;ok&quot;</span> <span class="co">-- do를 쓰면 함수명과 갈은 위치까지는 됩니다.</span></span></code></pre></div>
 <p>이쯤되면 규칙이 뭘지 혼란스럽습니다.</p>
-<p>그냥 직관으론 다 알 수 없는 규칙이 있습니다. 바로 <em>(5) 레이아웃 키워드 let, where, of, do 중에 하나가 오면 들여 쓰기를 리셋하고 새로운 레이 아웃을 시작</em>한다는 규칙<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>입니다. 위 예들은 <code>where</code>로 리셋하고 첫 시작하는 라인이 (3)번 규칙에 따라 <code>공백 2 + where 5글자 + 공백 1</code> 해서 총 8글자 들여 쓰기로 시작합니다. 첫 번째 <code>where</code> 예시는 <code>do</code>가 없는 경우는 리셋이 안되니, 아직 끝나지 않은 표현식은 (1)번 규칙에 따라 더 들여 써야 합니다.</p>
-<p>여기까지 wikibook 내용을 요약하며 곰곰히 보니 <em>함수명을 표현식의 시작</em>으로 보면 (1)번 끝나지 않은 표현식, (2)번 같은 레벨은 같은 들여쓰기, (3)번 레이아웃 키워드는 들여 쓰기에 포함된다는 규칙 세가지만 있으면, 다른 규칙은 없어도 위의 예시들이 모두 맞아 들어갑니다. wikibook은 실제 스펙 그대로가 아니라 풀어서 설명한 것으로, 실제 하스켈 스펙은 다음 사이트에 있습니다. <a href="https://www.haskell.org/onlinereport/haskell2010/haskellch10.html#x17-17800010.3" class="uri">https://www.haskell.org/onlinereport/haskell2010/haskellch10.html#x17-17800010.3</a> 실제 스펙으로 이해하기에는 다소 난해하긴 합니다.</p>
+<p>그냥 직관으론 다 알 수 없는 규칙이 있습니다. 바로 <em>(5) 레이아웃 키워드 let, where, of, do 중에 하나가 오면 들여 쓰기를 리셋하고 새로운 레이 아웃을 시작</em>한다는 규칙<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>입니다. 위 예들은 <code>where</code>로 리셋하고 첫 시작하는 라인이 (3)번 규칙에 따라 <code>공백 2 + where 5글자 + 공백 1</code> 해서 총 8칸 들여 쓰기로 시작했으니, 이 후에도 8칸 들여 쓰기 해야합니다. 첫 번째 <code>where</code> 예시는 <code>do</code>가 없는 경우는 리셋이 안되니, 아직 끝나지 않은 표현식은 (1)번 규칙에 따라 더 들여 써야 합니다. 완전히 왼쪽으로 붙이는 리셋이 아니라 함수명이 있는 곳을 기준으로 삼습니다.</p>
+<p>그런데 테스트를 해보니 let과 do의 동작이 다릅니다.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- error</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>func <span class="ot">=</span> <span class="kw">let</span> </span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>a <span class="ot">=</span> <span class="dv">1</span> <span class="co">-- 여기와</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="kw">in</span> a <span class="co">-- 여길 한 칸이라도 들여 쓰면 ok</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="co">-- ok</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>func2 <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="fu">putStrLn</span> <span class="st">&quot;ok</span></span></code></pre></div>
+<p><code>let</code>에 딸린 식은 함수명보다 반드시 들여 써야하지만, <code>do</code>는 그렇지 않습니다. wikibook에 따르면 같은 동작을 하는 것으로 쓰여 있는데 그렇지 않습니다. 어딘가 놓친 규칙이 있을 것 같은데 아직 찾지 못했습니다.</p>
+<p>또 <code>do</code>의 들여 쓰기에 따라 다음 구문이 영향을 받습니다.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>func2 <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">putStrLn</span> <span class="st">&quot;ok&quot;</span> <span class="co">-- 여길 한 칸이라도 들여 쓰면 func3 정의가 ok입니다.</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="co">-- error</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>func3 <span class="ot">=</span> a</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a> <span class="kw">where</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>a <span class="ot">=</span> <span class="dv">1</span></span></code></pre></div>
+<p>새 함수 정의의 시작인 <code>func3 = a</code> 는 <code>func2</code>안에 속하는 구문으로 해석해서 다음 에러가 납니다.</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>test13<span class="op">.</span>hs<span class="op">:</span><span class="dv">9</span><span class="op">:</span><span class="dv">7</span><span class="op">:</span> <span class="fu">error</span><span class="op">:</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    parse <span class="fu">error</span> on input ‘<span class="ot">=</span>’</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Perhaps</span> you need a 'let' <span class="kw">in</span> a 'do' block<span class="op">?</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    e<span class="op">.</span>g<span class="op">.</span> 'let x <span class="ot">=</span> <span class="dv">5</span>' instead <span class="kw">of</span> 'x <span class="ot">=</span> <span class="dv">5</span>'</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  <span class="op">|</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="dv">9</span> <span class="op">|</span> func3 <span class="ot">=</span> a</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>  <span class="op">|</span>    </span></code></pre></div>
+<p>추측으론, 한 레이아웃이 끝나고 다음 레이아웃이 시작됨을 표시하는 방법이 한 단계 내어 쓰기해야 하는데, <code>func2</code>의 <code>do</code>구문을 들여 쓰기 1단계로 했기 때문에, 이 보다 더 내어 쓰기를 할 수 없어 <code>func2</code>의 <code>do</code>구문을 끊지 못하는 상황입니다.</p>
+<p>여기까지 wikibook 내용을 요약하며 곰곰히 보니, 결국 스펙을 제대로 이해하는 수밖에 없습니다. wikibook은 실제 스펙 그대로가 아니라 풀어서 설명한 것으로, 실제 스펙은 다음 사이트에 있습니다. <a href="https://www.haskell.org/onlinereport/haskell2010/haskellch10.html#x17-17800010.3" class="uri">https://www.haskell.org/onlinereport/haskell2010/haskellch10.html#x17-17800010.3</a> 실제 스펙으로 이해하기에는 다소 난해하긴 합니다.</p>
+<h2 id="실제-스펙">실제 스펙</h2>
+<p>정해진 토큰 규칙에 따라 어휘를 분석해서 어휘 스트림을 만드는데, 여기에 들여 쓰기 칸 수가 바뀔때마다 <code>{n}</code>이나 <code>&lt;n&gt;</code>토큰을 집어 넣습니다.</p>
+<p>실제 구현은 <code>L</code>이라는 함수를 이용해 레이아웃이 의미가 있는 코드(줄여서 레이아웃 코드) 형태를 <code>{</code>,<code>}</code>,<code>;</code>를 쓰는 코드(줄여서 {;}코드)와 매칭합니다. 일단 L함수가 받는 두 개의 인자를 보면</p>
+<p>첫 번째 인자는 토큰 스트림이 들어옵니다.</p>
+<p><code>let</code>, <code>where</code>, <code>of</code>, <code>do</code> 4개 키워드 뒤에 중괄호<code>{</code>가 딸려 들어오지 않으면 <code>{n}</code>이란 토큰을 집어 넣습니다. 여기서 <code>n</code>은 다음 구문의 들여 쓰기 칸 수가 들어갑니다. 만일, 다음 구문 없이 파일 끝이라면 <code>0</code>이 들어갑니다. 이런 경우가 뭐가 있을까 싶은데, 예를들면 <code>where</code>키워드 뒤에 아무것도 없어도 에러는 나지 않습니다. 이 걸 말하는 걸까요?</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- ok</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>func3 <span class="ot">=</span> <span class="dv">1</span> <span class="kw">where</span></span></code></pre></div>
+<p>module의 첫 번째 어휘가 <code>{</code>나 <code>module</code>이 아니면, 앞에 {n}이 옵니다. n은 첫 번째 어휘의 들여 쓰기 칸 수가 들어갑니다. 아래와 같이 쓰면, {2}를 넣어놔서 들여 쓰기 상태를 바꾸니 다음 func2도 들여 쓰기에 맞춰야 합니다. 하지만 <code>{</code>나 <code>module</code>이면 들여 쓰기를 따로 정하지 않습니다.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- error</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="kw">where</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  func1 <span class="ot">=</span> <span class="dv">1</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  func2 <span class="ot">=</span> <span class="dv">2</span> </span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="op">^^</span></span></code></pre></div>
+<p>어휘의 시작 앞에 공백만 있으면, 이 어휘 앞에 <code>&lt;n&gt;</code>을 넣습니다. <code>n</code>은 이 어휘의 들여 쓰기 칸 수입니다. 단 위의 단계로 이미 {n}이 있을 때는 넣지 않습니다. 그리고 또 다음같은 경우도 넣지 않습니다. 아래 예를 보면 <code>\Bill</code>은 완성된 어휘의 첫글자도 아니고, 콤마<code>,</code>도 아니므로 <code>&lt;n&gt;</code>을 넣지 않습니다. 이어지는 문장은 <code>\Bill</code>이 아니라 <code>Some</code>처럼 <code>(</code>와 들여쓰기를 맞춘다는 얘기입니다.</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- ok</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>f <span class="ot">=</span> (<span class="st">&quot;Hello \</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="st">        \Bill&quot;</span>, <span class="st">&quot;Jake&quot;</span>)</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Some</span></span></code></pre></div>
+<p>두 번째 인자는</p>
+<p>레이아웃을 관리하는 스택을 만들고, <code>&lt;n&gt;</code>이나 <code>{n}</code>을 받을 때, n값을 넣어뒀다가 하나씩 꺼내거나 넣으면서 들여 쓰기 관리를 합니다. 이 두가지의 동작 차이는 아래 나옵니다.??????</p>
+<p>레이아웃을 지정하는 “layout context” 스택은<br />
+Zero : 명시적으로 중괄호<code>{</code>를 쓴 경우는 0입니다. 가장 안 쪽 컨텍스트가 <code>0</code>이면, 감싸진 컨텍스트가 끝나거나 새로운 컨텍스트가 생기기 전까지 레이아웃 토큰이 들어갈 일은 없습니다.<br />
+양의 정수 : 감싸진 컨텍스트의 들여 쓰기를 뜻합니다.</p>
+<p>※ 따로 스펙 설명엔 없지만, 중괄호 <code>{</code>를 쓰면 <code>0</code>으로 만드는데, 이게 항상 가장 왼쪽을 뜻하는게 아니라 let 일 때는 함수명까지이고, do일 때는 지정하지 않은 상태, 곧 가장 왼 쪽도 가능한 상태가 됩니다. 스펙에 이 차이를 설명하는 곳이 안보입니다.</p>
+<p>하스켈 일반 문법과 마찬가지로 토큰 스트림을 <code>(:)</code>을 이용해 표시하고, 레이아웃 규칙도 일반 하스켈 함수처럼 설명합니다. 입문을 막 시작했을 때 보기는 썩 편하지 않을 것 같습니다.</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- L은 레이아웃 스트림을 {;} 스트림으로 바꿉니다.</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- 토큰열에서 꺼낸 현재 토큰이 &lt;n&gt;이면</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="dt">L</span> (<span class="op">&lt;</span>n<span class="op">&gt;</span> <span class="op">:</span> ts) (레이아웃 스택 m <span class="op">:</span> ms) <span class="ot">=</span>   ;   <span class="op">:</span> (<span class="dt">L</span> ts (m <span class="op">:</span> ms))          만일 m <span class="ot">=</span> n</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>                                    <span class="ot">=</span>   }   <span class="op">:</span> (<span class="dt">L</span> (<span class="op">&lt;</span>n<span class="op">&gt;</span> <span class="op">:</span> ts) ms)        만일 n <span class="op">&lt;</span> m</span></code></pre></div>
+<p>토큰열에 <code>&lt;n&gt;</code>이 들어왔다면, 현재 레이아웃 스택에 있는 값이랑 비교해서 같다면, 같은 레벨의 문장이니 <code>;</code>를 결과 스트림에 넣습니다.</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> a <span class="ot">=</span> <span class="dv">1</span> <span class="co">-- 토큰a 앞에 토큰&lt;4&gt;가 들어있는데,</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>    b <span class="ot">=</span> <span class="dv">1</span> <span class="co">-- 이 토큰의 들여쓰기가 4이므로 m = n 입니다. 그럼 ;를 넣습니다.</span></span></code></pre></div>
+<p>L (<n> : ts) ms = L ts ms L ({n} : ts) (m : ms) = { : (L ts (n : m : ms)) 만일 n &gt; m</p>
+<p>Let, where, of, do등은 {으로 감싸고 있습니다. 이 걸 enclosing context라 합니다.</p>
+<p>미완성, 2021.5.29 작업중..</p>
 <section class="footnotes" role="doc-endnotes">
 <hr />
 <ol>
