@@ -190,7 +190,7 @@
 <span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Some</span></span></code></pre></div>
 <p><em>{n}이 들어오면 레이아웃 스택에 n을 추가하고, <n>은 현재 구문의 들여쓰기를 나타냅니다.</em></p>
 <h3 id="함수의-두-번째-인자">3 함수의 두 번째 인자</h3>
-<p>레이아웃을 관리하는 스택을 만들고, <code>&lt;n&gt;</code>이나 <code>{n}</code>을 받을 때, n값을 넣어뒀다가 하나씩 꺼내거나 넣으면서 들여 쓰기 관리를 합니다. 이 두가지의 동작 차이는 아래 나옵니다.??????</p>
+<p>레이아웃을 관리하는 스택을 만들고, <code>{n}</code>을 받을 때, n값을 넣어뒀다가 하나씩 꺼내거나 넣으면서 들여 쓰기 관리를 합니다.</p>
 <p>레이아웃을 지정하는 “layout context” 스택은<br />
 Zero : 명시적으로 중괄호<code>{</code>를 쓴 경우는 0입니다. 가장 안 쪽 컨텍스트가 <code>0</code>이면, 감싸진 컨텍스트가 끝나거나 새로운 컨텍스트가 생기기 전까지 레이아웃 토큰이 들어갈 일은 없습니다.<br />
 양의 정수 : enclosing 컨텍스트(블록을 의미합니다.)의 들여 쓰기를 뜻합니다.<br />
@@ -246,25 +246,22 @@ where 뒤의 첫 번째 토큰이 enclosing 컨텍스트보다 덜 들여 쓰여
 <span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="dt">L</span> (} <span class="op">:</span> ts) ms <span class="ot">=</span> parse<span class="op">-</span><span class="fu">error</span> (<span class="dt">Note</span> <span class="dv">3</span>)</span>
 <span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="dt">L</span> ({ <span class="op">:</span> ts) ms <span class="ot">=</span> {  <span class="op">:</span>  (<span class="dt">L</span> ts (<span class="dv">0</span> <span class="op">:</span> ms)) (<span class="dt">Note</span> <span class="dv">4</span>) </span></code></pre></div>
 <p>Note 3.<br />
-닫는 중괄호가 들어 왔다면, 그 전에 명시적으로 여는 중괄호를 써서 레이아웃 컨텍스트에 0을 넣어 놨어야 합니다. 그렇지 않으면 매치되는 중괄호를 연 적이 없다고 판단해서 parse-error입니다.</p>
+닫는 중괄호가 들어 왔다면, 그 전에 명시적으로 여는 중괄호를 써서 레이아웃 컨텍스트에 <code>0</code>을 넣어 놨어야 합니다. 그렇지 않으면 매치되는 중괄호를 연 적이 없다고 판단해서 <code>parse-error</code>입니다.</p>
 <p>Note 4.<br />
 여는 중괄호가 들어 왔다면, 레이아웃 스택에 0을 넣습니다.</p>
+<h4 id="다음-토큰-t이-문법상-이어지는-토큰이-아닐-때">다음 토큰 t이 문법상 이어지는 토큰이 아닐 때</h4>
 <div class="sourceCode" id="cb29"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>(사)</span>
 <span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="dt">L</span> (t <span class="op">:</span> ts) (m <span class="op">:</span> ms) <span class="ot">=</span> }  <span class="op">:</span>  (<span class="dt">L</span> (t <span class="op">:</span> ts) ms) <span class="kw">if</span> m ∕<span class="ot">=</span> <span class="dv">0</span> <span class="fu">and</span> parse<span class="op">-</span><span class="fu">error</span>(t) (<span class="dt">Note</span> <span class="dv">5</span>) </span></code></pre></div>
-<p>위 조건들에 모두 걸리지 않았다면, 그리고 현재 레이아웃 컨텍스트가 <code>0</code>이 아니고, <code>parse-error(t)</code>가 참이면, 레아아웃 컨텍스트를 하나 꺼내서 버리고, <code>}</code>을 결과에 붙이고, 다시 현재 토큰을 가지고 L을 부릅니다.<br />
-<code>parse-error(현재 토큰)</code> 해석은 다음과 같습니다. 만일 지금까지 <code>L</code>로 생성한 토큰과 다음 토큰<code>t</code>가 문법에 맞지 않는 prefix를 나타내고, 지금까지 생성한 토큰과 이어지는 <code>}</code>이 문법에 맞는 prefix라면(문법에 맞았기 때문에 여기까지 도달한 것입니다.), <code>parse-error(현재토큰t)</code>는 <code>true</code>입니다.</p>
-<div class="sourceCode" id="cb30"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>func3 <span class="ot">=</span> some</span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span> some <span class="ot">=</span> <span class="co">-- 현재 레이아웃 컨텍스트는 8</span></span>
-<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>         <span class="kw">let</span> <span class="dt">Wrong</span> a <span class="ot">=</span> <span class="dv">1</span> </span>
-<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>         <span class="kw">in</span> a <span class="op">+</span> <span class="dv">1</span></span></code></pre></div>
-<p>{ func3, some, where, {8}, let, {14}, Wrong a = 1;{}</p>
-<div class="sourceCode" id="cb31"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>(아)</span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="dt">L</span> (t <span class="op">:</span> ts) ms <span class="ot">=</span> t  <span class="op">:</span>  (<span class="dt">L</span> ts ms) </span></code></pre></div>
+<p>위 조건들에 모두 걸리지 않았다면, 그리고 현재 레이아웃 컨텍스트가 <code>0</code>이 아니고, <code>parse-error(t)</code>가 참이면, 레아아웃 컨텍스트를 하나 꺼내서 버리고, <code>}</code>을 결과에 붙이고, 다시 현재 토큰을 가지고 <code>L</code>을 부릅니다.<br />
+<code>parse-error(현재 토큰)</code> 해석은 다음과 같습니다. 만일 지금까지 <code>L</code>로 생성한 토큰과 다음 토큰<code>t</code>가 문법에 맞지 않는 prefix를 나타내고, 지금까지 생성한 토큰과 이어지는 <code>}</code>이 문법에 맞는 prefix라면, <code>parse-error(현재토큰t)</code>는 <code>true</code>입니다. 말이 복잡한데, 문법상 다음 토큰이 이어지는게 아니라면 <code>}</code>를 넣고 다음 토큰을 다시 살펴 본다는 말입니다.</p>
+<div class="sourceCode" id="cb30"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>(아)</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="dt">L</span> (t <span class="op">:</span> ts) ms <span class="ot">=</span> t  <span class="op">:</span>  (<span class="dt">L</span> ts ms) </span></code></pre></div>
 <p>위 조건 모두에 걸리지 않았다면, 현재 토큰을 붙이고, 레이아웃 스택 그대로 다음 토큰으로 진행</p>
-<div class="sourceCode" id="cb32"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>(자)</span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="dt">L</span> [] [] <span class="ot">=</span> [] <span class="co">-- 빈무자열 들어오면 종료</span></span>
-<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a><span class="dt">L</span> [] (m <span class="op">:</span> ms) <span class="ot">=</span> }  <span class="op">:</span>  <span class="dt">L</span> [] ms <span class="kw">if</span> m≠<span class="dv">0</span> (<span class="dt">Note</span> <span class="dv">6</span>)</span></code></pre></div>
-<p>토큰은 끝났는데, 레이아웃 스택이 비어 있지 않으면 <code>}</code>를 붙입니다. 그리고 레이아웃 스택이 비워질 때까지 하나씩 꺼내며 <code>}</code>를 붙입니다. 여기까지 도달했는데, non-layout context (즉 m=0) 안이라면 에러입니다.</p>
+<h4 id="종료-조건">종료 조건</h4>
+<div class="sourceCode" id="cb31"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>(자)</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="dt">L</span> [] [] <span class="ot">=</span> [] <span class="co">-- 빈 문자열 들어오면 종료</span></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="dt">L</span> [] (m <span class="op">:</span> ms) <span class="ot">=</span> }  <span class="op">:</span>  <span class="dt">L</span> [] ms <span class="kw">if</span> m≠<span class="dv">0</span> (<span class="dt">Note</span> <span class="dv">6</span>)</span></code></pre></div>
+<p>토큰은 끝났는데, 레이아웃 스택이 비어 있지 않으면 <code>}</code>를 붙입니다. 그리고 레이아웃 스택이 비워질 때까지 하나씩 꺼내며 <code>}</code>를 붙입니다. 여기까지 도달했는데, <code>non-layout context (즉 m=0)</code> 안이라면 에러입니다.</p>
 <p>2021.5.31 미완성</p>
 <section class="footnotes" role="doc-endnotes">
 <hr />
