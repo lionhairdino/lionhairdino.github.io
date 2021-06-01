@@ -67,11 +67,11 @@
 <div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ot">f ::</span> a <span class="ot">-&gt;</span> <span class="dt">Bool</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>f a <span class="ot">=</span> a <span class="op">==</span> <span class="st">&quot;x&quot;</span></span></code></pre></div>
 <p><code>a</code>는 아무 타입이나 된다고 했으니, <code>String</code> 타입으로 추론하면 아무 문제가 없을 것 같지만 에러가 납니다. (보통 폴리모픽 변수를 쓰면 <code>forall</code>이 생략되었다고 보면 됩니다.)</p>
-<pre><code>    • Couldn't match expected type ‘a’ with actual type ‘[Char]’
-      ‘a’ is a rigid type variable bound by
-        the type signature for:
-          f :: forall a. a -&gt; Bool
-    ...</code></pre>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>    • <span class="dt">Couldn't</span> match expected <span class="kw">type</span> ‘a’ with actual <span class="kw">type</span> ‘[<span class="dt">Char</span>]’</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>      ‘a’ is a rigid <span class="kw">type</span> variable bound by</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>        the <span class="kw">type</span> signature for<span class="op">:</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="ot">          f ::</span> <span class="kw">forall</span> a<span class="op">.</span> a <span class="ot">-&gt;</span> <span class="dt">Bool</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">...</span></span></code></pre></div>
 <p><code>a</code>는 타입이 정해지지도 않았는데, <code>[Char]</code>와 매치할 수 없다는 에러입니다.<br />
 “<code>a</code>는 아무타입이나 될 수 있으니 추론하면 되는 거 아니었어?”<br />
 <code>forall a</code>를 오해해서 생기는 혼란입니다. <code>a</code>는 정해지지 않은게 아니라, <em>“모든 타입”으로 정해졌습니다.</em> <code>a</code>는 모든 타입을 받는다고 해 놓고, 함수 내부에서는 <code>"x"</code>와 같은 <code>String</code> 타입이어야 한다고 해놨으니 GHC가 매치가 안된다고 불평합니다.</p>

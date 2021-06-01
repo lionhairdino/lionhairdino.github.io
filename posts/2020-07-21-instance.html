@@ -100,12 +100,12 @@
 <p><em>아마도 논리적인 설계는 다음과 비슷할 겁니다. (주의: 실제 테이블 모양이 이렇다는 얘기가 아닙니다.)</em></p>
 <p>인스턴스로 지정되는 타입은 사실 <em>“타입” 자체는 아무것도 바뀌지 않습니다.</em> 코드 조립을 위해 GHC가 관리하는 타입 테이블은 아무것도 바뀌지 않습니다. GHC가 코드 조립 중 메소드를 맞닥뜨렸을 때 메소드 테이블에서 “타입”을 키로 메소드를 선택합니다. 이 키 역할을 해주는 타입을 인스턴스 헤드에 써줍니다. 아마도 다음과 비슷하게 설계되어 있을겁니다.</p>
 <p>getName 메소드 테이블 <em>추정</em></p>
-<pre><code>Key      구현체
-======== ==================
-Player   Player용 getName
-Villain  Villain용 getName
-MyType   MyType용 getName
-...</code></pre>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Key</span>      구현체</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="op">========</span> <span class="op">==================</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="dt">Player</span>   <span class="dt">Player</span>용 getName</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="dt">Villain</span>  <span class="dt">Villain</span>용 getName</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="dt">MyType</span>   <span class="dt">MyType</span>용 getName</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="op">...</span></span></code></pre></div>
 <p>위 소스에서는 <code>getName</code> 메소드가 여러 개 있고, 이 중 하나를 선택하는 키로 쓰이는게 <code>Player</code>, <code>Villain</code> 타입입니다. 메소드가 인자로 받는 타입에 따라 구현체를 골라냅니다.</p>
 <h2 id="그럼-이렇게-constraint가-있는-경우는-어떻게-읽을까요">그럼 이렇게 constraint가 있는 경우는 어떻게 읽을까요?</h2>
 <div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> (<span class="dt">Eq</span> a) <span class="ot">=&gt;</span> <span class="dt">Eq</span> (<span class="dt">Tree</span> a) <span class="kw">where</span></span>
@@ -116,16 +116,16 @@ MyType   MyType용 getName
 <p>구체 타입까지 알 필요는 없고, <code>(==)</code>의 매개 변수가 <code>Eq a =&gt; Tree a</code> 타입이면 모두 이 인스턴스의 <code>(==)</code>메소드를 선택합니다.</p>
 <p><code>Tree Int</code>, <code>Tree Float</code>, … 뭐든 <code>Eq</code>의 인스턴스가 있는 타입이면 모두 위 인스턴스의 메소드를 선택합니다.</p>
 <p><code>(==)</code>메소드 테이블 <em>추정</em></p>
-<pre><code>Key                 구현체
-=================== ==========================
-Int                 Int용 (==)
-Float               Float용 (==)
-(Eq a) =&gt; Tree a    (Eq a) =&gt; Tree a용 (==)
-...</code></pre>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Key</span>                 구현체</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="op">===================</span> <span class="op">==========================</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="dt">Int</span>                 <span class="dt">Int</span>용 (<span class="op">==</span>)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="dt">Float</span>               <span class="dt">Float</span>용 (<span class="op">==</span>)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>(<span class="dt">Eq</span> a) <span class="ot">=&gt;</span> <span class="dt">Tree</span> a    (<span class="dt">Eq</span> a) <span class="ot">=&gt;</span> <span class="dt">Tree</span> a용 (<span class="op">==</span>)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="op">...</span></span></code></pre></div>
 <p>그럼 이렇게 키에 “<code>(Eq a)</code>”란 constraint가 <code>Key</code>로 쓰일 것 같은데, 그렇지 않습니다. <em>인스턴스를 고를 때 constraint는 전혀 고려하지 않습니다.</em> 그리고, 사실 <code>Tree</code>이기만 하면 <code>Tree</code>용 <code>(==)</code>를 선택합니다. <em>FlexibleInstances 확장을 켜지 않으면, 가장 바깥쪽 생성자(여기선 <code>Tree</code>)만 키로 사용</em>하므로 <code>Tree a</code>에서 <code>a</code>타입도 인스턴스를 찾는 조건이 아닙니다. 아마도 다음과 같을 겁니다. - 왜 기본 동작을 이렇게 설계했는지는 잘 모르겠습니다. 퍼포먼스 문제가 아니였을까요?</p>
-<pre><code>Key                 구현체
-=================== ==========================
-Tree                Tree용 (==)</code></pre>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Key</span>                 구현체</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="op">===================</span> <span class="op">==========================</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="dt">Tree</span>                <span class="dt">Tree</span>용 (<span class="op">==</span>)</span></code></pre></div>
 <p>그럼 constraint는 언제 영향을 줄까요? 다음 테스트로 짐작할 수 있습니다.<br />
 만일 <code>Eq</code> 인스턴스가 아닌 타입 <code>a</code>를 가진 <code>Tree</code>를 인자로 <code>(==)</code>를 부르면 어떤 에러가 날까요? <em>Eq (Tree a)</em>가 없다는 에러가 날까요? 아니면 <em>Eq a</em>가 없다는 에러가 날까요?</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Data.Tree</span>                       </span>

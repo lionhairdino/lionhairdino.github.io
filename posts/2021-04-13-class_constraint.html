@@ -116,10 +116,10 @@
 <span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span>
 <span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="kw">do</span></span>
 <span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    runReaderT (func <span class="dv">1</span>) <span class="st">&quot;config&quot;</span></span></code></pre></div>
-<pre><code>    • Could not deduce (MonadIO m) arising from a use of ‘liftIO’
-      from the context: MonadReader cfg m
-        bound by the type signature for:
-                   func :: forall cfg (m :: * -&gt; *) a. MonadReader cfg m =&gt; a -&gt; m ()</code></pre>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>    • <span class="dt">Could</span> <span class="fu">not</span> deduce (<span class="dt">MonadIO</span> m) arising from a use <span class="kw">of</span> ‘liftIO’</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>      from the context<span class="op">:</span> <span class="dt">MonadReader</span> cfg m</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        bound by the <span class="kw">type</span> signature for<span class="op">:</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="ot">                   func ::</span> <span class="kw">forall</span> cfg (<span class="ot">m ::</span> <span class="op">*</span> <span class="ot">-&gt;</span> <span class="op">*</span>) a<span class="op">.</span> <span class="dt">MonadReader</span> cfg m <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> m ()</span></code></pre></div>
 <p>이 경우는 <code>liftIO</code>를 보고 <code>MonadIO</code> 클래스까지 추론한 것 같긴 한데 에러가 납니다. 무슨 차이일까요? 왜 여기서는 <code>MonadIO</code> 클래스까지 추론deduce하지 못한다고 할까요? 뭔지 모른다는 게 아니라 <code>MonadIO</code> 라고 콕 찝기까지 하는데 왜 추론하지 못할까요?</p>
 <p>에러를 풀어 쓰면 “함수내에서 <code>liftIO</code>를 쓴다. <code>liftIO</code>를 쓰는 걸로 봐선 <code>MonadIO m</code>인데, <code>MonadReader cfg m</code> 컨텍스만 가지곤 <code>MonadIO m</code>만 받도록 할 수 없어” 입니다.</p>
 <p>나중에 조립할 때 MonadIO m 만 받겠다는 정보를 넣어주면 해결됩니다.</p>

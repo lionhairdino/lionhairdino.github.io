@@ -95,13 +95,13 @@
 <div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ot">fmapX ::</span> (<span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span>) <span class="ot">-&gt;</span> <span class="dt">Atom</span> <span class="ot">-&gt;</span> <span class="dt">Atom</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>fmapX f (<span class="dt">Atom</span> str (<span class="dt">Point</span> x y)) <span class="ot">=</span> <span class="dt">Atom</span> <span class="dt">Str</span> (<span class="dt">Point</span> (f x) y)</span></code></pre></div>
 <p>그럼 나머지 요소들에도 같은 함수들이 필요할 거라 예상할 수 있습니다.</p>
-<pre><code>spitElement
-updateElement
-fmapElement
-
-spitY
-updateY
-fmapY</code></pre>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>spitElement</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>updateElement</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>fmapElement</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>spitY</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>updateY</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>fmapY</span></code></pre></div>
 <p>데이터 타입이 다양한 깊이로 여러 값을 가지고 있을 때 매 번 패턴 매칭으로 접근하는 코드를 만들어야 합니다. 딱 봐도 프로그래머가 뭔 짓을 할 것만 같은 지루함이 보입니다. Lens는 바로 이 뭔 짓에 해당하는 라이브러리입니다.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Control.Lens</span> <span class="kw">hiding</span> (element)</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Control.Lens.TH</span></span>
@@ -206,11 +206,11 @@ fmapY</code></pre>
 <code>Double -&gt; f Double</code> 함수를 받아 <code>x</code>가 작업해서<br />
 <code>Point -&gt; f Point</code> 함수를 만들어 <code>point</code>에 넘기면<br />
 <code>Atom -&gt; f Atom</code> 함수를 만들어 <code>traverse</code> 첫 번째 인자로 넣어 줄 <em>준비를 한 상태</em>입니다.</div>
-<pre><code>&gt; :t traverse
-traverse :: (Traversable t, Applicative f) =&gt; (a -&gt; f b) -&gt; t a -&gt; f (t b)
-
-&gt; :t (traverse . point . x)
-(traverse . point . x) :: (Traversable t, Applicative f) =&gt; (Double -&gt; f Double) -&gt; t Atom -&gt; f (t Atom)</code></pre>
+<div class="sourceCode" id="cb22"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="op">:</span>t <span class="fu">traverse</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="fu">traverse</span><span class="ot"> ::</span> (<span class="dt">Traversable</span> t, <span class="dt">Applicative</span> f) <span class="ot">=&gt;</span> (a <span class="ot">-&gt;</span> f b) <span class="ot">-&gt;</span> t a <span class="ot">-&gt;</span> f (t b)</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="op">:</span>t (<span class="fu">traverse</span> <span class="op">.</span> point <span class="op">.</span> x)</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>(<span class="fu">traverse</span> <span class="op">.</span> point <span class="op">.</span> x)<span class="ot"> ::</span> (<span class="dt">Traversable</span> t, <span class="dt">Applicative</span> f) <span class="ot">=&gt;</span> (<span class="dt">Double</span> <span class="ot">-&gt;</span> f <span class="dt">Double</span>) <span class="ot">-&gt;</span> t <span class="dt">Atom</span> <span class="ot">-&gt;</span> f (t <span class="dt">Atom</span>)</span></code></pre></div>
 <h2 id="쥬스-만들기에-비유해-봤습니다">쥬스 만들기에 비유해 봤습니다</h2>
 <p>비유, 은유적인 예를 그다지 좋아하는 편은 아닌데, 함수가 많이 등장해 한 번 생각해 봤습니다.</p>
 <div class="sourceCode" id="cb23"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>(<span class="op">+</span><span class="dv">1</span>)은 칼날</span>
@@ -231,7 +231,7 @@ traverse :: (Traversable t, Applicative f) =&gt; (a -&gt; f b) -&gt; t a -&gt; f
 <div class="sourceCode" id="cb27"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">traverse</span> <span class="op">.</span> point <span class="op">.</span> x</span>
 <span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- 언젠가 칼날을 주면 블렌더를 완성해서 작업을 할 &quot;준비&quot;를 뜻합니다.</span></span></code></pre></div>
 <p>작업자에 칼날을 넘기며 오더를 내리는 함수는 over입니다.</p>
-<pre><code>over는 (작업자. 블렌더) 칼날 과일바구니 </code></pre>
+<div class="sourceCode" id="cb28"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>over는 (작업자<span class="op">.</span> 블렌더) 칼날 과일바구니 </span></code></pre></div>
 <p>이제 traverse와 컴포지션 모양이 나오는 걸 이해했으니, 다음은 펌크터로 넘어가겠습니다.</p>
 <h2 id="왜-펑크터가-들어가-있을까요">왜 펑크터가 들어가 있을까요?</h2>
 <h3 id="펑크터-없이-구현">펑크터 없이 구현</h3>
@@ -242,8 +242,8 @@ traverse :: (Traversable t, Applicative f) =&gt; (a -&gt; f b) -&gt; t a -&gt; f
 <span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a><span class="ot">xN ::</span> (<span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span>) <span class="ot">-&gt;</span> <span class="dt">Point</span> <span class="ot">-&gt;</span> <span class="dt">Point</span></span>
 <span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>xN k po <span class="ot">=</span> po { _x <span class="ot">=</span> k (_x po) }</span></code></pre></div>
-<pre><code>&gt;  pointN (xN (+1)) atom
-Atom {_element = &quot;I am Atom&quot;, _point = Point {_x = 2.0, _y = 2.0}}</code></pre>
+<div class="sourceCode" id="cb30"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span>  pointN (xN (<span class="op">+</span><span class="dv">1</span>)) atom</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="dt">Atom</span> {_element <span class="ot">=</span> <span class="st">&quot;I am Atom&quot;</span>, _point <span class="ot">=</span> <span class="dt">Point</span> {_x <span class="ot">=</span> <span class="fl">2.0</span>, _y <span class="ot">=</span> <span class="fl">2.0</span>}}</span></code></pre></div>
 <p>모양은 보기 좋게 <code>atom</code>, <code>point</code>, <code>x</code> 순서는 아니지만 작동은 잘 합니다. 물론 모양도 바꿀 수 있습니다.</p>
 <div class="sourceCode" id="cb31"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="ot">(#) ::</span> a <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> b</span>
 <span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>x <span class="op">#</span> f <span class="ot">=</span> f x</span>
@@ -253,7 +253,7 @@ Atom {_element = &quot;I am Atom&quot;, _point = Point {_x = 2.0, _y = 2.0}}</co
 <p><code>_x</code> 값을 보고 싶다면</p>
 <div class="sourceCode" id="cb33"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>atom <span class="op">#</span> _point <span class="op">#</span> _x</span></code></pre></div>
 <p>아직까진 왜 펑크터가 필요한지 모르겠습니다.</p>
-<pre><code>map (    # (pointN . xN) (+1)    ) [atom1, atom2]</code></pre>
+<div class="sourceCode" id="cb34"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">map</span> (    <span class="op">#</span> (pointN <span class="op">.</span> xN) (<span class="op">+</span><span class="dv">1</span>)    ) [atom1, atom2]</span></code></pre></div>
 <p>역시 map으로 잘 작동합니다. <em>왜 펑크터가 필요한 걸까요?</em></p>
 <h3 id="펑크터가-필요한-이유">펑크터가 필요한 이유</h3>
 <p><a href="https://www.fpcomplete.com/haskell/tutorial/lens/" class="uri">https://www.fpcomplete.com/haskell/tutorial/lens/</a></p>

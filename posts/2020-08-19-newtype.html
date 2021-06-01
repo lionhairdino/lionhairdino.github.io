@@ -63,13 +63,13 @@
 
 <h2 id="소스에선-다른-타입-하지만-바이너리에선-같은-타입">소스에선 다른 타입, 하지만 바이너리에선 같은 타입</h2>
 <p>어렵게 얘기하면 같은 성질의 것인데, 프로그램 로직속에서 다른 데이터로 취급하는 방법이라 할 수 있습니다. 예를 들면,</p>
-<pre><code>나이: 숫자,
-키: 숫자,
-몸무게: 숫자</code></pre>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>나이<span class="op">:</span> 숫자,</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>키<span class="op">:</span> 숫자,</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>몸무게<span class="op">:</span> 숫자</span></code></pre></div>
 <p>모두 숫자로 표현되는 성질의 데이터입니다. 하지만, 이들끼리의 연산은 의미가 없습니다. 그래서, 나이를 처리하는 곳에 키가 들어가거나, 몸무게를 처리하는 곳에 나이가 들어가는 실수를 하지 않게 안전 장치를 만들려고 합니다.</p>
-<pre><code>Age Int
-Height Int
-Weight Int</code></pre>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Age</span> <span class="dt">Int</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="dt">Height</span> <span class="dt">Int</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="dt">Weight</span> <span class="dt">Int</span></span></code></pre></div>
 <p>이렇게 래핑해서 각 각 다른 타입으로 만들고, 나이를 다루는 함수는 <code>Int</code>가 아닌 <code>Age Int</code>를 받도록 만들고, 키는 <code>Height Int</code>, 몸무게는 <code>Weight Int</code>를 받도록 만들면 다른 뜻을 지닌 값이 들어오는 걸 막을 수 있습니다.</p>
 <p>하지만, 이들은 타입 안정성을 위해 래핑한 것으로 본질은 <code>Int</code>와 다를게 없습니다. 코드 조립(type-checker)할 때만 써먹고, 런타임엔 필요 없는 정보입니다. 컴파일 타임에만 구별되고, 효율성을 위해 런타임에는 사라지게 래핑할 방법이 필요합니다.</p>
 <p>이럴 때 <code>newtype</code>을 씁니다.</p>

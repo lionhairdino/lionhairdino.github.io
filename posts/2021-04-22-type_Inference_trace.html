@@ -70,44 +70,43 @@
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  cfg <span class="ot">&lt;-</span> ask</span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span> ()</span></code></pre></div>
 <p>아래와 같은 에러가 납니다.</p>
-<pre><code>    • No instance for (Monad m) arising from a do statement
-      Possible fix:
-        add (Monad m) to the context of
-          the type signature for:
-            func1 :: forall (m :: * -&gt; *). m ()
-...
-8 |   cfg &lt;- ask
-
-    • Ambiguous type variable ‘a0’ arising from a use of ‘ask’
-      prevents the constraint ‘(MonadReader a0 m)’ from being solved.
-      Relevant bindings include
-        func1 :: m ()
-      Probable fix: use a type annotation to specify what ‘a0’ should be.
-      These potential instances exist:
-        instance [safe] Monad m =&gt; MonadReader r (ReaderT r m)
-          -- Defined in ‘Control.Monad.Reader.Class’
-        ...plus 13 instances involving out-of-scope types
-        (use -fprint-potential-instances to see them all)
-...
-8 |   cfg &lt;- ask
-</code></pre>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>    • <span class="dt">No</span> <span class="kw">instance</span> for (<span class="dt">Monad</span> m) arising from a <span class="kw">do</span> statement</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>      <span class="dt">Possible</span> fix<span class="op">:</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>        add (<span class="dt">Monad</span> m) to the context <span class="kw">of</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>          the <span class="kw">type</span> signature for<span class="op">:</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="ot">            func1 ::</span> <span class="kw">forall</span> (<span class="ot">m ::</span> <span class="op">*</span> <span class="ot">-&gt;</span> <span class="op">*</span>)<span class="op">.</span> m ()</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="op">...</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="dv">8</span> <span class="op">|</span>   cfg <span class="ot">&lt;-</span> ask</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    • <span class="dt">Ambiguous</span> <span class="kw">type</span> variable ‘a0’ arising from a use <span class="kw">of</span> ‘ask’</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>      prevents the constraint ‘(<span class="dt">MonadReader</span> a0 m)’ from being solved<span class="op">.</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>      <span class="dt">Relevant</span> bindings include</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="ot">        func1 ::</span> m ()</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>      <span class="dt">Probable</span> fix<span class="op">:</span> use a <span class="kw">type</span> annotation to specify what ‘a0’ should be<span class="op">.</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>      <span class="dt">These</span> potential instances exist<span class="op">:</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>        <span class="kw">instance</span> [safe] <span class="dt">Monad</span> m <span class="ot">=&gt;</span> <span class="dt">MonadReader</span> r (<span class="dt">ReaderT</span> r m)</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>          <span class="co">-- Defined in ‘Control.Monad.Reader.Class’</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>        <span class="op">...</span>plus <span class="dv">13</span> instances involving out<span class="op">-</span><span class="kw">of</span><span class="op">-</span>scope types</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>        (use <span class="op">-</span>fprint<span class="op">-</span>potential<span class="op">-</span>instances to see them <span class="fu">all</span>)</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="op">...</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="dv">8</span> <span class="op">|</span>   cfg <span class="ot">&lt;-</span> ask</span></code></pre></div>
 <p>문장 그대로 읽으면 do구문을 보고 <code>instance (Monad m)</code>을 찾아야 하는데, 그런 인스턴스가 없다는 얘기입니다. <code>func1</code>이 <code>do</code>를 쓰니 <code>Monad</code>입니다. <code>m</code>은 모든 타입이니 당연히 <code>Monad m</code> 인스턴스란 건 없습니다. 왜 <code>Monad m</code>을 <code>could not deduce</code>라고 하지 않고, <code>No instance</code> 에러라고 했을까요? 여기선 <code>m</code>을 <code>deduce</code>하지 못한게 아닙니다. 아무 제약constraint없이 <code>m</code>이라고만 쓰면 <code>forall m. m</code> 이란 뜻으로 <em>모든 타입을 다 받을 수 있다고 결정</em>된겁니다. 이렇게 찾은 <code>m</code>의 <code>Monad</code> 인스턴스는 없습니다. 그런데 만일 여기에 Constraint가 있다면, <em>Constraint를 이용해서 타입 추론deduce을 시도</em> 합니다. 보통 Constraint가 있어 deduce시도를 해봤는데도 필요한 타입을 찾지 못하면 could not deduce 에러가 납니다. 아래와 같이 Constraint를 일부 추가하고</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ot">func1 ::</span> (<span class="dt">Monad</span> m) <span class="ot">=&gt;</span> m ()</span></code></pre></div>
 <p>다시 컴파일 하면,</p>
-<pre><code>    • Could not deduce (MonadReader a0 m) arising from a use of ‘ask’
-      from the context: Monad m
-        bound by the type signature for:
-                   func1 :: forall (m :: * -&gt; *). Monad m =&gt; m ()
-      The type variable ‘a0’ is ambiguous
-      Relevant bindings include
-        func1 :: m () (bound at ...)
-      These potential instances exist:
-        instance [safe] Monad m =&gt; MonadReader r (ReaderT r m)
-          -- Defined in ‘Control.Monad.Reader.Class’
-        ...plus 13 instances involving out-of-scope types
-        (use -fprint-potential-instances to see them all)
-...
-8 |   cfg &lt;- ask</code></pre>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>    • <span class="dt">Could</span> <span class="fu">not</span> deduce (<span class="dt">MonadReader</span> a0 m) arising from a use <span class="kw">of</span> ‘ask’</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>      from the context<span class="op">:</span> <span class="dt">Monad</span> m</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        bound by the <span class="kw">type</span> signature for<span class="op">:</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="ot">                   func1 ::</span> <span class="kw">forall</span> (<span class="ot">m ::</span> <span class="op">*</span> <span class="ot">-&gt;</span> <span class="op">*</span>)<span class="op">.</span> <span class="dt">Monad</span> m <span class="ot">=&gt;</span> m ()</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>      <span class="dt">The</span> <span class="kw">type</span> variable ‘a0’ is ambiguous</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>      <span class="dt">Relevant</span> bindings include</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="ot">        func1 ::</span> m () (bound at <span class="op">...</span>)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>      <span class="dt">These</span> potential instances exist<span class="op">:</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>        <span class="kw">instance</span> [safe] <span class="dt">Monad</span> m <span class="ot">=&gt;</span> <span class="dt">MonadReader</span> r (<span class="dt">ReaderT</span> r m)</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>          <span class="co">-- Defined in ‘Control.Monad.Reader.Class’</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>        <span class="op">...</span>plus <span class="dv">13</span> instances involving out<span class="op">-</span><span class="kw">of</span><span class="op">-</span>scope types</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>        (use <span class="op">-</span>fprint<span class="op">-</span>potential<span class="op">-</span>instances to see them <span class="fu">all</span>)</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="op">...</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="dv">8</span> <span class="op">|</span>   cfg <span class="ot">&lt;-</span> ask</span></code></pre></div>
 <p><code>ask</code>를 쓰는 걸로 봐서 <code>m</code>은 <code>MonadReader a m</code> 인스턴스일텐데, 서명의 Constraint에는 <code>Monad m</code>만 있을 뿐, 더 추론할 정보가 없습니다.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ot">func1 ::</span> (<span class="dt">Monad</span> m, <span class="dt">MonadReader</span> c m) <span class="ot">=&gt;</span> m ()</span></code></pre></div>
 <p>이렇게 하면 컴파일 성공입니다. 함수 내부에서 특정 타입을 쓰도록 바꾸고 타입 추론을 더 살펴 보겠습니다.</p>
@@ -115,20 +114,20 @@
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>func1 <span class="ot">=</span> <span class="kw">do</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  cfg <span class="ot">&lt;-</span> ask</span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span> <span class="op">$</span> cfg <span class="op">+</span> <span class="dv">1</span></span></code></pre></div>
-<pre><code>    • Couldn't match type ‘c’ with ‘a’
-        arising from a functional dependency between constraints:
-          ‘MonadReader a m’
-            arising from a use of ‘ask’
-          ‘MonadReader c m’
-            arising from the type signature for:
-                           func1 :: forall (m :: * -&gt; *) c a. (Monad m, MonadReader c m) =&gt; m a
-      ‘c’ is a rigid type variable bound by
-        the type signature for:
-          func1 :: forall (m :: * -&gt; *) c a. (Monad m, MonadReader c m) =&gt; m a
-      ‘a’ is a rigid type variable bound by
-        the type signature for:
-          func1 :: forall (m :: * -&gt; *) c a. (Monad m, MonadReader c m) =&gt; m a
-8 |   cfg &lt;- ask</code></pre>
+<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>    • <span class="dt">Couldn't</span> match <span class="kw">type</span> ‘c’ with ‘a’</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>        arising from a functional dependency between constraints<span class="op">:</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>          ‘<span class="dt">MonadReader</span> a m’</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>            arising from a use <span class="kw">of</span> ‘ask’</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>          ‘<span class="dt">MonadReader</span> c m’</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>            arising from the <span class="kw">type</span> signature for<span class="op">:</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="ot">                           func1 ::</span> <span class="kw">forall</span> (<span class="ot">m ::</span> <span class="op">*</span> <span class="ot">-&gt;</span> <span class="op">*</span>) c a<span class="op">.</span> (<span class="dt">Monad</span> m, <span class="dt">MonadReader</span> c m) <span class="ot">=&gt;</span> m a</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>      ‘c’ is a rigid <span class="kw">type</span> variable bound by</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>        the <span class="kw">type</span> signature for<span class="op">:</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="ot">          func1 ::</span> <span class="kw">forall</span> (<span class="ot">m ::</span> <span class="op">*</span> <span class="ot">-&gt;</span> <span class="op">*</span>) c a<span class="op">.</span> (<span class="dt">Monad</span> m, <span class="dt">MonadReader</span> c m) <span class="ot">=&gt;</span> m a</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>      ‘a’ is a rigid <span class="kw">type</span> variable bound by</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>        the <span class="kw">type</span> signature for<span class="op">:</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="ot">          func1 ::</span> <span class="kw">forall</span> (<span class="ot">m ::</span> <span class="op">*</span> <span class="ot">-&gt;</span> <span class="op">*</span>) c a<span class="op">.</span> (<span class="dt">Monad</span> m, <span class="dt">MonadReader</span> c m) <span class="ot">=&gt;</span> m a</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="dv">8</span> <span class="op">|</span>   cfg <span class="ot">&lt;-</span> ask</span></code></pre></div>
 <p><code>a</code>와 <code>c</code>는 rigid type입니다. 참고 - <a href="../errors/2020-07-15-rigidTypeVariable.html">rigid type variable</a><br />
 forall c, 즉 모든 타입의 a와 c로 정해졌습니다.<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> 서명에 a와 c는 어떤 제약도 없으므로 어떤 타입이든 들어 올 수 있습니다. 함수 내부에서도 어떤 타입이 들어와도 처리할 수 있어야 합니다.</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">Monad</span> m <span class="ot">=&gt;</span> <span class="dt">MonadReader</span> r m <span class="op">|</span> m <span class="ot">-&gt;</span> r <span class="kw">where</span></span>
@@ -137,11 +136,11 @@ forall c, 즉 모든 타입의 a와 c로 정해졌습니다.<a href="#fn1" class
 <p><code>MonadReader r m</code>에서 <code>r</code>은 타입 서명에 있는 제약에서 <code>c</code>로 한 번 추론됐으니, 결과 타입때문에 추론된 <code>MonadReader a m</code>의 <code>a</code>와 매칭 할 수 없다는 얘기입니다.</p>
 <p>그럼 GHC의 추론에 의존하지 않고, <code>r</code>을 <code>Int</code>로 고정해 봅시다.</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ot">func1 ::</span> (<span class="dt">Monad</span> m, <span class="dt">MonadReader</span> <span class="dt">Int</span> m) <span class="ot">=&gt;</span> m <span class="dt">Int</span></span></code></pre></div>
-<pre><code>    • Non type-variable argument in the constraint: MonadReader Int m
-      (Use FlexibleContexts to permit this)
-    • In the type signature:
-        func1 :: (Monad m, MonadReader Int m) =&gt; m Int
-6 | func1 :: (Monad m, MonadReader Int m) =&gt; m Int</code></pre>
+<div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>    • <span class="dt">Non</span> <span class="kw">type</span><span class="op">-</span>variable argument <span class="kw">in</span> the constraint<span class="op">:</span> <span class="dt">MonadReader</span> <span class="dt">Int</span> m</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>      (<span class="dt">Use</span> <span class="dt">FlexibleContexts</span> to permit this)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    • <span class="dt">In</span> the <span class="kw">type</span> signature<span class="op">:</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="ot">        func1 ::</span> (<span class="dt">Monad</span> m, <span class="dt">MonadReader</span> <span class="dt">Int</span> m) <span class="ot">=&gt;</span> m <span class="dt">Int</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="dv">6</span> <span class="op">|</span><span class="ot"> func1 ::</span> (<span class="dt">Monad</span> m, <span class="dt">MonadReader</span> <span class="dt">Int</span> m) <span class="ot">=&gt;</span> m <span class="dt">Int</span></span></code></pre></div>
 <p>제약constraint에는 구체 타입을 적어 줄 수 없습니다. 구체 타입 지정을 위해 언어 확장을 켭니다. 참고 <a href="../extensions/2020-07-13-FlexibleInstances.html">FlexibleContexts</a></p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ot">{-# LANGUAGE FlexibleContexts #-}</span></span></code></pre></div>
 <p><em>타입 서명과 함수 내부에서 쓰는 타입이 일치</em>해야 합니다.</p>

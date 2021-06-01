@@ -101,9 +101,9 @@ Haskell98에서 이렇게 제약을 해두었다고 하는데 왜 그럴까요?<
 <div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ot">somefunc ::</span> (<span class="dt">MonadReader</span> c m) <span class="ot">=&gt;</span> <span class="op">...</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>somefunc <span class="op">...</span> <span class="ot">=</span> <span class="op">...</span> <span class="co">-- 여기 코드에는 c를 SomeConfig로 추론할만한(달리 말하면, SomeConfig여야만 하는) 단서가 되는 코드가 있습니다.</span></span></code></pre></div>
 <p>이럴 경우 <code>somefunc</code> 안에서 SomeConfig가 들어올거라 예상하고 작업을 하기 때문에, 나중에 코드 조립할 때 SomeConfig만 받겠다 안전 장치가 필요합니다. 하지만, 해당 정보가 어디에도 없습니다. 그래서 <code>MonadReader c m</code> 대신 <code>MonadReader SomeConfig m</code>라고 제약 사항을 두려하면 아래같은 오류가 납니다.</p>
-<pre><code>    • Couldn't match type ‘c’ with ‘SomeConfig’
-        arising from a functional dependency between constraints:
-          ‘MonadReader SomeConfig m</code></pre>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>    • <span class="dt">Couldn't</span> match <span class="kw">type</span> ‘c’ with ‘<span class="dt">SomeConfig</span>’</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>        arising from a functional dependency between constraints<span class="op">:</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>          ‘<span class="dt">MonadReader</span> <span class="dt">SomeConfig</span> m</span></code></pre></div>
 <p>이럴 때도, <code>MonadReader c a</code>가 아닌 <code>MonadReader SomeConfig a</code>로 일부 타입 변수를 구체 타입으로 써주려면 이 확장을 켜야 합니다.</p>
 <p>이게 처음에는 좀 혼란스러운 부분입니다. SomeConfig로 추론했다면 GHC가 알아서 나중에 타입 매칭을 해서 SoneConfig가 아닌게 들어오면 에러를 내면 좋은데, “이 함수는 SomeConfig 타입을 쓰는데, 나중에 다른게 들어오면 안되잖아, 그러니 네가 확실하게 통과 절차를 만들어 둬.”라고 미리 강요합니다. 아직 관련 설명은 보지 못했지만, 간단하게 다음과 같은 경우를 생각해 보면 이유를 추측할 수 있습니다. somefunc를 다른 부품(함수)과 조립할 때, <em>타입 서명만 보면서 하려면 타입 서명에 필요한 조건은 모두 적어놔야만 합니다.</em></p>
 
