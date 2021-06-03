@@ -75,9 +75,6 @@
 <li><a href="#alpha-equivalence">Alpha equivalence</a></li>
 <li><a href="#beta-reduction">Beta reduction</a></li>
 <li><a href="#redex">Redex</a></li>
-<li><a href="#normal-form">Normal Form</a></li>
-<li><a href="#head-normal-form">Head Normal Form</a></li>
-<li><a href="#weak-head-normal-form">Weak Head Normal Form</a></li>
 <li><a href="#free-variables">Free variables</a></li>
 <li><a href="#eta-reduction">Eta reduction</a></li>
 <li><a href="#combinators">Combinators</a></li>
@@ -132,130 +129,104 @@ expressions : 한 번 이상 abstraction 으로 싸여져 있는 식</p>
 <p>reduce할 수 있는 표현식.<br />
 Beta reduce 할 수 있는 표현식을 Beta redex.<br />
 Eta reduce 할 수 있는 표현식을 Eta redex.</p>
-<h3 id="normal-form">Normal Form</h3>
-<p>적용할 수 있는 reduction은 모두 적용한 표현식. eager 평가를 통해 얻게 되는 결과입니다.</p>
-<h3 id="head-normal-form">Head Normal Form</h3>
-<p><a href="https://en.wikipedia.org/wiki/Beta_normal_form" class="uri">https://en.wikipedia.org/wiki/Beta_normal_form</a><br />
-head 위치에 beta redex가 남아 있지 않은 표현식.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>𝜆x2<span class="op">.</span>  (𝜆x1<span class="op">.</span><span class="dt">A</span>) <span class="dt">M1</span>   <span class="dt">M2</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="op">^^^^^^^^^^^^^</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>       <span class="co">--(가)</span></span></code></pre></div>
-<p>Q. <code>𝜆x1</code>,<code>𝜆x2</code> 이런 부분이 head인데, 이 곳에 beta redex가 남아 있다니 무슨 말일까요? <code>M1</code>에 <code>(𝜆x1.A)</code>를 적용할 수 있으니 (가) <code>(𝜆x1.A) M1</code>이 redex인 건 알겠는데, 여기가 왜 <code>head</code>일까요? <code>𝜆x2.</code>의 <code>body</code> 아닌가요?</p>
-<p><em>application이 abstraction보다 우선 순위가 높음을 적용</em>해서 괄호로 명확한 순서를 표시하면</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>𝜆x2<span class="op">.</span>  (((𝜆x1<span class="op">.</span><span class="dt">A</span>) <span class="dt">M1</span>) <span class="dt">M2</span>)</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>       <span class="op">^^^^^^^^^^^^</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>        <span class="co">-- (나)</span></span></code></pre></div>
-<p>A가 뭔지 모르지만 (나) <code>((𝜆x1.A) M1)</code>가 M2를 받는 걸로 봐서 (나)는 람다 abstraction으로, M2를 받을 변수가 head에 있어야 합니다. (나) 전체가 head는 아니지만, (나)를 reduce 하고나면, 헤드가 보일 겁니다. 그래도 (나) 전체를 head position이라 부르는 건 찜찜합니다.<br />
-<a href="https://math.stackexchange.com/questions/2768395/head-position-in-lambda-calculus" class="uri">https://math.stackexchange.com/questions/2768395/head-position-in-lambda-calculus</a><br />
-head 위치에 beta redex가 있는 표현식이 어떤 게 있을까요?</p>
-<p>2021.06.02 작업 중…</p>
-<h3 id="weak-head-normal-form">Weak Head Normal Form</h3>
-<p>가능한 reduction 작업을 모두 적용하지는 않은 상태. lazy 평가를 통해 얻게 되는 결과입니다. 하스켈에서는 인자를 모두, 또는 일부를 적용하지 않은 함수를 말합니다. 람다 함수도 인자를 아직 받지 않은 함수이기 때문에 WHNF입니다. 또 한가지, 맨 바깥쪽이 값 생성자로 싸여있을 때도 WHNF라 부릅니다.</p>
-<p>값 생성자로 싸여 있다는 게 왜 reduction을 모두 적용하지 않은 상태일까요? WHNF는 reduction을 적용하면 Normal Form으로 바뀔 형태인데, 생성자에는 어떤 reduction 절차가 있을까요?</p>
-<p>생성자로 쌓여 있는 값은 reduce할 게 있는지 없는지 알 수 없는 상태입니다. 생성자를 벗겨봐야 안 쪽을 볼 수 있습니다. 관점을 값을 얻는 마지막 동작까지를 생각한다면 Just a에서 Just를 떼어내야 최종 값a에 도달할테니 Just가 붙어있는 표현식은 WHNF라 보는 걸까요?</p>
-<p>생성자도 하나의 함수로 볼 수 있으니, 아직 필요한 인자를 받지 않은 Just 등이 단독으로 있으면 WHNF일 것 같은데, Just 1도 WHNF로 보고, True도 WHNF로 본다고 합니다. 왜 그럴까요? True가 어떤 reduction이 가능할까요?</p>
-<p>추측해서 답을 내린다면, 힌트는 <em>생성자constructor</em>란 말에 있는 것 같습니다. 생성자 자체가 값은 아니라, 값을 만들어 내는 걸 생성자라 부릅니다. 생성자가 값을 만들어내는 절차를 reduction으로 보는 겁니다. 아무런 동작이 남아 있지 않은 상태를 Normal Form, 아직 하나라도 남아 있다면 WHNF입니다. - 검증필요</p>
-<p>참고<br />
-<a href="https://opentutorials.org/module/1941/11208">남현욱님의 WHNF</a> <a href="https://woogyun.tistory.com/520">우균님의 정규형(normal form), 상위정규형(head normal form), 최상위정규형(weak head normal form)의 차이</a><br />
-<a href="https://wiki.haskell.org/Weak_head_normal_form">Haskell.org WHNF</a></p>
 <h3 id="free-variables">Free variables</h3>
-<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>𝜆x<span class="op">.</span>xy</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>𝜆x<span class="op">.</span>xy</span></code></pre></div>
 <p>y 처럼 head에 없는 변수를 free 변수라고합니다.</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>(𝜆x<span class="op">.</span>xy)z</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>(𝜆x<span class="op">.</span>xy)z</span></code></pre></div>
 <p>z를 x에 넣어 주면 zy로 beta reduction은 끝납니다. 한 가지 주의할 점은 alpha equivalence는 free 변수에는 적용되지 않습니다.</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>𝜆x<span class="op">.</span>xz</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>𝜆x<span class="op">.</span>xy</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>𝜆x<span class="op">.</span>xz</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>𝜆x<span class="op">.</span>xy</span></code></pre></div>
 <p>두 개는 같은 함수가 아닙니다. 아래와 같이 bound 변수를 바꾸는 건 의미상 차이가 없는 alpha equivalence입니다.</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>𝜆x<span class="op">.</span>xz</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>𝜆y<span class="op">.</span>yz</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>𝜆x<span class="op">.</span>xz</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>𝜆y<span class="op">.</span>yz</span></code></pre></div>
 <p>그런데 문서를 읽는 동안 혼란스러웠던 점이 있습니다.</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>λf<span class="op">.</span>(f λx<span class="op">.</span>x)</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>λf<span class="op">.</span>(f λx<span class="op">.</span>x)</span></code></pre></div>
 <p>f는 head에 묶여 있으니, bound 변수입니다. 하지만, 아래와 같이 head를 떼어내고 body만 두고 볼 때는 free라 말합니다.</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>(f λx<span class="op">.</span>x)</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>(f λx<span class="op">.</span>x)</span></code></pre></div>
 <p><em>head까지 포함되어 있는 식</em>에서는 bound라고 하지만, head없이 body만 떼어내서 말할 때는, 어디 head에 묶여 있을지, 어디에도 묶여있지 않을지 알 수 없습니다. 이 때 f는 free입니다.</p>
 <p>만일 free변수와 bound변수가 이름이 겹칠 때는 혼동을 막기 위해 bound변수를 alpha equivalence를 적용(alpha conversion이라 부릅니다)해서 이름을 바꿔서 풉니다.</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>((λfunc<span class="op">.</span>λarg<span class="op">.</span>(func arg) arg) boing) <span class="ot">=&gt;</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>(λarg<span class="op">.</span>(arg arg) boing) <span class="ot">=&gt;</span></span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>(boing boing)  <span class="co">---------------- (x) arg 해석을 잘 못 했습니다.</span></span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>((λfunc<span class="op">.</span>λarg<span class="op">.</span>(func arg) arg) boing) <span class="ot">=&gt;</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>(λarg<span class="op">.</span>(arg arg) boing) <span class="ot">=&gt;</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>(boing boing)  <span class="co">---------------- (x) arg 해석을 잘 못 했습니다.</span></span></code></pre></div>
 <p>혼동을 막기 위해 bound되어 있는 arg를 arg1로 바꾸었습니다.</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>((λfunc<span class="op">.</span>λarg1<span class="op">.</span>(func arg1) arg) boing) <span class="ot">=&gt;</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>(λarg1<span class="op">.</span>(arg arg1) boing) <span class="ot">=&gt;</span></span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>(arg boing) <span class="co">----------------- (o) 제대로 풀었습니다.</span></span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>((λfunc<span class="op">.</span>λarg1<span class="op">.</span>(func arg1) arg) boing) <span class="ot">=&gt;</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>(λarg1<span class="op">.</span>(arg arg1) boing) <span class="ot">=&gt;</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>(arg boing) <span class="co">----------------- (o) 제대로 풀었습니다.</span></span></code></pre></div>
 <h3 id="eta-reduction">Eta reduction</h3>
-<div class="sourceCode" id="cb17"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>λ<span class="op">&lt;</span>name<span class="op">&gt;.</span>(<span class="op">&lt;</span>expression<span class="op">&gt;</span> <span class="op">&lt;</span>name<span class="op">&gt;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>λ<span class="op">&lt;</span>name<span class="op">&gt;.</span>(<span class="op">&lt;</span>expression<span class="op">&gt;</span> <span class="op">&lt;</span>name<span class="op">&gt;</span>)</span></code></pre></div>
 <p>이렇게 바운드 되어 있는 변수에 &lt;expression&gt;을 적용하는 모양은 그냥 아래와 같이 함수만 적어 놓은 것과 같습니다.</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>expression<span class="op">&gt;</span></span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>expression<span class="op">&gt;</span></span></code></pre></div>
 <p>하스켈로 말하면 <code>(\x -&gt; f x)</code> 1 은 그냥 f 1 과 같다는 말입니다. 이렇게 간단한 표현으로 바꾸는 걸 eta reduction이라 합니다.</p>
 <h3 id="combinators">Combinators</h3>
 <p>Free 변수가 없는 람다식을 컴비네이터라 부릅니다. 인자를 combine 한다는 의미로 이름 붙여졌습니다. 단어 뜻은 결합을 의미하는데, 이게 인자와 결합할 수 없는 변수는 없다란 뜻과 바로 연결되진 않네요. 여하튼 하스켈 문서에서 수시로 컴비네이터란 말이 등장하는데, Free 변수가 없다란 말로도 쓰이지만, 어떤 함수의 목적을 달성하기 위해 내부에서 조합해서 쓰이게 되는 비슷한 성격들의 함수들을 컴비네이터라 부르기도 합니다. 예를 들어 parsec에서 숫자 파서, 문자열 파서… 들을 조합해서 원하는 파싱을 할 때, 이들 파서 하나 하나를 컴비네이터라 부릅니다.</p>
 <h3 id="beta-normal-form">Beta Normal Form</h3>
 <p>더 이상 beta reduce 할 게 없는 상태</p>
 <h3 id="여러-개의-arguments">여러 개의 arguments</h3>
-<div class="sourceCode" id="cb19"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>𝜆xy<span class="op">.</span>xy</span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>𝜆xy<span class="op">.</span>xy</span></code></pre></div>
 <p>parameter가 여러 개일때는 왼쪽부터 beta reduction 합니다. 아래와 같이 괄호가 있다고 생각하면 됩니다.</p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>𝜆x<span class="op">.</span>(𝜆y<span class="op">.</span>xy)</span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>(𝜆x<span class="op">.</span>(𝜆y<span class="op">.</span>xy)) <span class="dv">1</span> <span class="dv">2</span></span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>(𝜆y<span class="op">.</span>1y) <span class="dv">2</span></span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="dv">12</span></span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>𝜆x<span class="op">.</span>(𝜆y<span class="op">.</span>xy)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>(𝜆x<span class="op">.</span>(𝜆y<span class="op">.</span>xy)) <span class="dv">1</span> <span class="dv">2</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>(𝜆y<span class="op">.</span>1y) <span class="dv">2</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="dv">12</span></span></code></pre></div>
 <h2 id="람다-함수-스타일로만-프로그래밍-구조를-만드는-게-가능할까">람다 함수 스타일로만 프로그래밍 구조를 만드는 게 가능할까?</h2>
 <p>전자 회로에 쓰이는 부품을 만들 듯, 특정 동작을 하는 함수들을 만들어 회로를 설계하는 것과 비슷해 보입니다. 모든 부품(함수)들의 정의를 살펴 보면 좋겠지만, 여기서는 그럴 수도 있겠다 정도의 감만 생기는게 목표입니다.</p>
 <h3 id="identity-function">Identity function</h3>
-<div class="sourceCode" id="cb21"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>λx<span class="op">.</span>x</span></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>λx<span class="op">.</span>x</span></code></pre></div>
 <h3 id="self-application-function">Self application function</h3>
 <p>재귀를 이용한 무한 루프</p>
-<div class="sourceCode" id="cb22"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>λs<span class="op">.</span>(s s)</span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>(λs<span class="op">.</span>(s s) λs<span class="op">.</span>(s s))</span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>λs<span class="op">.</span>(s s)</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>(λs<span class="op">.</span>(s s) λs<span class="op">.</span>(s s))</span></code></pre></div>
 <p>이렇게 reduction이 끝나지 않는 걸 divergence라 부릅니다.</p>
 <h3 id="function-application-function">Function application function</h3>
-<div class="sourceCode" id="cb23"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>λfunc<span class="op">.</span>λarg<span class="op">.</span>(func arg)</span></code></pre></div>
-<div class="sourceCode" id="cb24"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>((λfunc<span class="op">.</span>λarg<span class="op">.</span>(func arg) λx<span class="op">.</span>x) λs<span class="op">.</span>(s s))</span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>((λarg<span class="op">.</span>((λx<span class="op">.</span>x) arg)) λs<span class="op">.</span>(s s))</span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>((λarg<span class="op">.</span>(arg)) λs<span class="op">.</span>(s s))</span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>(λs<span class="op">.</span>(s s))</span></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>λfunc<span class="op">.</span>λarg<span class="op">.</span>(func arg)</span></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>((λfunc<span class="op">.</span>λarg<span class="op">.</span>(func arg) λx<span class="op">.</span>x) λs<span class="op">.</span>(s s))</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>((λarg<span class="op">.</span>((λx<span class="op">.</span>x) arg)) λs<span class="op">.</span>(s s))</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>((λarg<span class="op">.</span>(arg)) λs<span class="op">.</span>(s s))</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>(λs<span class="op">.</span>(s s))</span></code></pre></div>
 <h3 id="튜플">튜플</h3>
 <p>튜플을 만들어 내는 함수를 만들어 봅시다. 흔히 봤던 (a,b) 이런 외적인 모양이 아니라 튜플의 속성을 띄는 것이면 모양은 상관 없습니다. 첫 번째 값을 따로 꺼내거나, 두 번째 값을 따로 꺼낼 수 있는 걸 튜플의 속성이라 볼 수 있습니다.</p>
 <p>먼저 첫 번째 값, 두 번째 값을 꺼내는 함수를 만들면</p>
-<div class="sourceCode" id="cb25"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co">--첫 번째 인자를 고르는 함수</span></span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>λfirst<span class="op">.</span>λsecond<span class="op">.</span>first</span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="co">--두 번째 인자를 고르는 함수</span></span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>λfirst<span class="op">.</span>λsecond<span class="op">.</span>second</span></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co">--첫 번째 인자를 고르는 함수</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>λfirst<span class="op">.</span>λsecond<span class="op">.</span>first</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="co">--두 번째 인자를 고르는 함수</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>λfirst<span class="op">.</span>λsecond<span class="op">.</span>second</span></code></pre></div>
 <p>※재밌는 건, 천 번째 인자를 고르는 함수를 Identity 함수에 적용하면 두 번째 인자를 고르는 함수가 됩니다.</p>
-<div class="sourceCode" id="cb26"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>(λfirst<span class="op">.</span>λsecond<span class="op">.</span>first) (λx<span class="op">.</span>x)</span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>λsecond<span class="op">.</span>(λx<span class="op">.</span>x)</span></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>(λfirst<span class="op">.</span>λsecond<span class="op">.</span>first) (λx<span class="op">.</span>x)</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>λsecond<span class="op">.</span>(λx<span class="op">.</span>x)</span></code></pre></div>
 <p>alpha equivalence 특성을 이용해 second를 first로 x를 second로 바꿔서 표기하면</p>
-<div class="sourceCode" id="cb27"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>λfirst<span class="op">.</span>λsecond<span class="op">.</span>second</span></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>λfirst<span class="op">.</span>λsecond<span class="op">.</span>second</span></code></pre></div>
 <p>그 다음, 이 함수들에 적용할 튜플 함수를 만들면</p>
-<div class="sourceCode" id="cb28"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>λfirst<span class="op">.</span>λsecond<span class="op">.</span>λfunc<span class="op">.</span>((func first) second)</span></code></pre></div>
+<div class="sourceCode" id="cb26"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>λfirst<span class="op">.</span>λsecond<span class="op">.</span>λfunc<span class="op">.</span>((func first) second)</span></code></pre></div>
 <p>이 함수에 두 개의 인자를 주면, 두 개의 인자를 “가지고 있는” 함수가 됩니다.</p>
-<div class="sourceCode" id="cb29"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>λfirst<span class="op">.</span>λsecond<span class="op">.</span>λfunc<span class="op">.</span>((func first) second) (λx<span class="op">.</span><span class="dv">1</span>) (λx<span class="op">.</span><span class="dv">2</span>)</span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>λfunc<span class="op">.</span>((func (λx<span class="op">.</span><span class="dv">1</span>)) (λx<span class="op">.</span><span class="dv">2</span>)) </span></code></pre></div>
+<div class="sourceCode" id="cb27"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>λfirst<span class="op">.</span>λsecond<span class="op">.</span>λfunc<span class="op">.</span>((func first) second) (λx<span class="op">.</span><span class="dv">1</span>) (λx<span class="op">.</span><span class="dv">2</span>)</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>λfunc<span class="op">.</span>((func (λx<span class="op">.</span><span class="dv">1</span>)) (λx<span class="op">.</span><span class="dv">2</span>)) </span></code></pre></div>
 <p>이 함수를 첫 번째 인자를 고르는 함수에 적용하면</p>
-<div class="sourceCode" id="cb30"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>λfunc<span class="op">.</span>((func (x<span class="op">.</span><span class="dv">1</span>)) (λx<span class="op">.</span><span class="dv">2</span>)) λfirst<span class="op">.</span>λsecond<span class="op">.</span>first</span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>λfirst<span class="op">.</span>λsecond<span class="op">.</span>first (λx<span class="op">.</span><span class="dv">1</span>) (λx<span class="op">.</span><span class="dv">2</span>)</span>
-<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>(λx<span class="op">.</span><span class="dv">1</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb28"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>λfunc<span class="op">.</span>((func (x<span class="op">.</span><span class="dv">1</span>)) (λx<span class="op">.</span><span class="dv">2</span>)) λfirst<span class="op">.</span>λsecond<span class="op">.</span>first</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>λfirst<span class="op">.</span>λsecond<span class="op">.</span>first (λx<span class="op">.</span><span class="dv">1</span>) (λx<span class="op">.</span><span class="dv">2</span>)</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>(λx<span class="op">.</span><span class="dv">1</span>)</span></code></pre></div>
 <p>두 번째 인자를 고르는 함수에 적용하면</p>
-<div class="sourceCode" id="cb31"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>λfunc<span class="op">.</span>((func (x<span class="op">.</span><span class="dv">1</span>)) (λx<span class="op">.</span><span class="dv">2</span>)) λfirst<span class="op">.</span>λsecond<span class="op">.</span>second</span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>λfirst<span class="op">.</span>λsecond<span class="op">.</span>first (λx<span class="op">.</span><span class="dv">1</span>) (λx<span class="op">.</span><span class="dv">2</span>)</span>
-<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>(λx<span class="op">.</span><span class="dv">2</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb29"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>λfunc<span class="op">.</span>((func (x<span class="op">.</span><span class="dv">1</span>)) (λx<span class="op">.</span><span class="dv">2</span>)) λfirst<span class="op">.</span>λsecond<span class="op">.</span>second</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>λfirst<span class="op">.</span>λsecond<span class="op">.</span>first (λx<span class="op">.</span><span class="dv">1</span>) (λx<span class="op">.</span><span class="dv">2</span>)</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>(λx<span class="op">.</span><span class="dv">2</span>)</span></code></pre></div>
 <p>이렇게 튜플 속성을 함수로 표현했습니다.</p>
 <h3 id="분기문">분기문</h3>
 <p>함수만으로 분기문을 어떻게 만들까요? 이 글에서는 여기까지만 살펴 보겠습니다. 모든 걸 함수로 표기하면 얻는 잇점이 뭘까 더 생각해보고, 생각의 진전이 있을 때 이어가도록 하겠습니다.</p>
 <p>True가 들어 왔을 때와 False가 들어 왔을 때 가는 길이 다르게 해야 합니다. True, False 일 때 길을 고르는 함수를 정의하기 전에, 당연히 <em>True와 False를 함수로 정의</em>해야 합니다. <code>\_ -&gt; True</code>, <code>\_ -&gt; False</code> … 쯤으로 생각하는게 아닙니다. True와 False를 쓸 함수들을 생각해서 속성을 떠올려야 합니다. 어떤 함수를 True에 적용할 때와 False에 적용할 때 다른 값이 나오게 하면 됩니다.</p>
 <p>True를 select_first로, False를 select_second로 표현하기로 하고, 조건문은 다음과 같이 정의합니다.</p>
-<div class="sourceCode" id="cb32"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>λe1<span class="op">.</span>λe2<span class="op">.</span>λc<span class="op">.</span>((c e1) e2)</span></code></pre></div>
+<div class="sourceCode" id="cb30"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>λe1<span class="op">.</span>λe2<span class="op">.</span>λc<span class="op">.</span>((c e1) e2)</span></code></pre></div>
 <p>여기에 True, False 에 따라 실행할 식 2개를 먼저 넣어줍니다.</p>
-<div class="sourceCode" id="cb33"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>((λe1<span class="op">.</span>λe2<span class="op">.</span>λc<span class="op">.</span>((c e1) e2) <span class="op">&lt;</span>expression1<span class="op">&gt;</span>) <span class="op">&lt;</span>expression2<span class="op">&gt;</span>) <span class="ot">=&gt;</span></span>
-<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>(λe2<span class="op">.</span>λc<span class="op">.</span>((c <span class="op">&lt;</span>expression1<span class="op">&gt;</span>) e2) <span class="op">&lt;</span>expression2<span class="op">&gt;</span>) <span class="ot">=&gt;</span></span>
-<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>λc<span class="op">.</span>((c <span class="op">&lt;</span>expression1<span class="op">&gt;</span>) <span class="op">&lt;</span>expression2<span class="op">&gt;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb31"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>((λe1<span class="op">.</span>λe2<span class="op">.</span>λc<span class="op">.</span>((c e1) e2) <span class="op">&lt;</span>expression1<span class="op">&gt;</span>) <span class="op">&lt;</span>expression2<span class="op">&gt;</span>) <span class="ot">=&gt;</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>(λe2<span class="op">.</span>λc<span class="op">.</span>((c <span class="op">&lt;</span>expression1<span class="op">&gt;</span>) e2) <span class="op">&lt;</span>expression2<span class="op">&gt;</span>) <span class="ot">=&gt;</span></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>λc<span class="op">.</span>((c <span class="op">&lt;</span>expression1<span class="op">&gt;</span>) <span class="op">&lt;</span>expression2<span class="op">&gt;</span>)</span></code></pre></div>
 <p>이제 이 함수를 True (select_first) 에 적용하면,</p>
-<div class="sourceCode" id="cb34"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>(λc<span class="op">.</span>((c <span class="op">&lt;</span>expression1<span class="op">&gt;</span>) <span class="op">&lt;</span>expression2<span class="op">&gt;</span>) select_first) <span class="ot">=&gt;</span></span>
-<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>((select_first <span class="op">&lt;</span>expression1<span class="op">&gt;</span>) <span class="op">&lt;</span>expression2<span class="op">&gt;</span>) <span class="ot">=&gt;</span> <span class="op">...</span> <span class="ot">=&gt;</span></span>
-<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>expression1<span class="op">&gt;</span></span></code></pre></div>
+<div class="sourceCode" id="cb32"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>(λc<span class="op">.</span>((c <span class="op">&lt;</span>expression1<span class="op">&gt;</span>) <span class="op">&lt;</span>expression2<span class="op">&gt;</span>) select_first) <span class="ot">=&gt;</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>((select_first <span class="op">&lt;</span>expression1<span class="op">&gt;</span>) <span class="op">&lt;</span>expression2<span class="op">&gt;</span>) <span class="ot">=&gt;</span> <span class="op">...</span> <span class="ot">=&gt;</span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>expression1<span class="op">&gt;</span></span></code></pre></div>
 <p>False (select_second) 에 적용하면</p>
-<div class="sourceCode" id="cb35"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>(λc<span class="op">.</span>((c <span class="op">&lt;</span>expression1<span class="op">&gt;</span>) <span class="op">&lt;</span>expression2<span class="op">&gt;</span>) select_second) <span class="ot">=&gt;</span></span>
-<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>((select_second <span class="op">&lt;</span>expression1<span class="op">&gt;</span>) <span class="op">&lt;</span>expression2<span class="op">&gt;</span>) <span class="ot">=&gt;</span> <span class="op">...</span> <span class="ot">=&gt;</span></span>
-<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>expression2<span class="op">&gt;</span></span></code></pre></div>
+<div class="sourceCode" id="cb33"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>(λc<span class="op">.</span>((c <span class="op">&lt;</span>expression1<span class="op">&gt;</span>) <span class="op">&lt;</span>expression2<span class="op">&gt;</span>) select_second) <span class="ot">=&gt;</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>((select_second <span class="op">&lt;</span>expression1<span class="op">&gt;</span>) <span class="op">&lt;</span>expression2<span class="op">&gt;</span>) <span class="ot">=&gt;</span> <span class="op">...</span> <span class="ot">=&gt;</span></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>expression2<span class="op">&gt;</span></span></code></pre></div>
 <p>조건에 따라 다른 결과를 만드는 함수를 만들었습니다. 어떤 문법 요소도 추가하지 않고, 오직 함수 적용 개념만으로 분기를 만들었습니다.</p>
 <p>값이란 개념이 따로 없기 때문에 True라는 속성, False라는 속성은 <em>어딘가에 적용되어야만 드러납니다.</em></p>
 <p>더 추상화해서 생각하면, 속성이란 다른 것들과의 관계에 의해서 정해진다고 볼 수 있습니다. 혼자서 어떤 속성을 가지고 있는데, 그게 다른 어떤 것과도 관계가 없다면 아무런 의미가 없습니다. 속성이란 결국 다른 것들과의 관계로 드러납니다. True라는 속성은 True, False 두 개를 가지고 정해놓은 연산에 의해 의미(속성)를 가지거나, isTrue 같은 함수들을 정의해서 결과값을 달리하거나… 어떤식으로든 다른 것들과 관계가 있어야 합니다. 관계는 함수로 표현되므로 모든 속성은 함수로 표현할 수 있을 것 같다는 생각에 이릅니다. 아마 카테고리 이론의 출발점이 이런 생각이 아니었을까요?</p>
