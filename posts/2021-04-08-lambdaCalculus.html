@@ -212,9 +212,13 @@ Eta reduce 할 수 있는 표현식을 Eta redex.</p>
 <span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>λfirst<span class="op">.</span>λsecond<span class="op">.</span>first (λx<span class="op">.</span><span class="dv">1</span>) (λx<span class="op">.</span><span class="dv">2</span>)</span>
 <span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>(λx<span class="op">.</span><span class="dv">2</span>)</span></code></pre></div>
 <p>이렇게 튜플 속성을 함수로 표현했습니다.</p>
+<p>※ 보통 값에다 함수를 적용하는 방식으로 생각을 해왔습니다.<br />
+람다 대수학에서는 값 역할을 하는 것도 함수고, 이 값 함수를 다른 값 함수와 매핑하는 것도 함수입니다.<br />
+좀 낯설지만, 많은 개념들이 매핑 함수를 값 역할에 적용하는게 아니라, <em>값 역할을 하는 함수를 매핑 함수에 적용하는 방식</em>으로 구현합니다. 이렇게 하려면, 값 함수를 잘 째려보면 나중에 들어올 함수 자리가 있습니다. 튜플의 <code>func</code> 변수처럼 말입니다. 제가 느끼는 숨은 뜻은, 튜플이라는 속성을 다른 함수와의 관계로 표현했다는 것이 핵심입니다. 추가 문법 없이 다른 함수와 <em>관계</em>를 맺는 방법은 <em>application</em>뿐이 없습니다.</p>
+<p>어떻게 이런 방식을 떠올렸을까 신기합니다.</p>
 <h3 id="분기문">분기문</h3>
 <p>함수만으로 분기문을 어떻게 만들까요? 이 글에서는 여기까지만 살펴 보겠습니다. 모든 걸 함수로 표기하면 얻는 잇점이 뭘까 더 생각해보고, 생각의 진전이 있을 때 이어가도록 하겠습니다.</p>
-<p>True가 들어 왔을 때와 False가 들어 왔을 때 가는 길이 다르게 해야 합니다. True, False 일 때 길을 고르는 함수를 정의하기 전에, 당연히 <em>True와 False를 함수로 정의</em>해야 합니다. <code>\_ -&gt; True</code>, <code>\_ -&gt; False</code> … 쯤으로 생각하는게 아닙니다. True와 False를 쓸 함수들을 생각해서 속성을 떠올려야 합니다. 어떤 함수를 True에 적용할 때와 False에 적용할 때 다른 값이 나오게 하면 됩니다.</p>
+<p>True가 들어 왔을 때와 False가 들어 왔을 때 가는 길이 다르게 해야 합니다. True, False 일 때 길을 고르는 함수를 정의하기 전에, 당연히 <em>True와 False를 함수로 정의</em>해야 합니다. <code>\_ -&gt; True</code>, <code>\_ -&gt; False</code> … 쯤으로 생각하는게 아닙니다. True와 False를 쓸 함수들을 생각해서 속성을 떠올려야 합니다. 어떤 함수“를” True에 적용할 때와 False에 적용할 때 다른 값이 나오게 하면 됩니다.</p>
 <p>True를 select_first로, False를 select_second로 표현하기로 하고, 조건문은 다음과 같이 정의합니다.</p>
 <div class="sourceCode" id="cb30"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>λe1<span class="op">.</span>λe2<span class="op">.</span>λc<span class="op">.</span>((c e1) e2)</span></code></pre></div>
 <p>여기에 True, False 에 따라 실행할 식 2개를 먼저 넣어줍니다.</p>
@@ -231,7 +235,7 @@ Eta reduce 할 수 있는 표현식을 Eta redex.</p>
 <span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>expression2<span class="op">&gt;</span></span></code></pre></div>
 <p>조건에 따라 다른 결과를 만드는 함수를 만들었습니다. 어떤 문법 요소도 추가하지 않고, 오직 함수 적용 개념만으로 분기를 만들었습니다.</p>
 <p>값이란 개념이 따로 없기 때문에 True라는 속성, False라는 속성은 <em>어딘가에 적용되어야만 드러납니다.</em></p>
-<p>더 추상화해서 생각하면, 속성이란 다른 것들과의 관계에 의해서 정해진다고 볼 수 있습니다. 혼자서 어떤 속성을 가지고 있는데, 그게 다른 어떤 것과도 관계가 없다면 아무런 의미가 없습니다. 속성이란 결국 다른 것들과의 관계로 드러납니다. True라는 속성은 True, False 두 개를 가지고 정해놓은 연산에 의해 의미(속성)를 가지거나, isTrue 같은 함수들을 정의해서 결과값을 달리하거나… 어떤식으로든 다른 것들과 관계가 있어야 합니다. 관계는 함수로 표현되므로 모든 속성은 함수로 표현할 수 있을 것 같다는 생각에 이릅니다. 아마 카테고리 이론의 출발점이 이런 생각이 아니었을까요?</p>
+<p>더 추상화해서 생각하면, 우리가 <em>속성</em>이라 부르는 것들은 다른 것들과의 <em>관계</em>에 의해서 정해집니다. 혼자서 어떤 속성을 가지고 있는데, 그게 다른 어떤 것과도 관계가 없다면 아무런 의미가 없습니다. 속성이란 결국 다른 것들과의 관계입니다. True라는 속성은 True, False 두 개를 가지고 정해놓은 연산에 의해 의미(속성)를 가지거나, isTrue 같은 함수들을 정의해서 결과값을 달리하거나… 어떤식으로든 다른 것들과 관계가 있어야 합니다. 관계는 함수로 표현되므로 모든 속성은 함수로 표현할 수 있을 것 같다는 생각에 이릅니다. 아마 람다 대수학이나 카테고리 이론의 출발점이 이런 생각이 아니었을까요?</p>
 <hr />
 <p>참고 - 수학 관련 자료가 아닌 프로그래밍 관련 자료들입니다. 아무래도 이런 자료의 표기나 용어들이 프로그래머들에겐 더 익숙합니다.<br />
 AN INTRODUCTION TO FUNCTIONAL PROGRAMMING THROUGH LAMBDA CALCULUS - Greg Michaelson<br />
