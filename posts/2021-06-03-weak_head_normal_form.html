@@ -64,8 +64,7 @@
 <p>또 한 번 용어가 찜찜함을 남기네요. 그냥 바깥 생성자나 람다식을 WHNF로 보고 넘어가면 되는데, 왜 이런 용어를 붙였는지가 궁금해서 또 서핑의 늪에 빠져 버렸습니다.</p>
 <p><em>이해한 생각을 정리한 게 아니라, 추측한 내용을 길게 적어 놓았습니다.</em></p>
 <p><a href="https://woogyun.tistory.com/520">우균님의 정규형(normal form), 상위정규형(head normal form), 최상위정규형(weak head normal form)의 차이</a><br />
-포스트 작성 후 보게 되었는데, 잘 못 이해한 건지 HNF부분이 조금 다른 부분이 보입니다. 틀린 내용 정리가 끝나면 수정하도록 하겠습니다.<br />
-(우균 교수님이 더 많은 글을 공개하시면 좋을 것 같은데, 공개 글이 많이 보이진 않아 아쉽습니다.)</p>
+포스트 작성 후 보게 되었는데, 잘 못 이해한 건지 HNF부분이 조금 다른 부분이 보입니다. 틀린 내용 정리가 끝나면 수정하도록 하겠습니다. (우균 교수님이 더 많은 글을 공개하시거나 책을 내시면 좋을 것 같은데, 공개 글이 많이 보이진 않아 아쉽습니다.)</p>
 <p>NFData의 seq 함수 동작을 보다 보니, 혼동이 왔습니다. 분명 lazy를 잘 못 아해하고 있습니다. lazy는 아무것도 안하고 지나가는게 아니라, 완벽하게 끝내진 않더라도 때에 따라 일정 단계까지는 해석하고 지나갑니다. lazy는 지나가면서 나중에 실행하겠다는 계획만 잡고, 지금은 실행을 하나도 하지 않는다는 뜻이 아닙니다. 이 일정 단계가 바로 WHNF입니다. 표현식은 여러번 reduce를 거쳐 최종 값에 도달하는데, 어느 단계까지 도달했냐에 따라 이름을 붙여놨습니다.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>add x y <span class="ot">=</span> x <span class="op">+</span> y </span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -99,30 +98,27 @@ head 위치에 beta redex가 남아 있지 않은 표현식. 위 사이트 예�
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>            <span class="co">-- (ㄴ)</span></span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co">-- 위 식이 가질 수 있는 형태 중 단순한 걸 살펴보면</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>((((𝜆x1<span class="op">.</span><span class="dt">A</span>) <span class="dt">M1</span>) <span class="dt">M2</span>) <span class="dt">M3</span>) </span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="co">-- 람다 대수에서는 값이란 개념이 없습니다. M1,M2,... 모두 람다 함수입니다.</span></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co">-- A를 x, M1을 \x.M1 x, M2를 \x.M2 x 로 가정해 보면 </span></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>((((𝜆x<span class="op">.</span>x) (𝜆x<span class="op">.</span><span class="dt">M1</span> x)) (𝜆x<span class="op">.</span><span class="dt">M2</span> x)) (𝜆x<span class="op">.</span><span class="dt">M3</span> x))</span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>   <span class="op">^^^^^^^^^^^^^^^^</span></span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="co">-- 여길 head라 부릅니다.</span></span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="co">-- beta reduce하면</span></span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>𝜆x<span class="op">.</span><span class="dt">M1</span> (𝜆x<span class="op">.</span><span class="dt">M2</span> (𝜆x<span class="op">.</span><span class="dt">M3</span>(x)))</span></code></pre></div>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>(((𝜆x1<span class="op">.</span><span class="dt">A</span>) <span class="dt">M1</span>) <span class="dt">M2</span>) <span class="dt">M3</span> </span></code></pre></div>
 <p>head 위치에 beta redex가 있는 표현식이 어떤 게 있을까요? HNF는 head에 넣어 줄 값이 redex가 아니라는 뜻일까요?</p>
-<p><code>A</code>가 뭔지 모르지만 (ㄴ) <code>((𝜆x1.A) M1)</code>가 <code>M2</code>를 받는 걸로 봐서 (ㄴ)은 람다 abstraction으로, <code>M2</code>를 받을 변수가 head에 있어야 합니다. (ㄴ) 전체가 head는 아니지만, (ㄴ)을 reduce 하고나면, 헤드가 보일 겁니다. 그래도 (ㄴ) 전체를 head position이라 부르는 건 찜찜합니다. 아마도 <em>람다식의 <code>.</code>의 앞부분 <code>𝜆x</code>를 말하는 head와 다른 걸 말하는 것</em> 같습니다. 연이은 인자들 중 reduce가 일어나는 첫 번째 인자란 의미에서 head인 것 같습니다. 일단, 이렇게 <em>가정</em>하고 진행해 보겠습니다. 이 쪽이 하스켈쪽하고도 더 잘 맞아 보입니다. 하스켈에서는 가장 바깥 생성자the outermost constructor를 head라 부릅니다.<br />
+<p><code>A</code>가 뭔지 모르지만 (ㄴ) <code>((𝜆x1.A) M1)</code>가 <code>M2</code>, <code>M3</code>를 받는 걸로 봐서 (ㄴ)은 람다 abstraction으로, <code>M2</code>,<code>M3</code>를 받을 변수가 head에 있어야 합니다. (ㄴ) 전체가 head는 아니지만, (ㄴ)을 reduce 하고나면, 헤드가 보일 겁니다. 그래도 (ㄴ) 전체를 head position이라 부르는 건 찜찜합니다.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- 람다 대수에서는 값이란 개념이 없습니다. M1,M2,... 모두 람다 함수입니다.</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- A를 x, M1이 인자 2개를 받는 \x.\y.xy 이라 가정하면 </span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>(((𝜆x<span class="op">.</span>x) (𝜆x<span class="op">.</span>𝜆y<span class="op">.</span> <span class="op">...</span>)) <span class="dt">M2</span>) <span class="dt">M3</span> </span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="op">^^^^^^^^^^^^^^^^^^^</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co">-- 여길 head라 부릅니다.</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co">-- beta reduce하면</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>((𝜆x<span class="op">.</span>𝜆y<span class="op">.</span> <span class="op">...</span>) <span class="dt">M2</span>) <span class="dt">M3</span> </span></code></pre></div>
+<p>아마도 <em>람다식의 <code>.</code>의 앞부분 <code>𝜆x</code>를 말하는 head와 다른 걸 말하는 것</em> 같습니다. 연이은 인자들 중 reduce가 일어나는 첫 번째 인자란 의미에서 head인 것 같습니다. 일단, 이렇게 <em>가정</em>하고 진행해 보겠습니다. 이 쪽이 하스켈쪽하고도 더 잘 맞아 보입니다. 하스켈에서는 가장 바깥 생성자the outermost constructor를 head라 부릅니다.<br />
 <a href="https://math.stackexchange.com/questions/2768395/head-position-in-lambda-calculus" class="uri">https://math.stackexchange.com/questions/2768395/head-position-in-lambda-calculus</a></p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- Just 값 생성자인데, 레이어마다 번호를 붙여서 보겠습니다.</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="dt">Just3</span> (<span class="dt">Just2</span> (<span class="dt">Just1</span> <span class="dv">1</span>))</span></code></pre></div>
-<p>여기서 가장 바깥 Just3을 head라 부릅니다. 이 것과 람다 대수쪽 head가 같은 뜻인가 살펴 보겠습니다. 람다식으로 풀어 써보면</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>(\x <span class="ot">-&gt;</span> <span class="dt">Just3</span> x)       ((\x <span class="ot">-&gt;</span> <span class="dt">Just2</span> x)    ((\x <span class="ot">-&gt;</span> <span class="dt">Just1</span> x) <span class="dv">1</span>))</span></code></pre></div>
-<p>람다 대수학쪽 설명과 비교해 보면</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>((((𝜆x<span class="op">.</span>x) (𝜆x<span class="op">.</span><span class="dt">M1</span> x)) (𝜆x<span class="op">.</span><span class="dt">M2</span> x)) (𝜆x<span class="op">.</span><span class="dt">M3</span> x))</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- beta reduce하면</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>𝜆x<span class="op">.</span><span class="dt">M1</span> (𝜆x<span class="op">.</span><span class="dt">M2</span> (𝜆x<span class="op">.</span><span class="dt">M3</span>(x)))</span></code></pre></div>
-<p>서로 동일한 구조입니다.<br />
-가장 바깥 쪽 redex를 reduce하면, Head Normal Form이 됩니다. head에 redex가 남지 않았다는 뜻입니다. 하스켈쪽에서 보면 가장 바깥 쪽 한 단계만 evaluate했다는 얘기입니다. 용어의 근원을 살피는 건 복잡하지만, 동작 자체는 간단합니다.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- Just 값 생성자인데, 레이어마다 번호를 붙여서 보겠습니다.</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="dt">M1</span> (<span class="dt">M2</span> (<span class="dt">M3</span> <span class="dv">1</span>))</span></code></pre></div>
+<p>여기서 가장 바깥 M3을 head라 부릅니다. 이 것과 람다 대수쪽 head가 같은 뜻인가 살펴 보겠습니다.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>((𝜆x<span class="op">.</span>𝜆y<span class="op">.</span> <span class="op">...</span>) <span class="dt">M2</span>) <span class="dt">M3</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="dt">M1</span> (<span class="dt">M2</span> (<span class="dt">M3</span> <span class="dv">1</span>))</span></code></pre></div>
+<p>미완성. 2021.6.10 작성 중…</p>
+<p>가장 바깥 쪽 redex를 reduce하면, Head Normal Form이 됩니다. head에 redex가 남지 않았다는 뜻입니다. 하스켈쪽에서 보면 가장 바깥 쪽 한 단계만 evaluate했다는 얘기입니다. 용어의 근원을 살피는 건 복잡하지만, 동작 자체는 간단합니다.</p>
 <h3 id="weak-head-normal-form---whnf">Weak Head Normal Form - WHNF</h3>
 <ol type="1">
 <li><p>인자를 가지고만 있고 reduce하지 않은 함수<br />
