@@ -63,6 +63,9 @@
 
 <p>또 한 번 용어가 찜찜함을 남기네요. 그냥 바깥 생성자나 람다식을 WHNF로 보고 넘어가면 되는데, 왜 이런 용어를 붙였는지가 궁금해서 또 서핑의 늪에 빠져 버렸습니다.</p>
 <p><em>이해한 생각을 정리한 게 아니라, 추측한 내용을 길게 적어 놓았습니다.</em></p>
+<p><a href="https://woogyun.tistory.com/520">우균님의 정규형(normal form), 상위정규형(head normal form), 최상위정규형(weak head normal form)의 차이</a><br />
+포스트 작성 후 보게 되었는데, 잘 못 이해한 건지 HNF부분이 조금 다른 부분이 보입니다. 틀린 내용 정리가 끝나면 수정하도록 하겠습니다.<br />
+(우균 교수님이 더 많은 글을 공개하시면 좋을 것 같은데, 공개 글이 많이 보이진 않아 아쉽습니다.)</p>
 <p>NFData의 seq 함수 동작을 보다 보니, 혼동이 왔습니다. 분명 lazy를 잘 못 아해하고 있습니다. lazy는 아무것도 안하고 지나가는게 아니라, 완벽하게 끝내진 않더라도 때에 따라 일정 단계까지는 해석하고 지나갑니다. lazy는 지나가면서 나중에 실행하겠다는 계획만 잡고, 지금은 실행을 하나도 하지 않는다는 뜻이 아닙니다. 이 일정 단계가 바로 WHNF입니다. 표현식은 여러번 reduce를 거쳐 최종 값에 도달하는데, 어느 단계까지 도달했냐에 따라 이름을 붙여놨습니다.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>add x y <span class="ot">=</span> x <span class="op">+</span> y </span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -72,13 +75,13 @@
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="ot">=</span> (<span class="dv">3</span> , <span class="dv">7</span>)                                                  <span class="co">-----(라) WHNF, NF</span></span></code></pre></div>
 <p>(가)를 만나면, 어느 단계까지 평가하고 뒤로 미룰까요? 처음엔, 전체를 thunk로 두고 아무 것도 reduce하지 않습니다. 튜플이 필요한 시점이 오면 (thunk, thunk)로 reduce 합니다. 튜플안의 것들이 필요한 시점이 오면 (3, thunk) 또는 (thunk, 7), 둘 모두 필요해지면 최종 (3, 7)에 도달합니다. thunk가 들어간 중간 단계의 모양을 WHNF라 합니다. 왜 이런 이름이 붙었는지 살펴 보겠습니다.</p>
 <p>※ 계산 되지 않은 식을 thunk라 부릅니다. 번역하면 수식 덩어리쯤 될까요? 코드 덩어리?</p>
-<ul>
+<ol type="1">
 <li><a href="#normal-form---nf">Normal Form - NF</a></li>
 <li><a href="#head-normal-form---hnf">Head Normal Form - HNF</a></li>
 <li><a href="#weak-head-normal-form---whnf">Weak Head Normal Form - WHNF</a></li>
 <li><a href="#hnf와-whnf의-차이">HNF와 WHNF의 차이</a></li>
 <li><a href="#정리">정리</a></li>
-</ul>
+</ol>
 <h3 id="normal-form---nf">Normal Form - NF</h3>
 <p>적용할 수 있는 reduction은 모두 적용한 표현식. 즉시eager 평가를 통해 얻게 되는 결과입니다. (라)</p>
 <p>※ 람다 변수에 인자를 넣어, 람다 body에 있는 변수들을 인자로 대체하고 람다 헤드를 없애는 작업을 reduce라 합니다. <code>(\x -&gt; x + 1) 2</code> 를 application이란 reduce 작업을 하면 <code>2 + 1</code>이 됩니다.</p>
@@ -119,7 +122,7 @@ head 위치에 beta redex가 남아 있지 않은 표현식. 위 사이트 예�
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- beta reduce하면</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>𝜆x<span class="op">.</span><span class="dt">M1</span> (𝜆x<span class="op">.</span><span class="dt">M2</span> (𝜆x<span class="op">.</span><span class="dt">M3</span>(x)))</span></code></pre></div>
 <p>서로 동일한 구조입니다.<br />
-가장 바깥 쪽 redex를 reduce하면, Head Normal Form이 됩니다. head에 redex가 남지 않다는 뜻입니다. 하스켈쪽에서 보면 가장 바깥 쪽 한 단계만 evaluate했다는 얘기입니다. 용어의 근원을 살피는 건 복잡하지만, 동작 자체는 간단합니다.</p>
+가장 바깥 쪽 redex를 reduce하면, Head Normal Form이 됩니다. head에 redex가 남지 않았다는 뜻입니다. 하스켈쪽에서 보면 가장 바깥 쪽 한 단계만 evaluate했다는 얘기입니다. 용어의 근원을 살피는 건 복잡하지만, 동작 자체는 간단합니다.</p>
 <h3 id="weak-head-normal-form---whnf">Weak Head Normal Form - WHNF</h3>
 <ol type="1">
 <li><p>인자를 가지고만 있고 reduce하지 않은 함수<br />
@@ -129,7 +132,7 @@ head 위치에 beta redex가 남아 있지 않은 표현식. 위 사이트 예�
 <code>add 1 2</code> 람다 대수의 application. 인자를 모두 주었어도 이대로 있으면 WHNF? HNF ? — (ㄷ)<br />
 <code>1 + 2</code> 까지 도달한 상태가 WHNF<br />
 <code>3</code> 이 되면 NF</p>
-<p>(ㄷ) <code>add</code>를 <code>\x.(\y -&gt; x + y)</code> 람다 함수에 이름을 붙여 놓은 것으로 보면 <code>\x.(\y -&gt; x + y) 1 2</code> 라고 쓴 상태입니다. <code>(𝜆x1.A) M1 M2</code> 와 같은 구조입니다.</p></li>
+<p>(ㄷ) <code>add</code>를 <code>\x.(\y -&gt; x + y)</code> 람다 함수에 이름을 붙여 놓은 것으로 보면 <code>\x.(\y -&gt; x + y) 1 2</code> 라고 쓴 상태입니다. <code>(𝜆x1.A) M1 M2</code> 와 같은 구조입니다. HNF이면서 WHNF인데, 더 자세한 설명이 아래 쪽에 있습니다.</p></li>
 <li><p>값 생성자<br />
 값 생성자로 싸여 있다는 게 왜 reduction을 모두 적용하지 않은 상태일까요? WHNF는 reduction을 적용하면 Normal Form으로 바뀔 형태인데, 생성자에는 어떤 reduction 절차가 있을까요?<br />
 생성자도 하나의 함수로 볼 수 있으니, 아직 필요한 인자를 받지 않은 Just 등이 단독으로 있으면 WHNF일 것 같은데, Just 1도 WHNF로 보고, True도 WHNF로 본다고 합니다. 왜 그럴까요? True가 어떤 reduction이 가능할까요?</p>
@@ -154,11 +157,11 @@ HNF인데(헤드 Just1은 NF인데) <code>Just2</code>, <code>Just3</code> 중 r
 <p>NF, HNF, WHNF를 마치 실행 단계에 따라 리니어하게 이름을 붙인 것 같은데 의미상 꼭 그렇진 않습니다. 여러 생성자로 감싸져 있는 값을, 여러 레이어로 감싸져 있다 표현합니다. 헤드는 가장 바깥쪽 레이어를 가리킵니다. 레이어로 이들의 차이를 설명하면,</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="dt">HNF</span>는  헤드 레이어만 redex가 없으면 됩니다<span class="op">.</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="dt">NF</span>는   헤드 레이어만 redex가 없는게 아니라, 모든 레이어가 redex가 없어야 합니다<span class="op">.</span></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="dt">WHNF</span>는 헤드 레이어는 redex가 없고, 그 외 레이어는 redex가 있을 수도 없을 수도 있습니다<span class="op">.</span></span></code></pre></div>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="dt">WHNF</span>는 헤드 레이어는 redex가 없고, 그 외 레이어는 redex가 있을 수도 없을 수도 있습니다<span class="op">.</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>       (있을 수도, 없을 수도 있다는 의미로 <span class="dt">Weak</span>를 붙인 게 아닐까요<span class="op">?</span>)</span></code></pre></div>
 <p>헤드만 redex가 없기만 하면 HNF인데, 왜 하스켈에선 HNF는 쓰이지 않는다고 했을까요? 아직 이 말은 이해하지 못했습니다. <a href="https://en.wikibooks.org/wiki/Haskell/Laziness#Thunks_and_Weak_head_normal_form">wikibooks - There is also a ‘head normal form’, but it’s not used in Haskell.</a><br />
 모두 redex가 없는 경우 HNF라 불러도 되고 WHNF라 불러도 됩니다. HNF가 없다기 보다, Lazy를 설명할 때 HNF, 즉 헤드만 보는 게 아니라, 남은 레이어들이 redex가 있을 수도 있다는 가정하에 설명하니 WHNF란 용어만 있으면 된다는 뜻 아닐까요?</p>
 <p>참고<br />
-<a href="https://woogyun.tistory.com/520">우균님의 정규형(normal form), 상위정규형(head normal form), 최상위정규형(weak head normal form)의 차이</a> - 우균 교수님이 더 많은 글을 공개하시면 좋을 것 같은데, 공개 글이 많이 보이진 않아 아쉽습니다. HNF 개념이 제가 이해한 것과 좀 다른 해석이 있어 보입니다. 틀린 점이 명확히 정리 되면 수정하도록 하겠습니다.<br />
 <a href="https://opentutorials.org/module/1941/11208">남현욱님의 WHNF</a> - 사실, 하스켈에 필요한 WHNF의 실무적 지식은 여기 포스트에 있는 것만 알고 지나가도 됩니다.<br />
 <a href="https://wiki.haskell.org/Weak_head_normal_form">Haskell.org WHNF</a><br />
 <a href="https://stackoverflow.com/questions/6872898/what-is-weak-head-normal-form" class="uri">https://stackoverflow.com/questions/6872898/what-is-weak-head-normal-form</a></p>
