@@ -61,29 +61,35 @@
     
 </div>
 
-<p>또 한 번 용어가 찜찜함을 남기네요. 그냥 바깥 생성자나 람다식을 WHNF로 보고 넘어가면 되는데, 왜 이런 용어를 붙였는지가 궁금해서 또 서핑의 늪에 빠져 버렸습니다.</p>
+<p>또 한 번 용어가 찜찜함을 남기네요. 그냥 가장 바깥 생성자나 람다식을 WHNF로 보고 넘어가면 되는데, 왜 이런 용어를 붙였는지가 궁금해서 또 서핑의 늪에 빠져 버렸습니다.</p>
 <p><em>이해한 생각을 정리한 게 아니라, 추측한 내용을 길게 적어 놓았습니다.</em></p>
 <p><a href="https://woogyun.tistory.com/520">우균님의 정규형(normal form), 상위정규형(head normal form), 최상위정규형(weak head normal form)의 차이</a><br />
 포스트 작성 후 보게 되었는데, 잘 못 이해한 건지 HNF부분이 조금 다른 부분이 보입니다. 틀린 내용 정리가 끝나면 수정하도록 하겠습니다. (우균 교수님이 더 많은 글을 공개하시거나 책을 내시면 좋을 것 같은데, 공개 글이 많이 보이진 않아 아쉽습니다.)</p>
-<p>NFData의 seq 함수 동작을 보다 보니, 혼동이 왔습니다. 분명 lazy를 잘 못 아해하고 있습니다. lazy는 아무것도 안하고 지나가는게 아니라, 완벽하게 끝내진 않더라도 때에 따라 일정 단계까지는 해석하고 지나갑니다. lazy는 지나가면서 나중에 실행하겠다는 계획만 잡고, 지금은 실행을 하나도 하지 않는다는 뜻이 아닙니다. 이 일정 단계가 바로 WHNF입니다. 표현식은 여러번 reduce를 거쳐 최종 값에 도달하는데, 어느 단계까지 도달했냐에 따라 이름을 붙여놨습니다.</p>
+<p>NFData의 seq 함수 동작을 보다 보니, 혼동이 왔습니다. 분명 lazy를 잘 못 이해하고 있습니다. lazy는 아무것도 안하고 지나가는게 아니라, 완벽하게 끝내진 않더라도 때에 따라 일정 단계까지는 해석하고 지나갑니다. lazy는 지나가면서 나중에 실행하겠다는 계획만 잡고, 지금은 실행을 하나도 하지 않는다는 뜻이 아닙니다. 이 일정 단계가 바로 WHNF입니다. 표현식은 여러번 reduce를 거쳐 최종 값에 도달하는데, 어느 단계까지 도달했냐에 따라 이름을 붙여놨습니다.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>add x y <span class="ot">=</span> x <span class="op">+</span> y </span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  ( (add <span class="dv">1</span> <span class="dv">2</span>), (add <span class="dv">3</span> <span class="dv">4</span>) )                                <span class="co">------(가)</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="ot">=</span> ( (<span class="dv">1</span> <span class="op">+</span> <span class="dv">2</span>), (add <span class="dv">3</span> <span class="dv">4</span>)) ) 또는 ( (add <span class="dv">1</span> <span class="dv">2</span>), (<span class="dv">3</span> <span class="op">+</span> <span class="dv">4</span>) )     <span class="co">------(나) WHNF</span></span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="ot">=</span> ( (<span class="dv">1</span> <span class="op">+</span> <span class="dv">2</span>), (<span class="dv">3</span> <span class="op">+</span> <span class="dv">4</span>))                                     <span class="co">------(다) WHNF</span></span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="ot">=</span> (<span class="dv">3</span> , <span class="dv">7</span>)                                                  <span class="co">-----(라) WHNF, NF</span></span></code></pre></div>
+<p>Q: (+)는 .-&gt; x + y로 여기에 인자를 넣어주는 작업이 beta reduce이고, (+) 매핑은 그냥 reduce라 부르면 될까요? (+ 는 (1,2)와 3을 매핑한 것으로 볼 수 있습니다.) <em>추측</em> A: 람다 대수학에서는 +의 동작이 별도로 정의된 개념, 형식, 용어로 표현되는 게 아니라, 람다 대수학의 abstraction과 application으로 표현됩니다. 람다 대수학에서 함수의 실행은 beta reduce로 나타납니다. 그럼 reduce와 beta reduce를 구별할 필요는 없을 것 같습니다.</p>
 <p>(가)를 만나면, 어느 단계까지 평가하고 뒤로 미룰까요? 처음엔, 전체를 thunk로 두고 아무 것도 reduce하지 않습니다. 튜플이 필요한 시점이 오면 (thunk, thunk)로 reduce 합니다. 튜플안의 것들이 필요한 시점이 오면 (3, thunk) 또는 (thunk, 7), 둘 모두 필요해지면 최종 (3, 7)에 도달합니다. thunk가 들어간 중간 단계의 모양을 WHNF라 합니다. 왜 이런 이름이 붙었는지 살펴 보겠습니다.</p>
 <p>※ 계산 되지 않은 식을 thunk라 부릅니다. 번역하면 수식 덩어리쯤 될까요? 코드 덩어리?</p>
 <ol type="1">
 <li><a href="#normal-form---nf">Normal Form - NF</a></li>
-<li><a href="#head-normal-form---hnf">Head Normal Form - HNF</a></li>
+<li><a href="#head-normal-form---hnf">Head Normal Form - HNF</a>
+<ol type="1">
+<li><a href="#람다식의-헤드">람다식의 헤드</a></li>
+<li><a href="#첫-번째로-reduce되는-redex를-헤드라-부른다">첫 번째로 reduce되는 redex를 헤드라 부른다</a></li>
+<li><a href="#reduce-순서">reduce 순서</a></li>
+</ol></li>
 <li><a href="#weak-head-normal-form---whnf">Weak Head Normal Form - WHNF</a></li>
 <li><a href="#hnf와-whnf의-차이">HNF와 WHNF의 차이</a></li>
 <li><a href="#정리">정리</a></li>
 </ol>
 <h3 id="normal-form---nf">Normal Form - NF</h3>
 <p>적용할 수 있는 reduction은 모두 적용한 표현식. 즉시eager 평가를 통해 얻게 되는 결과입니다. (라)</p>
-<p>※ 람다 변수에 인자를 넣어, 람다 body에 있는 변수들을 인자로 대체하고 람다 헤드를 없애는 작업을 reduce라 합니다. <code>(\x -&gt; x + 1) 2</code> 를 application이란 reduce 작업을 하면 <code>2 + 1</code>이 됩니다.</p>
+<p>※ 람다 변수에 인자를 넣어, 람다 body에 있는 변수들을 인자로 대체하고 람다 헤드를 없애는 작업을 beta reduce라 합니다. <code>(\x -&gt; x + 1) 2</code> 를 application이란 beta reduce 작업을 하면 <code>2 + 1</code>이 됩니다.</p>
 <h3 id="head-normal-form---hnf">Head Normal Form - HNF</h3>
 <p>사실, 여기 head란 말 때문에 이 포스트를 정리하게 됐습니다.<br />
 <a href="https://en.wikipedia.org/wiki/Beta_normal_form" class="uri">https://en.wikipedia.org/wiki/Beta_normal_form</a><br />
@@ -92,34 +98,55 @@ head 위치에 beta redex가 남아 있지 않은 표현식. 위 사이트 예�
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="op">^^^^^^^^^^^^^</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>       <span class="co">--(ㄱ)</span></span></code></pre></div>
 <p><code>𝜆x1</code>,<code>𝜆x2</code> 이런 부분이 head인데, 이 곳에 beta redex가 남아 있다니 무슨 말일까요? <code>M1</code>에 <code>(𝜆x1.A)</code>를 적용할 수 있으니 (ㄱ) <code>(𝜆x1.A) M1</code>이 redex인 건 알겠는데, 여기가 왜 <code>head</code>일까요? <code>𝜆x2.</code>의 <code>body</code> 아닌가요? 참고 - <a href="../posts/2021-04-08-lambdaCalculus.html">람다 대수학 용어</a></p>
-<p><em>application이 abstraction보다 우선 순위가 높음을 적용</em>해서 괄호로 명확한 순서를 표시하면</p>
+<p><em>application이 abstraction보다 우선 순위가 높음을 적용</em>해서 괄호로 명확한 순서를 표시하면<br />
+<a href="https://math.stackexchange.com/questions/2768395/head-position-in-lambda-calculus" class="uri">https://math.stackexchange.com/questions/2768395/head-position-in-lambda-calculus</a></p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="op">...</span>𝜆x2<span class="op">.</span>  (((𝜆x1<span class="op">.</span><span class="dt">A</span>) <span class="dt">M1</span>) <span class="dt">M2</span>) <span class="op">...</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>          <span class="op">^^^^^^^^^^^^</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>            <span class="co">-- (ㄴ)</span></span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co">-- 위 식이 가질 수 있는 형태 중 단순한 걸 살펴보면</span></span>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>(((𝜆x1<span class="op">.</span><span class="dt">A</span>) <span class="dt">M1</span>) <span class="dt">M2</span>) <span class="dt">M3</span> </span></code></pre></div>
-<p>head 위치에 beta redex가 있는 표현식이 어떤 게 있을까요? HNF는 head에 넣어 줄 값이 redex가 아니라는 뜻일까요?</p>
+<h4 id="람다식의-헤드">람다식의 헤드</h4>
+<p>head 위치에 beta redex가 있는 표현식이 어떤 게 있을까요? HNF는 head에 넣어 줄 값이 redex가 아니라는 뜻일까요? (이 후 나오는 redex, reduce는 각 각 beta redex, beta reduce를 의미합니다.)</p>
 <p><code>A</code>가 뭔지 모르지만 (ㄴ) <code>((𝜆x1.A) M1)</code>가 <code>M2</code>, <code>M3</code>를 받는 걸로 봐서 (ㄴ)은 람다 abstraction으로, <code>M2</code>,<code>M3</code>를 받을 변수가 head에 있어야 합니다. (ㄴ) 전체가 head는 아니지만, (ㄴ)을 reduce 하고나면, 헤드가 보일 겁니다. 그래도 (ㄴ) 전체를 head position이라 부르는 건 찜찜합니다.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- 람다 대수에서는 값이란 개념이 없습니다. M1,M2,... 모두 람다 함수입니다.</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- A를 x, M1이 인자 2개를 받는 \x.\y.xy 이라 가정하면 </span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>(((𝜆x<span class="op">.</span>x) (𝜆x<span class="op">.</span>𝜆y<span class="op">.</span> <span class="op">...</span>)) <span class="dt">M2</span>) <span class="dt">M3</span> </span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="op">^^^^^^^^^^^^^^^^^^^</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co">-- 여길 head라 부릅니다.</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co">-- beta reduce하면</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>((𝜆x<span class="op">.</span>𝜆y<span class="op">.</span> <span class="op">...</span>) <span class="dt">M2</span>) <span class="dt">M3</span> </span></code></pre></div>
-<p>아마도 <em>람다식의 <code>.</code>의 앞부분 <code>𝜆x</code>를 말하는 head와 다른 걸 말하는 것</em> 같습니다. 연이은 인자들 중 reduce가 일어나는 첫 번째 인자란 의미에서 head인 것 같습니다. 일단, 이렇게 <em>가정</em>하고 진행해 보겠습니다. 이 쪽이 하스켈쪽하고도 더 잘 맞아 보입니다. 하스켈에서는 가장 바깥 생성자the outermost constructor를 head라 부릅니다.<br />
-<a href="https://math.stackexchange.com/questions/2768395/head-position-in-lambda-calculus" class="uri">https://math.stackexchange.com/questions/2768395/head-position-in-lambda-calculus</a></p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- Just 값 생성자인데, 레이어마다 번호를 붙여서 보겠습니다.</span></span>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- 람다 대수에서는 값이란 개념이 없습니다. M1, M2, M3 모두 람다 함수입니다.</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- beta reduce하면</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>(((𝜆x1<span class="op">.</span><span class="dt">A</span>) <span class="dt">M1</span>) <span class="dt">M2</span>) <span class="dt">M3</span> </span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>   <span class="op">^^^^^^^^^</span> <span class="co">------------- (A) 여기가 헤드</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a> ((𝜆x2<span class="op">.</span> <span class="op">...</span> ) <span class="dt">M2</span>) <span class="dt">M3</span> </span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>   <span class="op">^^^^^^^^^^^^^</span> <span class="co">--------- (B) 헤드(A)를 reduce하면 여기가 헤드</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  (𝜆x3<span class="op">.</span> <span class="op">...</span>     ) <span class="dt">M3</span> </span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="op">^^^^^^^^^^^^^^^^^^</span> <span class="co">----- (C) 헤드(B)를 reduce하면 여기가 헤드</span></span></code></pre></div>
+<h4 id="첫-번째로-reduce되는-redex를-헤드라-부른다">첫 번째로 reduce되는 redex를 헤드라 부른다</h4>
+<p>아마도 <em>람다식의 <code>.</code>의 앞부분 <code>𝜆x</code>를 말하는 head와 다른 걸 말하는 것</em> 같습니다. 연이은 reduce 작업 중 첫 번째란 의미에서 head인 것 같습니다. 일단, 이렇게 <em>가정</em>하고 진행해 보겠습니다. 이 쪽이 하스켈쪽하고도 더 잘 맞아 보입니다.</p>
+<p>하스켈에서는 가장 바깥 생성자the outermost constructor를 head라 부릅니다. 왜 그럴까 고민해 봤습니다.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- 레이어마다 번호를 붙여서 보겠습니다.</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="dt">M1</span> (<span class="dt">M2</span> (<span class="dt">M3</span> <span class="dv">1</span>))</span></code></pre></div>
-<p>여기서 가장 바깥 M3을 head라 부릅니다. 이 것과 람다 대수쪽 head가 같은 뜻인가 살펴 보겠습니다.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>((𝜆x<span class="op">.</span>𝜆y<span class="op">.</span> <span class="op">...</span>) <span class="dt">M2</span>) <span class="dt">M3</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="dt">M1</span> (<span class="dt">M2</span> (<span class="dt">M3</span> <span class="dv">1</span>))</span></code></pre></div>
-<p>미완성. 2021.6.10 작성 중…</p>
-<p>가장 바깥 쪽 redex를 reduce하면, Head Normal Form이 됩니다. head에 redex가 남지 않았다는 뜻입니다. 하스켈쪽에서 보면 가장 바깥 쪽 한 단계만 evaluate했다는 얘기입니다. 용어의 근원을 살피는 건 복잡하지만, 동작 자체는 간단합니다.</p>
+<p>여기서 가장 바깥 M1을 head라 부릅니다. 이 것과 람다 대수쪽 head가 같은 뜻일까 보면</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- M1을 \x1 -&gt; ..., M2를 \x2 -&gt; ..., M3를 \x3 -&gt; ...</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ot">=</span> (\x1 <span class="ot">-&gt;</span> <span class="op">...</span>)       ((\x2 <span class="ot">-&gt;</span> <span class="op">...</span>)        ( (x3 <span class="ot">-&gt;</span> <span class="op">...</span>)    <span class="dv">1</span> ))</span></code></pre></div>
+<p>람다 대수의 헤드와 여러겹 쌓여있는 식의 헤드가 “실행”의 의미로 좇아가면 흐름이 반대입니다.</p>
+<p>여기서 용어가 혼동 됩니다. ’reduce’와 값을 구하기 위해 ’함수를, 연산을 실행한다’와 같은 뜻일까요?<br />
+값을 구하려면 x3 람다식을 먼저 풀면서 바깥으로 나와야 하는데, reduce는 x1 람다식부터 합니다. reduce란 작업은 람다 변수를 통해 정보를 넣어주고, 람다 변수를 없애는 작업입니다. <em>할 수 있는 연산을 모두 실행해서 결과값을 얻는게 reduce가 아닙니다.</em></p>
+<h4 id="reduce-순서">reduce 순서</h4>
+<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>(\f <span class="ot">-&gt;</span> (\x <span class="ot">-&gt;</span> f <span class="dv">1</span> <span class="op">+</span> x))    (\x <span class="ot">-&gt;</span> x <span class="op">-</span> <span class="dv">1</span>)    <span class="dv">1</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="op">^^^^^^^^^^^^^^^^^^^^^^^</span>    <span class="op">^^^^^^^^^^^^^</span>   <span class="op">^^^</span> </span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>          (<span class="dt">A</span>)                    (<span class="dt">B</span>)       (<span class="dt">C</span>)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="ot">=</span> ( (\f <span class="ot">-&gt;</span> (\x <span class="ot">-&gt;</span> f <span class="dv">1</span> <span class="op">+</span> x)) (\x <span class="ot">-&gt;</span> x <span class="op">-</span> <span class="dv">1</span>) ) <span class="dv">1</span> </span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="ot">=</span> (\x <span class="ot">-&gt;</span> (\x <span class="ot">-&gt;</span> x <span class="op">-</span> <span class="dv">1</span>) <span class="dv">1</span> <span class="op">+</span> x) <span class="dv">1</span> <span class="co">-- (B)를 (A)의 람다 변수f를 통해 넣고, f를 지웁니다. reduce했다고 말합니다.</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>       <span class="op">^^^^^^^^^^^^^^^^</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>       <span class="co">-- f를 지우는 reduce를 통해 새로운 redex가 생겼습니다. 이 걸 또 reduce합니다.</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="ot">=</span> (\x <span class="ot">-&gt;</span> <span class="dv">0</span> <span class="op">+</span> x) <span class="dv">1</span> </span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="op">^^^^^^^^^^^^^^^</span> <span class="co">-- 마지막 남아 있는 redex를 reduce 합니다.</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="ot">=</span> <span class="dv">1</span> <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="ot">=</span> <span class="dv">2</span></span></code></pre></div>
+<p>실행 순서는 어떻게 될까요?<br />
+(A)는 (B)가 실행된 후 만들어진 람다식에 (C)를 넣으면서 실행합니다. reduce 순서는 어떻게 될까요? (A)에 (B)를 넣어 beta reduce 하고, 이렇게 나온 람다식에 (C)를 넣어 reduce 합니다.</p>
+<p>정리하면, <em>여러번 reduce를 거쳐야 되는 식이 있고, 여기서 첫 번째 reduce를 하게 되는 식을 head라 부릅니다. 첫 번째 실행되는 식이 아니라, 첫 번째 reduce되는 식을 말합니다.</em></p>
+<p>이해한게 맞는지 아직 고민 중입니다. 다른 의견이 있는 분은 댓글 부탁드립니다.</p>
 <h3 id="weak-head-normal-form---whnf">Weak Head Normal Form - WHNF</h3>
+<p>가장 바깥 쪽 redex를 reduce하면, Head Normal Form이 됩니다. head에 redex가 남지 않았다는 뜻입니다. 하스켈쪽에서 보면 가장 바깥 쪽 한 단계만 evaluate했다는 얘기입니다. 용어의 근원을 살피는 건 복잡하지만, 동작 자체는 간단합니다.</p>
 <ol type="1">
 <li><p>인자를 가지고만 있고 reduce하지 않은 함수<br />
 가능한 reduction 작업을 모두 적용하지는 않은 상태. 지연lazy 평가를 통해 얻게 되는 결과입니다. 하스켈에서는 인자를 모두, 또는 일부를 아직 적용하지 않은 함수를 말합니다. <em>아직 적용하진 않았지만, 인자가 없는 상태는 아닙니다.</em></p>
@@ -137,24 +164,24 @@ head 위치에 beta redex가 남아 있지 않은 표현식. 위 사이트 예�
 <p><code>Just (1 + 2)</code>가 있을 때, <code>(1 + 2)</code>가 계산reduce되는 시점은 <code>Just</code>를 벗겨 낼 때(패턴 매칭할 때)입니다. 그 전에는 계산되지 않은 WHNF상태로 머물게 됩니다. 가장 바깥쪽 생성자가 안쪽을 가리고 있다고 봐도 됩니다.</p></li>
 <li><p>람다 함수<br />
 인자를 아직 받지 않은 람다 함수</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>\x <span class="ot">-&gt;</span> x <span class="op">+</span> <span class="dv">1</span> <span class="co">-- (가)</span></span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>\x <span class="ot">-&gt;</span> x <span class="op">+</span> <span class="dv">1</span> <span class="co">-- (가)</span></span></code></pre></div>
 <p>이 상태로만 보면 더 이상 reduce할 수 없습니다. 인자를 받아야만 가능합니다.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>(\x <span class="ot">-&gt;</span> x <span class="op">+</span> <span class="dv">1</span> ) <span class="dv">2</span> <span class="co">-- (나)</span></span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>(\x <span class="ot">-&gt;</span> x <span class="op">+</span> <span class="dv">1</span> ) <span class="dv">2</span> <span class="co">-- (나)</span></span></code></pre></div>
 <p>이제 redex가 되었습니다. 인자 2가 있어 주면서 reduce할 수 있습니다.<br />
 람다 함수지만 (가)는 NF이고, (나)는 HNF이면서 WHNF</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span> <span class="op">+</span> <span class="dv">1</span></span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span> <span class="op">+</span> <span class="dv">1</span></span></code></pre></div>
 <p>이 상태가 WHNF입니다.</p></li>
 </ol>
 <h3 id="hnf와-whnf의-차이">HNF와 WHNF의 차이</h3>
-<p>위 예시 코드를 다시 보면(Just를 임의의 값 생성자로 보세요.)</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>(\x <span class="ot">-&gt;</span> <span class="dt">Just3</span> x)       ((\x <span class="ot">-&gt;</span> <span class="dt">Just2</span> x)    ((\x <span class="ot">-&gt;</span> <span class="dt">Just1</span> x) <span class="dv">1</span>))</span></code></pre></div>
-<p><code>Just1</code> 헤드 하나뿐만 아니라 <code>Just1</code>, <code>Just2</code>, <code>Just3</code> 같은 것 들이 모두 redex가 없는 HNF가 NF입니다.<br />
-HNF인데(헤드 Just1은 NF인데) <code>Just2</code>, <code>Just3</code> 중 redex를 가진 게 있으면 WHNF가 됩니다.</p>
-<p>NF, HNF, WHNF를 마치 실행 단계에 따라 리니어하게 이름을 붙인 것 같은데 의미상 꼭 그렇진 않습니다. 여러 생성자로 감싸져 있는 값을, 여러 레이어로 감싸져 있다 표현합니다. 헤드는 가장 바깥쪽 레이어를 가리킵니다. 레이어로 이들의 차이를 설명하면,</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="dt">HNF</span>는  헤드 레이어만 redex가 없으면 됩니다<span class="op">.</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="dt">NF</span>는   헤드 레이어만 redex가 없는게 아니라, 모든 레이어가 redex가 없어야 합니다<span class="op">.</span></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="dt">WHNF</span>는 헤드 레이어는 redex가 없고, 그 외 레이어는 redex가 있을 수도 없을 수도 있습니다<span class="op">.</span></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>       (있을 수도, 없을 수도 있다는 의미로 <span class="dt">Weak</span>를 붙인 게 아닐까요<span class="op">?</span>)</span></code></pre></div>
+<p>위 예시 코드를 다시 보면</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>(\x <span class="ot">-&gt;</span> <span class="dt">M1</span> x)       ((\x <span class="ot">-&gt;</span> <span class="dt">M2</span> x)    ((\x <span class="ot">-&gt;</span> <span class="dt">M3</span> x) <span class="dv">1</span>))</span></code></pre></div>
+<p><code>M1</code> 헤드 하나뿐만 아니라 <code>M2</code>, <code>M3</code> 같은 것 들이 모두 redex가 없는 HNF가 NF입니다.<br />
+HNF인데(헤드 <code>M1</code>은 NF인데) <code>M2</code>, <code>M3</code> 중 redex를 가진 게 있을지도 모르는 모양이 WHNF가 됩니다.</p>
+<p>NF, HNF, WHNF를 마치 실행 단계에 따라 리니어하게 이름을 붙인 것 같은데 의미상 꼭 그렇진 않습니다. 여러 생성자로 감싸져 있는 값을, 여러 레이어로 감싸져 있다 표현하는데, 헤드는 가장 바깥쪽 레이어를 가리킵니다. 레이어로 이들의 차이를 설명하면,</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="dt">HNF</span>는  헤드 레이어만 redex가 없으면 됩니다<span class="op">.</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="dt">NF</span>는   헤드 레이어만 redex가 없는게 아니라, 모든 레이어가 redex가 없어야 합니다<span class="op">.</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="dt">WHNF</span>는 헤드 레이어는 redex가 없고, 그 외 레이어는 redex가 있을 수도 없을 수도 있습니다<span class="op">.</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>       (있을 수도, 없을 수도 있다는 의미로 <span class="dt">Weak</span>를 붙인 게 아닐까요<span class="op">?</span>)</span></code></pre></div>
 <p>헤드만 redex가 없기만 하면 HNF인데, 왜 하스켈에선 HNF는 쓰이지 않는다고 했을까요? 아직 이 말은 이해하지 못했습니다. <a href="https://en.wikibooks.org/wiki/Haskell/Laziness#Thunks_and_Weak_head_normal_form">wikibooks - There is also a ‘head normal form’, but it’s not used in Haskell.</a><br />
 모두 redex가 없는 경우 HNF라 불러도 되고 WHNF라 불러도 됩니다. HNF가 없다기 보다, Lazy를 설명할 때 HNF, 즉 헤드만 보는 게 아니라, 남은 레이어들이 redex가 있을 수도 있다는 가정하에 설명하니 WHNF란 용어만 있으면 된다는 뜻 아닐까요?</p>
 <p>참고<br />
@@ -163,14 +190,14 @@ HNF인데(헤드 Just1은 NF인데) <code>Just2</code>, <code>Just3</code> 중 r
 <a href="https://stackoverflow.com/questions/6872898/what-is-weak-head-normal-form" class="uri">https://stackoverflow.com/questions/6872898/what-is-weak-head-normal-form</a></p>
 <h3 id="정리">정리</h3>
 <p>전체 표현식이 NF냐 아니냐가 관심사가 아닙니다. head에 redex가 없는 걸 HNF, 이 중 뒤따라 나오는 식들이 redex가 있든 없든 상관 안하는 걸 특별히 WHNF라 이름을 붙여놨습니다. 아래는 추측입니다. 하스켈에서 가장 간단한 구별법은 가장 바깥이 application이면 WHNF가 아니고, 람다 abstraction이나 값 생서자면 WHNF라 합니다.</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>(\x <span class="ot">-&gt;</span> x <span class="op">+</span> <span class="dv">1</span>) <span class="co">-- reduce할 게 없습니다. NF</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>(\x <span class="ot">-&gt;</span> x <span class="op">+</span> <span class="dv">1</span>) (<span class="dv">1</span> <span class="op">+</span> <span class="dv">3</span>) <span class="co">-- 인자가 있어 reduce할 수 있는 redex이므로 WHNF가 아닙니다.</span></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>(\x <span class="ot">-&gt;</span> x <span class="op">+</span> <span class="dv">1</span>) <span class="dv">1</span> <span class="co">-- 인자가 redex냐 아니냐는 구분 요소가 아닙니다. </span></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>                <span class="co">-- 이 것도 위와 마찬가지로 reduce할 수 있으니 WHNF가 아닙니다.</span></span></code></pre></div>
-<div class="sourceCode" id="cb13"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>(<span class="dv">1</span> <span class="op">+</span> <span class="dv">1</span>, <span class="dv">2</span> <span class="op">+</span> <span class="dv">2</span>) <span class="co">-- 가장 바깥쪽이 (,)로 튜플 값 생성자이므로 WHNF</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>(<span class="dv">2</span>,<span class="dv">4</span>) <span class="co">-- 안 쪽이 redex이냐 아니냐는 구분 요소가 아닙니다. </span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>      <span class="co">-- 위와 마찬가지로 가장 바깥쪽이 튜플 생성자이니 WHNF</span></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span> <span class="op">+</span> <span class="dv">3</span> <span class="co">-- 가장 바깥쪽이 함수 + application이므로 WHNF가 아닙니다.</span></span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>(\x <span class="ot">-&gt;</span> x <span class="op">+</span> <span class="dv">1</span>) <span class="co">-- reduce할 게 없습니다. NF</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>(\x <span class="ot">-&gt;</span> x <span class="op">+</span> <span class="dv">1</span>) (<span class="dv">1</span> <span class="op">+</span> <span class="dv">3</span>) <span class="co">-- 인자가 있어 reduce할 수 있는 redex이므로 WHNF가 아닙니다.</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>(\x <span class="ot">-&gt;</span> x <span class="op">+</span> <span class="dv">1</span>) <span class="dv">1</span> <span class="co">-- 인자가 redex냐 아니냐는 구분 요소가 아닙니다. </span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>                <span class="co">-- 이 것도 위와 마찬가지로 reduce할 수 있으니 WHNF가 아닙니다.</span></span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>(<span class="dv">1</span> <span class="op">+</span> <span class="dv">1</span>, <span class="dv">2</span> <span class="op">+</span> <span class="dv">2</span>) <span class="co">-- 가장 바깥쪽이 (,)로 튜플 값 생성자이므로 WHNF</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>(<span class="dv">2</span>,<span class="dv">4</span>) <span class="co">-- 안 쪽이 redex이냐 아니냐는 구분 요소가 아닙니다. </span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>      <span class="co">-- 위와 마찬가지로 가장 바깥쪽이 튜플 생성자이니 WHNF</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span> <span class="op">+</span> <span class="dv">3</span> <span class="co">-- 가장 바깥쪽이 함수 + application이므로 WHNF가 아닙니다.</span></span></code></pre></div>
 <p>안에 있는 내용물을 보지 않고, 가장 겉만 보면 <code>( , )</code> 값 생성자입니다. 안에 게 reduce 됐든 안됐든 관심이 없습니다. 이 상태는 WHNF입니다. 그런데 패턴 매칭해서 안에까지 들여다 보니 reduce할 게 없는 상태이면 NF입니다. 뒤집어서 따라가면, 모든 NF는 WHNF도 된다는 얘기입니다.</p>
 <p>알게 된 용어로 lazy 평가를 설명하면,<br />
 <em>lazy평가는 보이는대로 바로 NF로 evaluate하지 않고, WHNF로 머물다가 꼭 필요한 때가 오면, 필요한 단계만큼만 reduce하는 평가 전략을 말합니다.</em></p>
