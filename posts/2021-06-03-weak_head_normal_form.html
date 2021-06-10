@@ -142,7 +142,9 @@ head 위치에 beta redex가 남아 있지 않은 표현식. 위 사이트 예�
 <span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="ot">=</span> <span class="dv">1</span> <span class="op">+</span> <span class="dv">1</span></span>
 <span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="ot">=</span> <span class="dv">2</span></span></code></pre></div>
 <p>실행 순서는 어떻게 될까요?<br />
-(A)는 (B)가 실행된 후 만들어진 람다식에 (C)를 넣으면서 실행합니다. reduce 순서는 어떻게 될까요? (A)에 (B)를 넣어 beta reduce 하고, 이렇게 나온 람다식에 (C)를 넣어 reduce 합니다.</p>
+(A)는 (B)가 실행된 후 만들어진 람다식에 (C)를 넣으면서 실행합니다.<br />
+reduce 순서는 어떻게 될까요?<br />
+(A)에 (B)를 넣어 beta reduce 하고, 이렇게 나온 람다식에 (C)를 넣어 reduce 합니다.</p>
 <p>정리하면, <em>여러번 reduce를 거쳐야 되는 식이 있고, 여기서 첫 번째 reduce를 하게 되는 식을 head라 부릅니다. 첫 번째 실행되는 식이 아니라, 첫 번째 reduce되는 식을 말합니다.</em></p>
 <p>이해한게 맞는지 아직 고민 중입니다. 다른 의견이 있는 분은 댓글 부탁드립니다.</p>
 <h3 id="weak-head-normal-form---whnf">Weak Head Normal Form - WHNF</h3>
@@ -174,9 +176,9 @@ head 위치에 beta redex가 남아 있지 않은 표현식. 위 사이트 예�
 </ol>
 <h3 id="hnf와-whnf의-차이">HNF와 WHNF의 차이</h3>
 <p>위 예시 코드를 다시 보면</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>(\x <span class="ot">-&gt;</span> <span class="dt">M1</span> x)       ((\x <span class="ot">-&gt;</span> <span class="dt">M2</span> x)    ((\x <span class="ot">-&gt;</span> <span class="dt">M3</span> x) <span class="dv">1</span>))</span></code></pre></div>
-<p><code>M1</code> 헤드 하나뿐만 아니라 <code>M2</code>, <code>M3</code> 같은 것 들이 모두 redex가 없는 HNF가 NF입니다.<br />
-HNF인데(헤드 <code>M1</code>은 NF인데) <code>M2</code>, <code>M3</code> 중 redex를 가진 게 있을지도 모르는 모양이 WHNF가 됩니다.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>(\x1 <span class="ot">-&gt;</span> <span class="op">...</span>)       ((\x2 <span class="ot">-&gt;</span> <span class="op">...</span>)        ( (x3 <span class="ot">-&gt;</span> <span class="op">...</span>)    <span class="dv">1</span> ))</span></code></pre></div>
+<p><code>x1</code> 헤드 하나뿐만 아니라 <code>x2</code>, <code>x3</code> 같은 것 들이 모두 redex가 없는 HNF가 NF입니다.<br />
+HNF인데(헤드 <code>x1</code>은 NF인데) <code>x2</code>, <code>x3</code> 중 redex를 가진 게 있을지도 모르는 모양이 WHNF가 됩니다.</p>
 <p>NF, HNF, WHNF를 마치 실행 단계에 따라 리니어하게 이름을 붙인 것 같은데 의미상 꼭 그렇진 않습니다. 여러 생성자로 감싸져 있는 값을, 여러 레이어로 감싸져 있다 표현하는데, 헤드는 가장 바깥쪽 레이어를 가리킵니다. 레이어로 이들의 차이를 설명하면,</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="dt">HNF</span>는  헤드 레이어만 redex가 없으면 됩니다<span class="op">.</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="dt">NF</span>는   헤드 레이어만 redex가 없는게 아니라, 모든 레이어가 redex가 없어야 합니다<span class="op">.</span></span>
