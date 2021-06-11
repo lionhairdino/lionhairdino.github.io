@@ -72,7 +72,8 @@
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="ot">=</span> ( (<span class="dv">1</span> <span class="op">+</span> <span class="dv">2</span>), (add <span class="dv">3</span> <span class="dv">4</span>)) ) 또는 ( (add <span class="dv">1</span> <span class="dv">2</span>), (<span class="dv">3</span> <span class="op">+</span> <span class="dv">4</span>) )     <span class="co">------(나) WHNF</span></span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="ot">=</span> ( (<span class="dv">1</span> <span class="op">+</span> <span class="dv">2</span>), (<span class="dv">3</span> <span class="op">+</span> <span class="dv">4</span>))                                     <span class="co">------(다) WHNF</span></span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="ot">=</span> (<span class="dv">3</span> , <span class="dv">7</span>)                                                  <span class="co">-----(라) WHNF, NF</span></span></code></pre></div>
-<p>Q: (+)는 .-&gt; x + y로 여기에 인자를 넣어주는 작업이 beta reduce이고, (+) 매핑은 그냥 reduce라 부르면 될까요? (+ 는 (1,2)와 3을 매핑한 것으로 볼 수 있습니다.) <em>추측</em> A: 람다 대수학에서는 +의 동작이 별도로 정의된 개념, 형식, 용어로 표현되는 게 아니라, 람다 대수학의 abstraction과 application으로 표현됩니다. 람다 대수학에서 함수의 실행은 beta reduce로 나타납니다. 그럼 reduce와 beta reduce를 구별할 필요는 없을 것 같습니다.</p>
+<p>Q: (+)는 .-&gt; x + y로 여기에 인자를 넣어주는 작업이 beta reduce이고, (+) 매핑은 그냥 reduce라 부르면 될까요? (+ 는 (1,2)와 3을 매핑한 것으로 볼 수 있습니다.)<br />
+<em>추측</em> A: 람다 대수학에서는 +의 동작이 별도로 정의된 개념, 형식, 용어로 표현되는 게 아니라, 람다 대수학의 abstraction과 application으로 표현됩니다. 람다 대수학에서 함수의 실행은 beta reduce로 나타납니다. 그럼 reduce와 beta reduce를 구별할 필요는 없을 것 같습니다.</p>
 <p>(가)를 만나면, 어느 단계까지 평가하고 뒤로 미룰까요? 처음엔, 전체를 thunk로 두고 아무 것도 reduce하지 않습니다. 튜플이 필요한 시점이 오면 (thunk, thunk)로 reduce 합니다. 튜플안의 것들이 필요한 시점이 오면 (3, thunk) 또는 (thunk, 7), 둘 모두 필요해지면 최종 (3, 7)에 도달합니다. thunk가 들어간 중간 단계의 모양을 WHNF라 합니다. 왜 이런 이름이 붙었는지 살펴 보겠습니다.</p>
 <p>※ 계산 되지 않은 식을 thunk라 부릅니다. 번역하면 수식 덩어리쯤 될까요? 코드 덩어리?</p>
 <ol type="1">
@@ -190,7 +191,7 @@ reduce 순서는 어떻게 될까요?<br />
 <a href="https://wiki.haskell.org/Weak_head_normal_form">Haskell.org WHNF</a><br />
 <a href="https://stackoverflow.com/questions/6872898/what-is-weak-head-normal-form" class="uri">https://stackoverflow.com/questions/6872898/what-is-weak-head-normal-form</a></p>
 <h3 id="정리">정리</h3>
-<p>전체 표현식이 NF냐 아니냐가 관심사가 아닙니다. head에 redex가 없는 걸 HNF, 이 중 뒤따라 나오는 식들이 redex가 있든 없든 상관 안하는 걸 특별히 WHNF라 이름을 붙여놨습니다. 아래는 추측입니다. 하스켈에서 가장 간단한 구별법은 가장 바깥이 application이면 WHNF가 아니고(왜냐 하면 reduce가 되는 redex이니까), 람다 abstraction이나, 인자를 모두 받은 값 생성자면 WHNF라 합니다.</p>
+<p>전체 표현식이 NF냐 아니냐가 관심사가 아닙니다. head에 redex가 없는 걸 HNF, 이 중 뒤따라 나오는 식들이 redex가 있든 없든 상관 안하는 걸 특별히 WHNF라 이름을 붙여놨습니다. 하스켈에서 가장 간단한 구별법은 가장 바깥이 application이면 WHNF가 아니고(왜냐 하면 reduce가 되는 redex이니까), 람다 abstraction이나, 값 생성자면 WHNF라 합니다.</p>
 <div class="sourceCode" id="cb15"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>(\x <span class="ot">-&gt;</span> x <span class="op">+</span> <span class="dv">1</span>) <span class="co">-- reduce할 게 없습니다. NF</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>(\x <span class="ot">-&gt;</span> x <span class="op">+</span> <span class="dv">1</span>) (<span class="dv">1</span> <span class="op">+</span> <span class="dv">3</span>) <span class="co">-- 인자가 있어 reduce할 수 있는 redex이므로 WHNF가 아닙니다.</span></span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>(\x <span class="ot">-&gt;</span> x <span class="op">+</span> <span class="dv">1</span>) <span class="dv">1</span> <span class="co">-- 인자가 redex냐 아니냐는 구분 요소가 아닙니다. </span></span>
