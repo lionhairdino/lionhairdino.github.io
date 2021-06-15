@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko" lang="ko">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <title>lionhairdino - Void</title>
+
+        <meta name="description" content="Void 타입은 값 생성자가 하나도 없습니다. 아예 값을 가질 수 없습니다. 타입은 값의 추상화인데, 값도 못가지는 타입을 어디다 쓸까요?" />
+        <meta property="og:description" content="Void 타입은 값 생성자가 하나도 없습니다. 아예 값을 가질 수 없습니다. 타입은 값의 추상화인데, 값도 못가지는 타입을 어디다 쓸까요?" />
+
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <link rel="icon" href="https://lionhairdino.github.io/favicon.svg" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino16px.png" sizes="16x16" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino24px.png" sizes="24x24" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino32px.png" sizes="32x32" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino48px.png" sizes="48x48" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino57px.png" sizes="57x57" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino60px.png" sizes="60x60" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino64px.png" sizes="64x64" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino72px.png" sizes="72x72" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino76px.png" sizes="76x76" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino114px.png" sizes="114x114" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino120px.png" sizes="120x120" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino144px.png" sizes="144x144" />
+        <link rel="shortcut icon" href="../favicon.ico" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino152px.png" sizes="152x152" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino180px.png" sizes="180x180" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino192px.png" sizes="192x192" />
+        <link rel="manifest" href="../site.webmanifest" />
+        <link rel="mask-icon" href="https://lionhairdino.github.io/Lionhairdino_black.svg" color="#ff7500" />
+        <meta name="msapplication-TileImage" content="/images/favicon/Lionhairdino144px.png" />
+        <meta name="msapplication-TileColor" content="#ff7500" />
+        <meta name="theme-color" content="#ffffff" />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="Void" />
+        <meta property="og:site_name" content="Lionhairdino" />
+        <meta property="og:url" content="https://lionhairdino.github.io/posts/2021-06-15-void.html" />
+
+        <meta property="og:image" content="https://lionhairdino.github.io/images/state400px.png" />
+
+      <meta name="keywords" content="void, absurd, 타입 체커, type system">
+<script src="../script/copycode.js"></script>
+
+    </head>
+    <body>
+        <div id="header">
+            <div id="navigation">
+                <a href="../">lionhairdino</a> 
+                <a href="../about.html">about</a>
+                <!--<a href="/archive.html">archive</a>-->
+            </div>
+        </div>
+
+        <div id="content">
+            <h1>Void</h1>
+
+            <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+<div class="info">
+    Posted on June 15, 2021
+    
+</div>
+
+<h2 id="타입-체커를-영리하게-이용해-먹는-패턴">타입 체커를 영리하게 이용해 먹는 패턴</h2>
+<p>Void는 값이 없습니다. 값이 없으니 다른 값들과 어울려 뭔가를 하지 못합니다. 타입은 값들의 추상화인데, 값도 가질 수 없는 타입이 왜 필요할까요? 하스켈의 타입 정보는 런타임에는 모두 사라집니다. 타입은 값이 있든 없든 런타임에서 쓰이는 게 아니라, 컴파일 타임에 타입 체커가 써먹습니다. Void는 타입 체커는 통과할 수 있고, 실제 값을 가지면 안되는 그런 곳에 사용합니다. 그런 곳이 어디일까는 아래 예시를 보세요. ※ <a href="../posts/2020-06-17-DependentHaskell.html">dependent type 스타일</a>은 타입 체커 기능을 극단적으로 활용하는 방법입니다.</p>
+<p><a href="https://www.fpcomplete.com/blog/2017/07/to-void-or-to-void/" class="uri">https://www.fpcomplete.com/blog/2017/07/to-void-or-to-void/</a><br />
+여기 코드들은 모두 fpcomplete void 글에서 가져왔습니다. fpcomplete void 글을 읽으며, 고민됐던 부분들을 적었습니다.</p>
+<h2 id="절대-평가-되지-않을-값이면-무슨-타입을-써주는-게-좋을까요">절대 평가 되지 않을 값이면 무슨 타입을 써주는 게 좋을까요?</h2>
+<p>절대 평가 되지 않는 경우가 뭐가 있을까요?</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ot">loop ::</span> <span class="dt">IO</span> ()</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>loop <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">putStrLn</span> <span class="st">&quot;Ye!&quot;</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  loop</span></code></pre></div>
+<p>GHC는 절대 <code>loop</code> 결과값 <code>()</code>을 평가할 일이 없습니다. 무한 루프를 돌며 빠져 나가는 때는 error signal을 받을 때 말고는 끝낼 일이 없기 때문에 리턴값으로 Caller에게 <code>()</code>를 주는 일은 일어나지 않습니다. 그래서 lazy한 하스켈은 <code>IO Int</code>를 써주든 <code>IO NeverBeEvaluated</code>를 써주든 아무 상관이 없습니다. 절대 평가될 일이 없지만, <code>IO</code>는 타입 변수를 하나 갖는다는 규칙에 맞추기 위해 형식상 하나는 써줘야 합니다. 보통은 이럴데 <code>()</code>을 써줍니다. 그런데 여기에 타입 지정을 하면 GHC에게 일을 하나 시킬 수 있습니다.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ot">updateTimeRef ::</span> <span class="dt">IORef</span> <span class="dt">String</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> () <span class="co">--------------(A)</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co">--                                  ^^</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- 시간을 주기적으로 업데이트 해서 IORef에 넣는 코드.</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="op">...</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="ot">useTimeRef ::</span> <span class="dt">IORef</span> <span class="dt">String</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> <span class="dt">SomeResult</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co">-- IORef에서 시간을 꺼내서 작업하는 코드</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="ot">getSomeResult ::</span> <span class="dt">IO</span> <span class="dt">SomeResult</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>getSomeResult <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  now <span class="ot">&lt;-</span> getCurrentTime</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  timeRef <span class="ot">&lt;-</span> newIORef (<span class="fu">show</span> now)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>  eres <span class="ot">&lt;-</span> race (updateTimeRef timeRef) (useTimeRef timeRef)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>  <span class="kw">case</span> eres <span class="kw">of</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Left</span> () <span class="ot">-&gt;</span> <span class="fu">error</span> <span class="st">&quot;This shouldn't happen!&quot;</span> <span class="co">-- (A-1)</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    <span class="co">-- Left someResult -&gt; return someResult -- (B-1)</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Right</span> someResult <span class="ot">-&gt;</span> <span class="fu">return</span> someResult</span></code></pre></div>
+<p><code>race</code>는 두 쓰레드 중 하나가 끝나길 기다리는데, 실제론 <code>updateTimeRef</code>는 무한 루프이니, <code>useTimeRef</code>가 끝나길 기다리게 됩니다. <code>useTimeRef</code>가 끝나면 <code>updateTimeRef</code>도 kill 합니다. 결과값이 뭔지 평가하진 않지만, 타입 체커가 타입은 봅니다. 실제 <code>Left</code> 경우에 걸려들 일은 없지만, 타입 체커는 그럴지 안그럴지 알지 못합니다.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- 실제 평가될 일은 없지만 IO SomeResult로 바꾸면</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ot">updateTimeRef ::</span> <span class="dt">IORef</span> <span class="dt">String</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> <span class="dt">SomeResult</span> <span class="co">------(B)</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co">--                                  ^^^^^^^^^^</span></span></code></pre></div>
+<p>(A)의 경우</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>updateTimeRef의 결과 타입을 <span class="dt">IO</span> ()로 하면, </span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="dt">Left</span> someResult에서 someResult는 ()이 되고, </span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">return</span> ()값 하게 되니, </span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>getSomeResult의 리턴 타입 <span class="dt">IO</span> <span class="dt">SomeResult</span>와 맞지 않아 컴파일 에러입니다<span class="op">.</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>그래서 이럴 땐 <span class="fu">return</span> () 하지 않고 error를 써서 예외를 발생 시킵니다<span class="op">.</span> (<span class="dt">A</span><span class="op">-</span><span class="dv">1</span>)</span></code></pre></div>
+<p>(B)의 경우</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>updateTimeRef의 결과 타입을 <span class="dt">IO</span> <span class="dt">SomeResult</span>로 하면,   </span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="dt">Left</span> someResult에서 someResult는 <span class="dt">SomeResult</span> 타입이고, (<span class="dt">B</span><span class="op">-</span><span class="dv">1</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">return</span> <span class="dt">SomeResult</span>값 하게 되어</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>getSomeResult의 리턴 타입 <span class="dt">IO</span> <span class="dt">SomeResult</span>와 맞게 됩니다<span class="op">.</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>런타임에 값이 들어오든 말든 타입 체커는 타입만 봅니다<span class="op">.</span></span></code></pre></div>
+<p><code>getSomeResult</code>의 결과 타입이 <code>IO SomeResult</code>이니, <code>return SomeResult</code>는 되지만, <code>return ()</code>는 타입 체커를 통과하지 못합니다. <code>updateTimeRef</code>는 무한 루프를 도니 <code>IO</code> 뒤에 뭐라 써주든 상관은 없습니다. 하지만, 타입 체커를 통과하려면 <code>IO SomeResult</code>로 맞추면 됩니다.</p>
+<h2 id="평가되지-않을-값의-타입이라도-ghc는-타입-체커를-돌립니다.">평가되지 않을 값의 타입이라도 GHC는 타입 체커를 돌립니다.</h2>
+<p>타입 체커는 런타임에 값이 평가될지 안될지는 보지 않습니다. 이걸 이용해서 <code>updateTimeRef</code>는 무한루프를 돌며 <code>useTimeRef</code>보다 먼저 죽지 않는다는 검증을 GHC가 하도록 할 수 있습니다. 프로그래머가 계속 신경쓰지 않아도 GHC가 알아서 체크해주면, 런타임에 가서 드러날 에러들을 줄일 수 있기 때문에, 하스켈에서는 타입 체커를 최대한 활용하려는 노력, 패턴들이 자주 보입니다.</p>
+<p>뭘 써도 상관 없는 자리에 <code>SomeResult</code>를 넣으니, <code>error</code>를 써주지 않아도 부드럽게 <code>getSomeResult</code>를 정의할 수 있게 되었습니다. 여기서 그치는게 아니라, 숨어있는 이득이 있습니다. 실제 <code>updateTimeRef</code>는 <code>SomeResult</code> 타입 값을 만들어내지 않는데, <code>SomeResult</code>를 써 줄 수 있다는 말은 <code>SomeResult</code>가 평가되지 않는 무한 루프가 돈다는 뜻입니다. 풀어서 말하면, GHC가 <code>updateTimeRef</code>가 무한 루프가 도는지 체크를 하게 됐다는 겁니다.</p>
+<p>그런데 아래 문장 때문에 잘 못 이해한 건 아닌지 의심스럽습니다.</p>
+<p><em>The type system is in effect enforcing our requirement that useTimeRef will outlive updateTimeRef.</em></p>
+<p>타입 체커가 <code>useTimeRef</code>가 <code>updateTimeRef</code>보다 오래 살아남아야 한다는 조건을 만족하는지 확인한다는 말입니다. 그런데, 거꾸로 아닌가요? <code>updateTimeRef</code>가 먼저 죽으면 안되는 거 아닌가요? outlive(~보다 오래 살다)를 잘 못 번역한건지, 문장이 거꾸로 쓰인걸로 보입니다.</p>
+<p>저는 이해를 아예 못한 게 아니라, 이해는 한 것 같은데, 모순되는 텍스트들이 있으면 계속 되새김질 해보다 마지막에 자료를 의심합니다. 꽤 오랫동안 올라와 있던 포스트인데, <em>오류가 있다면 진작 잡아내지 않았을까요?</em> 저와 같이 고민한 분들이 있으면 댓글을 달아 주시면 좋겠습니다.</p>
+<p><code>useTimeRef</code>보다 <code>updateTimeRef</code>가 더 빨리 죽으면 컴파일이 안되도록 타입 체커에게 힌트를 준 상황처럼 됐습니다. 타입 체커가 무한 루프를 체크합니다.</p>
+<p>무한 루프의 리턴 타입은 실제 평가 될 일이 없기 때문에 아무거나 써줘도 됩니다. 그런데, 여기에 적절한 타입을 써주면, 프로그래머가 확인해야 될 걸 GHC에게 떠넘길수 있습니다.</p>
+<p>아래 코드는 fpcomplete의 코드를 조금 더 단순하게 바꿔서 필요한 동작만 있도록 했습니다.</p>
+<p>fpcomplete의 내용은, func를 IO MySpecial로 만들려면 무한 루프여야 한다는 뜻입니다. func가 실제로 리턴하는 값이 MySpecial이 아닌데, IO MySpecial로 써주려면 무한 루프인 경우뿐이 없으니, func가 무한 루프여야 하는 걸 GHC가 체크하는 효과가 난다는 뜻 입니다. func가 무한 루프이니 당연히 func2보다 func가 오래 삽니다.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Control.Concurrent.Async</span> (race)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">MySpecial</span> <span class="ot">=</span> <span class="dt">MySpecial</span> <span class="dt">Int</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="ot">func ::</span> <span class="dt">IO</span> <span class="dt">MySpecial</span> </span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>func <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">putStrLn</span> <span class="st">&quot;ok&quot;</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  func</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="ot">func2 ::</span> <span class="dt">IO</span> <span class="dt">MySpecial</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>func2 <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span> <span class="op">$</span> <span class="dt">MySpecial</span> <span class="dv">1</span> </span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="ot">work ::</span> <span class="dt">IO</span> <span class="dt">MySpecial</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>work <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>  eres <span class="ot">&lt;-</span> race func func2</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>  <span class="kw">case</span> eres <span class="kw">of</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Left</span> r <span class="ot">-&gt;</span> <span class="fu">return</span> r</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Right</span> r <span class="ot">-&gt;</span> <span class="fu">return</span> r</span></code></pre></div>
+<p>익숙해지면 아래 코드만 봐도 무한 루프임을 눈치 챈다고 합니다. 리턴 타입이 폴리모픽인게 무슨 뜻일까요?</p>
+<h2 id="결과-타입에-폴리모픽을-두는-트릭">결과 타입에 폴리모픽을 두는 트릭</h2>
+<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ot">updateTimeRef ::</span> <span class="dt">IORef</span> <span class="dt">String</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> a</span></code></pre></div>
+<p>보통은 함수의 출력에 타입 변수 <code>a</code>를 붙이는게 별다른 의미는 없다고 합니다. 그런데 여기처럼 쓰면 무한 루프임을 알려주는 의미가 있다고 합니다. 아래 설명을 보면, 만일 <code>updateTimeRef :: IORef String -&gt; IO ()</code> 이라면,</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ot">getSomeResult ::</span> <span class="dt">IO</span> <span class="dt">SomeResult</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="op">...</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    eres <span class="ot">&lt;-</span> race (updateTimeRef timeRef) (useTimeRef timeRef)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">case</span> eres <span class="kw">of</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>        <span class="dt">Left</span> sRes <span class="ot">-&gt;</span> <span class="fu">return</span> sRes <span class="co">--- (가)</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>        <span class="dt">Right</span> sRes <span class="ot">-&gt;</span> <span class="fu">return</span> sRes</span></code></pre></div>
+<p><code>Left</code>의 경우 <code>sRes</code>가 <code>()</code> 타입입니다. 그럼 <code>getSomeResult :: IO SomeResult</code>와 타입이 맞지 않아 타입 체커 에러입니다. 그럼 <code>updateTimeRef :: ... -&gt; IO SomeResult</code> 로 바꾸면, 타입 체커가 <code>sRes</code>가 <code>SomeResult</code> 타입이므로 OK입니다. 만일, <code>updateTimeRef</code>가 손댈 수 없는 라이브러리에 있다면 어떻게 할까요? 이럴 때를 위해서 <code>IO SomeResult</code>가 아니라 <code>IO a</code>로 타입을 열어 놓는 방법을 쓰면 됩니다. <code>updateTimeRef :: ... -&gt; IO a</code> 라면, 위와 같은 <code>case</code>문을 그대로 써도 됩니다.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ot">useTimeRef ::</span> <span class="op">...</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> <span class="dt">SomeOtherResult</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="ot">getSomeResult ::</span> <span class="dt">IO</span> <span class="dt">SomeOtherResult</span> </span></code></pre></div>
+<p>폴리모픽으로 만들어 놓으면, 위와 같이 <code>IO SomeOtherResult</code>로 바뀌어도 수정없이 쓸 수 있습니다.</p>
+<p>실제 <code>IO a</code>가 의미하는 건 무한 루프이거나 <code>예외/bottom</code> 입니다. 둘 중에 뭐가 됐든 <code>(가) Left</code> 에 걸려들 일은 없습니다. 이런 타입을 보면 무한 루프이거나 예외를 던질 수 있겠다고 알 수 있습니다.</p>
+<h2 id="void">Void</h2>
+<p><em>실제론 값이 들어오면 안되는 자리지만, 타입 체커는 통과해야 할 때 Void를 써 줍니다.</em> 위와 비슷하게 GHC에게 로직 체크 일부를 떠맡길 때 씁니다.</p>
+<p><code>updateTimeRef :: IO SomeResult</code>, 또는 <code>IO a</code>로 해 놓으면, 무한 루프가 아닌데도 오류가 나지 않는 경우가 하나 남아 있습니다. 여기선 그럴 일이 없겠지만, 실수로 SomeResult값을 리턴하게 바꾸면 타입 체커를 통과해버립니다. GHC가 무한 루프임을 체크해 주길 바랐는데, 구멍이 하나 있는 셈입니다.</p>
+<p>이 구멍을 막을 수 있는 방법이 바로 <code>Void</code>입니다.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Void</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="ot">absurd ::</span> <span class="dt">Void</span> <span class="ot">-&gt;</span> a</span></code></pre></div>
+<p><code>Void</code>는 값 생성자가 없습니다. <code>absurd</code>는 도메인의 모든 요소에 대해 매핑이 되어야 total 함수인데, 도메인에 요소가 없으면? 그럼 total 함수입니다. 만일 partial이라면 모든 값이 a와 매핑되지 않는다는 말로, 예외를 발생시키거나 무한 루프가 돈다는 얘기입니다. 어차피 total이든 아니든 타입 체커만 통과하면 될 것 같은데, total이 아닐 것처럼 생겨서 한 번 짚어 준 게 아닐까요? 어쨌든, <code>case</code> 문을 다음처럼 바꾸면</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>  <span class="kw">case</span> eres <span class="kw">of</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Left</span> voidValue <span class="ot">-&gt;</span> absurd voidValue</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Right</span> someResult <span class="ot">-&gt;</span> <span class="fu">return</span> someResult</span></code></pre></div>
+<p>타입 체커는 군말없이 통과합니다. <code>absurd</code>는 <code>Void</code>타입 값을 받아 <code>a</code>를 리턴합니다. 런타임이 아니라 타입 체커를 위한 장치입니다. 폴리모픽 타입이니 컴파일은 통과할테지만, 언제라도 <code>Void</code>타입이라 표시한 <code>voidValue</code>에 값이 들어오면 타입 미스 매치가 일어날테니, <code>Left</code>에 걸려들게 코딩하면 GHC가 잡아내 줍니다. <code>absurd</code>는 <code>Void</code>를 받아서 <code>a</code>를 출력한다기 보다, <em>타입 체커 통과를 위해 <code>Void</code>값을 다른 모양으로 보이게 한다</em>고 생각하면 편합니다.</p>
+<p><code>a</code>를 써서 어느 정도 해결할 수 있지만, <code>Void</code>를 쓰면 코드를 읽을 때 훨씬 더 직관적입니다.</p>
+<h2 id="rankntypes">RankNTypes</h2>
+<div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ot">withSideThread ::</span> <span class="dt">IO</span> void <span class="ot">-&gt;</span> <span class="dt">IO</span> a <span class="ot">-&gt;</span> <span class="dt">IO</span> a</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>withSideThread infinite finite <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  res <span class="ot">&lt;-</span> race infinite finite</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">case</span> res <span class="kw">of</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Left</span> x <span class="ot">-&gt;</span> absurd x</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Right</span> y <span class="ot">-&gt;</span> <span class="fu">return</span> y</span></code></pre></div>
+<p>이렇게 하면 에러가 납니다.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>    • <span class="dt">Couldn't</span> match <span class="kw">type</span> ‘void’ with ‘a’</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>      ‘void’ is a rigid <span class="kw">type</span> variable bound by</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>        the <span class="kw">type</span> signature for<span class="op">:</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="ot">          withSideThread ::</span> <span class="kw">forall</span> void a<span class="op">.</span> <span class="dt">IO</span> void <span class="ot">-&gt;</span> <span class="dt">IO</span> a <span class="ot">-&gt;</span> <span class="dt">IO</span> a</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>        at <span class="op">/</span><span class="dt">Users</span><span class="op">/</span>michael<span class="op">/</span><span class="dt">Desktop</span><span class="op">/</span>foo<span class="op">.</span>hs<span class="op">:</span><span class="dv">7</span><span class="op">:</span><span class="dv">19</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>      ‘a’ is a rigid <span class="kw">type</span> variable bound by</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>        the <span class="kw">type</span> signature for<span class="op">:</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="ot">          withSideThread ::</span> <span class="kw">forall</span> void a<span class="op">.</span> <span class="dt">IO</span> void <span class="ot">-&gt;</span> <span class="dt">IO</span> a <span class="ot">-&gt;</span> <span class="dt">IO</span> a</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>        at <span class="op">/</span><span class="dt">Users</span><span class="op">/</span>michael<span class="op">/</span><span class="dt">Desktop</span><span class="op">/</span>foo<span class="op">.</span>hs<span class="op">:</span><span class="dv">7</span><span class="op">:</span><span class="dv">19</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>      <span class="dt">Expected</span> <span class="kw">type</span><span class="op">:</span> <span class="dt">IO</span> a</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>        <span class="dt">Actual</span> <span class="kw">type</span><span class="op">:</span> <span class="dt">IO</span> void</span></code></pre></div>
+<p>이 에러를 피하기 위해 다음처럼 void를 a로 바꾸면</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="ot">withSideThread ::</span> <span class="dt">IO</span> a <span class="ot">-&gt;</span> <span class="dt">IO</span> a <span class="ot">-&gt;</span> <span class="dt">IO</span> a</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>withSideThread infinite finite <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  res <span class="ot">&lt;-</span> race infinite finite</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">case</span> res <span class="kw">of</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Left</span> x <span class="ot">-&gt;</span> <span class="fu">return</span> x</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Right</span> y <span class="ot">-&gt;</span> <span class="fu">return</span> y</span></code></pre></div>
+<p>타입 체커가 무한 루프임을 체크해 주는 동작은 사라져 버립니다. 왜냐 하면 다음 처럼 쓸 수 있기 때문입니다.</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="ot">getSomeResult ::</span> <span class="dt">IO</span> <span class="dt">SomeResult</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>getSomeResult <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  now <span class="ot">&lt;-</span> getCurrentTime</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  timeRef <span class="ot">&lt;-</span> newIORef (<span class="fu">show</span> now)</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  withSideThread (<span class="fu">return</span> <span class="dt">SomeResult</span>) (useTimeRef timeRef)</span></code></pre></div>
+<p>타입 체커의 개런티는 그대로 가져가면서 정의하는 방법은</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="ot">withSideThread ::</span> (<span class="kw">forall</span> void<span class="op">.</span> <span class="dt">IO</span> void) <span class="ot">-&gt;</span> <span class="dt">IO</span> a <span class="ot">-&gt;</span> <span class="dt">IO</span> a</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>withSideThread infinite finite <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  res <span class="ot">&lt;-</span> race infinite finite</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">case</span> res <span class="kw">of</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Left</span> x <span class="ot">-&gt;</span> absurd x</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Right</span> y <span class="ot">-&gt;</span> <span class="fu">return</span> y</span></code></pre></div>
+<p><code>forall</code>을 이용하는 방법입니다. <code>forall</code>의 자세한 설명은 참고글을 읽어주세요.</p>
+<p>참고 - <a href="../posts/2021-05-04-forall.html">forall-아무거나와 모든 것의 차이</a></p>
+<p>미완성 포스트… <span class="citation" data-cites="todo">@todo</span>: To Void or to void? 섹션을 이해하려면 positive, negative 개념을 명확히 한 후 봐야 할 것 같습니다.</p>
+
+<div class="comment">
+<script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
+</script>
+</div>
+        </div>
+        <div id="footer">
+            © 2021 lionhairdino. All rights reserved. Generated by <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+    </body>
+</html>
