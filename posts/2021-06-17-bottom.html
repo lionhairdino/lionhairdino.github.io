@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko" lang="ko">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <title>lionhairdino - bottom, Void, undefined, unit</title>
+
+        <meta name="description" content="얼핏 비슷해 보이는 단순 타입들입니다만 저마다 확실한 역할이 있습니다." />
+        <meta property="og:description" content="얼핏 비슷해 보이는 단순 타입들입니다만 저마다 확실한 역할이 있습니다." />
+
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <link rel="icon" href="https://lionhairdino.github.io/favicon.svg" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino16px.png" sizes="16x16" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino24px.png" sizes="24x24" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino32px.png" sizes="32x32" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino48px.png" sizes="48x48" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino57px.png" sizes="57x57" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino60px.png" sizes="60x60" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino64px.png" sizes="64x64" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino72px.png" sizes="72x72" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino76px.png" sizes="76x76" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino114px.png" sizes="114x114" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino120px.png" sizes="120x120" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino144px.png" sizes="144x144" />
+        <link rel="shortcut icon" href="../favicon.ico" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino152px.png" sizes="152x152" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino180px.png" sizes="180x180" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino192px.png" sizes="192x192" />
+        <link rel="manifest" href="../site.webmanifest" />
+        <link rel="mask-icon" href="https://lionhairdino.github.io/Lionhairdino_black.svg" color="#ff7500" />
+        <meta name="msapplication-TileImage" content="/images/favicon/Lionhairdino144px.png" />
+        <meta name="msapplication-TileColor" content="#ff7500" />
+        <meta name="theme-color" content="#ffffff" />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="bottom, Void, undefined, unit" />
+        <meta property="og:site_name" content="Lionhairdino" />
+        <meta property="og:url" content="https://lionhairdino.github.io/posts/2021-06-17-bottom.html" />
+
+        <meta property="og:image" content="https://lionhairdino.github.io/images/state400px.png" />
+
+      <meta name="keywords" content="bottom, undefined, Void, unit">
+<script src="../script/copycode.js"></script>
+
+    </head>
+    <body>
+        <div id="header">
+            <div id="navigation">
+                <a href="../">lionhairdino</a> 
+                <a href="../about.html">about</a>
+                <!--<a href="/archive.html">archive</a>-->
+            </div>
+        </div>
+
+        <div id="content">
+            <h1>bottom, Void, undefined, unit</h1>
+
+            <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+<div class="info">
+    Posted on June 17, 2021
+    
+</div>
+
+<p><em>리턴하지 않음을 리턴한다.</em> - bottom<br />
+<em>값이 없는 타입이다</em> - Void<br />
+<em>결과값이 원하는 타입은 뭐든 될 수 있는 함수</em> - undefined<br />
+<em>될 수 있는 값이 하나뿐인 타입</em> - unit</p>
+<p>꼭 이런 말장난 같은 타입들인데, 각 각 중요한 역할들을 합니다.</p>
+<p>간단하게 용도를 요약하면,<br />
+<code>Void</code>는 타입 체커만 통과하고 값이 들어오면 안되는 때 써먹기 위한 안전 장치<br />
+bottom은 무한 루프를 돌거나 예외를 발생시키는, 결과가 없는 함수를 위한 타입<br />
+<code>undefined</code>는 bottom 개념을 명시적으로 코드에서 쓸 필요가 있을 때 (디버깅을 위한 임시 코드에 많이 쓰입니다.)<br />
+unit은 값 생성자가 <code>()</code> 하나인 그냥 보통의 타입으로 특별한 정보가 필요없이 자리만 차지할 값이 필요할 때</p>
+<p><code>Int</code>가 가질 수 있는 값은 <code>{0,1,2,...}</code><br />
+<code>Unit</code>이 가질 수 있는 값은 <code>{()}</code><br />
+<code>Void</code>가 가질 수 있는 값은 <code>{}</code><br />
+bottom은 아예 값 개념이 없습니다.</p>
+<h2 id="bottom">bottom</h2>
+<p>타입 이론type theory에서 나온 개념으로 값 개념이 없는 타입을 말합니다.(Zero 타입 또는 empty 타입이라고 부르기도 합니다.) 값 개념이 없다는 말이 뭘 의미할까요?</p>
+<p>“무한 루프 함수는 값을 리턴하지 않는다.”<br />
+모든 함수는 리턴값이 있어야 합니다. 그러면 예외가 발생하거나 무한 루프를 도는 함수의 리턴값은 뭘까요? “리턴값이 없는” bottom이란 타입을 정하고<br />
+“무한 루프 함수는 bottom 타입을 리턴한다.”<br />
+이렇게 말합니다.</p>
+<p>bottom은 값이 없는게 아니라, 값을 리턴하지 않는 함수의 결과 타입을 말합니다. 값을 가질 수 없는 Void와는 다릅니다. bottom은 값이 있고 없고가 아니라, <em>결과를 리턴하지 않는 함수의 타입</em>입니다. 타입을 값의 추상화로만 바라 봐서는 쉽게 수긍이 가지 않습니다. 타입을 함수 동작의 추상화로 보면 어떨까 합니다.</p>
+<p>아래 같은 자료는 아직 못봤습니다. 틀렸을 수도 있는 <em>추측</em>입니다.</p>
+<p>함수 타입을 분류하는 추상화 계층을 그리면</p>
+<ol type="1">
+<li><p>값을 리턴하는 함수 타입<br />
+- <code>Int</code>를 리턴하는 함수 타입<br />
+- <code>Maybe Int</code>를 리턴하는 함수 타입<br />
+- <code>(Int -&gt; Int)</code>를 리턴하는 함수 타입<br />
+…</p></li>
+<li><p>값을 리턴하지 않는 함수 타입</p></li>
+<li><p>값을 리턴할 때도 있고, 안 할 때도 있는 함수 타입<br />
+- 1번 타입 | 2번 타입</p></li>
+</ol>
+<p><code>Int</code> 타입 함수보다 bottom 타입 함수는 한 단계 위 추상 계층으로 볼 수 있습니다. 실제 프로그래밍에서 타입은 버그를 줄여주기 위해 컴파일 직전, 타입 체커가 읽어 들여, 코드 조각(함수)들의 접점들이 다 무리없이 연결되는지 검사할 때 씁니다. 사람이 확실히 지킬수만 있다면 이론적으론 타입을 빼고 가도 됩니다. 물론 사람이 타입 체커만큼 본다는 건 불가능하겠지만 말입니다. 타입 이론에선 결과값을 돌려주지 않는 함수들을 표현할 때 필요한 개념이라 하는데, 그럼 하스켈에서는 다음처럼 Bottom 타입을 명시적으로 써주지 않는 이유는 뭘까요?</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ot">f1 ::</span> a <span class="ot">-&gt;</span> <span class="dt">Bottom</span> <span class="co">-- Bottom이란 타입은 없습니다.</span></span></code></pre></div>
+<p>무한 루프를 돌거나 에러로 끝나는 함수라면, 실용으로 생각하면 무한루프만이라도 Bottom이라 써줘도 될 것 같은데, 명확히 Bottom이란 타입은 없습니다. <em>추측</em> - 3번의 경우는 타입을 어떻게 적어줘야 할까요? <code>Int | Bottom</code> 이렇게 적으려면 새로운 문법을 도입해야 합니다. 모든 타입에는 항상 bottom이 들어있기 때문에 굳이 Bottom 표시를 안하는 게 아닐까요? 사실, 함수는 시그널을 받으면 리턴하지 않고 종료할 수 있기 때문에, 모든 함수는 3번 타입으로 볼 수 있습니다. (예외를 발생시키지 않도록 시그널을 받지 않게 <code>mask</code>를 씌우는 경우가 있긴 있습니다. 이런 경우가 훨씬 드물기 때문에 굳이 문법 요소를 추가한다면, 디폴트가 bottom이 있고, 어떤 표시를 하면 bottom이 아니라고 표시하는게 효율적일 것 같기도 합니다.)</p>
+<p>명시적으로 드러나는 때는 Bottom <em>타입</em> 대신 undefined <em>함수</em>를 씁니다. (아래 undefined 섹션 참고.)</p>
+<p>“모든 타입에는 bottom이 존재합니다.”</p>
+<p>실제 데이터 타입을 선언할 때 Bottom을 같이 선언하지 않아도, 자동으로 모든 타입에는 Bottom 타입이 함께 있다 볼 수 있습니다. (볼 수 있습니다라 적은 이유는, 개념 설명을 이렇게 하는 자료는 있는데, 정말 명시적으로 Int | Bottom 이런식의 코딩, 구현으로 바뀐다는 자료는 못 찾았습니다. 아마도 구현 자체를 바꾸는게 아니라, 이 개념을 염두하고 내부 처리를 하겠지요)</p>
+<p>※ type theory에서 bottom은 모든 타입의 서브 타입인데, 상대적인 개념으로 “모든 타입”을 의미하는 top 타입이란 용어도 있습니다.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ot">f ::</span> <span class="dt">Bool</span> <span class="ot">-&gt;</span> <span class="dt">Bool</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>f x <span class="ot">=</span> <span class="fu">undefined</span></span></code></pre></div>
+<p><code>Bool</code>에 있는 bottom을 쓴다는 뜻이고,</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ot">f ::</span> <span class="dt">Bool</span> <span class="ot">-&gt;</span> <span class="dt">Bool</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>f <span class="ot">=</span> <span class="fu">undefined</span></span></code></pre></div>
+<p>이렇게 쓰면 포인트 프리가 아니라 <code>(Bool -&gt; Bool)</code> 타입에 있는 bottom을 쓴다는 얘기입니다.</p>
+<p>total/partial 함수를 bottom으로 설명하면, bottom을 리턴하는 함수는 partial 함수, 이에 반해 모든 가능한 입력을 받아서 항상 bottom이 아닌 유효한 값을 리턴하는 함수를 total 함수라 부릅니다.</p>
+<p>참고 - <a href="../posts/2020-08-19-newtype.html">Newtype</a></p>
+<p>※ Q. 모든 하스켈 타입은 bottom과 sum 타입을 이루니, 모든 하스켈 타입은 대수 타입으로 봐도 되지 않을까요?</p>
+<h2 id="void">Void</h2>
+<p>별도 글에 정리해 두었습니다. <a href="../posts/2021-06-15-void.html">Void</a></p>
+<h2 id="undefined">undefined</h2>
+<p>bottom 개념을 명시적으로 표현하기 위하 함수입니다.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">undefined</span><span class="ot"> ::</span> a</span></code></pre></div>
+<p>모든 타입이 될 수 있기 때문에, 어떤 경우에도 타입 체커를 통과합니다. 하스켈에서 타입 제약 없이 a라고만 쓰면 무슨 의미일까요? 모든 타입이란 의미로 타입 체킹할 때 필요한 타입과 모두 매치된다는 뜻입니다.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">error</span><span class="ot"> ::</span> <span class="dt">String</span> <span class="ot">-&gt;</span> a</span></code></pre></div>
+<p>어떤 타입의 함수 안에서도 쓸 수 있다는 뜻입니다. 이론상, 모든 타입에 속할 수 있는 값은 bottom 뿐이 없습니다. 하스켈에서는 bottom을 결과 타입에 제약 없이 <code>a</code>만 써서 표현한다고 볼 수 있습니다.</p>
+<p>타입 체커가 undefined 함수를 만나면, 모든 타입을 처리할 수 있구나 하고 통과하고, 나중에 undefined를 평가할 때가 되면, 평가해서 얻을 값이 없다는 걸 알고 에러를 내뱉습니다.</p>
+<h2 id="unit">unit</h2>
+<p><code>Bool</code> 타입 값을 위한 비트는 <code>1</code>비트가 필요합니다. <code>0</code>이면 <code>False</code>, <code>1</code>이면 <code>True</code>로 처리하면 되니 <code>1</code>비트만 있으면 됩니다. 그럼 될 수 있는 값이 하나인 타입은 몇 비트가 필요할까요? <code>0</code>비트입니다. 데이터가 <code>0</code>비트라면 데이터가 없다는 말과 같습니다. 타입만 알려줘서 컴파일 타임에 타입 체커만 통과 하는 거면 Void로도 되지 않았을까요? 왜 unit이 필요했을까요?</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> () <span class="ot">=</span> ()</span></code></pre></div>
+<p>Void 타입은, 타입 체커는 통과하지만 언제든 절대 값이 들어오면 안되는 곳에 써주는 안전 장치입니다. 막다른 골목 표시 같은 겁니다.<br />
+unit은 평가하게 되도 에러가 나지 않습니다. 또한 폴리모픽이 아니기 때문에 명시적으로 ()를 지정해 줬을 때만 타입 체커를 통과합니다. 값이 고정이니 의미있는 정보를 담을 순 없습니다. 더미값이 필요할 때 써주는데, 필요한 크기가 0이므로 메모리를 효율적으로 씁니다. Void는 GHC가 값이 들어오면 안된다는 걸 체크하는 <em>안전 장치</em>라면, ()는 프로그래머가 명시적으로 <em>패턴 매칭 통과</em>를 위해 쓰는 표시입니다.</p>
+<h2 id="참고---각-타입들을-인자로-받을-때의-동작">참고 - 각 타입들을 인자로 받을 때의 동작</h2>
+<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Data.Void</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- 쓰지 않을 값을 요구하는 곳에 써 줍니다.</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co">-- IO는 타입 변수 자리가 하나 있는데, 여기를 메꿔주는 역할만 합니다.</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co">-- 구별되는 값이 없으므로, 쓸모 있는 정보를 담을 수 없습니다.</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="ot">func ::</span> () <span class="ot">-&gt;</span> <span class="dt">IO</span> ()</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>func _ <span class="ot">=</span> <span class="fu">putStrLn</span> <span class="st">&quot;ok&quot;</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> func ()</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>ok</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="co">-- Void 타입의 값을 만들 수 없으므로 func2는 실행할 수 없습니다.</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="co">-- Void는 안전 장치로 쓰입니다.</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="ot">func2 ::</span> <span class="dt">Void</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> ()</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>func2 _ <span class="ot">=</span> <span class="fu">putStrLn</span> <span class="st">&quot;ok&quot;</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> func2 <span class="dv">1</span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a><span class="fu">error</span> <span class="op">:</span> </span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>    • <span class="dt">No</span> <span class="kw">instance</span> for (<span class="dt">Num</span> <span class="dt">Void</span>) arising from the literal ‘1’</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>    • <span class="dt">In</span> the first argument <span class="kw">of</span> ‘func2’, namely ‘1’</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>      <span class="dt">In</span> the expression<span class="op">:</span> func2 <span class="dv">1</span></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>      <span class="dt">In</span> an equation for ‘it’<span class="op">:</span> it <span class="ot">=</span> func2 <span class="dv">1</span></span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a><span class="co">-- undefined는 평가되지 않고 다른 타입에는 폴리모픽하게 맞춰 줄 수 있는데</span></span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a><span class="co">-- 평가 되는 순간 에러가 납니다. 보통 디버깅에 씁니다.</span></span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a><span class="ot">func3 ::</span> a <span class="ot">-&gt;</span> <span class="dt">IO</span> ()</span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>func3 _ <span class="ot">=</span> <span class="fu">putStrLn</span> <span class="st">&quot;ok&quot;</span></span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> func3 <span class="fu">undefined</span></span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>ok</span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a><span class="co">-- bottom 개념이 눈에 보이도록 한 게 undefined입니다.</span></span></code></pre></div>
+<h2 id="정리">정리</h2>
+<p>특별한 값을 가지지 않은 타입들 (undefined / bottom), Void, unit 들은, 하나 하나의 개념은 그렇지 않지만, 결국 모두 타입 체커와 인터랙션을 위한 장치들입니다.</p>
+
+<div class="comment">
+<script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
+</script>
+</div>
+        </div>
+        <div id="footer">
+            © 2021 lionhairdino. All rights reserved. Generated by <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+    </body>
+</html>
