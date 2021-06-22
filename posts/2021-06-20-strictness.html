@@ -67,7 +67,7 @@
 <p>메모리와 퍼포먼스에 민감한 코드를 짜려면, 하스켈의 장점으로 꼽히는 lazy를 오히려 적절하게 빼내면서 작업해야 합니다. 이러기 위해 아래 항목들을 중요 토픽으로 뽑고 있습니다.</p>
 <div class="line-block">WHNF vs NF<br />
 seq, deepseq<br />
-타입에 Strictness 표시 달기<br />
+타입에 Strictness<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> 표시 달기<br />
 Bang patterns - 느낌표exclamation mark <code>!</code>를 Bang이라 부릅니다.<br />
 Bang은 seq 함수의 편의 문법syntactic sugar입니다.<br />
 데이터 구조의 Strictness: lazy, spine(가시,등골)-strict, 그리고 value-strict<br />
@@ -120,7 +120,7 @@ Bang은 seq 함수의 편의 문법syntactic sugar입니다.<br />
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> five <span class="ot">=</span> add (<span class="dv">1</span> <span class="op">+</span> <span class="dv">1</span>) (<span class="dv">1</span> <span class="op">+</span> <span class="dv">2</span>) <span class="co">-- (나)</span></span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>      seven <span class="ot">=</span> add (<span class="dv">1</span> <span class="op">+</span> <span class="dv">2</span>) (<span class="dv">1</span> <span class="op">+</span> <span class="dv">3</span>)</span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">putStrLn</span> <span class="op">$</span> <span class="st">&quot;Five: &quot;</span> <span class="op">++</span> <span class="fu">show</span> five</span></code></pre></div>
-<p>※ 필요할 때, 특정 시점에 평가<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>가 작동하게 하는 걸 forcing evaluation이라 합니다.<br />
+<p>※ 필요할 때, 특정 시점에 평가<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>가 작동하게 하는 걸 forcing evaluation이라 합니다.<br />
 (나)의 reduce 절차를 보면, putStrLn이 five가 가리키는 thunk가 먼저 평가되게(forcing evaluation)합니다.<br />
 평가해야만 하는 상황이 되서, 평가를 시작하는 걸 force evaluation이라 말하는데, 평가를 강제로, 또는 강요한다는 번역보다는, <em>thunk 상태로 멈춰</em> 있던 걸 평가 시작한다가 더 어울립니다.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>five <span class="ot">=</span> thunk, seven <span class="ot">=</span> thunk</span>
@@ -157,7 +157,7 @@ thunk 안에 add 함수를 가리키는 포인터, (1 + 1) thunk를 가리키는
 <span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">putStrLn</span> <span class="op">$</span> <span class="st">&quot;Five: &quot;</span> <span class="op">++</span> <span class="fu">show</span> five</span></code></pre></div>
 <p>!를 붙이는 위치가 헛갈리는데, !를 붙인 건 thunk로 놔둘 수 없다 정도로 생각하고 진도 나가겠습니다. five = thunk 상태가 안된다는 말입니다. !은 seq 함수의 편의 문법입니다.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">seq</span><span class="ot"> ::</span> a <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> b</span></code></pre></div>
-<p><code>b</code>가 평가될 때 항상 <code>a</code>도 평가되는 걸 보장하기 위해 GHC의 primitive operation<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>을 씁니다. bang 편의 문법이 아니라 seq로 쓰면</p>
+<p><code>b</code>가 평가될 때 항상 <code>a</code>도 평가되는 걸 보장하기 위해 GHC의 primitive operation<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a>을 씁니다. bang 편의 문법이 아니라 seq로 쓰면</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ot">add ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>add x y <span class="ot">=</span></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> part1 <span class="ot">=</span> <span class="fu">seq</span> x part2</span>
@@ -256,7 +256,7 @@ answer = x + y</div>
 <span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>   <span class="kw">in</span> go rt xs</span></code></pre></div>
 <p>이렇게 하면 loop를 돌 때마다 <code>sum</code>과 <code>count</code>를 thunk로 놔두지 못하고, 계속 평가하게 됩니다. (<code>sum + x</code> 는 WHNF가 아니니, WHNF가 되게 평가한다는 뜻입니다.)</p>
 <h2 id="deepseq">deepseq</h2>
-<p><code>seq</code>처럼 WHNF까지만 평가하는게 아니라, 아예 NF에 도달할 때까지 평가하는게 필요할 때가 있습니다. 그래야 thunk를 아예 남기지 않고, 정말 strict하게 값을 유지해서 메모리를 최소한만 사용하게 할 수 있습니다. 하스켈에 빌트되어 있는 이런 기능은 없지만, semi-standard<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a> 라이브러리가 있습니다. <code>rnf</code>(Reduce a value to Normal Form) 메소드를 가진 NFData 타입 클래스입니다.</p>
+<p><code>seq</code>처럼 WHNF까지만 평가하는게 아니라, 아예 NF에 도달할 때까지 평가하는게 필요할 때가 있습니다. 그래야 thunk를 아예 남기지 않고, 정말 strict하게 값을 유지해서 메모리를 최소한만 사용하게 할 수 있습니다. 하스켈에 빌트되어 있는 이런 기능은 없지만, semi-standard<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a> 라이브러리가 있습니다. <code>rnf</code>(Reduce a value to Normal Form) 메소드를 가진 NFData 타입 클래스입니다.</p>
 <div class="sourceCode" id="cb19"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">NFData</span> a <span class="kw">where</span></span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="ot">  rnf ::</span> a <span class="ot">-&gt;</span> ()</span></code></pre></div>
 <p><code>rnf</code>는 NF가 될 때까지 reduce하고 <code>()</code>를 리턴합니다.</p>
@@ -305,9 +305,9 @@ answer = x + y</div>
 <blockquote>
 <p>Q. 어디서 <code>rnf</code>를 부르고 있을까요?<br />
 A. <code>deepseq</code> 내부에서 부릅니다.</p>
-</blockquote>
 <div class="sourceCode" id="cb23"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="ot">deepseq ::</span> <span class="dt">NFData</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> b</span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>deepseq a b <span class="ot">=</span> rnf a <span class="ot">`seq`</span> b</span></code></pre></div>
+</blockquote>
 <blockquote>
 <p>Q. <code>NFData</code> 인스턴스만 <code>deepseq</code>를 부를 수 있습니다. 그럼 <code>deepseq</code>를 <code>NFData</code>의 메소드로 만들지 왜 <code>rnf</code>를 메소드로 만들었을까요?<br />
 A. <code>rnf</code>가 단독으로 쓰일 수도 있고, 다른 함수에서도 쓰고 있을거라 추측할 수 있습니다.</p>
@@ -386,57 +386,61 @@ record 문법을 쓸 때, strict 필드를 빠뜨리면 GHC가 알아서 알려 
 <h2 id="연산자와-force-함수">$!, $!! 연산자와 force 함수</h2>
 <p><code>$!</code> 연산자<br />
 함수와 인자를 받아, 인자를 WHNF가 되게 평가하고, 함수를 적용합니다.</p>
-<div class="sourceCode" id="cb26"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="ot">mysum ::</span> [<span class="dt">Int</span>] <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>mysum list0 <span class="ot">=</span></span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  go list0 <span class="dv">0</span></span>
-<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span></span>
-<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>    go [] total <span class="ot">=</span> total</span>
-<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>    go (x<span class="op">:</span>xs) total <span class="ot">=</span> go xs <span class="op">$!</span> total <span class="op">+</span> x</span>
-<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="fu">print</span> <span class="op">$</span> mysum [<span class="dv">1</span><span class="op">..</span><span class="dv">1000000</span>]</span></code></pre></div>
+<div class="sourceCode" id="cb26"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>f <span class="op">$!</span> x <span class="ot">=</span> <span class="kw">let</span> <span class="op">!</span>vx <span class="ot">=</span> x <span class="kw">in</span> f vx </span></code></pre></div>
+<div class="sourceCode" id="cb27"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="ot">mysum ::</span> [<span class="dt">Int</span>] <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>mysum list0 <span class="ot">=</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>  go list0 <span class="dv">0</span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>    go [] total <span class="ot">=</span> total</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>    go (x<span class="op">:</span>xs) total <span class="ot">=</span> go xs <span class="op">$!</span> total <span class="op">+</span> x</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="fu">print</span> <span class="op">$</span> mysum [<span class="dv">1</span><span class="op">..</span><span class="dv">1000000</span>]</span></code></pre></div>
 <p><code>total + x</code>는 <code>$!</code> 연산자를 적용해서 thunk로 남아 있을 수 없습니다.</p>
 <p><code>$!!</code> 연산자는 <code>$!</code> 연산자와 같은 동작을 하는데, <code>seq</code> 대신 <code>deepseq</code>를 씁니다.</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="kw">infixr</span> <span class="dv">0</span> <span class="op">$!!</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="ot">($!!) ::</span> (<span class="dt">NFData</span> a) <span class="ot">=&gt;</span> (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> b</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>f <span class="op">$!!</span> x <span class="ot">=</span> x <span class="ot">`deepseq`</span> f x</span></code></pre></div>
 <p><code>force</code> 함수는 WHNF로 평가되는 걸 NF가 될 때까지 평가하도록 바꿉니다.</p>
-<div class="sourceCode" id="cb27"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="ot">force ::</span> <span class="dt">NFData</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> a</span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>force x <span class="ot">=</span> x <span class="ot">`deepseq`</span> x</span></code></pre></div>
-<div class="sourceCode" id="cb28"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>go [] (total, count) <span class="ot">=</span> <span class="fu">fromIntegral</span> total <span class="op">/</span> count</span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>go (x<span class="op">:</span>xs) (total, count) <span class="ot">=</span> go xs <span class="op">$!</span> force (total <span class="op">+</span> x, count <span class="op">+</span> <span class="dv">1</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb29"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="ot">force ::</span> <span class="dt">NFData</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> a</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>force x <span class="ot">=</span> x <span class="ot">`deepseq`</span> x</span></code></pre></div>
+<div class="sourceCode" id="cb30"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>go [] (total, count) <span class="ot">=</span> <span class="fu">fromIntegral</span> total <span class="op">/</span> count</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>go (x<span class="op">:</span>xs) (total, count) <span class="ot">=</span> go xs <span class="op">$!</span> force (total <span class="op">+</span> x, count <span class="op">+</span> <span class="dv">1</span>)</span></code></pre></div>
 <blockquote>
 <p>Q. <code>$! force</code> 는 <code>$!!</code> 와 같은 것 아닌가요?</p>
 </blockquote>
 <h2 id="spine-strict">spine strict</h2>
-<div class="sourceCode" id="cb29"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">List</span> a <span class="ot">=</span> <span class="dt">Cons</span> a (<span class="dt">List</span> a) <span class="op">|</span> <span class="dt">Nil</span></span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="dt">Cons</span> <span class="fu">undefined</span> <span class="fu">undefined</span> <span class="ot">`seq`</span> <span class="fu">putStrLn</span> <span class="st">&quot;Hello World&quot;</span></span>
-<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- main = (undefined:undefined) `seq` putStrLn &quot;Hello World&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb31"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">List</span> a <span class="ot">=</span> <span class="dt">Cons</span> a (<span class="dt">List</span> a) <span class="op">|</span> <span class="dt">Nil</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="dt">Cons</span> <span class="fu">undefined</span> <span class="fu">undefined</span> <span class="ot">`seq`</span> <span class="fu">putStrLn</span> <span class="st">&quot;Hello World&quot;</span></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- main = (undefined:undefined) `seq` putStrLn &quot;Hello World&quot;</span></span></code></pre></div>
 <p><code>Cons undefined undefined</code>는 이미 WHNF여서 평가하지 않으므로 OK</p>
-<div class="sourceCode" id="cb30"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">List</span> a <span class="ot">=</span> <span class="dt">Cons</span> a <span class="op">!</span>(<span class="dt">List</span> a) <span class="op">|</span> <span class="dt">Nil</span></span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="dt">Cons</span> <span class="fu">undefined</span> <span class="fu">undefined</span> <span class="ot">`seq`</span> <span class="fu">putStrLn</span> <span class="st">&quot;Hello World&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb32"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">List</span> a <span class="ot">=</span> <span class="dt">Cons</span> a <span class="op">!</span>(<span class="dt">List</span> a) <span class="op">|</span> <span class="dt">Nil</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="dt">Cons</span> <span class="fu">undefined</span> <span class="fu">undefined</span> <span class="ot">`seq`</span> <span class="fu">putStrLn</span> <span class="st">&quot;Hello World&quot;</span></span></code></pre></div>
 <p>두 번째 인자 tail 자리는 strict인데 undefined를 만났으니 예외 발생</p>
-<div class="sourceCode" id="cb31"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">List</span> a <span class="ot">=</span> <span class="dt">Cons</span> a <span class="op">!</span>(<span class="dt">List</span> a) <span class="op">|</span> <span class="dt">Nil</span></span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="dt">Cons</span> <span class="fu">undefined</span> (<span class="dt">Cons</span> <span class="fu">undefined</span> <span class="dt">Nil</span>) <span class="ot">`seq`</span> <span class="fu">putStrLn</span> <span class="st">&quot;Hello World&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb33"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">List</span> a <span class="ot">=</span> <span class="dt">Cons</span> a <span class="op">!</span>(<span class="dt">List</span> a) <span class="op">|</span> <span class="dt">Nil</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="dt">Cons</span> <span class="fu">undefined</span> (<span class="dt">Cons</span> <span class="fu">undefined</span> <span class="dt">Nil</span>) <span class="ot">`seq`</span> <span class="fu">putStrLn</span> <span class="st">&quot;Hello World&quot;</span></span></code></pre></div>
 <p>몇 개의 원소를 가진 리스트인지는 알 수 있지만(구조=뼈대=spine은 알 수 있지만), 안에 들어 있는 건 알 필요 없을 수 있습니다. 이럴 때 spine strict라 부릅니다.</p>
-<div class="sourceCode" id="cb32"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">List</span> a <span class="ot">=</span> <span class="dt">Cons</span> <span class="op">!</span>a <span class="op">!</span>(<span class="dt">List</span> a) <span class="op">|</span> <span class="dt">Nil</span></span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="dt">Cons</span> <span class="fu">undefined</span> (<span class="dt">Cons</span> <span class="fu">undefined</span> <span class="dt">Nil</span>) <span class="ot">`seq`</span> <span class="fu">putStrLn</span> <span class="st">&quot;Hello World&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb34"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">List</span> a <span class="ot">=</span> <span class="dt">Cons</span> <span class="op">!</span>a <span class="op">!</span>(<span class="dt">List</span> a) <span class="op">|</span> <span class="dt">Nil</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="dt">Cons</span> <span class="fu">undefined</span> (<span class="dt">Cons</span> <span class="fu">undefined</span> <span class="dt">Nil</span>) <span class="ot">`seq`</span> <span class="fu">putStrLn</span> <span class="st">&quot;Hello World&quot;</span></span></code></pre></div>
 <p>첫 번째 인자가 strict인데 undefined를 만났으니 예외 발생</p>
-<div class="sourceCode" id="cb33"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">List</span> a <span class="ot">=</span> <span class="dt">Cons</span> <span class="op">!</span>a (<span class="dt">List</span> a) <span class="op">|</span> <span class="dt">Nil</span></span></code></pre></div>
+<div class="sourceCode" id="cb35"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">List</span> a <span class="ot">=</span> <span class="dt">Cons</span> <span class="op">!</span>a (<span class="dt">List</span> a) <span class="op">|</span> <span class="dt">Nil</span></span></code></pre></div>
 <p>이런 구조는 원 글의 저자도 본 적이 아직 없다고 합니다. 그래서 이런 걸 위한 특별한 이름이 있는지 조차 모른다고 합니다. 구조는 정해지지 않았는데 안에 들어있는 값이 정해진 경우도 있지 않을까요?</p>
 <h2 id="vector">Vector</h2>
 <p>Data.Vector 모듈에 있는 boxed vector는 <em>spine strict 구조</em>입니다.</p>
-<div class="sourceCode" id="cb34"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> Data.Vector.fromList [<span class="fu">undefined</span>] <span class="ot">`seq`</span> <span class="fu">putStrLn</span> <span class="st">&quot;Hello World&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb36"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> Data.Vector.fromList [<span class="fu">undefined</span>] <span class="ot">`seq`</span> <span class="fu">putStrLn</span> <span class="st">&quot;Hello World&quot;</span></span></code></pre></div>
 <p>spine은 생선뼈, 등뼈처럼 구조가 다 있다는 뜻의 재밌는 이름 같습니다. 구조는 있으므로we have full spine, OK</p>
-<div class="sourceCode" id="cb35"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> Data.Vector.fromList (<span class="fu">undefined</span><span class="op">:</span><span class="fu">undefined</span>) <span class="ot">`seq`</span> <span class="fu">putStrLn</span> <span class="st">&quot;Hello World&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb37"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> Data.Vector.fromList (<span class="fu">undefined</span><span class="op">:</span><span class="fu">undefined</span>) <span class="ot">`seq`</span> <span class="fu">putStrLn</span> <span class="st">&quot;Hello World&quot;</span></span></code></pre></div>
 <p>몇 개의 원소가 있는지 알 수 없으므로, 즉 뼈대를 알 수 없으므로 예외 발생</p>
-<div class="sourceCode" id="cb36"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> Data.Vector.fromList <span class="fu">undefined</span> <span class="ot">`seq`</span> <span class="fu">putStrLn</span> <span class="st">&quot;Hello World&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb38"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> Data.Vector.fromList <span class="fu">undefined</span> <span class="ot">`seq`</span> <span class="fu">putStrLn</span> <span class="st">&quot;Hello World&quot;</span></span></code></pre></div>
 <p>뼈대 뿐만 아니라 전체 구조를 알 수 없으므로 당연히 예외 발생</p>
 <p>Data.Vector.Unboxed 모듈에 있는 vector는 <em>value strict 구조</em>입니다.</p>
-<div class="sourceCode" id="cb37"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="kw">qualified</span> <span class="dt">Data.Vector.Unboxed</span> <span class="kw">as</span> <span class="dt">V</span></span>
-<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a><span class="ot">fromList ::</span> [<span class="dt">Int</span>] <span class="ot">-&gt;</span> <span class="dt">V.Vector</span> <span class="dt">Int</span></span>
-<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>fromList <span class="ot">=</span> V.fromList</span>
-<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span><span class="op">.</span> main <span class="ot">=</span> fromList [<span class="fu">undefined</span>] <span class="ot">`seq`</span> <span class="fu">putStrLn</span> <span class="st">&quot;Hello World&quot;</span></span>
-<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span><span class="op">.</span> main <span class="ot">=</span> fromList (<span class="fu">undefined</span><span class="op">:</span><span class="fu">undefined</span>) <span class="ot">`seq`</span> <span class="fu">putStrLn</span> <span class="st">&quot;Hello World&quot;</span></span>
-<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span><span class="op">.</span> main <span class="ot">=</span> fromList <span class="fu">undefined</span> <span class="ot">`seq`</span> <span class="fu">putStrLn</span> <span class="st">&quot;Hello World&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb39"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="kw">qualified</span> <span class="dt">Data.Vector.Unboxed</span> <span class="kw">as</span> <span class="dt">V</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a><span class="ot">fromList ::</span> [<span class="dt">Int</span>] <span class="ot">-&gt;</span> <span class="dt">V.Vector</span> <span class="dt">Int</span></span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>fromList <span class="ot">=</span> V.fromList</span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span><span class="op">.</span> main <span class="ot">=</span> fromList [<span class="fu">undefined</span>] <span class="ot">`seq`</span> <span class="fu">putStrLn</span> <span class="st">&quot;Hello World&quot;</span></span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span><span class="op">.</span> main <span class="ot">=</span> fromList (<span class="fu">undefined</span><span class="op">:</span><span class="fu">undefined</span>) <span class="ot">`seq`</span> <span class="fu">putStrLn</span> <span class="st">&quot;Hello World&quot;</span></span>
+<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span><span class="op">.</span> main <span class="ot">=</span> fromList <span class="fu">undefined</span> <span class="ot">`seq`</span> <span class="fu">putStrLn</span> <span class="st">&quot;Hello World&quot;</span></span></code></pre></div>
 <p>2번과 3번은 boxed vector와 같은 이유로 결과가 같은데, 첫 번째만 다릅니다. <em>spine strict</em>일 때는 구조만 있어도 OK였는데, <em>value strict</em>일 때는 구조 안에 들어 있는 것도 명확해야 OK입니다.</p>
 <h2 id="sets-maps">Sets, Maps</h2>
 <p>Map류의 모듈들은 Strict 버전과 Lazy 버전(eg. Data.HashMap.Strict, Data.HashMap.Lazy)들이 준비되어 있는 반면, Set류의 모듈들은 그렇지 않습니다. 컨테이너들은 모두 spine strict이므로, key 자리는 strict해야 합니다. set은 key만 가지고 있으니 value strict 구조입니다.<br />
@@ -446,78 +450,79 @@ Map류의 Lazy 버전은 spine-strict, value-lazy이고 Strict 버전은 둘 다
 const 함수는 const a b = a 로 정의되어 있는데, 첫 번째 인자에 strict하고, 두 번째 인자에 lazy합니다. 리스트의 (:) 값 생성자는 첫 인자와 두 번째 인자에 lazy합니다. 하지만 data List = Cons !a !(List a) | Nil 이렇게 정의하면 Cons는 첫 번째, 두 번째 인자에 strict 합니다.</p>
 <h2 id="folds">Folds</h2>
 <p>foldl의 strict 버전인 fold’도 NF까지 strict하진 않습니다. NF까지 도달하는 strict한 foldl’이 필요할 때 다음처럼 force를 통해 불러주면 됩니다.</p>
-<div class="sourceCode" id="cb38"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Data.List</span> (foldl')</span>
-<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Control.DeepSeq</span> (force)</span>
-<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a><span class="ot">average ::</span> [<span class="dt">Int</span>] <span class="ot">-&gt;</span> <span class="dt">Double</span></span>
-<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>average <span class="ot">=</span></span>
-<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>  divide <span class="op">.</span> foldl' add (<span class="dv">0</span>, <span class="dv">0</span>)</span>
-<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span></span>
-<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>    divide (total, count) <span class="ot">=</span> <span class="fu">fromIntegral</span> total <span class="op">/</span> count</span>
-<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>    add (total, count) x <span class="ot">=</span> force (total <span class="op">+</span> x, count <span class="op">+</span> <span class="dv">1</span>)</span>
-<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span>
-<span id="cb38-12"><a href="#cb38-12" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="fu">print</span> <span class="op">$</span> average [<span class="dv">1</span><span class="op">..</span><span class="dv">1000000</span>]</span></code></pre></div>
+<div class="sourceCode" id="cb40"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Data.List</span> (foldl')</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Control.DeepSeq</span> (force)</span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a><span class="ot">average ::</span> [<span class="dt">Int</span>] <span class="ot">-&gt;</span> <span class="dt">Double</span></span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>average <span class="ot">=</span></span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>  divide <span class="op">.</span> foldl' add (<span class="dv">0</span>, <span class="dv">0</span>)</span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span></span>
+<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a>    divide (total, count) <span class="ot">=</span> <span class="fu">fromIntegral</span> total <span class="op">/</span> count</span>
+<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a>    add (total, count) x <span class="ot">=</span> force (total <span class="op">+</span> x, count <span class="op">+</span> <span class="dv">1</span>)</span>
+<span id="cb40-10"><a href="#cb40-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-11"><a href="#cb40-11" aria-hidden="true" tabindex="-1"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span>
+<span id="cb40-12"><a href="#cb40-12" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="fu">print</span> <span class="op">$</span> average [<span class="dv">1</span><span class="op">..</span><span class="dv">1000000</span>]</span></code></pre></div>
 <h2 id="streaming-data">Streaming data</h2>
 <p>conduit같은 스트리밍 라이브러리들이 내세우는 것 중 하나가 고정된 크기의 메모리constant memory 사용입니다. 메모리 누수 걱정없이 쓸 수 있는 것처럼 보이지만 WHNF까지인지, NF까지인지 살펴봐야 합니다.</p>
 <p>뭘 조심해야 하는지 보이도록 average 함수를 conduit을 이용해서 안 좋은 방식으로 정의해 보겠습니다.</p>
-<div class="sourceCode" id="cb39"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Conduit</span></span>
-<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a><span class="ot">average ::</span> <span class="dt">Monad</span> m <span class="ot">=&gt;</span> <span class="dt">ConduitM</span> <span class="dt">Int</span> o m <span class="dt">Double</span></span>
-<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>average <span class="ot">=</span></span>
-<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>  divide <span class="op">&lt;$&gt;</span> foldlC add (<span class="dv">0</span>, <span class="dv">0</span>)</span>
-<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span></span>
-<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a>    divide (total, count) <span class="ot">=</span> <span class="fu">fromIntegral</span> total <span class="op">/</span> count</span>
-<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a>    add (total, count) x <span class="ot">=</span> (total <span class="op">+</span> x, count <span class="op">+</span> <span class="dv">1</span>)</span>
-<span id="cb39-9"><a href="#cb39-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-10"><a href="#cb39-10" aria-hidden="true" tabindex="-1"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span>
-<span id="cb39-11"><a href="#cb39-11" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="fu">print</span> <span class="op">$</span> runConduitPure <span class="op">$</span> enumFromToC <span class="dv">1</span> <span class="dv">1000000</span> <span class="op">.|</span> average</span></code></pre></div>
+<div class="sourceCode" id="cb41"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Conduit</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a><span class="ot">average ::</span> <span class="dt">Monad</span> m <span class="ot">=&gt;</span> <span class="dt">ConduitM</span> <span class="dt">Int</span> o m <span class="dt">Double</span></span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>average <span class="ot">=</span></span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>  divide <span class="op">&lt;$&gt;</span> foldlC add (<span class="dv">0</span>, <span class="dv">0</span>)</span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span></span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a>    divide (total, count) <span class="ot">=</span> <span class="fu">fromIntegral</span> total <span class="op">/</span> count</span>
+<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a>    add (total, count) x <span class="ot">=</span> (total <span class="op">+</span> x, count <span class="op">+</span> <span class="dv">1</span>)</span>
+<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-10"><a href="#cb41-10" aria-hidden="true" tabindex="-1"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span>
+<span id="cb41-11"><a href="#cb41-11" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="fu">print</span> <span class="op">$</span> runConduitPure <span class="op">$</span> enumFromToC <span class="dv">1</span> <span class="dv">1000000</span> <span class="op">.|</span> average</span></code></pre></div>
 <p>메모리 사용량을 보려면</p>
-<div class="sourceCode" id="cb40"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="op">$</span> stack <span class="co">--resolver lts-9.3 ghc --package conduit-combinators -- Main.hs -O2</span></span>
-<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a><span class="op">$</span> <span class="op">./</span><span class="dt">Main</span> <span class="op">+</span><span class="dt">RTS</span> <span class="op">-</span>s</span></code></pre></div>
+<div class="sourceCode" id="cb42"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="op">$</span> stack <span class="co">--resolver lts-9.3 ghc --package conduit-combinators -- Main.hs -O2</span></span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a><span class="op">$</span> <span class="op">./</span><span class="dt">Main</span> <span class="op">+</span><span class="dt">RTS</span> <span class="op">-</span>s</span></code></pre></div>
 <p>아직 conduit이 익숙하지 않아, 원 글에 아직은 추가할 게 없습니다.</p>
 <h2 id="chain-reaction">Chain reaction</h2>
 <p>아래는 아주 빡빡하게 strict로 만들어 놓은 작업입니다. 메모리를 얼마나 쓰는지 확인해 보세요.</p>
-<div class="sourceCode" id="cb41"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#!/usr/bin/env stack</span></span>
-<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- stack --resolver lts-9.3 script</span></span>
-<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a><span class="ot">{-# LANGUAGE BangPatterns #-}</span></span>
-<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">StrictList</span> a <span class="ot">=</span> <span class="dt">Cons</span> <span class="op">!</span>a <span class="op">!</span>(<span class="dt">StrictList</span> a) <span class="op">|</span> <span class="dt">Nil</span></span>
-<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a><span class="ot">strictMap ::</span> (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> <span class="dt">StrictList</span> a <span class="ot">-&gt;</span> <span class="dt">StrictList</span> b</span>
-<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a>strictMap _ <span class="dt">Nil</span> <span class="ot">=</span> <span class="dt">Nil</span></span>
-<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a>strictMap f (<span class="dt">Cons</span> a list) <span class="ot">=</span></span>
-<span id="cb41-10"><a href="#cb41-10" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> <span class="op">!</span>b <span class="ot">=</span> f a <span class="co">------------------------------------ bang!</span></span>
-<span id="cb41-11"><a href="#cb41-11" aria-hidden="true" tabindex="-1"></a>      <span class="op">!</span>list' <span class="ot">=</span> strictMap f list <span class="co">------------------- bang!</span></span>
-<span id="cb41-12"><a href="#cb41-12" aria-hidden="true" tabindex="-1"></a>   <span class="kw">in</span> b <span class="ot">`seq`</span> list' <span class="ot">`seq`</span> <span class="dt">Cons</span> b list' <span class="co">------------ seq</span></span>
-<span id="cb41-13"><a href="#cb41-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb41-14"><a href="#cb41-14" aria-hidden="true" tabindex="-1"></a><span class="ot">strictEnum ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">StrictList</span> <span class="dt">Int</span></span>
-<span id="cb41-15"><a href="#cb41-15" aria-hidden="true" tabindex="-1"></a>strictEnum low high <span class="ot">=</span></span>
-<span id="cb41-16"><a href="#cb41-16" aria-hidden="true" tabindex="-1"></a>  go low</span>
-<span id="cb41-17"><a href="#cb41-17" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span></span>
-<span id="cb41-18"><a href="#cb41-18" aria-hidden="true" tabindex="-1"></a>    go <span class="op">!</span>x</span>
-<span id="cb41-19"><a href="#cb41-19" aria-hidden="true" tabindex="-1"></a>      <span class="op">|</span> x <span class="op">==</span> high <span class="ot">=</span> <span class="dt">Cons</span> x <span class="dt">Nil</span></span>
-<span id="cb41-20"><a href="#cb41-20" aria-hidden="true" tabindex="-1"></a>      <span class="op">|</span> <span class="fu">otherwise</span> <span class="ot">=</span> <span class="dt">Cons</span> x (go <span class="op">$!</span> x <span class="op">+</span> <span class="dv">1</span>) <span class="co">---------- $!</span></span>
-<span id="cb41-21"><a href="#cb41-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb41-22"><a href="#cb41-22" aria-hidden="true" tabindex="-1"></a><span class="ot">double ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
-<span id="cb41-23"><a href="#cb41-23" aria-hidden="true" tabindex="-1"></a>double <span class="op">!</span>x <span class="ot">=</span> x <span class="op">*</span> <span class="dv">2</span> <span class="co">--------------------------------- bang!</span></span>
-<span id="cb41-24"><a href="#cb41-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb41-25"><a href="#cb41-25" aria-hidden="true" tabindex="-1"></a><span class="ot">evens ::</span> <span class="dt">StrictList</span> <span class="dt">Int</span></span>
-<span id="cb41-26"><a href="#cb41-26" aria-hidden="true" tabindex="-1"></a>evens <span class="ot">=</span> strictMap double <span class="op">$!</span> strictEnum <span class="dv">1</span> <span class="dv">1000000</span> <span class="co">-- $!</span></span>
-<span id="cb41-27"><a href="#cb41-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb41-28"><a href="#cb41-28" aria-hidden="true" tabindex="-1"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span>
-<span id="cb41-29"><a href="#cb41-29" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="kw">do</span></span>
-<span id="cb41-30"><a href="#cb41-30" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> string <span class="ot">=</span> <span class="st">&quot;Hello World&quot;</span></span>
-<span id="cb41-31"><a href="#cb41-31" aria-hidden="true" tabindex="-1"></a>      string' <span class="ot">=</span> evens <span class="ot">`seq`</span> string <span class="co">---------------- seq</span></span>
-<span id="cb41-32"><a href="#cb41-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">putStrLn</span> string</span></code></pre></div>
+<div class="sourceCode" id="cb43"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#!/usr/bin/env stack</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- stack --resolver lts-9.3 script</span></span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a><span class="ot">{-# LANGUAGE BangPatterns #-}</span></span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">StrictList</span> a <span class="ot">=</span> <span class="dt">Cons</span> <span class="op">!</span>a <span class="op">!</span>(<span class="dt">StrictList</span> a) <span class="op">|</span> <span class="dt">Nil</span></span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a><span class="ot">strictMap ::</span> (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> <span class="dt">StrictList</span> a <span class="ot">-&gt;</span> <span class="dt">StrictList</span> b</span>
+<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a>strictMap _ <span class="dt">Nil</span> <span class="ot">=</span> <span class="dt">Nil</span></span>
+<span id="cb43-9"><a href="#cb43-9" aria-hidden="true" tabindex="-1"></a>strictMap f (<span class="dt">Cons</span> a list) <span class="ot">=</span></span>
+<span id="cb43-10"><a href="#cb43-10" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> <span class="op">!</span>b <span class="ot">=</span> f a <span class="co">------------------------------------ bang!</span></span>
+<span id="cb43-11"><a href="#cb43-11" aria-hidden="true" tabindex="-1"></a>      <span class="op">!</span>list' <span class="ot">=</span> strictMap f list <span class="co">------------------- bang!</span></span>
+<span id="cb43-12"><a href="#cb43-12" aria-hidden="true" tabindex="-1"></a>   <span class="kw">in</span> b <span class="ot">`seq`</span> list' <span class="ot">`seq`</span> <span class="dt">Cons</span> b list' <span class="co">------------ seq</span></span>
+<span id="cb43-13"><a href="#cb43-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-14"><a href="#cb43-14" aria-hidden="true" tabindex="-1"></a><span class="ot">strictEnum ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">StrictList</span> <span class="dt">Int</span></span>
+<span id="cb43-15"><a href="#cb43-15" aria-hidden="true" tabindex="-1"></a>strictEnum low high <span class="ot">=</span></span>
+<span id="cb43-16"><a href="#cb43-16" aria-hidden="true" tabindex="-1"></a>  go low</span>
+<span id="cb43-17"><a href="#cb43-17" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span></span>
+<span id="cb43-18"><a href="#cb43-18" aria-hidden="true" tabindex="-1"></a>    go <span class="op">!</span>x</span>
+<span id="cb43-19"><a href="#cb43-19" aria-hidden="true" tabindex="-1"></a>      <span class="op">|</span> x <span class="op">==</span> high <span class="ot">=</span> <span class="dt">Cons</span> x <span class="dt">Nil</span></span>
+<span id="cb43-20"><a href="#cb43-20" aria-hidden="true" tabindex="-1"></a>      <span class="op">|</span> <span class="fu">otherwise</span> <span class="ot">=</span> <span class="dt">Cons</span> x (go <span class="op">$!</span> x <span class="op">+</span> <span class="dv">1</span>) <span class="co">---------- $!</span></span>
+<span id="cb43-21"><a href="#cb43-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-22"><a href="#cb43-22" aria-hidden="true" tabindex="-1"></a><span class="ot">double ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb43-23"><a href="#cb43-23" aria-hidden="true" tabindex="-1"></a>double <span class="op">!</span>x <span class="ot">=</span> x <span class="op">*</span> <span class="dv">2</span> <span class="co">--------------------------------- bang!</span></span>
+<span id="cb43-24"><a href="#cb43-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-25"><a href="#cb43-25" aria-hidden="true" tabindex="-1"></a><span class="ot">evens ::</span> <span class="dt">StrictList</span> <span class="dt">Int</span></span>
+<span id="cb43-26"><a href="#cb43-26" aria-hidden="true" tabindex="-1"></a>evens <span class="ot">=</span> strictMap double <span class="op">$!</span> strictEnum <span class="dv">1</span> <span class="dv">1000000</span> <span class="co">-- $!</span></span>
+<span id="cb43-27"><a href="#cb43-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-28"><a href="#cb43-28" aria-hidden="true" tabindex="-1"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span>
+<span id="cb43-29"><a href="#cb43-29" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb43-30"><a href="#cb43-30" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> string <span class="ot">=</span> <span class="st">&quot;Hello World&quot;</span></span>
+<span id="cb43-31"><a href="#cb43-31" aria-hidden="true" tabindex="-1"></a>      string' <span class="ot">=</span> evens <span class="ot">`seq`</span> string <span class="co">---------------- seq</span></span>
+<span id="cb43-32"><a href="#cb43-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">putStrLn</span> string</span></code></pre></div>
 <p><code>seq</code>나 <code>deepseq</code>를 이용해서 엮어 놓은 체인은 IO액션을 만나기 전에는 여전히 thunk 상태로 있습니다. 너무 오래 IO를 만나지 않고 루프를 돌게 만들면 의도와 달리 많은 메모리를 소모할 수 있습니다.</p>
 <section class="footnotes" role="doc-endnotes">
 <hr />
 <ol>
-<li id="fn1" role="doc-endnote"><p>evaluation을 평가말고 다른 어떤 말이 어울릴까요? 보통 가치를 매길 때 평가란 말을 씁니다. 지금 문장이 가치가 있는지를 살펴보는 게 아니라, reduce하거나 실행하거나 하는 동작을 evaluation이라고 합니다. 평가로 번역하면 딱 맞는 느낌은 아닌데, 어쨌든 자리 잡은 용어긴 합니다. 하스켈 문서들에선 reduce와 evaluate가 거의 동의어로 쓰입니다. 람다 대수학에서 reduce하는 걸, 프로그래밍에선 evaluate라고 합니다.</p>
-<p>사전에서 프로그래밍과 관련되지 않은 예문들을 보면 reduce나 execution의 의미는 보이지 않긴 합니다.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn2" role="doc-endnote"><p>primitive operation은 라이브러리등에 있는게 아니라, GHC가 만들어내는 런타임 베이스에 들어있는 작업입니다. 라이브러리 소스들을 보면 <code>#</code>이 붙은 코드들이 보이는데, 이들이 primitive operation입니다. 하스켈 코드로 구현되어 있지 않다고 하는데, 아마도 C로 구현되어 있지 않을까요?<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn3" role="doc-endnote"><p>아직 표준으로 정해지진 않았지만 GHC와 함께 배포되는 라이브러리<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn1" role="doc-endnote"><p>strict 번역을 뭐라 하는게 좋을까요? lazy를 지연으로, strict를 즉시로 하면 말이 안되게 붙을 때가 있습니다. 뒤에 평가란 낱말을 추가하면 조금 더 부드러워지긴 합니다. strict 함수는 (인자를) 즉시 평가 함수, lazy 함수는 (인자를) 지연 평가 함수. 그럼 strictness는 뭘로 번역할까요? 즉시 평가 정도? 사실, 시간과 관련된 말이 아니라, thunk가 될 수 있느냐 없느냐에 따른 구분입니다. 단어 뜻 그대로 엄격이라고 번역된 자료가 자주 보이긴 하는데 딱 맞아 보이는 번역은 아닙니다. spine-strict는 즉시 구조(골격, 뼈대) 평가 함수쯤 될까요?<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2" role="doc-endnote"><p>evaluation을 평가말고 다른 어떤 말이 어울릴까요? 보통 가치를 매길 때 평가란 말을 씁니다. 지금 문장이 가치가 있는지를 살펴보는 게 아니라, reduce하거나 실행하거나 하는 동작을 evaluation이라고 합니다. 평가로 번역하면 딱 맞는 느낌은 아닌데, 어쨌든 자리 잡은 용어긴 합니다. 하스켈 문서들에선 reduce와 evaluate가 거의 동의어로 쓰입니다. 람다 대수학에서 reduce하는 걸, 프로그래밍에선 evaluate라고 합니다.</p>
+<p>사전에서 프로그래밍과 관련되지 않은 예문들을 보면 reduce나 execution의 의미는 보이지 않긴 합니다.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn3" role="doc-endnote"><p>primitive operation은 라이브러리등에 있는게 아니라, GHC가 만들어내는 런타임 베이스에 들어있는 작업입니다. 라이브러리 소스들을 보면 <code>#</code>이 붙은 코드들이 보이는데, 이들이 primitive operation입니다. 하스켈 코드로 구현되어 있지 않다고 하는데, 아마도 C로 구현되어 있지 않을까요?<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn4" role="doc-endnote"><p>아직 표준으로 정해지진 않았지만 GHC와 함께 배포되는 라이브러리<a href="#fnref4" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section>
 
