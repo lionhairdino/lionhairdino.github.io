@@ -140,10 +140,12 @@
 <span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co">-- ok</span></span>
 <span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>func <span class="ot">=</span> <span class="dv">100</span></span>
 <span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>  <span class="op">-</span> <span class="dv">10</span></span></code></pre></div>
-<div class="line-block">Q. func를 표현식의 시작으로 보면 (1)번 규칙 끝나지 않은 수식으로 봐야하지 않을까요?<br />
-   100을 시작으로 본다면 (4)번 규칙을 적용해야 합니다.<br />
+<blockquote>
+<p>Q. func를 표현식의 시작으로 보면 (1)번 규칙 끝나지 않은 수식으로 봐야하지 않을까요?<br />
+100을 시작으로 본다면 (4)번 규칙을 적용해야 합니다.<br />
 A. 실제 스펙을 보고나면 do 구문은 레이아웃을 새로 시작하는 do의 특별한 동작 때문이고,<br />
-   100 - 는 끝나지 않은 수식입니다.</div>
+100 - 는 끝나지 않은 수식입니다.</p>
+</blockquote>
 <p>그럼 다음 <code>where</code>절의 들여 쓰기는 어떨까요?</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- error</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="kw">do</span></span>
@@ -209,11 +211,9 @@ A. 실제 스펙을 보고나면 do 구문은 레이아웃을 새로 시작하�
 <p>하스켈은 레이아웃으로 의미를 두는 방식과 C언어처럼 <code>{</code>,<code>;</code>,<code>}</code>를 써서 문장의 끝이나 블록을 표시하는 방법(이 때는 모든 토큰을 나누는 공백이 아닌 그외 공백들은 무시됩니다.) 두 가지 모두 쓸 수 있습니다. 스펙 설명을 보니, 내부에서는 레이아웃 방식에 <code>{</code>,<code>;</code>,<code>}</code>를 달아 의미 표시를 하는 방식으로 처리를 하고 있습니다. 어떤 규칙에 따라 어떤 걸 붙이는지 살펴보면 레이아웃의 의미를 알 수 있습니다.</p>
 <p>가장 눈여겨 볼 표시가 <code>{</code>가 어떨 때 붙는지 보면 들여 쓰기를 이해할 수 있습니다.</p>
 <p>정해진 토큰 규칙에 따라 어휘를 분석해서 어휘 스트림을 만드는데, 여기에 들여 쓰기 컨텍스트가 바뀔때마다 <code>{n}</code>을 넣고, 현재 토큰의 들여 쓰기값을 뜻하는 <code>&lt;n&gt;</code>토큰을 집어 넣습니다.</p>
-<blockquote>
 <p><code>let a = 1[....공백....]b = 1[줄바꿈....공백....]in a + b</code> 소스를<br />
 <code>let , {4} , a , = , 1 , &lt;4&gt; , b , = , 1 , &lt;0&gt; , in , {3} , a , + , b</code> 토큰열로 만들고<br />
 <code>let , { , a , = , 1 , ; , b , = , 1 , } , in , { , a , + , b , }</code> 으로 바꾼다.</p>
-</blockquote>
 <p>실제 구현은 <code>L</code>이라는 함수를 이용해 레이아웃이 의미가 있는 코드 형태를 <code>{</code>,<code>}</code>,<code>;</code>를 쓰는 코드로 바꿉니다. 일단 <code>L</code>함수가 받는 두 개의 인자를 보면</p>
 <h3 id="l-함수의-첫-번째-인자---토큰-스트림">L 함수의 첫 번째 인자 - 토큰 스트림</h3>
 <p>첫 번째 인자는 아래 처럼 레이아웃을 <code>{n}</code>,<code>&lt;n&gt;</code>으로 바꾼 토큰 스트림이 들어옵니다.</p>
