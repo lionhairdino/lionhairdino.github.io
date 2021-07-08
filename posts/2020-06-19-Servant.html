@@ -61,8 +61,9 @@
     
 </div>
 
-<h2 id="먼저-알아-둘-것-2021.6.27-추가">먼저 알아 둘 것 (2021.6.27 추가)</h2>
+<h2 id="생각-스트레칭">생각 스트레칭</h2>
 <h3 id="proxy">Proxy</h3>
+<p>Proxy가 타입 정보를 저장하는 테크닉을 보고나서 servant를 보면 도움이 됩니다.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Proxy</span> a <span class="ot">=</span> <span class="dt">Proxy</span></span></code></pre></div>
 <p>코드 조립을 위해, 타입 체커에게 힌트를 주기 위한 장치입니다.</p>
 <p>값에는 의미 있는 정보를 넣어둘 곳이 없습니다. 값은 오직 한 가지 Proxy만 있습니다. 하지만, <code>=</code>의 왼편 타입 생성자에는 <code>a</code>라는 타입 변수가 있습니다. 코드에서 <code>Proxy</code>란 값이 쓰이면, 이 값의 타입은 <code>Proxy Int</code>, <code>Proxy Double</code>, <code>Proxy (Maybe Int)</code> … 이 될 수 있다는 말입니다. 이런 타입 정보는 오직 타입 체커에서만 쓰이고, 런타임에는 사라지는 정보들입니다. 예로 컴파일 타임에 타입 체커가 클래스의 인스턴스를 고르는데 이 정보를 쓸 수 있습니다.</p>
@@ -89,10 +90,9 @@
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> yaho (<span class="dt">Proxy</span><span class="ot"> ::</span> <span class="dt">Proxy</span> <span class="dt">Villain</span>)</span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="dt">Yaho</span><span class="op">.</span> <span class="dt">I</span> am <span class="dt">Villain</span></span></code></pre></div>
 <blockquote>
-<p>Q. 런타임에 타입은 모두 사라지는 것 아닌가?<br />
-A. 위 소스는 main 함수가 없습니다. 최종 standalone으로 돌아가는 바이너리가 아닙니다. GHCi에서 테스트할 때는 아직 런타임 환경이 아닙니다. main이 있는 코드에서 yaho (Proxy :: Proxy Player)를 만났다면, 컴파일 타임에 타입 미스 매치가 되진 않는지 살펴 본 후, 최종 바이너리에서는 타입 정보는 빼버립니다. 여기서 Proxy의 역할은 yaho의 인스턴스를 고르는 것이니, 런타임에는 HasName의 인스턴스가 어느 하나로 고정되고 타입 정보는 사라집니다.</p>
+<p>Q. GHCi 예를 보면 <code>:: Proxy Player</code>로 타입을 지정해서 <code>yaho</code>에 넘기고 있습니다. 런타임에 타입은 모두 사라지는 것 아닌가요? A. 위 소스는 main 함수가 없습니다. 최종 standalone으로 돌아가는 바이너리가 아닙니다. GHCi에서 테스트할 때는 아직 완벽한 런타임 환경이 아닙니다. main이 있는 코드에서 yaho (Proxy :: Proxy Player)를 만났다면, 컴파일 타임에 타입 미스 매치가 되진 않는지 살펴 본 후, 최종 바이너리에서는 타입 정보는 빼버립니다. 여기서 Proxy의 역할은 yaho의 인스턴스를 고르는 것이니, 런타임에는 HasName의 인스턴스가 어느 하나로 고정되고 타입 정보는 사라집니다.</p>
 </blockquote>
-<p>마일 타입 체커가 코드 조립 중 yaho 함수에 (Proxy :: Proxy VillainLike)가 넘어간다면 컴파일 타임에 잡아 낼 수 있습니다.</p>
+<p>만일 타입 체커가 코드 조립 중 yaho 함수에 (Proxy :: Proxy VillainLike)가 넘어간다면 컴파일 타임에 잡아 낼 수 있습니다.</p>
 <h2 id="servant">Servant</h2>
 <p>모나드 스택들에서 허우적대다, 쉴 겸 눈에 바로 결과물이 보이는 웹 관련 라이브러리들을 봐 둘까 하고 봤다가 Type Level Programming 을 공부하도록 이끈 라이브러리입니다. Yui, JQuery 쯤에서 웹 관련 작업이 끊겨서, React도 모르는 상황에서 보니, 예시 코드를 봐도 뭘 위한 것인지 알게 되는데 좀 시간이 걸렸습니다.</p>
 <p>Servant가 하는 일은, http 리소스 요청과 하스켈 함수를 매칭 시켜주는 역할입니다. 매칭된 함수가 결과를 뱉으면, 이 결과를 요청자에게 보내는 일은 Servant backend로 쓰이고 있는 WAI 라이브러리가 담당합니다. URL과 헤더를 파싱할 때, 타입 레벨 프로그래밍 패턴을 이용해서 안전성을 높인 라이브러입니다.</p>

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko" lang="ko">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <title>lionhairdino - Attoparsec 사용법</title>
+
+        <meta name="description" content="lionhairdino - Attoparsec 사용법" />
+        <meta property="og:description" content="하스켈 함수형 프로그래밍" />
+
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <link rel="icon" href="https://lionhairdino.github.io/favicon.svg" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino16px.png" sizes="16x16" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino24px.png" sizes="24x24" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino32px.png" sizes="32x32" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino48px.png" sizes="48x48" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino57px.png" sizes="57x57" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino60px.png" sizes="60x60" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino64px.png" sizes="64x64" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino72px.png" sizes="72x72" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino76px.png" sizes="76x76" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino114px.png" sizes="114x114" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino120px.png" sizes="120x120" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino144px.png" sizes="144x144" />
+        <link rel="shortcut icon" href="../favicon.ico" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino152px.png" sizes="152x152" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino180px.png" sizes="180x180" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino192px.png" sizes="192x192" />
+        <link rel="manifest" href="../site.webmanifest" />
+        <link rel="mask-icon" href="https://lionhairdino.github.io/Lionhairdino_black.svg" color="#ff7500" />
+        <meta name="msapplication-TileImage" content="/images/favicon/Lionhairdino144px.png" />
+        <meta name="msapplication-TileColor" content="#ff7500" />
+        <meta name="theme-color" content="#ffffff" />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="Attoparsec 사용법" />
+        <meta property="og:site_name" content="Lionhairdino" />
+        <meta property="og:url" content="https://lionhairdino.github.io/posts/2021-07-07-attoparsec.html" />
+
+        <meta property="og:image" content="https://lionhairdino.github.io/images/state400px.png" />
+
+      <meta name="keywords" content="parse, parsec">
+<script src="../script/copycode.js"></script>
+
+    </head>
+    <body>
+        <div id="header">
+            <div id="navigation">
+                <a href="../">lionhairdino</a> 
+                <a href="../about.html">about</a>
+                <!--<a href="/archive.html">archive</a>-->
+            </div>
+        </div>
+
+        <div id="content">
+            <h1>Attoparsec 사용법</h1>
+
+            <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+<div class="info">
+    Posted on July  7, 2021
+    
+</div>
+
+<p>parsec 포스트처럼 아이디어를 찾아 본 게 아니라, 그저 사용법만 알아 봤습니다.</p>
+<h2 id="parser-타입-정의---parsec과-차이">Parser 타입 정의 - Parsec과 차이</h2>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">Parser</span> a <span class="ot">=</span> <span class="dt">Parser</span> {<span class="ot"> runParser ::</span> <span class="kw">forall</span> r<span class="op">.</span> <span class="dt">S</span> <span class="ot">-&gt;</span> <span class="dt">Failure</span> r <span class="ot">-&gt;</span> <span class="dt">Success</span> a r <span class="ot">-&gt;</span> <span class="dt">Result</span> r }</span></code></pre></div>
+<p>문자열과 실패를 처리할 함수, 성공을 처리할 함수를 받아 결과를 돌려주는 타입입니다.</p>
+<p>parsec 라이브러리에서는 다음과 같습니다.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">Parser</span> a <span class="ot">=</span> <span class="dt">Parser</span> {<span class="ot"> parse ::</span> <span class="dt">String</span> <span class="ot">-&gt;</span> [(a,<span class="dt">String</span>)] }</span></code></pre></div>
+<p>parsec 에서는 결과값을 리스트로 표시해서 실패를 []로 표현했는데, 여기서는 명시적으로 실패, 부분 매칭, 성공 3가지를 결과 타입으로 명시적으로 정의했습니다. <code>Partial</code>이 눈에 띕니다.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Result</span> r <span class="ot">=</span> <span class="dt">Fail</span> <span class="dt">S</span> [<span class="dt">String</span>] <span class="dt">String</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>              <span class="op">|</span> <span class="dt">Partial</span> (<span class="dt">B.ByteString</span> <span class="ot">-&gt;</span> <span class="dt">Result</span> r)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>              <span class="op">|</span> <span class="dt">Done</span> <span class="dt">S</span> r</span></code></pre></div>
+<blockquote>
+<p>Q. <code>Fail</code>, <code>Done</code>은 그럭 저럭 넘어 가겠는데, <code>Partial</code>의 함수<code>(B.ByteString -&gt; Result r)</code>가 목에 걸립니다. 결과로 파서 함수를 돌려주는 이유가 뭘까요?<br />
+A. 프로그래머가 지정하는 함수가 아니라, parse 함수가 결과로 <em>만들어내는</em>, 내부에 일부 파싱 작업이 진행된 결과를 갖고 있는 함수입니다. 이 함수를 추가 문자열에 적용하는 것만으로 기존 파싱 작업했던 것과 합쳐져서 최종 결과를 만들어 냅니다.</p>
+</blockquote>
+<h2 id="사용법">사용법</h2>
+<h3 id="parse-parseonly">parse, parseOnly</h3>
+<p><code>parse</code>에 파서와 문자열을 넣어주면 기본 <em>끝난 문자열로 인식하지 않습니다.</em> 문자열이 더 들어오길 기다리다가 ""이 들어오면 파싱을 끝마칩니다. <code>feed</code>로 추가 문자열을 넣어줍니다. 추가 문자열 없이 끝내려면 <code>parseOnly</code>를 씁니다. 이런 특성 때문에, Lazy하게 스트림을 처리할 때 parsec보다 유리합니다.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> r <span class="ot">=</span> parse (double) <span class="st">&quot;1&quot;</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="fu">print</span> r</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="dt">Partial</span> _</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> feed r <span class="st">&quot;&quot;</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="dt">Done</span> <span class="st">&quot;&quot;</span> <span class="fl">1.0</span></span></code></pre></div>
+<p>물론 매칭 실패 되면 추가 문자열을 기다리지 않습니다.</p>
+<h3 id="네트워크에서-패킷을-받아-double로-파싱하는-상황을-가정해-봅시다.">네트워크에서 패킷을 받아 double로 파싱하는 상황을 가정해 봅시다.</h3>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>recvByte <span class="ot">=</span> <span class="op">...</span>소켓에서 읽은 <span class="dt">ByteString</span> 리턴</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>dParser <span class="ot">=</span> parse double </span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>dParser recvByte</span></code></pre></div>
+<p>만일 <code>recvByte</code>가 <code>"1"</code>만 리턴하고, 다음은 아직 읽기 전이라면,</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>dParser <span class="st">&quot;1&quot;</span></span></code></pre></div>
+<p>에서 <code>Done "" 1.0</code> 으로 끝나면 안됩니다. 다음에 들어오는게 구분자(공백 같은 것들..)일지 이어지는 숫자일지 알 수 없으니 일단 <code>Partial</code> 상태로 두어야 합니다.</p>
+<p><code>feed</code>함수는 <code>Partial p</code>를 받아 <code>p</code>를 추가 문자열에 적용하는 함수입니다.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ot">feed ::</span> <span class="dt">Monoid</span> i <span class="ot">=&gt;</span> <span class="dt">IResult</span> i r <span class="ot">-&gt;</span> i <span class="ot">-&gt;</span> <span class="dt">IResult</span> i r</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>feed <span class="dt">Fail</span> <span class="op">...</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>feed (<span class="dt">Partial</span> p) moreByte <span class="ot">=</span> p moreByte</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>feed <span class="dt">Done</span> <span class="op">...</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>feed (dParser <span class="st">&quot;1&quot;</span>의 결과값 <span class="dt">Partial</span> p) <span class="st">&quot;2&quot;</span></span></code></pre></div>
+<p>이렇게 추가 적용했는데, 아직도 패킷이 끝났다는 표시가 없으면 어떻게 할까요? 또 <code>feed</code>를 불러야 합니다. 현재 <code>"12"</code>까지 매칭한 상태입니다. 파서를 한 두번 적용해서 끝나는 게 아니니 루프를 돌려야 합니다.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ot">recvLoop1 ::</span> <span class="dt">MonadIO</span> m <span class="ot">=&gt;</span> (<span class="dt">ByteString</span> <span class="ot">-&gt;</span> <span class="dt">Result</span> a) <span class="ot">-&gt;</span> <span class="dt">TCP.Socket</span> <span class="ot">-&gt;</span> m (<span class="dt">Maybe</span> (a, <span class="dt">ByteString</span>))</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>recvLoop1 p sock <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  resByte <span class="ot">&lt;-</span> Network.Simple.TCP.recv sock <span class="dv">1</span> <span class="co">--  소켓에서 1바이트 읽기. </span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>          <span class="co">-- Network.Simple.TCP.recv는 결과값이 (Maybe ByteString) 입니다. </span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="kw">case</span> p <span class="op">&lt;$&gt;</span> resByte <span class="kw">of</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Nothing</span>            <span class="ot">-&gt;</span> <span class="fu">return</span> <span class="dt">Nothing</span> <span class="co">-- 읽어 온 값이 없을 때</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Just</span> (<span class="dt">Fail</span> {})     <span class="ot">-&gt;</span> <span class="fu">return</span> <span class="dt">Nothing</span> <span class="co">-- 매칭 실패. (resByte를 리턴해서 다른 파서를 시도할 수도 있지만, </span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>                                         <span class="co">-- 여기선 단순하게 Nothing을 리턴합니다.)</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Just</span> (<span class="dt">Partial</span> p')  <span class="ot">-&gt;</span> recvLoop1 p sock <span class="co">-- p와 일부 매칭이 되고, </span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>                                           <span class="co">-- 다음을 더 읽어봐야 아는 상태. feed와 비슷한 구현.</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Just</span> (<span class="dt">Done</span> left a) <span class="ot">-&gt;</span> <span class="fu">return</span> (<span class="dt">Just</span> (a, left)) <span class="co">-- 완전히 p와 매칭 성공하고 남은 문자열이 있는 상황</span></span></code></pre></div>
+<h3 id="패킷을-남김없이-모두-파싱">패킷을 남김없이 모두 파싱</h3>
+<p>끊임없는 스트림을 파싱할 때는 <code>Done</code>이나 <code>Fail</code>로 끝나게 하면 안될 때도 있습니다. 한 번에 한가지 메시지만 들어 오는 게 아니라, <em>여러 메시지가 함께 들어 올 경우</em>도 있습니다. 아래 <code>recvLoop2</code>는 들어온 패킷은 모두 파싱 시도해서 결과를 리스트에 담습니다. <code>recvLoop1</code>과 <code>recvLoop2</code>의 차이는, <code>recvLoop1</code>은 한 번만 매칭 시도해서 성공하면 남은 패킷이 있더라도 리턴하고, <code>recvLoop2</code>는 들어온 모든 패킷에 반복해서 매칭을 시도합니다.</p>
+<p><a href="https://github.com/cronokirby/haze/blob/master/src/Haze/Peer.hs" class="uri">https://github.com/cronokirby/haze/blob/master/src/Haze/Peer.hs</a> 에서 발췌</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="ot">parse ::</span> (<span class="dt">ByteString</span> <span class="ot">-&gt;</span> <span class="dt">Result</span> <span class="dt">String</span>) <span class="ot">-&gt;</span> <span class="dt">ByteString</span> <span class="ot">-&gt;</span> <span class="dt">Maybe</span> ([<span class="dt">Message</span>], <span class="dt">CallBack</span>)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>parse callback bytes <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    (msgs, callback') <span class="ot">&lt;-</span> applyPartial callback bytes []</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span> (<span class="fu">reverse</span> msgs, callback')</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    applyPartial callback bs acc <span class="ot">=</span> </span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>      <span class="kw">case</span> callback bs <span class="kw">of</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>        <span class="dt">Fail</span>{}      <span class="ot">-&gt;</span> <span class="dt">Nothing</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>        <span class="dt">Partial</span> f   <span class="ot">-&gt;</span> <span class="dt">Just</span> (acc, f) <span class="co">-- Partial일 때만 값을 가지고 루프를 빠져 나간다. </span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>        <span class="dt">Done</span> left m <span class="ot">-&gt;</span> applyPartial firstCallBack left (m <span class="op">:</span> acc) </span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>                       <span class="co">-- Done일때는 acc에 결과를 누적하고 다시 첫 파서부터 매칭 시도</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a><span class="ot">recvLoop2 ::</span> (<span class="dt">ByteString</span> <span class="ot">-&gt;</span> <span class="dt">Result</span> <span class="dt">String</span>) <span class="ot">-&gt;</span> <span class="dt">IO</span> ()</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>recvLoop2 callback <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>    bytes  <span class="ot">&lt;-</span> <span class="op">...</span> <span class="co">-- 소켓에서 데이터 읽기 </span></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>    <span class="kw">case</span> parse callback bytes <span class="kw">of</span></span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>        <span class="dt">Nothing</span>          <span class="ot">-&gt;</span> recvLoop2 firstCallBack <span class="co">-- 아무것도 매칭 못하면 다시 처음부터</span></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>        <span class="dt">Just</span> (msgs, callback') <span class="ot">-&gt;</span> <span class="kw">do</span> <span class="co">-- Partial 상태일 때만 여기에 도착한다.</span></span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>            메시지 처리</span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>            recvLoop2 callback' </span></code></pre></div>
+
+<div class="comment">
+<script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
+</script>
+</div>
+        </div>
+        <div id="footer">
+            © 2021 lionhairdino. All rights reserved. Generated by <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+    </body>
+</html>
