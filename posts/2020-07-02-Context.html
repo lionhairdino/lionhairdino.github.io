@@ -93,7 +93,7 @@
 <div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- Traversal Maybe 인스턴스의 traverse 정의</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">traverse</span> f (<span class="dt">Just</span> a) <span class="ot">=</span> <span class="dt">Just</span> <span class="op">&lt;$&gt;</span> f a <span class="co">-- 또는 pure (Just) &lt;*&gt; f a</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>                                   <span class="co">-- a가 Just인지 살펴봤는데, 뒤에 또 한번 f a가 Just인지 &lt;$&gt;로 살펴 봅니다.</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>                                   <span class="co">-- &lt;$&gt;는 fmap의 중위 연산자입니다.</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>                                   <span class="co">-- &lt;$&gt;는 fmap의 중위infix 표현입니다.</span></span>
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="fu">traverse</span> f <span class="dt">Nothing</span> <span class="ot">=</span> <span class="fu">pure</span> <span class="dt">Nothing</span></span>
 <span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="fu">map</span> f (<span class="dt">Just</span> a) <span class="ot">=</span> <span class="dt">Just</span> (f a)</span>
@@ -124,7 +124,7 @@
 <p>리스트에 있는 모든 엘리먼트에 <code>f</code>를 적용하도록 되어 있는데, 엘리먼트 하나에 적용 후 <code>(:)</code>로 나머지와 붙일 때 <code>&lt;*&gt;</code>가 동작하고 있습니다. <code>f</code>의 결과 타입이 가진 컨텍스트가 발현됩니다.</p>
 <p><code>liftA2</code>를 이용한 <code>Travserable</code> 리스트 인스턴스는 좀 복잡해 보이는데, <code>liftA2</code>를 따라가면 <code>fmap</code>이 나옵니다. 리스트용 <code>traverse</code>도 <code>fmap</code>으로 갈래 길을 만들고 있는 겁니다.</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="kw">let</span> evenFilter <span class="ot">=</span> (\a <span class="ot">-&gt;</span> <span class="kw">if</span> <span class="fu">even</span> a <span class="kw">then</span> <span class="dt">Just</span> (a<span class="op">*</span>a) <span class="kw">else</span> <span class="dt">Nothing</span>)</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="fu">map</span> evenFilter [<span class="dv">2</span>,<span class="dv">4</span>,<span class="dv">6</span>] <span class="co">-- [Just 4,Just 6,Just 36]</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="fu">map</span> evenFilter [<span class="dv">2</span>,<span class="dv">4</span>,<span class="dv">6</span>] <span class="co">-- [Just 4,Just 16,Just 36]</span></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="fu">map</span> evenFilter [<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>] <span class="co">-- [Nothing,Just 4,Nothing]</span></span>
 <span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="fu">traverse</span> evenFilter [<span class="dv">2</span>,<span class="dv">4</span>,<span class="dv">6</span>] <span class="co">-- Just [4,16,36]</span></span>
 <span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="fu">traverse</span> evenFilter [<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>] <span class="co">-- Nothing</span></span></code></pre></div>
@@ -138,6 +138,35 @@
 단순 인자를 넘길 땐 <code>(공백)</code>을 쓰면 되지만, 인자를 넘길 때 어떤 동작(펑크터에서 꺼낸다거나…)을 항상 하게 하려면 새로 만들면 됩니다.</p>
 <p>그리고, <code>map</code>은 펑크터가 하나 등장하고 <code>Traversable</code>엔 펑크터가 두 개가 등장합니다.</p>
 <p><em>당연한 얘긴데 <code>&lt;*&gt;</code>로 묶으면 <code>&lt;*&gt;</code>의 코드가 실행됩니다.</em></p>
+<p>2021.7.31 추가</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Control.Concurrent.STM</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="ot">tv1 ::</span> <span class="dt">TVar</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">STM</span> ()</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>tv1 t <span class="ot">=</span> writeTVar t <span class="dv">1</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="ot">tv2 ::</span> <span class="dt">TVar</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">STM</span> ()</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>tv2 t <span class="ot">=</span> writeTVar t <span class="dv">5</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>  a <span class="ot">&lt;-</span> atomically <span class="op">$</span> newTVar <span class="dv">1</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> xs <span class="ot">=</span> [tv1, tv2]</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>  atomically <span class="op">$</span> <span class="fu">map</span> (\f <span class="ot">-&gt;</span> f a) xs <span class="co">-- (가)</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>  r <span class="ot">&lt;-</span> readTVarIO a</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span> r</span></code></pre></div>
+<p>위 코드는 리스트가 바깥이라 <code>atomically [STM.., STM..]</code> 이런 모양이 됩니다. 리스트에 <code>atomically</code>를 적용하는 모양이니 당연히 에러입니다.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Couldn't</span> match expected <span class="kw">type</span> ‘<span class="dt">STM</span> a0’ with actual <span class="kw">type</span> ‘[<span class="dt">STM</span> ()]’</span></code></pre></div>
+<p>아래와 같이 바꿔 쓰면 어떻게 될까요?</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">map</span> (\f <span class="ot">-&gt;</span> atomically <span class="op">$</span> f a) xs</span></code></pre></div>
+<p>이 것도 역시 가장 바깥이 리스트 상태 <code>[IO.., IO..]</code>여서 <code>IO</code> 컨텍스트인 <code>main</code>에서 바로 쓰지 못합니다.</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>• <span class="dt">Couldn't</span> match <span class="kw">type</span> ‘[]’ with ‘<span class="dt">IO</span>’</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="dt">Expected</span> <span class="kw">type</span><span class="op">:</span> <span class="dt">IO</span> (<span class="dt">IO</span> ())</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="dt">Actual</span> <span class="kw">type</span><span class="op">:</span> [<span class="dt">IO</span> ()]</span></code></pre></div>
+<p>리스트 안에 들어 있는 <code>IO</code>나 <code>STM</code>을 바깥으로 꺼내놔야 현재 컨텍스트에서 쓸 수 있습니다. 바로 이럴 때 <code>traverse</code>를 씁니다.</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>atomically <span class="op">$</span> <span class="fu">traverse</span> (\f <span class="ot">-&gt;</span> f a) xs</span></code></pre></div>
+<p>다시 한번 위에 나왔던 Maybe의 인스턴스를 예로 보면, <em>펑크터 두 개</em>가 섞여 있는 코드에서 펑크터 위치를 바꾸는 걸 알 수 있습니다.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- f와 Just의 감싼 순서를 바꾸고 있습니다.</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">traverse</span> f (<span class="dt">Just</span> a) <span class="ot">=</span> <span class="dt">Just</span> <span class="op">&lt;$&gt;</span> f a</span></code></pre></div>
+<p>생각을 좇아가는 팁은, <em>패턴 매칭</em>으로 펑크터가 벗겨지는 걸 상상하며 따라가면 좋습니다. 언제나, 펑크터가 가진 고유의 동작이 드러나려면 <em>패턴 매칭</em>으로 벗겨야 한다는 걸 기억하세요.</p>
 
 <div class="comment">
 <script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
