@@ -102,12 +102,13 @@
 <span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="ot">opt2 ::</span> <span class="dt">Builder</span> <span class="ot">-&gt;</span> <span class="dt">Config</span></span>
 <span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>opt2 builder <span class="ot">=</span> builder [<span class="st">&quot;-opt2&quot;</span>]</span></code></pre></div>
-<p>위 도구에서 보았던 속성을 먼저 가지고 있는 스타일로 옵션 지정을 하는 코드입니다. 빌더 함수를 넣어서 안에 들어 있던 리스트에 적용합니다.</p>
+<p>위 도구에서 보았던 속성을 먼저 가지고 있는 스타일로 옵션 지정을 하는 코드입니다. 빌더 함수를 넣어서 안에 들어 있는 리스트에 적용합니다.</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> defaultConfig <span class="op">#</span> opt1</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="dt">MakeConfig</span> [<span class="st">&quot;-default&quot;</span>,<span class="st">&quot;-opt1&quot;</span>,<span class="st">&quot;-opt1-1&quot;</span>]</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> defaultConfig <span class="op">#</span> opt2</span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="dt">MakeConfig</span> [<span class="st">&quot;-default&quot;</span>,<span class="st">&quot;-opt2&quot;</span>]</span></code></pre></div>
-<p>하지만 <code>opt1</code>과 <code>opt2</code>는 완성된 <code>Config</code>를 리턴합니다. 그럼 <code>opt1</code>과 <code>opt2</code> 두 개 모두 옵션 리스트에 넣으려면 어떻게 할까요? 최종 모양부터 상상하면, (다)를 이용해서 <code>defaultConfig # opt1 # opt2</code> 쯤 되는 모양으로 만들려고 합니다. 하스켈에선 뭔가 연이은 동작을 만들 땐 함수로 엮는 방법이 주로 쓰입니다.</p>
+<h2 id="아직-일이-끝나지-않았다---실행되지-않은-함수">아직 일이 끝나지 않았다 -&gt; 실행되지 않은 함수</h2>
+<p>하지만 <code>opt1</code>과 <code>opt2</code>는 완성된 <code>Config</code>를 리턴합니다. 그럼 <code>opt1</code>과 <code>opt2</code> 두 개 모두 옵션 리스트에 넣으려면 어떻게 할까요? 최종 모양부터 상상하면, (다)를 이용해서 <code>defaultConfig # opt1 # opt2</code> 쯤 되는 모양으로 만들려고 합니다. 하스켈에선 뭔가 연이은 동작을 만들 땐 함수로 엮는 방법이 주로 쓰입니다. ※ 무언가 완성되지 않은 상태로 둔다는 말은 <em>“함수”로 만들어 둔다</em>와 같은 말입니다. 이 것도 함수형 스타일로 생각하는 하나의 팁입니다.</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ot">opt1' ::</span> <span class="dt">Builder</span> <span class="ot">-&gt;</span> <span class="dt">Builder</span> </span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>opt1' builder <span class="ot">=</span> \options <span class="ot">-&gt;</span> builder ([<span class="st">&quot;-opt1&quot;</span>, <span class="st">&quot;-opt1-1&quot;</span>] <span class="op">++</span> options)</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
