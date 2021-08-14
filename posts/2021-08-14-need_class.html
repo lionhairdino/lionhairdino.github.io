@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko" lang="ko">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <title>lionhairdino - 여러 타입들이 공통된 속성이 있다면, 클래스로 타입을 열어 두자</title>
+
+        <meta name="description" content="lionhairdino - 여러 타입들이 공통된 속성이 있다면, 클래스로 타입을 열어 두자" />
+        <meta property="og:description" content="하스켈 함수형 프로그래밍" />
+
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <link rel="icon" href="https://lionhairdino.github.io/favicon.svg" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino16px.png" sizes="16x16" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino24px.png" sizes="24x24" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino32px.png" sizes="32x32" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino48px.png" sizes="48x48" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino57px.png" sizes="57x57" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino60px.png" sizes="60x60" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino64px.png" sizes="64x64" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino72px.png" sizes="72x72" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino76px.png" sizes="76x76" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino114px.png" sizes="114x114" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino120px.png" sizes="120x120" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino144px.png" sizes="144x144" />
+        <link rel="shortcut icon" href="../favicon.ico" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino152px.png" sizes="152x152" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino180px.png" sizes="180x180" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino192px.png" sizes="192x192" />
+        <link rel="manifest" href="../site.webmanifest" />
+        <link rel="mask-icon" href="https://lionhairdino.github.io/Lionhairdino_black.svg" color="#ff7500" />
+        <meta name="msapplication-TileImage" content="/images/favicon/Lionhairdino144px.png" />
+        <meta name="msapplication-TileColor" content="#ff7500" />
+        <meta name="theme-color" content="#ffffff" />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="여러 타입들이 공통된 속성이 있다면, 클래스로 타입을 열어 두자" />
+        <meta property="og:site_name" content="Lionhairdino" />
+        <meta property="og:url" content="https://lionhairdino.github.io/posts/2021-08-14-need_class.html" />
+
+        <meta property="og:image" content="https://lionhairdino.github.io/images/state400px.png" />
+
+
+<script src="../script/copycode.js"></script>
+
+    </head>
+    <body>
+        <div id="header">
+            <div id="navigation">
+                <a href="../">lionhairdino</a> 
+                <a href="../about.html">about</a>
+                <!--<a href="/archive.html">archive</a>-->
+            </div>
+        </div>
+
+        <div id="content">
+            <h1>여러 타입들이 공통된 속성이 있다면, 클래스로 타입을 열어 두자</h1>
+
+            <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+<div class="info">
+    Posted on August 14, 2021
+    
+</div>
+
+<p>아래처럼 methodA, methodB를 만들다 보니, 나중에 약간 다른 Config타입을 받을 일이 생긴다고 가정해 봅시다.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- ModuleA.hs</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="kw">module</span> <span class="dt">ModuleA</span> ( methodA) <span class="kw">where</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Config</span> <span class="ot">=</span> <span class="dt">Config</span> {<span class="ot"> pCommon ::</span> <span class="dt">Int</span>,<span class="ot"> pSpecA ::</span> <span class="dt">Int</span> }</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="ot">methodA ::</span> <span class="dt">Config</span> <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>methodA conf <span class="ot">=</span> pCommon conf</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co">-- ModuleB.hs</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="kw">module</span> <span class="dt">ModuleB</span> ( methodB ) <span class="kw">where</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Config</span> <span class="ot">=</span> <span class="dt">Config</span> {<span class="ot"> pCommon ::</span> <span class="dt">Int</span>,<span class="ot"> pSpecB ::</span> <span class="dt">Int</span> }</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="ot">methodB ::</span> <span class="dt">Config</span> <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>methodB conf <span class="ot">=</span> pCommon conf <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co">-- ModuleC.hs</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="kw">module</span> <span class="dt">ModuleC</span> () <span class="kw">where</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">ModuleA</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">ModuleB</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Config</span> <span class="ot">=</span> <span class="dt">Config</span> {<span class="ot"> pCommon ::</span> <span class="dt">Int</span>,<span class="ot"> pSpecC ::</span> <span class="dt">Int</span> }</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>conf <span class="ot">=</span> <span class="dt">Config</span> <span class="dv">10</span> <span class="dv">20</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="ot">run ::</span> <span class="dt">Config</span> <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>run <span class="ot">=</span> methodA <span class="op">+</span> methodB</span></code></pre></div>
+<p>컴파일 하면 여러 Config가 섞여 있어 에러가 납니다.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>ModuleC.hs<span class="op">:</span><span class="dv">14</span><span class="op">:</span><span class="dv">7</span><span class="op">:</span> <span class="fu">error</span><span class="op">:</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    • <span class="dt">Couldn't</span> match <span class="kw">type</span> ‘<span class="dt">Config</span>’</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>                     with ‘<span class="dt">ModuleA.Config</span>’</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>      <span class="dt">NB</span><span class="op">:</span> ‘<span class="dt">ModuleA.Config</span>’ is defined at ModuleA.hs<span class="op">:</span><span class="dv">6</span><span class="op">:</span><span class="dv">1</span><span class="op">-</span><span class="dv">54</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>          ‘<span class="dt">Config</span>’ is defined at ModuleC.hs<span class="op">:</span><span class="dv">9</span><span class="op">:</span><span class="dv">1</span><span class="op">-</span><span class="dv">54</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>      <span class="dt">Expected</span> <span class="kw">type</span><span class="op">:</span> <span class="dt">Config</span> <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>        <span class="dt">Actual</span> <span class="kw">type</span><span class="op">:</span> <span class="dt">ModuleA.Config</span> <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    • <span class="dt">In</span> the expression<span class="op">:</span> methodA <span class="op">+</span> methodB</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>      <span class="dt">In</span> an equation for ‘run’<span class="op">:</span> run <span class="ot">=</span> methodA <span class="op">+</span> methodB</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>   <span class="op">|</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="dv">14</span> <span class="op">|</span> run <span class="ot">=</span> methodA <span class="op">+</span> methodB</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>   <span class="op">|</span> </span></code></pre></div>
+<p>이럴 때, 공통으로 가지고 있는 속성을 클래스로 옮기면 다음처럼 쓸 수 있습니다다. 나중에 다른 Config 타입에서 쓸 일이 있는 메소드는 구체 methodA :: Config -&gt; Int 처럼 구체 타입을 지정하면 안됩니다. 다른 타입에서 쓸 일이 있는 함수는 GHC의 타입 추론에 맡기는 것 말고 방법이 없습니다. methodA :: c -&gt; Int 이런식으로 열어 놔야 합니다.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- ModuleA.hs</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="kw">module</span> <span class="dt">ModuleA</span> ( methodA) <span class="kw">where</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">ConfigCommon</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co">--data Config = Config { pSpecA :: Int }</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co">--instance ConfigCommon Config where</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co">--    pCommon cfg = 1</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="ot">methodA ::</span> <span class="dt">ConfigCommon</span> c <span class="ot">=&gt;</span> c <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>methodA conf <span class="ot">=</span> pCommon conf <span class="co">-- 어떤 pCommon이 쓰일지 여기선 아직 알 수 없다.</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co">-- ModuleB.hs</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="kw">module</span> <span class="dt">ModuleB</span> ( methodB ) <span class="kw">where</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">ConfigCommon</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="co">--data Config = Config { pSpecB :: Int }</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="co">--instance ConfigCommon Config where</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="co">--    pCommon cfg = 2</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="ot">methodB ::</span> <span class="dt">ConfigCommon</span> c <span class="ot">=&gt;</span> c <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>methodB conf <span class="ot">=</span> pCommon conf <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="co">-- ConfigCommon.hs</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="co">-- Config의 구체적인 모습은 모르지만, 일단 pCommon 속성을 쓴다는 걸 알려주기 위해 필요합니다.</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a><span class="ot">{-#LANGUAGE AllowAmbiguousTypes #-}</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="kw">module</span> <span class="dt">ConfigCommon</span> ( <span class="dt">ConfigCommon</span>(<span class="op">..</span>)) <span class="kw">where</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">ConfigCommon</span> c <span class="kw">where</span></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a><span class="ot">  pCommon ::</span> c <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a><span class="co">-- ModuleC.hs</span></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a><span class="kw">module</span> <span class="dt">ModuleC</span> () <span class="kw">where</span></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">ModuleA</span></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">ModuleB</span></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">ConfigCommon</span></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Config</span> <span class="ot">=</span> <span class="dt">Config</span> {<span class="ot"> pSpecC ::</span> <span class="dt">Int</span> }</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">ConfigCommon</span> <span class="dt">Config</span> <span class="kw">where</span></span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>    pCommon cfg <span class="ot">=</span> <span class="dv">100</span></span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>conf <span class="ot">=</span> <span class="dt">Config</span> <span class="dv">1000</span></span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a><span class="ot">run ::</span> <span class="dt">Config</span> <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>run conf <span class="ot">=</span> methodA conf <span class="op">+</span> methodB conf <span class="op">+</span> pSpecC conf</span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a><span class="co">-- run :: ConfigCommon c =&gt; c -&gt; Int</span></span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a><span class="co">-- run conf = methodA conf + methodB conf + pSpecC conf</span></span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a><span class="co">-- 만일 pSpecC를 쓰는 함수라면 이렇게 쓰지 못합니다.</span></span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a><span class="co">-- ConfigCommon c =&gt; 제약만으론 pSpecC가 뭔지 알려 줄 도리가 없습니다.</span></span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a><span class="co">-- pSpecC와 methodA, methodB 가 무엇인지 모두 알려 줄 방법은 </span></span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a><span class="co">-- 여기서 쓰이는 Config 타입 하나로 타입을 닫아야 합니다.</span></span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> run conf</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="dv">1201</span></span></code></pre></div>
+<p>원했던 방식으로 동작은 하지만, 매번 <code>Config</code>를 설정할 때 <code>ConfigCommon</code>의 인스턴스로 만들어야 합니다. 불편해서 다른 패턴이 없을까 고민 중인데, 타입을 열어두는 것 말고 딱히 찾아지거나, 떠오르는 아이디어가 없습니다.</p>
+<p>문제를 정리하면, 각 메소드가 정의된 파일에서 <code>Config</code>란 파일을 참조하는데, 각 모듈에 있는 <code>Config</code>들이 조금씩 다릅니다. 물론 <code>Config</code>마다 각각인 속성은 건드리지 않고, 공통된 속성만 건드리는데, 이 메소드들을 다른 컨텍스트 안에서 모아서 쓰려면 어떻게 해야 할까요?</p>
+<p>레코드 필드가 특별한 요소가 아니라, 그저 함수들을 모아만 놓은 것으로 본다면, 그 중 다른 <code>Config</code>들과 공통된 함수(여기선 필드field)들은 클래스 메소드로 보내버리고, 공통되지 않는 필드들만 남겨 놓은 상태라 볼 수 있습니다. 레코드 문법이 하나의 객체안에 속성들을 끈끈하게 모아 놓은게 아니라, 그저 <em>여기 저기 흩어져 있는 함수들의 이름</em>을 모아, 대표 이름을 붙여 놓은 것입니다. 그래서 레코드안의 필드들이 다른 레코드의 필드와 이름이 겹칠 수 없습니다. 필드들도 그냥 보통의 함수와 다를 게 없습니다. - 딱 이해하기 좋은 표현은 아닌 것 같긴 합니다.</p>
+
+<div class="comment">
+<script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
+</script>
+</div>
+        </div>
+        <div id="footer">
+            © 2021 lionhairdino. All rights reserved. Generated by <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+    </body>
+</html>
