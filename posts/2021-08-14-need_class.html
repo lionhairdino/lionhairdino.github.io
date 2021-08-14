@@ -150,7 +150,7 @@
 <span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a><span class="co">-- pSpecC와 methodA, methodB 가 무엇인지 모두 알려 줄 방법은 </span></span>
 <span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a><span class="co">-- 여기서 쓰이는 Config 타입 하나로 타입을 닫아야 합니다.</span></span></code></pre></div>
 <div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> run conf</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="dv">1201</span></span></code></pre></div>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="dv">41</span></span></code></pre></div>
 <p>원했던 방식으로 동작은 하지만, 매번 <code>Config</code>를 설정할 때 <code>ConfigCommon</code>의 인스턴스로 만들어야 합니다. 불편해서 다른 패턴이 없을까 고민 중인데, 타입을 열어두는 것 말고 딱히 찾아지거나, 떠오르는 아이디어가 없습니다.</p>
 <p>문제를 정리하면, 각 메소드가 정의된 파일에서 <code>Config</code>란 파일을 참조하는데, 각 모듈에 있는 <code>Config</code>들이 조금씩 다릅니다. 물론 <code>Config</code>마다 각각인 속성은 건드리지 않고, 공통된 속성만 건드리는데, 이 메소드들을 다른 컨텍스트 안에서 모아서 쓰려면 어떻게 해야 할까요?</p>
 <p>레코드 필드가 특별한 요소가 아니라, 그저 함수들을 모아만 놓은 것으로 본다면, 그 중 다른 <code>Config</code>들과 공통된 함수(여기선 필드field)들은 클래스 메소드로 보내버리고, 공통되지 않는 필드들만 남겨 놓은 상태라 볼 수 있습니다. 레코드 문법이 하나의 객체안에 속성들을 끈끈하게 모아 놓은게 아니라, 그저 <em>여기 저기 흩어져 있는 함수들의 이름</em>을 모아, 대표 이름을 붙여 놓은 것입니다. 그래서 레코드안의 필드들이 다른 레코드의 필드와 이름이 겹칠 수 없습니다. 필드들도 그냥 보통의 함수와 다를 게 없습니다. - 딱 이해하기 좋은 표현은 아닌 것 같긴 합니다.</p>
