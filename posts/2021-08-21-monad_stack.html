@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko" lang="ko">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <title>lionhairdino - 모나드 스택에서 안 쪽에 있는 모나드에 제약 사항이 또 필요한 이유</title>
+
+        <meta name="description" content="lionhairdino - 모나드 스택에서 안 쪽에 있는 모나드에 제약 사항이 또 필요한 이유" />
+        <meta property="og:description" content="하스켈 함수형 프로그래밍" />
+
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <link rel="icon" href="https://lionhairdino.github.io/favicon.svg" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino16px.png" sizes="16x16" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino24px.png" sizes="24x24" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino32px.png" sizes="32x32" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino48px.png" sizes="48x48" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino57px.png" sizes="57x57" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino60px.png" sizes="60x60" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino64px.png" sizes="64x64" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino72px.png" sizes="72x72" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino76px.png" sizes="76x76" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino114px.png" sizes="114x114" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino120px.png" sizes="120x120" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino144px.png" sizes="144x144" />
+        <link rel="shortcut icon" href="../favicon.ico" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino152px.png" sizes="152x152" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino180px.png" sizes="180x180" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino192px.png" sizes="192x192" />
+        <link rel="manifest" href="../site.webmanifest" />
+        <link rel="mask-icon" href="https://lionhairdino.github.io/Lionhairdino_black.svg" color="#ff7500" />
+        <meta name="msapplication-TileImage" content="/images/favicon/Lionhairdino144px.png" />
+        <meta name="msapplication-TileColor" content="#ff7500" />
+        <meta name="theme-color" content="#ffffff" />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="모나드 스택에서 안 쪽에 있는 모나드에 제약 사항이 또 필요한 이유" />
+        <meta property="og:site_name" content="Lionhairdino" />
+        <meta property="og:url" content="https://lionhairdino.github.io/posts/2021-08-21-monad_stack.html" />
+
+        <meta property="og:image" content="https://lionhairdino.github.io/images/state400px.png" />
+
+      <meta name="keywords" content="Monad Transformer, Monad Stack, 모나드 트랜스포머, mtl, MonadReader">
+<script src="../script/copycode.js"></script>
+
+    </head>
+    <body>
+        <div id="header">
+            <div id="navigation">
+                <a href="../">lionhairdino</a> 
+                <a href="../about.html">about</a>
+                <!--<a href="/archive.html">archive</a>-->
+            </div>
+        </div>
+
+        <div id="content">
+            <h1>모나드 스택에서 안 쪽에 있는 모나드에 제약 사항이 또 필요한 이유</h1>
+
+            <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+<div class="info">
+    Posted on August 21, 2021
+    
+</div>
+
+<p>여기서는 코드를 설명할 때, <code>Reader</code>와 <code>ReaderT</code>를 딱히 구분하지 않고 같은 것으로 봅니다. 둘의 관계는 모나드 트랜스포머 관련 글을 보시면 됩니다.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ot">{-# LANGUAGE GeneralizedNewtypeDeriving #-}</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Control.Monad.Reader</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Config</span> <span class="ot">=</span> <span class="dt">Config</span> {<span class="ot"> env1 ::</span> <span class="dt">Int</span> }</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">SomeM</span> conf m a <span class="ot">=</span> <span class="dt">SomeM</span> {<span class="ot"> runSomeM ::</span> <span class="dt">ReaderT</span> conf m a }</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">deriving</span> (<span class="dt">Functor</span>, <span class="dt">Applicative</span>, <span class="dt">Monad</span>, <span class="dt">MonadIO</span>, <span class="dt">MonadReader</span> conf)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="ot">func ::</span> <span class="dt">SomeM</span> <span class="dt">Config</span> m ()</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>func <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    env1 <span class="ot">&lt;-</span> asks env1</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">print</span> env1</span></code></pre></div>
+<p>언젠가는 <code>IO</code>컨텍스트에서 불릴거라 생각하고, 이렇게 쓰고 컴파일하면 <code>IO</code>를 찾는 에러가 납니다.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>monadStack<span class="op">.</span>hs<span class="op">:</span><span class="dv">13</span><span class="op">:</span><span class="dv">5</span><span class="op">:</span> <span class="fu">error</span><span class="op">:</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    • <span class="dt">Couldn't</span> match <span class="kw">type</span> ‘<span class="dt">IO</span>’ with ‘<span class="dt">SomeM</span> <span class="dt">Config</span> m’</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>      <span class="dt">Expected</span> <span class="kw">type</span><span class="op">:</span> <span class="dt">SomeM</span> <span class="dt">Config</span> m ()</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>        <span class="dt">Actual</span> <span class="kw">type</span><span class="op">:</span> <span class="dt">IO</span> ()</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>        <span class="op">...</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="dv">13</span> <span class="op">|</span>     <span class="fu">print</span> env1</span></code></pre></div>
+<p><code>print</code>는 <code>IO</code>타입이지, <code>SomeM</code> 타입이 아닙니다. 그래서 <code>SomeM</code>을 <code>MonadIO deriving</code>을 해줬는데, 왜 <code>IO</code>를 못 찾는는다는 에러가 날까요?<br />
+<code>MonadIO</code> 클래스의 인스턴스가 <code>IO</code> 타입과 같은 게 아닙니다. <code>MonadIO</code> 클래스는 <code>liftIO</code> 메소드를 가지고 있다는 표시일 뿐입니다.</p>
+<p>그럼, 언젠가 안 쪽에 <code>IO</code>층이 있을테니 <code>liftIO</code>로 끌어 올려다 쓰기 위해 <code>liftIO</code>를 추가합니다.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>func <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    env1 <span class="ot">&lt;-</span> asks env1</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    liftIO <span class="op">$</span> <span class="fu">print</span> env1</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>    • <span class="dt">No</span> <span class="kw">instance</span> for (<span class="dt">Monad</span> m) arising from a <span class="kw">do</span> statement</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>      <span class="dt">Possible</span> fix<span class="op">:</span> add (<span class="dt">Monad</span> m) to the context <span class="kw">of</span> <span class="op">...</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="dv">12</span> <span class="op">|</span>     env1 <span class="ot">&lt;-</span> asks env1</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    • <span class="dt">No</span> <span class="kw">instance</span> for (<span class="dt">MonadIO</span> m) arising from a use <span class="kw">of</span> ‘liftIO’</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>      <span class="dt">Possible</span> fix<span class="op">:</span> add (<span class="dt">MonadIO</span> m) to the context <span class="kw">of</span> <span class="op">...</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="dv">13</span> <span class="op">|</span>     liftIO <span class="op">$</span> <span class="fu">print</span> env1</span></code></pre></div>
+<p>일단 타입이 맞지 않는 건 해결되어 넘어갔는데, 이 번엔<br />
+<code>do</code>를 쓰는 걸 보니(눈에는 안보이지만 <code>&gt;&gt;=</code>를 쓰는 걸 보니) <code>Monad</code> 인스턴스여야 하는데 <code>m</code>이 <code>Monad</code>란 제약이 없다고 합니다.<br />
+<code>SomeM</code>이 이미 <code>deriving Monad</code> 해 놨는데, 왜 안에 들어있는 <code>m</code>이 <code>Monad</code> 인스턴스여야 한다고 할까요?<br />
+두 번째 에러도 비슷합니다.<br />
+<code>liftIO</code>를 쓰는 걸 봐서 <code>MonadIO</code> 인스턴스여야 하는데 <code>m</code>이 <code>MonadIO</code>란 제약이 없다고 합니다.<br />
+<code>SomeM</code>을 이미 <code>deriving MonadIO</code> 해 놨는데 말입니다.</p>
+<p>먼저, 모나드 스택을 이루는 트랜스포머들이 가진 bind의 동작을 살펴 보겠습니다.</p>
+<p><code>func</code>안에 보이지 않는 <code>bind</code>의 동작은 <code>deriving Monad</code>로 정의되어 있는데, <code>Some</code>의 <code>bind</code>, 안에 있는 <code>ReaderT</code>의 <code>bind</code>, 또 그 안에 있는 <code>m</code>의 <code>bind</code>가 모두 동작하게 되어 있는 <code>bind</code>입니다.</p>
+<blockquote>
+<p>Q. <code>SomeM</code> 타입 정의에는 제일 안에 들어 있는 <code>m</code>이 <code>Monad</code>란 말은 없는데요? A. <code>ReaderT</code> 정의에 <code>m</code>이 모나드여야 한다는 제약이 있습니다.</p>
+</blockquote>
+<p><code>SomeM</code>이 <code>MonadReader</code>에서 <code>deriving</code> 되어 있으니, <code>asks</code>가 있긴 있는데, <code>SomeM</code>의 <code>asks</code>가 하는 일은 다음 층의 <code>asks</code>를 부르는 동작만 합니다. 다음 층에서 <code>ReaderT</code>의 <code>asks</code>를 만나니 문제 없이 예상했던 <code>asks</code>의 동작을 합니다. 위에서도 보면 MonadReader 관련 에러는 안보입니다.</p>
+<p>이 번엔 <code>liftIO</code>를 보겠습니다.<br />
+<code>SomeM</code>이 <code>MonadIO</code>에서 <code>deriving</code> 되어 있으니, <code>liftIO</code>가 있긴 있는데, <code>SomeM</code>의 <code>liftIO</code>가 하는 일은 다음 층의 <code>liftIO</code>를 부르는 동작만 합니다. 다음 층이 <code>ReaderT</code>인데, 하스켈이 <code>ReaderT</code>의 <code>MonadIO</code> 인스턴스를 미리 준비 해놨습니다.</p>
+<p><a href="https://hackage.haskell.org/package/transformers-0.6.0.2/docs/src/Control.Monad.Trans.Reader.html#line-214" class="uri">https://hackage.haskell.org/package/transformers-0.6.0.2/docs/src/Control.Monad.Trans.Reader.html#line-214</a> ~~~ haskell instance (MonadIO m) =&gt; MonadIO (ReaderT r m) where liftIO = lift . liftIO – 별 다른 동작이 아니라, 다음 층으로 떠넘기기만 합니다. – ^ 이 건 m을 받는 liftIO입니다. ~~~</p>
+<p>인스턴스가 구현되어 있으니, <code>SomeM</code>이 <code>ReaderT</code>에게 떠넘기고, <code>ReaderT</code>가 <code>m</code>에게 떠넘기게 되는데, <code>m</code>이 뭔지 알 수 없습니다. <code>m</code>이 <code>liftIO</code>를 가지고 있을지 없을지 모른다는 에러입니다.<br />
+그래서 이 걸 해결하는 방법은, <em>나중에 liftIO를 가진 m이 들어올테니, 일단 넘어가</em>라고 알려주기 위해 <code>MonadIO m =&gt;</code> 제약을 추가합니다.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ot">func ::</span> (<span class="dt">MonadIO</span> m) <span class="ot">=&gt;</span> <span class="dt">SomeM</span> <span class="dt">Config</span> m ()</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>func <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    env1 <span class="ot">&lt;-</span> asks env1</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    liftIO <span class="op">$</span> <span class="fu">print</span> env1</span></code></pre></div>
+<p>정리하면, <code>asks</code>를 쓰는 모나드 스택은 어느 층엔가는 반드시 <code>Reader</code>가 있어야 하고, <code>Reader</code>보다 <em>상위층에 있는 모든 모나드</em>는 <code>MonadReader</code>의 인스턴스여야 합니다.(모두 <code>asks</code> 메소드를 가지고 있어야 합니다.) <code>Reader</code>모나드를 제외한 모든 모나드는 메소드 <code>asks</code>를 받았을 때, 자신이 직접 처리하는게 아니라 다음 층의 <code>asks</code>에게 떠넘기는 코드(<code>MonadReader</code>의 인스턴스)를 가지고 있어야 합니다.</p>
+<blockquote>
+<p>Q. MonadReader가 ReaderT인가요? A. 둘은 다른 겁니다. <code>ReaderT</code>는 타입이고, <code>MonadReader</code>는 클래스입니다. <code>ReaderT</code>는 <code>asks</code>를 가지고 있고, <code>MonadReader</code>는 <code>asks</code>를 가지고 있어야 한다는 제약을 나타낼 때 쓰입니다. <code>MonadReader</code>는 없어도, <code>ReaderT</code>만으로 모나드 스택은 만들 수 있습니다. 이 경우 각 층에 참여한 모나드들이 모두 <code>asks</code>를 알고 있지 않기 때문에 <code>asks</code>를 가진 <code>Reader</code>모나드 층에 도달할 수 있게끔 명시적으로 <code>lift</code>를 써주면 됩니다. <code>lift . lift . lift . ask</code> 이런 식으로 몇 번째 층에서 <code>asks</code>를 처리할 수 있는지 정확한 횟수의 <code>lift</code>를 써서 알려주면 됩니다. 하지만 모든 층이 <code>MonadReader</code>의 인스턴스여서 <code>asks</code> 메소드가 모두 구현되어 있다면 어떻게 될까요? 모든 층에 있는 <code>asks</code>가 모두 <code>asks</code> 자체 동작을 하는 게 아니라, <em>나는 모르지만, 다음 층으로 떠 넘겨 줄게(mtl라이브러리 핵심 아이디어)</em> 라는 동작을 하는 <code>asks</code>가 있다면, <code>lift</code>를 굳이 써주지 않고 그냥 <code>asks</code>만 써도, 알아서 <code>ReaderT</code>층까지 찾아가는 동작을 하게 됩니다. <code>MonadReader</code>는(mtl은) 모나드 트랜스포머 스택을 편하게 쓰기 위한 보조 라이브러리입니다.</p>
+</blockquote>
+
+<div class="comment">
+<script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
+</script>
+</div>
+        </div>
+        <div id="footer">
+            © 2021 lionhairdino. All rights reserved. Generated by <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+    </body>
+</html>
