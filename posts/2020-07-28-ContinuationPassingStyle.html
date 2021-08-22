@@ -61,252 +61,345 @@
     
 </div>
 
-<p>아이디어는 “<em>함수가 결과를 리턴하지 않고, 바로 이어질 함수를 같이 넘겨서, 항상 작업이 끝나면 이어진 함수로 넘어가도록 만들자</em>” 입니다.</p>
+<p>아이디어는 “<em>함수가 결과를 리턴하지 않고, 바로 이어질 함수를 같이 넘겨서, 항상 작업이 끝나면 이어진 함수로 넘어가도록 만들자</em>” 입니다. 함수형 프로그래밍은 스코프가 오래가는 변수가 없기 때문에 함수의 결과를 붙잡아 둘 때가 마땅히 없습니다. 그래서 굉장히 자주 쓰는 테크닉이 함수가 함수를 감싸도록 하는 겁니다. CPS스타일도 목표는 다르지 않습니다. 이어질 함수가 함수 컴포지션처럼 바깥에서 기다리냐, 아님 안 쪽에 들어가서 기다리냐 차이입니다.</p>
 <p>아래 설명에 <em>준비</em>란 말이 나오면, 언젠가 나중에 인자를 받으면 실행하게될 함수를 뜻합니다. 함수 뭉치를 바라 볼 때, 준비상태로 보면 한 결 이해가 편할 때가 있습니다.</p>
 <p><a href="../posts/2020-07-03-freeMonad.html">Free 모나드</a>와 같이 보면 모나드 개념을 얻는데 도움이 됩니다.</p>
 <h3 id="목차">목차</h3>
-<ul>
+<ol type="1">
+<li><a href="#준비-운동">준비 운동</a>
+<ol type="1">
+<li><a href="#고차-함수-읽기">고차 함수 읽기</a></li>
+<li><a href="#인자로-받은-걸-버리기">인자로 받은 걸 버리기</a></li>
+<li><a href="#고차함수와-고차함수를-받는-고차함수">고차함수와 고차함수를 받는 고차함수</a></li>
 <li><a href="#함수형에선-함수를-바꾸고-명령형에선-값을-바꾼다">함수형에선 함수를 바꾸고, 명령형에선 값을 바꾼다.</a></li>
+</ol></li>
+<li><a href="#continuation">Continuation</a></li>
 <li><a href="#cont-모나드">Cont 모나드</a></li>
 <li><a href="#그냥-함수-모나드와-뭐가-다를까">그냥 함수 모나드와 뭐가 다를까?</a></li>
 <li><a href="#callcc">callCC</a></li>
 <li><a href="#break">Break!</a></li>
-</ul>
-<h2 id="함수형에선-함수를-바꾸고-명령형에선-값을-바꾼다.">함수형에선 함수를 바꾸고, 명령형에선 값을 바꾼다.</h2>
+</ol>
+<h2 id="준비-운동">준비 운동</h2>
+<p>값을 넣고, 나중에 함수를 넣어, 이미 있는 값에 함수를 적용하는 모양을 생각해 봅시다.</p>
+<h3 id="고차-함수-읽기">고차 함수 읽기</h3>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ot">job ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> (<span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span>) <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>job x f <span class="ot">=</span> f (x <span class="op">+</span> <span class="dv">1</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- 아래와 같이 람다 함수 형태로 써도 같습니다.</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co">-- 커링된 형태로 읽을 일이 있을 땐, 아래처럼 두는게 편합니다.</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>job x <span class="ot">=</span> \f <span class="ot">-&gt;</span> f (x <span class="op">+</span> <span class="dv">1</span>)</span></code></pre></div>
+<p><code>job</code>이 끝난 결과를 <code>job</code>에 연결한다면</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- 함수를 받는 자리에 job을 넣어 주면</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>job x (job y f)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- 나중에 외부 요소가 들어올 자리는 람다 헤드로 빼어 표시해 주면</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>\f <span class="ot">-&gt;</span> job x (\y <span class="ot">-&gt;</span> job y f)</span></code></pre></div>
+<p><code>job 1</code>은 마치 내부에 속성을 지정하듯 <code>1</code>을 안에 가지고 있고, 적용할 함수를 기다리는 상태입니다.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>\f <span class="ot">-&gt;</span> job <span class="dv">1</span> (\y <span class="ot">-&gt;</span> job y f)</span></code></pre></div>
+<p>뭔가 처음 보면 난해해 보이는 모양입니다. 읽기 어려운 이유가 뭘까요? 머릿속에서 reduction을 해야 편하게 바라 볼텐데 나중으로 미뤄 둔 게 많아 reduction을 할 수 없어 불편합니다. 어떻게 봐야 마음이 편할까요?</p>
+<p>첫 번째, <em>함수 읽기</em></p>
+<p>값은 가만히 있고, 함수를 값에 적용<br />
+함수는 가만히 있고, 함수에 값을 넣어주는</p>
+<p>어떤 메타포가 더 편한가요? 저는 위와 같은 경우는 쓰여 있는 순서대로 읽는게 편합니다. 물론 항상 그렇다는 말은 아닙니다. 함수형을 하다보면 값이 기다리고 있는 걸로 볼 때가 더 많습니다. 여기서는 함수가 뒤에 나오는 바람에 순서대로 읽다보니 차이가 생겼습니다.</p>
+<p>“<code>job 1</code>로 <code>1 + 1</code> 작업이 끝난 결과를 <code>\y -&gt; ...</code> 에 넣어준다”</p>
+<p>두 번째, <em>헤드 없이 바라 보면 상수Constant, 고정</em>으로 보기<br />
+<code>(\y -&gt; job y f)</code> 만 놓고 보면 <code>f</code>는 아직 헤드가 없습니다. 이렇게 보면 <code>f</code>는 바인드된 변수가 아니니, 고정된 함수로 보고 읽습니다.</p>
+<p>세 번째, 센스 있는 이름으로 바꾸기</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- 마지막에 실행되는 함수라는 의미로 lastf</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>\lastf <span class="ot">-&gt;</span> job <span class="dv">1</span> (\y <span class="ot">-&gt;</span> job y lastf)</span></code></pre></div>
+<p>정리하면, 저는<br />
+“1을 받아 첫 번째 job에 넘겨 (+1)을 하고, 결과를 두 번째 job이 받아 또 (+1)을 하고 여기에, 함수를 받아 적용할 준비를 한 상태”<br />
+라고 읽습니다.</p>
+<h3 id="인자로-받은-걸-버리기">인자로 받은 걸 버리기</h3>
+<p>얼핏 생각하면 이런 함수로 뭘 할 수 있을까 싶습니다. 이런 작업을 하는 대표적인 함수로 <code>const</code>의 쓰임을 보겠습니다.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">const</span><span class="ot"> ::</span> a <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> a</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="fu">const</span> <span class="dv">10</span> <span class="st">&quot;ok&quot;</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="dv">10</span></span></code></pre></div>
+<p>인자 두 개를 받아 하나를 버리는 함수입니다. 이 걸 어디다 쓸까 싶은데 다음과 같은 경우 유용하게 쓰입니다.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Person</span> <span class="ot">=</span> <span class="dt">Person</span> {<span class="ot"> name ::</span> <span class="dt">String</span>,<span class="ot"> age ::</span> <span class="dt">Int</span> }</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>person1 <span class="ot">=</span> <span class="dt">Person</span> <span class="st">&quot;Who&quot;</span> <span class="dv">10</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co">-- 값을 수정하는 함수를 받습니다.</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="ot">modifyPersonAge ::</span> (<span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span>) <span class="ot">-&gt;</span> <span class="dt">Person</span> <span class="ot">-&gt;</span> <span class="dt">Person</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>modifyPersonAge f person <span class="ot">=</span> person { age <span class="ot">=</span> f (age person) }</span></code></pre></div>
+<p>내부에 이미 있는 값을 바꾸는 함수를 받는 모양일 때, 안에 있는 값을 수정하는게 아닌 새로운 값으로 바꾸려고 할 때 쓸 수 있습니다. 단순히 버리기만 하는 게 의미 있는 동작일 때도 있습니다.</p>
+<p>바꿀 “값”을 넣어주는 것과 “함수”를 넣어주는 차이가 뭘까요? 바꿀 “값”을 넣어주려면 “값”을 계산한 후 넣어줘야 하지만, “함수”를 넣어주면 꼭 필요한 순간까지 계산을 뒤로 미룰 수 있습니다. 하지만, 하스켈은 어차피 레이지하기 때문에 <code>func (1+1)</code>을 해도 <code>1+1</code>을 thunk로 가지고 있지 계산을 바로 하지 않습니다. 그럼 굳이 함수를 넘길 필요가 있을까요? 함수형에서는 여러 함수들을 엮고 엮어서 나중에 한방에 실행해서 결과물을 얻는 스타일로 작성합니다. 만일 안쪽에서 함수를 엮는 중간에 끼워넣어 엮고 싶다면 함수를 넘기는게 유용할 수 있습니다.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> modifyPersonAge (<span class="fu">const</span> <span class="dv">20</span>) person1</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="dt">Person</span> {name <span class="ot">=</span> <span class="st">&quot;Who&quot;</span>, age <span class="ot">=</span> <span class="dv">20</span>}</span></code></pre></div>
+<h3 id="고차함수와-고차함수를-받는-고차함수">고차함수와 고차함수를 받는 고차함수</h3>
+<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ot">iHaveFuncs ::</span> ( (<span class="dt">String</span> <span class="ot">-&gt;</span> <span class="dt">String</span>) <span class="ot">-&gt;</span> <span class="dt">String</span> ) <span class="ot">-&gt;</span> <span class="dt">String</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>iHaveFuncs f <span class="ot">=</span> f (<span class="op">&lt;&gt;</span> <span class="st">&quot; is not your func&quot;</span>)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="ot">needFunc ::</span> (<span class="dt">String</span> <span class="ot">-&gt;</span> <span class="dt">String</span>) <span class="ot">-&gt;</span> <span class="dt">String</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>needFunc f <span class="ot">=</span> f <span class="st">&quot;f&quot;</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>exec <span class="ot">=</span> iHaveFuncs <span class="op">$</span> \havefunc <span class="ot">-&gt;</span> needFunc havefunc </span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> exec</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;f is not your func&quot;</span></span></code></pre></div>
+<p>고차함수로 꼬아 꼬아 놨습니다. 이 글 끝에 같은 걸 보는데, <code>iHaveFuncs</code>가 넣어주는 함수보다 복잡한 걸 넣어주는 함수를 만납니다. 그 전에 살짝 준비 운동을 하면 좋습니다.</p>
+<p><code>needFunc f = f "f"</code> 에서 <code>f</code>는 나중에 누군가한테서 받아올 함수를 위한 자리입니다.<br />
+<code>iHaveFuncs f = f (...)</code> 에서 <code>f</code>는 <code>needFunc</code> 같은 모양의 함수를 받을 자리입니다.<br />
+지금부터가 핵심 테크닉입니다. <code>needFunc</code>가 받을 함수를 우리가 아니라 <code>iHaveFuncs</code>가 넣어줍니다.<br />
+<code>iHaveFuncs</code>는 미리 넣어 줄 함수 <code>(&lt;&gt; " is not your func")</code>를 미리 가지고 있습니다. <code>needFunc</code> 모양의 함수를 받으면 그 함수에게 갖고 있던 <code>(&lt;&gt;...)</code> 함수를 넣어 줍니다.</p>
+<p>고차함수를 받는 고차함수, 고차함수로 버무려진 코드입니다.<br />
+뭔가 C를 공부하면서 만났던 포인터의 포인터의 포인터…의 향기가 떠오릅니다.</p>
+<p>왜 이런 짓을 하는지는 이 글 제일 아래에서 볼 수 있습니다.</p>
+<h3 id="함수형에선-함수를-바꾸고-명령형에선-값을-바꾼다.">함수형에선 함수를 바꾸고, 명령형에선 값을 바꾼다.</h3>
 <p>명령형 프로그램에서는 계산이 진행될 때마다 상태를 갱신해서 최종 결과를 만들어냅니다. 함수형에서는 상태가 없기 때문에 단계별 계산이 어떻게 표현 될까요? 상태를 따로 두는게 아니라, 함수가 함수를 감싸도록 해서 상태를 그 즉시 다른 함수에 입력으로 넣어주면(<em>함수를 합쳐 놓으면</em>) 상태를 저장하는 작업이 필요 없습니다.</p>
 <p>함수란, 필요한 입력이 모두 주어지면 그 때 작업이 시작되어서 결과를 만들어내는 “할 일”을 뜻합니다. 함수<em>만</em> 있을 때는 아무런 일이 일어나지 않습니다. 함수에 <em>입력을 주는 순간</em> 일은 시작됩니다.</p>
 <p>명령형에서는 값(상태)을 변화시켜 가며 작업이 진행되지만, 함수형에서는 할 일을 모두 합쳐 놓는 작업을 진행하고, 마지막에 값을 주어 작업을 시작합니다.</p>
 <p>스포이드로 잉크 한 방울을 물에 딱 떨어뜨리면 확 퍼지듯이, 먼저 함수를 엮어 놓고 제일 바깥쪽 함수에 인자를 넣는 순간 함수 뭉치가 주욱 실행됩니다.</p>
 <p>좀 더 구체적인 느낌이 오도록 예를 들면,</p>
-<p>(1+), (2+), (3+) 작업이 있고, 여기에 0을 넣어서 최종 결과를 받는다면,</p>
+<p>(1+), (2*), (3-) 작업이 있고, 여기에 0을 넣어서 최종 결과를 받는다면,</p>
 <p>명령형에서는</p>
 <p>결과를 저장할 변수 r을 만들고,</p>
 <ol type="1">
-<li>0을 받아서, 0 (1+) 을 실행해서 1을 r에 넣고,</li>
-<li>r값을 꺼내서 다음 작업에 넣어주면 1 (2*) 를 실행해서 3을 r에 넣고,</li>
-<li>r값을 꺼내서 다음 작업에 넣어주면 3 (3-) 을 실행해서 6을 돌려줍니다.</li>
+<li>0을 받아서, (1+) 0 을 실행해서 1을 r에 넣고,</li>
+<li>r값을 꺼내서 다음 작업에 넣어주면 (2*) 1 를 실행해서 2를 r에 넣고,</li>
+<li>r값을 꺼내서 다음 작업에 넣어주면 (3-) 2 를 실행해서 1을 돌려줍니다.</li>
 </ol>
 <p>r값을 계속 변화시켜 가며 작업을 진행합니다.</p>
 <p>함수형에서는</p>
 <ol type="1">
-<li>(1+) 작업과 (2*) 작업을 합친 작업 (1+(2* _ ))를 만들고,</li>
-<li>(1+(2* _ )) 작업과 (3-) 작업을 합친 작업 (1+(2*(3- _)))을 만들고,</li>
-<li>이 작업에 0을 넣어서 6을 만들어 돌려줍니다.</li>
+<li>(1+) 작업과 (2*) 작업을 합친 작업 (2*(1+ _ ))를 만들고,</li>
+<li>(2*(1+ _ )) 작업과 (3-) 작업을 합친 작업 (3-(2*(1+ _)))을 만들고,</li>
+<li>이 작업에 0을 넣어서 1을 만들어 돌려줍니다.</li>
 </ol>
 <p>명령형에서는 값(상태)이 변하고, 함수형에서는 함수(할 일 목록)가 변합니다.</p>
 <p>위 개념을 그대로 코드로 옮겨 보겠습니다.<br />
 (1+), (2*), (3-) 작업을 엮어 아래 모양으로 만들어야 합니다.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>\r <span class="ot">-&gt;</span> <span class="dv">3</span><span class="op">-</span> (<span class="dv">2</span><span class="op">*</span> (<span class="dv">1</span><span class="op">+</span> r))</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>\r <span class="ot">-&gt;</span> <span class="dv">3</span><span class="op">-</span> (<span class="dv">2</span><span class="op">*</span> (<span class="dv">1</span><span class="op">+</span> r))</span></code></pre></div>
 <p><em>주의 - 여기 예시는 단순 함수 컴포지션으로 해결이 되지만, 한 단계의 결과가 바로 다음의 결과에 영향을 주는게 아닐 경우 단순 컴포지션으로 해결할 수 없습니다.</em></p>
+<p>그런데 엮여 있는 모양이 작업 순서와 반대 모양으로 나타납니다. 코드에서도 작업 순서대로 모양이 나오면 직관적이지 않을까요? <code>1+</code> 먼저, 그 다음 <code>2*</code>, 그 다음 <code>3-</code></p>
+<h2 id="continuation">Continuation</h2>
 <p>좀 더 일반화해서, 이전 단계의 결과가 영향을 주든 안주든, 다음 작업이 이전 작업을 품는 모양을 만들기 위해, <em>이어지는 작업으로 뭘 할지 인자로 넘기도록</em> 할 수 있습니다. 작업이 끝난 후 결과를 리턴하는게 아니라, 결과를 이어지는 함수의 인자로 넘기는 모양이 됩니다. 이 걸 함수 외부에서 하는게 아니라, 함수 내부에서 항상 할 수 밖에 없게 만들면 다음과 같습니다.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>func1 x <span class="ot">=</span> <span class="dv">1</span> <span class="op">+</span> x</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>func2 x <span class="ot">=</span> <span class="dv">2</span> <span class="op">*</span> x</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>func3 x <span class="ot">=</span> <span class="dv">3</span> <span class="op">-</span> x</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="ot">func1_cps ::</span> <span class="dt">Num</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> r) <span class="ot">-&gt;</span> r </span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co">-- func1_cps x nextfunc = nextfunc $ func1 x 를 람다 함수로 표기하면</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>func1_cps x <span class="ot">=</span> \nextfunc <span class="ot">-&gt;</span> nextfunc <span class="op">$</span> func1 x</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co">-- x를 받아 작업을 하고, 결과를 바로 리턴하는게 아니라, </span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co">-- 나중에 함수를 받아서 적용할 준비가 된 상태, 즉 함수를 반환합니다.</span></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="ot">func2_cps ::</span> <span class="dt">Num</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> r) <span class="ot">-&gt;</span> r </span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>func2_cps x <span class="ot">=</span> \nextfunc <span class="ot">-&gt;</span> nextfunc <span class="op">$</span> func2 x </span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="ot">func3_cps ::</span> <span class="dt">Num</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> r) <span class="ot">-&gt;</span> r </span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>func3_cps x <span class="ot">=</span> \nextfunc <span class="ot">-&gt;</span> nextfunc <span class="op">$</span> func3 x </span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>cps x <span class="ot">=</span> \k <span class="ot">-&gt;</span> func1_cps x (\x' <span class="ot">-&gt;</span> func2_cps x' (\x'' <span class="ot">-&gt;</span> func3_cps x'' k))</span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> (cps <span class="dv">1</span>) <span class="fu">print</span> <span class="co">-- print는 \k 매개 변수를 통해 품고 품은 모양의 가장 안쪽으로 들어가는 걸 눈여겨 보세요.</span></span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="op">-</span><span class="dv">1</span></span></code></pre></div>
-<p>마지막 cps 함수 모양을 보면 람다가 람다를 품는 식으로 엮여 있는데, 액션들이 많아지면 보기 편하진 않습니다. 그런데, 품는 모양이 익숙하지 않나요? 맞습니다. 모나드입니다. 하스켈에서 늘 그렇듯, <em>역시나 모나드 패턴</em>을 써서 동일한 기능을 단순하게 표기할 수 있습니다. 모나드로 cps를 다르게 구현하는게 아닌, 위 람다를 품은 람다를 보기 좋은 형태로 표기하는 역할만 합니다. Control.Monad.Trans.Cont 라이브러리에 <code>Cont</code> 모나드가 정의되어 있습니다.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>func1 x <span class="ot">=</span> <span class="dv">1</span> <span class="op">+</span> x</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>func2 x <span class="ot">=</span> <span class="dv">2</span> <span class="op">*</span> x</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>func3 x <span class="ot">=</span> <span class="dv">3</span> <span class="op">-</span> x</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="ot">func1_cps ::</span> <span class="dt">Num</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> r) <span class="ot">-&gt;</span> r </span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="co">-- func1_cps x nextfunc = nextfunc $ func1 x 를 람다 함수로 표기하면</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>func1_cps x <span class="ot">=</span> \nextfunc <span class="ot">-&gt;</span> nextfunc <span class="op">$</span> func1 x</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="co">-- x를 받아 작업을 하고, 결과를 바로 리턴하는게 아니라, </span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="co">-- 나중에 함수를 받아서 적용할 준비가 된 상태, 즉 함수를 반환합니다.</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="ot">func2_cps ::</span> <span class="dt">Num</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> r) <span class="ot">-&gt;</span> r </span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>func2_cps x <span class="ot">=</span> \nextfunc <span class="ot">-&gt;</span> nextfunc <span class="op">$</span> func2 x </span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="ot">func3_cps ::</span> <span class="dt">Num</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> r) <span class="ot">-&gt;</span> r </span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>func3_cps x <span class="ot">=</span> \nextfunc <span class="ot">-&gt;</span> nextfunc <span class="op">$</span> func3 x </span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>cps x <span class="ot">=</span> \k <span class="ot">-&gt;</span> func1_cps x (\x' <span class="ot">-&gt;</span> func2_cps x' (\x'' <span class="ot">-&gt;</span> func3_cps x'' k)) <span class="co">---- (가)</span></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> (cps <span class="dv">1</span>) <span class="fu">print</span> <span class="co">-- print는 \k 매개 변수를 통해 품고 품은 모양의 가장 안쪽으로 들어가는 걸 눈여겨 보세요.</span></span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a><span class="op">-</span><span class="dv">1</span></span></code></pre></div>
+<p>※ 괄호의 우선 순위를 생각하면 마치 <code>func3_cps</code>부터 실행하고, … 마지막에 <code>func1_cps</code>를 실행할 것처럼 괄호가 묶여 있습니다. 하지만, <code>func3_cps</code>를 실행reduce하려면 <code>x''</code>과 <code>k</code>가 있어야만 합니다. 결국 눈에 보이는대로 실행됩니다. <em>멀리 있는 헤드에 바인딩을 걸어두면 실행을 미룰 수</em> 있습니다. cps를 이런식으로 복잡한 설명을 하는 게 탐탁치 않은 분들도 있을텐데, 단순 읽는 것을 넘어 어떻게 이런 코드 모양을 떠올렸는지 아이디어 연결 고리를 찾기 위해서입니다.</p>
+<p>마지막 (가) <code>cps</code> 함수 모양을 보면 람다가 람다를 품는 식으로 엮여 있는데, 액션들이 많아지면 보기 편하진 않습니다. 그런데, 품는 모양이 익숙하지 않나요? 맞습니다. 모나드입니다. 하스켈에서 늘 그렇듯, <em>역시나 모나드 패턴</em>을 써서 동일한 기능을 단순하게 표기할 수 있습니다. 모나드로 <code>cps</code>를 다르게 구현하는게 아닌, 위 람다를 품은 람다를 보기 좋은 형태로 표기하는 역할만 합니다. Control.Monad.Trans.Cont 라이브러리에 <code>Cont</code> 모나드가 정의되어 있습니다.</p>
 <p><code>Cont</code> 모나드는 <code>\k -&gt; func1_cps x (\x' -&gt; func2_cps x' (\x'' -&gt; func3_cps x'' k))</code> 모양의 코드를 좀 더 보기 좋게 만들어주는 모나드입니다.</p>
 <p>※ 참고로 <code>(a -&gt; r) -&gt; r</code> 타입의 함수로 가장 많이 만나는 함수가 <code>($)</code> 커링 상태입니다. 값을 받아서 함수를 적용하는게 아니라, 값은 이미 갖고 있고, 함수를 받으면 이 값에 적용 후 결과를 돌려주는 함수입니다.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> (<span class="op">$</span> <span class="dv">3</span>) (<span class="op">+</span><span class="dv">2</span>)</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="dv">5</span></span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> (<span class="op">$</span> <span class="dv">3</span>) (<span class="op">+</span><span class="dv">2</span>)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="dv">5</span></span></code></pre></div>
 <p><code>($ 3)</code>은 함수를 받아서 <code>3</code>에다 적용 후 결과를 돌려줍니다.<br />
 <code>Cont</code> 모나드의 <code>return</code>이 이 함수를 이용해 정의되어 있습니다.</p>
 <h2 id="cont-모나드">Cont 모나드</h2>
 <p><code>(a -&gt; r) -&gt; r</code> 타입을 체이닝(품고 품게)하기 위해 바인드를 정의하는데, GHC가 이 바인드를 고를 수 있도록 <code>(a -&gt; r) -&gt; r</code> 타입을 래핑해서 새로운 타입을 만들어야 합니다.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">Cont</span> r a <span class="ot">=</span> <span class="dt">Cont</span> ((a <span class="ot">-&gt;</span> r) <span class="ot">-&gt;</span> r)</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">Cont</span> r a <span class="ot">=</span> <span class="dt">Cont</span> ((a <span class="ot">-&gt;</span> r) <span class="ot">-&gt;</span> r)</span></code></pre></div>
 <p>이 타입을 엮을 바인드를 정의합니다.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ot">cont ::</span> ((a <span class="ot">-&gt;</span> r) <span class="ot">-&gt;</span> r) <span class="ot">-&gt;</span> <span class="dt">Cont</span> r a</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ot">runCont ::</span> <span class="dt">Cont</span> r a <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> r) <span class="ot">-&gt;</span> r</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Moand</span> (<span class="dt">Cont</span> r) <span class="kw">where</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span> x <span class="ot">=</span> cont (<span class="op">$</span> x)</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  s <span class="op">&gt;&gt;=</span> f <span class="ot">=</span> cont <span class="op">$</span> \c <span class="ot">-&gt;</span> runCont s</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>                 <span class="op">$</span> \x <span class="ot">-&gt;</span> runCont (f x) c</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="ot">cont ::</span> ((a <span class="ot">-&gt;</span> r) <span class="ot">-&gt;</span> r) <span class="ot">-&gt;</span> <span class="dt">Cont</span> r a</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="ot">runCont ::</span> <span class="dt">Cont</span> r a <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> r) <span class="ot">-&gt;</span> r</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Moand</span> (<span class="dt">Cont</span> r) <span class="kw">where</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span> x <span class="ot">=</span> cont (<span class="op">$</span> x)</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  s <span class="op">&gt;&gt;=</span> f <span class="ot">=</span> cont <span class="op">$</span> \c <span class="ot">-&gt;</span> runCont s</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>                 <span class="op">$</span> \x <span class="ot">-&gt;</span> runCont (f x) c</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- 참고로 ($)는 infixr 0 우선 순위를 갖고 있습니다.</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- 센스있게 네이밍을 바꿔보면</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>  action1 <span class="op">&gt;&gt;=</span> receiveAction1Result <span class="ot">=</span> cont <span class="op">$</span> \lastc <span class="ot">-&gt;</span> runCont action1 </span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>                                          <span class="op">$</span> \result1 <span class="ot">-&gt;</span> runCont (receiveAction1Result result1) lastc</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- 준비 운동에서 만났던 함수와 비교하면, job과 action의 차이점은</span></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- action1은 이미 속성 값은 받은 상태로, 함수만 받으면 되는 상태입니다. Cont (\f ...)</span></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- receiveAction1Result는 action1의 결과값을 받고, 함수도 받아야 되는 상태입니다. r1 -&gt; Cont (\f ...)</span></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>   \lastf <span class="ot">-&gt;</span> job <span class="dv">1</span>     (\y <span class="ot">-&gt;</span>       job y                          lastf)</span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- 타입 표시를 위한 cont와 runCont를 빼고, 속성을 이미 가지고 있다는 걸 염두하고 보면</span></span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>   \lastc <span class="ot">-&gt;</span> action1   (\result1 <span class="ot">-&gt;</span> (receiveAction1Result result1) lastc)</span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- 동일한 모양입니다.</span></span></code></pre></div>
+<p><code>job1</code>을 실행하고 결과를 받아 <code>job2</code>를 실행하는 걸 연결한다는 말은<br />
+<code>job1</code>과 <code>r -&gt; job2</code> 를 연결한다고 표현할 수 있습니다. 두 개의 모양을 보니 모나드 액션이 떠오르지 않나요?<br />
+<code>m a</code> 와 <code>a -&gt; m b</code> 의 연결입니다. 참고 - <a href="https://lionhairdino.github.io/posts/2020-06-24-Monad.html#%EC%99%9C-a---m-b-%ED%83%80%EC%9E%85-%ED%95%A8%EC%88%98%EA%B0%80-%ED%8A%B9%EB%B3%84%ED%95%A0%EA%B9%8C">모나드 문턱에서-왜 a -&gt; m b 타입 함수가 특별할까?</a></p>
 <p><code>Cont</code> 모나드를 이용하면, <code>do</code> 표기로 람다를 품은 람다를 숨길 수 있습니다.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>func1_cont x <span class="ot">=</span> <span class="fu">return</span> <span class="op">$</span> func1 x <span class="co">-- 일반 함수를 CPS 스타일로 쓰기 위해 Cont로 래핑합니다.</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>func2_cont x <span class="ot">=</span> <span class="fu">return</span> <span class="op">$</span> func2 x</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>func3_cont x <span class="ot">=</span> <span class="fu">return</span> <span class="op">$</span> func3 x</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>cont x <span class="ot">=</span> <span class="kw">do</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  y <span class="ot">&lt;-</span> func1_cont x</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  z <span class="ot">&lt;-</span> func2_cont y</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  func3_cont z</span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> runCont (cont <span class="dv">1</span>) <span class="fu">print</span> <span class="co">-- 위와 마찬가지로 print는 품고 품은 모양의 가장 안쪽으로 들어갑니다.</span></span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="op">-</span><span class="dv">1</span></span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>func1_cont x <span class="ot">=</span> <span class="fu">return</span> <span class="op">$</span> func1 x <span class="co">-- 일반 함수를 CPS 스타일로 쓰기 위해 Cont로 래핑합니다.</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>func2_cont x <span class="ot">=</span> <span class="fu">return</span> <span class="op">$</span> func2 x</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>func3_cont x <span class="ot">=</span> <span class="fu">return</span> <span class="op">$</span> func3 x</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>cont x <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  y <span class="ot">&lt;-</span> func1_cont x</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>  z <span class="ot">&lt;-</span> func2_cont y</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>  func3_cont z</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> runCont (cont <span class="dv">1</span>) <span class="fu">print</span> <span class="co">-- 위와 마찬가지로 print는 품고 품은 모양의 가장 안쪽으로 들어갑니다.</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="op">-</span><span class="dv">1</span></span></code></pre></div>
 <p>모나드 정의를 풀어 보겠습니다. 바인드를 풀기 전에 <code>return</code>을 보면</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">return</span> x <span class="ot">=</span> cont (<span class="op">$</span> x)</span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">return</span> x <span class="ot">=</span> cont (<span class="op">$</span> x)</span></code></pre></div>
 <p>값을 먼저 넣어서 <code>Cont</code> 타입을 만들어 놓으면, 나중에 함수를 받아 값에 적용할 준비를 합니다.</p>
 <p>그럼, 다음으로 바인드를 풀어 보겠습니다.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>s <span class="op">&gt;&gt;=</span> f <span class="ot">=</span> cont (\c <span class="ot">-&gt;</span> runCont s (\x <span class="ot">-&gt;</span> runCont (f x) c))</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- 설명하기 좋게 함수, 변수명을 바꾸면</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>action <span class="op">&gt;&gt;=</span> nextf <span class="ot">=</span> cont (\lastFunc <span class="ot">-&gt;</span> runCont action (\actionResult <span class="ot">-&gt;</span> runCont (nextf actionResult) lastFunc))</span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>s <span class="op">&gt;&gt;=</span> f <span class="ot">=</span> cont (\c <span class="ot">-&gt;</span> runCont s (\x <span class="ot">-&gt;</span> runCont (f x) c))</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- 설명하기 좋게 함수, 변수명을 바꾸면</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>action <span class="op">&gt;&gt;=</span> nextf <span class="ot">=</span> cont (\lastFunc <span class="ot">-&gt;</span> runCont action (\actionResult <span class="ot">-&gt;</span> runCont (nextf actionResult) lastFunc))</span></code></pre></div>
 <p>위에 나왔던 cps 예시 코드를 비교를 위해 두 개만 엮는 모양으로 다시 쓰면,</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>cps x <span class="ot">=</span> \k <span class="ot">-&gt;</span> func1_cps x (\x' <span class="ot">-&gt;</span> func2_cps x' k)</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- 설명하기 좋게 함수, 변수명을 바꾸면</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>cps x <span class="ot">=</span> \lastFunc <span class="ot">-&gt;</span> func1_cps x (\func1Result <span class="ot">-&gt;</span> func2_cps func1Result lastFunc)</span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>cps x <span class="ot">=</span> \k <span class="ot">-&gt;</span> func1_cps x (\x' <span class="ot">-&gt;</span> func2_cps x' k)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- 설명하기 좋게 함수, 변수명을 바꾸면</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>cps x <span class="ot">=</span> \lastFunc <span class="ot">-&gt;</span> func1_cps x (\func1Result <span class="ot">-&gt;</span> func2_cps func1Result lastFunc)</span></code></pre></div>
 <p>바인드 정의가 조금 감이 오지 않나요?</p>
 <p><code>&gt;&gt;=</code>의 첫 번째 인자 <code>s</code>는 <code>Cont</code> 타입, 두 번째 인자 <code>f</code>는 <code>a -&gt; Cont r a</code> 타입.<br />
 <code>Cont</code> 값을 <code>runCont</code>로 벗겨내면 “<em>나중에 함수를 받아서 적용할 값이 있는 상태</em>”가 됩니다.<br />
 <code>runCont s</code>는 함수를 받을 상태가 되고, 여기에 <code>(\x -&gt; ...)</code> 함수를 넘기면 <em>s에 들어 있는 값</em>에 <code>(\x -&gt; ...)</code> 를 적용하게 됩니다.<br />
-<code>f</code>를 <code>x</code>에 적용하면 다시 <code>Cont</code> 값이 나오고,<br />
+<code>f :: a -&gt; Cont r a</code>를 <code>x</code>에 적용하면 다시 <code>Cont</code> 값이 나오고,<br />
 이 걸 <code>runCont</code>로 다시 벗겨서 외부에서 들어 올 <em>함수를 적용할 준비</em>를 해놓습니다.<br />
 구체적으로 무슨 일을 하는지 감이 잘 오는 해석은 아닙니다.</p>
 <p>구체 값을 넣어 어떻게 진행하는지 다시 보겠습니다.</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>func1_cont <span class="dv">1</span> <span class="op">&gt;&gt;=</span> \a <span class="ot">-&gt;</span> func2_cont a</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>cont (\c <span class="ot">-&gt;</span> runCont (func1_cont <span class="dv">1</span>) (\x <span class="ot">-&gt;</span> runCont ((\a <span class="ot">-&gt;</span> func2_cont a) x) c))</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- runCont (func1_cont 1) 의 결과 2를 준비한 상태에 (\x ...) 를 넘기면 ------(A)</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>cont (\c <span class="ot">-&gt;</span> runCont ((\a <span class="ot">-&gt;</span> func2_cont a) <span class="dv">2</span>) c)</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="co">-- ((\a -&gt; func2_cont a) 2) 를 풀면 </span></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="co">-- (func2_cont 2) 의 결과는 4 ------(B)</span></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>cont (\c <span class="ot">-&gt;</span> runCont (cont (<span class="op">$</span> <span class="dv">4</span>)) c)</span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>cont (\c <span class="ot">-&gt;</span> (<span class="op">$</span> <span class="dv">4</span>) c)</span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>func1_cont <span class="dv">1</span> <span class="op">&gt;&gt;=</span> \a <span class="ot">-&gt;</span> func2_cont a</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>cont (\c <span class="ot">-&gt;</span> runCont (func1_cont <span class="dv">1</span>) (\x <span class="ot">-&gt;</span> runCont ((\a <span class="ot">-&gt;</span> func2_cont a) x) c))</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- runCont (func1_cont 1) 의 결과 2를 준비한 상태에 (\x ...) 를 넘기면 ------(A)</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>cont (\c <span class="ot">-&gt;</span> runCont ((\a <span class="ot">-&gt;</span> func2_cont a) <span class="dv">2</span>) c)</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="co">-- ((\a -&gt; func2_cont a) 2) 를 풀면 </span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="co">-- (func2_cont 2) 의 결과는 4 ------(B)</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>cont (\c <span class="ot">-&gt;</span> runCont (cont (<span class="op">$</span> <span class="dv">4</span>)) c)</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>cont (\c <span class="ot">-&gt;</span> (<span class="op">$</span> <span class="dv">4</span>) c)</span></code></pre></div>
 <p><code>c</code>로 함수를 받아 <code>4</code>에 적용할 준비를 마친 상태가 되었습니다. 중간 과정에 보면 (A)에서 첫 번째 액션, (B)에서 두 번째 액션이 이어서 준비되는게 보입니다. <a href="../posts/2020-07-03-freeMonad.html">Free 모나드 포스트</a>를 보신분은 비슷한 모양이 여기서도 보일겁니다.</p>
 <h2 id="그냥-함수-모나드와-뭐가-다를까">그냥 함수 모나드와 뭐가 다를까?</h2>
 <p>함수 모나드</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>comp <span class="ot">=</span> <span class="kw">do</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  a <span class="ot">&lt;-</span> (\f <span class="ot">-&gt;</span> f <span class="dv">1</span>)</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  b <span class="ot">&lt;-</span> (\f <span class="ot">-&gt;</span> f <span class="dv">2</span>)</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span> <span class="op">$</span> a <span class="op">+</span> b</span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> comp (<span class="op">+</span><span class="dv">2</span>)</span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="dv">7</span></span></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>comp <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  a <span class="ot">&lt;-</span> (\f <span class="ot">-&gt;</span> f <span class="dv">1</span>)</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  b <span class="ot">&lt;-</span> (\f <span class="ot">-&gt;</span> f <span class="dv">2</span>)</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span> <span class="op">$</span> a <span class="op">+</span> b</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> comp (<span class="op">+</span><span class="dv">2</span>)</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="dv">7</span></span></code></pre></div>
 <p>Cont 모나드</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ot">conts ::</span> <span class="dt">Cont</span> r <span class="dt">Integer</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>conts <span class="ot">=</span> <span class="kw">do</span></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  a <span class="ot">&lt;-</span> cont (\f <span class="ot">-&gt;</span> f <span class="dv">1</span>)</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  b <span class="ot">&lt;-</span> cont (\f <span class="ot">-&gt;</span> f <span class="dv">2</span>)</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span> <span class="op">$</span> a <span class="op">+</span> b</span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> runCont conts (<span class="op">+</span><span class="dv">2</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="ot">conts ::</span> <span class="dt">Cont</span> r <span class="dt">Integer</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>conts <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  a <span class="ot">&lt;-</span> cont (\f <span class="ot">-&gt;</span> f <span class="dv">1</span>)</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>  b <span class="ot">&lt;-</span> cont (\f <span class="ot">-&gt;</span> f <span class="dv">2</span>)</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span> <span class="op">$</span> a <span class="op">+</span> b</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> runCont conts (<span class="op">+</span><span class="dv">2</span>)</span></code></pre></div>
 <p>결과값으로 뭐가 나올까요?<br />
 <code>1 + 2</code>, <code>2 + 2</code> 를 더해 <code>7</code>이 나올까요? 아닙니다.</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>a <span class="ot">&lt;-</span> cont (\f <span class="ot">-&gt;</span> f <span class="dv">1</span>) <span class="co">-- a는 1</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>b <span class="ot">&lt;-</span> cont (\f <span class="ot">-&gt;</span> f <span class="dv">2</span>) <span class="co">-- b는 2</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="fu">return</span> <span class="op">$</span> a <span class="op">+</span> b <span class="co">-- ($ 3)으로 외부에서 함수를 받아 3에 적용합니다.</span></span></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>a <span class="ot">&lt;-</span> cont (\f <span class="ot">-&gt;</span> f <span class="dv">1</span>) <span class="co">-- a는 1</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>b <span class="ot">&lt;-</span> cont (\f <span class="ot">-&gt;</span> f <span class="dv">2</span>) <span class="co">-- b는 2</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="fu">return</span> <span class="op">$</span> a <span class="op">+</span> b <span class="co">-- ($ 3)으로 외부에서 함수를 받아 3에 적용합니다.</span></span></code></pre></div>
 <p><code>runCont</code>로 <code>(+2)</code>를 넣어주면 <code>($ 3) (+2) = 5</code> 가 됩니다.</p>
 <p>예를 들어 <code>f x = x + 1</code>을 cps 액션으로 만들면, <code>f x = return $ x + 1</code><br />
-이 액션은 <code>x + 1</code> 이라는 작업을 하고 결과를 나중에 받는 함수에 넘길 준비를 합니다.<br />
-위 예시는 따로 작업은 없고, 상수 <code>1</code>, 상수 <code>2</code>를 가지고 있을 뿐입니다. 그래서 <code>a</code>에는 <code>1</code>, <code>b</code>에는 <code>2</code>가 들어갑니다.</p>
+이 Cont액션은 <code>x + 1</code> 이라는 작업을 하고 결과를 나중에 받는 함수에 넘길 준비를 합니다. <code>\willGetFunc -&gt; willGetFunc (x + 1)</code> 이런 모양입니다.<br />
+위 예시는 따로 작업은 없고, 작업이 들어갈 자리에 상수 <code>1</code>, 상수 <code>2</code>를 가지고 있을 뿐입니다. 그래서 <code>a</code>에는 <code>1</code>, <code>b</code>에는 <code>2</code>가 들어갑니다.</p>
 <p><em>runCont로 넣어준 함수는 모든 액션들에 적용되는게 아니라, 마지막에 실행되는 함수입니다.</em></p>
 <p><code>Cont</code> 모나드 액션은 함수(다음에 할 작업)를 받아 적용할 인자들을 준비하는 것과 같습니다. <code>Cont</code> 모나드의 바인드는 이들 액션을 품고 품은 모양으로 만드는 역할을 합니다. 실제 바인드가 동작하는 모습을 보면 순서대로 작업이 실행되는게 보입니다.</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>c <span class="ot">-&gt;</span> cont (\f <span class="ot">-&gt;</span> f <span class="dv">1</span>) <span class="op">&gt;&gt;=</span> \a <span class="ot">-&gt;</span> cont (\f <span class="ot">-&gt;</span> f <span class="dv">2</span>) <span class="op">&gt;&gt;=</span> \b <span class="ot">-&gt;</span> cont (<span class="op">$</span> (a <span class="op">+</span> b)) c</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- 보기 쉽게 Cont 안에 들어 있는 준비된 인자만 보이게 (..1..), (..2..), (..a+b..)로 바꿔보겠습니다. </span></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>cont <span class="op">$</span> \c <span class="ot">-&gt;</span> runCont ( cont (<span class="op">..</span><span class="dv">1</span><span class="op">..</span>))</span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>     <span class="op">$</span> \x <span class="ot">-&gt;</span> runCont ( (\a <span class="ot">-&gt;</span> cont (<span class="op">..</span><span class="dv">2</span><span class="op">..</span>) <span class="op">&gt;&gt;=</span> \b <span class="ot">-&gt;</span> cont (<span class="op">..</span>a<span class="op">+</span>b<span class="op">..</span>)) x) c</span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>\c <span class="ot">-&gt;</span> (<span class="op">..</span><span class="dv">1</span><span class="op">..</span>) <span class="op">$</span> (\x <span class="op">...</span>) <span class="co">-- cont의 바인드는 액션속에 있는 준비된 인자를 다음 액션에 넣어주는 역할을 합니다.</span></span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>\c <span class="ot">-&gt;</span> (\x <span class="op">...</span>) <span class="dv">1</span> <span class="co">-- 첫 번째 액션이 가지고 있던 인자 1이 x로 들어갑니다.</span></span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>\c <span class="ot">-&gt;</span> runCont ( (\a <span class="ot">-&gt;</span> cont (<span class="op">..</span><span class="dv">2</span><span class="op">..</span>) <span class="op">&gt;&gt;=</span> \b <span class="ot">-&gt;</span> cont (<span class="op">..</span>a<span class="op">+</span>b<span class="op">..</span>)) <span class="dv">1</span> ) c <span class="co">-- a에 넘어온 1이 들어갑니다.</span></span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>\c <span class="ot">-&gt;</span> runCont ( cont (<span class="op">..</span><span class="dv">2</span><span class="op">..</span>) <span class="op">&gt;&gt;=</span> \b <span class="ot">-&gt;</span> cont (<span class="op">..</span><span class="dv">1</span><span class="op">+</span>b<span class="op">..</span>) )  c </span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>\c <span class="ot">-&gt;</span> runCont ( cont <span class="op">$</span> \c2 <span class="ot">-&gt;</span> runCont (cont (<span class="op">..</span><span class="dv">2</span><span class="op">..</span>)) <span class="op">$</span> x2 <span class="ot">-&gt;</span> runCont ((\b <span class="ot">-&gt;</span> cont (<span class="op">..</span><span class="dv">1</span><span class="op">+</span>b<span class="op">..</span>)) x2) c2 ) c </span>
-<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>\c <span class="ot">-&gt;</span> runCont ( cont <span class="op">$</span> \c2 <span class="ot">-&gt;</span>      (<span class="op">..</span><span class="dv">2</span><span class="op">..</span>) <span class="op">$</span> x2 <span class="ot">-&gt;</span> runCont ((\b <span class="ot">-&gt;</span> cont (<span class="op">..</span><span class="dv">1</span><span class="op">+</span>b<span class="op">..</span>)) x2)     c2 ) c </span>
-<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>\c <span class="ot">-&gt;</span> runCont ( cont <span class="op">$</span> \c2 <span class="ot">-&gt;</span>      runCont ((\b <span class="ot">-&gt;</span> cont (<span class="op">..</span><span class="dv">1</span><span class="op">+</span>b<span class="op">..</span>)) <span class="dv">2</span>)     c2 ) c</span>
-<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a><span class="co">-- 두 번째 액션이 가지고 있던 인자 2가 x2로 들어갑니다.</span></span>
-<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>\c <span class="ot">-&gt;</span> runCont ( cont <span class="op">$</span> \c2 <span class="ot">-&gt;</span> runCont (cont (<span class="op">..</span><span class="dv">1</span><span class="op">+</span><span class="dv">2</span><span class="op">..</span>)) c2 ) c <span class="co">-- b에 2가 들어갑니다.</span></span>
-<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>\c <span class="ot">-&gt;</span> runCont ( cont <span class="op">$</span> \c2 <span class="ot">-&gt;</span> c2 (<span class="dv">1</span> <span class="op">+</span> <span class="dv">2</span>) ) c </span>
-<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>\c <span class="ot">-&gt;</span> <span class="op">$</span> c (<span class="dv">1</span> <span class="op">+</span> <span class="dv">2</span>) <span class="co">--c2에 c가 들어갑니다.</span></span></code></pre></div>
-<p><code>Cont</code> 모나드를 이런식으로 쓰진 않습니다. 이해를 돕기 위해 만든 조금은 억지스러운 예시입니다.</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>c <span class="ot">-&gt;</span> cont (\f <span class="ot">-&gt;</span> f <span class="dv">1</span>) <span class="op">&gt;&gt;=</span> \a <span class="ot">-&gt;</span> cont (\f <span class="ot">-&gt;</span> f <span class="dv">2</span>) <span class="op">&gt;&gt;=</span> \b <span class="ot">-&gt;</span> cont (<span class="op">$</span> (a <span class="op">+</span> b)) c</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- 보기 쉽게 Cont 안에 들어 있는 준비된 작업만 보이게 (..1..), (..2..), (..a+b..)로 바꿔보겠습니다. </span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>cont <span class="op">$</span> \c <span class="ot">-&gt;</span> runCont ( cont (<span class="op">..</span><span class="dv">1</span><span class="op">..</span>))</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>     <span class="op">$</span> \x <span class="ot">-&gt;</span> runCont ( (\a <span class="ot">-&gt;</span> cont (<span class="op">..</span><span class="dv">2</span><span class="op">..</span>) <span class="op">&gt;&gt;=</span> \b <span class="ot">-&gt;</span> cont (<span class="op">..</span>a<span class="op">+</span>b<span class="op">..</span>)) x) c</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>\c <span class="ot">-&gt;</span> (<span class="op">..</span><span class="dv">1</span><span class="op">..</span>) <span class="op">$</span> (\x <span class="op">...</span>) <span class="co">-- 바인드는 액션속에 있는 준비된 작업의 결과를 다음 액션에 넣어주는 역할을 합니다.</span></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>\c <span class="ot">-&gt;</span> (\x <span class="op">...</span>) <span class="dv">1</span> <span class="co">-- 첫 번째 액션이 가지고 있던 작업결과1이 x로 들어갑니다.</span></span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>\c <span class="ot">-&gt;</span> runCont ( (\a <span class="ot">-&gt;</span> cont (<span class="op">..</span><span class="dv">2</span><span class="op">..</span>) <span class="op">&gt;&gt;=</span> \b <span class="ot">-&gt;</span> cont (<span class="op">..</span>a<span class="op">+</span>b<span class="op">..</span>)) <span class="dv">1</span> ) c <span class="co">-- a에 넘어온 1이 들어갑니다.</span></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>\c <span class="ot">-&gt;</span> runCont ( cont (<span class="op">..</span><span class="dv">2</span><span class="op">..</span>) <span class="op">&gt;&gt;=</span> \b <span class="ot">-&gt;</span> cont (<span class="op">..</span><span class="dv">1</span><span class="op">+</span>b<span class="op">..</span>) )  c </span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>\c <span class="ot">-&gt;</span> runCont ( cont <span class="op">$</span> \c2 <span class="ot">-&gt;</span> runCont (cont (<span class="op">..</span><span class="dv">2</span><span class="op">..</span>)) <span class="op">$</span> x2 <span class="ot">-&gt;</span> runCont ((\b <span class="ot">-&gt;</span> cont (<span class="op">..</span><span class="dv">1</span><span class="op">+</span>b<span class="op">..</span>)) x2) c2 ) c </span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>\c <span class="ot">-&gt;</span> runCont ( cont <span class="op">$</span> \c2 <span class="ot">-&gt;</span>      (<span class="op">..</span><span class="dv">2</span><span class="op">..</span>) <span class="op">$</span> x2 <span class="ot">-&gt;</span> runCont ((\b <span class="ot">-&gt;</span> cont (<span class="op">..</span><span class="dv">1</span><span class="op">+</span>b<span class="op">..</span>)) x2)     c2 ) c </span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>\c <span class="ot">-&gt;</span> runCont ( cont <span class="op">$</span> \c2 <span class="ot">-&gt;</span>      runCont ((\b <span class="ot">-&gt;</span> cont (<span class="op">..</span><span class="dv">1</span><span class="op">+</span>b<span class="op">..</span>)) <span class="dv">2</span>)     c2 ) c</span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a><span class="co">-- 두 번째 액션이 가지고 있던 작업의 결과 2가 x2로 들어갑니다.</span></span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>\c <span class="ot">-&gt;</span> runCont ( cont <span class="op">$</span> \c2 <span class="ot">-&gt;</span> runCont (cont (<span class="op">..</span><span class="dv">1</span><span class="op">+</span><span class="dv">2</span><span class="op">..</span>)) c2 ) c <span class="co">-- b에 2가 들어갑니다.</span></span>
+<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>\c <span class="ot">-&gt;</span> runCont ( cont <span class="op">$</span> \c2 <span class="ot">-&gt;</span> c2 (<span class="dv">1</span> <span class="op">+</span> <span class="dv">2</span>) ) c </span>
+<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>\c <span class="ot">-&gt;</span> <span class="op">$</span> c (<span class="dv">1</span> <span class="op">+</span> <span class="dv">2</span>) <span class="co">--c2에 c가 들어갑니다.</span></span></code></pre></div>
+<p><code>Cont</code> 모나드를 이런식으로 쓰진 않습니다. 단순하게 보이도록 특별한 작업이 아닌 상수1, 상수2로 작업을 표현했습니다. 이해를 돕기 위해 만든 조금은 억지스러운 예시입니다.</p>
 <h2 id="callcc">callCC</h2>
-<p><code>Cont</code> 모나드를 익힐 때 <code>callCC</code>가 걸림돌이었습니다.</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="ot">callCC ::</span> ((a <span class="ot">-&gt;</span> <span class="dt">ContT</span> r m b) <span class="ot">-&gt;</span> <span class="dt">ContT</span> r m a) <span class="ot">-&gt;</span> <span class="dt">ContT</span> r m a</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>callCC f <span class="ot">=</span> <span class="dt">ContT</span> <span class="op">$</span> \c <span class="ot">-&gt;</span> runContT (f (\x <span class="ot">-&gt;</span> <span class="dt">ContT</span> <span class="op">$</span> \_ <span class="ot">-&gt;</span> c x)) c</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- 실제 라이브러리에는 위와 같이 ContT 트랜스포머로 구현되어 있습니다.</span></span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="co">-- 여기서는 트랜스포머를 빼고, 아래 Cont를 이용한 정의를 쓰겠습니다.</span></span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="ot">callCC ::</span> ((a <span class="ot">-&gt;</span> <span class="dt">Cont</span> r b) <span class="ot">-&gt;</span> <span class="dt">Cont</span> r a) <span class="ot">-&gt;</span> <span class="dt">Cont</span> r a</span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>callCC f <span class="ot">=</span> cont <span class="op">$</span> \h <span class="ot">-&gt;</span> runCont (f (\a <span class="ot">-&gt;</span> cont <span class="op">$</span> \_ <span class="ot">-&gt;</span> h a)) h</span></code></pre></div>
+<p><code>Cont</code> 모나드를 익힐 때 <code>callCC</code>가 걸림돌이었습니다. 지금도 속시원하게 이해했다고 보기는 어려운 것 같습니다. 아직도 값이 아닌 함수가 움직이는 것에 대해 불편함이 남아 있어 그런 것 같습니다.</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="ot">callCC ::</span> ((a <span class="ot">-&gt;</span> <span class="dt">ContT</span> r m b) <span class="ot">-&gt;</span> <span class="dt">ContT</span> r m a) <span class="ot">-&gt;</span> <span class="dt">ContT</span> r m a</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>callCC f <span class="ot">=</span> <span class="dt">ContT</span> <span class="op">$</span> \c <span class="ot">-&gt;</span> runContT (f (\x <span class="ot">-&gt;</span> <span class="dt">ContT</span> <span class="op">$</span> \_ <span class="ot">-&gt;</span> c x)) c</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- 실제 라이브러리에는 위와 같이 ContT 트랜스포머로 구현되어 있습니다.</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="co">-- 여기서는 트랜스포머를 빼고, 아래 Cont를 이용한 정의를 쓰겠습니다.</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="ot">callCC ::</span> ((a <span class="ot">-&gt;</span> <span class="dt">Cont</span> r b) <span class="ot">-&gt;</span> <span class="dt">Cont</span> r a) <span class="ot">-&gt;</span> <span class="dt">Cont</span> r a</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>callCC f <span class="ot">=</span> cont <span class="op">$</span> \h <span class="ot">-&gt;</span> runCont (f (\a <span class="ot">-&gt;</span> cont <span class="op">$</span> \_ <span class="ot">-&gt;</span> h a)) h</span></code></pre></div>
 <p><code>Cont</code> 체인에 놓여 있는 액션은 순서대로 실행됩니다. 그런데 <code>callCC</code>로 감싸면 실행 흐름이 달라집니다. <em>callCC가 상황에 따라 continuation을 끊습니다.</em> 어떻게 그럴까요?</p>
-<p><code>callCC</code>가 받는 인자 <code>f</code>의 타입은</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="ot">f ::</span> (a <span class="ot">-&gt;</span> <span class="dt">Cont</span> r b) <span class="ot">-&gt;</span> <span class="dt">Cont</span> r a </span></code></pre></div>
-<p><code>Cont</code> 값을 만드는 함수를 받아서 <code>Cont</code> 값을 돌려 줍니다. <code>(a -&gt; Cont r b)</code> 함수에 <code>a</code>만 넣어줘도 <code>Cont</code> 값이 나오는데, 왜 한 번 더 감쌌을까요? 보통 <code>a</code>와 <code>a -&gt; b</code> 함수를 같이 받아 필터를 거친 후 함수를 적용하곤 하는데, <code>f</code>는 <code>a</code>를 받지 않습니다. 함수만 받으면 <code>Cont</code> 값이 나오므로, “<code>f</code>안에 <code>a</code>가 있다”고 짐작할 수 있습니다. <code>callCC</code>는 <em>함수만 받으면 Cont 값을 만들 준비가 되어 있는 함수</em>를 인자로 받습니다. 아래 예시의 <code>(\k ..)</code> 함수들입니다. k로 <code>a -&gt; Cont r b</code> 함수를 받을겁니다.</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> runCont ( callCC <span class="op">$</span> \k <span class="ot">-&gt;</span> cont (\f <span class="ot">-&gt;</span> f <span class="st">&quot;ok&quot;</span>) ) <span class="fu">id</span></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;ok&quot;</span></span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> runCont ( callCC <span class="op">$</span> \k <span class="ot">-&gt;</span> k <span class="st">&quot;ok&quot;</span>) <span class="fu">id</span></span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;ok&quot;</span></span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> runCont ( callCC <span class="op">$</span> \k <span class="ot">-&gt;</span> <span class="kw">do</span> k <span class="st">&quot;first&quot;</span>; <span class="fu">return</span> <span class="st">&quot;second&quot;</span> ) (<span class="op">++</span> <span class="st">&quot; end&quot;</span>)</span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;first end&quot;</span></span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> runCont ( callCC <span class="op">$</span> \k <span class="ot">-&gt;</span> <span class="kw">do</span> <span class="fu">return</span> <span class="st">&quot;first&quot;</span>; <span class="fu">return</span> <span class="st">&quot;second&quot;</span> ) (<span class="op">++</span> <span class="st">&quot; end&quot;</span>)</span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;second end&quot;</span></span></code></pre></div>
+<p><code>callCC</code>가 받는 유일한 인자 <code>f</code>의 타입은</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="ot">f ::</span> (a <span class="ot">-&gt;</span> <span class="dt">Cont</span> r b) <span class="ot">-&gt;</span> <span class="dt">Cont</span> r a </span></code></pre></div>
+<p><code>Cont</code> 값을 만드는 함수를 받아서 <code>Cont</code> 값을 돌려 줍니다. <code>(a -&gt; Cont r b)</code> 함수에 <code>a</code>만 넣어줘도 <code>Cont</code> 값이 나오는데, 왜 한 번 더 감쌌을까요? 보통 <code>a</code>와 <code>a -&gt; b</code> 함수를 같이 받아 필터를 거친 후 함수를 적용하곤 하는데, <code>f</code>는 <code>a</code>를 받지 않습니다. 함수만 받으면 <code>Cont</code> 값이 나오므로, “<em>f안에 이미 a가 있다</em>”고 짐작할 수 있습니다. <code>callCC</code>는 <em>함수만 받으면 Cont 값을 만들 준비가 되어 있는 함수</em>를 인자로 받습니다. 아래 예시의 <code>(\k ..)</code> 함수들입니다. k로 <code>a -&gt; Cont r b</code> 함수를 받을겁니다.</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> runCont ( callCC <span class="op">$</span> \k <span class="ot">-&gt;</span> cont (\f <span class="ot">-&gt;</span> f <span class="st">&quot;ok&quot;</span>) ) <span class="fu">id</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;ok&quot;</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> runCont ( callCC <span class="op">$</span> \k <span class="ot">-&gt;</span> k <span class="st">&quot;ok&quot;</span>) <span class="fu">id</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;ok&quot;</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> runCont ( callCC <span class="op">$</span> \k <span class="ot">-&gt;</span> <span class="kw">do</span> k <span class="st">&quot;first&quot;</span>; <span class="fu">return</span> <span class="st">&quot;second&quot;</span> ) (<span class="op">++</span> <span class="st">&quot; end&quot;</span>)</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;first end&quot;</span> <span class="co">-- 숨어 있는 바인드가 동작했습니다.</span></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> runCont ( callCC <span class="op">$</span> \k <span class="ot">-&gt;</span> <span class="kw">do</span> <span class="fu">return</span> <span class="st">&quot;first&quot;</span>; <span class="fu">return</span> <span class="st">&quot;second&quot;</span> ) (<span class="op">++</span> <span class="st">&quot; end&quot;</span>)</span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;second end&quot;</span> <span class="co">-- 숨어 있는 바인드가 동작했습니다.</span></span></code></pre></div>
 <p><code>first end</code> 결과가 나온 코드를 보면, <code>return "second"</code>는 실행되지 않습니다. <em>아이디어는 continuation을 받아서 버리는 겁니다.</em> 아마도 <code>callCC</code> 중에 <code>\_ -&gt; ...</code> 모양의 코드가 있을 거라 짐작할 수 있습니다. <code>callCC</code>를 풀어 보겠습니다. <code>callCC</code> 정의에 <code>(\k ..)</code> 함수를 넣으면</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>cont <span class="op">$</span> \h <span class="ot">-&gt;</span> runCont ((\k <span class="ot">-&gt;</span> <span class="kw">do</span> k <span class="st">&quot;first&quot;</span>; <span class="fu">return</span> <span class="st">&quot;second&quot;</span>) (\a <span class="ot">-&gt;</span> cont <span class="op">$</span> \_ <span class="ot">-&gt;</span> h a)) h</span></code></pre></div>
+<div class="sourceCode" id="cb26"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>cont <span class="op">$</span> \h <span class="ot">-&gt;</span> runCont ((\k <span class="ot">-&gt;</span> <span class="kw">do</span> k <span class="st">&quot;first&quot;</span>; <span class="fu">return</span> <span class="st">&quot;second&quot;</span>) (\a <span class="ot">-&gt;</span> cont <span class="op">$</span> \_ <span class="ot">-&gt;</span> h a)) h</span></code></pre></div>
 <p><em>k에 <code>(\a -&gt; cont $ \_ -&gt; h a) :: a -&gt; Cont r b</code> 를 넣으면</em></p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>cont <span class="op">$</span> \h <span class="ot">-&gt;</span> runCont (<span class="kw">do</span> (\a <span class="ot">-&gt;</span> cont <span class="op">$</span> \_ <span class="ot">-&gt;</span> h a) <span class="st">&quot;first&quot;</span>; <span class="fu">return</span> <span class="st">&quot;second&quot;</span>) h</span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>cont <span class="op">$</span> \h <span class="ot">-&gt;</span> runCont (<span class="kw">do</span> cont <span class="op">$</span> \_ <span class="ot">-&gt;</span> h <span class="st">&quot;first&quot;</span>; <span class="fu">return</span> <span class="st">&quot;second&quot;</span>) h</span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>                         <span class="op">^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</span></span></code></pre></div>
+<div class="sourceCode" id="cb27"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>cont <span class="op">$</span> \h <span class="ot">-&gt;</span> runCont (<span class="kw">do</span> (\a <span class="ot">-&gt;</span> cont <span class="op">$</span> \_ <span class="ot">-&gt;</span> h a) <span class="st">&quot;first&quot;</span>; <span class="fu">return</span> <span class="st">&quot;second&quot;</span>) h</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>cont <span class="op">$</span> \h <span class="ot">-&gt;</span> runCont (<span class="kw">do</span> cont <span class="op">$</span> \_ <span class="ot">-&gt;</span> h <span class="st">&quot;first&quot;</span>; <span class="fu">return</span> <span class="st">&quot;second&quot;</span>) h</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>                         <span class="op">^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</span></span></code></pre></div>
 <p>밑 줄 표시한 부분의 바인드를 풀어 보겠습니다.</p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co">--바인드 정의</span></span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>s <span class="op">&gt;&gt;=</span> f <span class="ot">=</span> cont <span class="op">$</span> \c <span class="ot">-&gt;</span> runCont s <span class="op">$</span> \x <span class="ot">-&gt;</span> runCont (f x) c</span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- do가 가린 바인드를 드러내면</span></span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>cont <span class="op">$</span> \_ <span class="ot">-&gt;</span> h <span class="st">&quot;first&quot;</span> <span class="op">&gt;&gt;=</span> \_ <span class="ot">-&gt;</span> <span class="fu">return</span> <span class="st">&quot;second&quot;</span></span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="ot">=</span> cont <span class="op">$</span> \c <span class="ot">-&gt;</span> runCont (cont <span class="op">$</span> \_ <span class="ot">-&gt;</span> h <span class="st">&quot;first&quot;</span>) <span class="op">$</span> \x <span class="ot">-&gt;</span> runCont ((\_ <span class="ot">-&gt;</span> <span class="fu">return</span> <span class="st">&quot;second&quot;</span>) x) c</span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>                                                  <span class="op">^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</span></span>
-<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>                                                  <span class="co">-- 이 부분이 \_ 로 들어가므로 모두 버려집니다.</span></span>
-<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a><span class="ot">=</span> cont <span class="op">$</span> \c <span class="ot">-&gt;</span> h <span class="st">&quot;first&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb28"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co">--바인드 정의</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>s <span class="op">&gt;&gt;=</span> f <span class="ot">=</span> cont <span class="op">$</span> \c <span class="ot">-&gt;</span> runCont s <span class="op">$</span> \x <span class="ot">-&gt;</span> runCont (f x) c</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- do가 가린 바인드를 드러내면</span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>cont <span class="op">$</span> \_ <span class="ot">-&gt;</span> h <span class="st">&quot;first&quot;</span> <span class="op">&gt;&gt;=</span> \_ <span class="ot">-&gt;</span> <span class="fu">return</span> <span class="st">&quot;second&quot;</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a><span class="ot">=</span> cont <span class="op">$</span> \c <span class="ot">-&gt;</span> runCont (cont <span class="op">$</span> \_ <span class="ot">-&gt;</span> h <span class="st">&quot;first&quot;</span>) <span class="op">$</span> \x <span class="ot">-&gt;</span> runCont ((\_ <span class="ot">-&gt;</span> <span class="fu">return</span> <span class="st">&quot;second&quot;</span>) x) c</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>                                                  <span class="op">^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</span></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>                                                  <span class="co">-- 이 부분이 \_ 로 들어가므로 모두 버려집니다.</span></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a><span class="ot">=</span> cont <span class="op">$</span> \c <span class="ot">-&gt;</span> h <span class="st">&quot;first&quot;</span></span></code></pre></div>
 <p>코드를 모두 합쳐 보면</p>
-<div class="sourceCode" id="cb21"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> runCont (cont <span class="op">$</span> \h <span class="ot">-&gt;</span> runCont ( cont <span class="op">$</span> \c <span class="ot">-&gt;</span> h <span class="st">&quot;first&quot;</span> ) h) (<span class="op">++</span> <span class="st">&quot; end&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb29"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> runCont (cont <span class="op">$</span> \h <span class="ot">-&gt;</span> runCont ( cont <span class="op">$</span> \c <span class="ot">-&gt;</span> h <span class="st">&quot;first&quot;</span> ) h) (<span class="op">++</span> <span class="st">&quot; end&quot;</span>)</span></code></pre></div>
 <p>정리하면, <code>callCC</code>는 “continuation을 만드는 함수를 받아서 continuation을 만들어내는 작업”을 인자로 받습니다. <code>callCC</code> 정의를 보면</p>
-<div class="sourceCode" id="cb22"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>callCC f <span class="ot">=</span> cont <span class="op">$</span> \h <span class="ot">-&gt;</span> runCont (f (\a <span class="ot">-&gt;</span> cont <span class="op">$</span> \_ <span class="ot">-&gt;</span> h a)) h</span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>                                   <span class="op">^^^^^^^^^^^^^^^^^^^^^^^^</span></span></code></pre></div>
+<div class="sourceCode" id="cb30"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>callCC f <span class="ot">=</span> cont <span class="op">$</span> \h <span class="ot">-&gt;</span> runCont (f (\a <span class="ot">-&gt;</span> cont <span class="op">$</span> \_ <span class="ot">-&gt;</span> h a)) h</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>                                   <span class="op">^^^^^^^^^^^^^^^^^^^^^^^^</span></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>                                   <span class="co">-- 원래 continuation을 변형하기 위한 함수</span></span></code></pre></div>
 <p><code>f</code>는 continuation을 만드는 함수를 받는데, 여기에 continuation을 버리는 모양을 만드는 함수를 넘깁니다. <code>a</code>값을 받으면 <code>cont $ \_ -&gt; h a</code> 을 만듭니다. 보통 다른 continuation 들은 <code>cont $ \h -&gt; h a</code> 모양으로 인자로 받은 함수를 내부에 적용하면서 continuation을 이어가는데, 여기선 <code>\_</code> 로 받아서 버립니다.</p>
-<p>원래 작업은 <code>\k -&gt; do k "first"; return "second"</code> 인데, 여기 <code>k</code>에 <code>(\a -&gt; cont $ \_ -&gt;h a)</code>를 넣어 작업을 변형합니다. <code>k</code>가 실행되면 continuation을 끊게 되고, <code>k</code>가 실행되지 않으면 <code>return "second"</code>가 실행됩니다.</p>
+<p>원래 작업은 <code>\k -&gt; do k "first"; return "second"</code> 인데, 여기 <code>k</code>에 <code>(\a -&gt; cont $ \_ -&gt;h a)</code>를 넣어 <em>작업을 변형</em>합니다. <code>\k</code>에는 사용자가 뭔가를 넣어 주기 위한 인자가 아니라, <code>callCC</code>가 안에 이미 갖고 있는 <code>(\a -&gt; cont $ \_ -&gt;h a)</code>가 이 자리로 들어갑니다. <code>k</code>가 실행되면 continuation을 끊게 되고, <code>k</code>가 실행되지 않으면 <code>return "second"</code>가 실행됩니다. 고차 함수, 즉 외부에서 함수를 인자로 받는 함수들은 여기에 어떤 함수를 넣어서 함수를 변형할 수 있습니다. 참고 -<a href="http://localhost:8000/posts/2021-05-07-callbackTraining.html">함수가 들어 있는 데이터 타입의 펑크터 만들기</a></p>
+<p>callCC가 이렇게 말합니다. “Continuation 코드 덩어리 여기 저기 흐름을 끊고 싶은 자리에 <code>k</code>함수를 사용하고, <code>k</code>하나를 받는 람다 함수로 감싸서 줘. 나는 나중에 <code>k</code>로 표시한 곳에 내가 갖고 있는 <code>(\a ...)</code> 함수를 넣을 거야. 그러니 <code>(\a ...)</code> 함수가 작동할 곳에 <code>k</code>를 써주기만 하면 내가 알아서 할게”</p>
+<p>※ exception을 다루는 mask 함수에서도 같은 패턴이 보입니다.</p>
 <h2 id="break">Break!</h2>
 <p><code>callCC</code>가 조건에 따라 continuation을 끊는break 코드입니다.</p>
-<div class="sourceCode" id="cb23"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Control.Monad.Cont</span></span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Control.Monad.Cont.Class</span></span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>func1 x <span class="ot">=</span> x <span class="op">+</span> <span class="dv">1</span></span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>func2 x <span class="ot">=</span> x <span class="op">-</span> <span class="dv">1</span></span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a><span class="ot">func1_cont ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Cont</span> r <span class="dt">Int</span></span>
-<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>func1_cont x <span class="ot">=</span> <span class="fu">return</span> <span class="op">$</span> func1 x</span>
-<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a><span class="ot">func2_cont ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Cont</span> r <span class="dt">Int</span></span>
-<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>func2_cont x <span class="ot">=</span> <span class="fu">return</span> <span class="op">$</span> func2 x</span>
-<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a><span class="ot">contFuncs ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> ()</span>
-<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>contFuncs <span class="fu">init</span> <span class="ot">=</span> runCont </span>
-<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>  ( <span class="kw">do</span> </span>
-<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a>    b <span class="ot">&lt;-</span> func1_cont <span class="fu">init</span>; </span>
-<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a>    func2_cont b</span>
-<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a>  ) <span class="fu">print</span></span>
-<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a><span class="ot">callccFuncs ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Cont</span> r <span class="dt">Int</span></span>
-<span id="cb23-21"><a href="#cb23-21" aria-hidden="true" tabindex="-1"></a>callccFuncs <span class="fu">init</span> <span class="ot">=</span> runCont </span>
-<span id="cb23-22"><a href="#cb23-22" aria-hidden="true" tabindex="-1"></a>  ( </span>
-<span id="cb23-23"><a href="#cb23-23" aria-hidden="true" tabindex="-1"></a>    callCC <span class="op">$</span> \k <span class="ot">-&gt;</span> <span class="kw">do</span></span>
-<span id="cb23-24"><a href="#cb23-24" aria-hidden="true" tabindex="-1"></a>      when (<span class="fu">init</span> <span class="op">==</span> <span class="dv">1</span>) <span class="op">$</span> k <span class="op">$</span> func1_cont <span class="fu">init</span></span>
-<span id="cb23-25"><a href="#cb23-25" aria-hidden="true" tabindex="-1"></a>      <span class="fu">return</span> <span class="op">$</span> func2_cont <span class="fu">init</span></span>
-<span id="cb23-26"><a href="#cb23-26" aria-hidden="true" tabindex="-1"></a>  ) <span class="fu">id</span></span>
-<span id="cb23-27"><a href="#cb23-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-28"><a href="#cb23-28" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="kw">do</span></span>
-<span id="cb23-29"><a href="#cb23-29" aria-hidden="true" tabindex="-1"></a>  contFuncs <span class="dv">1</span> <span class="co">-- 1 + 1 - 1 = 1</span></span>
-<span id="cb23-30"><a href="#cb23-30" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> r1 <span class="ot">=</span> runCont (callccFuncs <span class="dv">1</span>) <span class="fu">id</span></span>
-<span id="cb23-31"><a href="#cb23-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">putStrLn</span> <span class="op">$</span> <span class="fu">show</span> r1 <span class="co">-- 1 + 1 = 2</span></span>
-<span id="cb23-32"><a href="#cb23-32" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> r2 <span class="ot">=</span> runCont (callccFuncs <span class="dv">2</span>) <span class="fu">id</span></span>
-<span id="cb23-33"><a href="#cb23-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">putStrLn</span> <span class="op">$</span> <span class="fu">show</span> r2 <span class="co">-- 2 - 1 = 1</span></span></code></pre></div>
+<div class="sourceCode" id="cb31"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Control.Monad.Cont</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Control.Monad.Cont.Class</span></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>func1 x <span class="ot">=</span> x <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>func2 x <span class="ot">=</span> x <span class="op">-</span> <span class="dv">1</span></span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a><span class="ot">func1_cont ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Cont</span> r <span class="dt">Int</span></span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>func1_cont x <span class="ot">=</span> <span class="fu">return</span> <span class="op">$</span> func1 x</span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a><span class="ot">func2_cont ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Cont</span> r <span class="dt">Int</span></span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>func2_cont x <span class="ot">=</span> <span class="fu">return</span> <span class="op">$</span> func2 x</span>
+<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a><span class="ot">contFuncs ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> ()</span>
+<span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a>contFuncs <span class="fu">init</span> <span class="ot">=</span> runCont </span>
+<span id="cb31-15"><a href="#cb31-15" aria-hidden="true" tabindex="-1"></a>  ( <span class="kw">do</span> </span>
+<span id="cb31-16"><a href="#cb31-16" aria-hidden="true" tabindex="-1"></a>    b <span class="ot">&lt;-</span> func1_cont <span class="fu">init</span>; </span>
+<span id="cb31-17"><a href="#cb31-17" aria-hidden="true" tabindex="-1"></a>    func2_cont b</span>
+<span id="cb31-18"><a href="#cb31-18" aria-hidden="true" tabindex="-1"></a>  ) <span class="fu">print</span></span>
+<span id="cb31-19"><a href="#cb31-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-20"><a href="#cb31-20" aria-hidden="true" tabindex="-1"></a><span class="ot">callccFuncs ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Cont</span> r <span class="dt">Int</span></span>
+<span id="cb31-21"><a href="#cb31-21" aria-hidden="true" tabindex="-1"></a>callccFuncs <span class="fu">init</span> <span class="ot">=</span> runCont </span>
+<span id="cb31-22"><a href="#cb31-22" aria-hidden="true" tabindex="-1"></a>  ( </span>
+<span id="cb31-23"><a href="#cb31-23" aria-hidden="true" tabindex="-1"></a>    callCC <span class="op">$</span> \k <span class="ot">-&gt;</span> <span class="kw">do</span></span>
+<span id="cb31-24"><a href="#cb31-24" aria-hidden="true" tabindex="-1"></a>      when (<span class="fu">init</span> <span class="op">==</span> <span class="dv">1</span>) <span class="op">$</span> k <span class="op">$</span> func1_cont <span class="fu">init</span></span>
+<span id="cb31-25"><a href="#cb31-25" aria-hidden="true" tabindex="-1"></a>      <span class="fu">return</span> <span class="op">$</span> func2_cont <span class="fu">init</span></span>
+<span id="cb31-26"><a href="#cb31-26" aria-hidden="true" tabindex="-1"></a>  ) <span class="fu">id</span></span>
+<span id="cb31-27"><a href="#cb31-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-28"><a href="#cb31-28" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb31-29"><a href="#cb31-29" aria-hidden="true" tabindex="-1"></a>  contFuncs <span class="dv">1</span> <span class="co">-- 1 + 1 - 1 = 1</span></span>
+<span id="cb31-30"><a href="#cb31-30" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> r1 <span class="ot">=</span> runCont (callccFuncs <span class="dv">1</span>) <span class="fu">id</span></span>
+<span id="cb31-31"><a href="#cb31-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">putStrLn</span> <span class="op">$</span> <span class="fu">show</span> r1 <span class="co">-- 1 + 1 = 2</span></span>
+<span id="cb31-32"><a href="#cb31-32" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> r2 <span class="ot">=</span> runCont (callccFuncs <span class="dv">2</span>) <span class="fu">id</span></span>
+<span id="cb31-33"><a href="#cb31-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">putStrLn</span> <span class="op">$</span> <span class="fu">show</span> r2 <span class="co">-- 2 - 1 = 1</span></span></code></pre></div>
 <p>전체 작업을 <code>callCC</code>로 감싸 놓으면 아래 코드 모양을 만들 수 있습니다. 연결, 연결 되서 실행되는 체인인데, 특정 조건과 맞으면 실행이 끝나는 코드입니다.</p>
-<div class="sourceCode" id="cb24"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>callCC <span class="op">$</span> \breakfunc <span class="ot">-&gt;</span></span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  <span class="op">...</span></span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>  a조건과 맞으면 breakfunc</span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>  <span class="op">...</span></span>
-<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>  b조건과 맞으면 breakfunc</span>
-<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>  <span class="op">...</span></span></code></pre></div>
+<div class="sourceCode" id="cb32"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>callCC <span class="op">$</span> \breakfunc <span class="ot">-&gt;</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="op">...</span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>  a조건과 맞으면 breakfunc</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>  <span class="op">...</span></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>  b조건과 맞으면 breakfunc</span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>  <span class="op">...</span></span></code></pre></div>
 <hr />
 <p>참고<br />
 <a href="https://cms2.ks.ac.kr/riet/contents/20190304/%ED%95%A8%EC%88%98%ED%98%95%20%ED%94%84%EB%A1%9C%EA%B7%B8%EB%9E%98%EB%B0%8D%EC%9D%98%20Continuation%EC%9D%84%20%EC%9D%B4%EC%9A%A9%ED%95%9C%20%ED%9D%90%EB%A6%84%EC%A0%9C%EC%96%B4.pdf">변석우님 - 함수형 프로그래밍의 Continuation을 이용한 흐름제어</a><br />
