@@ -70,7 +70,7 @@
 <ol type="1">
 <li><a href="#고차-함수-읽기">고차 함수 읽기</a></li>
 <li><a href="#인자로-받은-걸-버리기">인자로 받은 걸 버리기</a></li>
-<li><a href="#고차함수와-고차함수를-받는-고차함수">고차함수와 고차함수를 받는 고차함수</a></li>
+<li><a href="#고차-함수와-고차-함수를-받는-고차-함수">고차 함수와 고차 함수를 받는 고차 함수</a></li>
 <li><a href="#함수형에선-함수를-바꾸고-명령형에선-값을-바꾼다">함수형에선 함수를 바꾸고, 명령형에선 값을 바꾼다.</a></li>
 </ol></li>
 <li><a href="#continuation">Continuation</a></li>
@@ -80,8 +80,8 @@
 <li><a href="#break">Break!</a></li>
 </ol>
 <h2 id="준비-운동">준비 운동</h2>
-<p>값을 넣고, 나중에 함수를 넣어, 이미 있는 값에 함수를 적용하는 모양을 생각해 봅시다.</p>
 <h3 id="고차-함수-읽기">고차 함수 읽기</h3>
+<p>값을 넣고, 나중에 함수를 넣어, 이미 있는 값에 함수를 적용하는 모양을 생각해 봅시다.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ot">job ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> (<span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span>) <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>job x f <span class="ot">=</span> f (x <span class="op">+</span> <span class="dv">1</span>)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- 아래와 같이 람다 함수 형태로 써도 같습니다.</span></span>
@@ -125,7 +125,7 @@
 <p>바꿀 “값”을 넣어주는 것과 “함수”를 넣어주는 차이가 뭘까요? 바꿀 “값”을 넣어주려면 “값”을 계산한 후 넣어줘야 하지만, “함수”를 넣어주면 꼭 필요한 순간까지 계산을 뒤로 미룰 수 있습니다. 하지만, 하스켈은 어차피 레이지하기 때문에 <code>func (1+1)</code>을 해도 <code>1+1</code>을 thunk로 가지고 있지 계산을 바로 하지 않습니다. 그럼 굳이 함수를 넘길 필요가 있을까요? 함수형에서는 여러 함수들을 엮고 엮어서 나중에 한방에 실행해서 결과물을 얻는 스타일로 작성합니다. 만일 안쪽에서 함수를 엮는 중간에 끼워넣어 엮고 싶다면 함수를 넘기는게 유용할 수 있습니다.</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> modifyPersonAge (<span class="fu">const</span> <span class="dv">20</span>) person1</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="dt">Person</span> {name <span class="ot">=</span> <span class="st">&quot;Who&quot;</span>, age <span class="ot">=</span> <span class="dv">20</span>}</span></code></pre></div>
-<h3 id="고차함수와-고차함수를-받는-고차함수">고차함수와 고차함수를 받는 고차함수</h3>
+<h3 id="고차-함수와-고차-함수를-받는-고차-함수">고차 함수와 고차 함수를 받는 고차 함수</h3>
 <div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ot">iHaveFuncs ::</span> ( (<span class="dt">String</span> <span class="ot">-&gt;</span> <span class="dt">String</span>) <span class="ot">-&gt;</span> <span class="dt">String</span> ) <span class="ot">-&gt;</span> <span class="dt">String</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>iHaveFuncs f <span class="ot">=</span> f (<span class="op">&lt;&gt;</span> <span class="st">&quot; is not your func&quot;</span>)</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -135,14 +135,16 @@
 <span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>exec <span class="ot">=</span> iHaveFuncs <span class="op">$</span> \havefunc <span class="ot">-&gt;</span> needFunc havefunc </span>
 <span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> exec</span>
 <span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;f is not your func&quot;</span></span></code></pre></div>
-<p>고차함수로 꼬아 꼬아 놨습니다. 이 글 끝에 같은 걸 보는데, <code>iHaveFuncs</code>가 넣어주는 함수보다 복잡한 걸 넣어주는 함수를 만납니다. 그 전에 살짝 준비 운동을 하면 좋습니다.</p>
+<p>고차 함수로 꼬아 꼬아 놨습니다. 이 글 끝에 같은 걸 보는데, <code>iHaveFuncs</code>가 넣어주는 함수보다 복잡한 걸 넣어주는 함수를 만납니다. 그 전에 살짝 준비 운동을 하면 좋습니다.</p>
 <p><code>needFunc f = f "f"</code> 에서 <code>f</code>는 나중에 누군가한테서 받아올 함수를 위한 자리입니다.<br />
 <code>iHaveFuncs f = f (...)</code> 에서 <code>f</code>는 <code>needFunc</code> 같은 모양의 함수를 받을 자리입니다.<br />
 지금부터가 핵심 테크닉입니다. <code>needFunc</code>가 받을 함수를 우리가 아니라 <code>iHaveFuncs</code>가 넣어줍니다.<br />
 <code>iHaveFuncs</code>는 미리 넣어 줄 함수 <code>(&lt;&gt; " is not your func")</code>를 미리 가지고 있습니다. <code>needFunc</code> 모양의 함수를 받으면 그 함수에게 갖고 있던 <code>(&lt;&gt;...)</code> 함수를 넣어 줍니다.</p>
-<p>고차함수를 받는 고차함수, 고차함수로 버무려진 코드입니다.<br />
+<p>함수를 인자로 받는 함수를 고차 함수라 합니다. 이 용어를 이용하면,<br />
+<code>ihaveFuncs</code>는 <em>고차 함수에 넣어줄 함수를 미리 가지고 있는 고차 함수</em> 입니다.</p>
+<p>고차 함수를 받는 고차 함수, 고차 함수로 버무려진 코드입니다.<br />
 뭔가 C를 공부하면서 만났던 포인터의 포인터의 포인터…의 향기가 떠오릅니다.</p>
-<p>왜 이런 짓을 하는지는 이 글 제일 아래에서 볼 수 있습니다.</p>
+<p>왜 이런 짓을 하는지는 이 글 제일 아래 <code>callCC</code>에서 볼 수 있습니다.</p>
 <h3 id="함수형에선-함수를-바꾸고-명령형에선-값을-바꾼다.">함수형에선 함수를 바꾸고, 명령형에선 값을 바꾼다.</h3>
 <p>명령형 프로그램에서는 계산이 진행될 때마다 상태를 갱신해서 최종 결과를 만들어냅니다. 함수형에서는 상태가 없기 때문에 단계별 계산이 어떻게 표현 될까요? 상태를 따로 두는게 아니라, 함수가 함수를 감싸도록 해서 상태를 그 즉시 다른 함수에 입력으로 넣어주면(<em>함수를 합쳐 놓으면</em>) 상태를 저장하는 작업이 필요 없습니다.</p>
 <p>함수란, 필요한 입력이 모두 주어지면 그 때 작업이 시작되어서 결과를 만들어내는 “할 일”을 뜻합니다. 함수<em>만</em> 있을 때는 아무런 일이 일어나지 않습니다. 함수에 <em>입력을 주는 순간</em> 일은 시작됩니다.</p>
