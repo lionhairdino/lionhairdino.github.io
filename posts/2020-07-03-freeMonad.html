@@ -202,7 +202,7 @@
 <div class="sourceCode" id="cb17"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="op">SomeMonad..</span>(<span class="op">SomeMonad..</span>(<span class="op">SomeMonad..</span>(<span class="op">SomeMonad..</span>(<span class="op">SomeMonad..</span>))))</span></code></pre></div>
 <p><code>..</code> 부분에서 어떤 작업을 하느냐에 따라 모나드 성격이 결정됩니다. <code>Free</code> 모나드 패턴은 <code>..</code>부분에 동작하는 코드를 넣지 않고, 명세서 항목같은 걸 넣어두고 나중에 이 구조를 한 꺼풀씩 벗겨내는 함수에 넘겨서 실제 명세서 항목에 따른 작업을 하도록 합니다. 이런 코드를 보통 인터프리터라고 부릅니다.</p>
 <figure>
-<img src="../images/freeMonad.png" alt="공짜로?Free 모나드 되기" /><figcaption aria-hidden="true">공짜로?Free 모나드 되기</figcaption>
+<img src="../images/freeMonad.png" alt="공짜로? 모나드 되기. 단 Free 모나드만 될 수 있습니다." /><figcaption aria-hidden="true">공짜로? 모나드 되기. 단 Free 모나드만 될 수 있습니다.</figcaption>
 </figure>
 <div class="sourceCode" id="cb18"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- 인터프리터 예시</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="ot">showFree ::</span> <span class="dt">Free</span> <span class="dt">Act</span> () <span class="ot">-&gt;</span> <span class="dt">String</span></span>
@@ -228,7 +228,7 @@
 <p>가 “<code>Free</code> 모나드 패턴”입니다.</p>
 <h2 id="진짜-펑크터를-넘기면-원하는-모나드-동작을-할까">진짜 펑크터를 넘기면 원하는 모나드 동작을 할까?</h2>
 <h3 id="mymaybe">MyMaybe</h3>
-<p>펑크터를 받으면 공짜로Free 모나드를 만들어 준다기에, 그럼 기존 모나드들도 Free로 구현할 수 있는 한 번 시도해 봤습니다. Maybe와 같은 MyMaybe를 정의하는데, 펑크터까지만 만들어 두고, Free를 씌워서 모나드 동작을 하는지 살펴봤습니다.</p>
+<p>펑크터를 받으면 공짜로<code>Free</code> 모나드를 만들어 준다기에, 그럼 기존 모나드들도 <code>Free</code>로 구현할 수 있는 한 번 시도해 봤습니다. 결론을 말하면, 공짜를 뜻하는 <code>Free</code>가 아니라, 모나드 이름이 <code>Free</code>인 모나드라고 해야 할 것 같습니다. <code>Maybe</code>와 같은 <code>MyMaybe</code>를 정의하는데, 펑크터까지만 만들어 두고, <code>Free</code>를 씌워서 모나드 동작을 하는지 살펴봤습니다.</p>
 <p>참고 : Maybe 모나드 정의</p>
 <div class="sourceCode" id="cb19"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">return</span><span class="ot"> ::</span> a <span class="ot">-&gt;</span> <span class="dt">Maybe</span> a</span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">return</span> x  <span class="ot">=</span> <span class="dt">Just</span> x</span>
@@ -381,8 +381,8 @@
 <hr />
 <ol>
 <li id="fn1" role="doc-endnote"><p><strong>Free의 속 뜻</strong><br />
-같은 뜻으로 쓰인 Free 모노이드를 보면 이해하는데 도움이 됩니다.<br />
-리스트를 <code>Free</code> 모노이드라 부릅니다. 영어 번역으론 타입을 받으면 <code>free</code> 모노이드를 돌려주는 구조라 되어 있는데, 이런 설명식 문장으로 의사 소통이 귀찮은지 그냥 리스트를 <code>Free</code> 모노이드라 부르기도 합니다. 엄밀히 말하면 타입을 모노이드로 만드는 툴이 리스트이고, 이렇게 별 노력없이 만들어진 모노이드를 <code>Free</code> 모노이드라 부릅니다.</p>
+같은 뜻으로 쓰인 <code>Free</code> 모노이드를 보면 이해하는데 도움이 됩니다.<br />
+리스트를 <code>Free</code> 모노이드라 부릅니다. 영어 번역으론 타입을 받으면 <code>Free</code> 모노이드를 돌려주는 구조라 되어 있는데, 이런 설명식 문장으로 의사 소통이 귀찮은지 그냥 리스트를 <code>Free</code> 모노이드라 부르기도 합니다. 엄밀히 말하면 타입을 모노이드로 만드는 툴이 리스트이고, 이렇게 별 노력없이 만들어진 모노이드를 <code>Free</code> 모노이드라 부릅니다.</p>
 <p>This structure gives you a “free” monoid for a given type.</p>
 <p>어떤 타입이 들어있는 리스트이든, 리스트로 만들면 모노이드가 됩니다. 리스트가 무슨 매직을 부려 이렇게 할까요? 보통 “어떤 타입이든”이란 말이 들어가면, 지금 쓰이는 개념이 그 타입에 무관하다란 말과 같습니다. 한 가지 설명만으로 모든 경우와 맞서려 하면 머리가 복잡합니다. 그 때 그 때 어울리는 설명들을 가지고 헤쳐 나가야 합니다. 지금은 리스트를 값을 담고 있는 구조로만 해석하겠습니다. 이 구조가 모노이드 성격을 띄게 하면 내용물이야 뭐가 됐든 모노이드와 같은 동작을 하게 할 수 있습니다.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Monoid</span> [a] <span class="kw">where</span></span>
