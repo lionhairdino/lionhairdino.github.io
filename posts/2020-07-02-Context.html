@@ -86,10 +86,8 @@
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Applicative</span> <span class="dt">Maybe</span> <span class="kw">where</span>  </span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pure</span> <span class="ot">=</span> <span class="dt">Just</span>  </span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Nothing</span> <span class="op">&lt;*&gt;</span> _ <span class="ot">=</span> <span class="dt">Nothing</span>  <span class="co">-- 여기 패턴 매칭에서 갈래 길이 만들어진다.</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    (<span class="dt">Just</span> f) <span class="op">&lt;*&gt;</span> something <span class="ot">=</span> <span class="fu">fmap</span> f something <span class="co">-- f의 fmap이 실행되어 something의 갈래길이 만들어진다.</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>                                              <span class="co">-- ex) something이 [] 펑크터이면 []의 fmap이 실행되어</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>                                              <span class="co">-- 리스트의 비결정성이란 컨텍스트가 발현된다.</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>                                              <span class="co">-- 쉽게 얘기하면, 리스트 안에 들어 있는 각각의 값에 모두 f를 적용한다.</span></span></code></pre></div>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    (<span class="dt">Just</span> f) <span class="op">&lt;*&gt;</span> something <span class="ot">=</span> <span class="fu">fmap</span> f something <span class="co">-- 첫 번째 인자를 패턴 매칭해서 갈래길을 만들고,</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>                                              <span class="co">-- something에 fmap이 실행되어 또 한 번 갈래길이 만들어진다.</span></span></code></pre></div>
 <p>보통 펑크터들의 추가적인 정보는 갈래 길(분기)을 통해 드러납니다. <code>&lt;*&gt;</code> 정의를 보면, <code>Nothing</code>과 <code>Just f</code> 패턴 매칭으로 갈래 길이 드러납니다. 컨텍스트로 반복해서 동작할 코드가 바로 이 패턴 매칭입니다.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pure</span> (<span class="op">+</span>) <span class="op">&lt;*&gt;</span> <span class="dt">Just</span> <span class="dv">3</span> <span class="op">&lt;*&gt;</span> <span class="dt">Just</span> <span class="dv">5</span></span></code></pre></div>
 <p>보통 펑크터 안에 있는 값에, 여러 개의 매개 변수를 가진 함수를 적용하는데, 커링 진행 중간 단계를 보면 커링된(부분 적용된)함수가 펑크터 안에 놓여 있는 상태가 되어, 커링된 함수를 다시 펑크터에서 꺼낼 때 <code>&lt;*&gt;</code> 가 필요합니다. 좀 더 쉽게 보기 위해 위 코드의 중간 커링 단계를 보면</p>
@@ -104,10 +102,10 @@
 <h2 id="traversable">Traversable</h2>
 <p>한 발자국 더 들어가 봅시다.<br />
 <code>map</code>과 <code>traverse</code>의 차이가 뭘까요?<br />
-※ 하스켈의 작명 센스는 프로그래머와 그리 친해보이지 않는다는 의견이 종종 보이는데, traverse 단어 뜻(가로지리다. 횡단하다.)만 보고 언뜻 알기는 어려워 보입니다.</p>
+※ 하스켈의 작명 센스는 프로그래머와 그리 친해보이지 않는다는 의견이 종종 보이는데, traverse도 단어 뜻(가로지리다. 횡단하다.)만 보고 언뜻 알기는 어려워 보입니다.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- Traversal Maybe 인스턴스의 traverse 정의</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">traverse</span> f (<span class="dt">Just</span> a) <span class="ot">=</span> <span class="dt">Just</span> <span class="op">&lt;$&gt;</span> f a <span class="co">-- 또는 pure (Just) &lt;*&gt; f a</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>                                   <span class="co">-- a가 Just인지 살펴봤는데, 뒤에 또 한번 f a가 Just인지 &lt;$&gt;로 살펴 봅니다.</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>                                   <span class="co">-- 들어 온 값이 Just a인지 살펴봤는데, 뒤에 또 한번 f a가 Just인지 &lt;$&gt;로 살펴 봅니다.</span></span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>                                   <span class="co">-- &lt;$&gt;는 fmap의 중위infix 표현입니다.</span></span>
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="fu">traverse</span> f <span class="dt">Nothing</span> <span class="ot">=</span> <span class="fu">pure</span> <span class="dt">Nothing</span></span>
 <span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
@@ -178,10 +176,21 @@
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="dt">Actual</span> <span class="kw">type</span><span class="op">:</span> [<span class="dt">IO</span> ()]</span></code></pre></div>
 <p>리스트 안에 들어 있는 <code>IO</code>나 <code>STM</code>을 바깥으로 꺼내놔야 현재 컨텍스트에서 쓸 수 있습니다. 바로 이럴 때 <code>traverse</code>를 씁니다.</p>
 <div class="sourceCode" id="cb15"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>atomically <span class="op">$</span> <span class="fu">traverse</span> (\f <span class="ot">-&gt;</span> f a) xs</span></code></pre></div>
-<p>다시 한번 위에 나왔던 Maybe의 인스턴스를 예로 보면, <em>펑크터 두 개</em>가 섞여 있는 코드에서 펑크터 위치를 바꾸는 걸 알 수 있습니다.</p>
+<p>다시 한번 위에 나왔던 Maybe의 인스턴스를 예로 보면, <em>펑크터 두 개가 섞여 있는 코드에서 펑크터 위치를 바꾸는 걸</em> 알 수 있습니다.</p>
 <div class="sourceCode" id="cb16"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- f와 Just의 감싼 순서를 바꾸고 있습니다.</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">traverse</span> f (<span class="dt">Just</span> a) <span class="ot">=</span> <span class="dt">Just</span> <span class="op">&lt;$&gt;</span> f a</span></code></pre></div>
 <p>생각을 좇아가는 팁은, <em>패턴 매칭</em>으로 펑크터가 벗겨지는 걸 상상하며 따라가면 좋습니다. 언제나, 펑크터가 가진 고유의 동작이 드러나려면 <em>패턴 매칭</em>으로 벗겨야 한다는 걸 기억하세요.</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="op">:</span>t [<span class="fu">putStrLn</span> <span class="st">&quot;1&quot;</span>, <span class="fu">putStrLn</span> <span class="st">&quot;2&quot;</span>]</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>[<span class="fu">putStrLn</span> <span class="st">&quot;1&quot;</span>, <span class="fu">putStrLn</span> <span class="st">&quot;2&quot;</span>]<span class="ot"> ::</span> [<span class="dt">IO</span> ()]</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="co">-- IO와 [] 순서를 바꾸기 위해 </span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="op">:</span>t <span class="fu">traverse</span> <span class="fu">id</span> [<span class="fu">putStrLn</span> <span class="st">&quot;1&quot;</span>, <span class="fu">putStrLn</span> <span class="st">&quot;2&quot;</span>]</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="fu">traverse</span> <span class="fu">id</span> [<span class="fu">putStrLn</span> <span class="st">&quot;1&quot;</span>, <span class="fu">putStrLn</span> <span class="st">&quot;2&quot;</span>]<span class="ot"> ::</span> <span class="dt">IO</span> [()]</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="fu">traverse</span> <span class="fu">id</span> [<span class="fu">putStrLn</span> <span class="st">&quot;1&quot;</span>, <span class="fu">putStrLn</span> <span class="st">&quot;2&quot;</span>]</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>[(),()]</span></code></pre></div>
 
 <div class="comment">
 <script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>

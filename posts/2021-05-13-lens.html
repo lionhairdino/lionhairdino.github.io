@@ -77,17 +77,17 @@
 </div>
 
 <h3 id="목차">목차</h3>
-<ul>
+<ol type="1">
 <li><a href="#lens의-목적">Lens의 목적</a></li>
 <li><a href="#템플릿이-만들어내는-대략적인-코드-모양">템플릿이 만들어내는 대략적인 코드 모양</a></li>
 <li><a href="#traversals">Traversals</a></li>
 <li><a href="#쥬스-만들기에-비유해-봤습니다">쥬스 만들기에 비유해 봤습니다</a></li>
 <li><a href="#왜-펑크터가-들어가-있을까요">왜 펑크터가 들어가 있을까요?</a>
-<ul>
+<ol type="1">
 <li><a href="#펑크터-없이-구현">펑크터 없이 구현</a></li>
 <li><a href="#펑크터가-필요한-이유">펑크터가 필요한 이유</a></li>
-</ul></li>
-</ul>
+</ol></li>
+</ol>
 <figure>
 <img src="../images/lens.png" alt="천재만 하스켈을 쓰는 건 아닙니다. 몸 좀 쓰면 안되나요?" /><figcaption aria-hidden="true">천재만 하스켈을 쓰는 건 아닙니다. 몸 좀 쓰면 안되나요?</figcaption>
 </figure>
@@ -383,7 +383,7 @@
 <span id="cb46-29"><a href="#cb46-29" aria-hidden="true" tabindex="-1"></a>setPersonAddress address <span class="ot">=</span> modifyPersonAddress (<span class="fu">const</span> address)</span></code></pre></div>
 <p><code>Lens</code> 타입 안에 들어 있는 <code>Functor f</code>는<br />
 <code>over</code> 안에서 인자 <code>lens</code>에 <code>runIdentity</code>를 쓰는 걸 보고 GHC가 알아서 <code>Identity</code>로 추론하고,<br />
-<code>view</code> 안세서 인자 <code>lens</code>에 <code>getConst</code>를 쓰는 걸 보고 GHC가 알아서 <code>Const</code>로 추론합니다.</p>
+<code>view</code> 안에서 인자 <code>lens</code>에 <code>getConst</code>를 쓰는 걸 보고 GHC가 알아서 <code>Const</code>로 추론합니다.</p>
 <p><code>Lens</code> 타입 서명을 보면 <code>forall f. Functor f =&gt;</code> 나중에 어떤 펑크터든 될 수 있다고 선언했습니다. <code>personAddressL</code> 렌즈의 <code>&lt;$&gt;</code>는 <code>over</code><a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>에서 쓰이는 실제 코드와 <code>view</code>에 쓰이는 실제 코드가 다른 겁니다. <code>Lens</code>를 <em>하나의 코드로 해결한다는 말이 아닙니다. 실제 가져 올 코드는 GHC가 추론하도록 열어두고, 프로그래머는 같은 코드 모양을 쓰겠다</em>가 펑크터를 쓴 목적입니다.</p>
 <p>제작자가 어떻게 <code>Const</code>와 <code>Identity</code> 펑크터를 떠올렸을까 신기합니다.</p>
 <p><code>(a -&gt; a) -&gt; s -&gt; s</code> 타입을, 어떤 조건이 맞으면 <code>s -&gt; a</code> 타입이 되게 해야 됩니다.<br />
