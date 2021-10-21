@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko" lang="ko">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <title>lionhairdino - Lazy ByteString 과 Strict ByteString</title>
+
+        <meta name="description" content="Strict ByteString은 Lazy ByteString에 bang!을 붙인 것과 같은 걸까요?" />
+        <meta property="og:description" content="Strict ByteString은 Lazy ByteString에 bang!을 붙인 것과 같은 걸까요?" />
+
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <link rel="icon" href="https://lionhairdino.github.io/favicon.svg" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino16px.png" sizes="16x16" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino24px.png" sizes="24x24" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino32px.png" sizes="32x32" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino48px.png" sizes="48x48" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino57px.png" sizes="57x57" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino60px.png" sizes="60x60" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino64px.png" sizes="64x64" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino72px.png" sizes="72x72" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino76px.png" sizes="76x76" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino114px.png" sizes="114x114" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino120px.png" sizes="120x120" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino144px.png" sizes="144x144" />
+        <link rel="shortcut icon" href="../favicon.ico" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino152px.png" sizes="152x152" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino180px.png" sizes="180x180" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino192px.png" sizes="192x192" />
+        <link rel="manifest" href="../site.webmanifest" />
+        <link rel="mask-icon" href="https://lionhairdino.github.io/Lionhairdino_black.svg" color="#ff7500" />
+        <meta name="msapplication-TileImage" content="/images/favicon/Lionhairdino144px.png" />
+        <meta name="msapplication-TileColor" content="#ff7500" />
+        <meta name="theme-color" content="#ffffff" />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="Lazy ByteString 과 Strict ByteString" />
+        <meta property="og:site_name" content="Lionhairdino" />
+        <meta property="og:url" content="https://lionhairdino.github.io/posts/2021-10-21-lazybytestring.html" />
+
+        <meta property="og:image" content="https://lionhairdino.github.io/images/state400px.png" />
+
+      <meta name="keywords" content="Strict, Lazy, ByteString, Chunk">
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-E9WZ6VXGHP"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-E9WZ6VXGHP');
+</script>
+<script src="../script/copycode.js"></script>
+<script async src="https://cse.google.com/cse.js?cx=9c53b4915cbb2605c"></script>
+    </head>
+    <body>
+        <div id="header" style>
+            <div style="display:inline-block;margin-right:5px;padding-top: 5px;" id="logo">
+                <a href="../"><img style="width:30px;border:none" src="../images/favicon/Lionhairdino48px.png"></a>
+            </div>
+            <div style="display:inline-block;vertical-align: top;padding-top:5px;" id="navigation">
+                <a href="../" style>lionhairdino</a>
+                <a href="../about.html">about</a>
+                <!--<a href="/archive.html">archive</a>-->
+            </div>
+            <div style="display:inline-block;font-size:0.8em;vertical-align: top;">
+                <div style="display:inline-block;vertical-align: top;padding-top: 5px">사이트내 검색</div>
+                <div style="display:inline-block;width:180px;"> 
+                    <div class="gcse-searchbox-only"></div>
+                </div>
+            </div>
+        </div>
+        <div id="content">
+            <h1>Lazy ByteString 과 Strict ByteString</h1>
+            <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+<div class="info">
+    Posted on October 21, 2021
+    
+</div>
+
+<p>라이브러리 때문에 <code>Lazy</code>와 <code>Strict</code>를 혼용해서 써야 되는 상황이 생겨 헤매다가, 문득 <code>Lazy</code>가 생각처럼 동작하는지 궁금해서 테스트 해봤습니다.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ot">{-# LANGUAGE OverloadedStrings #-}</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ot">{-# LANGUAGE BangPatterns #-}</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Data.ByteString.Lazy</span> <span class="kw">as</span> <span class="dt">BL</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Data.ByteString</span> <span class="kw">as</span> <span class="dt">BS</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="ot">func1 ::</span> <span class="dt">BS.ByteString</span> <span class="ot">-&gt;</span> <span class="dt">BS.ByteString</span> <span class="ot">-&gt;</span> (<span class="dt">BS.ByteString</span>, <span class="dt">BS.ByteString</span>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>func1 a b <span class="ot">=</span> (a , b)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="ot">func2 ::</span> <span class="dt">BL.ByteString</span> <span class="ot">-&gt;</span> <span class="dt">BL.ByteString</span> <span class="ot">-&gt;</span> (<span class="dt">BL.ByteString</span>, <span class="dt">BL.ByteString</span>)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>func2 a b <span class="ot">=</span> (a , b)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co">-- BL에 bang을 붙이면 BS가 될까요?</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="ot">func3 ::</span> <span class="dt">BL.ByteString</span> <span class="ot">-&gt;</span> <span class="dt">BL.ByteString</span> <span class="ot">-&gt;</span> (<span class="dt">BL.ByteString</span>, <span class="dt">BL.ByteString</span>)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>func3 <span class="op">!</span>a <span class="op">!</span>b <span class="ot">=</span> (a , b)</span></code></pre></div>
+<p>Bang! 패턴에 대한 설명은 <a href="https://lionhairdino.github.io/posts/2021-06-20-strictness.html">Strict와 Lazy</a> 포스트를 참고하세요.</p>
+<pre><code>*Main&gt; :set -XOverloadedStrings 
+*Main&gt; let t1 = func1 undefined &quot;a&quot;
+*Main&gt; let t2 = func2 undefined &quot;b&quot;
+*Main&gt; let t3 = func3 undefined &quot;c&quot;
+*Main&gt; snd t1
+&quot;a&quot;
+*Main&gt; snd t2
+&quot;b&quot;
+*Main&gt; snd t3
+&quot;*** Exception: Prelude.undefined ...</code></pre>
+<p><code>Data.ByteString</code>이 <code>Strict</code>라 하면 <code>t1</code>과 <code>Lazy</code>에 <code>bang</code>을 붙인 <code>t3</code>가 같은 동작을 해야 될 것 같은데 그렇지 않습니다. 제가 생각하는 <code>Strict</code>가 아닌 걸로 보입니다. <code>ByteString Strict</code>와 <code>ByteString Lazy</code> 차이가 뭘까요?</p>
+<h2 id="strict">Strict</h2>
+<p><code>Data.ByteString.Internal</code>에 있는 <a href="http://downloads.haskell.org/~ghc/latest/docs/html/libraries/bytestring-0.10.12.1/src/Data-ByteString-Internal.html#ByteString">정의</a></p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- 효율적으로 공간을 활용하는 Word8 벡터입니다. 실제 데이터의 시작을 가리키는 포인터, 오프셋,길이로 표현됩니다.</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- 모든 필드에는 bang이 붙어 있습니다.</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">ByteString</span> <span class="ot">=</span> <span class="dt">PS</span> <span class="ot">{-# UNPACK #-}</span> <span class="op">!</span>(<span class="dt">ForeignPtr</span> <span class="dt">Word8</span>) <span class="co">-- payload</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>                     <span class="ot">{-# UNPACK #-}</span> <span class="op">!</span><span class="dt">Int</span>                <span class="co">-- offset</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>                     <span class="ot">{-# UNPACK #-}</span> <span class="op">!</span><span class="dt">Int</span>                <span class="co">-- length</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">deriving</span> (<span class="dt">Typeable</span>)</span></code></pre></div>
+<p><a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> ForeignPtr은 외부 객체 참조 포인터입니다.</p>
+<h2 id="lazy">Lazy</h2>
+<p><code>Data.ByteString.Lazy.Internal</code>에 있는 <a href="https://hackage.haskell.org/package/bytestring-0.11.1.0/docs/src/Data.ByteString.Lazy.Internal.html#ByteString">정의</a></p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- Chunk에는 Strict ByteString과 재귀적으로 Lazy ByteString이 같이 있습니다.</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="kw">qualified</span> <span class="dt">Data.ByteString.Internal</span> <span class="kw">as</span> <span class="dt">S</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">ByteString</span> <span class="ot">=</span> <span class="dt">Empty</span> <span class="op">|</span> <span class="dt">Chunk</span> <span class="ot">{-# UNPACK #-}</span> <span class="op">!</span><span class="dt">S.ByteString</span> <span class="dt">ByteString</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">deriving</span> (<span class="dt">Typeable</span>)</span></code></pre></div>
+<p><code>Lazy</code>는 <code>Strict ByteString</code>을 여러 Chunk로 쪼개어 갖고 있는 모양입니다. 달리 말하면, <code>Chunk</code>란 값 생성자로 여러번 쌓여 있는 상태입니다. <code>Strict</code>에는 필드들이 모두 <code>bang</code>이 붙어 있으므로 <code>PS</code> 값 생성자가 evalute될 때는 필드들 모두 덩어리<code>&lt;thunk&gt;</code>상태로 둘 수 없다는 말입니다. 물론 <code>PS</code> 생성자가 evaluate 되기 전에는 <code>&lt;thunk&gt;</code>로 남아 있을 겁니다.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Empty</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="dt">Chunk</span> <span class="op">!</span>(포인터, 오프셋, 길이) <span class="dt">Empty</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="dt">Chunk</span> <span class="op">!</span>(포인터, 오프셋, 길이) ( <span class="dt">Chunk</span> <span class="op">!</span>(포인터, 오프셋, 길이) <span class="dt">Empty</span> )</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="dt">Chunk</span> <span class="op">!</span>(포인터, 오프셋, 길이) ( <span class="dt">Chunk</span> <span class="op">!</span>(포인터, 오프셋, 길이) ( <span class="dt">Chunk</span> <span class="op">!</span>(포인터, 오프셋, 길이) <span class="dt">Empty</span> ))</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co">-- 이런 모양들이 될 수 있습니다.</span></span></code></pre></div>
+<p>연산들이 가장 바깥에 있는 <code>Chunk</code>를 evalute할 때 하나의 바이트열만 <code>strict</code>하게 두고, 안에 있는 <code>Chunk</code>는 <thunk>로 둡니다. 만일 오프셋, 길이를 봐서 다음 안 쪽의 <code>Chunk</code>로 넘어가면 그 때, 안 쪽 <code>Chunk</code>를 evaluate 할 겁니다.</p>
+<p>단순히 <code>bang</code>을 붙였냐 안 붙였냐의 차이가 아닙니다.<br />
+<code>Strict ByteString</code>이라 해서 무조건 <code>ByteString</code>만 만나면 <code>Strict</code>하게 동작하는 게 아니라, <em>Chunk없이 전체 문자열을 가리키는 포인터를 가져오고</em>, <code>Lazy ByteString</code>은 <code>Chunk</code>로 나누어 필요할 때 조금씩, 조금씩 각 조각을 가리키는 포인터를 가져오게 되어 있습니다.</p>
+<p>이렇게 보면, <em>Lazy ByteString은 단위를 1바이트보다 크게 잡은 배열에 값 생성자와 묶어 하나의 항목만 strict하게 평가</em>되도록 <code>bang</code>이 붙어 있는 것으로 볼 수 있습니다.</p>
+<h2 id="둘의-차이가-궁금했던-이유">둘의 차이가 궁금했던 이유</h2>
+<p><code>Strict</code>냐 <code>Lazy</code>냐가 궁금해진 이유는, 하나의 함수에서 다른 함수로 ByteString을 건네 줄 때, 계속해서 Copy가 일어나면 어마 어마하게 비효율적일텐데 어떻게 처리되고 있는지가 궁금해서였습니다. <code>Strict</code>도, <code>Lazy</code>도 똑 같이 <code>&lt;thunk&gt;</code>로 넘어가니 실제 카피는 일어나지 않다가, evalute될 때 Copy가 일어날텐데, Lazy는 첫 번째 <code>Chunk</code>안에 들어 있는 <code>PS</code> 생성자가 가진 <code>Strict</code> 포인터를 Copy할테고, <code>Strict</code>는 <code>PS</code>가 가진 <code>Strict</code> 포인터를 Copy할 겁니다. 함수간 전달에서는 크게 차이가 날 것 같지 않습니다. immutable한 데이터를 가리키는 포인터만을 Copy한다는 의미입니다.</p>
+<p>그런데 mutable 해야 하는 상황이 생기면 어떻게 될까요? <code>ByteString</code> 두 개를 붙인다 하면 새로운 <code>ByteString</code>으로 두 개의 실제 데이터 내용을 모두 Copy해와야 합니다. 예를들어 간단하게 앞에 한 바이트, 한 바이트 추가한다고 리스트처럼 생각하고 작업하다간 퍼포먼스가 한없이 떨어지게 됩니다. 빈번하게 mutable해야 한다면, <code>Strict ByteString</code>으로 해결할 수 있는 문제가 아닙니다.</p>
+<p>둘이 대부분 같은 인터페이스가 구현되어 있어 사용할 때는 신경쓰지 않아도 되겠지 했는데, 그렇지 않습니다. 함수가 <code>BL.ByteString</code>을 받도록 설계하면, 이 함수는 <code>BS.ByteString</code>을 받을 수 없습니다. 이유가 대부분 안에서 다른 라이브러리에 있는 ByteString 관련 함수들을 가져다 쓰는데, 해당 라이브리리들의 버전을 모두 바꿔줘야 합니다. 때로는 Strict, Lazy 둘 중 하나만 지원하는 라이브러리들도 있습니다.</p>
+<p>둘 중 어떤 걸 어떤 때 써야하는지 정리가 필요해 보이는데, 지금 당장은 딱 필요한 순간에 전체 바이트열이 필요한 경우가 많다면 Strict로, 그렇지 않으면 Lazy를 쓴다정도만 떠오릅니다.</p>
+<p>둘 모두 꼭 필요한 때가 아니면 포인터로 머물러 있는데, 꼭 필요한 때를 상상해 보면 출력을 한다든지, 파싱을 한다든지 내용이 필요할 때입니다. 파싱을 가정해 보면 <code>Strict ByteString</code>은 안에 있는 포인터가 가리키는 메모리에서 내용을 <em>한 번에 모두 읽어 옵니다.</em> Lazy는 일단 첫 번째 <code>Chunk</code>가 가리키는 것만 읽어오고, <em>더 필요하면 또 읽어올</em> 겁니다.</p>
+<section class="footnotes" role="doc-endnotes">
+<hr />
+<ol>
+<li id="fn1" role="doc-endnote"><p>ForeignPtr는 외부에 유지되는 객체에 대한 참조를 말합니다. 외부란, 하스켈 코드를 돌리는 런타임 시스템(더 구체적으론 스토리지 관리자)의 관리를 받지 않는 오브젝트란 뜻입니다. 하스켈의 힙이나 스택에서 더 이상 이 포인터를 보는 참조가 없으면 외부에 있는 릴리즈 담당 루틴을 부르게 됩니다. 더 깊이 보기 전에 추측해보면, C 등으로 alloc하고 해당 메모리를 가리키는 포인터를 하스켈이 받아서 작업할 때 쓸 것 같습니다.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section>
+
+<div class="comment">
+<script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
+</script>
+</div>
+<div style="text-align:right">Github 계정이 없는 분은 메일로 보내주세요. lionhairdino at gmail.com </div>
+        </div>
+        <div id="footer">
+            © 2021 lionhairdino. All rights reserved. Generated by <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+    </body>
+</html>

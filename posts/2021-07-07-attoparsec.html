@@ -82,7 +82,7 @@
 <p>문자열과 실패를 처리할 함수, 성공을 처리할 함수를 받아 결과를 돌려주는 타입입니다.</p>
 <p>parsec 라이브러리에서는 다음과 같습니다.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">Parser</span> a <span class="ot">=</span> <span class="dt">Parser</span> {<span class="ot"> parse ::</span> <span class="dt">String</span> <span class="ot">-&gt;</span> [(a,<span class="dt">String</span>)] }</span></code></pre></div>
-<p>parsec 에서는 결과값을 리스트로 표시해서 실패를 []로 표현했는데, 여기서는 명시적으로 실패, 부분 매칭, 성공 3가지를 결과 타입으로 명시적으로 정의했습니다. <code>Partial</code>이 눈에 띕니다.</p>
+<p>parsec 에서는 결과값을 리스트로 표시해서 실패를 []로 표현했는데, 여기서는 명시적으로 실패, 부분 매칭, 성공 3가지를 결과 타입으로 정의했습니다. <code>Partial</code>이 눈에 띕니다.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Result</span> r <span class="ot">=</span> <span class="dt">Fail</span> <span class="dt">S</span> [<span class="dt">String</span>] <span class="dt">String</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>              <span class="op">|</span> <span class="dt">Partial</span> (<span class="dt">B.ByteString</span> <span class="ot">-&gt;</span> <span class="dt">Result</span> r)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>              <span class="op">|</span> <span class="dt">Done</span> <span class="dt">S</span> r</span></code></pre></div>
@@ -99,7 +99,7 @@ A. 프로그래머가 지정하는 함수가 아니라, parse 함수가 결과�
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> feed r <span class="st">&quot;&quot;</span></span>
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="dt">Done</span> <span class="st">&quot;&quot;</span> <span class="fl">1.0</span></span></code></pre></div>
-<p>물론 매칭 실패 되면 추가 문자열을 기다리지 않습니다.</p>
+<p>물론 매칭 실패하면 추가 문자열을 기다리지 않습니다.</p>
 <h3 id="네트워크에서-패킷을-받아-double로-파싱하는-상황을-가정해-봅시다.">네트워크에서 패킷을 받아 double로 파싱하는 상황을 가정해 봅시다.</h3>
 <div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>recvByte <span class="ot">=</span> <span class="op">...</span>소켓에서 읽은 <span class="dt">ByteString</span> 리턴</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>dParser <span class="ot">=</span> parse double </span>
