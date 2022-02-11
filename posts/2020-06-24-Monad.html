@@ -92,10 +92,10 @@
 </figure>
 <p>제가 카테고리 이론에서의 모나드에 대해서 알고싶은 건, 그 자체라기보다, 어떤 아이디어, 철학, 개념이 하스켈의 모나드로 스며들었나 하는 겁니다. 조금은 덜 정교하게 “정의”를 이해하더라도 “아이디어”를 이해하고 싶습니다. 저와 비슷한 스탠스를 취하는 분들에겐 쓸모 있는 포스트일 수 있지만, 완벽한 정의를 원하는 분들에겐 쓸모 없는 포스트입니다.</p>
 <blockquote>
-<p>먼저 보는 정리.<br />
+<p>먼저 보는 요약.<br />
 (다른 유명한 자료, 문서들에 보편적으로 쓰여 있는 설명이 아니니, <em>날카로운 눈</em>으로 읽어 주세요.)<br />
-같은 형태의 함수endofunctor들이 있을 때, 이들을 체이닝 할 수 있는 구조를 모노이드라 합니다. (모나드가 아님에 주의)<br />
-체이닝할 때, 연결되는 부분의 타입이 달라 보조 함수 bind의 도움을 받는 구조를 모나드라 합니다.<br />
+같은 형태Type의 함수endofunctor들이 있을 때, 이들을 체이닝 할 수 있는 구조가 수학의 모노이드와 닮아 있습니다. (모나드가 아님에 주의)<br />
+체이닝할 때, 연결되는 부분의 타입이 달라 보조 함수 “bind의 도움”을 받는 구조를 모나드라 합니다.<br />
 연결 부위가 다르게 생긴 걸 체이닝하게 보조 함수가 존재한다고 모두 모나드라 부르진 않습니다.<br />
 연결 부위가 다르게 생긴 것 중 <code>a -&gt; m b</code> 모양을 체이닝 하면 모나드, <code>m a -&gt; b</code> 모양을 연결하면 코모나드라 부릅니다.<br />
 왜 하필 <code>a -&gt; m b</code> 모양을 체이닝하는 구조가 수많은 난제를 해결하며 함수형 프로그래밍의 구원자같은 패턴이 됐을까요?<br />
@@ -208,19 +208,19 @@ mono는 하나를 뜻하고, oid는 비슷하지만 같지 않은 걸 뜻합니�
 endofunc2 :: b -&gt; m c<br />
 …<br />
 a , b, c 는 폴리모픽을 뜻하므로 대표 타입으로 <code>a -&gt; m b</code> 로 표기하겠습니다.</p>
-<p>이런 엔도펑크터들이 있을 때, 엔도펑크터 하나 하나를 오브젝트로 보는 게 아니라(그런데 엔도펑크터를를 모피즘으로 보는데 Category of endofunctor라 합니다. 꼭 오브젝트를 이름으로 쓰는게 아니거나, 이해를 잘 못한 걸지도 모릅니다.), 오브젝트는 하나의 점으로 두고, <code>endofunc1</code>, <code>endofunc2</code> …을 모피즘으로 삼아 모노이달 카테고리(오브젝트가 하나만 있는 카테고리)에서 모노이드를 만들어 보겠습니다.</p>
+<p>이런 엔도펑크터들이 있을 때, 엔도펑크터 하나 하나를 오브젝트로 보는 게 아니라(그런데 엔도펑크터를 모피즘으로 보는데 Category of endofunctor라 합니다. ~<del>꼭 오브젝트를 이름으로 쓰는게 아니거나, 이해를 잘 못한 걸지도 모릅니다.</del>~ 여기선 엔도펑크터 a -&gt; m b가 하나의 오브젝트 역할을 하는 건 아닐까요?), 오브젝트는 하나의 점(a -&gt; m b 하나로 변하지 않으니)으로 두고, <code>endofunc1</code>, <code>endofunc2</code> …을 모피즘으로 삼아 모노이달 카테고리(~<del>오브젝트가 하나만 있는 카테고리</del>~ 모노이달 카테고리 중에 오브젝트가 하나만 있는 경우)에서 모노이드를 만들어 보겠습니다.</p>
 <p>오브젝트는 단 하나만 있습니다.<br />
-모피즘을 합성하는 <code>composition :: (a -&gt; m b) -&gt; (a -&gt; m b) -&gt; (a -&gt; m b)</code> 타입 이항 함수가 있어야 합니다.<br />
-<em>2022-01-30 추가: 위와 같은 함수를 정의할 수 없다는 지적을 받았습니다. 저는 모나딕 액션들을 합성하는 이항함수라는 의미에서 의사 코드처럼 적어 놓았는데, 수학적인 오류가 많은 정의라는 지적입니다.</em><br />
+모피즘을 합성하는 ~<del><code>composition :: (a -&gt; m b) -&gt; (a -&gt; m b) -&gt; (a -&gt; m b)</code></del>~<code>composition :: (a -&gt; m b) -&gt; (b -&gt; m c) -&gt; (a -&gt; m c)</code> 타입 이항 함수가 있어야 합니다.<br />
+<em>2022-01-30 추가: 위와 같은 함수를 정의할 수 없다는 지적을 받았습니다. 저는 모나딕 액션들을 합성하는 이항함수라는 의미에서 의사 코드처럼 적어 놓았는데, 수학적인 오류가 있는 정의라는 지적입니다.</em><br />
 <em>composition :: Monad m =&gt; (a -&gt; m b) -&gt; (b -&gt; m c) -&gt; (a -&gt; m c) 로 클레이슬리 컴포지션 정의와 같이 써야 한다고 합니다.</em><br />
-<em>저는 a, b, c를 큰 의미없이 m으로 싸여진 결과가 나오는 합성이란 의미만 강조하고 싶었는데, 비수학적으로 의미만 표현하는게 잘못되었다는 지적을 받았습니다.</em></p>
-<p>카테고리가 되기 위한 위 조건들 중 이항 함수만 살펴 보겠습니다. (실제 코드가 아니라 의사 코드입니다.)</p>
+<em>저는 a, b, c를 큰 의미없이 m으로 싸여진 결과가 나오는 타입의 합성이란 의미만 강조하고 싶었는데, 비수학적으로 의미만 표현하는게 잘못되었다는 지적을 받았습니다.</em><br />
+<em>(a -&gt; m b)와 (a -&gt; m b)라 쓰면, 첫 번째와 두 번째에 있는 a와 b가 같아야만 한다는 뜻이니 오류입니다.</em> 카테고리가 되기 위한 위 조건들 중 이항 함수만 살펴 보겠습니다. (실제 코드가 아니라 의사 코드입니다.)</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ot">composition ::</span> (a <span class="ot">-&gt;</span> m b) <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> m b) <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> m b)   </span></code></pre></div>
 <p>그럼, 이 구조가 모피즘으로 갖고 있는 모든 <code>endofunc</code>들은</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>composition endofunc1 endofunc2</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>composition (composition endofunc1 endofunc2) endofunc3 </span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="op">...</span>    </span></code></pre></div>
-<p>composition을 이용해 표현 할 수 있습니다. (composition 함수는 kleisly 카테고리의 <code>(&gt;=&gt;)</code>와 같은 함수입니다. monad composition이라 부르기도 하고, kleisly composition이라 부르기도 합니다. <code>(&gt;=&gt;)</code>는 <code>join</code>, <code>return</code>이 있으면 정의할 수 있습니다.)</p>
+<p>composition을 이용해 표현 할 수 있습니다. (composition 함수의 정교한 표현은 kleisly 카테고리의 <code>(&gt;=&gt;)</code> 함수입니다. monad composition이라 부르기도 하고, kleisly composition이라 부르기도 합니다. <code>(&gt;=&gt;)</code>는 <code>join</code>, <code>return</code>이 있으면 정의할 수 있습니다.)</p>
 <p>composition 같은 함수가 정의되어 있으면 모노이달 카테고리의 모노이드가 되고, 모노이드가 되면 모피즘을 몇 번이고 합성할 수 있게 됩니다.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>f <span class="op">&gt;=&gt;</span> g <span class="ot">=</span> join <span class="op">.</span> <span class="fu">fmap</span> g <span class="op">.</span> f</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- 또는</span></span>
@@ -231,9 +231,9 @@ a , b, c 는 폴리모픽을 뜻하므로 대표 타입으로 <code>a -&gt; m b<
 <p><code>join</code>과 <code>return</code>이 없으면 모노이드 구조가 아니지만, 추가해서 모노이드 구조가 되는 걸 모나드라 합니다. 엔도펑크터 + <code>return</code> + <code>join</code> 이 있는 “구조”를 모나드라 합니다. 모나드는 엔도펑크터의 모노이달 카테고리의 모노이드입니다.</p>
 <p><em>컴포지션을 하기 위해, 모노이드 구조를 만드는게 목적</em>입니다. 엔도펑크터 카테고리를 모노이드로 만들려고 join, return을 추가합니다.</p>
 <p>※ 하스켈에서 모나드 정의는 <code>fmap</code>, <code>return</code>, <code>bind</code> (이 건 <code>join</code>이나 Kleisly <code>(&gt;=&gt;)</code>로 표현되기도 합니다.)가 정의되어 있는 타입입니다. <code>fmap</code>은 펑크터에 정의되어 있는데, 모나드가 돠려면 펑크터여야 하기 때문에 여기서는 필요 조건에 함께 적어놨습니다.</p>
-<p>※ ~<del>모든 모노이드가 모나드는 아니지만, 모든 모나드는 모노이드입니다. 다시 말해, join, return이 없이 모노이드가 되는 구조는 모나드는 아니고 그냥 모노이드입니다.</del>~ 특정 조건을 만족하는 모나드만 모노이드입니다.</p>
-<p>※ 수학 이론말고 프로그래밍 쪽에서는, 엄밀히 말하면 <code>a -&gt; m b</code> 와 <code>a -&gt; m b</code> 를 kleisly 컴포지션으로 합성하려면 <code>a</code>와 <code>b</code>가 같은 타입이어야 합니다.</p>
 <p><em>2022-01-30 추가: 모든 모나드는 모노이다란 말이 틀렸다는 지적을 받았습니다. 모노이드가 아닌 모나드가 하스켈에서 의미가 있는 건지 아직 이해하지 못했습니다</em></p>
+<p>※ ~<del>모든 모노이드가 모나드는 아니지만, 모든 모나드는 모노이드입니다. 다시 말해, join, return이 없이 모노이드가 되는 구조는 모나드는 아니고 그냥 모노이드입니다.</del>~ 모든 모나드가 모노이드는 아니다라 얘기하면 특정 조건을 만족하는 모나드만 모노이드란 얘길 텐데, 그렇다면 A monad is just monoid .. 문장과 배치되는 것 아닐까요? 모나드는 모노이드인데, 어떤 모노이드냐 하면 엔도펑크터 카테고리 안의 모노이드란 뜻 아닐까요?</p>
+<p>※ 수학 이론말고 프로그래밍 쪽에서는, 엄밀히 말하면 <code>a -&gt; m b</code> 와 <code>a -&gt; m b</code> 를 kleisly 컴포지션으로 합성하려면 <code>a</code>와 <code>b</code>가 같은 타입이어야 합니다.</p>
 <h2 id="kleisly-카테고리">Kleisly 카테고리</h2>
 <p><code>a -&gt; m b</code> 타입 함수를 kleisly arrow라 부릅니다.<br />
 <code>a -&gt; b</code> 와 <code>b -&gt; c</code> 함수는 <code>(.)</code>으로 composition 하듯이 <code>a -&gt; m b</code> 와 <code>b -&gt; m c</code> 함수는 <code>(&gt;=&gt;)</code> 으로 composition 할 수 있습니다.</p>
@@ -243,7 +243,7 @@ a , b, c 는 폴리모픽을 뜻하므로 대표 타입으로 <code>a -&gt; m b<
 <p><em>2022-01-30 추가: Kleisli category가 1 object인 모노이드라고 생각하면 완전히 틀렸다는 지적을 받았습니다.</em></p>
 <h2 id="연속으로-컴포지션-하려면-모노이달-카테고리의-모노이드가-돼야-한다">연속으로 컴포지션 하려면 모노이달 카테고리의 모노이드가 돼야 한다</h2>
 <p><em>2022-01-30 추가: 모노이달 카테고리를 오브젝트가 하나만 있는 카테고리로 이해한 게 잘못되었다는 지적입니다.</em><br />
-<em>카테고리 자체를 오브젝트로 해서 모노이드가 되는 걸 모노이달 카테고리라 하는 것 같습니다.</em> 문서들이 “왜 이 개념이 필요한지” 목표를 명확히 써주면 좋을텐데, 대부분 카테고리 입문용 문서들이 <em>왜 그렇게 하는지</em> 이유를 쉽게 알려주지 않습니다. “이런 이런 모양이 펑크터야, 모노이드야, 모나드야” 라는 자료는 많지만, 왜 펑크터, 모노이드, 모나드로 만드는지 친절하게 목표를 풀어 주는 자료는 많지 않습니다.</p>
+<em>카테고리 자체를 오브젝트로 해서 모노이드 구조가 되는 걸 모노이달 카테고리라 하는 것 같습니다.</em> 문서들이 “왜 이 개념이 필요한지” 목표를 명확히 써주면 좋을텐데, 대부분 카테고리 입문용 문서들이 <em>왜 그렇게 하는지</em> 이유를 쉽게 알려주지 않습니다. “이런 이런 모양이 펑크터야, 모노이드야, 모나드야” 라는 자료는 많지만, 왜 펑크터, 모노이드, 모나드로 만드는지 친절하게 목표를 풀어 주는 자료는 많지 않습니다. 깊게 들어가서 한 텍스트를(한 권의 책) 마칠 때가 되면 이해하게 될 것 같은데, 세세한 상관 관계를 다 익히지 않고, 이러 이러한 목적때문에 이런 걸 떠올렸다라고 얘기할 수 없는 걸까요.</p>
 <p><code>join</code>, <code>return</code> 성격의 Natural Transformation이 있다면, 엔도펑크터를 체이닝(연속 연결)할 수 있습니다. 다시 말해 모나드로 만들면 컴포지션 할 수 있습니다.</p>
 <p>수학 용어를 걷어내면,<br />
 <code>a -&gt; m b</code> 함수를 컴포지션 하려면 <code>join</code>이 필요하다고 말할 수 있습니다.</p>
