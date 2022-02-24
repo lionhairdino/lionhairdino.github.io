@@ -128,7 +128,7 @@
 <li>지금 정해지지 않은 타입, <code>모든 타입 a</code>가 <code>Num</code>의 인스턴스여야 한다는 말입니다. <code>a</code>는 <code>모든 타입</code>인데, <code>Num</code> 인스턴스 중 <em>모든 타입용 인스턴스</em>는 당연히 없습니다.</li>
 </ul>
 <ol start="2" type="1">
-<li><code>Couldn't match</code> : 특정 타입까지 추론됐는데, 다른 조건에서 추론된 타입이 일치하지 않는다.</li>
+<li><code>Couldn't match</code> : 특정 타입까지 추론됐는데, 다른 조건에서 추론된 타입과 일치하지 않는다.</li>
 </ol>
 <ul>
 <li>서명 체크를 지나 , 나중에 코드 조립 중 들어온 타입을 보니 <code>'a'</code>가 들어왔습니다.<br />
@@ -137,23 +137,42 @@
 </li>
 <li>지금 정해지지 않은 타입, <code>모든 a</code>는 <code>모든 타입</code>이지 아직 하나의 구체 타입이 아닙니다. <code>모든 타입</code>과 <code>Char</code>는 매치되지 않습니다.</li>
 </ul>
-<p>만일 서명에서 영향을 주는 <code>forall a</code>였다면, GHC는 “이 매개 변수에 들어오는 타입은 뭐든 상관없어. 이 함수는 어떤 타입이든 처리할 수 있어” 라고 받아들입니다. (나중에 코드 조립할 때 들어오는 타입은 <code>모든forall a 타입</code>일 필요 없습니다. <code>Int</code>가 들어와도 되고, <code>Char</code>가 들어와도, … 됩니다.)<br />
-하지만 괄호가 있으면, GHC는 “나중에 들어오는 타입이 어느 한 타입이 아니라, <code>모든 타입 forall a</code>이어야만 해”라고 받아들입니다.</p>
+<p>2022.2.25 추가</p>
+<p>간단하게 보면 아래 상황과 같습니다.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ot">func1 ::</span> <span class="kw">forall</span> a<span class="op">.</span>a <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>func1 _ <span class="ot">=</span> <span class="dv">1</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="ot">func2 ::</span> (<span class="kw">forall</span> a<span class="op">.</span>a) <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>func2 _ <span class="ot">=</span> <span class="dv">2</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="op">*</span><span class="dt">Main</span><span class="op">&gt;</span> func1 <span class="dv">1</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="op">*</span><span class="dt">Main</span><span class="op">&gt;</span> func2 <span class="dv">1</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>interactive<span class="op">&gt;:</span><span class="dv">91</span><span class="op">:</span><span class="dv">7</span><span class="op">:</span> <span class="fu">error</span><span class="op">:</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    • <span class="dt">No</span> <span class="kw">instance</span> for (<span class="dt">Num</span> a) arising from the literal ‘1’</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>      <span class="dt">Possible</span> fix<span class="op">:</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>        add (<span class="dt">Num</span> a) to the context <span class="kw">of</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>          a <span class="kw">type</span> expected by the context<span class="op">:</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>            <span class="kw">forall</span> a<span class="op">.</span> a <span class="op">...</span></span></code></pre></div>
+<p><code>func2</code>에 인자로 줄 수 있는 값은 <code>undefined</code>뿐이 없습니다.</p>
+<p>만일 서명에 영향을 주는 <code>forall a</code>였다면, GHC는 “이 매개 변수에 들어오는 타입은 뭐든 상관없어. 이 함수는 어떤 타입이든 처리할 수 있어” 라고 받아들였을 겁니다. (나중에 코드 조립할 때 들어오는 타입은 <code>모든forall a 타입</code>일 필요 없습니다. <code>Int</code>가 들어와도 되고, <code>Char</code>가 들어와도, … 됩니다.)<br />
+하지만 괄호가 있으면, GHC는 “나중에 들어오는 타입이 어느 한 타입이 아니라, <code>모든 타입 forall a</code>이어야만 해”라고 받아들입니다. 모든 타입에 속하는 값은 <a href="https://lionhairdino.github.io/posts/2021-06-17-bottom.html"><code>undefined</code></a>뿐이 없습니다.</p>
 <p><code>foo</code>의 첫 번째 매개 변수의 타입은 <code>forall a. [a] -&gt; Int</code> 가 아니라, <code>(forall a. [a] -&gt; Int)</code>로 괄호로 싸여져 있습니다. 서명 단계가 아니라, 조립 단계 때 <code>forall a</code>타입을 다루는 함수가 들어오는지 확인한다는 말입니다. 이 매개 변수를 통해 들어온 함수의 타입은 어느 한 타입으로 고정된 타입이 아닌 <code>forall a. [a] -&gt; Int</code> 로 고정된 타입입니다. 함수 몸체에서 쓰일 때마다 <code>forall a</code>를 끌고 다니며 독립적으로 체크한다는 말입니다. 그래서 <code>length</code>란 함수가 들어 와서 <code>f x == f y</code> 에서 쓰일 때</p>
 <ol type="1">
 <li><code>x</code>에 적용한 <code>length</code> 함수는 <code>forall a. [a] -&gt; Int</code> 타입으로 서명에서 정한 조건을 통과했으니, 이제 x의 타입에 따라 구체 타입을 추론합니다.</li>
 <li><code>y</code>에 적용한 <code>length</code> 함수도 <code>forall a. [a] -&gt; Int</code> 타입으로 여기서도 통과하고, 구체 타입을 독립적으로 추론합니다.</li>
 </ol>
-<p>아직 명확하지 않은데, 하나는 함수 내부와 외부가 일치하는지 보는 서명 체크 단계에 쓰이고, 다른 하나는 함수 내부 코드 조립 단계로 이해하면 되지 않을까 합니다. 명확한 자료가 찾아지면 보충하도록 하겠습니다.</p>
-<p><code>모든 타입 forall a. a</code>란 말은</p>
+<p>아직 명확하지 않은데, 하나는 함수 내부와 외부가 일치하는지 보는 서명 체크 단계에 쓰이고, 다른 하나는 함수 내부 코드 조립 단계에 쓰이고 있는 걸로 보이긴 합니다. 아마도, 이렇게 구분하거나 설명하지 않을 것 같습니다. 명확한 자료가 찾아지면 보충하도록 하겠습니다.</p>
+<p>현재까지 추측은 <code>모든 타입 forall a. a</code>란 말은</p>
 <ol type="1">
 <li>서명 단계에선 “<em>어떤 타입으로 결정되어도 돼</em>” - “조립할 때 해당 매개 변수로 어떤 타입이 들어오든 상관 없어”</li>
-<li>내부 조립 단계에선 “<em>모든 타입을 다 처리할 수 있어</em>” -</li>
+<li>와부와 조립 단계에선 “<em>모든 타입을 다 처리할 수 있어</em>” -</li>
 </ol>
 <p>예를 들면,<br />
 서명 단계의 <code>forall a. a</code>란 곳으로 <code>Int</code>가 들어오면 통과할 수 있지만,<br />
 조립 단계에서 꺼내 온 <code>(forall a. a)</code> 로는 <code>Int</code>가 통과할 수 없습니다. <code>Int</code>는 <code>모든 타입</code>이 아닙니다.</p>
 <p><em>괄호 안은 lazy</em>하게 해석한다 말하면 될까요? 설명하면서도, 단어 선택이 혼동을 주고 있어, 좀 더 고민해서 바꿔야 할 것 같습니다.</p>
+<p><em>어디에도 서명, 조립 단계 이렇게 설명된 곳은 없습니다. 아직 왜 이런 결과가 나오는지 찾는 중입니다. forall a를 Bottom값으로 설명한 자료, 또는 타입을 매개 변수로 받는 함수 등으로 설명한 자료들을 찾았지만, 서명에 있는 괄호 (…)에 대해 명쾌하게 설명한 곳은 아직 찾지 못했습니다.</em></p>
 
 <div class="comment">
 <script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
