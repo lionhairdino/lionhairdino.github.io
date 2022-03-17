@@ -388,7 +388,8 @@
 <code>over</code> 안에서 인자 <code>lens</code>에 <code>runIdentity</code>를 쓰는 걸 보고 GHC가 알아서 <code>Identity</code>로 추론하고,<br />
 <code>view</code> 안에서 인자 <code>lens</code>에 <code>getConst</code>를 쓰는 걸 보고 GHC가 알아서 <code>Const</code>로 추론합니다.</p>
 <p><code>Lens</code> 타입 서명을 보면 <code>forall f. Functor f =&gt;</code> 나중에 어떤 펑크터든 될 수 있다고 선언했습니다. <code>personAddressL</code> 렌즈의 <code>&lt;$&gt;</code>는 <code>over</code><a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>에서 쓰이는 실제 코드와 <code>view</code>에 쓰이는 실제 코드가 다른 겁니다. <code>Lens</code>를 <em>하나의 코드로 해결한다는 말이 아닙니다. 실제 가져 올 코드는 GHC가 추론하도록 열어두고, 프로그래머는 같은 코드 모양을 쓰겠다</em>가 펑크터를 쓴 목적입니다.</p>
-<p>제작자가 어떻게 <code>Const</code>와 <code>Identity</code> 펑크터를 떠올렸을까 신기합니다.</p>
+<p>제작자가 어떻게 <code>Const</code>와 <code>Identity</code> 펑크터를 떠올렸을까 신기합니다.<br />
+(추가: 카테고리 이론 Monoidal Category 부분을 보면 <code>Const</code> 펑크터와 <code>Identity</code> 펑크터를 써서 <code>Monoidal</code>로 만드는 예가 나옵니다.)</p>
 <p><code>(a -&gt; a) -&gt; s -&gt; s</code> 타입을, 어떤 조건이 맞으면 <code>s -&gt; a</code> 타입이 되게 해야 됩니다.<br />
 타입 서명을 <code>(a -&gt; Const a p) -&gt; (s -&gt; Const a p)</code> 이렇게 바꾸고, 이 타입의 렌즈를 가져다 쓰는 <code>view</code>쪽에서 <code>Const</code>를 적당히 적용해서 <code>s -&gt; a</code>를 뽑아내야 합니다. 서명에서 치고 들어간게 아니라, <code>Const</code> 값 생성자를 넘기는 트릭을 먼저 떠올렸을까요?</p>
 <section class="footnotes" role="doc-endnotes">
