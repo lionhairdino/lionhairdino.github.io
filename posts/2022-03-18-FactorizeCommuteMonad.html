@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko" lang="ko">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <title>lionhairdino - 수학 비전공자의 모나드 해석</title>
+
+        <meta name="description" content="수학 비전공자가 카테고리 이론의 모나드에서 넘어온 핵심 아이디어 뭔지 찾는 글입니다." />
+        <meta property="og:description" content="수학 비전공자가 카테고리 이론의 모나드에서 넘어온 핵심 아이디어 뭔지 찾는 글입니다." />
+
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <link rel="icon" href="https://lionhairdino.github.io/favicon.svg" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino16px.png" sizes="16x16" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino24px.png" sizes="24x24" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino32px.png" sizes="32x32" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino48px.png" sizes="48x48" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino57px.png" sizes="57x57" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino60px.png" sizes="60x60" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino64px.png" sizes="64x64" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino72px.png" sizes="72x72" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino76px.png" sizes="76x76" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino114px.png" sizes="114x114" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino120px.png" sizes="120x120" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino144px.png" sizes="144x144" />
+        <link rel="shortcut icon" href="../favicon.ico" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino152px.png" sizes="152x152" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino180px.png" sizes="180x180" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino192px.png" sizes="192x192" />
+        <link rel="manifest" href="../site.webmanifest" />
+        <link rel="mask-icon" href="https://lionhairdino.github.io/Lionhairdino_black.svg" color="#ff7500" />
+        <meta name="msapplication-TileImage" content="/images/favicon/Lionhairdino144px.png" />
+        <meta name="msapplication-TileColor" content="#ff7500" />
+        <meta name="theme-color" content="#ffffff" />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="수학 비전공자의 모나드 해석" />
+        <meta property="og:site_name" content="Lionhairdino" />
+        <meta property="og:url" content="https://lionhairdino.github.io/posts/2022-03-18-FactorizeCommuteMonad.html" />
+
+        <meta property="og:image" content="https://lionhairdino.github.io/images/monad_smaejob.png" />
+
+      <meta name="keywords" content="Monad, 모나드, 대리인">
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-E9WZ6VXGHP"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-E9WZ6VXGHP');
+</script>
+<script src="../script/copycode.js"></script>
+<script async src="https://cse.google.com/cse.js?cx=9c53b4915cbb2605c"></script>
+    </head>
+    <body>
+        <div id="header" style>
+            <div style="display:inline-block;margin-right:5px;padding-top: 5px;" id="logo">
+                <a href="../"><img style="width:30px;border:none" src="../images/favicon/Lionhairdino48px.png"></a>
+            </div>
+            <div style="display:inline-block;vertical-align: top;padding-top:5px;" id="navigation">
+                <a href="../" style>lionhairdino</a>
+                <a href="../about.html">about</a>
+                <!--<a href="/archive.html">archive</a>-->
+            </div>
+            <div style="display:inline-block;font-size:0.8em;vertical-align: top;">
+                <div style="display:inline-block;vertical-align: top;padding-top: 5px">사이트내 검색</div>
+                <div style="display:inline-block;width:180px;"> 
+                    <div class="gcse-searchbox-only"></div>
+                </div>
+            </div>
+            <div>
+                여기 글들은 일종의 질문입니다. 주의! 틀린 내용이 있을 수 있습니다. 용어 선택도 학계, 업계에서 쓰는 걸로 되어 있지 않습니다.
+            </div>
+        </div>
+        <div id="content">
+            <h1>수학 비전공자의 모나드 해석</h1>
+            <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+<div class="info">
+    Posted on March 18, 2022
+    
+</div>
+
+<p><em>소통을 위해 잠깐 오픈한 포스트로 정리가 끝나지 않았습니다.</em></p>
+<p>아래와 같은 다이아그램으로 설명된 자료는 보지 못했습니다. <em>검증 필요</em></p>
+<h1 id="펑크터가-하는-일">펑크터가 하는 일</h1>
+<p>카테고리 <code>[C, D]</code>, 펑크터 <code>F: C -&gt; D</code> 카테고리 <code>C</code>에 펑크터F를 적용하면 자신과 <em>구조가 같은homomorphic</em> 투영을 카테고리 <code>D</code>에 만듭니다. 만일 역변환inverse이 가능하다면 isomorphic한 투영을 만들었다고 말할 수 있습니다.</p>
+<blockquote>
+<p>펑크터가 isomorphic이면 자신을 완전히 대신할 대리인을 만들 수 있습니다. <em>검증 필요</em></p>
+</blockquote>
+<h1 id="멀리-돌아오든-바로-가든-출발과-목적지만-같으면-같다">멀리 돌아오든 바로 가든 출발과 목적지만 같으면 같다</h1>
+<p>펑크터 <code>A,B,C,D</code>가 있을 때</p>
+<pre><code>A -&gt; D
+A -&gt; B -&gt; C -&gt; D</code></pre>
+<p>위 아래는 “같은” 변환을 합니다.</p>
+<p><span class="citation" data-cites="todo">@todo</span> Naturality Condition 추가</p>
+<h1 id="a---m-b-함수를-성분-분해해-보자">a -&gt; m b 함수를 성분 분해해 보자</h1>
+<p>a -&gt; m b 함수를 id펑크터로 보내고, m펑크터로 보낸 다이아그램입니다.</p>
+<p><img src="../images/monad_commute.png" alt="Commute" /> 붉은색 Natural Transformation을 잘 정의하면 아래와 같이 성분을 쪼갤 수 있습니다.</p>
+<p><img src="../images/monad_samejob.png" alt="같은 작업" /> 위 아래는 같은 작업입니다.</p>
+<h1 id="성분을-쪼개면-이어-붙일-수-있는-부분합성이-보인다.">성분을 쪼개면 이어 붙일 수 있는 부분(합성)이 보인다.</h1>
+<p>쪼개진 작업은 품고 품게(연속 composition 또는 Chaining) 할수 있지만,<br />
+원래 작업은 시작과 끝이 달라 연결 할 수 없습니다.</p>
+<figure>
+<img src="../images/monad_composition.png" alt="합성" /><figcaption aria-hidden="true">합성</figcaption>
+</figure>
+<h1 id="그래서-모나드가-하는-일은">그래서 모나드가 하는 일은?</h1>
+<p><em>a -&gt; m b 를 연이어 연결</em>하는게 목표입니다.</p>
+<h1 id="시작과-끝이-다른-타입인-함수를-어떻게-연결할까">시작과 끝이 다른 타입인 함수를 어떻게 연결할까?</h1>
+<p>그런데 시작과 끝이 달라 이대로는 연결할 수 없습니다. 그래서 자신과 isomorphic한 대리인을 세워, 작업을 하고, 대리인에서 결과를 꺼내오게 작업을 바꾸면, 같은 작업이지만 이어 붙일 수 있는 부분을 찾을 수 있습니다.</p>
+<p><img src="../images/monad_isomorphic.png" alt="합성" /> (<span class="citation" data-cites="todo">@todo</span> 대리인이란 말이 딱 안붙는다. 바꾸자.)</p>
+<blockquote>
+<p>핵심 아이디어: 작업을 조각 내보면 이어 붙일 수 있는 부분이 보입니다.</p>
+</blockquote>
+<p>박스 안에 들어갈 때 한 번 변환하고, 꺼내올 때 변환합니다.</p>
+<p>※ 아직 반드시 <code>isomorphic</code>해야 하는지는 확실하지 않습니다. 펑크터로 만든 대리 대상이 collapse 되지 않고 완전히 닮아야 말이 될 듯 한데, <code>m</code>이 반드시 <code>isomorphic</code>해야 한다는 자료는 아직 찾지 못했습니다.<br />
+하스켈 모나드들의 타입 생성자는 모두 <code>isomorphic</code> 합니다. <em>이 것과 관련된 자료를 찾고 있습니다.</em> 예) <code>Maybe a</code>와 <code>a</code>는 <code>isomorphic</code>합니다.</p>
+<p>@ todo 자료 찾아 추가</p>
+<p>@ todo 왜 a -&gt; m b가 필요한지 추가</p>
+<p>@ todo 모나드가 각 각 다른 문제를 해결하는 이유를 컨텍스트를 이용해서 설명</p>
+<p>@ todo Adjunction으로 설명 추가</p>
+
+<div class="comment">
+<script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
+</script>
+</div>
+<div style="text-align:right">Github 계정이 없는 분은 메일로 보내주세요. lionhairdino at gmail.com </div>
+        </div>
+        <div id="footer">
+            © 2021 lionhairdino. All rights reserved. Generated by <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+    </body>
+</html>
