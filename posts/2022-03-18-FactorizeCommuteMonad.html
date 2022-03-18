@@ -89,13 +89,13 @@
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="dt">A</span> <span class="ot">-&gt;</span> <span class="dt">B</span> <span class="ot">-&gt;</span> <span class="dt">C</span> <span class="ot">-&gt;</span> <span class="dt">D</span></span></code></pre></div>
 <p>위 아래는 “같은” 변환을 합니다.</p>
 <p><span class="citation" data-cites="todo">@todo</span> Naturality Condition 추가</p>
-<h1 id="a---m-b-함수와-같은-다른commute-길을-만들어-보자">a -&gt; m b 함수와 같은 다른commute 길을 만들어 보자</h1>
+<h1 id="a---m-b-함수와-도착지는-같지만-대체commute길을-만들어-보자">a -&gt; m b 함수와 도착지는 같지만 대체commute길을 만들어 보자</h1>
 <p><code>a -&gt; m b</code> 함수를 <code>id</code>펑크터로 보내고, <code>m</code>펑크터로 보내고, 둘 사이의 관계를 빨간색으로 표시한 다이아그램입니다.</p>
 <p>빨간색 Natural Transformation을 잘 정의하면, 아래의 함수 <code>f</code>와 같은 <code>Id a</code> -&gt; <code>m a</code> -&gt; <code>m m b</code> -&gt; <code>Id (m b)</code> 인 다른 길이 생깁니다. (오른쪽 파란색 f와 붙어 있는 디귿 모양)</p>
 <figure>
 <img src="../images/monad_commute.png" alt="Commute" /><figcaption aria-hidden="true">Commute</figcaption>
 </figure>
-<p>윗 쪽 화살표가 뒤집어진 걸 주의해서 보세요. <code>Id a -&gt; m a</code><br />
+<p>아래 쪽 arrow가 위arrow의 뒤집어진 방향인 걸 주의해서 보세요. <code>m m b -&gt; Id (m b)</code><br />
 이렇게 정의하면 아래와 같이 대체하는 길을 만들 수 있습니다.</p>
 <figure>
 <img src="../images/monad_samejob.png" alt="같은 작업" /><figcaption aria-hidden="true">같은 작업</figcaption>
@@ -110,18 +110,15 @@
 <p>더도 말고, 덜도 말고 딱 <em>a -&gt; m b 를 연이어 연결</em>하는게 목표입니다.<br />
 <span class="citation" data-cites="todo">@todo</span> a -&gt; m b 가 하스켈에서 중요한 이유 추가</p>
 <h1 id="끝과-시작이-다른-타입인-함수를-어떻게-연결할까">끝과 시작이 다른 타입인 함수를 어떻게 연결할까?</h1>
-<p>시작과 끝이 달라 그대로는 연결할 수 없습니다. 그래서 자신과 isomorphic한 대리인을 세워(Functor), 작업을 하고, 대리인으로부터 결과를 꺼내오게 작업을 바꾸면, 같은 작업이지만 이어 붙일 수 있는 부분을 찾을 수 있습니다.</p>
-<figure>
-<img src="../images/monad_isomorphic.png" alt="충분히 대신할 수 있는 - Isomorphic" /><figcaption aria-hidden="true">충분히 대신할 수 있는 - Isomorphic</figcaption>
-</figure>
-<p>※ 끝과 시작이 달라서 생기는 정보는 어떻게 할까요? 하스켈에서는 체인이 끝날 때까지 람다 함수의 컨텍스트로 <em>계속 유지</em>시킵니다.</p>
+<p>시작과 끝이 달라 그대로는 연결할 수 없습니다. 그래서 자신과 닮은 대리인을 세워(Functor), 작업을 하고, 대리인으로부터 결과를 꺼내오게 작업을 바꾸면, 같은 작업이지만 이어 붙일 수 있는 부분을 찾을 수 있습니다.</p>
+<p>a 와 m a는 isomorphic하지 않지만, 전체 과정이 끝나면 isomorphic 했을 때와 다르지 않습니다.</p>
+<p>※ 끝과 시작이 달라서 생기는 정보는 어떻게 할까요? 여기서 <code>a</code> 와 <code>m a</code>가, <code>m m a</code>와 <code>m a</code>가 isomorphic하지 않으면 안되지 않을까란 생각이 들었습니다. 하지만 <code>Id</code>와 <code>m</code>이, <code>m m</code>이 <code>m</code>과 isomorphic해야 된다는 조건은 없습니다. 펑크터 <code>m</code>으로 변환하는 동안 떼어내는 정보가 있다면, 이 정보는 <code>μ</code>가 책임져야 합니다. 그리고 최종 결과에 포함에서 돌려줘야 합니다. 이 일련의 과정이 마치 isomorphic하지 않은 관계를 여러 장치들로 isomorphic스럽게 관리한다처럼 보이는데, 반드시 그렇진 않기 때문에 이럴 때 isomorphic이란 말이 어울리지 않는다고 합니다.</p>
+<p>하스켈에서는 둘 의 차이로 생겨난 정보를 체인이 끝날 때까지 람다 함수의 컨텍스트로 <em>계속 유지</em>시킵니다.</p>
 <blockquote>
 <p>핵심 아이디어: 작업을 쪼개면 (대체commute할 수 있는 다른길을 찾아보면) 이어 붙일 방법이 보일 수 있습니다.</p>
 </blockquote>
 <p>박스 안에 들어갈 때 한 번 변환하고, 꺼내올 때 한 번 변환합니다.</p>
-<p>펑크터로 만든 대리 대상이 collapse 되지 않고 완전히 닮아야 말이 될 듯 한데, <code>m</code>이 반드시 <code>isomorphic</code> 비슷하게 만들어 준다는 자료는 아직 찾지 못했습니다.</p>
-<p>@ todo 자료 찾아 추가<br />
-@ todo 왜 a -&gt; m b가 필요한지 추가<br />
+<p>@ todo <code>μ</code>가 isomorphic하지 못해 떼어 낸 정보를 유지하는 예시. Maybe @ todo 왜 a -&gt; m b가 필요한지 추가<br />
 @ todo 모나드가 각 각 다른 문제를 해결하는 이유를 컨텍스트를 이용해서 설명<br />
 @ todo Adjunction으로 설명 추가</p>
 
