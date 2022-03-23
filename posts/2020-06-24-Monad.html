@@ -97,7 +97,7 @@
 같은 형태Type의 함수endofunctor들이 있을 때, 이들을 체이닝 할 수 있는 구조가 수학의 모노이드와 닮아 있습니다. (모나드가 아님에 주의)<br />
 체이닝할 때, 연결되는 부분의 타입이 달라 보조 함수 “bind의 도움”을 받는 구조를 모나드라 합니다.<br />
 연결 부위가 다르게 생긴 걸 체이닝하게 보조 함수가 존재한다고 모두 모나드라 부르진 않습니다.<br />
-연결 부위가 다르게 생긴 것 중 <code>a -&gt; m b</code> 모양을 체이닝 하면 모나드, <code>m a -&gt; b</code> 모양을 연결하면 코모나드라 부릅니다.<br />
+연결 부위가 다르게 생긴 것 중 <code>a -&gt; m b</code> 모양을 체이닝 하면 모나드, <code>m a -&gt; b</code> 모양을 체이닝하면 코모나드라 부릅니다.<br />
 왜 하필 <code>a -&gt; m b</code> 모양을 체이닝하는 구조가 수많은 난제를 해결하며 함수형 프로그래밍의 구원자같은 패턴이 됐을까요?<br />
 바로 람다 함수들을 체이닝할 때 <code>a -&gt; m b</code>에서 <code>a</code> 부분을 지워지지 않는 메모리(변수)처럼 활용할 수 있기 때문입니다.<br />
 (체이닝 개념을 <code>품는다</code>고 표현하면 의미상 딱 좋긴한데, 아직 생태계에서 쓰이는 표현은 아닙니다.)</p>
@@ -113,7 +113,6 @@
 <li><a href="#엔도펑크터-endofunctor">엔도펑크터 Endofunctor</a></li>
 <li><a href="#a-monad-is-just-a-monoid-in-the-category-of-endofunctor"><del>“A monad is just a monoid in the category of endofunctor”</del></a></li>
 <li><a href="#kleisly-카테고리"><del>Kleisly 카테고리</del></a></li>
-<li><a href="#연속으로-컴포지션-하려면-모노이달-카테고리의-모노이드가-돼야-한다"><del>연속으로 컴포지션 하려면 모노이달 카테고리의 모노이드가 돼야 한다</del></a></li>
 <li><a href="#왜-a---m-b-타입-함수가-특별할까">왜 <code>a -&gt; m b</code> 타입 함수가 특별할까?</a></li>
 <li><a href="#컨텍스트-context">컨텍스트 Context</a></li>
 <li><a href="#비순수-작업에-관여하는-부분만-떼어내-보면-모나드가-아니라-펑크터의-속성이다">비순수 작업에 관여하는 부분만 떼어내 보면 모나드가 아니라 펑크터의 속성이다</a></li>
@@ -126,15 +125,18 @@
 <li><a href="#미완성">미완성</a></li>
 </ol>
 <h2 id="모나드-목적">모나드 목적</h2>
-<p>함수형 프로그래밍 스타일은 함수를 품고 품게 엮어서(nested), 결국 프로그램은 하나의 커다란 함수가 됩니다. <code>a -&gt; a</code> 타입끼리, <code>m a -&gt; m a</code> 타입끼리, … 입출력이 같은 타입 함수는 그냥 컴포지션(.)으로 엮으면 되는데, <code>a -&gt; m a</code> 타입의 함수를 엮는 건 어떻게 할까요? 이 문제를 해결하기 위한게 모나드입니다.<br />
-그런데 왜 하필 <code>a -&gt; m a</code> 를 엮는게 그렇게 중요한 문제일까요? 어찌 보면 저에게는 이게 더 큰 의문이었습니다. 이 문제에 대한 추측을 아래 적어놨습니다.</p>
+<p>하스켈에서 펑크터로 감싼 타입이 들어간 함수는 다음 3가지가 있습니다.<br />
+<code>a -&gt; m b</code>, <code>m a -&gt; b</code>, <code>m a -&gt; m b</code><br />
+함수형 프로그래밍 스타일은 함수를 품고 품게 엮어서(nested), 결국 프로그램은 하나의 커다란 함수가 됩니다. <code>a -&gt; b</code> 타입끼리, <code>m a -&gt; m b</code> 타입끼리, … 입출력이 같은 타입 함수는 그냥 컴포지션(.)으로 엮으면 되는데, <code>a -&gt; m b</code> 타입의 함수, <code>m a -&gt; b</code> 타입의 함수를 엮는 건 어떻게 할까요? 둘 중 <code>a -&gt; m b</code>를 엮는 문제를 해결하기 위한게 모나드이고, <code>m a -&gt; b</code>를 해결하는 게 <a href="../posts/2021-05-06-comonad.html">코모나드</a>입니다.<br />
+그런데 왜 하필 <code>a -&gt; m b</code> 를 엮는게 그렇게 중요한 문제일까요? 어찌 보면 저에게는 이게 더 큰 의문이었습니다. 이 문제에 대한 추측을 아래 적어놨습니다.</p>
 <figure>
 <img src="../images/greateFunction.png" alt="멀리서 바라본 하스켈 프로그램 - 함수를 감싸고 감싸고…" /><figcaption aria-hidden="true">멀리서 바라본 하스켈 프로그램 - 함수를 감싸고 감싸고…</figcaption>
 </figure>
 <h2 id="어원">어원</h2>
 <p>unity, 산술 단위. 라틴어 monas, 그리스어 monas 에서 왔습니다. unit 이나 alone 을 뜻하던 단어였습니다.<br />
 <a href="https://www.etymonline.com/word/monad" class="uri">https://www.etymonline.com/word/monad</a><br />
-※ 카테고리 이론에서는 Monad를 Triple이라 부르기도 합니다.</p>
+뭔가 세 개가 힘을 합치면 <em>하나</em>가 되는 걸 뜻하는 게 아닐까요. 어디까지나 추측입니다.<br />
+※ 카테고리 이론에서는 Monad를 Triple, Triad라 부르기도 합니다.</p>
 <h2 id="카테고리-이론과-하스켈의-닮은-점">카테고리 이론과 하스켈의 닮은 점</h2>
 <p>람다 대수에서 모든 대상을 함수로 보고 대수 체계를 만들어 가 듯이 오로지 오브젝트들끼리의 관계만으로 대수 체계를 만들어가는, 쉽지 않은 수학 이론입니다. 모나드, 펑크터의 어원etimology이 이 곳이구나 정도만 알고 지나가도 되지만, 이 곳에서 온 용어와 개념들이 많기 때문에 결국에 입문정도는 해놔야 합니다.</p>
 <p>오브젝트가 갖고 있는 어떤 속성도 관심없고, 오브젝트들끼리의 관계만 의미를 두는 이론입니다. (오브젝트는 그냥 관계의 출발점과 끝점을 표시하는 점으로만 보면 됩니다.) 하스켈은 함수를 품고 품어서 프로그램을 완성하므로, 모피즘 <a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> 합성이라는 개념과 많이 닮아 있습니다. 하스켈의 한 데이터 구조를 대상으로 하는 함수들은 합성 능력이 있어야 쓸모가 있습니다.</p>
@@ -155,7 +157,7 @@
 <li>이항 함수는 함수의 컴포지션으로,</li>
 <li>결합 법칙은 고차 함수를 이용해</li>
 </ul>
-<p>표현합니다. 1 오브젝트 카테고리로 표현된다고 합니다.</p>
+<p>표현합니다. 1 오브젝트 카테고리로 표현된다고 합니다. (모노이드를 일반화한 모노이달 카테고리와는 다릅니다.)</p>
 <p>ex) <em>{0,1,2,…} 는 (+)</em>를 묶어 놓으면 모노이드입니다. 이 집합에 있는 모든 엘리먼트들의 관계는 <code>(+)</code>로 표현할 수 있습니다. 말의 순서를 바꿔서 얘기하면, 이항 함수 <code>(+)</code> 하나로 집합내 모든 엘리먼트들(나올 수 있는 모든 상태)을 만들어 낼 수 있습니다.</p>
 <p>이 말을 카테고리 쪽 모노이드로 표현하면, 구성 요소들을 다음처럼 바꿔서 표현합니다.<br />
 모피즘 <em>0+,1+,2+,3+…, Id, (.)</em>입니다.(오브젝트는 중요하지 않습니다. 그냥 시작과 끝을 표시하는 점으로 생각하면 됩니다.)<br />
@@ -174,26 +176,29 @@
 <li>결합 법칙을 따른다면, 함수 하나 하나가 어떤 외부 요소와도 상관없이 독립적으로 자신의 일만 한다는 말입니다. 만일 함수가 외부 요소에 의존한다면 결합을 다르게 할 경우 결과가 다르게 나올 수 있습니다.<br />
 <code>1 + 2 + 3 = (1 + 2) + 3 = 1 + (2 + 3)</code><br />
 하지만 (-)는 다릅니다.<br />
-<code>1 - 2 - 3 = (1 - 2) - 3 \= 1 - (2 - 3)</code></li>
+<code>1 - 2 - 3 = (1 - 2) - 3 \= 1 - (2 - 3)</code><br />
+추상 대수학에서는 결합 법칙이 성립하지 않으면, 대부분의 정리theorem들을 증명할 수가 없게됩니다. 예를 들면 소거cancel 법칙등을 써서 =을 사이에 두고 양 쪽에 같은 작업을 해서 목적을 향해가는 작업을 할 수 없습니다.</li>
 </ol>
 <p><del>결합 순서라는 외부 요소<em>?</em>에 따라 함수의 동작이 영향을 받습니다. (좀 억지스러운 이해같기도 한데, 다른 숨은 뜻이 보이면 수정하도록 하겠습니다.) 검증 필요</del><br />
 1. 항등원이 없으면 모피즘의 조합으로 모든 요소를 표현할 수 없습니다. 위 이항 함수의 설명과 같은 개념으로, 항등원이 있어야 total 함수가 될 수 있습니다. <em>검증 필요</em></p>
 <p><del>왜 모노이드로 만들려고 할까요?* 카테고리의 정의는 <code>a-&gt;b</code> , <code>b-&gt;c</code> 이면 반드시 <code>a-&gt;c</code>로 가는 함수가 존재합니다.카테고리란 말은 컴포지션을 할 수 있다라는 말입니다. 그런데, 오브젝트가 여러 개라면 그들 사이의 모피즘(함수), 컴포지션, 항등 함수를 모두 정의해야 카테고리가 됩니다. 하지만 모노이드 카테고리로 만들면, 함수의 합성으로 모든 모피즘이 표현 가능하다는게 보장되므로 쉽게 카테고리가 됩니다. 하스켈의 모나드는 “카테고리로 만들려고 한다”고 말할 수 있고, 더 구체적으로 말하면 “모노이달 카테고리(오브젝트가 하나만 있는 카테고리)모노이달 카테고리 중 오브젝트가 하나만 있는 모노이드로 만들려고 한다”고 말할 수 있습니다. <em>모노이달 카테고리의 모노이드가 되면, 컴포지션을 자유롭게 할 수 있는 구조</em>가 됩니다.</del></p>
 <p>※ 추측 : 집합의 Monoid에서 항등원을 빼면 semigroup, 항등원과 결합 법칙을 빼면, 즉 이항 연산만 존재한다는 조건만 있는 구조를 Magma라 부릅니다. semigroup과 Magma의 이항 연산도 닫혀 있긴 하지만, 집합의 모든 원소를 이항 연산의 결과로 표현할 수 있을지 없을지는 알 수 없습니다. 하지만 모노이드는 집합에 있는 모든 원소를 이항 연산으로 표현 할 수 있습니다. semigroup, Magma가 하스켈에서 주연이 되지 못한 이유는 이게 아닐까요? 모노이드는 이항 연산이 닫혀 있고, 이항 연산으로 모든 상태(집합내 모든 원소)에 도달할 수 있습니다. 그냥 닫혀만 있음을 보장해줘도 프로그래밍에서는 컴포지션이 가능하다는 의미가 있을 것 같으니 마그마도 반군도 가능할 것처럼 보이지만, 마그마나 반군은 모든 상태를 다 표현한다는 보장은 없습니다. 닫혀 있지만 모든 원소를 표현하지 못하는 경우를 생각해 봤습니다.<br />
 {0,1,2} 이고 이항함수가 f x y = 1 라면, 닽혀 있기는 하지만 0과 2는 이 이항함수로 표현하지 못합니다. 이게 프로그래밍에서는 어떤 의미일까요? 하스켈 모나드의 경우로 말을 바꿔보면, 어떤 액션은 컴포지션으로 나올 수 없다는 말입니다.</p>
-<p><em>2022-01-30 추가: 모노이달 카테고리에 대한 이해가 잘 못 되었다는 지적을 받았습니다. 모노이달이 오브젝트가 1개만 있는 걸 의미하는게 아닌 모노이드 구조로 되어 있는 카테고리라 해야 한다 합니다. 오브젝트가 여러개 있는 모노이달 카테고리가 뭔지 이해를 아직 못했습니다.</em></p>
+<p><em>2022-01-30 추가: 모노이달 카테고리에 대한 이해가 잘 못 되었다는 지적을 받았습니다. </em> 모노이달 카테고리는 오브젝트가 1개만 있는 1오브젝트 카테고리가 아니라, 카테고리들을 오브젝트로, 모피즘을 펑크터로 하는 Cat 카테고리에 바이펑크터를 넣어 모노이드같은 성격을 지니도록 한 카테고리 입니다.</p>
 <p><a href="https://www.euclideanspace.com/maths/discrete/category/concrete/monoid/index.htm" class="uri">https://www.euclideanspace.com/maths/discrete/category/concrete/monoid/index.htm</a><br />
 Monoids and Groups are categories with one object and an (endo-)functor going from that single functor back to itself.</p>
 <p><del>물론 다른 검증된 카테고리의 수학적 이론들을 적용할 수 있게 되는 효과가 있겠지만, 프로그래머에게 제일 와닿는 특징은 컴포지션입니다.</del></p>
 <p>※ Monoid 단어 뜻<br />
 mono는 하나를 뜻하고, oid는 비슷하지만 같지 않은 걸 뜻합니다. 이렇게 보면 하나고, 저렇게 보면 하나가 아닌 어떤 것 쯤 아닐까요. 0을 포함한 양의 정수는 더하기 연산을 쓰면 모노이드(0, 1, …, <del>succ</del>~ addFunc, 결합법칙)라 하는데, 모두 <del>succ가 반복되어 있는</del> 이항 함수가 반복되어 있는 한 가지 모양으로 표현할 수 있고, 또는 모두 하나의 뿌리에서 나온 것들이라 표현할 수도 있다는 의미 아닐까요. <em>2022-01-30 추가: succ가 이항 함수가 아니라는 지적을 받았습니다.</em> 보통 단항 함수로 쓰이니 이름을 바꿔 이항 함수와 혼돈을 주지 않는게 맞는 것 같습니다.</p>
-<p><del>(갈루아의 군론은 5차 방정식의 해를 구할수 없음을 증명할 때 쓰였다고 합니다. 증명을 하면서 만났던 수 체계들 중 하나가 모노이드인데, 카테고리 이론을 거쳐 하스켈에 스며든 모노이드가 속성은 같지만, 발현된 의미는 조금 다른게 아닐까싶은 생각이 듭니다. 예를 들면 모나드(모노이드 일종)가 실행 순서등을 지정하는 효과가 난다는 건 하스켈로 오기전엔 없는 의미, 용도 아니었을까요? 갈루아의 군론에 들어간 아이디어를 정확히 잡아내면 좋지만, 그렇게 하려면 역시나 논문의 늪으로 빠져서 전공을 바꿔야 할지도 모릅니다. 일단, 상상에서 멈추도록 하겠습니다. )</del> <em>2022-01-30 추가 : 모나드를 모노이드의 일종으로 보면 안된다고 하는 지적을 받았습니다.</em></p>
+<p>(갈루아의 군론은 5차 방정식의 해를 구할수 없음을 증명할 때 쓰였다고 합니다. 증명을 하면서 만났던 수 체계들 중 하나가 모노이드인데, 카테고리 이론을 거쳐 하스켈에 스며든 모노이드가 속성은 같지만, 발현된 의미는 조금 다른게 아닐까싶은 생각이 듭니다. 예를 들면 모나드(모노이드 일종)가 실행 순서등을 지정하는 효과가 난다는 건 하스켈로 오기전엔 없는 의미, 용도 아니었을까요? 갈루아의 군론에 들어간 아이디어를 정확히 잡아내면 좋지만, 그렇게 하려면 역시나 논문의 늪으로 빠져서 전공을 바꿔야 할지도 모릅니다. 일단, 상상에서 멈추도록 하겠습니다. )</p>
+<p><em>2022-01-30 추가 : 모나드를 모노이드의 일종으로 보면 안된다고 하는 지적을 받았습니다.</em><br />
+모나드를 모노이드의 일종으로 본다기 보다, 모나드의 목적을 달성하려고 정의한 함수들이 있으면 자연히 모노이드 구조도 만들 수 있습니다.</p>
 <h2 id="펑크터-펑터-함자-functor">펑크터 (펑터, 함자) Functor</h2>
 <p>카테고리와 카테고리 매핑이 펑크터</p>
-<p><del>하스켈에서 보면, 소스 카테고리의 모피즘을 다른 카테고리의 모피즘과 매핑하고, 소스 카테고리의 오브젝트를 다른 카테고리의 오브젝트와 매핑하는, 모피즘과 오브젝트 둘 모두를 매핑하는 걸 펑크터라 하는데, 카테고리 이론쪽에서는 오브젝트는 관심의 대상이 아니기 때문에 그냥 서로 다른 카테고리에 있느 모피즘들끼리 매핑하는 걸 펑크터라 보면 됩니다.</del></p>
-<p><del>카테고리와 카테고리를 매핑하는 함수를 펑크터라 부르기도 하고, 펑크터를 오브젝트로 해서 형성된 펑크터 카테고리를 그냥 펑크터라 부르기도 합니다. 하스켈에서는 fmap 만으론 오브젝트를 다른 카테고리의 오브젝트와 매핑하지 못하기 때문에 생성자를 추가해서, 이 생성자와 fmap이 있는 구조를 펑크터 타입이라 부릅니다. 그런데 이 것도 자료에 따라 그냥 펑크터라 부릅니다. 심지어 fmap을 적용할 때, 펑크터를 적용한다고 말하기도 합니다. 이런 혼란이 이해를 꽤 더디게 만들긴 합니다.</del></p>
+<p>하스켈에서 보면, 소스 카테고리의 모피즘을 다른 카테고리의 모피즘과 매핑하고, 소스 카테고리의 오브젝트를 다른 카테고리의 오브젝트와 매핑하는, 모피즘과 오브젝트 둘 모두를 매핑하는 걸 펑크터라 합니다. 그냥 함수 적용과 다른 점은, 펑크터는 구조까지 변환합니다. 그래서 function말고 다른 이름이 필요했던게 아닐까 싶습니다.</p>
+<p>카테고리와 카테고리를 매핑하는 함수를 펑크터라 부르고, 펑크터를 오브젝트로 해서 형성된 카테고리를 펑크터 카테고리로 부릅니다. 하스켈에서는 <code>fmap</code> 만으론 오브젝트를 다른 카테고리의 오브젝트와 매핑하지 못하기 때문에 생성자를 추가해서, 이 생성자와 <code>fmap</code>이 함께 있는 구조를 펑크터 타입이라 부릅니다. 그런데 이 것도 자료에 따라 그냥 펑크터라 부릅니다. 심지어 fmap을 적용할 때, 펑크터를 적용한다고 말하기도 합니다. 약간 혼란스럽긴 한데, 카테고리간 매핑을 하는 걸 펑크터라 합니다.</p>
 <h2 id="natural-transformation">Natural Transformation</h2>
-<p>펑크터와 펑크터 매핑은 따로 Natural Transformation 이라 부릅니다. 펑크터를 입력값으로 취급하는 함수, 즉 (함수를 인자로 받는 함수)를 인자로 받는 함수로 표현됩니다.</p>
+<p>펑크터와 펑크터 매핑은 따로 Natural Transformation 이라 부릅니다. 하스켈에서는 펑크터를 입력값으로 취급하는 함수, 즉 (함수를 인자로 받는 함수)를 인자로 받는 함수로 표현됩니다.</p>
 <h2 id="엔도펑크터-endofunctor">엔도펑크터 Endofunctor</h2>
 <p>용어 : ~의 카테고리 (category of ~)<br />
 오브젝트가 Set 이고 모피즘이 집합간 함수인 카테고리를 “category of set” 이라 합니다.<br />
@@ -202,43 +207,11 @@ mono는 하나를 뜻하고, oid는 비슷하지만 같지 않은 걸 뜻합니�
 <p>엔도펑크터의 카테고리는 오브젝트가 엔도펑크터이고 모피즘이 Natural Transformation인 카테고리입니다.</p>
 <p><code>[1,2]</code>는 리스트 펑크터입니다. Functor의 리스트 인스턴스에 있는 <code>fmap</code>으로 <code>(+5)</code>를 적용하면</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fmap</span> (<span class="op">+</span><span class="dv">5</span>) [<span class="dv">1</span>,<span class="dv">2</span>] <span class="ot">=</span> [<span class="dv">6</span>,<span class="dv">7</span>] </span></code></pre></div>
-<p>결과는 다시 리스트 펑크터입니다. 리스트를 카테고리로 볼 수도 있고, Hask 안의 한 오브젝트로 볼 수도 있습니다. <code>Hask -&gt; Hask</code> 로 보든 <code>List -&gt; List</code> 로 보든, 어떻게 보든 자기 카테고리로 다시 돌아오니 엔도펑크터입니다. 카테고리 이론 말고, 하스켈에서는 fmap을 가진 타입을 펑크터라 하는데, Hask를 벗어나는 경우는 없으니, 하스켈에서 만나는 펑크터는 모두 엔도펑크터라 불러도 됩니다.</p>
-<p>Some 타입을 정의하고, Some 타입의 컴포지션을 잘 정의하면 Some 카테고리로 볼 수도 있습니다. Maybe 카테고리, List 카테고리… 등 타입 하나가 컴포지션만 잘 정의되어 있으면 하나의 카테고리로 볼 수도 있습니다.</p>
-<p>카테고리 안의 일부 오브젝트가 새로운 카테고리를 형성하기도 하고, 한 카테고리에 속한 오브젝트가 다른 카테고리에 속하는 것도 가능합니다. 카테고리는 조건이 몇 개 없는 굉장히 추상적인 구조입니다.</p>
-<p><code>a -&gt; m b</code> 타입은 함수일까요, 펑크터일까요, Natural Transformation 일까요? 세 개 다 될 수 있습니다. <code>a</code> 타입에서 <code>m b</code> 타입으로 가는 함수로 볼 수 있고, <code>a</code> 카테고리의 구조를 유지하면서 <code>m b</code> 카테고리로 연결하는 펑크터로 볼 수도 있고, <code>a</code> 앞에 <code>Id</code> 펑크터가 생략됐다고 보고(<code>Id a -&gt; m b</code>) <code>Id</code> 펑크터에서 <code>m</code> 펑크터로 가는 Natural Transformation으로 볼 수도 있습니다. <em>검증 필요</em></p>
-<p>모나드를 얘기할 때는 <code>a -&gt; m b</code> 는 엔도펑크터로 봅니다. <code>m</code>은 <code>fmap</code>을 가지고 있는 펑크터 타입입니다.</p>
+<p>결과는 다시 리스트 펑크터입니다. <code>a -&gt; m b</code> 타입은 함수일까요, 펑크터일까요, Natural Transformation 일까요? 세 개 다 될 수 있습니다. <code>a</code> 타입에서 <code>m b</code> 타입으로 가는 함수로 볼 수 있고, <code>a</code> 카테고리의 구조를 유지하면서 <code>m b</code> 카테고리로 연결하는 펑크터로 볼 수도 있고, <code>a</code> 앞에 <code>Id</code> 펑크터가 생략됐다고 보고(<code>Id a -&gt; m b</code>) <code>Id</code> 펑크터에서 <code>m</code> 펑크터로 가는 Natural Transformation으로 볼 수도 있습니다. <em>검증 필요</em></p>
+<p>모나드를 얘기할 때는 <code>a -&gt; m b</code>는 m을 엔도펑크터로 보고 <code>a -&gt; m b</code>는 함수로 봅니다. <code>m</code>은 <code>fmap</code>을 가지고 있는 펑크터 타입입니다.</p>
 <h2 id="a-monad-is-just-a-monoid-in-the-category-of-endofunctor"><del>“A monad is just a monoid in the category of endofunctor”</del></h2>
 <p><em>검증 필요 - 명시적으로 kleisly arrow를 엔도펑크터로 표시하고, 아래같이 풀어 낸 자료는 아직 보진 못했습니다. 정확한 이해와 해석이 아닐 수 있습니다.</em><br />
-<em>아래 글은 수학적 오류가 많아 삭제 예정입니다.</em></p>
-<p>모나드로 가는 길은 여러 길이 있는데, bind에서 가는 길, <code>join</code> 과 <code>return</code> 에서 가는 길, <code>&gt;=&gt;</code> 에서 가는 길이 있습니다. 여기서는 <code>&gt;=&gt;</code> 에서 출발해 보겠습니다.</p>
-<p>endofunc1 :: a -&gt; m b<br />
-endofunc2 :: b -&gt; m c<br />
-…<br />
-a , b, c 는 폴리모픽을 뜻하므로 대표 타입으로 <code>a -&gt; m b</code> 로 표기하겠습니다.</p>
-<p><del>이런 엔도펑크터들이 있을 때, 엔도펑크터 하나 하나를 오브젝트로 보는 게 아니라(그런데 엔도펑크터를 모피즘으로 보는데 Category of endofunctor라 합니다. 꼭 오브젝트를 이름으로 쓰는게 아니거나, 이해를 잘 못한 걸지도 모릅니다. 여기선 엔도펑크터 a -&gt; m b가 하나의 오브젝트 역할을 하는 건 아닐까요?), 오브젝트는 하나의 점(a -&gt; m b 하나로 변하지 않으니)으로 두고, <code>endofunc1</code>, <code>endofunc2</code> …을 모피즘으로 삼아 모노이달 카테고리(오브젝트가 하나만 있는 카테고리 모노이달 카테고리 중에 오브젝트가 하나만 있는 경우)에서 모노이드를 만들어 보겠습니다.</del></p>
-<p><del>오브젝트는 단 하나만 있습니다.</del><br />
-모피즘을 합성하는 ~<del><code>composition :: (a -&gt; m b) -&gt; (a -&gt; m b) -&gt; (a -&gt; m b)</code></del>~<code>composition :: (a -&gt; m b) -&gt; (b -&gt; m c) -&gt; (a -&gt; m c)</code> 타입 이항 함수가 있어야 합니다.<br />
-<em>2022-01-30 추가: 위와 같은 함수를 정의할 수 없다는 지적을 받았습니다. 저는 모나딕 액션들을 합성하는 이항함수라는 의미에서 의사 코드처럼 적어 놓았는데, 수학적인 오류가 있는 정의라는 지적입니다.</em><br />
-<em>composition :: Monad m =&gt; (a -&gt; m b) -&gt; (b -&gt; m c) -&gt; (a -&gt; m c) 로 클레이슬리 컴포지션 정의와 같이 써야 한다고 합니다.</em><br />
-<em>저는 a, b, c를 큰 의미없이 m으로 싸여진 결과가 나오는 타입의 합성이란 의미만 강조하고 싶었는데, 비수학적으로 의미만 표현하는게 잘못되었다는 지적을 받았습니다.</em><br />
-<em>(a -&gt; m b)와 (a -&gt; m b)라 쓰면, 첫 번째와 두 번째에 있는 a와 b가 같아야만 한다는 뜻이니 오류입니다.</em> 카테고리가 되기 위한 위 조건들 중 이항 함수만 살펴 보겠습니다. (실제 코드가 아니라 의사 코드입니다.)</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ot">composition ::</span> (a <span class="ot">-&gt;</span> m b) <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> m b) <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> m b)   </span></code></pre></div>
-<p>그럼, 이 구조가 모피즘으로 갖고 있는 모든 <code>endofunc</code>들은</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>composition endofunc1 endofunc2</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>composition (composition endofunc1 endofunc2) endofunc3 </span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="op">...</span>    </span></code></pre></div>
-<p><del>composition을 이용해 표현 할 수 있습니다. (composition 함수의 정교한 표현은 kleisly 카테고리의 <code>(&gt;=&gt;)</code> 함수입니다. monad composition이라 부르기도 하고, kleisly composition이라 부르기도 합니다. <code>(&gt;=&gt;)</code>는 <code>join</code>, <code>return</code>이 있으면 정의할 수 있습니다.)</del></p>
-<p><del>composition 같은 함수가 정의되어 있으면 모노이달 카테고리의 모노이드가 되고, 모노이드가 되면 모피즘을 몇 번이고 합성할 수 있게 됩니다.</del></p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>f <span class="op">&gt;=&gt;</span> g <span class="ot">=</span> join <span class="op">.</span> <span class="fu">fmap</span> g <span class="op">.</span> f</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- 또는</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>f <span class="op">&gt;=&gt;</span> g <span class="ot">=</span> \x <span class="ot">-&gt;</span> f x <span class="op">&gt;&gt;=</span> g</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co">-- 참고</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>x <span class="op">&gt;&gt;=</span> f <span class="ot">=</span> join (<span class="fu">fmap</span> f x)</span></code></pre></div>
-<p><del><code>join</code>과 <code>return</code>이 없으면 모노이드 구조가 아니지만, 추가해서 모노이드 구조가 되는 걸 모나드라 합니다. 엔도펑크터 + <code>return</code> + <code>join</code> 이 있는 “구조”를 모나드라 합니다. 모나드는 엔도펑크터의 모노이달 카테고리의 모노이드입니다.</del></p>
-<p><em>컴포지션을 하기 위해, 모노이드 구조를 만드는게 목적</em>입니다. 엔도펑크터 카테고리를 모노이드로 만들려고 join, return을 추가합니다.</p>
-<p>※ 하스켈에서 모나드 정의는 <code>fmap</code>, <code>return</code>, <code>bind</code> (이 건 <code>join</code>이나 Kleisly <code>(&gt;=&gt;)</code>로 표현되기도 합니다.)가 정의되어 있는 타입입니다. <code>fmap</code>은 펑크터에 정의되어 있는데, 모나드가 돠려면 펑크터여야 하기 때문에 여기서는 필요 조건에 함께 적어놨습니다.</p>
-<p><em>2022-01-30 추가: 모든 모나드는 모노이다란 말이 틀렸다는 지적을 받았습니다. 모노이드가 아닌 모나드가 하스켈에서 의미가 있는 건지 아직 이해하지 못했습니다</em></p>
+<em>2022-01-30 추가: 모든 모나드는 모노이다란 말이 틀렸다는 지적을 받았습니다. 모노이드가 아닌 모나드가 하스켈에서 의미가 있는 건지 아직 이해하지 못했습니다</em></p>
 <p>※ ~<del>모든 모노이드가 모나드는 아니지만, 모든 모나드는 모노이드입니다. 다시 말해, join, return이 없이 모노이드가 되는 구조는 모나드는 아니고 그냥 모노이드입니다.</del>~ 모든 모나드가 모노이드는 아니다라 얘기하면 특정 조건을 만족하는 모나드만 모노이드란 얘길 텐데, 그렇다면 A monad is just monoid .. 문장과 배치되는 것 아닐까요? 모나드는 모노이드인데, 어떤 모노이드냐 하면 엔도펑크터 카테고리 안의 모노이드란 뜻 아닐까요? <a href="https://math.stackexchange.com/questions/1332690/monoid-as-a-single-object-category" class="uri">https://math.stackexchange.com/questions/1332690/monoid-as-a-single-object-category</a><br />
 ※ 수학 이론말고 프로그래밍 쪽에서는, 엄밀히 말하면 <code>a -&gt; m b</code> 와 <code>a -&gt; m b</code> 를 kleisly 컴포지션으로 합성하려면 <code>a</code>와 <code>b</code>가 같은 타입이어야 합니다.</p>
 <h2 id="kleisly-카테고리"><del>Kleisly 카테고리</del></h2>
@@ -248,13 +221,6 @@ a , b, c 는 폴리모픽을 뜻하므로 대표 타입으로 <code>a -&gt; m b<
 <li>bind 를 (2)<code>(&gt;=&gt;)</code>로 표현할 수도 있고, (3) <code>join</code> 과 <code>fmap</code> 으로도 표현할 수 있습니다. (1) (2) (3)중에 한 가지 방식만 정의되면, 모나드 역할을 할 수 있습니다.</li>
 </ol>
 <p><em>2022-01-30 추가: Kleisli category가 1 object인 모노이드라고 생각하면 완전히 틀렸다는 지적을 받았습니다.</em></p>
-<h2 id="연속으로-컴포지션-하려면-모노이달-카테고리의-모노이드가-돼야-한다"><del>연속으로 컴포지션 하려면 모노이달 카테고리의 모노이드가 돼야 한다</del></h2>
-<p><em>2022-01-30 추가: 모노이달 카테고리에 대한 이해가 부족해 삭제 예정입니다.</em><br />
-<del><em>카테고리 자체를 오브젝트로 해서 모노이드 구조가 되는 걸 모노이달 카테고리라 하는 것 같습니다.</em></del> <del>문서들이 “왜 이 개념이 필요한지” 목표를 명확히 써주면 좋을텐데, 대부분 카테고리 입문용 문서들이 <em>왜 그렇게 하는지</em> 이유를 쉽게 알려주지 않습니다. “이런 이런 모양이 펑크터야, 모노이드야, 모나드야” 라는 자료는 많지만, 왜 펑크터, 모노이드, 모나드로 만드는지 친절하게 목표를 풀어 주는 자료는 많지 않습니다. 깊게 들어가서 한 텍스트를(한 권의 책) 마칠 때가 되면 이해하게 될 것 같은데, 세세한 상관 관계를 다 익히지 않고, 이러 이러한 목적때문에 이런 걸 떠올렸다라고 얘기할 수 없는 걸까요.</del></p>
-<p><del><code>join</code>, <code>return</code> 성격의 Natural Transformation이 있다면, 엔도펑크터를 체이닝(연속 연결)할 수 있습니다. 다시 말해 모나드로 만들면 컴포지션 할 수 있습니다.</del></p>
-<p><del>수학 용어를 걷어내면,</del><br />
-<del><code>a -&gt; m b</code> 함수를 컴포지션 하려면 <code>join</code>이 필요하다고 말할 수 있습니다.</del></p>
-<p>다른 타입의 컴포지션과 달리 <code>a -&gt; m b</code> 타입 함수가 왜그리 중요한 역할을 하게 됐을까요?</p>
 <h2 id="왜-a---m-b-타입-함수가-특별할까">왜 <code>a -&gt; m b</code> 타입 함수가 특별할까?</h2>
 <p><code>m a -&gt; m b</code> 타입으로 함수를 만들면 복잡한 개념 없이 품고 품게composition 할 수 있지 않을까 생각이 듭니다. 하지만, <code>m</code> 컨텍스트에서 <code>m</code> 컨텍스트로 가면 품는 동안 반드시 <code>m</code> 컨텍스트가 발현된다는 보장이 없습니다. <code>m</code>을 다루는 함수면 <code>m</code>안에 있는 건 뭔지 신경쓰지 않을 수도 있습니다. <code>fmap</code>이 동작하거나, 패턴 매칭이 나와야지만 Side effect가 드러납니다. <code>m</code>을 열어 보는 순간이 있어야 합니다. <code>m a</code> 와 <code>a -&gt; m b</code><a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a> 함수를 받으면, <code>m a</code> 에서 <code>m</code> 을 벗겨내는 작업을 해야만 <code>a -&gt; m b</code> 함수를 적용할 수 있습니다. 다시 말해, <em>컨텍스트가 반드시 발현</em>됩니다. 수학이 아닌, 순수하게 프로그래밍 입장에서 바라 봤습니다. 참고 - <a href="../posts/2020-06-24-WrappingType.html#%EA%B0%92-%EC%83%9D%EC%84%B1%EC%9E%90%EB%A5%BC-%EB%B2%97%EA%B8%B8-%EB%95%8C-%EB%B0%9C%ED%98%84%EB%90%98%EB%8A%94-%EC%BB%A8%ED%85%8D%EC%8A%A4%ED%8A%B8">값을 감싸는 이유</a></p>
 <p>2021.5.21 추가<br />
@@ -270,7 +236,7 @@ a , b, c 는 폴리모픽을 뜻하므로 대표 타입으로 <code>a -&gt; m b<
 <p>참고 - <a href="../posts/2020-07-02-Context.html">컨텍스트, Applicative Functor, Traversable</a></p>
 <h2 id="비순수-작업에-관여하는-부분만-떼어내-보면-모나드가-아니라-펑크터의-속성이다">비순수 작업에 관여하는 부분만 떼어내 보면 모나드가 아니라 펑크터의 속성이다</h2>
 <p><code>Maybe</code>의 컨텍스트인 “<code>Nothing</code>일 수도 있어” 라는 컨텍스트를 처리하는 건 펑크터의 <code>fmap</code>이 맡습니다. <code>fmap</code>에서 <code>Nothing</code>이냐, <code>Just</code>냐에 따라 분기가 일어납니다. 이렇게 분기가 일어난 결과를 <em>다음 작업과 연결하는 작업을 담당하는게 모나드</em>입니다. 모나드의 <code>bind</code> 구현을 보면 <code>join</code>이 <code>fmap</code>을 품은 형태입니다. <code>fmap</code>으로 Side effect를 발현시키고 나온 결과물을 다음 액션과 연결하기 위해(타입을 맞추기 위해) <code>join</code>을 씌우는 모양입니다.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>x <span class="op">&gt;&gt;=</span> f     <span class="ot">=</span>     join      (<span class="fu">fmap</span> f x)</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>x <span class="op">&gt;&gt;=</span> f     <span class="ot">=</span>     join      (<span class="fu">fmap</span> f x)</span></code></pre></div>
 <h2 id="상태를-넘기는-영리한-방법이야">상태를 넘기는 영리한 방법이야?</h2>
 <p>특정 모나드의 동작만 놓고, 이렇게 동작하는게 모나드야라고 설명한 말입니다. 사람이 앉아서 밥을 먹는 걸 봤다고, 앉아서 밥을 먹는 건 사람이야 라고 얘기하면 사람이 뭔지 알기 어렵습니다. “상태를 넘기는 걸 모나드 패턴으로 구현할 수도 있어”가 더 맞는 표현입니다. 모나드를 특정 문제를 위한 패턴으로만 접근하면 꽤 멀리 돌아서 모나드에 도착할지도 모릅니다.</p>
 <h2 id="모나드가-왜-수많은-난제들을-해결할까">모나드가 왜 수많은 난제들을 해결할까?</h2>
@@ -287,30 +253,30 @@ IO는 컴포지션할 때마다 매 번 “Status처럼 런타임 상태값realw
 <p>초창기 하스켈에는 모나드가 없었다고 하는데, 그 때는 IO 같은 작업을 어떻게 해결했을까 궁금하긴 합니다. stream, continuation 등을 이용했다고 하는데, 곁가지가 또 너무 뻗칠까 당분간은 궁금함을 그냥 두기로 했습니다.</p>
 <h2 id="자신을-품고-있는-함수상위-함수의-매개-변수-값은-접근-할-수-있다-closure">자신을 품고 있는 함수(상위 함수)의 매개 변수 값은 접근 할 수 있다 Closure</h2>
 <p>람다 대수를 보면</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>𝜆x<span class="op">.</span>(𝜆y<span class="op">.</span>xy)</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>𝜆x<span class="op">.</span>(𝜆y<span class="op">.</span>xy)</span></code></pre></div>
 <p><code>𝜆y</code>를 매개 변수로 갖고 있는 함수에서 <code>𝜆x</code>에 접근 할 수 있습니다. <code>𝜆x.( ... )</code> 인 함수는 당연히 <code>𝜆x</code>를 … 에서 쓸 수 있어야 하니 당연한 결과입니다. 하스켈도 <code>\x -&gt; (\y -&gt; x + y)</code> 가 가능합니다. 매개 변수 이외에는 외부와 소통할 수 없는 함수형 프로그래밍에서의 함수에게는, 이 특징이 매우 유용하게 쓰입니다. 품고 품게 해서 엮은 함수들의 가장 바깥쪽에서 넣어 주는 인자값은, 그 함수 뭉치에서 전역값 같은 역할을 합니다.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>p1 <span class="op">&gt;&gt;=</span> \r1 <span class="ot">-&gt;</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>p2 <span class="op">&gt;&gt;=</span> \r2 <span class="ot">-&gt;</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>p3 <span class="op">&gt;&gt;=</span> \r3 <span class="ot">-&gt;</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>p4 <span class="op">&gt;&gt;=</span> \r4 <span class="ot">-&gt;</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>p5 <span class="op">&gt;&gt;=</span> \r5 <span class="ot">-&gt;</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="fu">return</span> (somef r1 r2 r3 r4 r5)</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="co">-- do로 표기하면</span></span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="kw">do</span> </span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>   r1 <span class="ot">&lt;-</span> p1</span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>   r2 <span class="ot">&lt;-</span> p2</span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>   r3 <span class="ot">&lt;-</span> p3</span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>   r4 <span class="ot">&lt;-</span> p4</span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>   r5 <span class="ot">&lt;-</span> p5</span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>   <span class="fu">return</span> (somef r1 r2 r3 r4 r5)</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>p1 <span class="op">&gt;&gt;=</span> \r1 <span class="ot">-&gt;</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>p2 <span class="op">&gt;&gt;=</span> \r2 <span class="ot">-&gt;</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>p3 <span class="op">&gt;&gt;=</span> \r3 <span class="ot">-&gt;</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>p4 <span class="op">&gt;&gt;=</span> \r4 <span class="ot">-&gt;</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>p5 <span class="op">&gt;&gt;=</span> \r5 <span class="ot">-&gt;</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="fu">return</span> (somef r1 r2 r3 r4 r5)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="co">-- do로 표기하면</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="kw">do</span> </span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>   r1 <span class="ot">&lt;-</span> p1</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>   r2 <span class="ot">&lt;-</span> p2</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>   r3 <span class="ot">&lt;-</span> p3</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>   r4 <span class="ot">&lt;-</span> p4</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>   r5 <span class="ot">&lt;-</span> p5</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>   <span class="fu">return</span> (somef r1 r2 r3 r4 r5)</span></code></pre></div>
 <p>람다 변수를 함수들의 결과를 저장해 두는 곳으로 씁니다. 바인드를 파워풀하게 만드는 또 하나의 요소입니다.</p>
 <p>참고 - <a href="../posts/2021-05-18-stateless.html">상태 개념 포스트</a></p>
 <h2 id="엮어-놓은-액션함수-뭉치-실행run">엮어 놓은 액션(함수) 뭉치 실행(run)</h2>
-<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>monadChain <span class="ot">=</span> runReader (<span class="kw">do</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>   <span class="op">...</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>   <span class="op">...</span></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>   ) env</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>monadChain <span class="ot">=</span> runReader (<span class="kw">do</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>   <span class="op">...</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>   <span class="op">...</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>   ) env</span></code></pre></div>
 <p><code>(\x...(\y...(\z...)))</code> 이렇게 엮어 놓은 함수 뭉치는 블랙박스로 바라보면 <code>(\x ...)</code> 하나의 함수일 뿐입니다.</p>
 <p><code>do</code> 이하 구문들은 여러 개의 <code>bind</code>로 품고 품게 되어 있는 함수 뭉치입니다. 아직 실행되지 않은, 언젠가 실행될 하나의 함수입니다. 이 뭉치의 가장 바깥쪽 함수에 <code>env</code>를 넣어주면, 그제서야 함수 뭉치의 실행이 “시작”됩니다. 그래서 모나드들이 레코드 필드 접근자의 이름을 <code>run~</code> 이라고 짓는 경우가 많습니다. 마치 골드버그 장치가 실행되는 것처럼, 전체가 동작을 시작하는 트리거를 표현하니 <code>run~</code>이란 이름이 적당해 보입니다.</p>
 <p>2022-01-30 추가: 커뮤니티에서 이 페이지를 열어 몇 분과 대화를 나눴는데, 수학적 오류가 한 가득한 페이지입니다. 주의해서 읽어 주세요.</p>
