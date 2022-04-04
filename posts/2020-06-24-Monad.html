@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko" lang="ko">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <title>lionhairdino - 모나드 문턱에서</title>
+
+        <meta name="description" content="모나드 기초부터 설명하는 문서는 아닙니다. 모나드 QnA 문서쯤 됩니다." />
+        <meta property="og:description" content="모나드 기초부터 설명하는 문서는 아닙니다. 모나드 QnA 문서쯤 됩니다." />
+
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <link rel="icon" href="https://lionhairdino.github.io/favicon.svg" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino16px.png" sizes="16x16" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino24px.png" sizes="24x24" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino32px.png" sizes="32x32" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino48px.png" sizes="48x48" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino57px.png" sizes="57x57" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino60px.png" sizes="60x60" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino64px.png" sizes="64x64" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino72px.png" sizes="72x72" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino76px.png" sizes="76x76" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino114px.png" sizes="114x114" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino120px.png" sizes="120x120" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino144px.png" sizes="144x144" />
+        <link rel="shortcut icon" href="../favicon.ico" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino152px.png" sizes="152x152" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino180px.png" sizes="180x180" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino192px.png" sizes="192x192" />
+        <link rel="manifest" href="../site.webmanifest" />
+        <link rel="mask-icon" href="https://lionhairdino.github.io/Lionhairdino_black.svg" color="#ff7500" />
+        <meta name="msapplication-TileImage" content="/images/favicon/Lionhairdino144px.png" />
+        <meta name="msapplication-TileColor" content="#ff7500" />
+        <meta name="theme-color" content="#ffffff" />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="모나드 문턱에서" />
+        <meta property="og:site_name" content="Lionhairdino" />
+        <meta property="og:url" content="https://lionhairdino.github.io/posts/2020-06-24-Monad.html" />
+
+        <meta property="og:image" content="https://lionhairdino.github.io/images/whyMonad.png" />
+
+      <meta name="keywords" content="monad, 모나드, 펑크터, functor">
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-E9WZ6VXGHP"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-E9WZ6VXGHP');
+</script>
+<script src="../script/copycode.js"></script>
+<script async src="https://cse.google.com/cse.js?cx=9c53b4915cbb2605c"></script>
+    </head>
+    <body>
+        <div id="header" style>
+            <div style="display:inline-block;margin-right:5px;padding-top: 5px;" id="logo">
+                <a href="../"><img style="width:30px;border:none" src="../images/favicon/Lionhairdino48px.png"></a>
+            </div>
+            <div style="display:inline-block;vertical-align: top;padding-top:5px;" id="navigation">
+                <a href="../" style>lionhairdino</a>
+                <a href="../about.html">about</a>
+                <!--<a href="/archive.html">archive</a>-->
+            </div>
+            <div style="display:inline-block;font-size:0.8em;vertical-align: top;">
+                <div style="display:inline-block;vertical-align: top;padding-top: 5px">사이트내 검색</div>
+                <div style="display:inline-block;width:180px;"> 
+                    <div class="gcse-searchbox-only"></div>
+                </div>
+            </div>
+            <div>
+                여기 글들은 일종의 질문입니다. 주의! 틀린 내용이 있을 수 있습니다. 용어 선택도 학계, 업계에서 쓰는 걸로 되어 있지 않습니다.
+            </div>
+        </div>
+        <div id="content">
+            <h1>모나드 문턱에서</h1>
+            <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+<div class="info">
+    Posted on June 24, 2020
+    
+</div>
+
+<figure>
+<img src="../images/whyMonad.png" alt="왜 하는지 먼저 알려주면 안될까?" /><figcaption aria-hidden="true">왜 하는지 먼저 알려주면 안될까?</figcaption>
+</figure>
+<p>2022-04-04 수정: 카테고리 이론과 관련된 글이 일부 있었는데, 부정확한 수학 글은 모두 걷어냈습니다.</p>
+<ol type="1">
+<li><a href="#모나드가-뭘까">모나드가 뭘까?</a></li>
+<li><a href="#a---m-b-타입을-합성하면-모나드인가"><code>a -&gt; m b</code> 타입을 합성하면 모나드인가?</a></li>
+<li><a href="#왜-a---m-b-타입-함수가-특별할까">왜 <code>a -&gt; m b</code> 타입 함수가 특별할까?</a></li>
+<li><a href="#자신을-품고-있는-함수상위-함수의-매개-변수-값은-접근-할-수-있다-closure">자신을 품고 있는 함수(상위 함수)의 매개 변수 값은 접근 할 수 있다 Closure</a></li>
+<li><a href="#컨텍스트-context">컨텍스트 Context</a></li>
+<li><a href="#비순수-작업은-모나드가-아니라-펑크터가-담당한다">비순수 작업은 모나드가 아니라 펑크터가 담당한다</a></li>
+<li><a href="#상태를-넘기는-영리한-방법이야">상태를 넘기는 영리한 방법이야?</a></li>
+<li><a href="#모나드가-왜-수많은-난제들을-해결할까">모나드가 왜 수많은 난제들을 해결할까?</a></li>
+<li><a href="#엮어-놓은-액션함수-뭉치-실행run">엮어 놓은 액션(함수) 뭉치 실행(run)</a></li>
+</ol>
+<h2 id="모나드가-뭘까">모나드가 뭘까?</h2>
+<p>펑크터 <code>m</code> 구조에 함수 두 개 <code>return: a -&gt; m a</code>,<code>join: m (m a) -&gt; a</code>가 있어, <code>m (m (m ...))</code>합성이 가능한 구조를 모나드라 합니다. 말로 풀면, 두 함수의 도움으로 같은 펑크터를 몇 번이고 계속 적용(합성)이 가능한 구조를 모나드라 합니다. - <a href="../posts/2022-03-25-beforeMonad.markdown">모나드, 같음</a> 글 참고</p>
+<h2 id="a---m-b-타입을-합성하면-모나드인가"><code>a -&gt; m b</code> 타입을 합성하면 모나드인가?</h2>
+<p>모나드 구조에 있는 함수를 이용하면 <code>a -&gt; m b</code> 타입 합성이 가능하지, 이 합성 자체가 모나드인 건 아닙니다. 모나드의 합성을 얘기할 때는 <code>m a, m (m a), m (m (m a)), m (m (m (m a))),...</code> 이렇게 펑크터<code>m</code>의 합성을 말하는 것입니다. <code>m</code>의 생성자도 비슷한 타입 <code>a -&gt; m a</code>이어서 혼란을 주기도 합니다.</p>
+<h2 id="왜-a---m-b-타입-함수가-특별할까">왜 <code>a -&gt; m b</code> 타입 함수가 특별할까?</h2>
+<p><code>m a -&gt; m b</code> 타입으로 함수를 만들면 복잡한 개념 없이 품고 품게composition 할 수 있지 않을까 생각이 듭니다. 하지만, <code>m</code> 컨텍스트에서 <code>m</code> 컨텍스트로 가면 품는 동안 반드시 <code>m</code> 컨텍스트가 발현된다는 보장이 없습니다. <code>m</code>을 다루는 함수면 <code>m</code>안에 있는 건 뭔지 신경쓰지 않을 수도 있습니다. <code>fmap</code>이 동작하거나, 패턴 매칭이 나와야지만 effect가 드러납니다. <code>m</code>을 열어 보는 순간이 있어야 합니다. <code>m a</code> 와 <code>a -&gt; m b</code>[^4] 함수를 받으면, <code>m a</code> 에서 <code>m</code> 을 벗겨내는 작업을 해야만 <code>a -&gt; m b</code> 함수를 적용할 수 있습니다. 다시 말해, <em>컨텍스트가 반드시 발현</em>됩니다. 수학이 아닌, 순수하게 프로그래밍 입장에서 바라 봤습니다. 참고 - <a href="../posts/2020-06-24-WrappingType.html#%EA%B0%92-%EC%83%9D%EC%84%B1%EC%9E%90%EB%A5%BC-%EB%B2%97%EA%B8%B8-%EB%95%8C-%EB%B0%9C%ED%98%84%EB%90%98%EB%8A%94-%EC%BB%A8%ED%85%8D%EC%8A%A4%ED%8A%B8">값을 감싸는 이유</a></p>
+<p>2021.5.21 추가<br />
+또 한가지 중요한 이유가 있습니다. 바로 클로저를 활용하기 위해서입니다. 아래 <a href="../posts/2020-06-24-Monad.html#%EC%9E%90%EC%8B%A0%EC%9D%84-%ED%92%88%EA%B3%A0-%EC%9E%88%EB%8A%94-%ED%95%A8%EC%88%98%EC%83%81%EC%9C%84-%ED%95%A8%EC%88%98%EC%9D%98-%EB%A7%A4%EA%B0%9C-%EB%B3%80%EC%88%98-%EA%B0%92%EC%9D%80-%EC%A0%91%EA%B7%BC-%ED%95%A0-%EC%88%98-%EC%9E%88%EB%8B%A4-closure">클로저</a>부분 참고, <a href="../posts/2021-05-21-parsec.html#%EC%99%9C-%ED%8C%8C%EC%84%9C%EC%99%80-%ED%8C%8C%EC%84%9C%EB%A5%BC-%EB%B6%99%EC%9D%B4%EC%A7%80-%EC%95%8A%EA%B3%A0-%ED%8C%8C%EC%84%9C-bind-%ED%8C%8C%EC%84%9C%EB%A5%BC-%EA%B3%A0%EB%A5%B4%EB%8A%94-%ED%95%A8%EC%88%98%EB%A5%BC-%EB%B6%99%EC%9D%BC%EA%B9%8C">Parsec 글</a> 참고<br />
+하스켈에 쓰는 수많은 모나드들이 람다 변수를 메모리처럼 쓰는 패턴을 이용합니다. 모나드가 온 사방에 나올 수 밖에 없는 이유입니다. 아래 Closure 참고 <code>a -&gt; m b</code>가 특별한 이유를 이렇게 설명하는 자료는 아직 찾지 못했습니다. <em>검증필요</em></p>
+<figure>
+<img src="../images/monadSecret.png" alt="아무리 그래도 모나드는 어렵습니다." /><figcaption aria-hidden="true">아무리 그래도 모나드는 어렵습니다.</figcaption>
+</figure>
+<h2 id="자신을-품고-있는-함수상위-함수의-매개-변수-값은-접근-할-수-있다-closure">자신을 품고 있는 함수(상위 함수)의 매개 변수 값은 접근 할 수 있다 Closure</h2>
+<p>람다 대수를 보면</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>𝜆x<span class="op">.</span>(𝜆y<span class="op">.</span>xy)</span></code></pre></div>
+<p><code>𝜆y</code>를 매개 변수로 갖고 있는 함수에서 <code>𝜆x</code>에 접근 할 수 있습니다. <code>𝜆x.( ... )</code> 인 함수는 당연히 <code>𝜆x</code>를 … 에서 쓸 수 있어야 하니 당연한 결과입니다. 하스켈도 <code>\x -&gt; (\y -&gt; x + y)</code> 가 가능합니다. 매개 변수 이외에는 외부와 소통할 수 없는 함수형 프로그래밍에서의 함수에게는, 이 특징이 매우 유용하게 쓰입니다. 품고 품게 해서 엮은 함수들의 가장 바깥쪽에서 넣어 주는 인자값은, 그 함수 뭉치에서 전역값 같은 역할을 합니다.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>p1 <span class="op">&gt;&gt;=</span> \r1 <span class="ot">-&gt;</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>p2 <span class="op">&gt;&gt;=</span> \r2 <span class="ot">-&gt;</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>p3 <span class="op">&gt;&gt;=</span> \r3 <span class="ot">-&gt;</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>p4 <span class="op">&gt;&gt;=</span> \r4 <span class="ot">-&gt;</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>p5 <span class="op">&gt;&gt;=</span> \r5 <span class="ot">-&gt;</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="fu">return</span> (somef r1 r2 r3 r4 r5)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co">-- do로 표기하면</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="kw">do</span> </span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>   r1 <span class="ot">&lt;-</span> p1</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>   r2 <span class="ot">&lt;-</span> p2</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>   r3 <span class="ot">&lt;-</span> p3</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>   r4 <span class="ot">&lt;-</span> p4</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>   r5 <span class="ot">&lt;-</span> p5</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>   <span class="fu">return</span> (somef r1 r2 r3 r4 r5)</span></code></pre></div>
+<p>람다 변수를 함수들의 결과를 저장해 두는 곳으로 씁니다. 바인드를 파워풀하게 만드는 또 하나의 요소입니다.</p>
+<p>참고 - <a href="../posts/2021-05-18-stateless.html">상태 개념 포스트</a></p>
+<h2 id="컨텍스트-context">컨텍스트 Context</h2>
+<p>문장과 문장 사이, 행간으로 번역하기도 하고, 맥락이라고 번역하기도 하는데, 무언가 명시적으로 언급하진 않았지만 현재 작업을 할 때 영향을 미치는 환경, 상황 같은 걸 말합니다. 코딩에서는 어떤 모양으로 컨텍스트가 나타날까요? 같은 성격의 작업을 할 때마다 항상 반복해서 실행되는 코드가 바로 컨텍스트입니다. 바인드 안에서 fmap을 불러 항상 effect 처리를 하는데, 바인드로 체이닝되어 연결될 때마다 effect 처리가 반복되는 걸 컨텍스트라 부릅니다.</p>
+<p>“컨텍스트를 이용해서 Side effect가 있는 비순수 함수와 <em>같은 결과</em>를 순수 함수로 만들어낸다”라고 말해야지, “컨텍스트는 side effect를 의미한다”라고 하면 틀린 말입니다.</p>
+<p>참고 - <a href="../posts/2020-07-02-Context.html">컨텍스트, Applicative Functor, Traversable</a></p>
+<h2 id="비순수-작업은-모나드가-아니라-펑크터가-담당한다">비순수 작업은 모나드가 아니라 펑크터가 담당한다</h2>
+<p><code>Maybe</code>의 컨텍스트인 “<code>Nothing</code>일 수도 있어” 라는 컨텍스트를 처리하는 건 펑크터의 <code>fmap</code>이 맡습니다. <code>fmap</code>에서 <code>Nothing</code>이냐, <code>Just</code>냐에 따라 패턴 매칭이 일어납니다. 이렇게 작업한 후 결과를 <em>다음 작업과 연결하는 작업을 담당하는게 모나드</em>입니다. 모나드의 <code>bind</code> 구현을 보면 <code>join</code>이 <code>fmap</code>을 품은 형태입니다. <code>fmap</code>으로 effect를 발현시키고 나온 결과물을 다음 액션과 연결하기 위해 <code>join</code>을 씌우는 모양입니다.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>x <span class="op">&gt;&gt;=</span> f <span class="ot">=</span>   join   (<span class="fu">fmap</span> f x)</span></code></pre></div>
+<h2 id="상태를-넘기는-영리한-방법이야">상태를 넘기는 영리한 방법이야?</h2>
+<p>이건 특정 모나드의 동작일 뿐입니다. “상태를 넘기는 걸 모나드 패턴으로 구현할 수도 있어”가 맞는 표현입니다. 모나드를 특정 문제를 위한 패턴으로만 접근하면 꽤 멀리 돌아서 모나드에 도착할지도 모릅니다.</p>
+<h2 id="모나드가-왜-수많은-난제들을-해결할까">모나드가 왜 수많은 난제들을 해결할까?</h2>
+<p>함수가 함수를 품을때마다 반드시 fmap이 한 번씩 동작합니다. 체이닝할 때 매 번 뭔가 작업을 반복적하고, 결과를 잃어버리지 않고 누적해야 한다면 딱 어울리는 패턴입니다.</p>
+<p>Maybe는 컴포지션할 때마다 매 번 “Nothing 인지 검사하고”<br />
+Status는 컴포지션할 때마다 매 번 “상태값을 액션에 넣어줘야 하고”<br />
+Writer는 컴포지션할 때마다 매 번 “로그 ‘같은’ 값들을 계속 누적하고”<br />
+IO는 컴포지션할 때마다 매 번 “Status처럼 런타임 상태값realworld을 계속 끌고 다녀야 하고”<br />
+…<br />
+(거의 대부분 “<em>순수 함수는 매개 변수로만 소통할 수 있다</em>”라는 제약 때문에 등장한 난제들입니다.)</p>
+<p>그리고 또 한가지,<br />
+카테고리 이론 쪽에선 의도한게 아닐 것 같은데요, 모나드의 굉장히 중요한 성격이 있습니다. 하스켈은 Lazy한 함수들이 순차적으로 실행된다는 보장이 없습니다. 하지만 함수들이 품고 품은 상태로 엮인 상태에서, 현재 함수를 실행하려면 반드시 이전 단계 함수의 결과값이 꼭 필요한 상태가 되게 하면, 자연스럽게 함수들 사이에 실행 순서가 생깁니다. 모나드 패턴으로 엮을 때 이 효과가 자연스럽게 생깁니다. 수학에서 개념을 가져왔지만, 수학 개념에서 주목하지 않았던 특징들도 나타납니다.</p>
+<p>정리하면, 함수를 컴포지션할 때마다 항상 처리해야 하는 작업이 있다거나, 실행 순서가 지켜져야 하는 작업이라면, 모나드가 딱입니다.</p>
+<p>초창기 하스켈에는 모나드가 없었다고 하는데, 그 때는 IO 같은 작업을 어떻게 해결했을까 궁금하긴 합니다. stream, continuation 등을 이용했다고 하는데, 곁가지가 또 너무 뻗칠까 당분간은 궁금함을 그냥 두기로 했습니다.</p>
+<h2 id="엮어-놓은-액션함수-뭉치-실행run">엮어 놓은 액션(함수) 뭉치 실행(run)</h2>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>monadChain <span class="ot">=</span> runReader (<span class="kw">do</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>   <span class="op">...</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>   <span class="op">...</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>   ) env</span></code></pre></div>
+<p><code>(\x...(\y...(\z...)))</code> 이렇게 엮어 놓은 함수 뭉치는 블랙박스로 바라보면 <code>(\x ...)</code> 하나의 함수일 뿐입니다.</p>
+<p><code>do</code> 이하 구문들은 여러 개의 <code>bind</code>로 품고 품게 되어 있는 함수 뭉치입니다. 아직 실행되지 않은, 언젠가 실행될 하나의 함수입니다. 이 뭉치의 가장 바깥쪽 함수에 <code>env</code>를 넣어주면, 그제서야 함수 뭉치의 실행이 “시작”됩니다. 그래서 모나드들이 레코드 필드 접근자의 이름을 <code>run~</code> 이라고 짓는 경우가 많습니다. 마치 골드버그 장치가 실행되는 것처럼, 전체가 동작을 시작하는 트리거를 표현하니 <code>run~</code>이란 이름이 적당해 보입니다.</p>
+<p>미완성…</p>
+
+<div class="comment">
+<script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
+</script>
+</div>
+<div style="text-align:right">Github 계정이 없는 분은 메일로 보내주세요. lionhairdino at gmail.com </div>
+        </div>
+        <div id="footer">
+            © 2021 lionhairdino. All rights reserved. Generated by <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+    </body>
+</html>
