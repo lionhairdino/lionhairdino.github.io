@@ -201,7 +201,7 @@ A의 3은 B의 b로 연결되었습니다.</p>
 <p>effect를 버리지 않는 한 <code>m a</code>에서 <code>a</code>를 꺼내오지 못합니다. <code>fmap</code> 내부에서 잠시 분리했다 결합하는 동작이 보여 오해할 수 있는데, 만일 단독으로 <code>a</code>를 받는다면 effect가 모두 사라진 상태니 <code>m a</code>와 다릅니다. effect가 있는 a는 있을 수 없습니다. <em>둘은 같게 볼 방법이 없습니다.</em></p>
 <br />
 <center>
-<font size="7em" style="font-weight: bolder; line-height: 1.2em">“ma와 a는 같게 볼 방법이 없다.”</font>
+<font size="7em" style="font-weight: bolder; line-height: 1.2em">“m a와 a는 같게 볼 방법이 없다.”</font>
 </center>
 <p><br /></p>
 <p>지금부터는 모나드로 넘어가니 <code>f</code>를 <code>m</code>이라 표기하겠습니다.</p>
@@ -350,7 +350,11 @@ A. 혹시 Functor의 <code>fmap</code>과 같아 보인다면, 둘의 받는 함
 <h2 id="결론">결론</h2>
 <p><code>a -&gt; m b</code>와 <code>b -&gt; m c</code> 합성 방법을 고민하면, <code>m b</code>에서 <code>b</code>로 돌아올 방법이 필요합니다. 하지만, 펑크터 <code>m</code>은 거의 isomorphism이 아닙니다. 구조만 보존하면(homomorphism) 어떻게 변형할지 알 수 없습니다. 거꾸로 돌아오는 길은, effect를 모두 잃어버리니 애시당초 없을 확률이 높습니다. (isomorphic하여 돌아 올 때 잃어버릴 게 없다면 effect가 없다는 말입니다. effect가 없는 모나드로는 Identity 모나드가 있습니다.) 그럼 합성을 포기 했을 것도 같은데, effect만 따로 합칠 수만 있다면 합성할 수 있다는 생각을 어떻게 했을까요? 펑크터에 대한 통찰이 있어 effect가 따로 보였을까요?</p>
 <p>카테고리 이론은 현재 카테고리에서 해결책을 찾지 못할 때 펑크터로 변환한 곳에서 해결책을 찾기도 합니다. <code>a -&gt; m b</code>를 펑크터<code>m</code>으로 한 번 더 변환하면 <code>m a -&gt; m (m b)</code>가 됩니다. 여기서 해결책을 찾기 시작한 건 아닐까요?</p>
-<p>어떻게 떠올렸을지 모를 천재적 센스에 따라, 1. <code>m b</code>를 <code>b</code>로 만들 때 effect를 잃어버리지 않고, 2. <code>a -&gt; m c</code> 새로 생기는 effect와 합쳐서 <code>m c</code>에 넣어 놓기 위해 3. <code>join :: m (m a) -&gt; m a</code>만 있으면 합성이 가능해집니다. (그리고 여기 글에서는 제대로 언급하지 않았지만, <code>m a</code>가 아닌 <code>a</code>를 받아 <code>fmap (a -&gt; m b)</code>에 넣으려면, effect의 초기값 역할을 할 <code>return :: a -&gt; m a</code>가 필요합니다. bind를 주로 보다보면 시작이 <code>m a</code>라 return이 집중을 덜 받긴 합니다.)</p>
+<p>어떻게 떠올렸을지 모를 천재적 센스에 따라,<br />
+1. <code>m b</code>를 <code>b</code>로 만들 때 effect를 잃어버리지 않고,<br />
+2. <code>a -&gt; m c</code> 새로 생기는 effect와 합쳐서 <code>m c</code>에 넣어 놓기 위해<br />
+3. <code>join :: m (m a) -&gt; m a</code>만 있으면 합성이 가능해집니다.<br />
+(그리고 여기 글에서는 제대로 언급하지 않았지만, <code>m a</code>가 아닌 <code>a</code>를 받아 <code>fmap (a -&gt; m b)</code>에 넣으려면, effect의 초기값 역할을 할 <code>return :: a -&gt; m a</code>가 필요합니다. bind를 주로 보다보면 시작이 <code>m a</code>라 return이 포커스를 덜 받긴 합니다.)</p>
 <div class="sourceCode" id="cb28"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>        a <span class="ot">-&gt;</span> m b</span>
 <span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>m a <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> m b) <span class="ot">-&gt;</span> m b</span>
 <span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a></span>
