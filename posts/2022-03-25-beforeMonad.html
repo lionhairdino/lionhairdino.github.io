@@ -81,10 +81,9 @@
 
 <p>모나드로 가는 도중 생각해 보면 도움이 될 것 같은 내용들을 정리했습니다.<br />
 처음 모나드를 접하시는 분들보다는 한 번쯤 모나드 설명을 봤던 분들에게 적합한 글일 것 같습니다.<br />
-<code>Functor</code>와 <code>Maybe</code> 동작에 대한 사전 지식이 필요합니다.</p>
+<code>Functor</code>와 <code>Maybe</code> 동작에 대한 지식이 있으면 도움이 됩니다.</p>
 <p>주의 )<br />
-모나드의 독특함 때문에 수많은 모나드 튜토리얼들이 올라오는데, 잘못된 이해로 남긴 글을 <a href="https://byorgey.wordpress.com/2009/01/12/abstraction-intuition-and-the-monad-tutorial-fallacy/">Burrito 부리토</a>라고 부르는 것 같습니다. 이 글도 부리토 중에 하나일 수 있습니다. 그렇게 되지 않기 위해 노력하지만 모든게 확실한 내용이라 장담할 수 없습니다. 여기 글에서 무언가를 알게 된다면, 꼭 다른 분들과 상의해서 검증하시기 바랍니다.<br />
-임시 오픈이며 최대한 검증 중입니다. 틀린 내용이 많다면 삭제 예정입니다.</p>
+모나드의 독특함 때문에 수많은 모나드 튜토리얼들이 올라오는데, 잘못된 이해로 남긴 글을 <a href="https://byorgey.wordpress.com/2009/01/12/abstraction-intuition-and-the-monad-tutorial-fallacy/">Burrito 부리토</a>라고 부르는 것 같습니다. 이 글도 부리토 중에 하나일 수 있습니다. 그렇게 되지 않기 위해 노력하지만 모든게 확실한 내용이라 장담할 수 없습니다. 여기 글에서 무언가를 알게 된다면, 꼭 다른 분들과 상의해서 검증하시기 바랍니다.</p>
 <ol type="1">
 <li><a href="#펑크터로-변환한-타입과-변환-전-타입의-관계">펑크터로 변환한 타입과 변환 전 타입의 관계</a></li>
 <li><a href="#펑크터-타입이-같이-있는-함수">펑크터 타입이 같이 있는 함수</a></li>
@@ -164,18 +163,19 @@ A. 여기서 같다 다르다의 관심사는 한 함수 내에서가 아니라,
 <figure>
 <img src="../images/before_monad_iso.png" alt="전단사bijective" /><figcaption aria-hidden="true">전단사bijective</figcaption>
 </figure>
-<p><code>A</code>와 <code>B</code>는 서로 전사Surjective이며, 단사injective로 연결된 전단사bijective 관계입니다. <code>f: A -&gt; B</code> 함수가 있고, 돌아 오는 <code>g: B -&gt; A</code> 함수(<code>f</code>의 역함수)도 있습니다. <code>A</code>를 넣어줘야 할 곳에 <code>g(B의 원소)</code>를 해서 넣어 줄수도 있고, <code>B</code>를 넣어줘야 할 곳에 <code>f(A의 원소)</code>를 해서 넣어줘도 됩니다. ※이런 관계를 Isomorphic 관계라 합니다. 서로 다른 정도를 표현하는 함수를 적용하면 바로 같은 것으로 바뀌고 있습니다.</p>
+<p><code>A</code>와 <code>B</code>는 서로 전사Surjective이며, 단사injective로 연결된 전단사bijective 관계입니다. <code>f: A -&gt; B</code> 함수가 있고, 돌아 오는 <code>g: B -&gt; A</code> 함수(<code>f</code>의 역함수)도 있습니다. <code>A</code>를 넣어줘야 할 곳에 <code>g(B의 원소)</code>를 해서 넣어 줄수도 있고, <code>B</code>를 넣어줘야 할 곳에 <code>f(A의 원소)</code>를 해서 넣어줘도 됩니다. ※ 이런 관계를 Isomorphic 관계라 합니다. 서로 다른 정도를 표현하는 함수를 적용하면 바로 같은 것으로 바뀌고 있습니다.</p>
 <figure>
 <img src="../images/before_monad_noniso.png" alt="A에서 B로 가며 정보를 잃어버렸습니다." /><figcaption aria-hidden="true">A에서 B로 가며 정보를 잃어버렸습니다.</figcaption>
 </figure>
 <p>A의 1과 2는 B의 a로 연결되고,<br />
 A의 3은 B의 b로 연결되었습니다.</p>
-<p><code>f: A -&gt; B</code> 로 갔다가 다시 <code>g: B -&gt; A</code> 으로 돌아올 수 없습니다. <code>a</code>에서 출발하면 <code>1</code>로 가야 하는지 <code>2</code>로 가야 하는지 알 수 없습니다. <code>c</code>에서 출발해도 마찬가지로 어디로 가야할지 알 수 없습니다. 이럴 때는 둘이 같은 것으로 볼 방법이 없습니다. 하지만, 다음 방법을 통해서 마치 돌아갈 수 있는 것 처럼 할 수 있습니다. 예를 들어, 만일 <code>f</code>로 <code>B</code>의 <code>a</code>에 도착할 때마다 <code>1</code>에서 왔는지, <code>2</code>에서 왔는지 기록하는 보조 함수를 만든다면, <code>g</code>를 이용해 바로 올 수는 없지만, 이 보조 함수 만들기에 따라서 마치 전단사 함수처럼 동작할 수도 있습니다. (꼭 전단사로 만들어야 되는 건 아닙니다.)</p>
+<p><code>f: A -&gt; B</code> 로 갔다가 다시 <code>g: B -&gt; A</code> 으로 돌아올 수 없습니다. <code>a</code>에서 출발하면 <code>1</code>로 가야 하는지 <code>2</code>로 가야 하는지 알 수 없습니다. <code>c</code>에서 출발해도 마찬가지로 어디로 가야할지 알 수 없습니다. 이럴 때는 아무 조치 없이는 둘이 같은 것으로 볼 방법이 없습니다. 하지만, 다음 방법을 통해서 마치 돌아갈 수 있는 것 처럼 할 수 있습니다. 예를 들어, 만일 <code>f</code>로 <code>B</code>의 <code>a</code>에 도착할 때마다 <code>1</code>에서 왔는지, <code>2</code>에서 왔는지 기록하는 보조 함수를 만든다면, <code>g</code>를 이용해 바로 올 수는 없지만, 이 보조 함수 만들기에 따라서 마치 전단사 함수처럼 동작할 수도 있습니다. (꼭 전단사로 만들어야 되는 건 아닙니다.)</p>
 <p>“<code>A</code>는 <code>B</code>와 (g + 보조 함수)를 적용하면 문제 없을 만큼 다르다고 말할 수 있습니다.”</p>
 <p>하지만 <em>항상 보조 함수를 만들 수 있는 건 아닙니다.</em></p>
 <h2 id="m-a-에서-a로-돌아오기">m a 에서 a로 돌아오기?</h2>
 <h3 id="maybe-펑크터가-추가한-구조effect">Maybe 펑크터가 추가한 구조effect</h3>
-<p>※ 펑크터를 말할 땐 타입 생성자를 <code>f</code>, 모나드를 말할 때는 <code>m</code>으로 표기합니다. ※ <code>m a</code>에서 <code>a</code>로 돌아갈 때 갖고 갈 수 없는 정보를 effect라 합니다.</p>
+<p>※ 펑크터를 말할 땐 타입 생성자를 <code>f</code>, 모나드를 말할 때는 <code>m</code>으로 표기합니다.<br />
+※ <code>m a</code>에서 <code>a</code>로 돌아갈 때 갖고 갈 수 없는 정보를 effect라 합니다.</p>
 <p>펑크터는 오브젝트들만 매핑하는 게 아니라, 모피즘과 합성도 매핑해야 합니다. 오브젝트는 타입 생성자로 감싸서 변환하고, 모피즘은 <code>fmap</code>이란 함수를 통해서 변환합니다.</p>
 <p><code>f a</code>값에 적용해야 될 함수가 <code>a -&gt; b</code>이면 <code>f a</code>와 <code>a</code>가 달라 적용할 수 없습니다. 매직은 없습니다. <code>f a</code>를 <code>a</code>로 바꾸든, <code>a -&gt; b</code>를 <code>f a -&gt; b</code> 또는 <code>f a -&gt; f b</code>로 바꾸든 해야 합니다. 필요한 정보 구조(effect)를 모두 가지고 있는 타입은 <code>f b</code>이니, 이 정보들을 잃어버리지 않기 위해 <code>f a -&gt; f b</code> 타입으로 만듭니다.</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fmap</span><span class="ot"> ::</span> <span class="dt">Functor</span> <span class="dt">F</span> <span class="ot">=&gt;</span> (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> f a <span class="ot">-&gt;</span> f b</span>
@@ -198,7 +198,7 @@ A의 3은 B의 b로 연결되었습니다.</p>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>              f c <span class="ot">-&gt;</span> f d</span></code></pre></div>
 <p>같은 타입들끼리 만나고 있으니 문제가 없습니다. <code>f a</code>, <code>f b</code>, <code>f c</code> 모두 <code>f</code>를 가지고 있는, 즉 effect를 잃어버리지 않고 갖고 있는 타입들입니다.</p>
 <p>여기서 <code>fmap</code>의 내부 동작을 보면 <code>f a</code>에서 <code>a</code>를 꺼내온 것으로 오해할 수 있습니다. 하지만 <code>fmap</code>의 결과는 <code>f b</code>입니다. 내부에서 일시적으로 effect를 분리해서 <code>a</code>를 꺼내와 작업하지만, 최종 <code>a</code>만 단독으로 받을 수 없습니다.</p>
-<p>effect를 버리지 않는 한 <code>m a</code>에서 <code>a</code>를 꺼내오지 못합니다. <code>fmap</code> 내부에서 잠시 분리했다 결합하는 동작이 보여 오해할 수 있는데, 만일 단독으로 <code>a</code>를 받는다면 effect가 모두 사라진 상태니 <code>m a</code>와 다릅니다. effect가 있는 a는 있을 수 없습니다. <em>둘은 같게 볼 방법이 없습니다.</em></p>
+<p>effect를 버리지 않는 한 <code>m a</code>에서 <code>a</code>를 꺼내오지 못합니다. <code>fmap</code> 내부에서 잠시 분리했다 결합하는 동작이 보여 오해할 수 있는데, 만일 단독으로 <code>a</code>를 받는다면 effect가 모두 사라진 상태니 <code>m a</code>와 다릅니다. effect가 있는 그냥 <code>a</code>는 있을 수 없습니다. <em>둘은 같게 볼 방법이 없습니다.</em></p>
 <br />
 <center>
 <font size="7em" style="font-weight: bolder; line-height: 1.2em">“m a와 a는 같게 볼 방법이 없다.”</font>
@@ -273,7 +273,7 @@ A. 모나드 바탕에 들어간 생각을 <code>(.)</code>과 비슷한 모양�
 <span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>m <span class="op">.</span> m <span class="ot">-&gt;</span> m</span></code></pre></div>
 <p>함수 타입만 봐서는 <code>a -&gt; m b</code>의 출력 <code>m b</code>와 <code>b -&gt; m c</code>의 입력 <code>b</code>를 맞춰야만 될 것 같지만, 함수의 작업 내용으로 보면 <code>m . m</code> 을 <code>m</code> 하나와 같게 보는 문제입니다. 접점에서 <code>m b</code>와 <code>b</code>가 만나는 건 어차피 컴비네이터가 일시적으로 해결하고, 진짜 문제는 작업 내용을 잃어버리지 않는 겁니다. (<code>a</code>로 가면 effect를 모두 잃어버립니다.)</p>
 <p>애초에 이 문제는 <code>m a</code>와 <code>a</code>의 문제가 아니라, effect가 두 번 겹쳐지기 때문에 <code>m (m a)</code>와 <code>m a</code>의 문제입니다.</p>
-<p>함수 합성을 바라 보는 조금은 다른 눈이 생긴 것 같지 않나요?</p>
+<p>함수 합성을 바라 보는 조금은 다른 눈이 생긴 것 같지 않나요? 반드시 타입이 같지 않아도 필요한 정보만 유지할 방법만 보인다면 합성이 가능 할 수 있습니다.</p>
 <blockquote>
 <p>Q. <code>m a -&gt; a</code>는 불가능한데, <code>m (m a)  -&gt; m a</code>는 왜 가능한가요?<br />
 A. 최종 결과값이 <code>a</code>가 되면 effect를 담아 둘 곳이 아예 없습니다. 하지만 <code>m a</code>라면 담아 둘 곳은 있는 상태입니다. <code>fmap</code> 내부에는 입력으로 들어온 <code>m a</code>의 effect와 <code>a -&gt; m b</code>에서 새로 만들어낸 effect, 이렇게 두 effect가 같이 있게 됩니다. 두 번의 effect를 어떻게 하나로 만들 방법만 있다면(effect algebra를 정의할 수 있다면) 하나로 만들어진 <code>effect</code>는 다시 <code>m a</code>에 담을 수 있습니다. 다시 말하지만 결과값이 <code>a</code>이면 effect를 담아둘 곳이 없습니다.<br />
@@ -308,7 +308,9 @@ A. 결과 a는 더이상 List 모나드 타입이 아닙니다. 위에서 말한
 <p>Q. <code>(&gt;=&gt;)</code>보다 <code>(&gt;&gt;=)</code>가 왜 더 편리한가요?<br />
 A. <code>(&gt;&gt;=)</code>를 쓰면 <code>do</code>구문으로 바꿔서 표현할 수 있습니다.</p>
 <div class="sourceCode" id="cb21"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>m a <span class="op">&gt;&gt;=</span> (\a <span class="ot">-&gt;</span> <span class="op">...</span> m b <span class="op">&gt;&gt;=</span> (\b <span class="ot">-&gt;</span> <span class="op">...</span> m c <span class="op">&gt;&gt;=</span> (\c <span class="ot">-&gt;</span> <span class="op">...</span> m d)))</span></code></pre></div>
-<p>※ <code>do</code> 구문은 괄호가 위처럼 들어가 있는 상태입니다. 괄호가 없으면 마지막 액션에서 <code>a, b</code>를 가져오지 못합니다. 단순 <code>act1 &gt;&gt;= act2 &gt;&gt;= act3</code> 을 바꾼게 아니라 위의 괄호와 같은 실행 단위로 묶여 있어야 합니다.</p>
+<p>※ <code>do</code> 구문은 괄호가 위처럼 들어가 있는 상태입니다.<br />
+괄호가 없으면 마지막 액션에서 <code>a, b</code>를 가져오지 못합니다.<br />
+단순 <code>act1 &gt;&gt;= act2 &gt;&gt;= act3</code> 을 바꾼게 아니라 위의 괄호와 같은 실행 단위로 묶여 있어야 합니다.</p>
 <div class="sourceCode" id="cb22"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="kw">do</span></span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>    a <span class="ot">&lt;-</span> m a</span>
 <span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    b <span class="ot">&lt;-</span> m b</span>
@@ -359,14 +361,14 @@ A. 혹시 Functor의 <code>fmap</code>과 같아 보인다면, 둘의 받는 함
 2. <code>a -&gt; m c</code> 새로 생기는 effect와 합쳐서 <code>m c</code>에 넣어 놓기 위해<br />
 3. <code>join :: m (m a) -&gt; m a</code>만 있으면 합성이 가능해집니다.<br />
 (그리고 여기 글에서는 제대로 언급하지 않았지만, <code>m a</code>가 아닌 <code>a</code>를 받아 <code>fmap (a -&gt; m b)</code>에 넣으려면, effect의 초기값 역할을 할 <code>return :: a -&gt; m a</code>가 필요합니다. bind를 주로 보다보면 시작이 <code>m a</code>라 return이 포커스를 덜 받긴 합니다.)</p>
-<div class="sourceCode" id="cb28"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>        a <span class="ot">-&gt;</span> m b</span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>m a <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> m b) <span class="ot">-&gt;</span> m b</span>
+<div class="sourceCode" id="cb28"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>  a     a <span class="ot">-&gt;</span> m b       b</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>m   <span class="ot">-&gt;</span> (        ) <span class="ot">-&gt;</span> m  </span>
 <span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>        b <span class="ot">-&gt;</span> m c</span>
-<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>m b <span class="ot">-&gt;</span> (b <span class="ot">-&gt;</span> m c) <span class="ot">-&gt;</span> m c</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>  b     b <span class="ot">-&gt;</span> m c       c</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>m   <span class="ot">-&gt;</span> (        ) <span class="ot">-&gt;</span> m  </span>
 <span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>        c <span class="ot">-&gt;</span> m d</span>
-<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>m c <span class="ot">-&gt;</span> (c <span class="ot">-&gt;</span> m d) <span class="ot">-&gt;</span> m d</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>  c     c <span class="ot">-&gt;</span> m d       d</span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>m   <span class="ot">-&gt;</span> (        ) <span class="ot">-&gt;</span> m  </span>
 <span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a><span class="op">...</span></span></code></pre></div>
 <p>위와 같은 함수들의 합성은<br />
 값은 값대로 처리하며 진행되고,</p>
@@ -379,7 +381,7 @@ A. 혹시 Functor의 <code>fmap</code>과 같아 보인다면, 둘의 받는 함
 <p><img align="right" src="../images/before_monad_bindblock.png"></p>
 <p>하스켈에서 정확히 코드 모양으로 얘기하면 <code>a -&gt; m b</code>와 <code>b -&gt; m c</code>를 연결하는 게 아니라, <code>bind (&gt;&gt;=)</code>끼리 연결합니다. <code>bind (&gt;&gt;=)</code>는 그림의 비어있는 박스 부분에 적당한 <code>(a -&gt; m b)</code>를 채워 넣으면 합성되게 구조를 만들어 둔다고 볼 수 있습니다.</p>
 <p>두 줄 요약.<br />
-<em>“effect를 합성할 수 있는 join이 있어 m (m (m …))을 m 하나로 표현 가능한 구조를 모나드라 합니다.”</em><br />
+<em>“effect를 합성할 수 있는 join이 있어 m (m (m …))을 m 하나로 표현 가능한 구조를 모나드라 합니다. (m은 펑크터)”</em><br />
 <em>“a -&gt; m b 타입의 함수를 합성할 때 모나드 구조로 만들어 해결합니다.”</em></p>
 <h2 id="모나드가-필요함을-눈치-채는-예시">모나드가 필요함을 눈치 채는 예시</h2>
 <p>숫자 두개 알파벳 하나를 받는 Parser 함수를 구현한다면, numParser 두 번, alphabetParser 한 번 연결해서 구현하면 좋겠다는 생각을 할 수 있습니다.</p>
