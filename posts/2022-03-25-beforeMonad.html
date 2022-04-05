@@ -349,7 +349,8 @@ A. 혹시 Functor의 <code>fmap</code>과 같아 보인다면, 둘의 받는 함
 <p>※ 참고 - 어떤 타입의 <code>id</code>가 들어가는지 보는 방법<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a></p>
 <h2 id="결론">결론</h2>
 <p><code>a -&gt; m b</code>와 <code>b -&gt; m c</code> 합성 방법을 고민하면, <code>m b</code>에서 <code>b</code>로 돌아올 방법이 필요합니다. 하지만, 펑크터 <code>m</code>은 거의 isomorphism이 아닙니다. 구조만 보존하면(homomorphism) 어떻게 변형할지 알 수 없습니다. 거꾸로 돌아오는 길은, effect를 모두 잃어버리니 애시당초 없을 확률이 높습니다. (isomorphic하여 돌아 올 때 잃어버릴 게 없다면 effect가 없다는 말입니다. effect가 없는 모나드로는 Identity 모나드가 있습니다.) 그럼 합성을 포기 했을 것도 같은데, effect만 따로 합칠 수만 있다면 합성할 수 있다는 생각을 어떻게 했을까요? 펑크터에 대한 통찰이 있어 effect가 따로 보였을까요?</p>
-<p>카테고리 이론은 현재 카테고리에서 해결책을 찾지 못할 때 펑크터로 변환한 곳에서 해결책을 찾기도 합니다. <code>a -&gt; m b</code>를 펑크터<code>m</code>으로 한 번 더 변환하면 <code>m a -&gt; m (m b)</code>가 됩니다. 여기서 해결책을 찾기 시작한 건 아닐까요?</p>
+<p>카테고리 이론은 현재 카테고리에서 해결책을 찾지 못할 때 펑크터로 변환한 곳에서 해결책을 찾기도 합니다. <code>a -&gt; m b</code>를 펑크터<code>m</code>으로 한 번 더 변환하면 <code>m a -&gt; m (m b)</code>가 됩니다. 둘이 같게 만드는데서 해결책을 찾기 시작한 건 아닐까요?</p>
+<p><img src="../images/join_commute.png" alt="join (fmap f (return a)) = f a" /> (a -&gt; m b 모피즘을 펑크터 id로 변환한 것과, 펑크터 m으로 변환한 것의 Naturality condition에서 join 부분만 방향을 바꾼 것)</p>
 <p>어떻게 떠올렸을지 모를 천재적 센스에 따라,<br />
 1. <code>m b</code>를 <code>b</code>로 만들 때 effect를 잃어버리지 않고,<br />
 2. <code>a -&gt; m c</code> 새로 생기는 effect와 합쳐서 <code>m c</code>에 넣어 놓기 위해<br />
@@ -374,6 +375,9 @@ A. 혹시 Functor의 <code>fmap</code>과 같아 보인다면, 둘의 받는 함
 <p>모나드 공부는 생각의 시작점도 쉽게 추측되지 않고, 얻어지는 장점도 너무 많아 더 혼란스움을 주는 것 같습니다. 이 글의 목적은 모나드의 완벽한 이해가 아닙니다. 합성을 위해서는 <code>a</code>와 <code>m a</code>가 같아야 하는데, 그렇지 않기 때문에 이를 해결하기 위해 모나드가 나왔다를 이해하는 겁니다. 그래야 타입으로 설계할 때, <em>조금</em> 다른 타입이지만 비슷한 속성을 가지고 있는, 즉 펑크터로 변환한 타입과 변환 전 타입이 서로 만나면 모나드를 떠올릴 수 있습니다.</p>
 <p><img align="right" src="../images/before_monad_bindblock.png"></p>
 <p>하스켈에서 정확히 코드 모양으로 얘기하면 <code>a -&gt; m b</code>와 <code>b -&gt; m c</code>를 연결하는 게 아니라, <code>bind (&gt;&gt;=)</code>끼리 연결합니다. <code>bind (&gt;&gt;=)</code>는 그림의 비어있는 박스 부분에 적당한 <code>(a -&gt; m b)</code>를 채워 넣으면 합성되게 구조를 만들어 둔다고 볼 수 있습니다.</p>
+<p>두 줄 요약.<br />
+<em>“effect를 합성할 수 있는 join이 있어 m (m (m …))을 m 하나로 표현 가능한 구조를 모나드라 합니다.”</em><br />
+<em>“a -&gt; m b 타입의 함수를 합성할 때 모나드 구조로 만들어 해결합니다.”</em></p>
 <h2 id="모나드가-필요함을-눈치-채는-예시">모나드가 필요함을 눈치 채는 예시</h2>
 <p>숫자 두개 알파벳 하나를 받는 Parser 함수를 구현한다면, numParser 두 번, alphabetParser 한 번 연결해서 구현하면 좋겠다는 생각을 할 수 있습니다.</p>
 <p>그럼, 입력 문자열 “12A”를 파싱하는 동작을 생각해 보면</p>
