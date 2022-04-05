@@ -89,22 +89,26 @@
 <li><a href="#펑크터-타입이-같이-있는-함수">펑크터 타입이 같이 있는 함수</a></li>
 <li><a href="#서로-다른-정도를-표현하는-방법-함수">서로 다른 정도를 표현하는 방법: 함수</a></li>
 <li><a href="#역변환inverse이-없는데-어떻게-같게-볼-수-있을까">역변환Inverse이 없는데, 어떻게 같게 볼 수 있을까?</a></li>
-<li><a href="#m-a-에서-a로-돌아오기">m a 에서 a로 돌아오기?</a>
+<li><a href="#m-a에서-a로-돌아오기"><code>m a</code>에서 <code>a</code>로 돌아오기?</a>
 <ol type="1">
-<li><a href="#maybe-펑크터가-추가한-구조effect">Maybe 펑크터가 추가한 구조effect</a></li>
+<li><a href="#maybe-펑크터가-추가한-구조effect"><code>Maybe</code> 펑크터가 추가한 구조effect</a></li>
 <li><a href="#패턴-매칭">패턴 매칭</a></li>
 </ol></li>
 <li><a href="#합성composition--특정-작업을-하는-동안만은-같은-걸로-보기">합성Composition : 특정 작업을 하는 동안만은 같은 걸로 보기</a></li>
-<li><a href="#우리는-이미-fmap을-갖고-있다">우리는 이미 fmap을 갖고 있다</a></li>
-<li><a href="#join">Join</a></li>
+<li><a href="#우리는-이미-fmap을-갖고-있다">우리는 이미 <code>fmap</code>을 갖고 있다</a></li>
+<li><a href="#join"><code>join</code></a></li>
 <li><a href="#m-a와-a가-다른-문제를-m-a---a-아니고-왜-m-m-a---m-a"><code>m a</code>와 <code>a</code>가 다른 문제를 <code>m a -&gt; a</code> 아니고, 왜 <code>m (m a) -&gt; m a</code>?</a></li>
-<li><a href="#bind">Bind</a></li>
-<li><a href="#하스켈에서-join-구현">하스켈에서 join 구현</a></li>
+<li><a href="#bind-">Bind <code>(&gt;&gt;=)</code></a></li>
+<li><a href="#하스켈에서-join-구현">하스켈에서 <code>join</code> 구현</a></li>
 <li><a href="#결론">결론</a></li>
 <li><a href="#모나드가-필요함을-눈치-채는-예시">모나드가 필요함을 눈치 채는 예시</a></li>
 <li><a href="#카테고리-이론으로-가는-힌트">카테고리 이론으로 가는 힌트</a></li>
 <li><a href="#도움을-주신-분들">도움을 주신 분들</a></li>
 <li><a href="#여기-글은-독일수도-있다">여기 글은 “독”일수도 있다</a></li>
+<li><a href="#여러-모나드의-effect-합성">여러 모나드의 effect 합성</a></li>
+<li><a href="#state">State</a></li>
+<li><a href="#writer">Writer</a></li>
+<li><a href="#reader">Reader</a></li>
 </ol>
 <p>하스켈에서 함수의 합성composition은 정말 중요합니다. 시작과 끝이라고 봐도 될 정도로 핵심 근간을 이루는 개념입니다. 모나드는 특정 타입의 함수를 연이어 합성하려면 필요하게 되는 구조입니다. 대부분 모나드 자료는 합성에서 설명을 풀어 나갑니다. 하지만, 여기서는 “합성” 자체보다, 합성을 하기 위해 필요한 “같음”에 주목했습니다. 함수를 합성하려면 첫 함수의 결과값과 이어지는 두 번째 함수의 입력값이 서로 같아야 합니다. 아니면, 적어도 같게 만들 수 있는 함수가 있어야 합니다. “같게 볼 수 있게 만드는 함수”가 있다면, 복잡한 테크닉 없이 그냥 이 함수를 적용하기만 하면 됩니다. 눈에 보이는 “같게 볼 수 있게 만드는 함수”가 없을 경우가 문제입니다.</p>
 <p>같게 볼 수 있는 함수가 아니라 아예 <code>inverseM :: m a -&gt; a</code> 가 존재한다면?<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
@@ -172,8 +176,8 @@ A의 3은 B의 b로 연결되었습니다.</p>
 <p><code>f: A -&gt; B</code> 로 갔다가 다시 <code>g: B -&gt; A</code> 으로 돌아올 수 없습니다. <code>a</code>에서 출발하면 <code>1</code>로 가야 하는지 <code>2</code>로 가야 하는지 알 수 없습니다. <code>c</code>에서 출발해도 마찬가지로 어디로 가야할지 알 수 없습니다. 이럴 때는 아무 조치 없이는 둘이 같은 것으로 볼 방법이 없습니다. 하지만, 다음 방법을 통해서 마치 돌아갈 수 있는 것 처럼 할 수 있습니다. 예를 들어, 만일 <code>f</code>로 <code>B</code>의 <code>a</code>에 도착할 때마다 <code>1</code>에서 왔는지, <code>2</code>에서 왔는지 기록하는 보조 함수를 만든다면, <code>g</code>를 이용해 바로 올 수는 없지만, 이 보조 함수 만들기에 따라서 마치 전단사 함수처럼 동작할 수도 있습니다. (꼭 전단사로 만들어야 되는 건 아닙니다.)</p>
 <p>“<code>A</code>는 <code>B</code>와 (g + 보조 함수)를 적용하면 문제 없을 만큼 다르다고 말할 수 있습니다.”</p>
 <p>하지만 <em>항상 보조 함수를 만들 수 있는 건 아닙니다.</em></p>
-<h2 id="m-a-에서-a로-돌아오기">m a 에서 a로 돌아오기?</h2>
-<h3 id="maybe-펑크터가-추가한-구조effect">Maybe 펑크터가 추가한 구조effect</h3>
+<h2 id="m-a에서-a로-돌아오기"><code>m a</code>에서 <code>a</code>로 돌아오기?</h2>
+<h3 id="maybe-펑크터가-추가한-구조effect"><code>Maybe</code> 펑크터가 추가한 구조effect</h3>
 <p>※ 펑크터를 말할 땐 타입 생성자를 <code>f</code>, 모나드를 말할 때는 <code>m</code>으로 표기합니다.<br />
 ※ <code>m a</code>에서 <code>a</code>로 돌아갈 때 갖고 갈 수 없는 정보를 effect라 합니다.</p>
 <p>펑크터는 오브젝트들만 매핑하는 게 아니라, 모피즘과 합성도 매핑해야 합니다. 오브젝트는 타입 생성자로 감싸서 변환하고, 모피즘은 <code>fmap</code>이란 함수를 통해서 변환합니다.</p>
@@ -224,7 +228,7 @@ A의 3은 B의 b로 연결되었습니다.</p>
 </li>
 <li><code>a -&gt; m b</code>를 <code>m a -&gt; m b</code>로 만들든지 해야 합니다.</li>
 </ol>
-<h2 id="우리는-이미-fmap을-갖고-있다">우리는 이미 fmap을 갖고 있다</h2>
+<h2 id="우리는-이미-fmap을-갖고-있다">우리는 이미 <code>fmap</code>을 갖고 있다</h2>
 <p>※ 우리는 <code>fmap</code> “만” 갖고 있다고 해야 맞을 것 같습니다. <code>fmap</code>은 오브젝트만 변환하는게 아닌 모피즘도 변환합니다. 예를 들어 <code>a -&gt; m b</code>를 펑크터 <code>m</code>으로 한 번 더 변환하면 <code>m a -&gt; m (m b)</code>가 되는 걸 알고 있습니다. <code>m a</code>가 가지고 있던 effect를 잃어버리지 않으려면, <code>a -&gt; m b</code>에 <code>m a</code>를 넣기 위해, 일단 <code>m a -&gt; m (m b)</code>로 만드는 수밖에 없습니다.</p>
 <p>위에서 봤던 것처럼 <code>Maybe a</code>와 <code>a</code>가 달라서 생기는 문제, 즉 추가된 <code>Nothing</code> 생성자 문제를 위해 또 함수를 만들 필요 없이, 이미 만들어져 있는 <code>fmap</code>을 가져옵니다. <code>fmap</code>의 내부를 들여다 보면 <code>a -&gt; m b</code> 함수와 <code>m a</code>를 받아, <code>m a</code>에서 <code>m</code>을 떼어내며, <code>m a</code>가 가지고 있던 effect를 따로 두고 (이걸 effect1이라 이름 붙이겠습니다.) <code>a</code>에 <code>a -&gt; m b</code> 함수를 적용합니다. 그럼 결과 <code>m b</code>는 새로운 effect를 가지고 있게 됩니다. 이걸 effect2라 이름 붙이겠습니다. 남은 작업은 하나만 남았습니다. effect1과 effect2를 모두 잃어버리지 않고 다시 <code>m b</code>로 만들 수만 있다면, 또 다시 다른 <code>b -&gt; m c</code> 모양의 함수와 연이어 합성 할 수 있게 됩니다.</p>
 <blockquote>
@@ -236,7 +240,7 @@ A. 컴비네이터 안에서 <code>m a</code>에 있던 effect를 떼어낸 후 
 <font size="7em" style="font-weight: bolder; line-height: 1.2em">“m (m a)와 m a는 얼마나 다를까?”</font>
 </center>
 <p><br /></p>
-<h2 id="join">Join</h2>
+<h2 id="join"><code>join</code></h2>
 <figure>
 <img src="../images/join.png" alt="effect 합성" /><figcaption aria-hidden="true">effect 합성</figcaption>
 </figure>
@@ -288,7 +292,7 @@ A. 결과 a는 더이상 List 모나드 타입이 아닙니다. 위에서 말한
 <font size="7em" style="font-weight: bolder; line-height: 1.2em">“m (m a)와 m a는 effect합성만 되면 같게 볼 수 있다.”</font>
 </center>
 <p><br /></p>
-<h2 id="bind">Bind</h2>
+<h2 id="bind">Bind <code>(&gt;&gt;=)</code></h2>
 <p>※ 모나드 구조라 하면,<br />
 두 번의 effect를 하나로 합치는 <code>join</code>이 있기 때문에<br />
 <code>a -&gt; m b</code> 타입의 함수를 합성할 때 만나게 되는 <code>m (m a)</code>를 <code>m a</code>로 만들 수 있게 되어 합성이 가능해집니다.</p>
@@ -340,7 +344,7 @@ A. 혹시 Functor의 <code>fmap</code>과 같아 보인다면, 둘의 받는 함
 </figure>
 <p><code>m a</code>를 받아 <code>a</code>를 꺼내고, <code>a -&gt; m b</code>에 넘길수 없는 정보effect들은 따로 떼어 내서, 나중에 “새로 생성된 <code>m</code>의 정보effect”와 합쳐 다시 <code>m b</code>로 만듭니다. 이 값을 다음 <code>bind</code>에 넘깁니다.<br />
 ※ <code>(&gt;&gt;=)</code>나 <code>(&gt;=&gt;)</code>는 모나드의 <code>join</code>을 편하게 쓰기 위한 컴비네이터입니다.</p>
-<h2 id="하스켈에서-join-구현">하스켈에서 join 구현</h2>
+<h2 id="하스켈에서-join-구현">하스켈에서 <code>join</code> 구현</h2>
 <p><code>join</code>, <code>(&gt;&gt;=)</code>, <code>(&gt;=&gt;)</code>는 어느 한 쪽만 구현되어 있으면 다른 쪽을 구현할 수 있습니다. 하스켈에선 먼저 <code>bind (&gt;&gt;=)</code>가 구현되어 있고, 이를 써서 <code>join</code>이 구현되어 있습니다.</p>
 <div class="sourceCode" id="cb26"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="ot">join   ::</span> (<span class="dt">Monad</span> m) <span class="ot">=&gt;</span> m (m a) <span class="ot">-&gt;</span> m a</span>
 <span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>join x <span class="ot">=</span>  x <span class="op">&gt;&gt;=</span> <span class="fu">id</span></span>
@@ -357,10 +361,10 @@ A. 혹시 Functor의 <code>fmap</code>과 같아 보인다면, 둘의 받는 함
 </figure>
 <p>(a -&gt; m b 모피즘을 펑크터 id로 변환한 것과, 펑크터 m으로 변환한 것의 Naturality condition에서 join 부분만 방향을 바꾼 것)</p>
 <p>어떻게 떠올렸을지 모를 천재적 센스에 따라,<br />
-1. <code>m b</code>를 <code>b</code>로 만들 때 effect를 잃어버리지 않고,<br />
-2. <code>a -&gt; m c</code> 새로 생기는 effect와 합쳐서 <code>m c</code>에 넣어 놓기 위해<br />
+1. <code>m a</code>가 가진 effect를 잃어버리지 않고,<br />
+2. <code>a -&gt; m b</code> 새로 생기는 effect와 합쳐서 <code>m b</code>에 넣어 놓기 위해<br />
 3. <code>join :: m (m a) -&gt; m a</code>만 있으면 합성이 가능해집니다.<br />
-(그리고 여기 글에서는 제대로 언급하지 않았지만, <code>m a</code>가 아닌 <code>a</code>를 받아 <code>fmap (a -&gt; m b)</code>에 넣으려면, effect의 초기값 역할을 할 <code>return :: a -&gt; m a</code>가 필요합니다. bind를 주로 보다보면 시작이 <code>m a</code>라 return이 포커스를 덜 받긴 합니다.)</p>
+(그리고 여기 글에서는 제대로 언급하지 않았지만, <code>m a</code>가 아닌 <code>a</code>를 받아 <code>fmap (a -&gt; m b)</code>에 넣으려면, effect의 초기값 역할을 할 <code>return :: a -&gt; m a</code>가 필요합니다. bind를 주로 보다보면 시작이 <code>m a</code>라 <code>return</code>이 포커스를 덜 받긴 합니다.)</p>
 <div class="sourceCode" id="cb28"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>  a     a <span class="ot">-&gt;</span> m b       b</span>
 <span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>m   <span class="ot">-&gt;</span> (        ) <span class="ot">-&gt;</span> m  </span>
 <span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -414,6 +418,34 @@ Functor 하나를 이용해 구조는 유지한 채 다른 모양으로 매핑�
 <p>블로그 글은 출판된 글과 다릅니다. 가장 큰 차이는 정교함, 정확성이란 생각이 듭니다. 출판 글들은 좀 더 자본을 들여 여러 사람들의 감수 절차도 밟고 정확한 내용을 출판하게 되지만(물론 가장 중요한 요소는 저자겠지요), 블로그 글은 글쓴이가 잘 못 이해하거나 해도, 감수라는 절차들이 따로 없어 틀릴 확률이 높아 주의해서 봐야 합니다. 저도 반복해서 검증하기 위해 노력하긴 하지만, 모두 정확하다는 확신을 갖고 올리는 글들은 아닙니다. 읽는이들이 감수자가 되어서 읽어야 합니다. 정말 안좋은 경우도 충분히 생길 수 있을거라 봅니다. 처음 접하는 개념들을 틀린 설명으로 시작한다면 확실히 독이 될 수도 있습니다. 다른 곳에 있는 내용들을 번역하거나 옮기는 글들이 많지 않아, 다시 말해 정확히 근거가 있지 않은 경우가 있어 여기 글들은 독Burrito이 될 수도 있습니다.</p>
 <p>그럼에도 글을 올리는 이유는, 모나드에 접근하는 시작점 중에 하나가 “같음”이라 생각하는데, 기존 자료들에서 보지 못해, 적어도 생각의 범위를 넓히는 역할은 할 수 있을것 같아 올립니다.</p>
 <p>항상 경계하며 보시고 꼭 다른 분들과 의견을 나누거나 생태계 공식 텍스트로 인정 받는 자료들을 통해 검증하며 보시기 바랍니다.</p>
+<h2 id="여러-모나드의-effect-합성">여러 모나드의 effect 합성</h2>
+<h3 id="state">State</h3>
+<p>바깥에서 얻은 <code>s</code>를 안에 넣어줍니다.</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">State</span> s a <span class="ot">=</span> <span class="dt">State</span> {<span class="ot"> runState ::</span> s <span class="ot">-&gt;</span> (a,s) }  </span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>(<span class="dt">State</span> ma) <span class="op">&gt;&gt;=</span> make_mb <span class="ot">=</span> <span class="dt">State</span> <span class="op">$</span> \inits <span class="ot">-&gt;</span> <span class="kw">let</span> (a, newState) <span class="ot">=</span> ma inits </span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>                                     <span class="co">-- 최초 바깥에서 들어온 inits를 ma에 넣어주면 newState가 된다. </span></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>                                           (<span class="dt">State</span> mb) <span class="ot">=</span> make_mb a <span class="co">--  f :: a -&gt; m b</span></span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>                                           <span class="kw">in</span>  mb newState <span class="co">-- mb에 ma가 갖고 있던 state를 넣어준다.  </span></span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a><span class="co">-- 바깥 mma에 있던 state를 안쪽 ma에 넣어준다.</span></span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>join (<span class="dt">State</span> mma) <span class="ot">=</span> (<span class="dt">State</span> mma) <span class="op">&gt;&gt;=</span> <span class="fu">id</span></span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>                 <span class="ot">=</span> \inits <span class="ot">-&gt;</span> <span class="kw">let</span> (ma, newState) <span class="ot">=</span> mma inits</span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>                                 (<span class="dt">State</span> mb) <span class="ot">=</span> <span class="fu">id</span> ma <span class="co">--mb = ma</span></span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>                             <span class="kw">in</span>  mb newState</span></code></pre></div>
+<h3 id="writer">Writer</h3>
+<p>바깥 <code>w</code>와 안쪽 <code>w</code>를 <code>mappend</code>합니다.</p>
+<div class="sourceCode" id="cb32"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">Writer</span> w a <span class="ot">=</span> <span class="dt">Writer</span> {<span class="ot"> runWriter ::</span> (a, w) } </span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>(<span class="dt">Writer</span> (ma_x, ma_v)) <span class="op">&gt;&gt;=</span> make_mb <span class="ot">=</span> <span class="kw">let</span> (<span class="dt">Writer</span> (mb_y, mb_v')) <span class="ot">=</span> make_mb ma_x <span class="kw">in</span> <span class="dt">Writer</span> (mb_y, ma_v <span class="ot">`mappend`</span> mb_v')</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- 바깥 mma에 있던 mma_v와 안쪽 ma_v'을 mappend해서 하나로 만든다.</span></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>join (<span class="dt">Writer</span> (mma_x, mma_v)) <span class="ot">=</span> (<span class="dt">Writer</span> (mma_x, mma_v)) <span class="op">&gt;&gt;=</span> <span class="fu">id</span></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>                             <span class="ot">=</span> <span class="kw">let</span> (<span class="dt">Writer</span> (ma_y, ma_v')) <span class="ot">=</span> <span class="fu">id</span> mma_x <span class="kw">in</span> <span class="dt">Writer</span> (ma_y, mma_v <span class="ot">`mappend`</span> ma_v')</span></code></pre></div>
+<h3 id="reader">Reader</h3>
+<p>바깥 함수에 <code>w</code>를 인자로 주고, 안쪽에도 <code>w</code>를 인자로 줍니다.</p>
+<div class="sourceCode" id="cb33"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>ma <span class="op">&gt;&gt;=</span> make_mb  <span class="ot">=</span> \w <span class="ot">-&gt;</span> make_mb (ma w) w </span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- 바깥mma에 w를 주어 안쪽 ma를 만들고 w를 준다.</span></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>join ((<span class="ot">-&gt;</span>) mma) <span class="ot">=</span> ((<span class="ot">-&gt;</span>) mma) <span class="op">&gt;&gt;=</span> <span class="fu">id</span></span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>                <span class="ot">=</span> \w <span class="ot">-&gt;</span> <span class="fu">id</span> (((<span class="ot">-&gt;</span>) mma) w) w</span></code></pre></div>
 <section class="footnotes" role="doc-endnotes">
 <hr />
 <ol>
