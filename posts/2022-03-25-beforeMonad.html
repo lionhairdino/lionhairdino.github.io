@@ -105,11 +105,15 @@
 <li><a href="#카테고리-이론으로-가는-힌트">카테고리 이론으로 가는 힌트</a></li>
 <li><a href="#도움을-주신-분들">도움을 주신 분들</a></li>
 <li><a href="#여기-글은-독일수도-있다">여기 글은 “독”일수도 있다</a></li>
+<li><a href="#appendix">Appendix</a>
+<ol type="1">
 <li><a href="#effect-합성-예시">effect 합성 예시</a>
 <ol type="1">
 <li><a href="#state">State</a></li>
 <li><a href="#writer">Writer</a></li>
 <li><a href="#reader">Reader</a></li>
+</ol></li>
+<li><a href="#그럼-join의-동작은-마음대로-만들어도-되나">그럼 join의 동작은 마음대로 만들어도 되나?</a></li>
 </ol></li>
 </ol>
 <p>하스켈에서 함수의 합성composition은 정말 중요합니다. 시작과 끝이라고 봐도 될 정도로 핵심 근간을 이루는 개념입니다. 모나드는 특정 타입의 함수를 연이어 합성하려면 필요하게 되는 구조입니다. 대부분 모나드 자료는 합성에서 설명을 풀어 나갑니다. 하지만, 여기서는 “합성” 자체보다, 합성을 하기 위해 필요한 “같음”에 주목했습니다. 함수를 합성하려면 첫 함수의 결과값과 이어지는 두 번째 함수의 입력값이 서로 같아야 합니다. 아니면, 적어도 같게 만들 수 있는 함수가 있어야 합니다. “같게 볼 수 있게 만드는 함수”가 있다면, 복잡한 테크닉 없이 그냥 이 함수를 적용하기만 하면 됩니다. 눈에 보이는 “같게 볼 수 있게 만드는 함수”가 없을 경우가 문제입니다.</p>
@@ -289,9 +293,6 @@ effect가 필요 없어서 버린다면 <code>m a -&gt; a</code>도 가능하지
 <p>Q. List 모나드의 head 함수는 <code>head :: [a] -&gt; a</code> 타입인데요?<br />
 A. 결과 a는 더이상 List 모나드 타입이 아닙니다. 위에서 말한대로 effect를 버리면 가능합니다. 이 경우 List 모나드의 effect를 버렸다고 말합니다.</p>
 </blockquote>
-<figure>
-<img src="../images/maybe_join.png" alt="Maybe (Maybe a)" /><figcaption aria-hidden="true">Maybe (Maybe a)</figcaption>
-</figure>
 <br />
 <center>
 <font size="7em" style="font-weight: bolder; line-height: 1.2em">“m (m a)와 m a는 effect합성만 되면 같게 볼 수 있다.”</font>
@@ -426,12 +427,13 @@ Functor 하나를 이용해 구조는 유지한 채 다른 모양으로 매핑�
 <p>블로그 글은 출판된 글과 다릅니다. 가장 큰 차이는 정교함, 정확성이란 생각이 듭니다. 출판 글들은 좀 더 자본을 들여 여러 사람들의 감수 절차도 밟고 정확한 내용을 출판하게 되지만(물론 가장 중요한 요소는 저자겠지요), 블로그 글은 글쓴이가 잘 못 이해하거나 해도, 감수라는 절차들이 따로 없어 틀릴 확률이 높아 주의해서 봐야 합니다. 저도 반복해서 검증하기 위해 노력하긴 하지만, 모두 정확하다는 확신을 갖고 올리는 글들은 아닙니다. 읽는이들이 감수자가 되어서 읽어야 합니다. 정말 안좋은 경우도 충분히 생길 수 있을거라 봅니다. 처음 접하는 개념들을 틀린 설명으로 시작한다면 확실히 독이 될 수도 있습니다. 다른 곳에 있는 내용들을 번역하거나 옮기는 글들이 많지 않아, 다시 말해 정확히 근거가 있지 않은 경우가 있어 여기 글들은 독Burrito이 될 수도 있습니다.</p>
 <p>그럼에도 글을 올리는 이유는, 모나드에 접근하는 시작점 중에 하나가 “같음”이라 생각하는데, 기존 자료들에서 보지 못해, 적어도 생각의 범위를 넓히는 역할은 할 수 있을것 같아 올립니다.</p>
 <p>항상 경계하며 보시고 꼭 다른 분들과 의견을 나누거나 생태계 공식 텍스트로 인정 받는 자료들을 통해 검증하며 보시기 바랍니다.</p>
-<h2 id="effect-합성-예시">effect 합성 예시</h2>
+<h2 id="appendix">Appendix</h2>
+<h3 id="effect-합성-예시">effect 합성 예시</h3>
 <p><code>(&gt;&gt;=)</code>는 <code>join</code>과 <code>fmap</code>의 동작으로 이루어져 있는데, 여기서 <code>join</code>부분만 떼어내서 보도록 하겠습니다.<br />
 <code>join</code>은 아래와 같이 <code>(&gt;&gt;=)</code>로 구현할 수 있습니다.</p>
 <div class="sourceCode" id="cb32"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>join mma <span class="ot">=</span> mma <span class="op">&gt;&gt;=</span> <span class="fu">id</span></span></code></pre></div>
 <p><code>(&gt;&gt;=)</code>에 쓰이는 변수명은 <code>m a -&gt; (a -&gt; m b) -&gt; m b</code>에 맞춰 <code>ma</code>, <code>make_mb</code>, <code>mb</code>로 두었습니다.</p>
-<h3 id="state">State</h3>
+<h4 id="state">State</h4>
 <p>바깥에서 얻은 <code>s</code>를 안에 넣어줍니다.<br />
 <code>s</code>를 넣어주는 effect1과 변경된 <code>s</code>를 넣어주는 effect2를 합쳐 변경된<code>s</code>를 넣어주는 effect로 만듭니다.</p>
 <div class="sourceCode" id="cb33"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">State</span> s a <span class="ot">=</span> <span class="dt">State</span> {<span class="ot"> runState ::</span> s <span class="ot">-&gt;</span> (a,s) }  </span>
@@ -445,20 +447,25 @@ Functor 하나를 이용해 구조는 유지한 채 다른 모양으로 매핑�
 <span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a>                 <span class="ot">=</span> \inits <span class="ot">-&gt;</span> <span class="kw">let</span> (ma, newState) <span class="ot">=</span> mma inits</span>
 <span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a>                                 (<span class="dt">State</span> mb) <span class="ot">=</span> <span class="fu">id</span> ma <span class="co">--mb = ma</span></span>
 <span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a>                             <span class="kw">in</span>  mb newState</span></code></pre></div>
-<h3 id="writer">Writer</h3>
+<h4 id="writer">Writer</h4>
 <p>바깥에서 <code>w</code>가 생긴 effect1과 안쪽에서 <code>w</code>생긴 effect를 <code>mappend</code>해서 하나로 만듭니다.</p>
 <div class="sourceCode" id="cb34"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">Writer</span> w a <span class="ot">=</span> <span class="dt">Writer</span> {<span class="ot"> runWriter ::</span> (a, w) } </span>
 <span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>(<span class="dt">Writer</span> (ma_x, ma_v)) <span class="op">&gt;&gt;=</span> make_mb <span class="ot">=</span> <span class="kw">let</span> (<span class="dt">Writer</span> (mb_y, mb_v')) <span class="ot">=</span> make_mb ma_x <span class="kw">in</span> <span class="dt">Writer</span> (mb_y, ma_v <span class="ot">`mappend`</span> mb_v')</span>
 <span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- 바깥 mma에 있던 mma_v와 안쪽 ma_v'을 mappend해서 하나로 만든다.</span></span>
 <span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>join (<span class="dt">Writer</span> (mma_x, mma_v)) <span class="ot">=</span> (<span class="dt">Writer</span> (mma_x, mma_v)) <span class="op">&gt;&gt;=</span> <span class="fu">id</span></span>
 <span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>                             <span class="ot">=</span> <span class="kw">let</span> (<span class="dt">Writer</span> (ma_y, ma_v')) <span class="ot">=</span> <span class="fu">id</span> mma_x <span class="kw">in</span> <span class="dt">Writer</span> (ma_y, mma_v <span class="ot">`mappend`</span> ma_v')</span></code></pre></div>
-<h3 id="reader">Reader</h3>
+<h4 id="reader">Reader</h4>
 <p><code>w</code>를 인자로 주는 effect1과 <code>w</code>를 인자로 주는 effect2를 합쳐도 <code>w</code>를 인자로 주는 effect입니다.</p>
 <div class="sourceCode" id="cb35"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>ma <span class="op">&gt;&gt;=</span> make_mb  <span class="ot">=</span> \w <span class="ot">-&gt;</span> make_mb (ma w) w </span>
 <span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- 바깥mma에 w를 주어 안쪽 ma를 만들고 w를 준다.</span></span>
 <span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>join ((<span class="ot">-&gt;</span>) mma) <span class="ot">=</span> ((<span class="ot">-&gt;</span>) mma) <span class="op">&gt;&gt;=</span> <span class="fu">id</span></span>
 <span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>                <span class="ot">=</span> \w <span class="ot">-&gt;</span> <span class="fu">id</span> (((<span class="ot">-&gt;</span>) mma) w) w</span></code></pre></div>
+<h3 id="그럼-join의-동작은-마음대로-만들어도-되나">그럼 join의 동작은 마음대로 만들어도 되나?</h3>
+<figure>
+<img src="../images/maybe_join.png" alt="Maybe (Maybe a)의 join" /><figcaption aria-hidden="true">Maybe (Maybe a)의 join</figcaption>
+</figure>
+<p><span class="citation" data-cites="todo">@todo</span>: Monad law 3가지를 지키면서 만들어야 하고, 그렇게 만들면 Theorem of Free에 따라 유일성unicity이 있다는 내용 추가 <span class="citation" data-cites="todo">@todo</span>: Nothing :: Maybe (Maybe a)를 Just 1 :: Maybe a와 연결했을 때 monad law가 틀어지는 예시 추가</p>
 <section class="footnotes" role="doc-endnotes">
 <hr />
 <ol>
