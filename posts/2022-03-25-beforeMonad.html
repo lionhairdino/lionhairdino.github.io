@@ -95,7 +95,7 @@
 <li><a href="#패턴-매칭">패턴 매칭</a></li>
 </ol></li>
 <li><a href="#합성composition--특정-작업을-하는-동안만은-같은-걸로-보기">합성Composition : 특정 작업을 하는 동안만은 같은 걸로 보기</a></li>
-<li><a href="#우리는-이미-fmap을-갖고-있다">우리는 이미 <code>fmap</code>을 갖고 있다</a></li>
+<li><a href="#이미-fmap을-갖고-있다">이미 <code>fmap</code>을 갖고 있다</a></li>
 <li><a href="#join"><code>join</code></a></li>
 <li><a href="#m-a와-a가-다른-문제를-m-a---a-아니고-왜-m-m-a---m-a를-볼까"><em>m a와 a가 다른 문제를 m a -&gt; a 아니고, 왜 m (m a) -&gt; m a를 볼까?</em></a></li>
 <li><a href="#bind-">Bind <code>(&gt;&gt;=)</code></a></li>
@@ -185,7 +185,7 @@ A의 3은 B의 b로 연결되었습니다.</p>
 <h2 id="m-a에서-a로-돌아오기"><code>m a</code>에서 <code>a</code>로 돌아오기?</h2>
 <h3 id="maybe-펑크터가-추가한-구조effect"><code>Maybe</code> 펑크터가 추가한 구조effect</h3>
 <p>※ 펑크터를 말할 땐 타입 생성자를 <code>f</code>, 모나드를 말할 때는 <code>m</code>으로 표기합니다.<br />
-※ <code>m a</code>에서 <code>a</code>로 돌아갈 때 갖고 갈 수 없는 정보를 effect라 합니다.</p>
+※ <code>m a</code>에서 <code>a</code>로 돌아갈 때 가지고 있을 수 없는 정보를 effect라 합니다. (보통 <code>a</code>에서 <code>m a</code>로 가며 생기는 것들로 정의를 하는데, 여기서는 거꾸로 보는게 이해에 도움이 됩니다.)</p>
 <p>펑크터는 오브젝트들만 매핑하는 게 아니라, 모피즘과 합성도 매핑해야 합니다. 오브젝트는 타입 생성자로 감싸서 변환하고, 모피즘은 <code>fmap</code>이란 함수를 통해서 변환합니다.</p>
 <p><code>f a</code>값에 적용해야 될 함수가 <code>a -&gt; b</code>이면 <code>f a</code>와 <code>a</code>가 달라 적용할 수 없습니다. 매직은 없습니다. <code>f a</code>를 <code>a</code>로 바꾸든, <code>a -&gt; b</code>를 <code>f a -&gt; b</code> 또는 <code>f a -&gt; f b</code>로 바꾸든 해야 합니다. 필요한 정보 구조(effect)를 모두 가지고 있는 타입은 <code>f b</code>이니, 이 정보들을 잃어버리지 않기 위해 <code>f a -&gt; f b</code> 타입으로 만듭니다.</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fmap</span><span class="ot"> ::</span> <span class="dt">Functor</span> <span class="dt">F</span> <span class="ot">=&gt;</span> (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> f a <span class="ot">-&gt;</span> f b</span>
@@ -198,23 +198,24 @@ A의 3은 B의 b로 연결되었습니다.</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Int</span> <span class="op">:</span> <span class="op">...</span> <span class="op">-</span><span class="dv">2</span>, <span class="op">-</span><span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span> , <span class="dv">2</span> <span class="op">...</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="dt">Maybe</span> <span class="dt">Int</span> <span class="op">:</span> <span class="op">...</span> <span class="dt">Just</span> (<span class="op">-</span><span class="dv">2</span>), <span class="dt">Just</span> (<span class="op">-</span><span class="dv">1</span>), <span class="dt">Just</span> <span class="dv">0</span>, <span class="dt">Just</span> <span class="dv">1</span>, <span class="dt">Just</span> <span class="dv">2</span> <span class="op">...|</span> <span class="dt">Nothing</span></span></code></pre></div>
 <p><code>Just</code>들이야 <code>Int</code>와 일대일 대응이 되지만, <code>Int</code>에는 없던 <code>Nothing</code>이라는 값생성자를 추가하여 Sum 타입으로 만들어 두었습니다. 하스켈에서 <em>Sum 타입들은 모두 패턴 매칭으로 각 각 처리</em>해야 합니다. 어느 한 값생성자라도 놓치면 런타임에 그 형태의 값이 들어오면 오류가 나기 때문에 모든 값 생성자에 대한 처리를 해두어야 합니다. <code>Nothing</code>처리를 추가하겠다가 <code>Maybe</code>를 벗겨 낼 때 반드시 하기로 한 약속입니다. 이 약속이 Maybe가 가진 effect입니다.</p>
-<p><code>a -&gt; b</code> 함수는 어차피 effect에 적용하기 위한 함수가 아닙니다. effect는 잠시 다른데로 옮겨 두고, <code>a -&gt; b</code>를 적용할 수 있는 것에만 적용하고, 다시 effect를 합치면 됩니다.</p>
 <h3 id="패턴-매칭">패턴 매칭</h3>
+<p><code>a -&gt; b</code> 함수는 어차피 effect에 적용하기 위한 함수가 아닙니다. effect는 잠시 다른데로 옮겨 두고, <code>a -&gt; b</code>를 적용할 수 있는 것에만 적용하고, 다시 effect를 합치면 됩니다.</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fmap</span> _ <span class="dt">Nothing</span>  <span class="ot">=</span> <span class="dt">Nothing</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">fmap</span> f (<span class="dt">Just</span> a) <span class="ot">=</span> <span class="dt">Just</span> (f a)</span></code></pre></div>
-<p>우리가 최종 원하는 결과는 <code>b</code>가 아니라 <code>Nothing</code>일 수도 있는 <code>Maybe b</code> 입니다. 이제 <code>Maybe a</code>에 <code>func :: a -&gt; b</code> 함수를 적용하려면 <code>fmap func</code>라고 써주면 하스켈이 인자 타입을 보고 알아서 <code>Maybe</code>의 <code>fmap</code>을 찾아와 적용합니다. <code>func1 :: a -&gt; b</code>, <code>func2 :: b -&gt; c</code>, <code>func3 :: c -&gt; d</code> 함수를 합성하려면 <code>fmap func1 . fmap func2 . fmap func3</code>으로 합성하면 됩니다.</p>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">fmap</span> func (<span class="dt">Just</span> a) <span class="ot">=</span> <span class="dt">Just</span> (func a)</span></code></pre></div>
+<p>눈여겨 볼 부분은 함수를 적용한 후의 결과 타입입니다. effect를 버리지 않으려면(<code>Nothing</code>을 잃어버리지 않으려면), <code>b</code>가 아니라 <code>Nothing</code>일 수도 있는 <code>Maybe b</code> 를 리턴해야 됩니다. <code>a -&gt; b</code> 함수를 적용한 후 다시 effect가 있는 <code>f a</code>로 만들고 있습니다.</p>
+<p>이제 <code>Maybe a</code>에 <code>func :: a -&gt; b</code> 함수를 적용하려면 <code>fmap func</code>라고 써주면 하스켈이 인자 타입을 보고 알아서 <code>Maybe</code>의 <code>fmap</code>을 찾아와 적용해서 결과값 <code>f b</code>를 리턴하는 함수로 만듭니다. <code>func1 :: a -&gt; b</code>, <code>func2 :: b -&gt; c</code>, <code>func3 :: c -&gt; d</code> 함수를 합성하려면 <code>fmap func1 . fmap func2 . fmap func3</code>으로 합성하면 됩니다.</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>f a <span class="ot">-&gt;</span> f b</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>       f b <span class="ot">-&gt;</span> f c</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>              f c <span class="ot">-&gt;</span> f d</span></code></pre></div>
 <p>같은 타입들끼리 만나고 있으니 문제가 없습니다. <code>f a</code>, <code>f b</code>, <code>f c</code> 모두 <code>f</code>를 가지고 있는, 즉 effect를 잃어버리지 않고 갖고 있는 타입들입니다.</p>
-<p>여기서 <code>fmap</code>의 내부 동작을 보면 <code>f a</code>에서 <code>a</code>를 꺼내온 것으로 오해할 수 있습니다. 하지만 <code>fmap</code>의 결과는 <code>f b</code>입니다. 내부에서 일시적으로 effect를 분리해서 <code>a</code>를 꺼내와 작업하지만, 최종 <code>a</code>만 단독으로 받을 수 없습니다.</p>
-<p>effect를 버리지 않는 한 <code>m a</code>에서 <code>a</code>를 꺼내오지 못합니다. <code>fmap</code> 내부에서 잠시 분리했다 결합하는 동작이 보여 오해할 수 있는데, 만일 단독으로 <code>a</code>를 받는다면 effect가 모두 사라진 상태니 <code>m a</code>와 다릅니다. effect가 있는 그냥 <code>a</code>는 있을 수 없습니다. <em>둘은 같게 볼 방법이 없습니다.</em></p>
+<p>여기서 <code>fmap</code>의 내부 동작을 보면 <code>f a</code>에서 <code>a</code>를 꺼내온 것으로 오해할 수 있습니다. 하지만 <code>fmap</code>의 결과는 <code>f b</code>입니다. 내부에서 일시적으로 effect를 분리해서 <code>a</code>를 대상으로 작업하지만, 가지고 있던 effect를 버리지 않는 한 최종 <code>a</code>만 단독으로 받을 수 없습니다.</p>
+<p>만일 <code>a -&gt; b</code>의 입력과 <code>f a</code>가 달라 <code>f a</code>를 <code>a</code> 로 만든 다음 <code>a -&gt; b</code> 를 적용하면 결과값은 effect를 잃어버린 <code>b</code>입니다. 결과로 <code>b</code>를 받는다면 effect가 모두 사라진 상태니 <code>f b</code>와 다릅니다. effect가 살아 있는 그냥 <code>b</code>는 있을 수 없습니다. 결론은, 둘은 같게 볼 방법이 없습니다. 그렇다면 <code>a -&gt; m b</code>와 <code>b -&gt; m c</code>에서 <code>m b</code>를 <code>b</code>로 만들 수 없으니 를 합성할 방법이 없는 것 아닐까요?</p>
 <br />
 <center>
 <font size="7em" style="font-weight: bolder; line-height: 1.2em">“m a와 a는 같게 볼 방법이 없다.”</font>
 </center>
 <p><br /></p>
-<p>지금부터는 모나드로 넘어가니 <code>f</code>를 <code>m</code>이라 표기하겠습니다.</p>
+<p>지금부터는 <strong>모나드</strong>로 넘어가니 <code>f</code>를 <code>m</code>이라 표기하겠습니다.</p>
 <p>물론 <code>m a</code>에 <code>func :: a -&gt; m b</code> 함수를 적용할 때도 <code>fmap func</code>라고 써주면 됩니다. 단, 이 때는 <em>합성에 문제가 생깁니다.</em> <code>func1 :: a -&gt; m b</code>, <code>func2 :: b -&gt; m c</code>, <code>func3 :: c -&gt; m d</code> 함수를 합성하려면 <code>fmap</code>만으로 해결이 되지 않습니다. <code>fmap f</code>의 결과는 <code>m b</code>가 아니라 <code>m (m b)</code>입니다.</p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>m a <span class="ot">-&gt;</span> m (m b)</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>          m b <span class="ot">-&gt;</span> m (m c)</span>
@@ -234,12 +235,15 @@ A의 3은 B의 b로 연결되었습니다.</p>
 </li>
 <li><code>a -&gt; m b</code>를 <code>m a -&gt; m b</code>로 만들든지 해야 합니다.</li>
 </ol>
-<h2 id="우리는-이미-fmap을-갖고-있다">우리는 이미 <code>fmap</code>을 갖고 있다</h2>
-<p>※ 우리는 <code>fmap</code> “만” 갖고 있다고 해야 맞을 것 같습니다. <code>fmap</code>은 오브젝트만 변환하는게 아닌 모피즘도 변환합니다. 예를 들어 <code>a -&gt; m b</code>를 펑크터 <code>m</code>으로 한 번 더 변환하면 <code>m a -&gt; m (m b)</code>가 되는 걸 알고 있습니다. <code>m a</code>가 가지고 있던 effect를 잃어버리지 않으려면, <code>a -&gt; m b</code>에 <code>m a</code>를 넣기 위해, 일단 <code>m a -&gt; m (m b)</code>로 만드는 수밖에 없습니다.</p>
-<p>위에서 봤던 것처럼 <code>Maybe a</code>와 <code>a</code>가 달라서 생기는 문제, 즉 추가된 <code>Nothing</code> 생성자 문제를 위해 또 함수를 만들 필요 없이, 이미 만들어져 있는 <code>fmap</code>을 가져옵니다. <code>fmap</code>의 내부를 들여다 보면 <code>a -&gt; m b</code> 함수와 <code>m a</code>를 받아, <code>m a</code>에서 <code>m</code>을 떼어내며, <code>m a</code>가 가지고 있던 effect를 따로 두고 (이걸 effect1이라 이름 붙이겠습니다.) <code>a</code>에 <code>a -&gt; m b</code> 함수를 적용합니다. 그럼 결과 <code>m b</code>는 새로운 effect를 가지고 있게 됩니다. 이걸 effect2라 이름 붙이겠습니다. 남은 작업은 하나만 남았습니다. effect1과 effect2를 모두 잃어버리지 않고 다시 <code>m b</code>로 만들 수만 있다면, 또 다시 다른 <code>b -&gt; m c</code> 모양의 함수와 연이어 합성 할 수 있게 됩니다.</p>
+<h2 id="이미-fmap을-갖고-있다">이미 <code>fmap</code>을 갖고 있다</h2>
+<p>※ <code>fmap</code> “만” 갖고 있다고 해야 맞을 것 같습니다. <code>fmap</code>은 오브젝트만 변환하는게 아닌 모피즘도 변환합니다. 예를 들어 <code>a -&gt; m b</code>를 펑크터 <code>m</code>으로 한 번 더 변환하면 <code>m a -&gt; m (m b)</code>가 되는 걸 알고 있습니다. <code>m a</code>가 가지고 있던 effect를 잃어버리지 않으려면, <code>a -&gt; m b</code>에 <code>m a</code>를 넣기 위해, 일단 <code>m a -&gt; m (m b)</code>로 만드는 수밖에 없습니다.</p>
+<p>위에서 봤던 것처럼 <code>Maybe a</code>와 <code>a</code>가 달라서 생기는 문제, 즉 추가된 <code>Nothing</code> 생성자 문제를 위해 또 함수를 만들 필요 없이, 이미 만들어져 있는 <code>fmap</code>을 가져옵니다. <code>fmap</code>의 내부를 들여다 보면<br />
+- <code>a -&gt; m b</code> 함수와 <code>m a</code>를 받아,<br />
+- <code>m a</code>에서 <code>m</code>을 잠시 떼어내며, <code>m a</code>가 가지고 있던 effect를 따로 두고 (이걸 <strong>effect1</strong>이라 이름 붙이겠습니다.)<br />
+- <code>a</code>에 <code>a -&gt; m b</code> 함수를 적용합니다. 그럼 결과 <code>m b</code>는 새로운 effect를 가지고 있게 됩니다. 이걸 <strong>effect2</strong>라 이름 붙이겠습니다. - 남은 작업은 하나만 남았습니다. <strong>effect1</strong>과 <strong>effect2</strong>를 모두 잃어버리지 않고 다시 <code>m b</code>로 만들 수만 있다면, 또 다시 다른 <code>b -&gt; m c</code> 모양의 함수와 연이어 합성 할 수 있게 됩니다.</p>
 <blockquote>
 <p>Q. 만일 1번 방법 <code>m a -&gt; a</code> 으로 해결한다면 <code>m (m b)</code>가 나오지 않아도 되는 것 아닐까요?<br />
-A. 컴비네이터 안에서 <code>m a</code>에 있던 effect를 떼어낸 후 <code>a</code>에 <code>a -&gt; m b</code>를 적용하면 또 하나의 effect가 생기는 건 마찬가지입니다. <code>fmap</code>을 이용해서 <code>a -&gt; m b</code> 함수를 <code>m a -&gt; m (m b)</code>로 변환한 것과 표현만 다를 뿐이지 같은 절차입니다. (<code>fmap</code> 내부에서 똑 같은 방법으로 진행됩니다.) 결론은 effect 두 개를 모두 살리려면 <code>m (m a) -&gt; m a</code>가 반드시 필요합니다.</p>
+A. 컴비네이터 안에서 <code>m a</code>에 있던 <strong>effect1</strong>을 떼어낸 후 <code>a</code>에 <code>a -&gt; m b</code>를 적용하면 또 하나의 <strong>effect2</strong>가 생기는 건 마찬가지입니다. <code>fmap</code>을 이용해서 <code>a -&gt; m b</code> 함수를 <code>m a -&gt; m (m b)</code>로 변환한 것과 표현만 다를 뿐이지 같은 절차입니다. (<code>fmap</code> 내부에서 똑 같은 방법으로 진행됩니다.) 결론은 effect 두 개를 모두 살리려면 <code>m (m a) -&gt; m a</code>가 반드시 필요합니다.</p>
 </blockquote>
 <br />
 <center>
@@ -253,7 +257,8 @@ A. 컴비네이터 안에서 <code>m a</code>에 있던 effect를 떼어낸 후 
 <div class="sourceCode" id="cb16"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- join :: (Monad m) =&gt; m (m a) -&gt; m a</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- 여기서는 아래로 단순화 해서 보겠습니다. </span></span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="ot">join ::</span> m (m a) <span class="ot">-&gt;</span> m a</span></code></pre></div>
-<code>fmap</code>으로 나온 결과에 <code>join</code>을 적용해서 다시 <code>m (m a)</code>가 <code>m a</code>가 되면, <code>fmap</code>을 이용해 연이어 합성할 수 있게 됩니다. <code>join</code>이 하는 일은 단순히 <code>m</code> 하나를 떼어내는 것이 아닙니다. <code>join</code>은 <code>m a</code>가 되며 생긴 effect1과 <code>m (m a)</code>가 되며 생긴 effect2 모두를 잃어버리지 않아야 합니다. 이를 위한 해결책이 바로 effect composition입니다. effect1과 effect2를 합쳐 하나의 effect로 만들어 <code>m a</code>에 다시 담아 둘 수 있으면 됩니다. 그게 불가능하면 모나드로 만들 수 없습니다. effect를 합성할 때 effect의 id의 역할을 할 수 있게 만들어 주는 모나드의 <code>return</code>도 중요한 역할이지만, 반짝이는 센스가 들어가 있는 부분은 바로 여기 <code>join</code>입니다.<br />
+<p>위와 같은 함수 <code>join</code>이 있다면, <code>fmap</code>으로 나온 결과에 적용하여 다시 <code>m a</code>가 되므로 연이어 합성할 수 있게 됩니다. <code>join</code>이 하는 일은 단순히 <code>m</code> 하나를 떼어내는 것이 아닙니다. <code>join</code>은 <code>m a</code>가 되며 생긴 <strong>effect1</strong>과 <code>m (m a)</code>가 되며 생긴 <strong>effect2</strong> 모두를 잃어버리지 않아야 합니다. 이를 위한 해결책이 바로 effect composition입니다. <strong>effect1</strong>과 <strong>effect2</strong>를 합쳐 <strong>하나의 effect</strong>로 만들어 <code>m a</code>에 다시 담아 둘 수 있으면 됩니다. 그게 불가능하면 모나드로 만들 수 없습니다.</p>
+<p>※ effect를 합성할 때 effect의 id의 역할을 할 수 있게 만들어 주는 모나드의 <code>return</code>도 중요한 역할이지만, 반짝이는 센스가 들어가 있는 부분은 바로 여기 <code>join</code>입니다.</p>
 <br />
 <center>
 <font size="7em" style="font-weight: bolder; line-height: 1.2em"> <em>두 번의 effect를 하나의 effect에 담기</em></font>
@@ -275,15 +280,15 @@ A. 모나드 바탕에 들어간 생각을 <code>(.)</code>과 비슷한 모양�
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>f <span class="op">&gt;=&gt;</span> g     <span class="ot">=</span> \x <span class="ot">-&gt;</span> f x <span class="op">&gt;&gt;=</span> g</span></code></pre></div>
 </blockquote>
 <h2 id="m-a와-a가-다른-문제를-m-a---a-아니고-왜-m-m-a---m-a를-볼까"><em>m a와 a가 다른 문제를 m a -&gt; a 아니고, 왜 m (m a) -&gt; m a를 볼까?</em></h2>
-<p><strong><code>a -&gt; m b</code>와 <code>b -&gt; m c</code>를 합성하면 effect는 <code>m b</code>, <code>m c</code> 두 번 생깁니다. <code>m a</code>와 <code>a</code>가 달라서 생기는 문제처럼 보이지만, 한 걸을 뒤에서 넓게 보면 사실은 우리가 풀어야 될 문제는, 둘을 같게 보는게 아니라 두 번의 effect가 있는 걸, effect 하나와 같게 만드는 문제입니다.</strong></p>
+<p><strong><code>a -&gt; m b</code>와 <code>b -&gt; m c</code>를 합성하면 effect는 <code>m b</code>, <code>m c</code> 두 번 생깁니다. <code>m b</code>와 <code>b</code>가 달라서 생기는 문제처럼 보이지만, 한 걸음 뒤에서 넓게 보면 <em>사실 우리가 풀어야 될 문제는, 둘을 같게 보는게 아니라 두 번의 effect가 있는 걸, effect 하나와 같게 만드는 문제</em>입니다.</strong></p>
 <div class="sourceCode" id="cb19"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>[a <span class="ot">-&gt;</span> m b]  <span class="op">.</span>  [b <span class="ot">-&gt;</span> m c]  <span class="op">-----&gt;</span>  [a <span class="ot">-&gt;</span> m c]</span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a> a <span class="ot">-&gt;</span>   b   <span class="op">.</span>   b <span class="ot">-&gt;</span>   c   <span class="op">-----&gt;</span>   a <span class="ot">-&gt;</span>   c</span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>      m     <span class="op">.</span>        m     <span class="op">-----&gt;</span>        m</span>
 <span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>m <span class="op">.</span> m <span class="ot">-&gt;</span> m</span></code></pre></div>
-<p><strong>함수 타입만 봐서는 <code>a -&gt; m b</code>의 출력 <code>m b</code>와 <code>b -&gt; m c</code>의 입력 <code>b</code>를 맞춰야만 될 것 같지만, 함수의 작업 내용으로 보면 <code>m . m</code> 을 <code>m</code> 하나와 같게 보는 문제입니다. 접점에서 <code>m b</code>와 <code>b</code>가 만나는 건 어차피 컴비네이터가 일시적으로 해결하고, 진짜 문제는 작업 내용을 잃어버리지 않는 겁니다.</strong> (<code>a</code>로 가면 effect를 모두 잃어버립니다.)</p>
+<p><strong>함수 타입만 봐서는 <code>a -&gt; m b</code>의 출력 <code>m b</code>와 <code>b -&gt; m c</code>의 입력 <code>b</code>를 맞춰야만 될 것 같지만, 함수의 작업 내용으로 보면 <code>m . m</code> 을 <code>m</code> 하나와 같게 보는 문제입니다. 접점에서 <code>m b</code>와 <code>b</code>가 만나는 건 어차피 컴비네이터가 일시적으로 해결하고, 진짜 문제는 작업 내용을 잃어버리지 않는 겁니다.</strong> (<code>b</code>로 가면 effect를 모두 잃어버립니다.)</p>
 <p>애초에 이 문제는 <code>m a</code>와 <code>a</code>의 문제가 아니라, effect가 두 번 겹쳐지기 때문에 <code>m (m a)</code>와 <code>m a</code>의 문제입니다.</p>
-<p>함수 합성을 바라 보는 조금은 다른 눈이 생긴 것 같지 않나요? 만나는 타입이 반드시 같지 않아도 필요한 정보만 유지할 방법만 보인다면 컴비네이터를 이용해 합성이 가능 할 수 있습니다.</p>
+<p>함수 합성을 바라 보는 조금은 다른 눈이 생긴 것 같지 않나요? <em>만나는 타입이 반드시 같지 않아도 필요한 정보만 유지할 방법만 보인다면 컴비네이터를 이용해 합성</em>이 가능 할 수 있습니다.</p>
 <blockquote>
 <p>Q. <code>m a -&gt; a</code>는 불가능한데, <code>m (m a)  -&gt; m a</code>는 왜 가능한가요?<br />
 A. 최종 결과값이 <code>a</code>가 되면 effect를 담아 둘 곳이 아예 없습니다. 하지만 <code>m a</code>라면 담아 둘 곳은 있는 상태입니다. <code>fmap</code> 내부에는 입력으로 들어온 <code>m a</code>의 effect와 <code>a -&gt; m b</code>에서 새로 만들어낸 effect, 이렇게 두 effect가 같이 있게 됩니다. 두 번의 effect를 어떻게 하나로 만들 방법만 있다면(effect algebra를 정의할 수 있다면) 하나로 만들어진 <code>effect</code>는 다시 <code>m a</code>에 담을 수 있습니다. 다시 말하지만 결과값이 <code>a</code>이면 effect를 담아둘 곳이 없습니다.<br />
@@ -302,7 +307,7 @@ A. 결과 <code>a</code>는 더이상 List 모나드 타입이 아닙니다. 위
 <p>※ 모나드 구조라 하면,<br />
 두 번의 effect를 하나로 합치는 <code>join</code>이 있기 때문에<br />
 <code>a -&gt; m b</code> 타입의 함수를 합성할 때 만나게 되는 <code>m (m a)</code>를 <code>m a</code>로 만들 수 있게 되어 합성이 가능해집니다.</p>
-<p><strong><code>a -&gt; m b</code> 타입 합성하는 자체를 모나드라 부르는게 아니라</strong>, <code>m a, m (m a), m (m (m a)), m (m (m (m a)))...</code> 처럼 합성해도 effect를 모두 하나로 합쳐 <code>m a</code>로 표현할 수 있게 <code>return</code>, <code>join</code>이 있는 구조를 모나드라 합니다. 처음 공부를 할 때, 모나드의 목표를 합성으로 설명하며 <code>a -&gt; m b</code> 타입의 합성이 같이 나와 혼란스러웠던 부분입니다.</p>
+<p><strong><code>a -&gt; m b</code> 타입을 합성하는 자체를 모나드라 부르는게 아니라</strong>, <code>m a, m (m a), m (m (m a)), m (m (m (m a)))...</code> 처럼 합성해도 effect를 모두 하나로 합쳐 <code>m a</code>로 표현할 수 있게 <code>return</code>, <code>join</code>이 있는 구조를 모나드라 합니다. 처음 공부를 할 때, 모나드의 목표를 합성으로 설명하며 <code>a -&gt; m b</code> 타입의 합성이 같이 나와 혼란스러웠던 부분입니다.</p>
 <p>하스켈에선 <code>a -&gt; m b</code> 타입 함수를 합성하는데 <code>join</code>을 좀 더 편리하게 쓰기 위해(모나드를 편리하게 쓰기 위해) 아래와 같은 컴비네이터 함수를 정의합니다.</p>
 <figure>
 <img src="../images/before_monad_bind.png" alt="Bind = join(fmap…)" /><figcaption aria-hidden="true">Bind = join(fmap…)</figcaption>
@@ -348,7 +353,7 @@ A. 혹시 Functor의 <code>fmap</code>과 같아 보인다면, 둘의 받는 함
 <figure>
 <img src="../images/before_monad_bindGraph.png" alt="목표는 m a -&gt; … -&gt; m c 입니다" /><figcaption aria-hidden="true">목표는 m a -&gt; … -&gt; m c 입니다</figcaption>
 </figure>
-<p><code>m a</code>를 받아 <code>a</code>를 꺼내고, <code>a -&gt; m b</code>에 넘길수 없는 정보effect들은 따로 떼어 내서, 나중에 “새로 생성된 <code>m</code>의 정보effect”와 합쳐 다시 <code>m b</code>로 만듭니다. 이 값을 다음 <code>bind</code>에 넘깁니다.<br />
+<p><code>m a</code>를 받아 <code>a</code>를 꺼내고, <code>a -&gt; m b</code>에 넘길수 없는 <strong>진한 파랑 m</strong>은 따로 떼어 내서, 나중에 새로 생성된 <strong>옅은 파랑 m</strong>과 하나의 <strong>진한 파랑 m</strong>으로 합쳐 다시 <code>m b</code>로 만듭니다. 이 값을 다음 <code>bind</code>에 넘깁니다.<br />
 ※ <code>(&gt;&gt;=)</code>나 <code>(&gt;=&gt;)</code>는 모나드의 <code>join</code>을 편하게 쓰기 위한 컴비네이터입니다.</p>
 <h2 id="하스켈에서-join-구현">하스켈에서 <code>join</code> 구현</h2>
 <p><code>join</code>, <code>(&gt;&gt;=)</code>, <code>(&gt;=&gt;)</code>는 어느 한 쪽만 구현되어 있으면 다른 쪽을 구현할 수 있습니다. 하스켈에선 먼저 <code>bind (&gt;&gt;=)</code>가 구현되어 있고, 이를 써서 <code>join</code>이 구현되어 있습니다.</p>
