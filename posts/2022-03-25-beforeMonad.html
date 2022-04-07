@@ -97,7 +97,7 @@
 <li><a href="#합성composition--특정-작업을-하는-동안만은-같은-걸로-보기">합성Composition : 특정 작업을 하는 동안만은 같은 걸로 보기</a></li>
 <li><a href="#우리는-이미-fmap을-갖고-있다">우리는 이미 <code>fmap</code>을 갖고 있다</a></li>
 <li><a href="#join"><code>join</code></a></li>
-<li><a href="#m-a와-a가-다른-문제를-m-a---a-아니고-왜-m-m-a---m-a를-볼까"><em><code>m a</code>와 <code>a</code>가 다른 문제를 <code>m a -&gt; a</code> 아니고, 왜 <code>m (m a) -&gt; m a</code>를 볼까?</em></a></li>
+<li><a href="#m-a와-a가-다른-문제를-m-a---a-아니고-왜-m-m-a---m-a를-볼까"><em>m a와 a가 다른 문제를 m a -&gt; a 아니고, 왜 m (m a) -&gt; m a를 볼까?</em></a></li>
 <li><a href="#bind-">Bind <code>(&gt;&gt;=)</code></a></li>
 <li><a href="#하스켈에서-join-구현">하스켈에서 <code>join</code> 구현</a></li>
 <li><a href="#결론">결론</a></li>
@@ -274,7 +274,7 @@ A. 모나드 바탕에 들어간 생각을 <code>(.)</code>과 비슷한 모양�
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="ot">(&gt;=&gt;)       ::</span> <span class="dt">Monad</span> m <span class="ot">=&gt;</span> (a <span class="ot">-&gt;</span> m b) <span class="ot">-&gt;</span> (b <span class="ot">-&gt;</span> m c) <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> m c)</span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>f <span class="op">&gt;=&gt;</span> g     <span class="ot">=</span> \x <span class="ot">-&gt;</span> f x <span class="op">&gt;&gt;=</span> g</span></code></pre></div>
 </blockquote>
-<h2 id="m-a와-a가-다른-문제를-m-a---a-아니고-왜-m-m-a---m-a를-볼까"><em><code>m a</code>와 <code>a</code>가 다른 문제를 <code>m a -&gt; a</code> 아니고, 왜 <code>m (m a) -&gt; m a</code>를 볼까?</em></h2>
+<h2 id="m-a와-a가-다른-문제를-m-a---a-아니고-왜-m-m-a---m-a를-볼까"><em>m a와 a가 다른 문제를 m a -&gt; a 아니고, 왜 m (m a) -&gt; m a를 볼까?</em></h2>
 <p><strong><code>a -&gt; m b</code>와 <code>b -&gt; m c</code>를 합성하면 effect는 <code>m b</code>, <code>m c</code> 두 번 생깁니다. <code>m a</code>와 <code>a</code>가 달라서 생기는 문제처럼 보이지만, 한 걸을 뒤에서 넓게 보면 사실은 우리가 풀어야 될 문제는, 둘을 같게 보는게 아니라 두 번의 effect가 있는 걸, effect 하나와 같게 만드는 문제입니다.</strong></p>
 <div class="sourceCode" id="cb19"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>[a <span class="ot">-&gt;</span> m b]  <span class="op">.</span>  [b <span class="ot">-&gt;</span> m c]  <span class="op">-----&gt;</span>  [a <span class="ot">-&gt;</span> m c]</span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a> a <span class="ot">-&gt;</span>   b   <span class="op">.</span>   b <span class="ot">-&gt;</span>   c   <span class="op">-----&gt;</span>   a <span class="ot">-&gt;</span>   c</span>
