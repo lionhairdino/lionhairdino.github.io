@@ -248,7 +248,7 @@ A. 컴비네이터 안에서 <code>m a</code>에 있던 effect를 떼어낸 후 
 <p><br /></p>
 <h2 id="join"><code>join</code></h2>
 <figure>
-<img src="../images/join.png" alt="effect 합성" /><figcaption aria-hidden="true">effect 합성</figcaption>
+<img src="../images/join_v2.png" alt="effect 합성 - 흐릿한 부분이 있으면 &gt;=&gt;, 없으면 &gt;&gt;=" /><figcaption aria-hidden="true">effect 합성 - 흐릿한 부분이 있으면 &gt;=&gt;, 없으면 &gt;&gt;=</figcaption>
 </figure>
 <div class="sourceCode" id="cb16"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- join :: (Monad m) =&gt; m (m a) -&gt; m a</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- 여기서는 아래로 단순화 해서 보겠습니다. </span></span>
@@ -265,7 +265,7 @@ A. 컴비네이터 안에서 <code>m a</code>에 있던 effect를 떼어낸 후 
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>                            m b <span class="op">&gt;&gt;&gt;</span> join (<span class="fu">fmap</span> g b) <span class="op">&gt;&gt;&gt;</span> m c</span>
 <span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>                                                        m c <span class="op">&gt;&gt;&gt;</span> join (<span class="fu">fmap</span> h c) <span class="op">&gt;&gt;&gt;</span> m d</span></code></pre></div>
 <figure>
-<img src="../images/joinjoin.png" alt="effect 합성한 것에 합성" /><figcaption aria-hidden="true">effect 합성한 것에 합성</figcaption>
+<img src="../images/joinjoin_v2.png" alt="effect 합성한 것에 합성 - 흐릿한 부분이 있으면 &gt;=&gt;, 없으면 &gt;&gt;=" /><figcaption aria-hidden="true">effect 합성한 것에 합성 - 흐릿한 부분이 있으면 &gt;=&gt;, 없으면 &gt;&gt;=</figcaption>
 </figure>
 <blockquote>
 <p>Q. 함수 합성은 <code>(.)</code>으로 함수와 함수를 합성해서 결과로 합성을 돌려주는데, <code>bind</code>는 값과 함수를 합성해서 값을 돌려 주고 있습니다.<br />
@@ -283,7 +283,7 @@ A. 모나드 바탕에 들어간 생각을 <code>(.)</code>과 비슷한 모양�
 <span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>m <span class="op">.</span> m <span class="ot">-&gt;</span> m</span></code></pre></div>
 <p>함수 타입만 봐서는 <code>a -&gt; m b</code>의 출력 <code>m b</code>와 <code>b -&gt; m c</code>의 입력 <code>b</code>를 맞춰야만 될 것 같지만, 함수의 작업 내용으로 보면 <code>m . m</code> 을 <code>m</code> 하나와 같게 보는 문제입니다. 접점에서 <code>m b</code>와 <code>b</code>가 만나는 건 어차피 컴비네이터가 일시적으로 해결하고, 진짜 문제는 작업 내용을 잃어버리지 않는 겁니다. (<code>a</code>로 가면 effect를 모두 잃어버립니다.)</p>
 <p>애초에 이 문제는 <code>m a</code>와 <code>a</code>의 문제가 아니라, effect가 두 번 겹쳐지기 때문에 <code>m (m a)</code>와 <code>m a</code>의 문제입니다.</p>
-<p>함수 합성을 바라 보는 조금은 다른 눈이 생긴 것 같지 않나요? 반드시 타입이 같지 않아도 필요한 정보만 유지할 방법만 보인다면 합성이 가능 할 수 있습니다.</p>
+<p>함수 합성을 바라 보는 조금은 다른 눈이 생긴 것 같지 않나요? 만나는 타입이 반드시 같지 않아도 필요한 정보만 유지할 방법만 보인다면 컴비네이터를 이용해 합성이 가능 할 수 있습니다.</p>
 <blockquote>
 <p>Q. <code>m a -&gt; a</code>는 불가능한데, <code>m (m a)  -&gt; m a</code>는 왜 가능한가요?<br />
 A. 최종 결과값이 <code>a</code>가 되면 effect를 담아 둘 곳이 아예 없습니다. 하지만 <code>m a</code>라면 담아 둘 곳은 있는 상태입니다. <code>fmap</code> 내부에는 입력으로 들어온 <code>m a</code>의 effect와 <code>a -&gt; m b</code>에서 새로 만들어낸 effect, 이렇게 두 effect가 같이 있게 됩니다. 두 번의 effect를 어떻게 하나로 만들 방법만 있다면(effect algebra를 정의할 수 있다면) 하나로 만들어진 <code>effect</code>는 다시 <code>m a</code>에 담을 수 있습니다. 다시 말하지만 결과값이 <code>a</code>이면 effect를 담아둘 곳이 없습니다.<br />
@@ -291,7 +291,7 @@ effect가 필요 없어서 버린다면 <code>m a -&gt; a</code>도 가능하지
 </blockquote>
 <blockquote>
 <p>Q. List 모나드의 head 함수는 <code>head :: [a] -&gt; a</code> 타입인데요?<br />
-A. 결과 a는 더이상 List 모나드 타입이 아닙니다. 위에서 말한대로 effect를 버리면 가능합니다. 이 경우 List 모나드의 effect를 버렸다고 말합니다.</p>
+A. 결과 <code>a</code>는 더이상 List 모나드 타입이 아닙니다. 위에서 말한대로 effect를 버리면 가능합니다. 이 경우 List 모나드의 effect를 버렸다고 말합니다.</p>
 </blockquote>
 <br />
 <center>
@@ -394,8 +394,8 @@ A. 혹시 Functor의 <code>fmap</code>과 같아 보인다면, 둘의 받는 함
 <p><img align="right" src="../images/before_monad_bindblock.png"></p>
 <p>하스켈에서 정확히 코드 모양으로 얘기하면 <code>a -&gt; m b</code>와 <code>b -&gt; m c</code>를 연결하는 게 아니라, <code>bind (&gt;&gt;=)</code>끼리 연결합니다. <code>bind (&gt;&gt;=)</code>는 그림의 비어있는 박스 부분에 적당한 <code>(a -&gt; m b)</code>를 채워 넣으면 합성되게 구조를 만들어 둔다고 볼 수 있습니다.</p>
 <p>두 줄 요약.<br />
-<strong>“effect를 합성할 수 있는 join이 있어 m (m (m …))을 m 하나로 표현 가능한 구조를 모나드라 합니다. (m은 펑크터)”</strong><br />
-<strong>“a -&gt; m b 타입의 함수를 합성할 때 m부분을 합성하기 위해 모나드 구조로 만들어 해결합니다.”</strong></p>
+<strong>“effect를 합성할 수 있는 <code>join</code>이 있어 <code>m (m (m ...))</code>을 <code>m</code> 하나로 표현 가능한 구조를 모나드라 합니다. (<code>m</code>은 펑크터)”</strong><br />
+<strong>“<code>a -&gt; m b</code> 타입의 함수를 합성할 때 <code>m</code>부분을 합성하기 위해 모나드 구조로 만들어 해결합니다.”</strong></p>
 <h2 id="모나드가-필요함을-눈치-채는-예시">모나드가 필요함을 눈치 채는 예시</h2>
 <p>숫자 두개 알파벳 하나를 받는 Parser 함수를 구현한다면, numParser 두 번, alphabetParser 한 번 연결해서 구현하면 좋겠다는 생각을 할 수 있습니다.</p>
 <p>그럼, 입력 문자열 “12A”를 파싱하는 동작을 생각해 보면</p>
@@ -413,14 +413,14 @@ A. 혹시 Functor의 <code>fmap</code>과 같아 보인다면, 둘의 받는 함
 <p>기본이 되는 구조(Category)를 정의해 두고,<br />
 Functor 하나를 이용해 구조는 유지한 채 다른 모양으로 매핑하고,<br />
 다른 Functor를 이용해 역시 구조는 유지한 채 다른 모양으로 매핑합니다.<br />
-그런 후 변환된 두 대상들을 얼마나 다르다고 말할 수 있는지를 Natural Transform (:: Functor -&gt; Functor)으로 표현합니다.</p>
-<p>위와 같은 방법을 포함해서 여러가지 방법으로 다른 것과 관계를 찾아, 기존 수학에 있던 개념들을 오로지 이들 관계로만 표현해서 체계를 만들어 갑니다. 이렇게 하면, 대상의 속성들에 의존하지 않게 되어 다른 곳에서도 카테고리로 정의만 되면 기존 개념들을 그대로 적용할 수 있게 됩니다. 그 과정 속에서 위에서 보았던, 모나드 <code>join</code>의 <code>m m</code>을 <code>m</code>으로 바꾸는 동작과 동일하게, <code>m m</code>과 <code>m</code>의 다름을 처리해서 모노이드로 만드는 경우가 나옵니다. 카테고리에서 이런 동작이 포함되어 있는 구조를 모나드라합니다. 하스켈에 있는 펑크터와 모나드가 나온 곳이라 하여, 딱 모나드까지만 가보려고 하는데 그리 순탄하지는 않습니다.</p>
-<p>※ 추측: Monad의 어원은 하나를 뜻하는 Monas에서 왔다고 합니다. 아마도 서로 다른 대상을 “같게” 본다는 의미가 있어 이렇게 이름 붙인게 아닐까요? 카테고리 이론에선 Monad를 Triple, Triad라 부르기도 합니다.</p>
+그런 후 변환된 두 대상들을 얼마나 다르다고 말할 수 있는지를 Natural Transform (:: Functor -&gt; Functor)으로 표현합니다. (<code>return</code>과 <code>join</code>은 펑크터T와 펑크터T<sup>2</sup>의 다름을 나타내는 Natural Transform입니다.)</p>
+<p>위와 같은 방법을 포함해서 여러가지 방법으로 다른 것과 관계를 찾아, 기존 수학에 있던 개념들을 오로지 이들 관계로만 표현해서 체계를 만들어 갑니다. 이렇게 하면, 대상의 속성들에 의존하지 않게 되어 다른 곳에서도 카테고리로 정의만 되면 기존 개념들을 그대로 적용할 수 있게 됩니다. 그 과정 속에서 위에서 보았던, 모나드 <code>join</code>의 <code>m (m a)</code>를 <code>m a</code>로 바꾸는 동작과 동일하게, <code>m · m</code>과 <code>m</code>의 다름을 처리해서 모노이드로 만드는 경우가 나옵니다. 카테고리에서 이런 동작이 포함되어 있는 구조를 모나드라합니다. 하스켈에 있는 펑크터와 모나드가 나온 곳이라 하여, 딱 모나드까지만 가보려고 하는데 그리 순탄하지는 않습니다.</p>
+<p>※ 추측: Monad의 어원은 하나를 뜻하는 Monas에서 왔다고 합니다. 아마도 서로 다른 대상을 “같게” 본다는 의미가 있어 이렇게 이름 붙인게 아닐까요? 카테고리 이론에선 Monad를 Triple, Triad라 부르기도 합니다. 이 때는 3가지(펑크터, return, join)가 있으면 하나로 볼 수 있어서 그런 건 아닐까 추측합니다. 어디까지나 추측입니다.</p>
 <figure>
 <img src="../images/isomorphic.png" alt="같음" /><figcaption aria-hidden="true">같음</figcaption>
 </figure>
 <h2 id="도움을-주신-분들">도움을 주신 분들</h2>
-<p>모나드의 카테고리 이론쪽 개념과 그동안 엉켜있던 모나드 조각들을 푸는데 도움을 주신 Ailrun님 감사드립니다.</p>
+<p>모나드의 카테고리 이론쪽 개념과 그동안 엉켜있던 모나드 조각들을 푸는데 도움을 주신 Ailrun님 감사드립니다. 덕분에 혼자서 넘어가기 어려운 산들을 넘어간 것 같습니다.</p>
 <h2 id="여기-글은-독일수도-있다">여기 글은 “독”일수도 있다</h2>
 <p>모나드 설명 글들은, 보통 “합성”을 시작으로 접근하는 경우가 많은데, 여기 글은 “같음”에 촛점을 두었습니다. 개인 의견은 모나드 설명을 “같음”에서 시작해서 풀어나가는 것이 좀 더 이해하는데 도움이 된다고 생각합니다. 모두 <code>a -&gt; b</code> 나 <code>m a -&gt; m b</code>만 있어, 단순 컴포지션으로 해결할 수 있었다면 모나드를 볼 필요가 없었을 겁니다. <code>m a</code>와 <code>a</code>가 달라서 생기는 절차를 기막히게 이용했다는 생각이 듭니다. 서로 조금씩 다른 수많은 타입들을 어떤 순간에는 같은 것으로 보고 처리할 수 있다는 생각은, 모든 걸 함수로 컴포지션하면서 풀어나가는 함수형에선 대단히 중요한 역할을 합니다.</p>
 <p>카테고리 이론은 들여다 볼수록 하스켈과 정말 많이 닮았다는 생각이 들긴 하는데, 글로 정리할 정도로 이해하기가 쉽지 않네요. 국내에도 “프로그래밍 언어”등을 전공으로 하는 분들이 많을텐데, 가볍게 볼 수 있는 글들을 많이 남겨 주면 좋겠습니다.</p>
@@ -465,7 +465,8 @@ Functor 하나를 이용해 구조는 유지한 채 다른 모양으로 매핑�
 <figure>
 <img src="../images/maybe_join2.png" alt="Maybe (Maybe a)의 join" /><figcaption aria-hidden="true">Maybe (Maybe a)의 join</figcaption>
 </figure>
-<p><span class="citation" data-cites="todo">@todo</span>: Monad law 3가지를 지키면서 만들어야 하고, 그렇게 만들면 Theorem for Free에 따라 유일성unicity이 있다는 내용 추가 <span class="citation" data-cites="todo">@todo</span>: Nothing :: Maybe (Maybe a)를 Just 1 :: Maybe a와 연결했을 때 monad law가 틀어지는 예시 추가</p>
+<p><span class="citation" data-cites="todo">@todo</span>: Monad law 3가지를 지키면서 만들어야 하고, 또한 Theorem for Free에 따라 유일성unicity이 있다는 내용 추가<br />
+<span class="citation" data-cites="todo">@todo</span>: Nothing :: Maybe (Maybe a)를 Just 1 :: Maybe a와 연결했을 때 monad law가 틀어지는 예시 추가</p>
 <section class="footnotes" role="doc-endnotes">
 <hr />
 <ol>
