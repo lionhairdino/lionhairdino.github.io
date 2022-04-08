@@ -85,13 +85,11 @@
 <li><a href="#free-모나드">Free 모나드</a></li>
 <li><a href="#free-모나드-아이디어">Free 모나드 아이디어</a></li>
 <li><a href="#free-모나드-패턴">Free 모나드 패턴</a></li>
-<li><a href="#진짜-펑크터를-넘기면-원하는-모나드-동작을-할까">진짜 펑크터를 넘기면 원하는 모나드 동작을 할까?</a>
-<ol type="1">
+<li><a href="#진짜-펑크터를-넘기면-원하는-모나드-동작을-할까">진짜 펑크터를 넘기면 원하는 모나드 동작을 할까?</a></li>
 <li><a href="#mymaybe">MyMaybe</a></li>
 <li><a href="#myreader">MyReader</a></li>
-</ol></li>
 </ol>
-<p>아래 목적을 이루기 위해 <code>Free</code> 모나드를 활용하는 패턴입니다. <code>Free</code> 모나드 자체가 아래 용도만을 위해 만들어진 건 아니지만 실용 코드에서는 아래 목적으로 사용하는 걸 자주 만납니다. (다른 용도로 쓰는 걸 못 봤습니다.) <code>Free</code> 모나드만 단독으로 자세히 보려면 적당한 글이 아닙니다. <code>Free</code> 모나드를 이용해서 DSL을 구현하는 패턴을 다루는 글입니다. <code>Free</code> 모나드로 이렇게 긴 글을 쓰게 될 줄은 몰랐습니다. 아직 완전히 이해하지 못한 상태에서도 이런데, 이해가 끝나면 꽤나 긴 글이 될 것 같습니다.</p>
+<p>아래 목적을 이루기 위해 <code>Free</code> 모나드를 활용하는 패턴입니다. <code>Free</code> 모나드 자체가 아래 용도만을 위해 만들어진 건 아니지만 실용 코드에서는 아래 목적으로 사용하는 걸 자주 만납니다. (다른 용도로 쓰는 걸 아직 못 봤습니다.) <code>Free</code> 모나드만 단독으로 자세히 보려면 적당한 글이 아닙니다. <code>Free</code> 모나드를 이용해서 DSL을 구현하는 패턴을 다루는 글입니다. <code>Free</code> 모나드로 이렇게 긴 글을 쓰게 될 줄은 몰랐습니다. 아직 완전히 이해하지 못한 상태에서도 이런데, 이해가 끝나면 꽤나 긴 글이 될 것 같습니다.</p>
 <h2 id="비유하자면">비유하자면…</h2>
 <p>빈 상자들을 연결(바인딩) 가능하게 설계해 두고, 어떤 것(펑크터)이든 상자에 넣기만 하면, 연결 가능하니까 모나드라 우깁니다. 제 생각엔 겉 상자가 모나드지, 안에 들어 있는 건 여전히 모나드가 아니잖아… 란 생각이 들지만, 어쨌든 모나드라 부릅니다.</p>
 <p>겉 모양으로 요약한다면, Free와 펑크터가 샌드위치처럼 교대로 쌓여져 있는 구조를 연결하는 모양입니다.</p>
@@ -106,10 +104,28 @@
 <h2 id="free-모나드">Free 모나드</h2>
 <div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Free</span> f r <span class="ot">=</span> <span class="dt">Free</span> (f (<span class="dt">Free</span> f r)) <span class="op">|</span> <span class="dt">Pure</span> r</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> (<span class="dt">Functor</span> f) <span class="ot">=&gt;</span> <span class="dt">Monad</span> (<span class="dt">Free</span> f) <span class="kw">where</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span> a <span class="ot">=</span> <span class="dt">Pure</span> a</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    (<span class="dt">Free</span> x) <span class="op">&gt;&gt;=</span> g <span class="ot">=</span> <span class="dt">Free</span> (<span class="fu">fmap</span> (<span class="op">&gt;&gt;=</span> g) x) <span class="co">--(1)</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    (<span class="dt">Pure</span> r) <span class="op">&gt;&gt;=</span> g <span class="ot">=</span> g r</span></code></pre></div>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Functor</span> f <span class="ot">=&gt;</span> <span class="dt">Functor</span> (<span class="dt">Free</span> f) <span class="kw">where</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmap</span> f (<span class="dt">Pure</span> x) <span class="ot">=</span> <span class="dt">Pure</span> (f x)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmap</span> f (<span class="dt">Free</span> g) <span class="ot">=</span> <span class="dt">Free</span> (<span class="fu">fmap</span> f <span class="op">&lt;$&gt;</span> g)  </span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> (<span class="dt">Functor</span> f) <span class="ot">=&gt;</span> <span class="dt">Monad</span> (<span class="dt">Free</span> f) <span class="kw">where</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span> a <span class="ot">=</span> <span class="dt">Pure</span> a</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    (<span class="dt">Free</span> x) <span class="op">&gt;&gt;=</span> g <span class="ot">=</span> <span class="dt">Free</span> (<span class="fu">fmap</span> (<span class="op">&gt;&gt;=</span> g) x) <span class="co">--(1) </span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    (<span class="dt">Pure</span> r) <span class="op">&gt;&gt;=</span> g <span class="ot">=</span> g r</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="co">-- effect 합성을 보기 위해 join의 동작을 보면</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="co">-- x는 Free f r 타입입니다.</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>join (<span class="dt">Pure</span> x) <span class="ot">=</span> x</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>join (<span class="dt">Free</span> x) <span class="ot">=</span> <span class="dt">Free</span> <span class="op">$</span> join <span class="op">&lt;$&gt;</span> x</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="co">-- 또는</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>join x <span class="ot">=</span> x <span class="op">&gt;&gt;=</span> <span class="fu">id</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>join (<span class="dt">Free</span> (f (<span class="dt">Pure</span> r))) <span class="ot">=</span> (<span class="dt">Free</span> (f (<span class="dt">Pure</span> r))) <span class="op">&gt;&gt;=</span> <span class="fu">id</span> </span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>                         <span class="ot">=</span>  <span class="dt">Free</span> (<span class="fu">fmap</span> (<span class="op">&gt;&gt;=</span> <span class="fu">id</span>) (f (<span class="dt">Pure</span> r)))</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>                         <span class="ot">=</span>  <span class="dt">Free</span> (f (<span class="dt">Pure</span> r <span class="op">&gt;&gt;=</span> <span class="fu">id</span>))</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>                         <span class="ot">=</span>  <span class="dt">Free</span> (f (<span class="fu">id</span> r)) <span class="co">-- id :: Free f r</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>                         <span class="ot">=</span>  <span class="dt">Free</span> (f (<span class="dt">Pure</span> r))</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="co">-- m a 도, m (m a)도 Free (f (Pure r))을 표현할 수 있습니다. </span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="co">-- 굳이 effect를 합치기 위한 작업이 필요 없습니다.</span></span></code></pre></div>
 <p>바인드의 <code>Pure</code>와 매칭됐을 때 말고, <code>Free</code>와 매칭됐을 때를 직관적으로 해석해 보면,<br />
 <code>Free</code> 바인드가 하는 일은<br />
 <code>Free ... (Free ...(Free ... Pure))</code> 이런 모양의 값에,<br />
