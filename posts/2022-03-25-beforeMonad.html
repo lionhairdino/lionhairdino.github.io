@@ -238,9 +238,10 @@ A의 3은 B의 b로 연결되었습니다.</p>
 <h2 id="이미-fmap을-갖고-있다">이미 <code>fmap</code>을 갖고 있다</h2>
 <p>※ <code>fmap</code> “만” 갖고 있다고 해야 맞을 것 같습니다. <code>fmap</code>은 오브젝트만 변환하는게 아닌 모피즘도 변환합니다. 예를 들어 <code>a -&gt; m b</code>를 펑크터 <code>m</code>으로 한 번 더 변환하면 <code>m a -&gt; m (m b)</code>가 되는 걸 알고 있습니다. <code>m a</code>가 가지고 있던 effect를 잃어버리지 않으려면, <code>a -&gt; m b</code>에 <code>m a</code>를 넣기 위해, 일단 <code>m a -&gt; m (m b)</code>로 만드는 수밖에 없습니다.</p>
 <p>위에서 봤던 것처럼 <code>Maybe a</code>와 <code>a</code>가 달라서 생기는 문제, 즉 추가된 <code>Nothing</code> 생성자 문제를 위해 또 함수를 만들 필요 없이, 이미 만들어져 있는 <code>fmap</code>을 가져옵니다. <code>fmap</code>의 내부를 들여다 보면<br />
-- <code>a -&gt; m b</code> 함수와 <code>m a</code>를 받아,<br />
-- <code>m a</code>에서 <code>m</code>을 잠시 떼어내며, <code>m a</code>가 가지고 있던 effect를 따로 두고 (이걸 <strong>effect1</strong>이라 이름 붙이겠습니다.)<br />
-- <code>a</code>에 <code>a -&gt; m b</code> 함수를 적용합니다. 그럼 결과 <code>m b</code>는 새로운 effect를 가지고 있게 됩니다. 이걸 <strong>effect2</strong>라 이름 붙이겠습니다. - 남은 작업은 하나만 남았습니다. <strong>effect1</strong>과 <strong>effect2</strong>를 모두 잃어버리지 않고 다시 <code>m b</code>로 만들 수만 있다면, 또 다시 다른 <code>b -&gt; m c</code> 모양의 함수와 연이어 합성 할 수 있게 됩니다.</p>
+* <code>a -&gt; m b</code> 함수와 <code>m a</code>를 받아,<br />
+* <code>m a</code>에서 <code>m</code>을 잠시 떼어내며, <code>m a</code>가 가지고 있던 effect를 따로 두고 (이걸 <strong>effect1</strong>이라 이름 붙이겠습니다.)<br />
+* <code>a</code>에 <code>a -&gt; m b</code> 함수를 적용합니다. 그럼 결과 <code>m b</code>는 새로운 effect를 가지고 있게 됩니다. 이걸 <strong>effect2</strong>라 이름 붙이겠습니다.<br />
+* 남은 작업은 하나만 남았습니다. <strong>effect1</strong>과 <strong>effect2</strong>를 모두 잃어버리지 않고 다시 <code>m b</code>로 만들 수만 있다면, 또 다시 다른 <code>b -&gt; m c</code> 모양의 함수와 연이어 합성 할 수 있게 됩니다.</p>
 <blockquote>
 <p>Q. 만일 1번 방법 <code>m a -&gt; a</code> 으로 해결한다면 <code>m (m b)</code>가 나오지 않아도 되는 것 아닐까요?<br />
 A. 컴비네이터 안에서 <code>m a</code>에 있던 <strong>effect1</strong>을 떼어낸 후 <code>a</code>에 <code>a -&gt; m b</code>를 적용하면 또 하나의 <strong>effect2</strong>가 생기는 건 마찬가지입니다. <code>fmap</code>을 이용해서 <code>a -&gt; m b</code> 함수를 <code>m a -&gt; m (m b)</code>로 변환한 것과 표현만 다를 뿐이지 같은 절차입니다. (<code>fmap</code> 내부에서 똑 같은 방법으로 진행됩니다.) 결론은 effect 두 개를 모두 살리려면 <code>m (m a) -&gt; m a</code>가 반드시 필요합니다.</p>
@@ -456,10 +457,12 @@ Functor 하나를 이용해 구조는 유지한 채 다른 모양으로 매핑�
 <h4 id="writer">Writer</h4>
 <p>바깥에서 <code>w</code>가 생긴 effect1과 안쪽에서 <code>w</code>생긴 effect를 <code>mappend</code>해서 하나로 만듭니다.</p>
 <div class="sourceCode" id="cb34"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">Writer</span> w a <span class="ot">=</span> <span class="dt">Writer</span> {<span class="ot"> runWriter ::</span> (a, w) } </span>
-<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>(<span class="dt">Writer</span> (ma_x, ma_v)) <span class="op">&gt;&gt;=</span> make_mb <span class="ot">=</span> <span class="kw">let</span> (<span class="dt">Writer</span> (mb_y, mb_v')) <span class="ot">=</span> make_mb ma_x <span class="kw">in</span> <span class="dt">Writer</span> (mb_y, ma_v <span class="ot">`mappend`</span> mb_v')</span>
-<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- 바깥 mma에 있던 mma_v와 안쪽 ma_v'을 mappend해서 하나로 만든다.</span></span>
-<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>join (<span class="dt">Writer</span> (mma_x, mma_v)) <span class="ot">=</span> (<span class="dt">Writer</span> (mma_x, mma_v)) <span class="op">&gt;&gt;=</span> <span class="fu">id</span></span>
-<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>                             <span class="ot">=</span> <span class="kw">let</span> (<span class="dt">Writer</span> (ma_y, ma_v')) <span class="ot">=</span> <span class="fu">id</span> mma_x <span class="kw">in</span> <span class="dt">Writer</span> (ma_y, mma_v <span class="ot">`mappend`</span> ma_v')</span></code></pre></div>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>(<span class="dt">Writer</span> (ma_x, ma_v)) <span class="op">&gt;&gt;=</span> make_mb</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>                <span class="ot">=</span> <span class="kw">let</span> (<span class="dt">Writer</span> (mb_y, mb_v')) <span class="ot">=</span> make_mb ma_x <span class="kw">in</span> <span class="dt">Writer</span> (mb_y, ma_v <span class="ot">`mappend`</span> mb_v')</span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a><span class="co">-- 바깥 mma에 있던 mma_v와 안쪽 ma_v'을 mappend해서 하나로 만든다.</span></span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>join (<span class="dt">Writer</span> (mma_x, mma_v)) </span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>                <span class="ot">=</span> (<span class="dt">Writer</span> (mma_x, mma_v)) <span class="op">&gt;&gt;=</span> <span class="fu">id</span></span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>                <span class="ot">=</span> <span class="kw">let</span> (<span class="dt">Writer</span> (ma_y, ma_v')) <span class="ot">=</span> <span class="fu">id</span> mma_x <span class="kw">in</span> <span class="dt">Writer</span> (ma_y, mma_v <span class="ot">`mappend`</span> ma_v')</span></code></pre></div>
 <h4 id="reader">Reader</h4>
 <p><code>w</code>를 인자로 주는 effect1과 <code>w</code>를 인자로 주는 effect2를 합쳐도 <code>w</code>를 인자로 주는 effect입니다.</p>
 <div class="sourceCode" id="cb35"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>ma <span class="op">&gt;&gt;=</span> make_mb  <span class="ot">=</span> \w <span class="ot">-&gt;</span> make_mb (ma w) w </span>
@@ -469,10 +472,10 @@ Functor 하나를 이용해 구조는 유지한 채 다른 모양으로 매핑�
 <span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>                <span class="ot">=</span> \w <span class="ot">-&gt;</span> <span class="fu">id</span> (((<span class="ot">-&gt;</span>) mma) w) w</span></code></pre></div>
 <h3 id="그럼-join의-동작은-마음대로-만들어도-되나">그럼 join의 동작은 마음대로 만들어도 되나?</h3>
 <figure>
-<img src="../images/maybe_join2.png" alt="Sum형태로 드러나는 effect 예: Maybe (Maybe a)의 join" /><figcaption aria-hidden="true">Sum형태로 드러나는 effect 예: Maybe (Maybe a)의 join</figcaption>
+<img src="../images/maybe_join2.png" alt="Maybe (Maybe a)의 join" /><figcaption aria-hidden="true">Maybe (Maybe a)의 join</figcaption>
 </figure>
 <figure>
-<img src="../images/writer_v2.png" alt="Product형태로 드러나는 effect 예: Writer (Writer a)의 join" /><figcaption aria-hidden="true">Product형태로 드러나는 effect 예: Writer (Writer a)의 join</figcaption>
+<img src="../images/writer_v2.png" alt="Writer (Writer a)의 join" /><figcaption aria-hidden="true">Writer (Writer a)의 join</figcaption>
 </figure>
 <p><span class="citation" data-cites="todo">@todo</span>: Monad law 3가지를 지키면서 만들어야 하고, 또한 Theorem for Free에 따라 유일성unicity이 있다는 내용 추가<br />
 <span class="citation" data-cites="todo">@todo</span>: Nothing :: Maybe (Maybe a)를 Just 1 :: Maybe a와 연결했을 때 monad law가 틀어지는 예시 추가</p>
