@@ -151,8 +151,9 @@
 <p>대부분 <code>Free(..(Free..))</code>와 같은 값을 만나고, 여기에 바인드로 <code>(\_ -&gt; Free ...)</code> 함수를 적용하면 <code>Free</code>가 몇 번 감싸져 있든 안쪽까지 들어가 <code>Pure r</code>에 도달해서 <code>r</code>에 함수를 적용하므로 가장 안쪽에 이어 붙이는 효과가 납니다. 적용하는 함수는 리턴 타입이 <code>Free</code> 타입이니, <em>결과는 Free 속에 Free를 넣은 형태</em>가 됩니다.</p>
 <p>어떤 펑크터가 됐든 <code>Free</code>로 감싸서 <code>Free</code>타입으로 만들면 <code>..</code> 이라 표시된 자리에 펑크터 값이 들어갑니다.</p>
 <h2 id="free-모나드-join">Free 모나드 join</h2>
-<p>모나드가 하는 일이 눈에 잘 들어오지 않을 때는 join으로 effect를 합성하는데 어떤 정보를 남기는지 보며 됩니다.</p>
-<p>Free 모나드의 <code>join</code> 동작을 보면 ※ <code>join</code> 구현 참고 - <a href="../posts/2022-03-25-beforeMonad.markdown">모나드, 같음 - m (m a)와 m a는 얼마나 다를까?</a></p>
+<p>모나드가 하는 일이 눈에 잘 들어오지 않을 때는 <code>join</code>으로 effect를 합성하는데 어떤 정보를 남기는지 보면 도움이 됩니다.</p>
+<p>※ <code>join</code> 구현 참고 - <a href="../posts/2022-03-25-beforeMonad.markdown">모나드, 같음 - m (m a)와 m a는 얼마나 다를까?</a></p>
+<p>Free 모나드의 <code>join</code> 동작을 보면</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- x는 Free f r 타입입니다.</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>join (<span class="dt">Pure</span> x) <span class="ot">=</span> (<span class="dt">Pure</span> x) <span class="op">&gt;&gt;=</span> <span class="fu">id</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>              <span class="co">-- join이 m(m a)를 받으므로 x는 Free f r타입입니다.</span></span>
