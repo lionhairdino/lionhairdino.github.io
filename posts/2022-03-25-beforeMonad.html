@@ -102,7 +102,7 @@
 <li><a href="#합성composition--특정-작업을-하는-동안만은-같은-걸로-보기">합성Composition : 특정 작업을 하는 동안만은 같은 걸로 보기</a></li>
 <li><a href="#이미-fmap을-갖고-있다">이미 <code>fmap</code>을 갖고 있다</a></li>
 <li><a href="#join"><code>join</code></a></li>
-<li><a href="#m-a와-a가-다른-문제를-m-a---a-아니고-왜-m-m-a---m-a를-볼까">m a와 a가 다른 문제를 m a -&gt; a 아니고, 왜 m (m a) -&gt; m a를 볼까?</a></li>
+<li><a href="#m-a와-a가-다른-문제를-m-a---a-아니고-왜-m-m-a---m-a를-볼까"><code>m a</code>와 <code>a</code>가 다른 문제를 <code>m a -&gt; a</code> 아니고, 왜 <code>m (m a) -&gt; m a</code>를 볼까?</a></li>
 <li><a href="#bind-">Bind <code>(&gt;&gt;=)</code></a></li>
 <li><a href="#하스켈에서-join-구현">하스켈에서 <code>join</code> 구현</a></li>
 <li><a href="#결론">결론</a></li>
@@ -126,7 +126,7 @@
 <p>이 글의 결론부터 말하면, 컴비네이터를 이용한 합성은 접점의 타입이 꼭 같아야 할 필요가 없습니다. 각 함수들의 결과를 잃어버리지 않을 수만 있다면 합성이 가능합니다.</p>
 <br />
 <center>
-<font size="7em" style="font-style:italic; font-weight: bolder; line-height: 1.2em">“m a와 a는 얼마나 다를까?”</font><br />이 글의 부제는 m (m a)와 m a는 얼마나 다를까입니다.
+<font size="7em" style="font-style:italic; font-weight: bolder; line-height: 1.2em">“<code>m a</code>와 <code>a</code>는 얼마나 다를까?”</font><br />이 글의 부제는 <code>m (m a)</code>와 <code>m a</code>는 얼마나 다를까입니다.
 </center>
 <p><br /></p>
 <h2 id="펑크터로-변환한-타입과-변환-전-타입의-관계">펑크터로 변환한 타입과 변환 전 타입의 관계</h2>
@@ -218,7 +218,7 @@ A의 3은 B의 b로 연결되었습니다.</p>
 <p>※ 같게 볼 수 있는 함수가 아니라 아예 <code>inverseM :: m a -&gt; a</code> 가 존재한다면?<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
 <br />
 <center>
-<font size="7em" style="font-style:italic; font-weight: bolder; line-height: 1.2em">“m a와 a는 같게 볼 방법이 없다.”</font>
+<font size="7em" style="font-style:italic; font-weight: bolder; line-height: 1.2em">“<code>m a</code>와 <code>a</code>는 같게 볼 방법이 없다.”</font>
 </center>
 <p><br /></p>
 <p>지금부터는 <strong>모나드</strong>로 넘어가니 <code>f</code>를 <code>m</code>이라 표기하겠습니다.</p>
@@ -254,7 +254,7 @@ A. 컴비네이터 안에서 <code>m a</code>에 있던 <strong>effect1</strong>
 </blockquote>
 <br />
 <center>
-<font size="7em" style="font-style:italic; font-weight: bolder; line-height: 1.2em">“m (m a)와 m a는 얼마나 다를까?”</font>
+<font size="7em" style="font-style:italic; font-weight: bolder; line-height: 1.2em">“<code>m (m a)</code>와 <code>m a</code>는 얼마나 다를까?”</font>
 </center>
 <p><br /></p>
 <h2 id="join"><code>join</code></h2>
@@ -273,7 +273,7 @@ A. 컴비네이터 안에서 <code>m a</code>에 있던 <strong>effect1</strong>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>m a <span class="op">&gt;&gt;&gt;</span> join (<span class="fu">fmap</span> f a) <span class="op">&gt;&gt;&gt;</span> m b</span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>                            m b <span class="op">&gt;&gt;&gt;</span> join (<span class="fu">fmap</span> g b) <span class="op">&gt;&gt;&gt;</span> m c</span>
 <span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>                                                        m c <span class="op">&gt;&gt;&gt;</span> join (<span class="fu">fmap</span> h c) <span class="op">&gt;&gt;&gt;</span> m d</span></code></pre></div>
-<h2 id="m-a와-a가-다른-문제를-m-a---a-아니고-왜-m-m-a---m-a를-볼까">m a와 a가 다른 문제를 m a -&gt; a 아니고, 왜 m (m a) -&gt; m a를 볼까?</h2>
+<h2 id="m-a와-a가-다른-문제를-m-a---a-아니고-왜-m-m-a---m-a를-볼까"><code>m a</code>와 <code>a</code>가 다른 문제를 <code>m a -&gt; a</code> 아니고, 왜 <code>m (m a) -&gt; m a</code>를 볼까?</h2>
 <p><strong><code>a -&gt; m b</code>와 <code>b -&gt; m c</code>를 합성하면 effect는 <code>m b</code>, <code>m c</code> 두 번 생깁니다. <code>m b</code>와 <code>b</code>가 달라서 생기는 문제처럼 보이지만, 한 걸음 뒤에서 넓게 보면 <em>사실 우리가 풀어야 될 문제는, 둘을 같게 보는게 아니라 두 번의 effect가 있는 걸, effect 하나와 같게 만드는 문제</em>입니다.</strong></p>
 <div class="sourceCode" id="cb18"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>[a <span class="ot">-&gt;</span> m b]  <span class="op">.</span>  [b <span class="ot">-&gt;</span> m c]  <span class="op">-----&gt;</span>  [a <span class="ot">-&gt;</span> m c]</span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a> a <span class="ot">-&gt;</span>   b   <span class="op">.</span>   b <span class="ot">-&gt;</span>   c   <span class="op">-----&gt;</span>   a <span class="ot">-&gt;</span>   c</span>
@@ -289,12 +289,12 @@ A. 최종 결과값이 <code>a</code>가 되면 effect를 담아 둘 곳이 아�
 effect가 필요 없어서 버린다면 <code>m a -&gt; a</code>도 가능하지만, effect를 잃어버리지 않으려면 <code>m a -&gt; a</code>는 불가능하다고 말합니다.</p>
 </blockquote>
 <blockquote>
-<p>Q. List 모나드의 head 함수는 <code>head :: [a] -&gt; a</code> 타입인데요?<br />
-A. 결과 <code>a</code>는 더이상 List 모나드 타입이 아닙니다. 위에서 말한대로 effect를 버리면 가능합니다. 이 경우 List 모나드의 effect를 버렸다고 말합니다.</p>
+<p>Q. <code>List</code> 모나드의 <code>head</code> 함수는 <code>head :: [a] -&gt; a</code> 타입인데요?<br />
+A. 결과 <code>a</code>는 더이상 <code>List</code> 모나드 타입이 아닙니다. 위에서 말한대로 effect를 버리면 가능합니다. 이 경우 <code>List</code> 모나드의 effect를 버렸다고 말합니다.</p>
 </blockquote>
 <br />
 <center>
-<font size="7em" style="font-style:italic; font-weight: bolder; line-height: 1.2em">“m (m a)와 m a는 effect 합성만 되면, 특정 상황에선 같게 볼 수 있다.”</font>
+<font size="7em" style="font-style:italic; font-weight: bolder; line-height: 1.2em">“<code>m (m a)</code>와 <code>m a</code>는 effect 합성만 되면, 특정 상황에선 같게 볼 수 있다.”</font>
 </center>
 <p><br /></p>
 <h2 id="bind">Bind <code>(&gt;&gt;=)</code></h2>
@@ -485,7 +485,7 @@ Functor 하나를 이용해 구조는 유지한 채 다른 모양으로 매핑�
 <section class="footnotes" role="doc-endnotes">
 <hr />
 <ol>
-<li id="fn1" role="doc-endnote"><p>그냥 같게 볼 수 있는 함수가 아니라 inverseM :: m a -&gt; a 가 존재한다면?</p>
+<li id="fn1" role="doc-endnote"><p>그냥 같게 볼 수 있는 함수가 아니라 <code>inverseM :: m a -&gt; a</code> 가 존재한다면?</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ot">inverseMaybe ::</span> <span class="dt">Maybe</span> a <span class="ot">-&gt;</span> a</span></code></pre></div>
 <p>이렇게 거꾸로 변환할 수 있는 방법이 있다면</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fmap</span><span class="ot"> ::</span> (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> <span class="dt">Maybe</span> a <span class="ot">-&gt;</span> <span class="dt">Maybe</span> b</span>
