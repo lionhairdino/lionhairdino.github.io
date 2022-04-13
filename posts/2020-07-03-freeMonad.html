@@ -86,11 +86,9 @@
 <li><a href="#free-모나드-join">Free 모나드 join</a></li>
 <li><a href="#free-모나드-아이디어">Free 모나드 아이디어</a></li>
 <li><a href="#free-모나드-패턴">Free 모나드 패턴</a></li>
-<li><a href="#진짜-펑크터를-넘기면-원하는-모나드-동작을-할까">진짜 펑크터를 넘기면 원하는 모나드 동작을 할까?</a>
-<ol type="1">
+<li><a href="#진짜-펑크터를-넘기면-원하는-모나드-동작을-할까">진짜 펑크터를 넘기면 원하는 모나드 동작을 할까?</a></li>
 <li><a href="#mymaybe">MyMaybe</a></li>
 <li><a href="#myreader">MyReader</a></li>
-</ol></li>
 </ol>
 <p>아래 목적을 이루기 위해 <code>Free</code> 모나드를 활용하는 패턴입니다. <code>Free</code> 모나드 자체가 아래 용도만을 위해 만들어진 건 아니지만 실용 코드에서는 아래 목적으로 사용하는 걸 자주 만납니다. (다른 용도로 쓰는 걸 아직 못 봤습니다.) <code>Free</code> 모나드만 단독으로 자세히 보려면 적당한 글이 아닙니다. <code>Free</code> 모나드를 이용해서 DSL을 구현하는 패턴을 다루는 글입니다. <code>Free</code> 모나드로 이렇게 긴 글을 쓰게 될 줄은 몰랐습니다. 아직 완전히 이해하지 못한 상태에서도 이런데, 이해가 끝나면 꽤나 긴 글이 될 것 같습니다.</p>
 <h2 id="비유하자면">비유하자면…</h2>
@@ -189,8 +187,8 @@
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>[펑크터, 펑크터, 펑크터<span class="op">...</span>] <span class="op">&lt;&gt;</span> [펑크터, 펑크터] <span class="op">&lt;&gt;</span> [펑크터, 펑크터, 펑크터<span class="op">...</span>]</span></code></pre></div>
 <p><code>Free</code> 모나드로 구현한 DSL 패턴을 리스트로도 구현할 수 있을 것 같은데, 왜 특별히 <code>Free</code> 모나드를 만들었을까요?</p>
 <p>참고 - <a href="https://www.parsonsmatt.org/2017/09/22/what_does_free_buy_us.html">Overcoming Software - What does Free buy us?</a></p>
-<p>그 이유는, 아래 예를 든 Act같이 단순한 경우는 리스트로 구현해도 되지만, DSL의 명령어들이 리턴값이 있을 경우 단순 리스트로 구현할 수 없습니다. 달리 표현하면, 리스트에선 먼저 실행한 명령의 결과를 가져와 그 다음 명령에게 줘야 할 때 어떻게 할 방법이 없습니다. (인터프리터 단계에서 State 모나드등을 써서 해결할 수 있을 것 같긴 합니다.) 다음 명령어에게 결과를 넘기기 위해 타입에 next 자리를 넣어 이어지는 명령에 결과값을 넘기도록 할 수 있습니다. 그런데 이렇게 next 자리를 타입에 만들면 더 이상 리스트로 시퀀싱을 표현할 수 없습니다. 리스트의 원소는 서로 어떤 영향도 주지 않는 독립된 요소입니다.</p>
-<p>CPS에서도 다음 이어지는 함수를 넣는 테크닉을 썼는데, 여기와 CPS의 다른 점은? 여기선 함수만 써주는게 아니라, 다음 할 일을 나타내는 단순한 태그를 써주거나, 이전 명령의 결과값이 다음 명령어로 넘어가야 할 때는 함수 형태를 쓰기도 합니다.</p>
+<p>그 이유는, 아래 예를 든 <code>Act</code>같이 단순한 경우는 리스트로 구현해도 되지만, DSL의 명령어들이 리턴값이 있을 경우 단순 리스트로 구현할 수 없습니다. 달리 표현하면, 리스트에선 먼저 실행한 명령의 결과를 가져와 그 다음 명령에게 줘야 할 때 어떻게 할 방법이 없습니다. (인터프리터 단계에서 <code>State</code> 모나드등을 써서 해결할 수 있을 것 같긴 합니다.) 다음 명령어에게 결과를 넘기기 위해 타입에 <code>next</code> 자리를 넣어 이어지는 명령에 결과값을 넘기도록 할 수 있습니다. 그런데 이렇게 <code>next</code> 자리를 타입에 만들면 더 이상 리스트로 시퀀싱을 표현할 수 없습니다. 리스트의 원소는 서로 어떤 영향도 주지 않는 독립된 요소입니다.</p>
+<p><code>CPS</code>에서도 다음 이어지는 함수를 넣는 테크닉을 썼는데, 여기와 <code>CPS</code>의 다른 점은? 여기선 함수만 써주는게 아니라, 다음 할 일을 나타내는 단순한 태그를 써주거나, 이전 명령의 결과값이 다음 명령어로 넘어가야 할 때는 함수 형태를 쓰기도 합니다.</p>
 <p>사실 리스트 값은 <code>cons x1 (cons x2 (cons x3 []))</code>의 편의 표현입니다. <code>Free</code>값 <code>Free (functor (Free functor (Free (functor (Pure ())))))</code>과 많이 닮아 보이지 않나요? 펑크터로 <code>(,)</code>를 넘기면 <code>Free</code>로 리스트를 만들 수도 있습니다. 둘의 차이는 Free는 어떤 펑크터든 받아서 구조를 만들 수 있는 상태고, 리스트는 이미 정해진 펑크터를 받아 구조가 완성된 상태입니다.</p>
 <p>품는nested 구조 자체야 수 많은 곳에 쓰이는데, 이해가 까다로운 게 어찌 보면 품는 구조가 익숙하지 않아 그럴 수도 있겠습니다. 말을 하다 보니, 품는 구조에 익숙하지 않다는 말은, 함수형에 익숙하지 않다와 거의 동의어처럼 느껴집니다.</p>
 <p>람다 대수의 기본 틀이 품는 구조입니다. 이 걸 그대로 가져온 게 함수형 프로그래밍입니다. 데이터 구조를 만들 때 첫 번째로 해야 하는, 무의식 중에 자연히 써먹어야 하는 틀인데 전 그렇지 못 해 계속 훈련 중입니다. 참고 - <a href="../posts/2021-08-30-nested.html">품고 품기</a></p>
@@ -205,16 +203,17 @@
 <span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="co">-- Act 타입 단독으로 재귀적으로 표현되는게 아니라, Free로 감쌀 때 next를 이용해 재귀적으로 표현됩니다. </span></span>
 <span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Act</span> next <span class="ot">=</span> <span class="dt">Act1</span> next <span class="op">|</span> <span class="dt">Act2</span> next <span class="op">|</span> <span class="dt">Done</span></span>
 <span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="co">-- Free 정의를 보면 functor를 받게 되어있는데, 바인드 안 쪽을 보면 fmap을 부릅니다. 펑크터로 만들어야 한다는 얘깁니다.</span></span>
-<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Functor</span> <span class="dt">Act</span> <span class="kw">where</span></span>
-<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmap</span> f (<span class="dt">Act1</span> next) <span class="ot">=</span> <span class="dt">Act1</span> (f next)</span>
-<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmap</span> f (<span class="dt">Act2</span> next) <span class="ot">=</span> <span class="dt">Act2</span> (f next)</span>
-<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmap</span> f <span class="dt">Done</span> <span class="ot">=</span> <span class="dt">Done</span></span>
-<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a><span class="co">-- 위 Act 타입을 Free로 감싸놓습니다.</span></span>
-<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>act1 <span class="ot">=</span> <span class="dt">Free</span> (<span class="dt">Act1</span> (<span class="dt">Pure</span> ()))</span>
-<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>act2 <span class="ot">=</span> <span class="dt">Free</span> (<span class="dt">Act2</span> (<span class="dt">Pure</span> ()))</span>
-<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>done <span class="ot">=</span> <span class="dt">Free</span> (<span class="dt">Done</span>          )</span></code></pre></div>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="co">-- Free 정의를 보면 functor를 받게 되어있는데, 바인드 안 쪽을 보면 fmap을 부릅니다. </span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="co">-- 펑크터로 만들어야 한다는 얘깁니다.</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Functor</span> <span class="dt">Act</span> <span class="kw">where</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmap</span> f (<span class="dt">Act1</span> next) <span class="ot">=</span> <span class="dt">Act1</span> (f next)</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmap</span> f (<span class="dt">Act2</span> next) <span class="ot">=</span> <span class="dt">Act2</span> (f next)</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmap</span> f <span class="dt">Done</span> <span class="ot">=</span> <span class="dt">Done</span></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a><span class="co">-- 위 Act 타입을 Free로 감싸놓습니다.</span></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>act1 <span class="ot">=</span> <span class="dt">Free</span> (<span class="dt">Act1</span> (<span class="dt">Pure</span> ()))</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>act2 <span class="ot">=</span> <span class="dt">Free</span> (<span class="dt">Act2</span> (<span class="dt">Pure</span> ()))</span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>done <span class="ot">=</span> <span class="dt">Free</span> (<span class="dt">Done</span>          )</span></code></pre></div>
 <p>※ 각주 데이터의 재귀 참고<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
 <p>이제 <code>act1</code>, <code>act2</code>, <code>act2</code>, <code>act1</code>, <code>act2</code>, <code>done</code> 순서로 작업을 해야 된다면</p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Free</span>(<span class="dt">Act1</span> (<span class="dt">Free</span>(<span class="dt">Act2</span> (<span class="dt">Free</span>(<span class="dt">Act2</span> (<span class="dt">Free</span>(<span class="dt">Act1</span> (<span class="dt">Free</span>(<span class="dt">Act2</span> (<span class="dt">Free</span> <span class="dt">Done</span>))))))))))   </span></code></pre></div>
@@ -355,11 +354,14 @@
 <span id="cb23-26"><a href="#cb23-26" aria-hidden="true" tabindex="-1"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span>
 <span id="cb23-27"><a href="#cb23-27" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="fu">putStrLn</span> <span class="op">$</span> interpreter func</span></code></pre></div>
 <p><code>MyNothing</code> 값을 엮었으니 <code>func</code>는 <code>MyMaybe</code>의 컨텍스트가 작동해서 모두 합친 결과는 <code>MyNothing</code>이 나올거라 예측했다면 <code>Free</code> 모나드를 아직 잘 못 이해한 겁니다. 결과값은 <code>Just</code> <code>Nothing</code>입니다. <code>func</code>값은 아래와 같습니다.</p>
-<div class="sourceCode" id="cb24"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- 손대지 않은 act1 그대로 값입니다. act2와 바인딩하는데 fmap이 MyNothing을 만나 더 이상 바인딩을 진행하지 않습니다.</span></span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- 바인딩할 때 fmap 컨텍스트가 작동해서 바인딩을 끊어버렸으니 MyMaybe는 역할을 하긴 했는데</span></span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- 그렇다고 전체 결과가 MyNothing으로 바뀌는 건 아닙니다. MyNothing을 만나기 전 통과했던 MyJust들은 모두</span></span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="co">-- 그대로 살아서 Free로 쌓여 있는 상태입니다.</span></span>
-<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="dt">Free</span>(<span class="dt">MyJust</span>(<span class="dt">Free</span>(<span class="dt">MyNothing</span>)))</span></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- 손대지 않은 act1 그대로 값입니다. act2와 바인딩하는데 </span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- fmap이 MyNothing을 만나 더 이상 바인딩을 진행하지 않습니다.</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- 바인딩할 때 fmap 컨텍스트가 작동해서 바인딩을 끊어버렸으니 </span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="co">-- MyMaybe는 역할을 하긴 했는데 그렇다고 전체 결과가 </span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="co">-- MyNothing으로 바뀌는 건 아닙니다. </span></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a><span class="co">-- MyNothing을 만나기 전 통과했던 MyJust들은 모두</span></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a><span class="co">-- 그대로 살아서 Free로 쌓여 있는 상태입니다.</span></span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a><span class="dt">Free</span>(<span class="dt">MyJust</span>(<span class="dt">Free</span>(<span class="dt">MyNothing</span>)))</span></code></pre></div>
 <p>더 이상의 reduce가 필요 없습니다. 이대로가 값이니, 첫 번째 <code>Free</code>가 감싸고 있는 것은 그냥 <code>MyJust</code>이고, 두 번째 안 쪽 <code>Free</code>가 감싸고 있는 건 변함없이 <code>MyNothing</code>입니다. 저도 한동안 <code>Free</code>가 컨텍스트를 발현시키며 엮어 준다고 생각했습니다. 하지만 <code>Free</code>값은 이미 엮여저 있는 상태고, 엮여져 있는 모양은 변하는게 아닙니다. 물론, 다른 <code>Free</code>와 바인딩할 때 중간에 <code>Nothing</code>을 만나면 더 이상 바인딩 하지 않습니다. <code>Maybe</code>의 컨텍스트가 발현되긴 했지만, <code>Maybe</code>모나드처럼 결과가 단순 <code>Nothing</code>이 되는게 아니라, 그 때까지 바인딩한 결과는 그대로 살아 있게됩니다. <code>Free</code> 바인드는 엮은 것 속에 넣어 이어서 엮어 주는 역할만 합니다. 그럼 첫 번째 <code>MyMaybe</code>의 예는 어떻게 해석할까요?</p>
 <p><code>Pure x</code>를 만나면 쓰이는 바인드는 <code>(Pure r) &gt;&gt;= g = g r</code> 로 <code>r</code>을 바로 꺼내 <code>g</code>를 바로 적용합니다. 그래서 <code>Maybe</code>와 우연히 같은 동작을 합니다.</p>
 <p>정리하면, 펑크터 단독으로 겹겹이 싸 놓으면 다른 펑크터와 연결할 수 없지만, <code>Free</code>모나드라는 칸막이를 중간 중간 넣어 겹겹이 싸 놓으면 다른 겹겹으로 싸 놓은 펑크터와 연결이 가능해집니다. 이미 엮여 있는 값에서 펑크터의 컨텍스트가 순차적으로 드러나는 건 아닙니다. 이 걸 다른 것과 바인딩하게 되면 하나 하나 벗겨 내면서, 그 때부터 컨텍스트가 드러날 순 있는데, 대부분 <code>Free</code> 모나드 패턴에 쓰이는 펑크터의 <code>fmap</code>은 별다른 컨텍스트 없이 안으로 파고드는 작업만 합니다. 굳이 겹칠 때마다 컨텍스트가 의미가 있다면 바인딩할 때 발현 되긴 합니다.</p>
