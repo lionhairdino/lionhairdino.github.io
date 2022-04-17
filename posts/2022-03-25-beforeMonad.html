@@ -88,7 +88,8 @@
 <p><strong>요약</strong><br />
 <strong>Effect를 합성할 수 있는 <code>return</code>, <code>join</code>이 있어, 펑크터 <code>m</code>을 여러번 적용한 <code>m (m (m ...))</code>을 <code>m</code>을 한 번 적용한 것으로 표현 가능한 구조를 모나드라 합니다. <code>a -&gt; m b</code> 타입의 함수를 합성할 때 <code>m</code>부분을 합성하기 위해 모나드 구조로 만들어 해결합니다.</strong></p>
 </blockquote>
-<p>위 문장이 이해가 되시는 분은 이 글을 보시지 않아도 됩니다.</p>
+<p>위 문장이 이해가 되시는 분은 이 글을 보시지 않아도 됩니다.<br />
+이 글은 위 문장에 있는 작업들이 필요한 이유부터 살펴서, 모나드가 뭔지보다, 언제 모나드가 필요할까를 고민하는 글입니다.</p>
 <ol type="1">
 <li><a href="#펑크터로-변환한-타입과-변환-전-타입의-관계">펑크터로 변환한 타입과 변환 전 타입의 관계</a></li>
 <li><a href="#펑크터-타입이-같이-있는-함수">펑크터 타입이 같이 있는 함수</a></li>
@@ -329,16 +330,16 @@ A. 모나드 바탕에 들어간 생각을 <code>(.)</code>과 비슷한 모양�
 </figure>
 <blockquote>
 <p>Q. <code>(&gt;=&gt;)</code>보다 <code>(&gt;&gt;=)</code>가 왜 더 편리한가요?<br />
-A. <code>(&gt;&gt;=)</code>를 쓰면 <code>do</code>구문으로 바꿔서 표현할 수 있습니다.</p>
+A. (&gt;&gt;=)<code>를 쓰는 모양은</code>do`구문으로 바꿔서 표현할 수 있습니다.</p>
 <div class="sourceCode" id="cb22"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>m a <span class="op">&gt;&gt;=</span> (\a <span class="ot">-&gt;</span> <span class="op">...</span> m b <span class="op">&gt;&gt;=</span> (\b <span class="ot">-&gt;</span> <span class="op">...</span> m c <span class="op">&gt;&gt;=</span> (\c <span class="ot">-&gt;</span> <span class="op">...</span> m d)))</span></code></pre></div>
-<p>※ <code>do</code> 구문은 괄호가 위처럼 들어가 있는 상태입니다.<br />
-괄호가 없으면 마지막 액션에서 <code>a, b</code>를 가져오지 못합니다.<br />
-단순 <code>act1 &gt;&gt;= act2 &gt;&gt;= act3</code> 을 바꾼게 아니라 위의 괄호와 같은 실행 단위로 묶여 있어야 합니다. 람다 함수는 정의가 괄호를 만나지 않는다면 line 끝까지이기 때문에 액션 정의를 계속 람다 함수를 쓰면 괄호를 쓰지 않아도 같은 효과가 납니다.</p>
+<p>위 구문을 아래처럼 쓸 수 있습니다. (<span class="citation" data-cites="todo">@todo</span>: do구문으로 바꾸는 원리 추가)</p>
 <div class="sourceCode" id="cb23"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="kw">do</span></span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>    a <span class="ot">&lt;-</span> m a</span>
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>    b <span class="ot">&lt;-</span> m b</span>
 <span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>    c <span class="ot">&lt;-</span> m c</span>
 <span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>    m d <span class="co">-- 여기서 a,b,c를 모두 쓸 수 있습니다.</span></span></code></pre></div>
+<p>※ 참고로 <code>do</code> 구문은 바인드로 연결하되 괄호가 위처럼 들어가 있는 상태를 편의를 위해 바꿔서 표현한 것(Syntactic sugar)입니다.<br />
+괄호가 없으면 마지막 액션에서 <code>a, b</code>를 가져오지 못합니다. 단순 <code>act1 &gt;&gt;= act2 &gt;&gt;= act3</code> 을 바꾼게 아니라 위의 괄호와 같은 실행 단위로 묶여 있어야 합니다. 람다 함수는 정의가 괄호를 만나지 않는다면 구문의 끝까지이기 때문에, 액션 정의에 계속 람다 함수를 쓰면 괄호를 쓰지 않아도 같은 효과가 납니다. 지금 여기서 꼭 알아야 할 내용은 아니긴 한데, 나중에 실행 순서가 궁금할 때를 위해 써 놓습니다. :w</p>
 </blockquote>
 <blockquote>
 <p>Q. Functor의 <code>fmap</code>과 <code>(&gt;&gt;=)</code> 정의가 같지 않나요?<br />
