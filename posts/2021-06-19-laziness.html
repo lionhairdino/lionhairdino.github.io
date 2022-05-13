@@ -119,8 +119,8 @@ nonstrict가 lazy와 같은 작업 모양을 가리키지만 완전 동의어들
 <p>“필요한 때”가 두가지 형태로 나타납니다. 하나는 <em>패턴 매칭</em>이고, 하나는 <em>primitive IO 함수 안에 있을 때</em>입니다. 감싸고 있는 함수의 값을 구하려면 인자나, 안에 있는 함수의 값을 먼저 구해야 되니, 그때 평가되기 시작한다고 쓰지 않고, 콕 찝어서 패턴 매칭과 IO라 했을까요?</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- 다 같은 add인데 편의상 번호를 붙이겠습니다.</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>add1 (add2 <span class="dv">1</span> <span class="dv">2</span>) (add3 <span class="dv">3</span> <span class="dv">4</span>)</span></code></pre></div>
-<p>add1 값을 구하려면 add2와 add3 값을 알아야 하는데, 어디 패턴 매칭과 IO가 있다는 말일까요?<br />
-add1이 왜 값을 알아야 되는 상황이 될까요? 위 식은, 처음엔 add1도 드러나지 않는, 전체가 그냥 thunk로 남아 있습니다. 그러다 다른 IO안에서 add1을 부르던가, 어디서 패턴 매칭이되면 그제서야 add1이 평가될 필요가 생기고, 연쇄적으로 add2, add3가 평가될 필요가 생깁니다. 그래서 thunk를 평가하는 가장 시작점을 패턴 매칭과 IO라고 말한 겁니다.</p>
+<p><code>add1</code> 값을 구하려면 <code>add2</code>와 <code>add3</code> 값을 알아야 하는데, 어디 패턴 매칭과 <code>IO</code>가 있다는 말일까요?<br />
+<code>add1</code>이 왜 값을 알아야 되는 상황이 될까요? 위 식은, 처음엔 <code>add1</code>도 드러나지 않는, 전체가 그냥 thunk로 남아 있습니다. 그러다 다른 <code>IO</code>안에서 <code>add1</code>을 부르던가, 어디서 패턴 매칭이되면 그제서야 <code>add1</code>이 평가될 필요가 생기고, 연쇄적으로 <code>add2</code>, <code>add3</code>가 평가될 필요가 생깁니다. 그래서 thunk를 평가하는 가장 시작점을 패턴 매칭과 <code>IO</code>라고 말한 겁니다.</p>
 <h2 id="weak-head-normal-form">Weak Head Normal Form</h2>
 <p>별도 포스트 참고 - <a href="../posts/2021-06-03-weak_head_normal_form.html">WHNF에서 head의 뜻</a></p>
 <h2 id="lazy-함수-strict-함수">lazy 함수, strict 함수</h2>
@@ -129,22 +129,21 @@ add1이 왜 값을 알아야 되는 상황이 될까요? 위 식은, 처음엔 a
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>(<span class="fu">length</span> <span class="op">.</span> <span class="fu">show</span> ) [<span class="st">&quot;ab&quot;</span>,<span class="st">&quot;bc&quot;</span>,<span class="st">&quot;cd&quot;</span>]</span></code></pre></div>
 <p><code>length</code> 함수는 <code>thunk : thunk : thunk : []</code> 까지만 reduce해도 3이라는 값을 구할 수 있습니다. <code>length . show</code> 는 thunk를 남기지 않고, 모두 reduce 해야 합니다. 이럴 때 <code>length . show</code> 함수가 <code>length</code>보다 좀 더 strict하다고 말합니다. 인자로 들어온 값을 <em>한 단계라도</em> WHNF로 만들면 strict 함수라 부릅니다. 아예 한 단계도 reduce하지 않는 함수를 lazy 함수라 부릅니다.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>f x y <span class="ot">=</span> <span class="fu">length</span> <span class="op">$</span> <span class="fu">show</span> x</span></code></pre></div>
-<p>이 경우 f는 x를 NF가 될 때까지 fully reduce하고, y는 전혀 손대지 않습니다. 그럼 x에 대해선 strict하고, y에 대해선 lazy하다고 말합니다.</p>
+<p>이 경우 <code>f</code>는 <code>x</code>를 NF가 될 때까지 fully reduce하고, <code>y</code>는 전혀 손대지 않습니다. 그럼 <code>x</code>에 대해선 strict하고, <code>y</code>에 대해선 lazy하다고 말합니다.</p>
 <h2 id="black-box-strictness-analysis">Black-box strictness analysis</h2>
-<p>번역하면, 블랙 박스 평가 전략 분석쯤 될 것 같습니다. 소스를 볼 수 없는 함수의 평가 전략을 확인하려면 undefined를 이용하면 됩니다. undefined는 평가되는 순간 에러가 나니 인자로 undefined를 넣어 보면 됩니다.</p>
+<p>번역하면, 블랙 박스 평가 전략 분석쯤 될 것 같습니다. 소스를 볼 수 없는 함수의 평가 전략을 확인하려면 <code>undefined</code>를 이용하면 됩니다. <code>undefined</code>는 평가되는 순간 에러가 나니 인자로 <code>undefined</code>를 넣어 보면 됩니다.</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="fu">length</span> [<span class="fu">undefined</span>, <span class="fu">undefined</span>, <span class="fu">undefined</span>]</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="fu">head</span> (<span class="dv">4</span> <span class="op">:</span> <span class="fu">undefined</span>)</span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="dv">4</span></span></code></pre></div>
 <h2 id="ghci는-io가-동작한다.">GHCi는 IO가 동작한다.</h2>
-<p>id 함수는 strict일까요, lazy일까요?</p>
-<p>하스켈 repl인 GHCi에서 코드 동작을 확인하는 작업은 모두 IO 위에서 돌아가기 때문에 lazy여부를 보는게 가끔 헛갈릴 때도 있습니다. IO출력을 위해서 show가 가능한 단계까지 평가가 이루어진다는 말입니다. 다음처럼 결과값을 바로 IO 출력에 물리지 않도록 테스트하면 됩니다.</p>
+<p>하스켈 repl인 GHCi에서 코드 동작을 확인하는 작업은 모두 IO 위에서 돌아가기 때문에 lazy여부를 보는게 가끔 헛갈릴 때도 있습니다. IO출력을 위해서 <code>show</code>가 가능한 단계까지 평가가 이루어진다는 말입니다. 다음처럼 결과값을 바로 IO 출력에 물리지 않도록 테스트하면 됩니다.</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> (x, y) <span class="ot">=</span> <span class="fu">undefined</span> <span class="kw">in</span> x <span class="co">-- Error</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> (x, y) <span class="ot">=</span> <span class="fu">id</span> <span class="fu">undefined</span> <span class="kw">in</span> x <span class="co">-- Error</span></span></code></pre></div>
-<p>위 코드가 딱히 id에 물려도 평가를 멈추거나 하지 않는 걸로 봐서, id는 strict함수입니다. lazy동작을 하는 예를 들어보면,</p>
+<p>lazy동작 예를 들어보면,</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> (x, y) <span class="ot">=</span> <span class="fu">undefined</span> <span class="kw">in</span> x <span class="co">-- Error</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> (x, y) <span class="ot">=</span> <span class="fu">const</span> (<span class="dv">3</span>, <span class="dv">4</span>) <span class="fu">undefined</span> <span class="co">-- No error, const (3, 4)는 lazy</span></span></code></pre></div>
-<p>const 함수는 에러가 나지 않습니다. undefined를 평가하지 않고, const에서 멈춥니다.</p>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> (x, y) <span class="ot">=</span> <span class="fu">const</span> (<span class="dv">3</span>, <span class="dv">4</span>) <span class="fu">undefined</span> <span class="kw">in</span> x <span class="co">-- No error</span></span></code></pre></div>
+<p><code>const</code> 함수는 에러가 나지 않습니다. <code>undefined</code>를 평가하지 않고, <code>const (3,4)</code>에서 멈춥니다.</p>
 <h2 id="lazy-패턴-매칭">Lazy 패턴 매칭</h2>
 <p>별도 포스트 참고 - <a href="../posts/2020-07-11-LazyPatternMatch.html">Lazy Pattern Match</a></p>
 <h2 id="미래에서-값-빌려오기">미래에서 값 빌려오기</h2>
@@ -156,9 +155,9 @@ add1이 왜 값을 알아야 되는 상황이 될까요? 위 식은, 처음엔 a
 <span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span></span>
 <span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    x <span class="ot">=</span> <span class="dt">Foo</span> <span class="dv">1</span> y</span>
 <span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    y <span class="ot">=</span> <span class="dt">Foo</span> <span class="dv">2</span> x</span></code></pre></div>
-<p>생성자도 일반 함수와 똑같이 lazy하게 평가 됩니다. circularFoo가 평가되기 시작하면, 언제 끝날지 모르지만 다음처럼 힘닿는데까지 갈겁니다.</p>
+<p>생성자도 일반 함수와 똑같이 lazy하게 평가 됩니다. <code>circularFoo</code>가 평가되기 시작하면, 언제 끝날지 모르지만 다음처럼 힘닿는데까지 갈겁니다.</p>
 <pre><code>Foo 1 (Foo 2 (Foo 1 (...)))</code></pre>
-<p>하지만 lazy하게 평가되기 때문에, Foo 데이터 안에 next를 평가할 일이 없으면 다음 상태로 머뭅니다.</p>
+<p>하지만 lazy하게 평가되기 때문에, <code>Foo</code> 데이터 안에 <code>next</code>를 평가할 일이 없으면 다음 상태로 머뭅니다.</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>thunk <span class="co">-- 처음엔 그냥 thunk</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="dt">Foo</span> <span class="dv">1</span> thunk <span class="co">-- 한 단계 평가</span></span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="dt">Foo</span> <span class="dv">1</span> (<span class="dt">Foo</span> <span class="dv">2</span> thunk) <span class="co">-- 또 한 단계 평가</span></span>
