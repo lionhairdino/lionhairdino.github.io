@@ -265,7 +265,10 @@
 <p>그럼, 다음으로 바인드를 풀어 보겠습니다.</p>
 <div class="sourceCode" id="cb16"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>s <span class="op">&gt;&gt;=</span> f <span class="ot">=</span> cont (\c <span class="ot">-&gt;</span> runCont s (\x <span class="ot">-&gt;</span> runCont (f x) c))</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- 설명하기 좋게 함수, 변수명을 바꾸면</span></span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>action <span class="op">&gt;&gt;=</span> nextf <span class="ot">=</span> cont (\lastFunc <span class="ot">-&gt;</span> runCont action (\actionResult <span class="ot">-&gt;</span> runCont (nextf actionResult) lastFunc))</span></code></pre></div>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>action <span class="op">&gt;&gt;=</span> nextf <span class="ot">=</span> </span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  cont (\lastFunc <span class="ot">-&gt;</span> runCont action (</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    \actionResult <span class="ot">-&gt;</span> runCont (nextf actionResult) lastFunc</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>    ))</span></code></pre></div>
 <p>위에 나왔던 cps 예시 코드를 비교를 위해 두 개만 엮는 모양으로 다시 쓰면,</p>
 <div class="sourceCode" id="cb17"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>cps x <span class="ot">=</span> \k <span class="ot">-&gt;</span> func1_cps x (\x' <span class="ot">-&gt;</span> func2_cps x' k)</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- 설명하기 좋게 함수, 변수명을 바꾸면</span></span>
