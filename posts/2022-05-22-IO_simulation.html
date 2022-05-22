@@ -214,13 +214,13 @@ Total은 <code>0</code>,<code>1</code>,<code>2</code>,<code>3</code> 네가지 �
 <div class="sourceCode" id="cb18"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>((m <span class="op">&gt;&gt;&gt;&gt;</span> action1) <span class="op">&gt;&gt;&gt;&gt;</span> action2) <span class="op">&gt;&gt;&gt;&gt;</span> action3</span></code></pre></div>
 <p><code>&gt;&gt;&gt;&gt;</code>가 하는 일은, <code>m</code>에서 <code>Total</code> 값을 꺼내 <code>action1</code>에 주면 <code>(Total, 새 Display)</code> 값이 나옵니다. 여기서 다시 누적값을 꺼내 <code>action2</code>에 넘겨주고 있습니다. 그런데, 이 함수 체인을 다음과 같이 바꾸면 어떤 일이 일어나는지 보겠습니다.</p>
 <div class="sourceCode" id="cb19"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>m <span class="op">&gt;&gt;&gt;&gt;</span> (\r0 <span class="ot">-&gt;</span> action1 r0 <span class="op">&gt;&gt;&gt;&gt;</span> (\r1 <span class="ot">-&gt;</span> action2 r1 <span class="op">&gt;&gt;&gt;&gt;</span> (\r2 <span class="ot">-&gt;</span> action3 r2)))</span></code></pre></div>
-<p>굳이 람다 변수로 인자를 받아 적용하는 모양으로 바꿨습니다. action 하나 하나를 보면 결과는 같습니다. 왜 이렇게 바꿀까요? 이유를 보기 위해 단순화 해서 살펴보겠습니다.<br />
+<p>굳이 람다 변수로 인자를 받아 적용하는 모양으로 바꿨습니다. action 하나 하나를 보면 결과는 같습니다. 왜 이렇게 바꿀까요? 이유를 보기 위해 단순화해서 살펴보겠습니다.<br />
 컴비네이터와 인자 순서가 비슷한 <code>&amp;</code>을 이용하겠습니다.<br />
 <code>&amp;</code>는 함수 인자 쓰는 순서를 “인자 &amp; 함수”로 바꿔주는 연산자입니다.</p>
 <div class="sourceCode" id="cb20"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Data.Function</span> (&amp;) </span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="dv">1</span> <span class="op">&amp;</span> (<span class="op">+</span><span class="dv">1</span>) <span class="op">&amp;</span> (<span class="op">+</span><span class="dv">1</span>) </span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span></span></code></pre></div>
-<p>이렇게 초기값1을 받아 작업 2번하는 모양을 람다 변수로 인자를 받는 모양으로 바꾸면 아래 같이 됩니다.</p>
+<p>이렇게 초기값1을 받아 작업 두 번하는 모양을 람다 변수로 인자를 받는 모양으로 바꾸면 아래 같이 됩니다.</p>
 <div class="sourceCode" id="cb21"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="dv">1</span> <span class="op">&amp;</span> (<span class="op">+</span><span class="dv">1</span>)</span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span></span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="dv">1</span> <span class="op">&amp;</span> (\r0 <span class="ot">-&gt;</span> (<span class="op">+</span><span class="dv">1</span>) r0)</span>
@@ -233,7 +233,7 @@ Total은 <code>0</code>,<code>1</code>,<code>2</code>,<code>3</code> 네가지 �
 <span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span></span></code></pre></div>
 <p>인자를 그냥 바로 적용하지 않고, 람다 변수를 통해서 쓰고 있습니다. 어차피 받아서 쓸 값을 이렇게 람다 변수를 통하게 하면, 람다 컨텍스트 특징 때문에 두 번째 <code>\r1 -&gt; ...</code> 액션 안에서, 첫 번째 액션의 람다 변수로 있던 <code>r0</code>를 쓸 수 있습니다.</p>
 <p>“하스켈의 순수 함수는 <em>매개 변수</em>와 <em>람다 컨텍스트 변수</em>를 통해서만 외부와 소통할 수 있습니다.”</p>
-<p>이 걸 활용하기 위해 액션 결과값들이 람다 컨텍스트 변수에 <em>기억</em>되고 있습니다. mutable한 변수를 만들지 못하는 하스켈에서는 아주 중요한 특징입니다.</p>
+<p>이 제약을 뚫고 상태 개념을 만들기 위해 액션 결과값들이 람다 컨텍스트 변수에 <em>기억</em>되고 있습니다. mutable 변수를 만들지 못하는 하스켈에서는 아주 중요한 특징입니다.</p>
 <p>다시 컴비네이터로 돌아가서, 여기 쓰인 컴비네이터로 <code>action</code>들을 묶는데, 람다 변수를 이용하는 패턴<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>으로 바꾸면 모든 action들의 결과값들을 따로 <em>기억</em>시키는 효과가 납니다.</p>
 <div class="sourceCode" id="cb23"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>m <span class="op">&gt;&gt;&gt;&gt;</span> (\r0 <span class="ot">-&gt;</span> action1 r0 <span class="op">&gt;&gt;&gt;&gt;</span> (\r1 <span class="ot">-&gt;</span> action2 r1 <span class="op">&gt;&gt;&gt;&gt;</span> (\r2 <span class="ot">-&gt;</span> action3 r2)))</span></code></pre></div>
 <p>람다 정의는 특별히 괄호나 쌍을 이루는 문법 요소가 없으면 라인 끝까지입니다. 그리고 컴비네이터의 연산 우선 순위를</p>
