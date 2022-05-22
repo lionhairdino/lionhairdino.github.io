@@ -4,7 +4,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-        <title>lionhairdino - IO모나드 시뮬레이션</title>
+        <title>lionhairdino - 단순한 모나드 코드</title>
 
         <meta name="description" content="수학적인 접근이 아니라, 간단한 모형 코드로 어떤 패턴을 모나드라 부르는지 살펴봅니다." />
         <meta property="og:description" content="수학적인 접근이 아니라, 간단한 모형 코드로 어떤 패턴을 모나드라 부르는지 살펴봅니다." />
@@ -33,7 +33,7 @@
         <meta name="msapplication-TileColor" content="#ff7500" />
         <meta name="theme-color" content="#ffffff" />
         <meta property="og:type" content="website" />
-        <meta property="og:title" content="IO모나드 시뮬레이션" />
+        <meta property="og:title" content="단순한 모나드 코드" />
         <meta property="og:site_name" content="Lionhairdino" />
         <meta property="og:url" content="https://lionhairdino.github.io/posts/2022-05-22-IO_simulation.html" />
 
@@ -74,7 +74,7 @@
             </div>
         </div>
         <div class="js-toc-content">
-            <h1>IO모나드 시뮬레이션</h1>
+            <h1>단순한 모나드 코드</h1>
             <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
 <div class="info">
     Posted on May 22, 2022
@@ -82,7 +82,7 @@
 </div>
 
 <p>수학 기반에서 보지 않고, 순전히 코드만 보고 어떤 경우에 모나드를 떠올렸을까 상상해 봤습니다.</p>
-<p><code>Display</code> : <code>IO</code>모나드의 <code>Realworld</code> 모형<br />
+<p><code>Display</code> : <code>IO</code>모나드의 <code>Realworld</code><a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> 모형<br />
 현실 세계의 복잡함이 정수 하나로 표시된다고 가정하겠습니다. 특별히 Input 없고, Output만 있고 Output은 오로지 정수로만 나타납니다.<br />
 <code>Display</code>가 표시하는 정보는 작업의 횟수 <code>0</code>, <code>1</code>, <code>2</code>, <code>3</code>..<code>100</code>… 등입니다.<br />
 <code>Display</code>값을 변형하게 되는 동작들을 <code>inc</code>, <code>dec</code>라고 표현해 보겠습니다.<br />
@@ -234,7 +234,7 @@
 <p>인자를 그냥 바로 적용하지 않고, 람다 변수를 통해서 쓰고 있습니다. 어차피 받아서 쓸 값을 이렇게 람다 변수를 통하게 하면, 람다 컨텍스트 특징 때문에 두 번째 <code>\r1 -&gt; ...</code> 액션 안에서, 첫 번째 액션의 람다 변수로 있던 <code>r0</code>를 쓸 수 있습니다.</p>
 <p>“하스켈의 순수 함수는 <em>매개 변수</em>와 <em>람다 컨텍스트 변수</em>를 통해서만 외부와 소통할 수 있습니다.”</p>
 <p>이 제약을 뚫고 상태 개념을 만들기 위해 액션 결과값들이 람다 컨텍스트 변수에 <em>기억</em>되고 있습니다. mutable 변수를 만들지 못하는 하스켈에서는 아주 중요한 특징입니다.</p>
-<p>다시 컴비네이터로 돌아가서, 여기 쓰인 컴비네이터로 <code>action</code>들을 묶는데, 람다 변수를 이용하는 패턴<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>으로 바꾸면 모든 action들의 결과값들을 따로 <em>기억</em>시키는 효과가 납니다.</p>
+<p>다시 컴비네이터로 돌아가서, 여기 쓰인 컴비네이터로 <code>action</code>들을 묶는데, 람다 변수를 이용하는 패턴<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>으로 바꾸면 모든 action들의 결과값들을 따로 <em>기억</em>시키는 효과가 납니다.</p>
 <div class="sourceCode" id="cb23"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>m <span class="op">&gt;&gt;&gt;&gt;</span> (\r0 <span class="ot">-&gt;</span> action1 r0 <span class="op">&gt;&gt;&gt;&gt;</span> (\r1 <span class="ot">-&gt;</span> action2 r1 <span class="op">&gt;&gt;&gt;&gt;</span> (\r2 <span class="ot">-&gt;</span> action3 r2)))</span></code></pre></div>
 <p>람다 정의는 특별히 괄호나 쌍을 이루는 문법 요소가 없으면 라인 끝까지입니다. 그리고 컴비네이터의 연산 우선 순위를</p>
 <div class="sourceCode" id="cb24"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="kw">infixl</span> <span class="dv">1</span> <span class="op">&gt;&gt;&gt;&gt;</span></span></code></pre></div>
@@ -295,7 +295,9 @@
 <section class="footnotes" role="doc-endnotes">
 <hr />
 <ol>
-<li id="fn1" role="doc-endnote"><p>이런 패턴을 모나드 제3법칙이라고도 합니다.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn1" role="doc-endnote"><p>실제 IO모나드 구현은 다음과 같습니다. ~~~ haskell newtype IO a = IO (State# RealWorld -&gt; (# State# RealWorld, a #)) ~~~ <code>#</code>은 타입이 <code>Unboxed</code>라는 뜻인데, 나중에 다른 글에서 다루도록 하고, <code>IO</code>는 <code>RealWorld</code>란 <code>State</code>를 받아, <code>RealWorld</code>와 <code>a</code> 튜플을 돌려주는 함수 타입입니다. 하스켈의 함수는 모두 순수 함수이기 때문에 입력이 같으면 출력이 같아야 합니다. 예를 들어 Random 값이 계속 다르게 받으려면 입력값을 계속 다르게 해서 불러야 합니다. <code>RealWorld</code>는 특별히 의미 있는 정보를 담고 있는게 아니라, 순수 함수 규칙을 깨지 않기위해 존재하며 하스켈 런타임에서 프리미티브하게 처리 합니다.<br />
+액션 하나를 실행하고 다음 액션으로 넘어갈 때는 변형된 <code>Realworld</code>가 들어간다는 의미로 쓰이는데, 실제 <code>Realworld</code> 값이 변하진 않고, 하스켈 런타임에서 프리미티브하게 처리합니다.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2" role="doc-endnote"><p>이런 패턴을 모나드 제3법칙이라고도 합니다.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section>
 
