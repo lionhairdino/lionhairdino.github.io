@@ -84,7 +84,7 @@
 <p>“인자로 받은 타입에 따라, 다른 작업을 하는 같은 이름의 함수method를 만든다.”<br />
 추상적으로 표현하면<br />
 “클래스는 성격을 선언해 놓고, 클래스의 성격을 인스턴스로 구현한다.”</p>
-<p>객체지향OOP에서의 인스턴스와는 다른 의미입니다. OOP에서는 객체 설계도에 해당하는 클래스 선언을 하고, 이 설계도에 따라 만든 구현체를 인스턴스로 표현하는데, 하스켈에서 클래스는 몇 개 함수의 선언을 묶어놓은 셋set 의미입니다. 이 함수 선언들을 특정 데이터 타입에 맞게 구현한 것을 인스턴스로 부릅니다. 이렇게 얘기하니 꼭 다른 의미라고 보지 않아도 될 것 같긴 합니다. 무언가 틀에 해당하는 걸 먼저 정해놓고, 틀에 따라 실제 쓸 물건을 만드는 건 똑같습니다. 대부분의 문서에서 다름을 강조하는데, 클래스라는 단어 뜻에만 기대서 본다면 굳이 달라 보이지 않기도 합니다.</p>
+<p>객체지향OOP에서의 인스턴스와는 다른 의미입니다. OOP에서는 객체 설계도에 해당하는 클래스 선언을 하고, 이 설계도에 따라 만든 구현체를 인스턴스로 표현하는데, 하스켈에서 클래스는 몇 개 함수의 선언을 묶어놓은 셋set이고, 이 함수 선언들을 특정 데이터 타입에 맞게 구현한 것을 인스턴스로 부릅니다. 이렇게 얘기하니 꼭 다른 의미라고 보지 않아도 될 것 같긴 합니다. 무언가 틀에 해당하는 걸 먼저 정해놓고, 틀에 따라 실제 쓸 물건을 만드는 건 똑같습니다. 대부분의 문서에서 다름을 강조하는데, 클래스라는 단어 뜻에만 기대서 본다면 굳이 달라 보이지 않기도 합니다.</p>
 <h2 id="클래스-정의를-어떤-식으로-읽어야-좋을까요">클래스 정의를 어떤 식으로 읽어야 좋을까요?</h2>
 <div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">HasName</span> a <span class="kw">where</span>    </span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ot">  getName ::</span> a <span class="ot">-&gt;</span> <span class="dt">String</span></span>
@@ -95,7 +95,7 @@
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="op">...</span></span></code></pre></div>
 <p>“a type a is an instance of the class HasName”<br />
 “<code>a</code>는 <code>HasName</code> 클래스의 인스턴스”</p>
-<p>“<code>Player</code>는 <code>HasName</code>의 인스턴스이다.”<br />
+<p>“<code>Player</code>는 <code>HasName</code>의 인스턴스다.”<br />
 “<code>HasName Player</code> 인스턴스가 있다.”<br />
 “<code>Player</code> 타입을 만나면 <code>getName</code> 메소드를 가져올 <code>HasName</code> 인스턴스가 있다.”</p>
 <p>대체로 위와 같은 해석이 많이 쓰이는데, 해석만 봐서는 마치 <code>Player</code>가 <code>HasName</code>의 구현체처럼 느껴지지 않나요?</p>
@@ -112,10 +112,11 @@
 <span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Convertible</span> <span class="dt">Char</span> <span class="dt">Int</span> <span class="kw">where</span></span>
 <span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  convert <span class="ot">=</span> <span class="op">...</span></span>
 <span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  union <span class="ot">=</span> <span class="op">...</span></span></code></pre></div>
-<p><code>HasName Player</code>처럼 헤드에 매개 변수가 하나만 있을 때는 “<code>Player</code>는 <code>HasName</code>의 인스턴스이다”란 해석이 그럭 저럭 넘어갈만 한데, “<code>Int Char</code>는 <code>Convertible</code>의 인스턴스이다”란 해석은 저한테는 직관적으로 와닿지 않습니다. 저와 비슷한 느낌이 오는 분들은 다음처럼 해석하면 도움이 됩니다.</p>
-<p>인스턴스를 선언하는 건 메소드 셋set을 준비하는 겁니다. <code>Convertible</code>은 <code>convert</code>, <code>union</code>으로 이루어진 메소드 셋set의 이름같은 겁니다. 인스턴스 헤드에 쓰여 있는 <code>Char</code>와 <code>Int</code>는 여러 메소드 셋 중에 하나를 선택할 때 쓰이는 <em>키key</em>또는 <em>태그tag</em> 같은겁니다. <code>Char</code>와 <code>Int</code>는 구현체 자체를 뜻하는게 아니라, 여러 구현체중 하나를 고를 때, 다른 구현체와 구별하기 위한 key를 뜻합니다.</p>
-<p>“<code>instance Convertible Int Char</code> 선언은 <code>Convertible</code>의 새로운 메소드 셋(<code>convert</code>,<code>union</code>) 한 벌을 추가하고, 이 메소드 셋의 키는 <code>Int Char</code> 로 지정한다.”</p>
-<p><em>Player는 HasName의 구현체가 아니라, HasName 구현체 중 하나를 골라낼 때 쓰는 키입니다.</em></p>
+<p><code>HasName Player</code>처럼 헤드에 매개 변수가 하나만 있을 때는 “<code>Player</code>는 <code>HasName</code>의 인스턴스다”란 해석이 그럭 저럭 넘어갈만 한데, “<code>Int Char</code>는 <code>Convertible</code>의 인스턴스다”란 해석은 직관적으로 잘 와닿지 않습니다. 저와 비슷한 느낌이 오는 분들은 다음처럼 해석하면 도움이 됩니다.</p>
+<p>인스턴스를 정의하는 건 메소드 셋set을 준비하는 겁니다. <code>Convertible</code>은 <code>convert</code>, <code>union</code>으로 이루어진 메소드 셋set의 이름같은 겁니다. Typeclass는 이 셋set을 가진(성격을 가진) Type들의 부류입니다. 인스턴스 헤드에 쓰여 있는 <code>Char</code>와 <code>Int</code>는 여러 메소드 셋 중에 하나를 선택할 때 쓰이는 <em>키key</em>또는 <em>태그tag</em> 같은겁니다. <code>Char</code>와 <code>Int</code>는 구현체 자체를 뜻하는게 아니라, 여러 구현체중 하나를 고를 때, 다른 구현체와 구별하기 위한 key로 쓰이게 됩니다. 개념적으로 말을 할 땐, <code>Char</code>와 <code>Int</code>의 조합은 <code>Convertible</code> 인스턴스다 또는 인스턴스를 가졌다고 말합니다.</p>
+<p>“<code>instance Convertible Int Char</code> 정의는 <code>Convertible</code>의 새로운 메소드 셋(<code>convert</code>,<code>union</code>) 한 벌을 추가하고, 이 메소드 셋의 키는 <code>Int Char</code> 로 지정한다.”</p>
+<p><em>Player는 HasName의 구현체가 아니라, HasName 구현체 중 하나를 골라낼 때 쓰는 키입니다.</em><br />
+<em>Player는 HasName 성질을 가지고 있다.</em> <em>Player는 HasName 인스턴스다.</em></p>
 <h2 id="타입-테이블은-아무것도-바뀌지-않습니다.">타입 테이블은 아무것도 바뀌지 않습니다.</h2>
 <p><em>아마도 논리적인 설계는 다음과 비슷할 겁니다. (주의: 실제 테이블 모양이 이렇다는 얘기가 아닙니다.)</em></p>
 <p>인스턴스로 지정되는 타입은 사실 <em>“타입” 자체는 아무것도 바뀌지 않습니다.</em> 코드 조립을 위해 GHC가 관리하는 타입 테이블은 아무것도 바뀌지 않습니다. GHC가 코드 조립 중 메소드를 맞닥뜨렸을 때 메소드 테이블에서 “타입”을 키로 메소드를 선택합니다. 이 키 역할을 해주는 타입을 인스턴스 헤드에 써줍니다. 아마도 다음과 비슷하게 설계되어 있을겁니다.</p>
