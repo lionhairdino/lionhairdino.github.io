@@ -86,7 +86,7 @@
 현실 세계의 복잡함이 정수 하나로 표시된다고 가정하겠습니다. 특별히 Input 없고, Output만 있고 Output은 오로지 정수로만 나타납니다.<br />
 <code>Display</code>가 표시하는 정보는 작업의 횟수 <code>0</code>, <code>1</code>, <code>2</code>, <code>3</code>..<code>100</code>… 등입니다.<br />
 <code>Display</code>값을 변형하게 되는 동작들을 <code>inc</code>, <code>dec</code>라고 표현해 보겠습니다.<br />
-Total은 <code>0</code>,<code>1</code>,<code>2</code>,<code>3</code> 네가지 값만 가지는 <code>modular 4</code>라고 하겠습니다.</p>
+<code>Total</code>은 <code>0</code>,<code>1</code>,<code>2</code>,<code>3</code> 네가지 값만 가지는 <code>modular 4</code>라고 하겠습니다.</p>
 <h2 id="비순수-함수">비순수 함수</h2>
 <p>매개 변수 이외의 방법으로도 외부와 소통할 수 있는 함수는 아래처럼 작업할 수 있습니다.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- pseudo code</span></span>
@@ -207,9 +207,9 @@ Total은 <code>0</code>,<code>1</code>,<code>2</code>,<code>3</code> 네가지 �
 <p>비순수 함수로 작업했던 것과 동일한 결과를 내는 작업이 다음 모양이 되었습니다.</p>
 <div class="sourceCode" id="cb17"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>((<span class="dv">0</span>,<span class="dv">0</span>) <span class="op">&gt;&gt;&gt;&gt;</span> inc) <span class="op">&gt;&gt;&gt;&gt;</span> dec <span class="op">&gt;&gt;&gt;&gt;</span> inc <span class="op">&gt;&gt;&gt;&gt;</span> dec </span></code></pre></div>
 <blockquote>
-<p>(다)에서 Display 변화 값을 합치는 부분이 모나드를 이해하는 굉장히 중요한 부분입니다. 정리에서 이야기를 이어 가겠습니다.</p>
+<p>(다)에서 <code>Display</code> 변화 값을 합치는 부분이 모나드를 이해하는 굉장히 중요한 부분입니다. 액션을 컴비네이터를 이용해 합성해도 원래 있던 <code>Display</code> 값을 잃어버리지 않고, 액션으로 인해 생긴 Display 값도 잃어비리지 않고 있습니다. 정리에서 이야기를 이어 가겠습니다.</p>
 </blockquote>
-<h3 id="람다-컨텍스트-변수-활용">람다 컨텍스트 변수 활용</h3>
+<h3 id="람다-컨텍스트-활용">람다 컨텍스트 활용</h3>
 <p>컴비네이터를 연속으로 적용해서 액션 적용을 아래처럼 할 수 있습니다.</p>
 <div class="sourceCode" id="cb18"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>((m <span class="op">&gt;&gt;&gt;&gt;</span> action1) <span class="op">&gt;&gt;&gt;&gt;</span> action2) <span class="op">&gt;&gt;&gt;&gt;</span> action3</span></code></pre></div>
 <p><code>&gt;&gt;&gt;&gt;</code>가 하는 일은, <code>m</code>에서 <code>Total</code> 값을 꺼내 <code>action1</code>에 주면 <code>(Total, 새 Display)</code> 값이 나옵니다. 여기서 다시 누적값을 꺼내 <code>action2</code>에 넘겨주고 있습니다. 그런데, 이 함수 체인을 다음과 같이 바꾸면 어떤 일이 일어나는지 보겠습니다.</p>
@@ -298,6 +298,7 @@ Total은 <code>0</code>,<code>1</code>,<code>2</code>,<code>3</code> 네가지 �
 <span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>   dec r3</span></code></pre></div>
 <p>※ 최대한 단순화 해서 Effect가 합성되는 것을 보이는 걸 목표로 했습니다. 조금 더 자세히 모나드를 다룬 글도 같이 올려 놨습니다. 여기서 Effect를 어떻게 별도로 끌고 다니는지 확인 후 보시면 좋을 것 같습니다.<br />
 <a href="../posts/2022-03-25-beforeMonad.html">모나드, 같음 - m (m a)와 m a는 얼마나 다를까?</a></p>
+<p>다른 문서들과 마찬가지로, 오류가 없다는 확신은 없습니다. 오류나 의심나는 부분은 댓글이나, 메일을 주고 받으며 고쳐 나가면 좋겠습니다.</p>
 <section class="footnotes" role="doc-endnotes">
 <hr />
 <ol>
