@@ -89,77 +89,77 @@
 <code>Total</code>은 <code>0</code>,<code>1</code>,<code>2</code>,<code>3</code> 네가지 값만 가지는 <code>modular 4</code>라고 하겠습니다.</p>
 <h2 id="비순수-함수">비순수 함수</h2>
 <p>매개 변수 이외의 방법으로도 외부와 소통할 수 있는 함수는 아래처럼 작업할 수 있습니다.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- pseudo code</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>global total, display</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>setDisplay <span class="ot">=</span> </span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    display <span class="ot">=</span> display <span class="op">+</span> <span class="dv">1</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>display <span class="ot">=</span> <span class="dv">0</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>total <span class="ot">=</span> <span class="dv">0</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>inc <span class="ot">=</span> </span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    total <span class="ot">=</span> (total <span class="op">+</span> <span class="dv">1</span>) <span class="ot">`mod`</span> <span class="dv">4</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    setDisplay total </span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>dec <span class="ot">=</span> </span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    total <span class="ot">=</span> (total <span class="op">-</span> <span class="dv">1</span>) <span class="ot">`mod`</span> <span class="dv">4</span></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    setDisplay total </span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co">-- program</span></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>inc </span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>dec </span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>inc </span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>dec </span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="co">-- 결과 0, display는 4 </span></span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- pseudo code</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>global total, display</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>setDisplay <span class="ot">=</span> </span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    display <span class="ot">=</span> display <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>display <span class="ot">=</span> <span class="dv">0</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>total <span class="ot">=</span> <span class="dv">0</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>inc <span class="ot">=</span> </span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    total <span class="ot">=</span> (total <span class="op">+</span> <span class="dv">1</span>) <span class="ot">`mod`</span> <span class="dv">4</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    setDisplay total </span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>dec <span class="ot">=</span> </span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    total <span class="ot">=</span> (total <span class="op">-</span> <span class="dv">1</span>) <span class="ot">`mod`</span> <span class="dv">4</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    setDisplay total </span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="co">-- program</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>inc </span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>dec </span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>inc </span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>dec </span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="co">-- 결과 0, display는 4 </span></span></code></pre></div>
 <h2 id="순수-함수">순수 함수</h2>
 <h3 id="매개-변수로-모두-받아야-한다.">매개 변수로 모두 받아야 한다.</h3>
 <p>하지만, 외부와 매개 변수와 반환값으로만 소통할 수 있는 환경에선 어떻게 할까요? 전역 변수를 둘 수 없으니, display, total 두 개를 모든 함수에 넘기고, 결과로 수정된 display, total을 받아야 합니다.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ot">inc ::</span> <span class="dt">Total</span> <span class="ot">-&gt;</span> <span class="dt">Display</span> <span class="ot">-&gt;</span> <span class="dt">Total</span><span class="op">?</span> <span class="dt">Display</span><span class="op">?</span></span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ot">inc ::</span> <span class="dt">Total</span> <span class="ot">-&gt;</span> <span class="dt">Display</span> <span class="ot">-&gt;</span> <span class="dt">Total</span><span class="op">?</span> <span class="dt">Display</span><span class="op">?</span></span></code></pre></div>
 <p>반환값이 두 개여야 합니다. 어떻게 할까요? 튜플을 쓰면 됩니다.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ot">inc ::</span> <span class="dt">Total</span> <span class="ot">-&gt;</span> <span class="dt">Display</span> <span class="ot">-&gt;</span> (<span class="dt">Total</span>, <span class="dt">Display</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ot">inc ::</span> <span class="dt">Total</span> <span class="ot">-&gt;</span> <span class="dt">Display</span> <span class="ot">-&gt;</span> (<span class="dt">Total</span>, <span class="dt">Display</span>)</span></code></pre></div>
 <p>합성을 해야 하니 입력도 같은 타입으로 받도록 하겠습니다.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ot">inc ::</span> (<span class="dt">Total</span>, <span class="dt">Display</span>) <span class="ot">-&gt;</span> (<span class="dt">Total</span>, <span class="dt">Display</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">Display</span> <span class="ot">=</span> <span class="dt">Int</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">Total</span> <span class="ot">=</span> <span class="dt">Int</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="ot">inc ::</span> (<span class="dt">Total</span>, <span class="dt">Display</span>) <span class="ot">-&gt;</span> (<span class="dt">Total</span>, <span class="dt">Display</span>)</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>inc (s,d) <span class="ot">=</span> <span class="kw">let</span> newTotal <span class="ot">=</span> (s <span class="op">+</span> <span class="dv">1</span>) <span class="ot">`mod`</span> <span class="dv">4</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>                newDisplay <span class="ot">=</span> d <span class="op">+</span> <span class="dv">1</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>            <span class="kw">in</span> (newTotal, newDisplay)</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="ot">dec ::</span> (<span class="dt">Total</span>, <span class="dt">Display</span>) <span class="ot">-&gt;</span> (<span class="dt">Total</span>, <span class="dt">Display</span>)</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>dec (s,d) <span class="ot">=</span> <span class="kw">let</span> newTotal <span class="ot">=</span> (s <span class="op">-</span> <span class="dv">1</span>) <span class="ot">`mod`</span> <span class="dv">4</span></span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>                newDisplay <span class="ot">=</span> d <span class="op">+</span> <span class="dv">1</span></span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>            <span class="kw">in</span> (newTotal, newDisplay)</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ot">inc ::</span> (<span class="dt">Total</span>, <span class="dt">Display</span>) <span class="ot">-&gt;</span> (<span class="dt">Total</span>, <span class="dt">Display</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">Display</span> <span class="ot">=</span> <span class="dt">Int</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">Total</span> <span class="ot">=</span> <span class="dt">Int</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="ot">inc ::</span> (<span class="dt">Total</span>, <span class="dt">Display</span>) <span class="ot">-&gt;</span> (<span class="dt">Total</span>, <span class="dt">Display</span>)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>inc (s,d) <span class="ot">=</span> <span class="kw">let</span> newTotal <span class="ot">=</span> (s <span class="op">+</span> <span class="dv">1</span>) <span class="ot">`mod`</span> <span class="dv">4</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>                newDisplay <span class="ot">=</span> d <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>            <span class="kw">in</span> (newTotal, newDisplay)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="ot">dec ::</span> (<span class="dt">Total</span>, <span class="dt">Display</span>) <span class="ot">-&gt;</span> (<span class="dt">Total</span>, <span class="dt">Display</span>)</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>dec (s,d) <span class="ot">=</span> <span class="kw">let</span> newTotal <span class="ot">=</span> (s <span class="op">-</span> <span class="dv">1</span>) <span class="ot">`mod`</span> <span class="dv">4</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>                newDisplay <span class="ot">=</span> d <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>            <span class="kw">in</span> (newTotal, newDisplay)</span></code></pre></div>
 <p><code>1</code>를 더하고,<br />
 <code>1</code>을 빼고,<br />
 <code>1</code>을 더하고,<br />
 <code>1</code>를 빼는데<br />
 반드시 이순서로 실행되고 결과를 돌려줘야 한다고 가정합니다. 하스켈은 함수의 실행 순서가 정해져 있지 않습니다. 하지만 하나의 함수가 다른 함수의 값이 필요하도록 만들면 실행 순서를 강제할 수 있습니다.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>program <span class="ot">=</span> \(s,d) <span class="ot">-&gt;</span>  dec (inc (dec (inc (s,d))))</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>program <span class="ot">=</span> \(s,d) <span class="ot">-&gt;</span>  dec (inc (dec (inc (s,d))))</span></code></pre></div>
 <p>이제 <code>program</code>에 초기 <code>(0, 0)</code>을 넣어 주면 <code>inc</code>, <code>dec</code>, <code>inc</code>, <code>dec</code>를 순차적으로 실행합니다.</p>
 <p><code>inc</code>와 <code>dec</code>는<br />
 1. 현재 상태<code>(Total, Display)</code>를 입력으로 받고 1. 상태를 가지고 작업한 후 1. 새로운 <code>(Total, Display)</code>를 반환합니다.</p>
 <p>매개 변수로도 비순수 함수로 만든 코드와 똑같은 결과를 가져오는 작업을 만들었습니다.</p>
 <h3 id="memoize-문제">memoize 문제</h3>
 <p>만일 <code>Display</code> 없이</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>inc t <span class="ot">=</span> (t <span class="op">+</span> <span class="dv">1</span>) <span class="ot">`mod`</span> <span class="dv">4</span></span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>inc t <span class="ot">=</span> (t <span class="op">+</span> <span class="dv">1</span>) <span class="ot">`mod`</span> <span class="dv">4</span></span></code></pre></div>
 <p>이럴 수만 있다면, 하스켈은 입력 값이 같으면 다시 계산하지 않고 캐싱해 두었던 결과값을 돌려줍니다.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>inc <span class="dv">0</span> <span class="op">...</span> inc <span class="dv">0</span> <span class="op">...</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>          <span class="op">^^^^^</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>          또 계산하지 않는다<span class="op">.</span></span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>inc <span class="dv">0</span> <span class="op">...</span> inc <span class="dv">0</span> <span class="op">...</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>          <span class="op">^^^^^</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>          또 계산하지 않는다<span class="op">.</span></span></code></pre></div>
 <p>하지만 지금은 <code>Display</code>값이 계속 변하고 있어 memoize가 되지 않습니다.</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>inc (<span class="dv">0</span>,<span class="dv">0</span>)<span class="op">...</span> inc (<span class="dv">0</span>,<span class="dv">4</span>) <span class="op">...</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>             <span class="op">^^^^^^^^^</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>             또 계산해야 한다<span class="op">.</span></span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>inc (<span class="dv">0</span>,<span class="dv">0</span>)<span class="op">...</span> inc (<span class="dv">0</span>,<span class="dv">4</span>) <span class="op">...</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>             <span class="op">^^^^^^^^^</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>             또 계산해야 한다<span class="op">.</span></span></code></pre></div>
 <p>함수형에서 함수는, 되도록 하나의 작업에 집중하는 것이 좋습니다. <code>inc</code> 함수는 <code>total</code>에 <code>1</code>을 더하는 역할만 하면 됩니다. <code>Display</code> 상태를 바꾸는 건 별도의 작업입니다. memoize가 되게 하려면 어떻게든 입력값이 덜 변하게 해야 하니, <code>total</code>를 받아 <code>1</code>을 더하고, <code>Display</code>는 더할 값만 반환해서 다른 함수가 담당하도록 바꿔 보겠습니다.</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ot">inc ::</span> <span class="dt">Total</span> <span class="ot">-&gt;</span> (<span class="dt">Total</span>, <span class="dt">Display</span>)</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>inc s <span class="ot">=</span> <span class="kw">let</span> newTotal <span class="ot">=</span> (s <span class="op">+</span> <span class="dv">1</span>) <span class="ot">`mod`</span> <span class="dv">4</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>        <span class="kw">in</span> (newTotal, <span class="dv">1</span>)</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="ot">dec ::</span> <span class="dt">Total</span> <span class="ot">-&gt;</span> (<span class="dt">Total</span>, <span class="dt">Display</span>)</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>dec s <span class="ot">=</span> <span class="kw">let</span> newTotal <span class="ot">=</span> (s <span class="op">-</span> <span class="dv">1</span>) <span class="ot">`mod`</span> <span class="dv">4</span></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>        <span class="kw">in</span> (newTotal, <span class="dv">1</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ot">inc ::</span> <span class="dt">Total</span> <span class="ot">-&gt;</span> (<span class="dt">Total</span>, <span class="dt">Display</span>)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>inc s <span class="ot">=</span> <span class="kw">let</span> newTotal <span class="ot">=</span> (s <span class="op">+</span> <span class="dv">1</span>) <span class="ot">`mod`</span> <span class="dv">4</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>        <span class="kw">in</span> (newTotal, <span class="dv">1</span>)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="ot">dec ::</span> <span class="dt">Total</span> <span class="ot">-&gt;</span> (<span class="dt">Total</span>, <span class="dt">Display</span>)</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>dec s <span class="ot">=</span> <span class="kw">let</span> newTotal <span class="ot">=</span> (s <span class="op">-</span> <span class="dv">1</span>) <span class="ot">`mod`</span> <span class="dv">4</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>        <span class="kw">in</span> (newTotal, <span class="dv">1</span>)</span></code></pre></div>
 <p><code>inc</code>와 <code>dec</code>안에서 <code>Display</code>를 <em>계산하는 부분이 빠졌습니다.</em></p>
 <h3 id="컴비네이터">컴비네이터</h3>
 <p>이렇게 타입을 바꾸니 다음 문제가 생겼습니다.</p>
@@ -170,7 +170,7 @@
 <p>첫 번째, 입출력이 다른 문제를 해결해야 합니다. 입력은 <code>Display</code>가 포함되어 있는 <code>(Total, Display)</code>이고,<br />
 액션은 <code>Total -&gt; (Total, Display)</code> 형태의 함수입니다.<br />
 컴비네이터는 이 둘을 받아 <code>(Total, Display)</code>를 출력해야 합니다.</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ot">combinator ::</span> (<span class="dt">Total</span>, <span class="dt">Display</span>) <span class="ot">-&gt;</span> (<span class="dt">Total</span> <span class="ot">-&gt;</span> (<span class="dt">Total</span>, <span class="dt">Display</span>)) <span class="ot">-&gt;</span> (<span class="dt">Total</span>, <span class="dt">Display</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ot">combinator ::</span> (<span class="dt">Total</span>, <span class="dt">Display</span>) <span class="ot">-&gt;</span> (<span class="dt">Total</span> <span class="ot">-&gt;</span> (<span class="dt">Total</span>, <span class="dt">Display</span>)) <span class="ot">-&gt;</span> (<span class="dt">Total</span>, <span class="dt">Display</span>)</span></code></pre></div>
 <ul>
 <li>상태를 나타내는 튜플<code>(Total, Display)</code>을 받고,<br />
 </li>
@@ -178,12 +178,12 @@
 <li>새롭게 바뀐 상태 튜플<code>(Total, Display)</code>을 돌려주는 함수입니다.</li>
 </ul>
 <p>두 번째, 누적 작업을 해야합니다.</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>combinator (s,oldd) action <span class="ot">=</span> <span class="kw">let</span> (news, newd) <span class="ot">=</span> action s</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>           <span class="op">^^^^^^^^</span>              <span class="op">^^^^^^^^^^^^</span></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>             (가)                     (나)</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>                             <span class="kw">in</span> (news, oldd <span class="op">+</span> newd)</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>                                       <span class="op">^^^^^^^^^^^</span>            </span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>                                           (다)</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>combinator (s,oldd) action <span class="ot">=</span> <span class="kw">let</span> (news, newd) <span class="ot">=</span> action s</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>           <span class="op">^^^^^^^^</span>              <span class="op">^^^^^^^^^^^^</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>             (가)                     (나)</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>                             <span class="kw">in</span> (news, oldd <span class="op">+</span> newd)</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>                                       <span class="op">^^^^^^^^^^^</span>            </span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>                                           (다)</span></code></pre></div>
 <ul>
 <li>인자를 (가)로 패턴 매칭해서 <code>Total</code>와 <code>Display</code>를 꺼냅니다.<br />
 </li>
@@ -194,97 +194,97 @@
 <li><em>원래 있던 디스플레이 값에 더합니다.(다)</em></li>
 </ul>
 <h3 id="컴비네이터-합성">컴비네이터 합성</h3>
-<div class="sourceCode" id="cb13"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>combinator (<span class="dv">0</span>,<span class="dv">0</span>) inc <span class="co">-- (Total, Display)</span></span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>combinator (<span class="dv">0</span>,<span class="dv">0</span>) inc <span class="co">-- (Total, Display)</span></span></code></pre></div>
 <p>이 걸 다음 <code>inc</code>에 넘기면 다음 모양이 됩니다.</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>combinator (combinator (<span class="dv">0</span>,<span class="dv">0</span>) inc) inc</span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>combinator (combinator (<span class="dv">0</span>,<span class="dv">0</span>) inc) inc</span></code></pre></div>
 <p>combinator를 중위 연산으로 표현하면</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>(<span class="dv">0</span>,<span class="dv">0</span>) <span class="ot">`combinator`</span> inc</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>((<span class="dv">0</span>,<span class="dv">0</span>) <span class="ot">`combinator`</span> inc) <span class="ot">`combinator`</span> inc</span></code></pre></div>
-<p>컴비네이터를 보기 좋게 기호로 정의하면,</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="ot">(&gt;&gt;&gt;&gt;)::</span> (<span class="dt">Total</span>, <span class="dt">Display</span>) <span class="ot">-&gt;</span> (<span class="dt">Total</span> <span class="ot">-&gt;</span> (<span class="dt">Total</span>, <span class="dt">Display</span>)) <span class="ot">-&gt;</span> (<span class="dt">Total</span>, <span class="dt">Display</span>)</span>
+<div class="sourceCode" id="cb16"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>(<span class="dv">0</span>,<span class="dv">0</span>) <span class="ot">`combinator`</span> inc</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>((<span class="dv">0</span>,<span class="dv">0</span>) <span class="op">&gt;&gt;&gt;&gt;</span> inc) <span class="op">&gt;&gt;&gt;&gt;</span> inc</span></code></pre></div>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>((<span class="dv">0</span>,<span class="dv">0</span>) <span class="ot">`combinator`</span> inc) <span class="ot">`combinator`</span> inc</span></code></pre></div>
+<p>컴비네이터를 보기 좋게 기호로 정의하면,</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="ot">(&gt;&gt;&gt;&gt;)::</span> (<span class="dt">Total</span>, <span class="dt">Display</span>) <span class="ot">-&gt;</span> (<span class="dt">Total</span> <span class="ot">-&gt;</span> (<span class="dt">Total</span>, <span class="dt">Display</span>)) <span class="ot">-&gt;</span> (<span class="dt">Total</span>, <span class="dt">Display</span>)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>((<span class="dv">0</span>,<span class="dv">0</span>) <span class="op">&gt;&gt;&gt;&gt;</span> inc) <span class="op">&gt;&gt;&gt;&gt;</span> inc</span></code></pre></div>
 <p>비순수 함수로 작업했던 것과 동일한 결과를 내는 작업이 다음 모양이 되었습니다.</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>((<span class="dv">0</span>,<span class="dv">0</span>) <span class="op">&gt;&gt;&gt;&gt;</span> inc) <span class="op">&gt;&gt;&gt;&gt;</span> dec <span class="op">&gt;&gt;&gt;&gt;</span> inc <span class="op">&gt;&gt;&gt;&gt;</span> dec </span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>((<span class="dv">0</span>,<span class="dv">0</span>) <span class="op">&gt;&gt;&gt;&gt;</span> inc) <span class="op">&gt;&gt;&gt;&gt;</span> dec <span class="op">&gt;&gt;&gt;&gt;</span> inc <span class="op">&gt;&gt;&gt;&gt;</span> dec </span></code></pre></div>
 <blockquote>
 <p>(다)에서 <code>Display</code> 변화 값을 합치는 부분이 모나드를 이해하는 굉장히 중요한 부분입니다. 액션을 컴비네이터를 이용해 합성해도 원래 있던 <code>Display</code> 값을 잃어버리지 않고, 액션으로 인해 생긴 Display 값도 잃어비리지 않고 있습니다. 정리에서 이야기를 이어 가겠습니다.</p>
 </blockquote>
 <h3 id="람다-컨텍스트-활용">람다 컨텍스트 활용</h3>
 <p>컴비네이터를 연속으로 적용해서 액션 적용을 아래처럼 할 수 있습니다.</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>((m <span class="op">&gt;&gt;&gt;&gt;</span> action1) <span class="op">&gt;&gt;&gt;&gt;</span> action2) <span class="op">&gt;&gt;&gt;&gt;</span> action3</span></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>((m <span class="op">&gt;&gt;&gt;&gt;</span> action1) <span class="op">&gt;&gt;&gt;&gt;</span> action2) <span class="op">&gt;&gt;&gt;&gt;</span> action3</span></code></pre></div>
 <p><code>&gt;&gt;&gt;&gt;</code>가 하는 일은, <code>m</code>에서 <code>Total</code> 값을 꺼내 <code>action1</code>에 주면 <code>(Total, 새 Display)</code> 값이 나옵니다. 여기서 다시 누적값을 꺼내 <code>action2</code>에 넘겨주고 있습니다. 그런데, 이 함수 체인을 다음과 같이 바꾸면 어떤 일이 일어나는지 보겠습니다.</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>m <span class="op">&gt;&gt;&gt;&gt;</span> (\r0 <span class="ot">-&gt;</span> action1 r0 <span class="op">&gt;&gt;&gt;&gt;</span> (\r1 <span class="ot">-&gt;</span> action2 r1 <span class="op">&gt;&gt;&gt;&gt;</span> (\r2 <span class="ot">-&gt;</span> action3 r2)))</span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>m <span class="op">&gt;&gt;&gt;&gt;</span> (\r0 <span class="ot">-&gt;</span> action1 r0 <span class="op">&gt;&gt;&gt;&gt;</span> (\r1 <span class="ot">-&gt;</span> action2 r1 <span class="op">&gt;&gt;&gt;&gt;</span> (\r2 <span class="ot">-&gt;</span> action3 r2)))</span></code></pre></div>
 <p>굳이 람다 변수로 인자를 받아 적용하는 모양으로 바꿨습니다. action 하나 하나를 보면 결과는 같습니다. 왜 이렇게 바꿀까요? 이유를 보기 위해 단순화해서 살펴보겠습니다.<br />
 컴비네이터와 인자 순서가 비슷한 <code>&amp;</code>을 이용하겠습니다.<br />
 <code>&amp;</code>는 함수 인자 쓰는 순서를 “인자 &amp; 함수”로 바꿔주는 연산자입니다.</p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Data.Function</span> (&amp;) </span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="dv">1</span> <span class="op">&amp;</span> (<span class="op">+</span><span class="dv">1</span>) <span class="op">&amp;</span> (<span class="op">+</span><span class="dv">1</span>) </span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span></span></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Data.Function</span> (&amp;) </span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="dv">1</span> <span class="op">&amp;</span> (<span class="op">+</span><span class="dv">1</span>) <span class="op">&amp;</span> (<span class="op">+</span><span class="dv">1</span>) </span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span></span></code></pre></div>
 <p>이렇게 초기값1을 받아 작업 두 번하는 모양을 람다 변수로 인자를 받는 모양으로 바꾸면 아래 같이 됩니다.</p>
-<div class="sourceCode" id="cb21"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="dv">1</span> <span class="op">&amp;</span> (<span class="op">+</span><span class="dv">1</span>)</span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span></span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="dv">1</span> <span class="op">&amp;</span> (\r0 <span class="ot">-&gt;</span> (<span class="op">+</span><span class="dv">1</span>) r0)</span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span></span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="dv">1</span> <span class="op">&amp;</span> (\r0 <span class="ot">-&gt;</span> (<span class="op">+</span><span class="dv">1</span>) r0 <span class="op">&amp;</span> (\r1 <span class="ot">-&gt;</span> (<span class="op">+</span><span class="dv">1</span>) r1))</span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span></span></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="dv">1</span> <span class="op">&amp;</span> (<span class="op">+</span><span class="dv">1</span>)</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="dv">1</span> <span class="op">&amp;</span> (\r0 <span class="ot">-&gt;</span> (<span class="op">+</span><span class="dv">1</span>) r0)</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="dv">1</span> <span class="op">&amp;</span> (\r0 <span class="ot">-&gt;</span> (<span class="op">+</span><span class="dv">1</span>) r0 <span class="op">&amp;</span> (\r1 <span class="ot">-&gt;</span> (<span class="op">+</span><span class="dv">1</span>) r1))</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span></span></code></pre></div>
 <p>이렇게 바꾸면 굉장히 중요한 특징이 생깁니다.</p>
-<div class="sourceCode" id="cb22"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="dv">1</span> <span class="op">&amp;</span> (\r0 <span class="ot">-&gt;</span> (<span class="op">+</span><span class="dv">1</span>) r0 <span class="op">&amp;</span> (\r1 <span class="ot">-&gt;</span> (<span class="op">+</span> r0) r1))</span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>                                <span class="op">^^^^^^</span></span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span></span></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="dv">1</span> <span class="op">&amp;</span> (\r0 <span class="ot">-&gt;</span> (<span class="op">+</span><span class="dv">1</span>) r0 <span class="op">&amp;</span> (\r1 <span class="ot">-&gt;</span> (<span class="op">+</span> r0) r1))</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>                                <span class="op">^^^^^^</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span></span></code></pre></div>
 <p>인자를 그냥 바로 적용하지 않고, 람다 변수를 통해서 쓰고 있습니다. 어차피 받아서 쓸 값을 이렇게 람다 변수를 통하게 하면, 람다 컨텍스트 특징 때문에 두 번째 <code>\r1 -&gt; ...</code> 액션 안에서, 첫 번째 액션의 람다 변수로 있던 <code>r0</code>를 쓸 수 있습니다.</p>
 <p>“하스켈의 순수 함수는 <em>매개 변수</em>와 <em>람다 컨텍스트 변수</em>를 통해서만 외부와 소통할 수 있습니다.”</p>
 <p>이 제약을 뚫고 상태 개념을 만들기 위해 액션 결과값들이 람다 컨텍스트 변수에 <em>기억</em>되고 있습니다. mutable 변수를 만들지 못하는 하스켈에서는 아주 중요한 특징입니다.</p>
 <p>다시 컴비네이터로 돌아가서, 여기 쓰인 컴비네이터로 <code>action</code>들을 묶는데, 람다 변수를 이용하는 패턴<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>으로 바꾸면 모든 action들의 결과값들을 따로 <em>기억</em>시키는 효과가 납니다.</p>
-<div class="sourceCode" id="cb23"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>m <span class="op">&gt;&gt;&gt;&gt;</span> (\r0 <span class="ot">-&gt;</span> action1 r0 <span class="op">&gt;&gt;&gt;&gt;</span> (\r1 <span class="ot">-&gt;</span> action2 r1 <span class="op">&gt;&gt;&gt;&gt;</span> (\r2 <span class="ot">-&gt;</span> action3 r2)))</span></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>m <span class="op">&gt;&gt;&gt;&gt;</span> (\r0 <span class="ot">-&gt;</span> action1 r0 <span class="op">&gt;&gt;&gt;&gt;</span> (\r1 <span class="ot">-&gt;</span> action2 r1 <span class="op">&gt;&gt;&gt;&gt;</span> (\r2 <span class="ot">-&gt;</span> action3 r2)))</span></code></pre></div>
 <p>람다 정의는 특별히 괄호나 쌍을 이루는 문법 요소가 없으면 라인 끝까지입니다. 그리고 컴비네이터의 연산 우선 순위를</p>
-<div class="sourceCode" id="cb24"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="kw">infixl</span> <span class="dv">1</span> <span class="op">&gt;&gt;&gt;&gt;</span></span></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="kw">infixl</span> <span class="dv">1</span> <span class="op">&gt;&gt;&gt;&gt;</span></span></code></pre></div>
 <p>이렇게 지정하고 나면 괄호를 생략하고 다음처럼 쓸 수 있습니다.</p>
-<div class="sourceCode" id="cb25"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>m <span class="op">&gt;&gt;&gt;&gt;</span> \r0 <span class="ot">-&gt;</span> action1 r0 </span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="op">&gt;&gt;&gt;&gt;</span> \r1 <span class="ot">-&gt;</span> action2 r1 </span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  <span class="op">&gt;&gt;&gt;&gt;</span> \r2 <span class="ot">-&gt;</span> action3 r2</span></code></pre></div>
+<div class="sourceCode" id="cb26"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>m <span class="op">&gt;&gt;&gt;&gt;</span> \r0 <span class="ot">-&gt;</span> action1 r0 </span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="op">&gt;&gt;&gt;&gt;</span> \r1 <span class="ot">-&gt;</span> action2 r1 </span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="op">&gt;&gt;&gt;&gt;</span> \r2 <span class="ot">-&gt;</span> action3 r2</span></code></pre></div>
 <p>위 예시에 적용하면 다음 모양이 됩니다.</p>
-<div class="sourceCode" id="cb26"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>(<span class="dv">0</span>,<span class="dv">0</span>) <span class="op">&gt;&gt;&gt;&gt;</span> \r0 <span class="ot">-&gt;</span> inc</span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>      <span class="op">&gt;&gt;&gt;&gt;</span> \r1 <span class="ot">-&gt;</span> dec</span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>      <span class="op">&gt;&gt;&gt;&gt;</span> \r2 <span class="ot">-&gt;</span> inc</span>
-<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>      <span class="op">&gt;&gt;&gt;&gt;</span> \r3 <span class="ot">-&gt;</span> dec</span></code></pre></div>
+<div class="sourceCode" id="cb27"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>(<span class="dv">0</span>,<span class="dv">0</span>) <span class="op">&gt;&gt;&gt;&gt;</span> \r0 <span class="ot">-&gt;</span> inc</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>      <span class="op">&gt;&gt;&gt;&gt;</span> \r1 <span class="ot">-&gt;</span> dec</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>      <span class="op">&gt;&gt;&gt;&gt;</span> \r2 <span class="ot">-&gt;</span> inc</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>      <span class="op">&gt;&gt;&gt;&gt;</span> \r3 <span class="ot">-&gt;</span> dec</span></code></pre></div>
 <h2 id="정리">정리</h2>
 <p><code>Display</code>가 없이 <code>Total</code>만 있는 값을 초기 <code>Display</code>값을 포함한 튜플로 바꿔주는 함수를 아래와 같이 정의합니다.</p>
-<div class="sourceCode" id="cb27"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">return</span><span class="ot"> ::</span> <span class="dt">Total</span> <span class="ot">-&gt;</span> (<span class="dt">Total</span>, <span class="dt">Display</span>)</span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="fu">return</span> n <span class="ot">=</span> (n, <span class="dv">0</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb28"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">return</span><span class="ot"> ::</span> <span class="dt">Total</span> <span class="ot">-&gt;</span> (<span class="dt">Total</span>, <span class="dt">Display</span>)</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="fu">return</span> n <span class="ot">=</span> (n, <span class="dv">0</span>)</span></code></pre></div>
 <p>순수함수와 컴비네이터로 만든 실제 작동하는 코드로 정리하면 다음과 같습니다.</p>
-<div class="sourceCode" id="cb28"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="kw">module</span> <span class="dt">Test</span> <span class="kw">where</span>    </span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">Display</span> <span class="ot">=</span> <span class="dt">Int</span>    </span>
-<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">Total</span> <span class="ot">=</span> <span class="dt">Int</span>    </span>
-<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a><span class="fu">return</span><span class="ot"> ::</span> <span class="dt">Total</span> <span class="ot">-&gt;</span> (<span class="dt">Total</span>, <span class="dt">Display</span>)    </span>
-<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a><span class="fu">return</span> n <span class="ot">=</span> (n, <span class="dv">0</span>)    </span>
-<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a><span class="ot">(&gt;&gt;&gt;&gt;)::</span> (<span class="dt">Total</span>, <span class="dt">Display</span>) <span class="ot">-&gt;</span> (<span class="dt">Total</span> <span class="ot">-&gt;</span> (<span class="dt">Total</span>, <span class="dt">Display</span>)) <span class="ot">-&gt;</span> (<span class="dt">Total</span>, <span class="dt">Display</span>)    </span>
-<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>(<span class="op">&gt;&gt;&gt;&gt;</span>) (s,oldd) action <span class="ot">=</span> <span class="kw">let</span> (news, newd) <span class="ot">=</span> action s    </span>
-<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>                        <span class="kw">in</span> (news, oldd <span class="op">+</span> newd)    </span>
-<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a><span class="ot">inc ::</span> <span class="dt">Total</span> <span class="ot">-&gt;</span> (<span class="dt">Total</span>, <span class="dt">Display</span>)    </span>
-<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a>inc s <span class="ot">=</span> <span class="kw">let</span> newTotal <span class="ot">=</span> (s <span class="op">+</span> <span class="dv">1</span>) <span class="ot">`mod`</span> <span class="dv">4</span>    </span>
-<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a>        <span class="kw">in</span> (newTotal, <span class="dv">1</span>)    </span>
-<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a><span class="ot">dec ::</span> <span class="dt">Total</span> <span class="ot">-&gt;</span> (<span class="dt">Total</span>, <span class="dt">Display</span>)    </span>
-<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a>dec s <span class="ot">=</span> <span class="kw">let</span> newTotal <span class="ot">=</span> (s <span class="op">-</span> <span class="dv">1</span>) <span class="ot">`mod`</span> <span class="dv">4</span>    </span>
-<span id="cb28-19"><a href="#cb28-19" aria-hidden="true" tabindex="-1"></a>        <span class="kw">in</span> (newTotal, <span class="dv">1</span>)    </span>
-<span id="cb28-20"><a href="#cb28-20" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb28-21"><a href="#cb28-21" aria-hidden="true" tabindex="-1"></a><span class="ot">program ::</span> (<span class="dt">Total</span>, <span class="dt">Display</span>)    </span>
-<span id="cb28-22"><a href="#cb28-22" aria-hidden="true" tabindex="-1"></a>program <span class="ot">=</span> (<span class="dv">0</span>,<span class="dv">0</span>) <span class="op">&gt;&gt;&gt;&gt;</span> \r0 <span class="ot">-&gt;</span> inc r0 </span>
-<span id="cb28-23"><a href="#cb28-23" aria-hidden="true" tabindex="-1"></a>                <span class="op">&gt;&gt;&gt;&gt;</span> \r1 <span class="ot">-&gt;</span> dec r1 </span>
-<span id="cb28-24"><a href="#cb28-24" aria-hidden="true" tabindex="-1"></a>                <span class="op">&gt;&gt;&gt;&gt;</span> \r2 <span class="ot">-&gt;</span> inc r2 </span>
-<span id="cb28-25"><a href="#cb28-25" aria-hidden="true" tabindex="-1"></a>                <span class="op">&gt;&gt;&gt;&gt;</span> \r3 <span class="ot">-&gt;</span> dec r3</span>
-<span id="cb28-26"><a href="#cb28-26" aria-hidden="true" tabindex="-1"></a>      </span>
-<span id="cb28-27"><a href="#cb28-27" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="kw">do</span>    </span>
-<span id="cb28-28"><a href="#cb28-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span> program  </span></code></pre></div>
+<div class="sourceCode" id="cb29"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="kw">module</span> <span class="dt">Test</span> <span class="kw">where</span>    </span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">Display</span> <span class="ot">=</span> <span class="dt">Int</span>    </span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">Total</span> <span class="ot">=</span> <span class="dt">Int</span>    </span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a><span class="fu">return</span><span class="ot"> ::</span> <span class="dt">Total</span> <span class="ot">-&gt;</span> (<span class="dt">Total</span>, <span class="dt">Display</span>)    </span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a><span class="fu">return</span> n <span class="ot">=</span> (n, <span class="dv">0</span>)    </span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a><span class="ot">(&gt;&gt;&gt;&gt;)::</span> (<span class="dt">Total</span>, <span class="dt">Display</span>) <span class="ot">-&gt;</span> (<span class="dt">Total</span> <span class="ot">-&gt;</span> (<span class="dt">Total</span>, <span class="dt">Display</span>)) <span class="ot">-&gt;</span> (<span class="dt">Total</span>, <span class="dt">Display</span>)    </span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>(<span class="op">&gt;&gt;&gt;&gt;</span>) (s,oldd) action <span class="ot">=</span> <span class="kw">let</span> (news, newd) <span class="ot">=</span> action s    </span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>                        <span class="kw">in</span> (news, oldd <span class="op">+</span> newd)    </span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a><span class="ot">inc ::</span> <span class="dt">Total</span> <span class="ot">-&gt;</span> (<span class="dt">Total</span>, <span class="dt">Display</span>)    </span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a>inc s <span class="ot">=</span> <span class="kw">let</span> newTotal <span class="ot">=</span> (s <span class="op">+</span> <span class="dv">1</span>) <span class="ot">`mod`</span> <span class="dv">4</span>    </span>
+<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a>        <span class="kw">in</span> (newTotal, <span class="dv">1</span>)    </span>
+<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb29-17"><a href="#cb29-17" aria-hidden="true" tabindex="-1"></a><span class="ot">dec ::</span> <span class="dt">Total</span> <span class="ot">-&gt;</span> (<span class="dt">Total</span>, <span class="dt">Display</span>)    </span>
+<span id="cb29-18"><a href="#cb29-18" aria-hidden="true" tabindex="-1"></a>dec s <span class="ot">=</span> <span class="kw">let</span> newTotal <span class="ot">=</span> (s <span class="op">-</span> <span class="dv">1</span>) <span class="ot">`mod`</span> <span class="dv">4</span>    </span>
+<span id="cb29-19"><a href="#cb29-19" aria-hidden="true" tabindex="-1"></a>        <span class="kw">in</span> (newTotal, <span class="dv">1</span>)    </span>
+<span id="cb29-20"><a href="#cb29-20" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb29-21"><a href="#cb29-21" aria-hidden="true" tabindex="-1"></a><span class="ot">program ::</span> (<span class="dt">Total</span>, <span class="dt">Display</span>)    </span>
+<span id="cb29-22"><a href="#cb29-22" aria-hidden="true" tabindex="-1"></a>program <span class="ot">=</span> (<span class="dv">0</span>,<span class="dv">0</span>) <span class="op">&gt;&gt;&gt;&gt;</span> \r0 <span class="ot">-&gt;</span> inc r0 </span>
+<span id="cb29-23"><a href="#cb29-23" aria-hidden="true" tabindex="-1"></a>                <span class="op">&gt;&gt;&gt;&gt;</span> \r1 <span class="ot">-&gt;</span> dec r1 </span>
+<span id="cb29-24"><a href="#cb29-24" aria-hidden="true" tabindex="-1"></a>                <span class="op">&gt;&gt;&gt;&gt;</span> \r2 <span class="ot">-&gt;</span> inc r2 </span>
+<span id="cb29-25"><a href="#cb29-25" aria-hidden="true" tabindex="-1"></a>                <span class="op">&gt;&gt;&gt;&gt;</span> \r3 <span class="ot">-&gt;</span> dec r3</span>
+<span id="cb29-26"><a href="#cb29-26" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb29-27"><a href="#cb29-27" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="kw">do</span>    </span>
+<span id="cb29-28"><a href="#cb29-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span> program  </span></code></pre></div>
 <p>컴비네이터<code>&gt;&gt;&gt;&gt;</code>가 바인드<code>&gt;&gt;=</code>의 구현입니다. 비순수 함수로 만들었던 코드와 완전히 동일한 작업을 하는데, 모두 순수한 함수로만 작업하고 있습니다.</p>
 <p>코드로 얘기하면 <code>combinator</code>와 <code>return</code>이 있는 구조를 모나드라 합니다.</p>
 <p><code>inc</code>와 <code>dec</code>로 바꾸길 원하는 값은 <code>Total</code> 하나입니다. 그런데, 이 <code>Total</code>을 변경하기 위해서 몇 번의 작업을 했는지 카운팅을 하기 위해 <code>Display</code>를 만들었습니다.</p>
-<div class="sourceCode" id="cb29"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Total</span> <span class="op">------&gt;</span> (<span class="dt">Total</span>, <span class="dt">Display</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb30"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Total</span> <span class="op">------&gt;</span> (<span class="dt">Total</span>, <span class="dt">Display</span>)</span></code></pre></div>
 <p><code>(Total, Display)</code> 에서 <code>Total</code>로 갈 때 잃어버리는 정보를 Effect라 합니다.</p>
 <p><code>combinator</code>함수 안을 들여다보면 입력으로 들어온 <code>Display</code>값을 꺼내, <code>inc</code> 또는 <code>dec</code>로 인해 새로 생긴 <code>Display</code>값을 더하고 있습니다. 말을 바꾸면 입력으로 들어온 Effect1과 <code>inc</code> 또는 <code>dec</code> 같은 액션으로 생긴 Effect2 두 개를 합쳐(여기서는 단순히 더하기지만, Effect 타입에 따라 적절하게 정의합니다.) 새로운 <code>(Total, Display)</code> 값을 돌려주고 있습니다.</p>
 <h3 id="그래서-어떤-걸-모나드라-하나">그래서 어떤 걸 모나드라 하나?</h3>
@@ -294,49 +294,51 @@
 <a href="../posts/2022-03-25-beforeMonad.html">모나드, 같음 - m (m a)와 m a는 얼마나 다를까?</a></p>
 <p>다른 문서들과 마찬가지로, 오류가 없다는 확신은 없습니다. 오류나 의심나는 부분은 댓글이나, 메일을 주고 받으며 고쳐 나가면 좋겠습니다.</p>
 <h2 id="모나드-인스턴스">모나드 인스턴스</h2>
-<div class="sourceCode" id="cb30"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="kw">module</span> <span class="dt">Test</span> <span class="kw">where</span>    </span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">Display</span> <span class="ot">=</span> <span class="dt">Int</span>    </span>
-<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">Total</span> <span class="ot">=</span> <span class="dt">Int</span>    </span>
-<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">SimpleMonad</span> a <span class="ot">=</span> <span class="dt">SimpleMonad</span> (a, <span class="dt">Display</span>)    </span>
-<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>                           <span class="kw">deriving</span> <span class="dt">Show</span>    </span>
-<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>                               </span>
-<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Functor</span> <span class="dt">SimpleMonad</span> <span class="kw">where</span>    </span>
-<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmap</span> f (<span class="dt">SimpleMonad</span> (t, d)) <span class="ot">=</span> <span class="dt">SimpleMonad</span> (f t, d)    </span>
-<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a>                                                   </span>
-<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Applicative</span> <span class="dt">SimpleMonad</span> <span class="kw">where</span>    </span>
-<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pure</span> n <span class="ot">=</span> <span class="dt">SimpleMonad</span> (n, <span class="dv">0</span>)    </span>
-<span id="cb30-14"><a href="#cb30-14" aria-hidden="true" tabindex="-1"></a>  (<span class="dt">SimpleMonad</span> (f, d1)) <span class="op">&lt;*&gt;</span> (<span class="dt">SimpleMonad</span> (t, d2)) <span class="ot">=</span>  <span class="dt">SimpleMonad</span> (f t, d1 <span class="op">+</span> d2)    </span>
-<span id="cb30-15"><a href="#cb30-15" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb30-16"><a href="#cb30-16" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Monad</span> <span class="dt">SimpleMonad</span> <span class="kw">where</span>    </span>
-<span id="cb30-17"><a href="#cb30-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span> <span class="ot">=</span> <span class="fu">pure</span>     </span>
-<span id="cb30-18"><a href="#cb30-18" aria-hidden="true" tabindex="-1"></a>  (<span class="op">&gt;&gt;=</span>) (<span class="dt">SimpleMonad</span>(oldTotal ,oldD)) action <span class="ot">=</span>     </span>
-<span id="cb30-19"><a href="#cb30-19" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> <span class="dt">SimpleMonad</span> (newTotal, newD) <span class="ot">=</span> action oldTotal    </span>
-<span id="cb30-20"><a href="#cb30-20" aria-hidden="true" tabindex="-1"></a>    <span class="kw">in</span> <span class="dt">SimpleMonad</span> (newTotal, oldD <span class="op">+</span> newD)    </span>
-<span id="cb30-21"><a href="#cb30-21" aria-hidden="true" tabindex="-1"></a>                                          </span>
-<span id="cb30-22"><a href="#cb30-22" aria-hidden="true" tabindex="-1"></a><span class="ot">inc ::</span> <span class="dt">Total</span> <span class="ot">-&gt;</span> <span class="dt">SimpleMonad</span> <span class="dt">Total</span>         </span>
-<span id="cb30-23"><a href="#cb30-23" aria-hidden="true" tabindex="-1"></a>inc s <span class="ot">=</span> <span class="kw">let</span> newTotal <span class="ot">=</span> (s <span class="op">+</span> <span class="dv">1</span>) <span class="ot">`mod`</span> <span class="dv">4</span>    </span>
-<span id="cb30-24"><a href="#cb30-24" aria-hidden="true" tabindex="-1"></a>        <span class="kw">in</span> <span class="dt">SimpleMonad</span> (newTotal, <span class="dv">1</span>)      </span>
-<span id="cb30-25"><a href="#cb30-25" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb30-26"><a href="#cb30-26" aria-hidden="true" tabindex="-1"></a><span class="ot">dec ::</span> <span class="dt">Total</span> <span class="ot">-&gt;</span> <span class="dt">SimpleMonad</span> <span class="dt">Total</span>    </span>
-<span id="cb30-27"><a href="#cb30-27" aria-hidden="true" tabindex="-1"></a>dec s <span class="ot">=</span> <span class="kw">let</span> newTotal <span class="ot">=</span> (s <span class="op">-</span> <span class="dv">1</span>) <span class="ot">`mod`</span> <span class="dv">4</span>    </span>
-<span id="cb30-28"><a href="#cb30-28" aria-hidden="true" tabindex="-1"></a>        <span class="kw">in</span> <span class="dt">SimpleMonad</span> (newTotal, <span class="dv">1</span>)    </span>
-<span id="cb30-29"><a href="#cb30-29" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb30-30"><a href="#cb30-30" aria-hidden="true" tabindex="-1"></a><span class="ot">program ::</span> <span class="dt">SimpleMonad</span> <span class="dt">Total</span>    </span>
-<span id="cb30-31"><a href="#cb30-31" aria-hidden="true" tabindex="-1"></a>program <span class="ot">=</span> <span class="kw">do</span>    </span>
-<span id="cb30-32"><a href="#cb30-32" aria-hidden="true" tabindex="-1"></a>             r0 <span class="ot">&lt;-</span> <span class="fu">return</span> <span class="dv">0</span>    </span>
-<span id="cb30-33"><a href="#cb30-33" aria-hidden="true" tabindex="-1"></a>             r1 <span class="ot">&lt;-</span> inc r0    </span>
-<span id="cb30-34"><a href="#cb30-34" aria-hidden="true" tabindex="-1"></a>             r2 <span class="ot">&lt;-</span> dec r1    </span>
-<span id="cb30-35"><a href="#cb30-35" aria-hidden="true" tabindex="-1"></a>             r3 <span class="ot">&lt;-</span> inc r2    </span>
-<span id="cb30-36"><a href="#cb30-36" aria-hidden="true" tabindex="-1"></a>             dec r3    </span>
-<span id="cb30-37"><a href="#cb30-37" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb30-38"><a href="#cb30-38" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="kw">do</span>    </span>
-<span id="cb30-39"><a href="#cb30-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span> program </span></code></pre></div>
+<div class="sourceCode" id="cb31"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="kw">module</span> <span class="dt">Test</span> <span class="kw">where</span>    </span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">Display</span> <span class="ot">=</span> <span class="dt">Int</span>    </span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">Total</span> <span class="ot">=</span> <span class="dt">Int</span>    </span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">SimpleMonad</span> a <span class="ot">=</span> <span class="dt">SimpleMonad</span> (a, <span class="dt">Display</span>)    </span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>                           <span class="kw">deriving</span> <span class="dt">Show</span>    </span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>                               </span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Functor</span> <span class="dt">SimpleMonad</span> <span class="kw">where</span>    </span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmap</span> f (<span class="dt">SimpleMonad</span> (t, d)) <span class="ot">=</span> <span class="dt">SimpleMonad</span> (f t, d)    </span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>                                                   </span>
+<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Applicative</span> <span class="dt">SimpleMonad</span> <span class="kw">where</span>    </span>
+<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pure</span> n <span class="ot">=</span> <span class="dt">SimpleMonad</span> (n, <span class="dv">0</span>)    </span>
+<span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a>  (<span class="dt">SimpleMonad</span> (f, d1)) <span class="op">&lt;*&gt;</span> (<span class="dt">SimpleMonad</span> (t, d2)) <span class="ot">=</span>  <span class="dt">SimpleMonad</span> (f t, d1 <span class="op">+</span> d2)    </span>
+<span id="cb31-15"><a href="#cb31-15" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb31-16"><a href="#cb31-16" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Monad</span> <span class="dt">SimpleMonad</span> <span class="kw">where</span>    </span>
+<span id="cb31-17"><a href="#cb31-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span> <span class="ot">=</span> <span class="fu">pure</span>     </span>
+<span id="cb31-18"><a href="#cb31-18" aria-hidden="true" tabindex="-1"></a>  (<span class="op">&gt;&gt;=</span>) (<span class="dt">SimpleMonad</span>(oldTotal ,oldD)) action <span class="ot">=</span>     </span>
+<span id="cb31-19"><a href="#cb31-19" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> <span class="dt">SimpleMonad</span> (newTotal, newD) <span class="ot">=</span> action oldTotal    </span>
+<span id="cb31-20"><a href="#cb31-20" aria-hidden="true" tabindex="-1"></a>    <span class="kw">in</span> <span class="dt">SimpleMonad</span> (newTotal, oldD <span class="op">+</span> newD)    </span>
+<span id="cb31-21"><a href="#cb31-21" aria-hidden="true" tabindex="-1"></a>                                          </span>
+<span id="cb31-22"><a href="#cb31-22" aria-hidden="true" tabindex="-1"></a><span class="ot">inc ::</span> <span class="dt">Total</span> <span class="ot">-&gt;</span> <span class="dt">SimpleMonad</span> <span class="dt">Total</span>         </span>
+<span id="cb31-23"><a href="#cb31-23" aria-hidden="true" tabindex="-1"></a>inc s <span class="ot">=</span> <span class="kw">let</span> newTotal <span class="ot">=</span> (s <span class="op">+</span> <span class="dv">1</span>) <span class="ot">`mod`</span> <span class="dv">4</span>    </span>
+<span id="cb31-24"><a href="#cb31-24" aria-hidden="true" tabindex="-1"></a>        <span class="kw">in</span> <span class="dt">SimpleMonad</span> (newTotal, <span class="dv">1</span>)      </span>
+<span id="cb31-25"><a href="#cb31-25" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb31-26"><a href="#cb31-26" aria-hidden="true" tabindex="-1"></a><span class="ot">dec ::</span> <span class="dt">Total</span> <span class="ot">-&gt;</span> <span class="dt">SimpleMonad</span> <span class="dt">Total</span>    </span>
+<span id="cb31-27"><a href="#cb31-27" aria-hidden="true" tabindex="-1"></a>dec s <span class="ot">=</span> <span class="kw">let</span> newTotal <span class="ot">=</span> (s <span class="op">-</span> <span class="dv">1</span>) <span class="ot">`mod`</span> <span class="dv">4</span>    </span>
+<span id="cb31-28"><a href="#cb31-28" aria-hidden="true" tabindex="-1"></a>        <span class="kw">in</span> <span class="dt">SimpleMonad</span> (newTotal, <span class="dv">1</span>)    </span>
+<span id="cb31-29"><a href="#cb31-29" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb31-30"><a href="#cb31-30" aria-hidden="true" tabindex="-1"></a><span class="ot">program ::</span> <span class="dt">SimpleMonad</span> <span class="dt">Total</span>    </span>
+<span id="cb31-31"><a href="#cb31-31" aria-hidden="true" tabindex="-1"></a>program <span class="ot">=</span> <span class="kw">do</span>    </span>
+<span id="cb31-32"><a href="#cb31-32" aria-hidden="true" tabindex="-1"></a>             r0 <span class="ot">&lt;-</span> <span class="fu">return</span> <span class="dv">0</span>    </span>
+<span id="cb31-33"><a href="#cb31-33" aria-hidden="true" tabindex="-1"></a>             r1 <span class="ot">&lt;-</span> inc r0    </span>
+<span id="cb31-34"><a href="#cb31-34" aria-hidden="true" tabindex="-1"></a>             r2 <span class="ot">&lt;-</span> dec r1    </span>
+<span id="cb31-35"><a href="#cb31-35" aria-hidden="true" tabindex="-1"></a>             r3 <span class="ot">&lt;-</span> inc r2    </span>
+<span id="cb31-36"><a href="#cb31-36" aria-hidden="true" tabindex="-1"></a>             dec r3    </span>
+<span id="cb31-37"><a href="#cb31-37" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb31-38"><a href="#cb31-38" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="kw">do</span>    </span>
+<span id="cb31-39"><a href="#cb31-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span> program </span></code></pre></div>
 <section class="footnotes" role="doc-endnotes">
 <hr />
 <ol>
-<li id="fn1" role="doc-endnote"><p>실제 IO모나드 구현은 다음과 같습니다. ~~~ haskell newtype IO a = IO (State# RealWorld -&gt; (# State# RealWorld, a #)) ~~~ <code>#</code>은 타입이 <code>Unboxed</code>라는 뜻인데, 나중에 다른 글에서 다루도록 하고, <code>IO</code>는 <code>RealWorld</code>란 <code>State</code>를 받아, <code>RealWorld</code>와 <code>a</code> 튜플을 돌려주는 함수 타입입니다. 하스켈의 함수는 모두 순수 함수이기 때문에 입력이 같으면 출력이 같아야 합니다. 예를 들어 Random 값이 계속 다르게 받으려면 입력값을 계속 다르게 해서 불러야 합니다. <code>RealWorld</code>는 특별히 의미 있는 정보를 담고 있는게 아니라, 순수 함수 규칙을 깨지 않기위해 존재하며 하스켈 런타임에서 프리미티브하게 처리 합니다.<br />
+<li id="fn1" role="doc-endnote"><p>실제 IO모나드 구현은 다음과 같습니다.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">IO</span> a <span class="ot">=</span> <span class="dt">IO</span> (<span class="dt">State</span><span class="op">#</span> <span class="dt">RealWorld</span> <span class="ot">-&gt;</span> (<span class="op">#</span> <span class="dt">State</span><span class="op">#</span> <span class="dt">RealWorld</span>, a <span class="op">#</span>))</span></code></pre></div>
+<p><code>#</code>은 타입이 <code>Unboxed</code>라는 뜻인데, 나중에 다른 글에서 다루도록 하고, <code>IO</code>는 <code>RealWorld</code>란 <code>State</code>를 받아, <code>RealWorld</code>와 <code>a</code> 튜플을 돌려주는 함수 타입입니다. 하스켈의 함수는 모두 순수 함수이기 때문에 입력이 같으면 출력이 같아야 합니다. 예를 들어 Random 값이 계속 다르게 받으려면 입력값을 계속 다르게 해서 불러야 합니다. <code>RealWorld</code>는 특별히 의미 있는 정보를 담고 있는게 아니라, 순수 함수 규칙을 깨지 않기위해 존재하며 하스켈 런타임에서 프리미티브하게 처리 합니다.<br />
 액션 하나를 실행하고 다음 액션으로 넘어갈 때는 변형된 <code>Realworld</code>가 들어간다는 의미로 쓰이는데, 실제 <code>Realworld</code> 값이 변하진 않고, 하스켈 런타임에서 프리미티브하게 처리합니다.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 <li id="fn2" role="doc-endnote"><p>이런 패턴을 모나드 제3법칙이라고도 합니다.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
