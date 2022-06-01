@@ -83,17 +83,15 @@
 
 <p>이 글을 읽으시려면 <code>IO</code> 모나드와 <code>Reader</code> 모나드의 동작을 알고 있어야 합니다.</p>
 <h3 id="목차">목차</h3>
-<ul>
+<ol type="1">
 <li><a href="#io">IO</a></li>
 <li><a href="#io-위에-reader">IO 위에 Reader</a></li>
-<li><a href="#mtl">mtl</a>
-<ul>
+<li><a href="#mtl">mtl</a></li>
 <li><a href="#return-type-polymorphic">Return Type Polymorphic</a></li>
 <li><a href="#mtl-핵심-아이디어">mtl 핵심 아이디어</a></li>
-</ul></li>
 <li><a href="#자주-만나는-에러-no-instance">자주 만나는 에러 No instance</a></li>
 <li><a href="#에러-수정">에러 수정</a></li>
-</ul>
+</ol>
 <p>라이브러리를 제외하고, <code>IO</code>가 없는 프로그램은 없습니다. 데이터를 받고, 처리를 하고, 출력을 해주는게 프로그램입니다. 예를 들어, 소수를 구하는 프로그램은 입력Input도 없고, 출력Ouput도 없는 것 아니냐라고 생각할 수도 있습니다. 입력은 없지만, 구한 소수를 눈에 보이지 않게 하면 의미가 없으니 결국 출력이 필요합니다. 소수를 구하는 함수 자체에는 출력이 없지만, 나중에 GHCi 등에서 함수를 부르면 결과값을 출력해주는 작업을 GHCi가 대신하게 됩니다. 어찌 됐든 결론은, 언젠가 <code>IO</code>는 반드시 필요하다는 얘기입니다.</p>
 <h2 id="io">IO</h2>
 <p><code>IO</code> 모나드를 반드시 써야 하고, 모든 <code>IO</code> 액션들이 설정값을 필요로 하는 경우를 생각해 봅시다. 이미 <code>IO</code>로 체이닝한 상태인데 <code>Reader</code> 모나드를 쓰고 싶을 때는 어떻게 할까요? 이미 <code>IO</code> 액션이 <code>(..(..(..())))</code> 이렇게 엮여 있는데, 액션 하나가 실행 할 때마다 <code>Reader</code> 속성이 발현되도록 다시 엮어야 합니다.</p>
@@ -233,29 +231,30 @@
 <span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Control.Monad.Reader</span> ( <span class="dt">MonadReader</span>, <span class="dt">ReaderT</span>, runReaderT, ask )</span>
 <span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="co">-- act1 :: IO () 이렇게 타입을 고정하면 IO 컨텍스트에서만 act1을 부를 수 있습니다.</span></span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="co">-- MonadIO m =&gt; 으로 지정하면 IO 컨텍스트에서 불러 쓸 수 있고, ReaderT Int IO 컨텍스트에서도 그대로 불러 쓸 수 있습니다.</span></span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="ot">act1 ::</span> (<span class="dt">MonadIO</span> m) <span class="ot">=&gt;</span> m ()</span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>act1 <span class="ot">=</span> <span class="kw">do</span></span>
-<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>  liftIO <span class="op">$</span> <span class="fu">putStrLn</span> <span class="op">$</span> <span class="st">&quot;어떤 컨텍스트 안에서든 쓸 수 있어요.&quot;</span> </span>
-<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a><span class="ot">act2 ::</span> (<span class="dt">MonadReader</span> <span class="dt">Int</span> m, <span class="dt">MonadIO</span> m) <span class="ot">=&gt;</span> m ()</span>
-<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>act2 <span class="ot">=</span> <span class="kw">do</span></span>
-<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>    num <span class="ot">&lt;-</span> ask</span>
-<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>    liftIO <span class="op">$</span> <span class="fu">print</span> num</span>
-<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a><span class="ot">act3 ::</span> (<span class="dt">MonadReader</span> <span class="dt">Int</span> m) <span class="ot">=&gt;</span> m ()</span>
-<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>act3 <span class="ot">=</span> <span class="kw">do</span></span>
-<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>    num <span class="ot">&lt;-</span> ask</span>
-<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span> ()</span>
-<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a><span class="ot">acts ::</span> <span class="dt">ReaderT</span> <span class="dt">Int</span> <span class="dt">IO</span> ()</span>
-<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>acts <span class="ot">=</span> <span class="kw">do</span></span>
-<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>    act1</span>
-<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a>    act2</span>
-<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a>    act3</span>
-<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span>
-<span id="cb12-29"><a href="#cb12-29" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="kw">do</span> liftIO <span class="op">$</span> runReaderT acts <span class="dv">1</span></span></code></pre></div>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="co">-- MonadIO m =&gt; 으로 지정하면 IO 컨텍스트에서 불러 쓸 수 있고, </span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="co">-- ReaderT Int IO 컨텍스트에서도 그대로 불러 쓸 수 있습니다.</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="ot">act1 ::</span> (<span class="dt">MonadIO</span> m) <span class="ot">=&gt;</span> m ()</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>act1 <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>  liftIO <span class="op">$</span> <span class="fu">putStrLn</span> <span class="op">$</span> <span class="st">&quot;어떤 컨텍스트 안에서든 쓸 수 있어요.&quot;</span> </span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="ot">act2 ::</span> (<span class="dt">MonadReader</span> <span class="dt">Int</span> m, <span class="dt">MonadIO</span> m) <span class="ot">=&gt;</span> m ()</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>act2 <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>    num <span class="ot">&lt;-</span> ask</span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>    liftIO <span class="op">$</span> <span class="fu">print</span> num</span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a><span class="ot">act3 ::</span> (<span class="dt">MonadReader</span> <span class="dt">Int</span> m) <span class="ot">=&gt;</span> m ()</span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>act3 <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>    num <span class="ot">&lt;-</span> ask</span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span> ()</span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a><span class="ot">acts ::</span> <span class="dt">ReaderT</span> <span class="dt">Int</span> <span class="dt">IO</span> ()</span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>acts <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a>    act1</span>
+<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a>    act2</span>
+<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a>    act3</span>
+<span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-29"><a href="#cb12-29" aria-hidden="true" tabindex="-1"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span>
+<span id="cb12-30"><a href="#cb12-30" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="kw">do</span> liftIO <span class="op">$</span> runReaderT acts <span class="dv">1</span></span></code></pre></div>
 <p><code>act1</code>, <code>act2</code>, <code>act3</code> 모두 <code>ReaderT</code>로 추론되고,<br />
 <code>act1</code>의 조립 조건 <code>(MonadIO m) =&gt;</code> 을 만족하는 <code>instance MonadIO ReaderT...</code>가 있으니 OK<br />
 <code>act2</code>의 조립 조건 <code>(MonadReader Int m, MonadIO m) =&gt;</code> 을 만족하는 <code>instance MonadReader ReaderT...</code>, <code>instance MonadIO ReaderT...</code>가 있으니 OK<br />
@@ -307,14 +306,14 @@
 <p>아래 에러가 납니다.</p>
 <div class="sourceCode" id="cb18"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>    • <span class="dt">No</span> <span class="kw">instance</span> for (<span class="dt">MonadReader</span> <span class="dt">IO</span>)</span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>        arising from a use <span class="kw">of</span> ‘somefunc</span></code></pre></div>
-<p><code>somefunc</code>에선 Return Type Polymorphic과 constraint를 이용해 타입 추론을 뒤로 미뤘습니다. 나중에 <code>somefunc</code>가 불릴 컨텍스트가 <code>MonadIO</code>, <code>MonadReader</code> 인스턴스인지 체크해야 합니다. 지금 코드는 IO 컨텍스트 안에서 불렀습니다. 그럼 <code>instance MonadIO IO</code> , <code>instance MonadReader c IO</code> 가 있어야 하는데, <code>instance MonadReader IO</code> 는 정의되어 있지 않다는 에러입니다. <code>MonadReader</code> 쪽을 보면 실제로 <code>IO</code> 인스턴스는 정의되어 있지 않습니다.</p>
+<p><code>somefunc</code>에선 Return Type Polymorphic과 constraint를 이용해 타입 추론을 뒤로 미뤘습니다. 나중에 <code>somefunc</code>가 불릴 컨텍스트가 <code>MonadIO</code>, <code>MonadReader</code> 인스턴스인지 체크해야 합니다. 지금 코드는 <code>IO</code> 컨텍스트 안에서 불렀습니다. 그럼 <code>instance MonadIO IO</code> , <code>instance MonadReader c IO</code> 가 있어야 하는데, <code>instance MonadReader IO</code> 는 정의되어 있지 않다는 에러입니다. <code>MonadReader</code> 쪽을 보면 실제로 <code>IO</code> 인스턴스는 정의되어 있지 않습니다.</p>
 <p>※ 그럼 <code>MonadReader</code>는 다른 트랜스포머용 인스턴스는 모두 정의해 놨는데, 왜 <code>IO</code>는 정의해놓지 않았을까요? <code>MonadReader</code>는 <code>ask</code>메소드를 계층에 상관없이 편리하게 쓰기 위해 정의한 클래스입니다. <em>어떤 트랜스포머로 쌓여 있든, 결국 ReaderT모나드의 ask등의 메소드를 찾아 갈 수 있게 만들어 놓은 겁니다.</em> <code>IO</code>는 모나드 스택에서 항상 바닥에 있는 모나드이므로 <code>IO</code>까지 도달하면 더 진행할 수 가 없습니다. 만일 <code>IOT</code>같은 <code>IO</code> 트랜스포머가 있다면 얘기는 달라질 겁니다.</p>
 <p>※ 그럼 <code>MonadIO IO</code> 인스턴스가 없다는 에러는 왜 안 났을까요?</p>
 <div class="sourceCode" id="cb19"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">MonadIO</span> <span class="dt">IO</span> <span class="kw">where</span></span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>    liftIO <span class="ot">=</span> <span class="fu">id</span></span></code></pre></div>
 <p><code>Monad IO</code> 인스턴스는 정의 되어있습니다.</p>
 <p>※ <code>IO</code>의 트랜스포머 <code>IOT</code>는 왜 없을까요?<br />
-http://h2.jaguarpaw.co.uk/posts/io-transformer/</p>
+<a href="http://h2.jaguarpaw.co.uk/posts/io-transformer/" class="uri">http://h2.jaguarpaw.co.uk/posts/io-transformer/</a></p>
 <h2 id="에러-수정">에러 수정</h2>
 <p>다른 부분 수정없이 <code>runReaderT</code>로 환경값을 먹이면 컴파일 됩니다. 왜 그럴까요?</p>
 <div class="sourceCode" id="cb20"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> runReaderT somefunc <span class="op">...</span> 환경값 <span class="op">...</span></span></code></pre></div>

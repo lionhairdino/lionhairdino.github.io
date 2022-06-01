@@ -91,8 +91,9 @@
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Applicative</span> <span class="dt">Maybe</span> <span class="kw">where</span>  </span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pure</span> <span class="ot">=</span> <span class="dt">Just</span>  </span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Nothing</span> <span class="op">&lt;*&gt;</span> _ <span class="ot">=</span> <span class="dt">Nothing</span>  <span class="co">-- 여기 패턴 매칭에서 갈래 길이 만들어진다.</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    (<span class="dt">Just</span> f) <span class="op">&lt;*&gt;</span> something <span class="ot">=</span> <span class="fu">fmap</span> f something <span class="co">-- 첫 번째 인자를 패턴 매칭해서 갈래길을 만들고,</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>                                              <span class="co">-- something에 fmap이 실행되어 또 한 번 갈래길이 만들어진다.</span></span></code></pre></div>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    (<span class="dt">Just</span> f) <span class="op">&lt;*&gt;</span> something <span class="ot">=</span> <span class="fu">fmap</span> f something </span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>        <span class="co">-- 첫 번째 인자를 패턴 매칭해서 갈래길을 만들고,</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>        <span class="co">-- something에 fmap이 실행되어 또 한 번 갈래길이 만들어진다.</span></span></code></pre></div>
 <p>보통 펑크터들의 추가적인 정보는 갈래 길(분기)을 통해 드러납니다. <code>&lt;*&gt;</code> 정의를 보면, <code>Nothing</code>과 <code>Just f</code> 패턴 매칭으로 갈래 길이 드러납니다. 컨텍스트로 반복해서 동작할 코드가 바로 이 패턴 매칭입니다.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pure</span> (<span class="op">+</span>) <span class="op">&lt;*&gt;</span> <span class="dt">Just</span> <span class="dv">3</span> <span class="op">&lt;*&gt;</span> <span class="dt">Just</span> <span class="dv">5</span></span></code></pre></div>
 <p>보통 펑크터 안에 있는 값에, 여러 개의 매개 변수를 가진 함수를 적용하는데, 커링 진행 중간 단계를 보면 커링된(부분 적용된)함수가 펑크터 안에 놓여 있는 상태가 되어, 커링된 함수를 다시 펑크터에서 꺼낼 때 <code>&lt;*&gt;</code> 가 필요합니다. 좀 더 쉽게 보기 위해 위 코드의 중간 커링 단계를 보면</p>
@@ -107,7 +108,7 @@
 <h2 id="traversable">Traversable</h2>
 <p>한 발자국 더 들어가 봅시다.<br />
 <code>map</code>과 <code>traverse</code>의 차이가 뭘까요?<br />
-※ 하스켈의 작명 센스는 프로그래머와 그리 친해보이지 않는다는 의견이 종종 보이는데, traverse도 단어 뜻(가로지르다. 횡단하다.)만 보고 언뜻 알기는 어려워 보입니다.</p>
+※ 하스켈의 작명 센스는 프로그래머와 그리 친해보이지 않는다는 의견이 종종 보이는데, <code>traverse</code>도 단어 뜻(가로지르다. 횡단하다.)만 보고 언뜻 알기는 어려워 보입니다.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- Traversal Maybe 인스턴스의 traverse 정의</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">traverse</span> f (<span class="dt">Just</span> a) <span class="ot">=</span> <span class="dt">Just</span> <span class="op">&lt;$&gt;</span> f a <span class="co">-- 또는 pure (Just) &lt;*&gt; f a</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>                                   <span class="co">-- 들어 온 값이 Just a인지 살펴봤는데, </span></span>
@@ -119,8 +120,8 @@
 <span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="fu">map</span> f (<span class="dt">Just</span> a) <span class="ot">=</span> <span class="dt">Just</span> (f a)</span>
 <span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="fu">map</span> f <span class="dt">Nothing</span> <span class="ot">=</span> <span class="dt">Nothing</span></span></code></pre></div>
 <p>둘 다 펑크터 안의 값에 함수를 적용하는 역할을 합니다. 단, 적용할 때 <code>map</code>은 기본 함수 적용이고, <code>traverse</code>는 <code>&lt;*&gt;</code>로 함수를 적용합니다. 무슨 차이가 있을까요? 이제 컨텍스트 개념을 알게 됐으니 간단히 이렇게 얘기하면 됩니다.</p>
-<p>“map은 컨텍스트 없이 함수를 적용하고, traverse는 applicative의 컨텍스트를 발현 시키고 함수를 적용한다.”</p>
-<p>applicative 컨텍스트로 돌아갈 코드는, 타입에 따라 정의한 인스턴스에 있는 <code>&lt;*&gt;</code>의 구현체입니다</p>
+<p>“<code>map</code>은 컨텍스트 없이 함수를 적용하고, <code>traverse</code>는 <code>applicative</code>의 컨텍스트를 발현 시키고 함수를 적용한다.”</p>
+<p><code>applicative</code> 컨텍스트로 돌아갈 코드는, 타입에 따라 정의한 인스턴스에 있는 <code>&lt;*&gt;</code>의 구현체입니다</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Applicative</span> [] <span class="kw">where</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pure</span> x    <span class="ot">=</span> [x]</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    fs <span class="op">&lt;*&gt;</span> xs <span class="ot">=</span> [f x <span class="op">|</span> f <span class="ot">&lt;-</span> fs, x <span class="ot">&lt;-</span> xs]</span></code></pre></div>
@@ -219,8 +220,8 @@
 <span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a><span class="co">-- TVar 안에 들어 있는 문자열의 길이를 모두 합하려면 traverse로 돌려야 합니다.</span></span>
 <span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">putStrLn</span> <span class="op">$</span> <span class="fu">show</span> <span class="op">$</span> <span class="fu">sum</span> sizes</span></code></pre></div>
 <blockquote>
-<p>Q. Applicative 펑크터와 모나드의 차이 Applicative와 모나드 둘 다 effect를 가지고 있습니다.<br />
-Applicative는 <code>&lt;*&gt;</code>를 통해 함수를 적용하는데, 모두 독립적으로 적용합니다. 이전 작업 결과(effect)가 다음 작업에 영향을 주지 않습니다. <code>&lt;*&gt;</code> 작업들은 parallel 하게 돌릴 수 있습니다. 모나드는 이전 effect와 다음 effect를 합성해서 하나의 effect로 표현합니다.</p>
+<p>Q. <code>Applicative</code> 펑크터와 모나드의 차이 <code>Applicative</code>와 모나드 둘 다 effect를 가지고 있습니다.<br />
+<code>Applicative</code>는 <code>&lt;*&gt;</code>를 통해 함수를 적용하는데, 모두 독립적으로 적용합니다. 이전 작업 결과(effect)가 다음 작업에 영향을 주지 않습니다. <code>&lt;*&gt;</code> 작업들은 parallel 하게 돌릴 수 있습니다. 모나드는 이전 effect와 다음 effect를 합성해서 하나의 effect로 표현합니다.</p>
 </blockquote>
 <p>모나드는 <a href="../posts/2022-03-25-beforeMonad.html">모나드, 같음</a> 글을 참고하세요.</p>
 
