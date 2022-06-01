@@ -184,12 +184,14 @@
 <li>(2*(1+ _ )) 작업과 (3-) 작업을 합친 작업 (3-(2*(1+ _)))을 만들고,</li>
 <li>이 작업에 0을 넣어서 1을 만들어 돌려줍니다.</li>
 </ol>
-<p>명령형에서는 값(상태)이 변하고, 함수형에서는 함수(할 일 목록)가 변합니다.</p>
+<p>명령형에서는 값(상태)이 변하고,
+함수형에서는 함수(할 일 목록)가 변합니다.</p>
 <p>위 개념을 그대로 코드로 옮겨 보겠습니다.<br />
 (1+), (2*), (3-) 작업을 엮어 아래 모양으로 만들어야 합니다.</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>\r <span class="ot">-&gt;</span> <span class="dv">3</span><span class="op">-</span> (<span class="dv">2</span><span class="op">*</span> (<span class="dv">1</span><span class="op">+</span> r))</span></code></pre></div>
 <p><em>주의 - 여기 예시는 단순 함수 컴포지션으로 해결이 되지만, 한 단계의 결과가 바로 다음의 결과에 영향을 주는게 아닐 경우 단순 컴포지션으로 해결할 수 없습니다.</em></p>
-<p>그런데 엮여 있는 모양이 작업 순서와 반대 모양으로 나타납니다. 코드에서도 작업 순서대로 모양이 나오면 직관적이지 않을까요? <code>1+</code> 먼저, 그 다음 <code>2*</code>, 그 다음 <code>3-</code></p>
+<p>그런데 엮여 있는 모양이 작업 순서와 반대 모양으로 나타납니다. 코드에서도 작업 순서대로 모양이 나오면 직관적이지 않을까요?
+<code>1+</code> 먼저, 그 다음 <code>2*</code>, 그 다음 <code>3-</code></p>
 <h2 id="continuation">Continuation</h2>
 <p>좀 더 일반화해서, 이전 단계의 결과가 영향을 주든 안주든, 다음 작업이 이전 작업을 품는 모양을 만들기 위해, <em>이어지는 작업으로 뭘 할지 인자로 넘기도록</em> 할 수 있습니다. 작업이 끝난 후 결과를 리턴하는게 아니라, 결과를 이어지는 함수의 인자로 넘기는 모양이 됩니다. 이 걸 함수 외부에서 하는게 아니라, 함수 내부에서 항상 할 수 밖에 없게 만들면 다음과 같습니다.</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>func1 x <span class="ot">=</span> <span class="dv">1</span> <span class="op">+</span> x</span>

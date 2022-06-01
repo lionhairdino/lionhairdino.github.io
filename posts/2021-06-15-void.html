@@ -139,7 +139,8 @@
 <p>뭘 써도 상관 없는 자리에 <code>SomeResult</code>를 넣으니, <code>error</code>를 써주지 않아도 부드럽게 <code>getSomeResult</code>를 정의할 수 있게 되었습니다. 여기서 그치는게 아니라, 숨어있는 이득이 있습니다. 실제 <code>updateTimeRef</code>는 <code>SomeResult</code> 타입 값을 만들어내지 않는데, <code>SomeResult</code>를 써 줄 수 있다는 말은 <code>SomeResult</code>가 평가되지 않는 무한 루프가 돈다는 뜻입니다. 풀어서 말하면, GHC가 <code>updateTimeRef</code>가 무한 루프가 도는지 체크를 하게 됐다는 겁니다.</p>
 <p>그런데 아래 문장 때문에 잘 못 이해한 건 아닌지 의심스럽습니다.</p>
 <p><em>The type system is in effect enforcing our requirement that useTimeRef will outlive updateTimeRef.</em></p>
-<p>타입 체커가 <code>useTimeRef</code>가 <code>updateTimeRef</code>보다 오래 살아남아야 한다는 조건을 만족하는지 확인한다는 말입니다. 그런데, 거꾸로 아닌가요? <code>updateTimeRef</code>가 먼저 죽으면 안되는 거 아닌가요? outlive(~보다 오래 살다)를 잘 못 번역한건지, 문장이 거꾸로 쓰인걸로 보입니다.</p>
+<p>타입 체커가 <code>useTimeRef</code>가 <code>updateTimeRef</code>보다 오래 살아남아야 한다는 조건을 만족하는지 확인한다는 말입니다.
+그런데, 거꾸로 아닌가요? <code>updateTimeRef</code>가 먼저 죽으면 안되는 거 아닌가요? outlive(~보다 오래 살다)를 잘 못 번역한건지, 문장이 거꾸로 쓰인걸로 보입니다.</p>
 <p>저는 이해를 아예 못한 게 아니라, 이해는 한 것 같은데, 모순되는 텍스트들이 있으면 계속 되새김질 해보다 마지막에 자료를 의심합니다. 꽤 오랫동안 올라와 있던 포스트인데, <em>오류가 있다면 진작 잡아내지 않았을까요?</em> 저와 같이 고민한 분들이 있으면 댓글을 달아 주시면 좋겠습니다.</p>
 <p><code>useTimeRef</code>보다 <code>updateTimeRef</code>가 더 빨리 죽으면 컴파일이 안되도록 타입 체커에게 힌트를 준 상황처럼 됐습니다. 타입 체커가 무한 루프를 체크합니다.</p>
 <p>무한 루프의 리턴 타입은 실제 평가 될 일이 없기 때문에 아무거나 써줘도 됩니다. 그런데, 여기에 적절한 타입을 써주면, 프로그래머가 확인해야 될 걸 GHC에게 떠넘길수 있습니다.</p>
@@ -231,7 +232,8 @@
 <span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Right</span> y <span class="ot">-&gt;</span> <span class="fu">return</span> y</span></code></pre></div>
 <p><code>forall</code>을 이용하는 방법입니다. <code>forall</code>의 자세한 설명은 참고글을 읽어주세요.</p>
 <p>참고 - <a href="../posts/2021-05-04-forall.html">forall-아무거나와 모든 것의 차이</a></p>
-<p>미완성 포스트… <span class="citation" data-cites="todo">@todo</span>: To Void or to void? 섹션을 이해하려면 positive, negative 개념을 명확히 한 후 봐야 할 것 같습니다.</p>
+<p>미완성 포스트…
+<span class="citation" data-cites="todo">@todo</span>: To Void or to void? 섹션을 이해하려면 positive, negative 개념을 명확히 한 후 봐야 할 것 같습니다.</p>
 
 <div class="comment">
 <script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>

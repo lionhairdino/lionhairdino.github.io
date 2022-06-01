@@ -136,7 +136,10 @@
 <p>몸무게를 표현하기 위해 <code>Int</code> 타입 값이 필요한데, 몸무게가 변할 때마다 이유를 기록해 두고 싶습니다.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">HasLog</span> a <span class="ot">=</span> <span class="dt">HasLog</span> a [<span class="dt">String</span>]</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">Weight</span> <span class="ot">=</span> <span class="dt">HasLog</span> <span class="dt">Int</span></span></code></pre></div>
-<p>이럴 때 <code>Int</code>에서 <code>Weight</code>로 “변환Transform” 되었다고 말합니다. <code>Int</code>용 <code>(+)</code>, <code>(-)</code>는 이미 있으니 이 함수를 그대로 써서 새로운 타입에 적용하고 싶습니다. <code>(+)</code>, <code>(-)</code>를 다시 정의하지 않고, 기존 함수들을 사용할 때, 바로 사용하지 않고 중간에 끼어들어 <code>Weight</code>에서 <code>Int</code>를 꺼내주는 브로커 함수를 만들면 됩니다. (이 함수를 <code>fmap</code>이라 부릅니다.) <code>fmap</code> 함수를 <code>Weight</code> 타입에서 쓸 수 있도록 추가해 주는데, 이럴 때 “펑크터 구조를 추가했다 또는 변환했다”라고 합니다.</p>
+<p>이럴 때 <code>Int</code>에서 <code>Weight</code>로 “변환Transform” 되었다고 말합니다.
+<code>Int</code>용 <code>(+)</code>, <code>(-)</code>는 이미 있으니 이 함수를 그대로 써서 새로운 타입에 적용하고 싶습니다.
+<code>(+)</code>, <code>(-)</code>를 다시 정의하지 않고, 기존 함수들을 사용할 때, 바로 사용하지 않고 중간에 끼어들어 <code>Weight</code>에서 <code>Int</code>를 꺼내주는 브로커 함수를 만들면 됩니다. (이 함수를 <code>fmap</code>이라 부릅니다.)
+<code>fmap</code> 함수를 <code>Weight</code> 타입에서 쓸 수 있도록 추가해 주는데, 이럴 때 “펑크터 구조를 추가했다 또는 변환했다”라고 합니다.</p>
 <p>이런식으로 하스켈에서 프로그램을 작성하다 보면, 수많은 “타입을 갑싼 타입”들이 생기게 되는데, 이들은 기존 데이터와 아주 다른 것이 아닙니다. 위 몸무게의 예는 <code>Int</code>가 가지는 속성은 똑같이 가지고 있고, 추가적으로 <code>[String]</code>을 갖고 있다고 봅니다. <code>Int</code>를 처리하던 함수들은 모두 그대로 쓰고 싶습니다. 그럴 때 <code>fmap</code>을 추가한 타입들을 펑크터라고 부릅니다. 여기 글에서 주목하는 부분은 바로 몸무게 <code>Weight</code>와 <code>Int</code>의 <em>다른(닮은) 정도</em>입니다.</p>
 <p>“<code>Weight</code>와 <code>Int</code>는 다르지만, <code>Int</code> 성질은 둘 다 가지고 있는 <em>닮은 타입</em>이다.”</p>
 <p>펑크터는 <code>a</code> 타입과 “닮은” <code>f a</code> 타입을 만들어 냅니다.<br />
@@ -170,7 +173,8 @@ A. 여기서 같다 다르다의 관심사는 한 함수 내에서가 아니라,
 <p>기준에서 부터 측정된 값들을 서로 계산해서 둘의 다른 정도를 구합니다.<br />
 “(5 - 3) = 2, 또는 (3 - 5) = -2”<br />
 “3에서 5는 2만큼 떨어져 있다.”</p>
-<p>둘 중 하나를 기준으로 잡을 수도 있습니다. 기준을 만들고 특정 연산(함수)을 이용해서 대상들을 비교하면, 같은지 다른지 좀 더 모호하지 않게 얘기할 수 있게 됩니다.</p>
+<p>둘 중 하나를 기준으로 잡을 수도 있습니다.
+기준을 만들고 특정 연산(함수)을 이용해서 대상들을 비교하면, 같은지 다른지 좀 더 모호하지 않게 얘기할 수 있게 됩니다.</p>
 <figure>
 <img src="../images/1mm.png" alt="정확하게 얘기하기" /><figcaption aria-hidden="true">정확하게 얘기하기</figcaption>
 </figure>
@@ -182,7 +186,10 @@ A. 여기서 같다 다르다의 관심사는 한 함수 내에서가 아니라,
 <figure>
 <img src="../images/before_monad_iso.png" alt="전단사bijective" /><figcaption aria-hidden="true">전단사bijective</figcaption>
 </figure>
-<p><code>A</code>와 <code>B</code>는 서로 전사Surjective이며, 단사injective로 연결된 전단사bijective 관계입니다. <code>f: A -&gt; B</code> 함수가 있고, 돌아 오는 <code>g: B -&gt; A</code> 함수(<code>f</code>의 역함수)도 있습니다. <code>A</code>를 넣어줘야 할 곳에 <code>g(B의 원소)</code>를 해서 넣어 줄수도 있고, <code>B</code>를 넣어줘야 할 곳에 <code>f(A의 원소)</code>를 해서 넣어줘도 됩니다. ※ 이런 관계를 Isomorphic 관계(이름만 다를 뿐 같은 구조)라 합니다. 서로 다른 정도를 표현하는 함수를 적용하면 바로 같은 것으로 바뀌고 있습니다.</p>
+<p><code>A</code>와 <code>B</code>는 서로 전사Surjective이며, 단사injective로 연결된 전단사bijective 관계입니다.
+<code>f: A -&gt; B</code> 함수가 있고, 돌아 오는 <code>g: B -&gt; A</code> 함수(<code>f</code>의 역함수)도 있습니다.
+<code>A</code>를 넣어줘야 할 곳에 <code>g(B의 원소)</code>를 해서 넣어 줄수도 있고, <code>B</code>를 넣어줘야 할 곳에 <code>f(A의 원소)</code>를 해서 넣어줘도 됩니다. ※ 이런 관계를 Isomorphic 관계(이름만 다를 뿐 같은 구조)라 합니다.
+서로 다른 정도를 표현하는 함수를 적용하면 바로 같은 것으로 바뀌고 있습니다.</p>
 <figure>
 <img src="../images/before_monad_noniso.png" alt="A에서 B로 가며 정보를 잃어버렸습니다." /><figcaption aria-hidden="true">A에서 B로 가며 정보를 잃어버렸습니다.</figcaption>
 </figure>
@@ -206,7 +213,8 @@ A의 3은 B의 b로 연결되었습니다.</p>
 <p>그럼 <code>Int</code>와 <code>Maybe Int</code>가 가진 오브젝트의 차이는</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Int</span> <span class="op">:</span> <span class="op">...</span> <span class="op">-</span><span class="dv">2</span>, <span class="op">-</span><span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span> , <span class="dv">2</span> <span class="op">...</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="dt">Maybe</span> <span class="dt">Int</span> <span class="op">:</span> <span class="op">...</span> <span class="dt">Just</span> (<span class="op">-</span><span class="dv">2</span>), <span class="dt">Just</span> (<span class="op">-</span><span class="dv">1</span>), <span class="dt">Just</span> <span class="dv">0</span>, <span class="dt">Just</span> <span class="dv">1</span>, <span class="dt">Just</span> <span class="dv">2</span> <span class="op">...|</span> <span class="dt">Nothing</span></span></code></pre></div>
-<p><code>Just</code>들이야 <code>Int</code>와 일대일 대응이 되지만, <code>Int</code>에는 없던 <code>Nothing</code>이라는 값생성자를 추가하여 Sum 타입으로 만들어 두었습니다. 하스켈에서 <em>Sum 타입들은 모두 패턴 매칭으로 각 각 처리</em>해야 합니다. 어느 한 값생성자라도 놓치면 런타임에 그 형태의 값이 들어오면 오류가 나기 때문에 모든 값 생성자에 대한 처리를 해두어야 합니다. <code>Nothing</code>처리를 추가하겠다가 <code>Maybe</code>를 벗겨 낼 때 반드시 하기로 한 약속입니다. 이 약속이 <code>Maybe</code>가 가진 effect입니다.</p>
+<p><code>Just</code>들이야 <code>Int</code>와 일대일 대응이 되지만, <code>Int</code>에는 없던 <code>Nothing</code>이라는 값생성자를 추가하여 Sum 타입으로 만들어 두었습니다.
+하스켈에서 <em>Sum 타입들은 모두 패턴 매칭으로 각 각 처리</em>해야 합니다. 어느 한 값생성자라도 놓치면 런타임에 그 형태의 값이 들어오면 오류가 나기 때문에 모든 값 생성자에 대한 처리를 해두어야 합니다. <code>Nothing</code>처리를 추가하겠다가 <code>Maybe</code>를 벗겨 낼 때 반드시 하기로 한 약속입니다. 이 약속이 <code>Maybe</code>가 가진 effect입니다.</p>
 <h3 id="패턴-매칭">패턴 매칭</h3>
 <p><code>a -&gt; b</code> 함수는 어차피 effect에 적용하기 위한 함수가 아닙니다. effect는 잠시 다른데로 옮겨 두고, <code>a -&gt; b</code>를 적용할 수 있는 것에만 적용하고, 다시 effect를 합치면 됩니다.</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fmap</span> _    <span class="dt">Nothing</span>  <span class="ot">=</span> <span class="dt">Nothing</span></span>
@@ -218,7 +226,9 @@ A의 3은 B의 b로 연결되었습니다.</p>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>              f c <span class="ot">-&gt;</span> f d</span></code></pre></div>
 <p>같은 타입들끼리 만나고 있으니 문제가 없습니다. <code>f a</code>, <code>f b</code>, <code>f c</code> 모두 <code>f</code>를 가지고 있는, 즉 effect를 잃어버리지 않고 갖고 있는 타입들입니다.</p>
 <p>여기서 <code>fmap</code>의 내부 동작을 보면 <code>f a</code>에서 <code>a</code>를 꺼내온 것으로 오해할 수 있습니다. 하지만 <code>fmap</code>의 결과는 <code>f b</code>입니다. 내부에서 일시적으로 effect를 분리해서 <code>a</code>를 대상으로 작업하지만, 가지고 있던 effect를 버리지 않는 한 최종 <code>a</code>만 단독으로 받을 수 없습니다.</p>
-<p>만일 <code>a -&gt; b</code>의 입력과 <code>f a</code>가 달라 <code>f a</code>를 <code>a</code> 로 만든 다음 <code>a -&gt; b</code> 를 적용하면 결과값은 effect를 잃어버린 <code>b</code>입니다. 결과로 <code>b</code>를 받는다면 effect가 모두 사라진 상태니 <code>f b</code>와 다릅니다. effect가 살아 있는 그냥 <code>b</code>는 있을 수 없습니다. effect가 사라지지 않게 보조 함수가 도와주게 하더라도, 마지막 결과가 effect를 담을 곳이 없으면 어찌할 방법이 없습니다. 결론은, 둘은 같게 볼 방법이 없습니다. 그렇다면 <code>a -&gt; m b</code>와 <code>b -&gt; m c</code>에서 <code>m b</code>를 <code>b</code>로 만들 수 없으니 를 합성할 방법이 없는 것 아닐까요?</p>
+<p>만일 <code>a -&gt; b</code>의 입력과 <code>f a</code>가 달라 <code>f a</code>를 <code>a</code> 로 만든 다음 <code>a -&gt; b</code> 를 적용하면 결과값은 effect를 잃어버린 <code>b</code>입니다. 결과로 <code>b</code>를 받는다면 effect가 모두 사라진 상태니 <code>f b</code>와 다릅니다. effect가 살아 있는 그냥 <code>b</code>는 있을 수 없습니다.
+effect가 사라지지 않게 보조 함수가 도와주게 하더라도, 마지막 결과가 effect를 담을 곳이 없으면 어찌할 방법이 없습니다.
+결론은, 둘은 같게 볼 방법이 없습니다. 그렇다면 <code>a -&gt; m b</code>와 <code>b -&gt; m c</code>에서 <code>m b</code>를 <code>b</code>로 만들 수 없으니 를 합성할 방법이 없는 것 아닐까요?</p>
 <p>※ 같게 볼 수 있는 함수가 아니라 아예 <code>inverseM :: m a -&gt; a</code> 가 존재한다면?<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
 <br />
 <center>
@@ -232,14 +242,16 @@ A의 3은 B의 b로 연결되었습니다.</p>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>                    m c <span class="ot">-&gt;</span> m (m d)</span></code></pre></div>
 <p>함수들을 합성할 수가 없습니다. 합성할 일이 없다면 펑크터의 <code>fmap</code>만으로 해결할 수 있지만, 합성을 해야 되면 다른 조치가 필요해졌습니다.</p>
 <h2 id="합성composition-특정-작업을-하는-동안만은-같은-걸로-보기">합성Composition : 특정 작업을 하는 동안만은 같은 걸로 보기</h2>
-<p>특정 작업을 하는 동안만 다음처럼 제약을 두었다고 생각해 봅시다. ※ “특정 작업을 하는 동안”이란 표현은 함수가 연이어 합성되어 있는 모양이 실행되는 동안을 말합니다. 예) working = act1 . act2 . act3</p>
+<p>특정 작업을 하는 동안만 다음처럼 제약을 두었다고 생각해 봅시다.
+※ “특정 작업을 하는 동안”이란 표현은 함수가 연이어 합성되어 있는 모양이 실행되는 동안을 말합니다. 예) working = act1 . act2 . act3</p>
 <p>“함수는 함수와 바로 연결하지 못하고, 반드시 중간에 다른 접착 함수Combinator를 두어 연결 작업을 맡긴다.”</p>
 <p>그러면, 위에서 봤던 둘이 달라서 생기는 문제들을 모두 컴비네이터 함수에 떠 넘길 수 있습니다. 뭔가 특별한 것 같지만, 사실 합성 <code>(.)</code> 연산자도 아래와 같이 정의되어 있는 컴비네이터 함수입니다.</p>
 <div class="sourceCode" id="cb15"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="ot">(.)    ::</span> (b <span class="ot">-&gt;</span> c) <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> c</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>(<span class="op">.</span>) f g <span class="ot">=</span> \x <span class="ot">-&gt;</span> f (g x)</span></code></pre></div>
 <p>컴비네이터 함수가 여러 함수들을 연결해서 체인을 만드는 동안, 연결할 때마다 반복해서 처리하는 작업을 컨텍스트라 부릅니다. <code>(.)</code>은 컨텍스트가 없는 컴포지션이라고 말할 수 있습니다.</p>
 <p>출력과 입력 타입이 같은 함수 합성을 할 때, 보통 <code>(.)</code>을 쓰는데, <code>a -&gt; m b</code> 형태의 합성을 할 때만 쓸 다른 함수를 정의해서 <code>(.)</code>에는 없는 컨텍스트 작업을 추가합니다.</p>
-<p>다시 <code>Maybe</code>를 가져와서 예를 들겠습니다. <code>m a</code>에 <code>a -&gt; m b</code>를 적용하려면 두 가지 방법이 있을 수 있습니다.</p>
+<p>다시 <code>Maybe</code>를 가져와서 예를 들겠습니다.
+<code>m a</code>에 <code>a -&gt; m b</code>를 적용하려면 두 가지 방법이 있을 수 있습니다.</p>
 <ol type="1">
 <li><code>m a</code>를 <code>a</code>로 만들고, 다른 함수가 <code>Nothing</code>에 대한 처리를 도와주든지,<br />
 </li>
@@ -247,7 +259,8 @@ A의 3은 B의 b로 연결되었습니다.</p>
 </ol>
 <h2 id="이미-fmap을-갖고-있다">이미 <code>fmap</code>을 갖고 있다</h2>
 <p>※ <code>fmap</code> “만” 갖고 있다고 해야 맞을 것 같습니다. <code>fmap</code>은 오브젝트만 변환하는게 아닌 모피즘도 변환합니다. 예를 들어 <code>a -&gt; m b</code>를 펑크터 <code>m</code>으로 한 번 더 변환하면 <code>m a -&gt; m (m b)</code>가 되는 걸 알고 있습니다. <code>m a</code>가 가지고 있던 effect를 잃어버리지 않으려면, <code>a -&gt; m b</code>에 <code>m a</code>를 넣기 위해, 일단 <code>m a -&gt; m (m b)</code>로 만드는 수밖에 없습니다.</p>
-<p>위에서 봤던 것처럼 <code>Maybe a</code>와 <code>a</code>가 달라서 생기는 문제, 즉 추가된 <code>Nothing</code> 생성자 문제를 위해 또 함수를 만들 필요 없이, 이미 만들어져 있는 <code>fmap</code>을 가져옵니다. <code>fmap</code>의 내부를 들여다 보면<br />
+<p>위에서 봤던 것처럼 <code>Maybe a</code>와 <code>a</code>가 달라서 생기는 문제, 즉 추가된 <code>Nothing</code> 생성자 문제를 위해 또 함수를 만들 필요 없이, 이미 만들어져 있는 <code>fmap</code>을 가져옵니다.
+<code>fmap</code>의 내부를 들여다 보면<br />
 * <code>a -&gt; m b</code> 함수와 <code>m a</code>를 받아,<br />
 * <code>m a</code>에서 <code>m</code>을 잠시 떼어내며, <code>m a</code>가 가지고 있던 effect를 따로 두고 (이걸 <strong>effect1</strong>이라 이름 붙이겠습니다.)<br />
 * <code>a</code>에 <code>a -&gt; m b</code> 함수를 적용합니다. 그럼 결과 <code>m b</code>는 새로운 effect를 가지고 있게 됩니다. 이걸 <strong>effect2</strong>라 이름 붙이겠습니다.<br />
@@ -341,11 +354,15 @@ A. (&gt;&gt;=)<code>를 쓰는 모양은</code>do`구문으로 바꿔서 표현�
 <span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>    c <span class="ot">&lt;-</span> m c</span>
 <span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>    m d <span class="co">-- 여기서 a,b,c를 모두 쓸 수 있습니다.</span></span></code></pre></div>
 <p>※ 참고로 <code>do</code> 구문은 바인드로 연결하되 괄호가 위처럼 들어가 있는 상태를 편의를 위해 바꿔서 표현한 것(Syntactic sugar)입니다.<br />
-괄호가 없으면 마지막 액션에서 <code>a, b</code>를 가져오지 못합니다. 단순 <code>act1 &gt;&gt;= act2 &gt;&gt;= act3</code> 을 바꾼게 아니라 위의 괄호와 같은 실행 단위로 묶여 있어야 합니다. 람다 함수는 정의가 괄호를 만나지 않는다면 구문의 끝까지이기 때문에, 액션 정의에 계속 람다 함수를 쓰면 괄호를 쓰지 않아도 같은 효과가 납니다. 지금 여기서 꼭 알아야 할 내용은 아니긴 한데, 나중에 실행 순서가 궁금할 때를 위해 써 놓습니다. ※ 람다 함수 정의는 괄호 뿐만 아니라 커플링이 되는 문법 요소(let …in, [] )들을 만나지 않으면 구문 끝까지입니다. -(Ailrun님 조언 감사합니다.)</p>
+괄호가 없으면 마지막 액션에서 <code>a, b</code>를 가져오지 못합니다. 단순 <code>act1 &gt;&gt;= act2 &gt;&gt;= act3</code> 을 바꾼게 아니라 위의 괄호와 같은 실행 단위로 묶여 있어야 합니다.
+람다 함수는 정의가 괄호를 만나지 않는다면 구문의 끝까지이기 때문에, 액션 정의에 계속 람다 함수를 쓰면 괄호를 쓰지 않아도 같은 효과가 납니다.
+지금 여기서 꼭 알아야 할 내용은 아니긴 한데, 나중에 실행 순서가 궁금할 때를 위해 써 놓습니다.
+※ 람다 함수 정의는 괄호 뿐만 아니라 커플링이 되는 문법 요소(let …in, [] )들을 만나지 않으면 구문 끝까지입니다. -(Ailrun님 조언 감사합니다.)</p>
 </blockquote>
 <blockquote>
 <p>Q. Functor의 <code>fmap</code>과 <code>(&gt;&gt;=)</code> 타입 시그시처가 같지 않나요?<br />
-A. 혹시 Functor의 <code>fmap</code>과 같아 보인다면, 둘의 받는 함수의 타입을 확인해 보세요. <code>fmap</code> 은 <code>(a -&gt; b)</code> 함수를, <code>&gt;&gt;=</code> 는 <code>(a -&gt; m b)</code> 함수를 받습니다.</p>
+A. 혹시 Functor의 <code>fmap</code>과 같아 보인다면, 둘의 받는 함수의 타입을 확인해 보세요.
+<code>fmap</code> 은 <code>(a -&gt; b)</code> 함수를, <code>&gt;&gt;=</code> 는 <code>(a -&gt; m b)</code> 함수를 받습니다.</p>
 <div class="sourceCode" id="cb24"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fmap</span><span class="ot">  ::</span> <span class="dt">Functor</span> f <span class="ot">=&gt;</span> (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> f a <span class="ot">-&gt;</span> f b</span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="ot">(&gt;&gt;=) ::</span> <span class="dt">Monad</span> m <span class="ot">=&gt;</span> m a <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> m b) <span class="ot">-&gt;</span> m b</span></code></pre></div>
 </blockquote>
@@ -386,7 +403,8 @@ A. 혹시 Functor의 <code>fmap</code>과 같아 보인다면, 둘의 받는 함
 </figure>
 <h2 id="결론">결론</h2>
 <p><code>a -&gt; m b</code>와 <code>b -&gt; m c</code> 합성 방법을 고민하면, <code>m b</code>에서 <code>b</code>로 돌아올 방법이 필요합니다. 하지만, 펑크터 <code>m</code>은 거의 isomorphism이 아닙니다. 구조만 보존하면(homomorphism) 어떻게 변형할지 알 수 없습니다. 거꾸로 돌아오는 길은, effect를 모두 잃어버리니 애시당초 없을 확률이 높습니다. (isomorphic하여 돌아 올 때 잃어버릴 게 없다면 effect가 없다는 말입니다. effect가 없는 모나드로는 Identity 모나드가 있습니다.) 그럼 합성을 포기 했을 것도 같은데, effect만 따로 합칠 수만 있다면 합성할 수 있다는 생각을 어떻게 했을까요? 펑크터에 대한 통찰이 있어 effect가 따로 보였을까요?</p>
-<p>카테고리 이론은 현재 카테고리에서 해결책을 찾지 못할 때 펑크터로 변환한 곳에서 해결책을 찾기도 합니다. <code>a -&gt; m b</code>를 펑크터<code>m</code>으로 한 번 더 변환하면 <code>m a -&gt; m (m b)</code>가 됩니다. 둘이 같게 만드는데서 해결책을 찾기 시작한 건 아닐까요?</p>
+<p>카테고리 이론은 현재 카테고리에서 해결책을 찾지 못할 때 펑크터로 변환한 곳에서 해결책을 찾기도 합니다.
+<code>a -&gt; m b</code>를 펑크터<code>m</code>으로 한 번 더 변환하면 <code>m a -&gt; m (m b)</code>가 됩니다. 둘이 같게 만드는데서 해결책을 찾기 시작한 건 아닐까요?</p>
 <figure>
 <img src="../images/join_commute.png" alt="join (fmap f (return a)) = f a" /><figcaption aria-hidden="true">join (fmap f (return a)) = f a</figcaption>
 </figure>

@@ -102,12 +102,14 @@
 <div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- m (m a) -&gt; m a 가 있어 아래처럼 할 수 있습니다.</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>m (m (m (m <span class="op">...</span>))) <span class="ot">-&gt;</span> m</span></code></pre></div>
 <h2 id="a---m-b-타입을-합성하면-모나드인가"><code>a -&gt; m b</code> 타입을 합성하면 모나드인가?</h2>
-<p>모나드 구조에 있는 함수(카테고리 이론에선 Natural Transformation)를 이용하면 <code>a -&gt; m b</code> 타입 합성이 가능한 것이지, 이 합성 자체가 모나드인 건 아닙니다. 모나드의 합성을 얘기할 때는 <code>m a, m (m a), m (m (m a)), m (m (m (m a))),...</code> 이렇게 펑크터<code>m</code>의 합성을 말하는 것입니다. <code>m</code>의 생성자도 비슷한 타입 <code>a -&gt; m a</code>이어서 혼란을 주기도 합니다. 하스켈에서 모나드를 만날 때는 대부분 <code>a -&gt; m b</code> 합성에서 만나니 둘을 혼동할만 합니다.</p>
+<p>모나드 구조에 있는 함수(카테고리 이론에선 Natural Transformation)를 이용하면 <code>a -&gt; m b</code> 타입 합성이 가능한 것이지, 이 합성 자체가 모나드인 건 아닙니다. 모나드의 합성을 얘기할 때는 <code>m a, m (m a), m (m (m a)), m (m (m (m a))),...</code> 이렇게 펑크터<code>m</code>의 합성을 말하는 것입니다.
+<code>m</code>의 생성자도 비슷한 타입 <code>a -&gt; m a</code>이어서 혼란을 주기도 합니다. 하스켈에서 모나드를 만날 때는 대부분 <code>a -&gt; m b</code> 합성에서 만나니 둘을 혼동할만 합니다.</p>
 <h2 id="왜-a---m-b-타입-함수가-특별할까">왜 <code>a -&gt; m b</code> 타입 함수가 특별할까?</h2>
 <p><code>m a -&gt; m b</code> 타입으로 함수를 만들면 복잡한 개념 없이 품고 품게composition 할 수 있지 않을까 생각이 듭니다. 하지만, <code>m</code> 컨텍스트에서 <code>m</code> 컨텍스트로 가면 품는 동안 반드시 <code>m</code> 컨텍스트가 발현된다는 보장이 없습니다. <code>m</code>을 다루는 함수면 <code>m</code>안에 있는 건 뭔지 신경쓰지 않을 수도 있습니다. <code>fmap</code>이 동작하거나, 패턴 매칭이 나와야지만 effect<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>가 드러납니다. <code>m</code>을 열어 보는 순간이 있어야 합니다. <code>m a</code> 와 <code>a -&gt; m b</code> 함수를 받으면, <code>m a</code> 에서 <code>m</code> 을 벗겨내는 작업을 해야만 <code>a -&gt; m b</code> 함수를 적용할 수 있습니다. 다시 말해, <em>컨텍스트가 반드시 발현</em>됩니다. 수학이 아닌, 순수하게 프로그래밍 입장에서 바라 봤습니다. 참고 - <a href="../posts/2020-06-24-WrappingType.html#%EA%B0%92-%EC%83%9D%EC%84%B1%EC%9E%90%EB%A5%BC-%EB%B2%97%EA%B8%B8-%EB%95%8C-%EB%B0%9C%ED%98%84%EB%90%98%EB%8A%94-%EC%BB%A8%ED%85%8D%EC%8A%A4%ED%8A%B8">값을 감싸는 이유</a></p>
 <p>2021.5.21 추가<br />
 또 한가지 중요한 이유가 있습니다. 바로 클로저를 활용하기 위해서입니다. 아래 <a href="../posts/2020-06-24-Monad.html#%EC%9E%90%EC%8B%A0%EC%9D%84-%ED%92%88%EA%B3%A0-%EC%9E%88%EB%8A%94-%ED%95%A8%EC%88%98%EC%83%81%EC%9C%84-%ED%95%A8%EC%88%98%EC%9D%98-%EB%A7%A4%EA%B0%9C-%EB%B3%80%EC%88%98-%EA%B0%92%EC%9D%80-%EC%A0%91%EA%B7%BC-%ED%95%A0-%EC%88%98-%EC%9E%88%EB%8B%A4-closure">클로저</a>부분 참고, <a href="../posts/2021-05-21-parsec.html#%EC%99%9C-%ED%8C%8C%EC%84%9C%EC%99%80-%ED%8C%8C%EC%84%9C%EB%A5%BC-%EB%B6%99%EC%9D%B4%EC%A7%80-%EC%95%8A%EA%B3%A0-%ED%8C%8C%EC%84%9C-bind-%ED%8C%8C%EC%84%9C%EB%A5%BC-%EA%B3%A0%EB%A5%B4%EB%8A%94-%ED%95%A8%EC%88%98%EB%A5%BC-%EB%B6%99%EC%9D%BC%EA%B9%8C">Parsec 글</a> 참고<br />
-하스켈에 쓰는 수많은 모나드들이 람다 변수를 메모리처럼 쓰는 패턴을 이용합니다. 모나드가 하스켈 온 사방에 나올 수 밖에 없는 이유입니다. 아래 Closure 참고 <code>a -&gt; m b</code>가 특별한 이유를 이렇게 설명하는 자료는 아직 찾지 못했습니다. <em>검증필요</em></p>
+하스켈에 쓰는 수많은 모나드들이 람다 변수를 메모리처럼 쓰는 패턴을 이용합니다. 모나드가 하스켈 온 사방에 나올 수 밖에 없는 이유입니다. 아래 Closure 참고
+<code>a -&gt; m b</code>가 특별한 이유를 이렇게 설명하는 자료는 아직 찾지 못했습니다. <em>검증필요</em></p>
 <figure>
 <img src="../images/monadSecret.png" alt="아무리 그래도 모나드는 어렵습니다." /><figcaption aria-hidden="true">아무리 그래도 모나드는 어렵습니다.</figcaption>
 </figure>
@@ -167,7 +169,9 @@
 <hr />
 <ol>
 <li id="fn1" role="doc-endnote"><p><strong>Effect</strong><br />
-effect는 아래와 같이 정의하지 않지만, 모나드 관련해선 아래와 같이 해석합니다. <code>m a -&gt; a</code>로 오는 동안 사라지는 정보를 effect라 부릅니다. 만일 사라지는 정보가 없다면(둘이 isomorphic 하다면), <code>m a</code>는 effect가 없다고 말합니다.</p>
+effect는 아래와 같이 정의하지 않지만, 모나드 관련해선 아래와 같이 해석합니다.
+<code>m a -&gt; a</code>로 오는 동안 사라지는 정보를 effect라 부릅니다.
+만일 사라지는 정보가 없다면(둘이 isomorphic 하다면), <code>m a</code>는 effect가 없다고 말합니다.</p>
 <p><strong>Computation 예</strong><br />
 - partiality<br />
 - nondeterminism<br />
@@ -177,8 +181,11 @@ effect는 아래와 같이 정의하지 않지만, 모나드 관련해선 아래
 - interactive input<br />
 - interactive output<br />
 [출처 Notions of computation and monads - Eugenio Moggi]</p>
-<p>(사전적으로는 컴퓨터가 계산하는 작업을 computation이라 부릅니다.) <code>T A</code>는 <code>A</code>의 computation 결과, <code>T</code>를 notion of computation이라 합니다. <code>a -&gt; m b</code> 함수는 <code>m</code>이 모나드라면 monadic computation</p>
-<p>튜링 머신으로 reduce되는 어떤 것이든 computation이라 부릅니다. <code>1+1</code>이란 식을 그대로 바라보면 computation이라 부르지 않지만, 이 식을 컴퓨터에 넣어 결과를 가져오기 위해, 컴퓨터에 준비한 <code>1+1</code>은 computation이라 부릅니다.</p>
+<p>(사전적으로는 컴퓨터가 계산하는 작업을 computation이라 부릅니다.)
+<code>T A</code>는 <code>A</code>의 computation 결과, <code>T</code>를 notion of computation이라 합니다.
+<code>a -&gt; m b</code> 함수는 <code>m</code>이 모나드라면 monadic computation</p>
+<p>튜링 머신으로 reduce되는 어떤 것이든 computation이라 부릅니다.
+<code>1+1</code>이란 식을 그대로 바라보면 computation이라 부르지 않지만, 이 식을 컴퓨터에 넣어 결과를 가져오기 위해, 컴퓨터에 준비한 <code>1+1</code>은 computation이라 부릅니다.</p>
 <p><strong>Computational effect</strong><br />
 computaion으로 인해 생기는 effect</p>
 <p><strong>Effectful function</strong><br />

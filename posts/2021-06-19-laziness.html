@@ -98,8 +98,13 @@
 <h2 id="strict-nonstrict-lazy-eager">Strict, Nonstrict, Lazy, Eager</h2>
 <p><a href="https://wiki.haskell.org/Lazy_vs._non-strict">haskell wiki Lazy vs. non-strict</a></p>
 <p>strict와 nonstrict는 <em>reduce 방향</em>에 따른 용어입니다.<br />
-프로그래밍 언어가 strict하다는 말은 다음을 의미합니다. “함수를 실행하기 전에, 인자들은 항상 평가가 끝난 상태여야 한다.” = 수학 스타일로 말하면 “식 안에 있는 것부터 reduce한 후 바깥을 reduce한다.” 이걸 strict하다고 말합니다. (어떤 것도 모호하게 두고 다음으로 넘어가지 않는다는 뜻에서 strict를 쓴게 아닐까요?)</p>
-<p>nonstrict는 “함수에 들어오는 인자는 평가가 되지 않은 상태여도 상관 없다.” = “식 바깥부터 reduce하고, 그 다음 안에 있는 걸 reduce 한다.”</p>
+프로그래밍 언어가 strict하다는 말은 다음을 의미합니다.
+“함수를 실행하기 전에, 인자들은 항상 평가가 끝난 상태여야 한다.”
+= 수학 스타일로 말하면 “식 안에 있는 것부터 reduce한 후 바깥을 reduce한다.”
+이걸 strict하다고 말합니다. (어떤 것도 모호하게 두고 다음으로 넘어가지 않는다는 뜻에서 strict를 쓴게 아닐까요?)</p>
+<p>nonstrict는
+“함수에 들어오는 인자는 평가가 되지 않은 상태여도 상관 없다.”
+= “식 바깥부터 reduce하고, 그 다음 안에 있는 걸 reduce 한다.”</p>
 <p>lazy와 eager는 <em>reduce를 하는 타이밍과 관련된</em> 말입니다.<br />
 당장 필요하지 않아도 redex를 만나면 항상 reduce를 하고 넘어가는 reduce 전략을 즉시eager 평가라 하고,<br />
 꼭 필요할 때까진 건드리지 않는 걸 지연lazy 평가라 합니다.</p>
@@ -107,7 +112,8 @@
 nonstrict가 lazy와 같은 작업 모양을 가리키지만 완전 동의어들은 아닙니다.</p>
 <p>이렇게 자세한 뜻은 차이가 있지만, 거의 동의어처럼 쓰이긴 합니다.</p>
 <h2 id="구조와-값">구조와 값</h2>
-<p><em>이런 식으로 설명 되어 있는 곳은 없습니다. 추측입니다.</em> 구조와 값으로 나누어서 보면, 구조를 먼저 준비하는 게 nonstrict고, 값을 먼저 준비하는게 strict입니다. (1+1, 2+2) 튜플이 있을 때, nonstrict는 튜플 구성 요소는 관심이 없고 구조부터 만듭니다.</p>
+<p><em>이런 식으로 설명 되어 있는 곳은 없습니다. 추측입니다.</em>
+구조와 값으로 나누어서 보면, 구조를 먼저 준비하는 게 nonstrict고, 값을 먼저 준비하는게 strict입니다. (1+1, 2+2) 튜플이 있을 때, nonstrict는 튜플 구성 요소는 관심이 없고 구조부터 만듭니다.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>(thunk<span class="op">-</span><span class="dv">1</span><span class="op">+</span><span class="dv">1</span> 식을 가리키는 포인터, thunk<span class="op">-</span><span class="dv">2</span><span class="op">+</span><span class="dv">2</span> 식을 가리키는 포인터)</span></code></pre></div>
 <p>이렇게 메모리에 구조를 준비하고, 그 다음 thunk가 가리키는 수식을 reduce(평가,실행,계산)해서</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>(<span class="dv">2</span>,<span class="dv">4</span>) 로 만듭니다<span class="op">.</span></span></code></pre></div>

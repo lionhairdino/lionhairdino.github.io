@@ -118,7 +118,8 @@
 <span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="co">-- 역시 타입 서명을 추가하면 포인트 프리로 쓸 수 있다. (5)</span></span>
 <span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="ot">f5 ::</span> (<span class="dt">Show</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">String</span></span>
 <span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>f5 <span class="ot">=</span> <span class="fu">show</span></span></code></pre></div>
-<p><em>검증 필요</em> 왜 (1)과 (2)가 다르게 추론될까요?<br />
+<p><em>검증 필요</em>
+왜 (1)과 (2)가 다르게 추론될까요?<br />
 monomorphism restriction 때문에 다르게 추론됩니다.<br />
 (1)번은 <code>f1</code>을 <code>show</code>와 함수 바인딩<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>해서 <code>x</code>를 추론합니다. <code>f1</code>은 <code>show x</code> 함수에 이름을 붙여 놓은겁니다. <code>show</code>가 그렇듯이 <code>f1</code>은 <code>Show</code> 인스턴스를 인자로 받습니다. 하지만 (2)번은 <code>show</code>가 아닌 <code>\x -&gt; ...</code> 람다 함수에 이름을 붙여 놓은 겁니다. 여기서도 역시 하스켈은 lazy합니다. <code>show</code>가 실행이 필요해지기 전까지는 <code>x</code>가 뭔지 모르는 상태입니다. monomorphism 제한이 켜져 있는 상태에서 추론 단서가 전혀 없으면 ()로 추론합니다.<br />
 그럼 (4)번은 어떻게 해석하면 될까요? (1)번에서 <code>x</code>는 함수 바인딩 하면서 <code>show</code>에 있는 매개 변수의 정보를 가져오지만, (4)번은 매개 변수는 상관없이 <code>show</code> 함수와 바인딩합니다.</p>

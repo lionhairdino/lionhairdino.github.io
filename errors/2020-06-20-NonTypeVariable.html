@@ -94,9 +94,17 @@
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ot">  ::</span> (<span class="dt">Num</span> b1, <span class="dt">Num</span> a, <span class="dt">Num</span> (b1, b2)) <span class="ot">=&gt;</span> (<span class="dt">Maybe</span> a, b1)</span></code></pre></div>
 <p><code>=&gt;</code> 왼쪽의 타입 제약constraint을 보면 <code>Num (b1, b2)</code>가 보입니다. GHC는 왜 이런 제약이 있다고 추론했을까요?</p>
 <ol type="1">
-<li><p><code>fmap</code>은 어떤 인스턴스의 <code>fmap</code>을 선택했을까요?<br> <code>fmap</code>의 두 번째 인자 <code>(,)</code>를 보고, 튜플의 fmap 을 선택했습니다.<br> <code>fmap :: (a0 -&gt; b) -&gt; (a, a0) -&gt; (a,b)</code><br></p></li>
-<li><p><code>fmap</code> 첫 번째 매개 변수의 타입은 <code>a0 -&gt; b</code><br> <code>&gt; :t (+1) . fst</code> <br> <code>(+1) . fst :: Num c =&gt; (c, b) -&gt; c</code> <br> <code>a0</code>는 <code>(c,b)</code>가 되고, <code>b</code>는 <code>c</code>라고 추론합니다.<br></p></li>
-<li><p><code>fmap</code> 두 번째 매개 변수의 타입은 <code>(a, a0)</code><br> <code>(Just 1, 100)</code> 인자가 들어왔으니, <code>a</code>는 <code>Just 1</code>, <code>a0</code>는 <code>100</code><br> 위에서 <code>a0</code>는 튜플로 추론됐고, 여기서는 <code>100</code>을 보고 <code>Num</code> 클래스 소속이라고 추론 됐습니다.<br> <code>100</code>은 <code>Int</code>나 <code>Double</code>이 아니고 <code>Num a =&gt; a</code> 입니다.<br></p></li>
+<li><p><code>fmap</code>은 어떤 인스턴스의 <code>fmap</code>을 선택했을까요?<br>
+<code>fmap</code>의 두 번째 인자 <code>(,)</code>를 보고, 튜플의 fmap 을 선택했습니다.<br>
+<code>fmap :: (a0 -&gt; b) -&gt; (a, a0) -&gt; (a,b)</code><br></p></li>
+<li><p><code>fmap</code> 첫 번째 매개 변수의 타입은 <code>a0 -&gt; b</code><br>
+<code>&gt; :t (+1) . fst</code> <br>
+<code>(+1) . fst :: Num c =&gt; (c, b) -&gt; c</code> <br>
+<code>a0</code>는 <code>(c,b)</code>가 되고, <code>b</code>는 <code>c</code>라고 추론합니다.<br></p></li>
+<li><p><code>fmap</code> 두 번째 매개 변수의 타입은 <code>(a, a0)</code><br>
+<code>(Just 1, 100)</code> 인자가 들어왔으니, <code>a</code>는 <code>Just 1</code>, <code>a0</code>는 <code>100</code><br>
+위에서 <code>a0</code>는 튜플로 추론됐고, 여기서는 <code>100</code>을 보고 <code>Num</code> 클래스 소속이라고 추론 됐습니다.<br>
+<code>100</code>은 <code>Int</code>나 <code>Double</code>이 아니고 <code>Num a =&gt; a</code> 입니다.<br></p></li>
 <li><p><code>Num (,)</code>이라고 추론 됐습니다. <code>(,)</code> 인스턴스가 없다는 에러가 날 것 같기도 한데, 그 이전에 <code>Num a =&gt; a</code> 에서 <code>a</code>에 튜플이 들어갑니다. 제약에는 타입 클래스만 올 수 있습니다. <code>a, b</code> 같은 타입 변수가 아니라 생성자 <code>(,)</code>가 들어왔기 때문에 non type-variable argument 란 에러가 납니다.</p></li>
 </ol>
 <p>에러는 괄호를 잘 못 씌워서 원하는 대로 함수 적용이 이루어지지 않았는데, 에러 메시지는 <em>“제약에 타입 변수가 아닌게 들어왔다”</em> 입니다. 꽤 오랫동안 봐야 통찰이 생길 것 같은 연결 고리입니다.</p>
@@ -124,12 +132,15 @@
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="ot">(.) ::</span> (b <span class="ot">-&gt;</span> c) <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> c</span>
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="fu">fmap</span><span class="ot"> ::</span> <span class="dt">Functor</span> f <span class="ot">=&gt;</span> (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> f a <span class="ot">-&gt;</span> f b</span>
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>(b <span class="ot">-&gt;</span> c) 가 <span class="fu">fmap</span> (<span class="op">+</span><span class="dv">1</span>)<span class="ot"> ::</span> (functor f, <span class="dt">Num</span> b) <span class="ot">=&gt;</span> f b <span class="ot">-&gt;</span> f b</span></code></pre></div>
-<p><code>b</code> 자리에 <code>f b</code>, <code>c</code> 자리에 <code>f b</code> 로 추론하고 그럼 두 번째 함수인 <code>a -&gt; b</code>는 <code>a -&gt; f b</code>라 추론합니다. 그런데, 두 번째 함수는 <code>(fst (Just 1, 100))</code> 에서 <code>Num a =&gt; Maybe a</code>로 추론됩니다.</p>
+<p><code>b</code> 자리에 <code>f b</code>, <code>c</code> 자리에 <code>f b</code> 로 추론하고
+그럼 두 번째 함수인 <code>a -&gt; b</code>는 <code>a -&gt; f b</code>라 추론합니다.
+그런데, 두 번째 함수는 <code>(fst (Just 1, 100))</code> 에서 <code>Num a =&gt; Maybe a</code>로 추론됩니다.</p>
 <p>그래서 <code>a -&gt; f b</code>와 <code>Maybe a</code>가 매칭이 안된다는 에러가 납니다.</p>
 <p>에러는 괄호를 잘 못 씌워서 원하는 대로 함수 적용이 이루어지지 않았는데, 에러 메시지는 <em>“타입 매칭 실패”</em> 입니다. 에러에 대한 경험을 키우는 것 말고, 별다른 이해 방법이 없어 보입니다. GHC 입장에서 생각하고, 타입 추론을 생각하며 에러를 따라 가는 훈련이 필요합니다.</p>
 <hr />
 <p>[1] 괄호 없는 표현식의 실행 순서</p>
-<p>:info 명령어로 우선 순위를 볼 수 있습니다. prefix 적용은 따로 우선 순위 표현이 없는데, 중위 연산자와 섞어 쓸 때면 우선순위가 가장 높은 10이라고 보면 되겠습니다. infix 만 우선 순위가 있습니다. 그리고 또 한가지, 중위 연산자는 함수를 넘기는 곳에 인자로 쓰일 수 없습니다. 괄호로 감싸서 prefix 로 만들어 넘겨야 합니다.</p>
+<p>:info 명령어로 우선 순위를 볼 수 있습니다.
+prefix 적용은 따로 우선 순위 표현이 없는데, 중위 연산자와 섞어 쓸 때면 우선순위가 가장 높은 10이라고 보면 되겠습니다. infix 만 우선 순위가 있습니다. 그리고 또 한가지, 중위 연산자는 함수를 넘기는 곳에 인자로 쓰일 수 없습니다. 괄호로 감싸서 prefix 로 만들어 넘겨야 합니다.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- . 은 infixr 9</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- $ 는 infixr 0</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- 아래처럼 괄호 없이 써도 연산자 우선 순위가 있어 제대로 계산됩니다.</span></span>

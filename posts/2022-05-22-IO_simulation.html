@@ -139,7 +139,9 @@
 <div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>program <span class="ot">=</span> \(s,d) <span class="ot">-&gt;</span>  dec (inc (dec (inc (s,d))))</span></code></pre></div>
 <p>이제 <code>program</code>에 초기 <code>(0, 0)</code>을 넣어 주면 <code>inc</code>, <code>dec</code>, <code>inc</code>, <code>dec</code>를 순차적으로 실행합니다.</p>
 <p><code>inc</code>와 <code>dec</code>는<br />
-1. 현재 상태<code>(Total, Display)</code>를 입력으로 받고 1. 상태를 가지고 작업한 후 1. 새로운 <code>(Total, Display)</code>를 반환합니다.</p>
+1. 현재 상태<code>(Total, Display)</code>를 입력으로 받고
+1. 상태를 가지고 작업한 후
+1. 새로운 <code>(Total, Display)</code>를 반환합니다.</p>
 <p>매개 변수로도 비순수 함수로 만든 코드와 똑같은 결과를 가져오는 작업을 만들었습니다.</p>
 <h3 id="memoize-문제">memoize 문제</h3>
 <p>만일 <code>Display</code> 없이</p>
@@ -167,14 +169,16 @@
 <li>입, 출력이 달라서 합성이 안되니, 컴비네이터(접착 함수)가 필요해졌습니다.</li>
 <li><code>Display</code>를 누적 계산해 줄 작업이 필요합니다.</li>
 </ol>
-<p>첫 번째, 입출력이 다른 문제를 해결해야 합니다. 입력은 <code>Display</code>가 포함되어 있는 <code>(Total, Display)</code>이고,<br />
+<p>첫 번째, 입출력이 다른 문제를 해결해야 합니다.
+입력은 <code>Display</code>가 포함되어 있는 <code>(Total, Display)</code>이고,<br />
 액션은 <code>Total -&gt; (Total, Display)</code> 형태의 함수입니다.<br />
 컴비네이터는 이 둘을 받아 <code>(Total, Display)</code>를 출력해야 합니다.</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ot">combinator ::</span> (<span class="dt">Total</span>, <span class="dt">Display</span>) <span class="ot">-&gt;</span> (<span class="dt">Total</span> <span class="ot">-&gt;</span> (<span class="dt">Total</span>, <span class="dt">Display</span>)) <span class="ot">-&gt;</span> (<span class="dt">Total</span>, <span class="dt">Display</span>)</span></code></pre></div>
 <ul>
 <li>상태를 나타내는 튜플<code>(Total, Display)</code>을 받고,<br />
 </li>
-<li><code>inc</code>나 <code>dec</code>같은 상태를 변화시키는 함수를 받아 (특별히 이런 함수를 액션이라 부르겠습니다.)</li>
+<li><code>inc</code>나 <code>dec</code>같은 상태를 변화시키는 함수를 받아
+(특별히 이런 함수를 액션이라 부르겠습니다.)</li>
 <li>새롭게 바뀐 상태 튜플<code>(Total, Display)</code>을 돌려주는 함수입니다.</li>
 </ul>
 <p>두 번째, 누적 작업을 해야합니다.</p>
@@ -208,7 +212,8 @@
 <p>비순수 함수로 작업했던 것과 동일한 결과를 내는 작업이 다음 모양이 되었습니다.</p>
 <div class="sourceCode" id="cb18"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>((<span class="dv">0</span>,<span class="dv">0</span>) <span class="op">&gt;&gt;&gt;&gt;</span> inc) <span class="op">&gt;&gt;&gt;&gt;</span> dec <span class="op">&gt;&gt;&gt;&gt;</span> inc <span class="op">&gt;&gt;&gt;&gt;</span> dec </span></code></pre></div>
 <blockquote>
-<p>(다)에서 <code>Display</code> 변화 값을 합치는 부분이 모나드를 이해하는 굉장히 중요한 부분입니다. 액션을 컴비네이터를 이용해 합성해도 원래 있던 <code>Display</code> 값을 잃어버리지 않고, 액션으로 인해 생긴 Display 값도 잃어비리지 않고 있습니다. 정리에서 이야기를 이어 가겠습니다.</p>
+<p>(다)에서 <code>Display</code> 변화 값을 합치는 부분이 모나드를 이해하는 굉장히 중요한 부분입니다. 액션을 컴비네이터를 이용해 합성해도 원래 있던 <code>Display</code> 값을 잃어버리지 않고, 액션으로 인해 생긴 Display 값도 잃어비리지 않고 있습니다.
+정리에서 이야기를 이어 가겠습니다.</p>
 </blockquote>
 <h3 id="람다-컨텍스트-활용">람다 컨텍스트 활용</h3>
 <p>컴비네이터를 연속으로 적용해서 액션 적용을 아래처럼 할 수 있습니다.</p>

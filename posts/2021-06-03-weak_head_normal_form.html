@@ -124,7 +124,8 @@
 </ol>
 <p>※ 그런데, Parallel and Concurrent Programming in Haskell - Simon Marlow 책의 29p Deepseq에서 NFData 클래스 설명 부분을 보면</p>
 <p>it isn’t possible to put a function in normal form</p>
-<p>이라 말합니다. 람다식이 함수인데, 인자 없는 람다식이 NF이란 말인지 아닌지 헛갈립니다. 함수는 안을 들여다 볼 수 없기 때문에, 안에 redex가 있을지 없을지 모르니 NF라 장담할 수 없습니다.</p>
+<p>이라 말합니다. 람다식이 함수인데, 인자 없는 람다식이 NF이란 말인지 아닌지 헛갈립니다.
+함수는 안을 들여다 볼 수 없기 때문에, 안에 redex가 있을지 없을지 모르니 NF라 장담할 수 없습니다.</p>
 <p>추측 - 람다 대수학에서 보면 값이란 게 없습니다. 모든 대상들은 함수입니다. 수나, 참 거짓등도 모두 함수로 정의되어 있습니다. 람다식을 reduce하고 reduce해서 나온 최종 결과가 값처럼 별도의 개념이 아니라 수나 참 거짓을 의미하는 람다식으로 끝납니다. 람다식들 중 더 이상 reduce 할 수 없는 상태면 function이라 부르지 않는 건 아닐까요?</p>
 <h3 id="head-normal-form---hnf">Head Normal Form - HNF</h3>
 <p>사실, 여기 head란 말 때문에 이 포스트를 정리하게 됐습니다.<br />
@@ -193,7 +194,8 @@ reduce 순서는 어떻게 될까요?<br />
 <code>add 1 2</code> 람다 대수의 application. 인자를 모두 주었어도 이대로 있으면 redex — (ㄷ)<br />
 <code>1 + 2</code> 까지 도달해도 redex<br />
 <code>3</code> 이 되면 NF</p>
-<p>(ㄷ) <code>add</code>를 <code>\x.(\y -&gt; x + y)</code> 람다 함수에 이름을 붙여 놓은 것으로 보면 <code>\x.(\y -&gt; x + y) 1 2</code> 라고 쓴 상태입니다. <code>(𝜆x1.A) M1 M2</code> 와 같은 구조입니다. 헤드에 redex가 있으므로 NF,HNF,WHNF 모두 아닙니다. 더 자세한 설명이 아래 쪽에 있습니다.</p></li>
+<p>(ㄷ) <code>add</code>를 <code>\x.(\y -&gt; x + y)</code> 람다 함수에 이름을 붙여 놓은 것으로 보면 <code>\x.(\y -&gt; x + y) 1 2</code> 라고 쓴 상태입니다.
+<code>(𝜆x1.A) M1 M2</code> 와 같은 구조입니다. 헤드에 redex가 있으므로 NF,HNF,WHNF 모두 아닙니다. 더 자세한 설명이 아래 쪽에 있습니다.</p></li>
 <li><p>값 생성자<br />
 값 생성자로 싸여 있다는 게 왜 redex가 있을지도 모르는 상태일까요?<br />
 생성자도 하나의 함수로 볼 수 있으니, 아직 필요한 인자를 받지 않은 Just 등이 단독으로 있으면 WHNF일 것 같은데, Just 1도 WHNF로 보고, True도 WHNF로 본다고 합니다. 왜 그럴까요? True 안에는 어떤 reduction이 있을 가능성이 있을까요? 이럴 때는 WHNF가 아니라 HNF이며 NF일 것 같이 보입니다.</p>

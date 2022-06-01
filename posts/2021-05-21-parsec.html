@@ -121,7 +121,8 @@
 <h2 id="parser-타입-정의">Parser 타입 정의</h2>
 <div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">Parser</span> a <span class="ot">=</span> <span class="dt">Parser</span> {<span class="ot"> parse ::</span> <span class="dt">String</span> <span class="ot">-&gt;</span> [(a,<span class="dt">String</span>)] }</span></code></pre></div>
 <p>유지하고 있어야 할 정보가 두 가지입니다. 리스트로 가지고 있든, 특별히 만든 타입으로 가지고 있든, 두 가지 정보만 가지고 있으면 됩니다. 두가지 정보를 효율적으로 묶어 놓기 좋은 방법이 바로 튜플입니다. 파싱된 결과가 하나가 아닐 경우를 위해 리스트로 만들었습니다.<br />
-Parser는 문자열을 받아서 어떤 작업을 한 후 튜플 리스트를 돌려주는 함수 타입을 말합니다. 파서를 “스트림을 받아서 튜플 리스트를 주는 함수” 타입이라 읽겠습니다. 아마도 파서를 연결 연결한 모양으로 스트림을 파싱하게 될 겁니다. <code>Parser</code>는 입력은 문자열인데, 출력이 튜플이라 컴포지션이 안됩니다. 나중에 들어올 값이 첫 번째 <code>Parser</code>를 통과하고, ‘남은 스트림’과 ’파싱된 결과’ 이 두 개의 정보를 가지고, 두 번째 <code>Parser</code>도 통과할 <em>준비</em>를 해놔야 합니다. 이게 바로 바로 값을 통과시키며 따라가는게 아니라, 값은 언젠가 들어 오겠거니 하고 함수를 미리 조립해 놓는 것입니다.</p>
+Parser는 문자열을 받아서 어떤 작업을 한 후 튜플 리스트를 돌려주는 함수 타입을 말합니다.
+파서를 “스트림을 받아서 튜플 리스트를 주는 함수” 타입이라 읽겠습니다. 아마도 파서를 연결 연결한 모양으로 스트림을 파싱하게 될 겁니다. <code>Parser</code>는 입력은 문자열인데, 출력이 튜플이라 컴포지션이 안됩니다. 나중에 들어올 값이 첫 번째 <code>Parser</code>를 통과하고, ‘남은 스트림’과 ’파싱된 결과’ 이 두 개의 정보를 가지고, 두 번째 <code>Parser</code>도 통과할 <em>준비</em>를 해놔야 합니다. 이게 바로 바로 값을 통과시키며 따라가는게 아니라, 값은 언젠가 들어 오겠거니 하고 함수를 미리 조립해 놓는 것입니다.</p>
 <h2 id="그런데-왜-결과-타입이-튜플-리스트일까">그런데 왜 결과 타입이 튜플 리스트일까?</h2>
 <p><code>String -&gt; (a, String)</code>쯤이면 될 것 같은데, 결과값이 왜 튜플 리스트일까요? 파서가 실패하게 되면 Maybe 타입을 써서 Nothing을 리턴하고, 성공하면 Just (a, String)을 리턴하게 할 수도 있을텐데, 그러지 않고 리스트를 이용했습니다. 성공하면 싱글턴 리스트 [(a, String)], 실패하면 빈 리스트 []를 리턴하도록 만들었습니다. 이렇게 리스트로 만들면, 딱 하나의 결과만 나오는 파서가 아닌 여러 갈래의 길로 나갈 수도 있는 파서를 만들 수 있습니다. (<span class="citation" data-cites="todo:여러">@todo:여러</span> 갈래길이 나오는 예시 추가)</p>
 <h2 id="왜-파서와-파서를-붙이지-않고-파서와-파서를-고르는-함수를-붙일까">왜 파서와 파서를 붙이지 않고, 파서와 파서를 고르는 함수를 붙일까?</h2>
@@ -316,7 +317,8 @@ Parser는 문자열을 받아서 어떤 작업을 한 후 튜플 리스트를 �
 <p>이 정리도 딱 마음에 드는 건 아닌데, 재귀가 가장 왼쪽에 있어서 그렇다는 설명보다는 조금 더 낫지 않을까 합니다.</p>
 <p>그럼 이 아이디어를 기억해 두고, chainl을 풀어 보겠습니다.<br />
 왜 <code>Parser (a -&gt; a -&gt; a)</code> 타입의 파서 연산자가 왔을까요? <code>p</code>는 <code>term</code>이나 <code>expr</code>등이 들어옵니다. <code>expr</code>과 <code>term</code>이 그냥 붙어 있진 않습니다. <code>+</code> 나 <code>*</code> 같은 연산자를 통해 여러번 붙어 있는 걸 파싱하는게 목표입니다. 그래서 두 번째 인자는 파서 두 개를 받아 합친 파서를 만들어 주는 연산자가 들어옵니다. 다시 정확히 얘기하면</p>
-<p>( 연산자는 여러가지가 올 수 있는데, 눈에 잘띄도록 연산자는 +로 표기 하겠습니다. ) <code>p</code>에 <code>파서</code>를 넣으면, 반복된 <code>+ p</code>를 <code>p</code>뒤에 붙여야 합니다.</p>
+<p>( 연산자는 여러가지가 올 수 있는데, 눈에 잘띄도록 연산자는 +로 표기 하겠습니다. )
+<code>p</code>에 <code>파서</code>를 넣으면, 반복된 <code>+ p</code>를 <code>p</code>뒤에 붙여야 합니다.</p>
 <div class="sourceCode" id="cb26"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="ot">chainl ::</span> <span class="dt">Parser</span> a <span class="ot">-&gt;</span> <span class="dt">Parser</span> (a <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> a) <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Parser</span> a</span>
 <span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>chainl p op a <span class="ot">=</span> (p <span class="ot">`chainl1`</span> op) <span class="op">&lt;|&gt;</span> <span class="fu">return</span> a</span>
 <span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -331,7 +333,8 @@ Parser는 문자열을 받아서 어떤 작업을 한 후 튜플 리스트를 �
 <code>p</code> 에서 파서를 꺼내<br />
 처음 <code>lookahead</code>가 가리키는 토큰을 파싱하는 파서와<br />
 다음으로 이동한 <code>lookahead</code>가 가리키는 토큰을 파싱하는 파서를<br />
-연산자로 붙입니다. 그리고, 다시 자기 자신을 부릅니다.(재귀) 언제까지? 파싱이 실패해서 <code>&lt;|&gt; return a</code>가 돌 때까지 계속합니다.</p>
+연산자로 붙입니다. 그리고, 다시 자기 자신을 부릅니다.(재귀)
+언제까지? 파싱이 실패해서 <code>&lt;|&gt; return a</code>가 돌 때까지 계속합니다.</p>
 <p>정리하면, 몇 번이고 +p를 적용할 <em>준비</em>가 되어 있는 파서 뭉치를 만들어냅니다.</p>
 <p><code>rest</code> 함수가 하는 일은, 3번 아이디어의 <code>lookahead</code>를 다음으로 이동하는 역할을 합니다. <code>r1</code> 에서 <code>&lt;-</code>가 동작해서 <code>lookahead</code>를 옮기고, <code>r2</code> 에서 <code>&lt;-</code>가 동작해서 <code>lookahead</code>를 옮깁니다.</p>
 <p><code>expr = expr + term</code>을 파싱해 보겠습니다.</p>
@@ -384,7 +387,9 @@ A. 가능합니다. 이해한게 맞는지 확인하기 위해 에러에 에러,
 <span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>    ) <span class="op">&lt;|&gt;</span> <span class="fu">return</span> r1</span></code></pre></div>
 </blockquote>
 <p>※ GHC는 <code>newtype</code>으로 싸놓은 <code>Parser</code>를 필요할 때까지 뭔지 보지 않습니다. 안에 함수가 들어 있는지, 무슨 구조로 되어 있는지 관심이 없습니다. 그저 a를 래핑한 타입으로 봅니다. 패턴 매칭으로 벗겨져야만 함수가 드러납니다.</p>
-<p>※ 설마 이런 오해를 할까 싶은 오해도 합니다. <code>Parser (a -&gt; a -&gt; a)</code> 에서 <code>Parser</code>를 벗겨내면 <code>(a -&gt; a -&gt; a)</code>가 나올까요? 선언에 쓰여있는 <code>Parser (a -&gt; a -&gt; a)</code>는 값이 아니라 <em>타입 생성자</em>입니다. 이 타입의 값에서 <em>값 생성자</em> <code>Parser</code>를 벗겨내면</p>
+<p>※ 설마 이런 오해를 할까 싶은 오해도 합니다.
+<code>Parser (a -&gt; a -&gt; a)</code> 에서 <code>Parser</code>를 벗겨내면 <code>(a -&gt; a -&gt; a)</code>가 나올까요?
+선언에 쓰여있는 <code>Parser (a -&gt; a -&gt; a)</code>는 값이 아니라 <em>타입 생성자</em>입니다. 이 타입의 값에서 <em>값 생성자</em> <code>Parser</code>를 벗겨내면</p>
 <div class="sourceCode" id="cb31"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="dt">String</span> <span class="ot">-&gt;</span> [ (  (a <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> a)  , <span class="dt">String</span>) ] </span></code></pre></div>
 <p>타입의 값이 나옵니다. 굳이 <code>(a -&gt; a -&gt; a)</code>를 이 구조안에 우겨 넣을까요? <code>Parser</code> 컨텍스트를 유지하기 위해서입니다.</p>
 <p>타입 생성자가 아닌 값 생성자 <code>Parser</code>로 값을 만들려면 <code>String -&gt; [(a, String)]</code> 타입의 함수를 인자로 줘야 합니다.</p>
@@ -460,7 +465,8 @@ A. 가능합니다. 이해한게 맞는지 확인하기 위해 에러에 에러,
 <span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a><span class="ot">=</span> (<span class="op">:</span>) <span class="op">&lt;$&gt;</span> v <span class="op">&lt;*&gt;</span> (((<span class="op">:</span>) <span class="op">&lt;$&gt;</span> v <span class="op">&lt;*&gt;</span> (some_v <span class="op">&lt;|&gt;</span> <span class="fu">pure</span> []))                 <span class="op">&lt;|&gt;</span> <span class="fu">pure</span> [])</span>
 <span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a><span class="ot">=</span> (<span class="op">:</span>) <span class="op">&lt;$&gt;</span> v <span class="op">&lt;*&gt;</span> (((<span class="op">:</span>) <span class="op">&lt;$&gt;</span> v <span class="op">&lt;*&gt;</span> (((<span class="op">:</span>) <span class="op">&lt;$&gt;</span> v <span class="op">&lt;*&gt;</span> many_v) <span class="op">&lt;|&gt;</span> <span class="fu">pure</span> [])) <span class="op">&lt;|&gt;</span> <span class="fu">pure</span> [])</span>
 <span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a><span class="ot">=</span> <span class="op">...</span></span></code></pre></div>
-<p>reduce과정이야 무식하게 따라가면 읽을 수 있긴 한데, 이 교차 재귀의 종료 조건(엣지 조건)은 뭘까요? <code>v</code>를 반복해서 붙여 놓습니다. 붙일 때마다 언제든 다음 단계로 진행하지 않을 조건 바로 <code>&lt;|&gt; pure []</code>도 계속 같이 붙여 놓습니다. 이 함수들은 꼭 파서를 위한 함수들만은 아닌데, 파서를 만들면서 같이 나온 건 아닐까 싶습니다. 파서와 정말 찰떡인 함수들입니다. 몇 번이고 반복하다가 파서가 실패하면 <code>&lt;|&gt; pure []</code> 로 넘겨서 더 이상 진행하지 않고 결과값을 리턴합니다. <code>many_v</code> 는 <code>&lt;|&gt; pure []</code>를 붙이는 역할, <code>some_v</code>는 <code>v</code>를 리스트에 넣어두는 역할을 반복하고 있습니다. 하스켈을 공부하려면 충분히 Lazy해져야 합니다.</p>
+<p>reduce과정이야 무식하게 따라가면 읽을 수 있긴 한데, 이 교차 재귀의 종료 조건(엣지 조건)은 뭘까요?
+<code>v</code>를 반복해서 붙여 놓습니다. 붙일 때마다 언제든 다음 단계로 진행하지 않을 조건 바로 <code>&lt;|&gt; pure []</code>도 계속 같이 붙여 놓습니다. 이 함수들은 꼭 파서를 위한 함수들만은 아닌데, 파서를 만들면서 같이 나온 건 아닐까 싶습니다. 파서와 정말 찰떡인 함수들입니다. 몇 번이고 반복하다가 파서가 실패하면 <code>&lt;|&gt; pure []</code> 로 넘겨서 더 이상 진행하지 않고 결과값을 리턴합니다. <code>many_v</code> 는 <code>&lt;|&gt; pure []</code>를 붙이는 역할, <code>some_v</code>는 <code>v</code>를 리스트에 넣어두는 역할을 반복하고 있습니다. 하스켈을 공부하려면 충분히 Lazy해져야 합니다.</p>
 <figure>
 <img src="../images/mutualRecursion.png" alt="화살 주고 과녁 확인하고, 과녁 확인하고 화살 주고" /><figcaption aria-hidden="true">화살 주고 과녁 확인하고, 과녁 확인하고 화살 주고</figcaption>
 </figure>
@@ -573,13 +579,17 @@ A. 가능합니다. 이해한게 맞는지 확인하기 위해 에러에 에러,
 <span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="fu">odd</span> <span class="dv">0</span>       <span class="ot">=</span> <span class="dt">False</span></span>
 <span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="fu">odd</span> n <span class="ot">=</span> <span class="fu">even</span> (n <span class="op">-</span> <span class="dv">1</span>)</span></code></pre></div>
 <p>재귀 하나만 나와도 머리가 복잡한데, 두 개가 교차로 부르고 있습니다. 어떻게 해석할까요?</p>
-<p>하스켈은 Lazy합니다. 필요할 때 해석하고, 아직 필요하지 않을 때는 이름만 유지합니다. <code>even을 부르면 odd를 부를거야.</code><br />
-<code>odd를 부르면 even을 부를거야.</code> 만일 프로그램을 머릿속에서 시뮬레이션 하는데, 이렇게 서로를 불러대서 껄끄럽다면, 아칙 충분히 Lazy하지 않아서입니다.</p>
+<p>하스켈은 Lazy합니다. 필요할 때 해석하고, 아직 필요하지 않을 때는 이름만 유지합니다.
+<code>even을 부르면 odd를 부를거야.</code><br />
+<code>odd를 부르면 even을 부를거야.</code>
+만일 프로그램을 머릿속에서 시뮬레이션 하는데, 이렇게 서로를 불러대서 껄끄럽다면, 아칙 충분히 Lazy하지 않아서입니다.</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">even</span> <span class="dv">100</span> <span class="ot">=</span> <span class="fu">odd</span> <span class="dv">99</span></span></code></pre></div>
 <p>아직 reduce 할게 남아 있으면 또 진행하면 됩니다.</p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">odd</span> <span class="dv">99</span> <span class="ot">=</span> <span class="fu">even</span> <span class="dv">98</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="op">...</span></span></code></pre></div>
-<p>어느 함수에서 <code>0</code>에 도달하냐에 따라 결과값은 <code>true | false</code> 로 달라집니다. 이게 읽는 건 충분히 Lazy하게 하다 보면 따라갈 수 있긴 있는데, 이런 구조가 떠오르긴 쉽지 않네요. 어쨌건 핵심은 Lazy입니다. 조금은 <em>무책임하게</em> 접근할 줄도 알아야 이런 아이디어가 떠오를 것 같습니다.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<p>어느 함수에서 <code>0</code>에 도달하냐에 따라 결과값은 <code>true | false</code> 로 달라집니다.
+이게 읽는 건 충분히 Lazy하게 하다 보면 따라갈 수 있긴 있는데, 이런 구조가 떠오르긴 쉽지 않네요.
+어쨌건 핵심은 Lazy입니다. 조금은 <em>무책임하게</em> 접근할 줄도 알아야 이런 아이디어가 떠오를 것 같습니다.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section>
 

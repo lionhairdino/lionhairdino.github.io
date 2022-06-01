@@ -114,7 +114,8 @@ bottom은 아예 값 개념이 없습니다.</p>
 <li><p>값을 리턴할 때도 있고, 안 할 때도 있는 함수 타입<br />
 - 1번 타입 | 2번 타입</p></li>
 </ol>
-<p><code>Int</code> 타입 함수보다 bottom 타입 함수는 한 단계 위 추상 계층으로 볼 수 있습니다. 실제 프로그래밍에서 타입은 버그를 줄여주기 위해 컴파일 직전, 타입 체커가 읽어 들여, 코드 조각(함수)들의 접점들이 다 무리없이 연결되는지 검사할 때 씁니다. 사람이 확실히 지킬수만 있다면 이론적으론 타입을 빼고 가도 됩니다. 물론 사람이 타입 체커만큼 본다는 건 불가능하겠지만 말입니다. 타입 이론에선 결과값을 돌려주지 않는 함수들을 표현할 때 필요한 개념이라 하는데, 그럼 하스켈에서는 다음처럼 Bottom 타입을 명시적으로 써주지 않는 이유는 뭘까요?</p>
+<p><code>Int</code> 타입 함수보다 bottom 타입 함수는 한 단계 위 추상 계층으로 볼 수 있습니다.
+실제 프로그래밍에서 타입은 버그를 줄여주기 위해 컴파일 직전, 타입 체커가 읽어 들여, 코드 조각(함수)들의 접점들이 다 무리없이 연결되는지 검사할 때 씁니다. 사람이 확실히 지킬수만 있다면 이론적으론 타입을 빼고 가도 됩니다. 물론 사람이 타입 체커만큼 본다는 건 불가능하겠지만 말입니다. 타입 이론에선 결과값을 돌려주지 않는 함수들을 표현할 때 필요한 개념이라 하는데, 그럼 하스켈에서는 다음처럼 Bottom 타입을 명시적으로 써주지 않는 이유는 뭘까요?</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ot">f1 ::</span> a <span class="ot">-&gt;</span> <span class="dt">Bottom</span> <span class="co">-- Bottom이란 타입은 없습니다.</span></span></code></pre></div>
 <p>무한 루프를 돌거나 에러로 끝나는 함수라면, 실용으로 생각하면 무한루프만이라도 Bottom이라 써줘도 될 것 같은데, 명확히 Bottom이란 타입은 없습니다. <em>추측</em> - 3번의 경우는 타입을 어떻게 적어줘야 할까요? <code>Int | Bottom</code> 이렇게 적으려면 새로운 문법을 도입해야 합니다. 모든 타입에는 항상 bottom이 들어있기 때문에 굳이 Bottom 표시를 안하는 게 아닐까요? 사실, 함수는 시그널을 받으면 리턴하지 않고 종료할 수 있기 때문에, 모든 함수는 3번 타입으로 볼 수 있습니다. (예외를 발생시키지 않도록 시그널을 받지 않게 <code>mask</code>를 씌우는 경우가 있긴 있습니다. 이런 경우가 훨씬 드물기 때문에 굳이 문법 요소를 추가한다면, 디폴트가 bottom이 있고, 어떤 표시를 하면 bottom이 아니라고 표시하는게 효율적일 것 같기도 합니다.)</p>
 <p>명시적으로 드러나는 때는 Bottom <em>타입</em> 대신 undefined <em>함수</em>를 씁니다. (아래 undefined 섹션 참고.)</p>
@@ -138,7 +139,8 @@ bottom은 아예 값 개념이 없습니다.</p>
 <h2 id="undefined">undefined</h2>
 <p>bottom 개념을 명시적으로 표현하기 위하 함수입니다.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">undefined</span><span class="ot"> ::</span> a</span></code></pre></div>
-<p>모든 타입이 될 수 있기 때문에, 어떤 경우에도 타입 체커를 통과합니다. 하스켈에서 타입 제약 없이 a라고만 쓰면 무슨 의미일까요? 모든 타입이란 의미로 타입 체킹할 때 필요한 타입과 모두 매치된다는 뜻입니다.</p>
+<p>모든 타입이 될 수 있기 때문에, 어떤 경우에도 타입 체커를 통과합니다.
+하스켈에서 타입 제약 없이 a라고만 쓰면 무슨 의미일까요? 모든 타입이란 의미로 타입 체킹할 때 필요한 타입과 모두 매치된다는 뜻입니다.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">error</span><span class="ot"> ::</span> <span class="dt">String</span> <span class="ot">-&gt;</span> a</span></code></pre></div>
 <p>어떤 타입의 함수 안에서도 쓸 수 있다는 뜻입니다. 이론상, 모든 타입에 속할 수 있는 값은 bottom 뿐이 없습니다. 하스켈에서는 bottom을 결과 타입에 제약 없이 <code>a</code>만 써서 표현한다고 볼 수 있습니다.</p>
 <p>타입 체커가 undefined 함수를 만나면, 모든 타입을 처리할 수 있구나 하고 통과하고, 나중에 undefined를 평가할 때가 되면, 평가해서 얻을 값이 없다는 걸 알고 에러를 내뱉습니다.</p>

@@ -185,7 +185,9 @@
 </ol>
 <div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>runReaderT act2 <span class="st">&quot;친구&quot;</span></span></code></pre></div>
 <p><code>act2</code>는 <code>IO</code>작업 <code>putStrLn " 나는 친구와 밥을 먹었다. "</code>를 <em>준비</em>하고, <code>IO ()</code>를 리턴합니다.</p>
-<p>결론은 <code>act1</code>에 <code>"친구"</code>를 넣어 <code>IO</code> 액션을 만들고, 그 다음 <code>act2</code>에 <code>"친구"</code>를 넣어 <code>IO</code> 액션을 만들어서, 바인드의 결과는 <code>IO</code> 액션을 엮어 놓은 상태가 됐습니다.<br />
+<p>결론은 <code>act1</code>에 <code>"친구"</code>를 넣어 <code>IO</code> 액션을 만들고,
+그 다음 <code>act2</code>에 <code>"친구"</code>를 넣어 <code>IO</code> 액션을 만들어서,
+바인드의 결과는 <code>IO</code> 액션을 엮어 놓은 상태가 됐습니다.<br />
 <code>IO</code> 액션 엮음chaining은 GHCi에서 이 엮음에 realworld 환경값을 넣어주면서 실행하게 됩니다. (<code>IO</code> 모나드의 실행)<br />
 (이 품고 품게 엮은 모양을 뭐라 번역하면 좋을까요?)</p>
 <p><code>ReaderT</code>의 바인드를 보면 두 개의 바인드가 실행되는 게 보이나요?</p>
@@ -261,7 +263,8 @@
 <code>act3</code>의 조립 조건 <code>(MonadReader Int m) =&gt;</code> 을 만족하는 <code>instance MonadReader ReaderT...</code>가 있으니 OK</p>
 <p>미리 준비되어 있는 <code>MonadReader</code>의 인스턴스는 <code>MaybeT</code>, <code>ListT</code>, <code>WriterT</code>, <code>StateT</code>, <code>IdentityT</code>, <code>ExceptT</code>, <code>ErrorT</code>, <code>ContT</code>, <code>ReaderT</code>, <code>RWST</code> 용 인스턴스가 있습니다. <code>acts</code>의 리턴 타입(또는 컨텍스트라 말하기도 합니다.)이 <code>ReaderT</code> 타입이니, <code>act2</code>의 타입도 <code>ReaderT</code> 타입으로 추론하고, <code>ReaderT</code>용 <code>ask</code>를 가져옵니다.<br />
 <a href="https://hackage.haskell.org/package/mtl-2.2.2/docs/Control-Monad-Reader.html#g:1" class="uri">https://hackage.haskell.org/package/mtl-2.2.2/docs/Control-Monad-Reader.html#g:1</a></p>
-<p>미리 준비되어 있는 <code>MonadIO</code>의 인스턴스는 <code>MonadIO</code>쪽에서 선언되어 있지 않고, <code>ReaderT</code>나 <code>WriterT...</code> 각각에서 볼 수 있습니다. <a href="https://hackage.haskell.org/package/mtl-2.2.2/docs/Control-Monad-Reader.html#g:3" class="uri">https://hackage.haskell.org/package/mtl-2.2.2/docs/Control-Monad-Reader.html#g:3</a></p>
+<p>미리 준비되어 있는 <code>MonadIO</code>의 인스턴스는 <code>MonadIO</code>쪽에서 선언되어 있지 않고, <code>ReaderT</code>나 <code>WriterT...</code> 각각에서 볼 수 있습니다.
+<a href="https://hackage.haskell.org/package/mtl-2.2.2/docs/Control-Monad-Reader.html#g:3" class="uri">https://hackage.haskell.org/package/mtl-2.2.2/docs/Control-Monad-Reader.html#g:3</a></p>
 <p><code>main</code> 을 다음과 같이 쓰면 <code>ReaderT</code> 타입은 보이지 않아 처음에는 다른 컨텍스트로 오해할 수도 있지만, <code>runReaderT</code>를 보고 알 수 있습니다.</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> liftIO <span class="op">$</span> runReaderT ( <span class="kw">do</span></span>
