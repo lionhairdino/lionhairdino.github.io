@@ -83,9 +83,10 @@
 
 <p>모나드 트라우마로 움찔한 분들은 코모나드란 용어가 나오기 전까진 코모나드는 잠깐 잊어버리고 보는 게 더 나을 수 있습니다.</p>
 <p>지금까지 알게 모르게 이미 아래 같은 패턴으로 코딩한 적이 있을 수도 있습니다. 아래서 참조한 가브리엘 글의 제목도 you could have invented comonads 입니다.</p>
+<h2 id="몸풀기">몸풀기</h2>
 <p>몸풀기를 잠깐 하고 넘어 가도록 하겠습니다.</p>
 <p>고차 함수, 람다 함수를 활용한 방법</p>
-<h4 id="가-인자-하나를-넣어-주면-속성을-지정해서-가지고-있는-것과-같습니다.">(가) – 인자 하나를 넣어 주면, 속성을 지정해서 가지고 있는 것과 같습니다.</h4>
+<h3 id="가-인자-하나를-넣어-주면-속성을-지정해서-가지고-있는-것과-같다.">(가) – 인자 하나를 넣어 주면, 속성을 지정해서 가지고 있는 것과 같다.</h3>
 <div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ot">haveProperty ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> ( (<span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span>) <span class="ot">-&gt;</span> <span class="dt">Int</span> )</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>haveProperty x <span class="ot">=</span> \f <span class="ot">-&gt;</span> f x</span></code></pre></div>
 <div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="kw">let</span> personA <span class="ot">=</span> haveProperty <span class="dv">10</span></span>
@@ -94,7 +95,8 @@
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="dv">30</span></span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> personB (<span class="op">+</span><span class="dv">20</span>)</span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="dv">120</span></span></code></pre></div>
-<h4 id="나-미리-함수를-넣어-놓는-방식도-가능합니다.">(나) – 미리 함수를 넣어 놓는 방식도 가능합니다.</h4>
+<h3 id="나-미리-함수를-넣어-놓기">(나) – 미리 함수를 넣어 놓기</h3>
+<p>위 (가)와 같은데, 함수를 넘겨서 갖고 있게 할 수도 있습니다.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ot">haveFunc ::</span> (<span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span>) <span class="ot">-&gt;</span> (<span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span>)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>haveFunc f <span class="ot">=</span> \x <span class="ot">-&gt;</span> f (x <span class="op">+</span> <span class="dv">1</span>)</span></code></pre></div>
 <div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="kw">let</span> toolA<span class="ot">=</span> haveFunc (<span class="op">+</span><span class="dv">2</span>)</span>
@@ -103,11 +105,14 @@
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="dv">4</span></span>
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> toolB <span class="dv">1</span></span>
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="dv">5</span></span></code></pre></div>
-<h4 id="다-그리고-표현을-매끄럽게-하기-위해-기존-oop에서-쓰던-익숙한-흐름으로-바꾸기-위해-함수명과-인자-순서를-거꾸로-써주기-위한-연산자를-정의합니다.">(다) – 그리고, 표현을 매끄럽게 하기 위해 (기존 OOP에서 쓰던 익숙한 흐름으로 바꾸기 위해) 함수명과 인자 순서를 거꾸로 써주기 위한 연산자를 정의합니다.</h4>
-<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ot">(#) ::</span> a <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> b</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>x <span class="op">#</span> f <span class="ot">=</span> f x</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="kw">infixl</span> <span class="dv">0</span> <span class="op">#</span></span></code></pre></div>
+<h3 id="다-함수명과-인자의-순서를-바꾸기-위한-헬퍼">(다) – 함수명과 인자의 순서를 바꾸기 위한 헬퍼</h3>
+<p>그리고, 표현을 매끄럽게 하기 위해 (기존 OOP에서 쓰던 익숙한 흐름으로 바꾸기 위해) 함수명과 인자 순서를 거꾸로 써주기 위한 연산자를 정의합니다.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- Data.Function에 있는 (&amp;)와 같은 함수입니다.</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- 굳이 정의하지 않아도 되는데, 원문에 따라 일단 보고 지나 가겠습니다.</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="ot">(#) ::</span> a <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> b</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>x <span class="op">#</span> f <span class="ot">=</span> f x</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="kw">infixl</span> <span class="dv">0</span> <span class="op">#</span></span></code></pre></div>
 <p>※ 아래는 Gabriel Gonzalez의 블로그 <a href="https://www.haskellforall.com/2013/02/you-could-have-invented-comonads.html" class="uri">https://www.haskellforall.com/2013/02/you-could-have-invented-comonads.html</a>의 코드 일부를 발췌했습니다.</p>
 <h2 id="builder-패턴">Builder 패턴</h2>
 <div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">Option</span> <span class="ot">=</span> <span class="dt">String</span></span>
@@ -215,7 +220,7 @@ A. 마치 <code>w a</code>에 <code>(w a -&gt; b)</code>를 바로 적용해도 
 A. <code>m a</code>에서 <code>m</code>을 떼어내고 <code>a</code>를 반환하는 순간 <code>m</code>은 다시 살려낼 수 없습니다. 그런데 <code>fmap</code>도 내부 동작을 보면 패턴 매칭으로 <code>m</code>을 벗겨내고 있습니다. 하지만, 그 <code>m</code>은 스코프에 남아 있는 상태로 처리하고, <code>a</code>에 함수 적용을 마치고 난 후 그 걸 다시 가져와 합친 다음 반환합니다. 그래서, 이 걸 컨텍스트를 유지한다고 말합니다.</p>
 </blockquote>
 <h2 id="왜-a---w-a는-안되는데-w-a---w-w-a는-가능한가">왜 a -&gt; w a는 안되는데 w a -&gt; w (w a)는 가능한가?</h2>
-<p><code>m a -&gt; a</code> 는 effect를 담아둘 곳이 없어 불가능하지만, <code>m (m a) -&gt; m a</code> 는 effect 두 개를 <code>join</code>해서 <code>m</code>에 담아 둘 수 있어 가능했습니다. 이와 비슷하게 코모나드는 <code>a -&gt; w a</code> 는 <code>w</code>를 만들어내질 못하니 불가능하지만, <code>w a -&gt; w (w a)</code>는 기존 가지고 있던 <code>w</code>를 <code>duplicate</code>하니 가능합니다.<br />
+<p><a href="../posts/2022-03-25-beforeMonad.html">모나드</a>에서 <code>m a -&gt; a</code> 는 effect를 담아둘 곳이 없어 불가능하지만, <code>m (m a) -&gt; m a</code> 는 effect 두 개를 <code>join</code>해서 <code>m</code>에 담아 둘 수 있어 가능했습니다. 이와 비슷하게 코모나드는 <code>a -&gt; w a</code> 는 <code>w</code>를 만들어내질 못하니 불가능하지만, <code>w a -&gt; w (w a)</code>는 기존 가지고 있던 <code>w</code>를 <code>duplicate</code>하니 가능합니다.<br />
 다르게 표현하면,<br />
 <code>join</code>으로 합친 것이 effect를 잃어버리지 않는 경우만 모나드로 만들 수 있었던 것처럼,
 <code>duplicate</code>로 복사한게 effect로써의 의미가 있는 경우만 코모나드로 만들 수 있습니다.</p>
