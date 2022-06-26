@@ -198,13 +198,21 @@ A. 실제 스펙을 보고나면 do 구문은 레이아웃을 새로 시작하�
 <span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="co">-- ok</span></span>
 <span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  func2 <span class="ot">=</span> </span>
 <span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>      a</span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>   <span class="kw">where</span> </span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>   <span class="kw">where</span></span>
 <span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>  a <span class="ot">=</span> <span class="dv">1</span> <span class="co">-- 이렇게 func2까진 내어 써도 ok</span></span>
-<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a><span class="co">-- ok</span></span>
-<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>func3 <span class="ot">=</span> <span class="kw">do</span></span>
-<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a><span class="fu">putStrLn</span> <span class="st">&quot;ok&quot;</span> <span class="co">-- func3까지 내어 써도 ok</span></span></code></pre></div>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- 이건 func2에 딸린 문장이 아니라, 탑레벨로 정의한 상태가 됩니다.</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- 아래 설명 참고</span></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a><span class="co">-- ok</span></span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>func3 <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a><span class="fu">putStrLn</span> <span class="st">&quot;ok&quot;</span> <span class="co">-- func3까지 내어 써도 ok</span></span></code></pre></div>
 <p><code>let</code>에 딸린 식은 함수명(이 전 컨텍스트)보다 반드시 들여 써야하지만, <code>do</code>와 <code>where</code>는 그렇지 않습니다. 스펙에 따르면 같은 동작을 할 것으로 쓰여 있는데 그렇지 않습니다. 바로 이 전 컨텍스트보다는 들여 써야 하니 <code>do</code>, <code>where</code> 구문도 한 칸이상 들여 쓰기 해야 할 것 같은데, 함수명까지 가능합니다. <em>어딘가 놓친 규칙이 있을 것 같은데 아직 찾지 못했습니다.</em></p>
+<blockquote>
+<p>2022.6.26 추가<br />
+GHC와 haskell2010 리포트가 다르게 동작한다는 걸 알게되있습니다. 특별히 <code>do</code>구문이 <code>let</code>과 다르게 동작하는 이유를 <a href="https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/bugs.html#extension-NondecreasingIndentation">NondecreasingIndentation</a>를 보시면 알 수 있습니다.
+<code>do</code> 체이닝 할 때를 위해 특이하게 동작하는 걸로 보입니다.
+이 뿐만 아니라, GHC와 haskell2010 리포트가 다른 부분이 꽤 있습니다. 위 링크 페이지에서 확인하실 수 있습니다. (Ailrun님 감사합니다.)</p>
+</blockquote>
 <p>또 <code>do</code>의 들여 쓰기에 따라 다음 구문이 영향을 받습니다.</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- ok</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>func2 <span class="ot">=</span> <span class="kw">do</span></span>
@@ -214,7 +222,7 @@ A. 실제 스펙을 보고나면 do 구문은 레이아웃을 새로 시작하�
 <span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="co">-- 위 putStrLn을 한 칸이라도 들여 쓰면 ok로 바뀝니다.</span></span>
 <span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>func3 <span class="ot">=</span> a</span>
 <span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a> <span class="kw">where</span></span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>a <span class="ot">=</span> <span class="dv">1</span></span></code></pre></div>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>   a <span class="ot">=</span> <span class="dv">1</span></span></code></pre></div>
 <p>새 함수 정의의 시작인 <code>func3 = a</code> 는 <code>func2</code>안에 속하는 구문으로 해석해서 다음 에러가 납니다.</p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>test13<span class="op">.</span>hs<span class="op">:</span><span class="dv">9</span><span class="op">:</span><span class="dv">7</span><span class="op">:</span> <span class="fu">error</span><span class="op">:</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    parse <span class="fu">error</span> on input ‘<span class="ot">=</span>’</span>
@@ -340,7 +348,7 @@ Zero : 명시적으로 중괄호<code>{</code>를 쓴 경우는 0입니다. 가�
 <ol>
 <li id="fn1" role="doc-endnote"><p>wikibook엔 (4)번 표현식 시작이 라인 시작에 없을 때의 규칙 설명이 있습니다. 하지만, 없어도 (1)번과 (5)번 규칙으로 정해질 것 같은데, GHC 내부에 구현되어 있는 규칙이 뭔지 궁금합니다.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 <li id="fn2" role="doc-endnote"><p>wikibook 설명엔 다음과 같이 되어 있습니다.<br />
-If you see one of the layout keywords, (<code>let</code>, <code>where</code>, <code>of</code>, <code>do</code>), insert an open <code>curly brace</code> (right before the stuff that follows it)<br />
+If you see one of the layout keywords, (<code>let</code>, <code>where</code>, <code>of</code>, <code>do</code>), insert an open <code>curly brace</code> (right before the stuff that follows it)
 C언어처럼 <code>let {</code>, <code>where {</code>, <code>of {</code>, <code>do {</code> 중괄호를 넣어서 읽으면 된다고 되어 있는 걸, 동작에 맞춰 말을 바꿨습니다. <code>{</code> 중괄호를 넣는다는 건 새로운 레이아웃을 시작한다는 말입니다.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 <li id="fn3" role="doc-endnote"><p>들여 쓰기에 따라 코드에 의미가 있기 때문에 layout이란 용어를 씁니다. 코드가 어떻게 배치 되었냐는 말입니다. <code>{}</code>을 써서 블록을 표현하던 걸, <code>{}</code>없이 동일한 들여 쓰기만으로 같은 블록안의 코드임을 나타냅니다. 이 때 한 블록을 나타내는 동일한 들여 쓰기 값을 layout context라 합니다. 문서에 따라 layout이라 표현하는데도 있고, context라 표현하는데도 있고, layout context, 현재 컨텍스트 등등으로 표현합니다.<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
