@@ -141,8 +141,8 @@
 <p>그리고 아래 플러그인 설치 명령을 실행하면 휘리릭 설치 완료입니다.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="at">:PlugInstall</span></span></code></pre></div>
 <h3 id="haskell-language-server-이하-hls">Haskell Language Server (이하 HLS)</h3>
-<p>에디터들이 LSP (Language Server Protocol)에 맞춰 요청을 보내면,
-<code>GHC</code>, <code>Stack</code>, <code>Cabal</code>, <code>HLS</code>를 설치할 때, 지금(2022) 가장 권장되는 방식은 <code>ghcup</code>를 이용하는 방식인 듯 합니다.</p>
+<p>에디터들이 LSP (Language Server Protocol)에 맞춰 요청을 보내면, 이를 받아 언어 컴파일러나 기타 툴의 도움을 받아 필요한 정보를 돌려주는 툴을 Language Server라 합니다. 하스켈 생태계에서 에디터들의 IDE스런 동작을 도와주는 여러 툴들이 있었는데, 지금은 거의 <a href="https://haskell-language-server.readthedocs.io/en/latest/index.html">Haskell Language Server</a>로 흡수 및 통일 된 것 같습니다.</p>
+<p><code>GHC</code>, <code>Stack</code>, <code>Cabal</code>, <code>HLS</code>를 설치할 때, 지금(2022) 가장 권장되는 방식은 <code>ghcup</code>를 이용하는 방식인 듯 합니다.</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">ghcup</span> tui</span></code></pre></div>
 <p>실행 경로가 잘 잡혀있고 정상 동작하는지 확인하기 위해 아래로 확인</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> haskell-language-server-wrapper <span class="ex">--lsp</span></span></code></pre></div>
@@ -246,7 +246,7 @@
 <span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">(</span><span class="ex">use</span> <span class="at">-v</span> for more information<span class="kw">)</span><span class="bu">.</span></span>
 <span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  <span class="ex">Please</span> ensure that ghcide is compiled with the same GHC installation as the project.</span></code></pre></div>
 <p>뜬금 없이 <code>HLS</code>에 포함되어 있는 <code>ghcide</code>가 프로젝트와 같은 <code>GHC</code> 버전으로 컴파일 되지 않았다는 에러입니다. 그런데, 그 위에 메시지를 보면 패키지 로드에 실패했다는 메시지도 보입니다. 이 상태에서 <code>stack build</code>를 하고 나면 <code>HLS</code>가 정상 동작합니다.</p>
-<p><code>hie-bios</code>는 <code>stack repl</code>을 쓰는데, <code>stack repl</code>은 <code>executables</code>에 있는 파일을 볼 때 <code>dependencies</code>에 있는 <em>로컬 라이브러리 컴포넌트는 빌드하지 않는다</em>고 합니다. <code>stack build</code>는 <code>library</code>와 <code>executables</code>를 모두 빌드하는데, <code>stack repl</code>은 다른 동작을 합니다. <code>stack</code>의 버그로 볼 수 있다고 합니다. (Ailrun님, 조언 감사합니다.) 이런 이유로 <code>Cabal</code>이 아닌 <code>stack</code>을 쓸 때는 <code>stack build</code>를 한 번 해줘야 <code>HLS</code>가 정상 동작합니다.</p>
+<p><code>hie-bios</code><a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>는 <code>stack repl</code>을 쓰는데, <code>stack repl</code>은 <code>executables</code>에 있는 파일을 볼 때 <code>dependencies</code>에 있는 <em>로컬 라이브러리 컴포넌트는 빌드하지 않는다</em>고 합니다. <code>stack build</code>는 <code>library</code>와 <code>executables</code>를 모두 빌드하는데, <code>stack repl</code>은 다른 동작을 합니다. <code>stack</code>의 버그로 볼 수 있다고 합니다. (Ailrun님, 조언 감사합니다.) 이런 이유로 <code>Cabal</code>이 아닌 <code>stack</code>을 쓸 때는 <code>stack build</code>를 한 번 해줘야 <code>HLS</code>가 정상 동작합니다.</p>
 <p><code>HLS</code>가 시작 못하는 진짜 이유는, <code>package.yaml</code>에 의존성이 지정되어 있는 패키지(여기 경우는 myApp)를 로드하려 하는데, 해당 패키지가 없기 때문입니다. 이 때, <code>stack build</code>를 하면 라이브러리가 쓰이든 안 쓰이든 모두 빌드됩니다.</p>
 <p>만일 <code>Main.hs</code>를 아래와 같이 <code>import Lib</code>를 넣어 주면, <code>stack build</code>를 하지 않아도 <code>HLS</code>가 작동합니다.</p>
 <div class="sourceCode" id="cb23"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="kw">module</span> <span class="dt">Main</span> <span class="kw">where</span></span>
@@ -254,6 +254,14 @@
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span>
 <span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> someFunc</span></code></pre></div>
 <p>장황하긴 한데, HLS가 동작하려면 필요한 조건과, <code>stack</code>이 일괄적인 동작을 하지 않는 부분은 알아두면 도움이 되는 곳이 있을 것 같습니다.</p>
+<section class="footnotes" role="doc-endnotes">
+<hr />
+<ol>
+<li id="fn1" role="doc-endnote"><p>hie-bios
+HLS가 하스켈 프로젝트를 어떻게 빌드할지 알아야 합니다. 어떤 플래그, 패키지등이 필요한지 정보가 필요합니다. <code>hie-bios</code>는 현재 사용중인 빌드 시스템으로부터 이런 정보들을 가져오는 툴입니다.
+<a href="https://github.com/haskell/hie-bios/blob/master/README.md" class="uri">https://github.com/haskell/hie-bios/blob/master/README.md</a><a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section>
 
 <div class="comment">
 <script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
