@@ -82,10 +82,10 @@
 </div>
 
 <p>2022.7.8 추가
-<code>Thunk</code>, <code>Chunk</code>를 혼용해서 쓰던 걸 바로 잡습니다.
-<code>Thunk</code> : 아직 평가 되기 전 코드를 의미합니다. 이 문서에서는 혼동을 피하기 위해 <code>&lt;Thunk&gt;</code>로 표기하겠습니다.
+<code>Thunk</code>, <code>Chunk</code>를 혼용해서 쓰던 걸 바로 잡습니다.<br />
+<code>Thunk</code> : 아직 평가 되기 전 코드를 의미합니다. 이 문서에서는 혼동을 피하기 위해 <code>&lt;Thunk&gt;</code>로 표기하겠습니다.<br />
 <code>Chunk</code> : 전체를 이루는 각 부분들을 덩어리Chunk라고 합니다. Lazy와 관계 없이 부분을 뜻하는, 단어 뜻 그대로 덩어리란 의미로 읽으면 됩니다.</p>
-<p>ex. <code>Strict ByteString</code>도 <code>Lazy ByteString</code>도 평가 하기 전에는 <code>&lt;Thunk&gt;</code> 남아 있습니다.
+<p>ex. <code>Strict ByteString</code>도 <code>Lazy ByteString</code>도 평가 하기 전에는 <code>&lt;Thunk&gt;</code> 남아 있습니다.<br />
 ex. <code>fromChunk</code>를 이용해서 <code>Strict ByteString Chunk</code>를 여러개 모아 하나의 <code>Lazy ByteString</code>으로 만들 수 있습니다.</p>
 <p>※ 바로 잡는데 도움을 주신 준규님, Ailrun님 감사합니다.</p>
 <p>라이브러리 때문에 <code>Lazy</code>와 <code>Strict</code>를 혼용해서 써야 되는 상황이 생겨 헤매다가, 문득 <code>Lazy</code>가 생각처럼 동작하는지 궁금해서 테스트 해봤습니다.</p>
@@ -104,25 +104,26 @@ ex. <code>fromChunk</code>를 이용해서 <code>Strict ByteString Chunk</code>�
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="ot">func3 ::</span> <span class="dt">BL.ByteString</span> <span class="ot">-&gt;</span> <span class="dt">BL.ByteString</span> <span class="ot">-&gt;</span> (<span class="dt">BL.ByteString</span>, <span class="dt">BL.ByteString</span>)</span>
 <span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>func3 <span class="op">!</span>a <span class="op">!</span>b <span class="ot">=</span> (a , b)</span></code></pre></div>
 <p>Bang! 패턴에 대한 설명은 <a href="https://lionhairdino.github.io/posts/2021-06-20-strictness.html">Strict와 Lazy</a> 포스트를 참고하세요.</p>
-<pre><code>*Main&gt; :set -XOverloadedStrings
-*Main&gt; let t1 = func1 undefined &quot;a&quot;
-*Main&gt; let t2 = func2 undefined &quot;b&quot;
-*Main&gt; let t3 = func3 undefined &quot;c&quot;
-*Main&gt; snd t1
-&quot;a&quot;
-*Main&gt; snd t2
-&quot;b&quot;
-*Main&gt; snd t3
-&quot;*** Exception: Prelude.undefined ...</code></pre>
-<p><code>Data.ByteString</code>이 <code>Strict</code>라 하면 <code>t1</code>과 <code>Lazy</code>에 <code>bang</code>을 붙인 <code>t3</code>가 같은 동작을 해야 될 것 같은데 그렇지 않습니다. 제가 생각하는 <code>Strict</code>가 아닌 걸로 보입니다. <code>ByteString Strict</code>와 <code>ByteString Lazy</code> 차이가 뭘까요?</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">*Main</span><span class="op">&gt;</span> :set <span class="at">-XOverloadedStrings</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">*Main</span><span class="op">&gt;</span> let t1 = func1 undefined <span class="st">&quot;a&quot;</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ex">*Main</span><span class="op">&gt;</span> let t2 = func2 undefined <span class="st">&quot;b&quot;</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="ex">*Main</span><span class="op">&gt;</span> let t3 = func3 undefined <span class="st">&quot;c&quot;</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="ex">*Main</span><span class="op">&gt;</span> snd t1</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;a&quot;</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="ex">*Main</span><span class="op">&gt;</span> snd t2</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;b&quot;</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="ex">*Main</span><span class="op">&gt;</span> snd t3</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;*** Exception: Prelude.undefined ...</span></span></code></pre></div>
+<p><code>Data.ByteString</code>이 <code>Strict</code>라 하면 <code>t1</code>과 <code>Lazy</code>에 <code>bang</code>을 붙인 <code>t3</code>가 같은 동작을 해야 될 것 같은데 그렇지 않습니다. 예상했던 <code>Strict</code>의 동작인가요? <code>ByteString Strict</code>와 <code>ByteString Lazy</code> 차이가 뭘까요?</p>
 <h2 id="strict">Strict</h2>
 <p><code>Data.ByteString.Internal</code>에 있는 <a href="http://downloads.haskell.org/~ghc/latest/docs/html/libraries/bytestring-0.10.12.1/src/Data-ByteString-Internal.html#ByteString">정의</a></p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- 효율적으로 공간을 활용하는 Word8 벡터입니다. 실제 데이터의 시작을 가리키는 포인터, 오프셋,길이로 표현됩니다.</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- 모든 필드에는 bang이 붙어 있습니다.</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">ByteString</span> <span class="ot">=</span> <span class="dt">PS</span> <span class="ot">{-# UNPACK #-}</span> <span class="op">!</span>(<span class="dt">ForeignPtr</span> <span class="dt">Word8</span>) <span class="co">-- payload</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>                     <span class="ot">{-# UNPACK #-}</span> <span class="op">!</span><span class="dt">Int</span>                <span class="co">-- offset</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>                     <span class="ot">{-# UNPACK #-}</span> <span class="op">!</span><span class="dt">Int</span>                <span class="co">-- length</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">deriving</span> (<span class="dt">Typeable</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- 효율적으로 공간을 활용하는 Word8 벡터입니다. </span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- 실제 데이터의 시작을 가리키는 포인터, 오프셋,길이로 표현됩니다.</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- 모든 필드에는 bang이 붙어 있습니다.</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">ByteString</span> <span class="ot">=</span> <span class="dt">PS</span> <span class="ot">{-# UNPACK #-}</span> <span class="op">!</span>(<span class="dt">ForeignPtr</span> <span class="dt">Word8</span>) <span class="co">-- payload</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>                     <span class="ot">{-# UNPACK #-}</span> <span class="op">!</span><span class="dt">Int</span>                <span class="co">-- offset</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>                     <span class="ot">{-# UNPACK #-}</span> <span class="op">!</span><span class="dt">Int</span>                <span class="co">-- length</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>     <span class="kw">deriving</span> (<span class="dt">Typeable</span>)</span></code></pre></div>
 <p><a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> ForeignPtr은 외부 객체 참조 포인터입니다.</p>
 <h2 id="lazy">Lazy</h2>
 <p><code>Data.ByteString.Lazy.Internal</code>에 있는 <a href="https://hackage.haskell.org/package/bytestring-0.11.1.0/docs/src/Data.ByteString.Lazy.Internal.html#ByteString">정의</a></p>
@@ -130,21 +131,21 @@ ex. <code>fromChunk</code>를 이용해서 <code>Strict ByteString Chunk</code>�
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="kw">qualified</span> <span class="dt">Data.ByteString.Internal</span> <span class="kw">as</span> <span class="dt">S</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">ByteString</span> <span class="ot">=</span> <span class="dt">Empty</span> <span class="op">|</span> <span class="dt">Chunk</span> <span class="ot">{-# UNPACK #-}</span> <span class="op">!</span><span class="dt">S.ByteString</span> <span class="dt">ByteString</span></span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">deriving</span> (<span class="dt">Typeable</span>)</span></code></pre></div>
-<p><code>Lazy</code>는 <code>Strict ByteString</code>을 여러 Chunk로 쪼개어 갖고 있는 모양입니다. 달리 말하면, <code>Chunk</code>란 값 생성자로 여러번 쌓여 있는 상태입니다.
-<code>Strict</code>에는 필드들이 모두 <code>bang</code>이 붙어 있으므로 <code>PS</code> 값 생성자가 evalute될 때, 모든 필드들은 <code>&lt;Thunk&gt;</code>상태로 둘 수 없다는 말입니다. 물론 <code>PS</code> 생성자가 evaluate 되기 전에는 <code>&lt;Thunk&gt;</code>로 남아 있을 겁니다.</p>
+<p><code>Lazy</code>는 <code>Strict ByteString</code>을 여러 Chunk로 쪼개어 갖고 있는 모양입니다. 달리 말하면, <code>Chunk</code>란 값 생성자로 여러 번 쌓여 있는 상태입니다.
+<code>Strict</code>에는 필드들이 모두 <code>bang</code>이 붙어 있으므로 <code>PS</code> 값 생성자가 평가될 때, 모든 필드들은 <code>&lt;Thunk&gt;</code>상태로 둘 수 없다는 말입니다. 물론 <code>PS</code> 생성자가 평가되기 전에는 <code>&lt;Thunk&gt;</code>로 남아 있을 겁니다.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Empty</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="dt">Chunk</span> <span class="op">!</span>(포인터, 오프셋, 길이) <span class="dt">Empty</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="dt">Chunk</span> <span class="op">!</span>(포인터, 오프셋, 길이) ( <span class="dt">Chunk</span> <span class="op">!</span>(포인터, 오프셋, 길이) <span class="dt">Empty</span> )</span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="dt">Chunk</span> <span class="op">!</span>(포인터, 오프셋, 길이) ( <span class="dt">Chunk</span> <span class="op">!</span>(포인터, 오프셋, 길이) ( <span class="dt">Chunk</span> <span class="op">!</span>(포인터, 오프셋, 길이) <span class="dt">Empty</span> ))</span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co">-- 이런 모양들이 될 수 있습니다.</span></span></code></pre></div>
-<p>연산들이 가장 바깥에 있는 <code>Chunk</code>를 evalute할 때 하나의 바이트열만 <code>strict</code>하게 두고, 안에 있는 <code>Chunk</code>는 <code>&lt;Thunk&gt;</code>로 둡니다. 만일 오프셋, 길이를 봐서 다음 안 쪽의 <code>Chunk</code>로 넘어가면 그 때, 안 쪽 <code>Chunk</code>를 evaluate 할 겁니다.</p>
-<p>단순히 <code>bang</code>을 붙였냐 안 붙였냐의 차이가 아닙니다.<br />
+<p>연산들이 가장 바깥에 있는 <code>Chunk</code>를 평가할 때 하나의 바이트열만 <code>strict</code>하게 두고, 안에 있는 <code>Chunk</code>는 <code>&lt;Thunk&gt;</code>로 둡니다. 만일 오프셋, 길이를 봐서 다음 안 쪽의 <code>Chunk</code>로 넘어가면 그 때, 안 쪽 <code>Chunk</code>를 평가 할 겁니다.</p>
+<p>단순히 <code>bang</code>을 붙였냐 안 붙였냐의 차이가 아닙니다.
 <code>Strict ByteString</code>이라 해서 무조건 <code>ByteString</code>만 만나면 <code>Strict</code>하게 동작하는 게 아니라, <em>Chunk없이 전체 문자열을 가리키는 포인터를 가져오고</em>, <code>Lazy ByteString</code>은 <code>Chunk</code>로 나누어 필요할 때 조금씩, 조금씩 각 조각을 가리키는 포인터를 가져오게 되어 있습니다.</p>
 <p>이렇게 보면, <em>Lazy ByteString은 단위를 1바이트보다 크게 잡은 배열에 값 생성자와 묶어 하나의 항목만 strict하게 평가</em>되도록 <code>bang</code>이 붙어 있는 것으로 볼 수 있습니다.</p>
 <h2 id="둘의-차이가-궁금했던-이유">둘의 차이가 궁금했던 이유</h2>
-<p><code>Strict</code>냐 <code>Lazy</code>냐가 궁금해진 이유는, 하나의 함수에서 다른 함수로 ByteString을 건네 줄 때, 계속해서 Copy가 일어나면 어마 어마하게 비효율적일텐데 어떻게 처리되고 있는지가 궁금해서였습니다. <code>Strict</code>도, <code>Lazy</code>도 똑 같이 <code>&lt;Thunk&gt;</code>로 넘어가니 실제 카피는 일어나지 않다가, evalute될 때 Copy가 일어날텐데, 그 전까지는 Lazy는 첫 번째 <code>Chunk</code>안에 들어 있는 <code>PS</code> 생성자가 가진 <code>Strict</code> 포인터를 Copy할테고, <code>Strict</code>는 <code>PS</code>가 가진 <code>Strict</code> 포인터를 Copy할 겁니다. 함수간 전달에서는 크게 차이가 날 것 같지 않습니다. immutable한 데이터를 가리키는 포인터만을 Copy하는 것으로 보입니다.</p>
+<p><code>Strict</code>냐 <code>Lazy</code>냐가 궁금해진 이유는, 하나의 함수에서 다른 함수로 ByteString을 건네 줄 때, 계속해서 Copy가 일어나면 어마 어마하게 비효율적일텐데 어떻게 처리되고 있는지가 궁금해서였습니다. <code>Strict</code>도, <code>Lazy</code>도 똑 같이 <code>&lt;Thunk&gt;</code>로 넘어가니 실제 복사는 일어나지 않다가, 평가될 때 복사가 일어날텐데, 그 전까지는 Lazy는 첫 번째 <code>Chunk</code>안에 들어 있는 <code>PS</code> 생성자가 가진 <code>Strict</code> 포인터를 복사할테고, <code>Strict</code>는 <code>PS</code>가 가진 <code>Strict</code> 포인터를 복사할 겁니다. 함수간 전달에서는 크게 차이가 날 것 같지 않습니다. immutable한 데이터를 가리키는 포인터만을 복사하는 것으로 보입니다.</p>
 <p>mutable 해야 하는 상황이 생기면 어떻게 될까요?
-<code>ByteString</code> 두 개를 붙인다 하면 새로운 <code>ByteString</code>으로 두 개의 실제 데이터 내용을 모두 Copy해와야 합니다. 예를들어 간단하게 앞에 한 바이트, 한 바이트 추가한다고 리스트처럼 생각하고 작업하다간 퍼포먼스가 한없이 떨어지게 됩니다. 빈번하게 mutable해야 한다면, <code>Strict ByteString</code>으로 해결할 수 있는 문제가 아닙니다.
+<code>ByteString</code> 두 개를 붙인다 하면 새로운 <code>ByteString</code>으로 두 개의 실제 데이터 내용을 모두 복사해와야 합니다. 예를들어 간단하게 앞에 한 바이트, 한 바이트 추가한다고 리스트처럼 생각하고 작업하다간 퍼포먼스가 한없이 떨어지게 됩니다. 빈번하게 mutable해야 한다면, <code>Strict ByteString</code>으로 해결할 수 있는 문제가 아닙니다.
 (이럴 때 <a href="https://hackage.haskell.org/package/bytestring-0.11.2.0/docs/Data-ByteString-Builder.html">Builder</a>를 씁니다.)</p>
 <p>둘이 대부분 같은 인터페이스가 구현되어 있어 사용할 때는 신경쓰지 않아도 되겠지 했는데, 그렇지 않습니다. 함수가 <code>BL.ByteString</code>을 받도록 설계하면, 이 함수는 <code>BS.ByteString</code>을 받을 수 없습니다. 이유가 대부분 안에서 다른 라이브러리에 있는 <code>ByteString</code> 관련 함수들을 가져다 쓰는데, 해당 라이브리리들의 버전을 모두 바꿔줘야 합니다. 때로는 <code>Strict</code>, <code>Lazy</code> 둘 중 하나만 지원하는 라이브러리들도 있습니다.</p>
 <p>둘 중 어떤 걸 어떤 때 써야하는지 정리가 필요해 보이는데, 지금 당장은 딱 필요한 순간에 전체 바이트열이 필요한 경우가 많다면 <code>Strict</code>로, 그렇지 않으면 <code>Lazy</code>를 쓴다정도만 떠오릅니다.</p>
