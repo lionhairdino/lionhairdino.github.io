@@ -85,9 +85,9 @@
 <code>Thunk</code>, <code>Chunk</code>를 혼용해서 쓰던 걸 바로 잡습니다.<br />
 <code>Thunk</code> : 아직 평가 되기 전 코드를 의미합니다. 이 문서에서는 혼동을 피하기 위해 <code>&lt;Thunk&gt;</code>로 표기하겠습니다.<br />
 <code>Chunk</code> : 전체를 이루는 각 부분들을 덩어리Chunk라고 합니다. Lazy와 관계 없이 부분을 뜻하는, 단어 뜻 그대로 덩어리란 의미로 읽으면 됩니다.</p>
-<p>ex. <code>Strict ByteString</code>도 <code>Lazy ByteString</code>도 평가 하기 전에는 <code>&lt;Thunk&gt;</code> 남아 있습니다.<br />
-ex. <code>fromChunk</code>를 이용해서 <code>Strict ByteString Chunk</code>를 여러개 모아 하나의 <code>Lazy ByteString</code>으로 만들 수 있습니다.</p>
-<p>※ 바로 잡는데 도움을 주신 준규님, Ailrun님 감사합니다.</p>
+<p>ex. <code>Strict ByteString</code>도 <code>Lazy ByteString</code>도 평가 하기 전에는 <code>&lt;Thunk&gt;</code>로 남아 있습니다.<br />
+ex. <a href="https://hackage.haskell.org/package/bytestring-0.11.3.1/docs/Data-ByteString-Lazy.html#v:fromChunks"><code>fromChunks</code></a>를 이용해서 <code>Strict ByteString Chunk</code>를 여러개 모아 하나의 <code>Lazy ByteString</code>으로 만들 수 있습니다.</p>
+<p>※ 바로 잡는데 도움을 주신 <a href="https://gist.github.com/nattybear/99e035b8968540b0bc044378aac5177e">준규</a>님, Ailrun님 감사합니다.</p>
 <p>라이브러리 때문에 <code>Lazy</code>와 <code>Strict</code>를 혼용해서 써야 되는 상황이 생겨 헤매다가, 문득 <code>Lazy</code>가 생각처럼 동작하는지 궁금해서 테스트 해봤습니다.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ot">{-# LANGUAGE OverloadedStrings #-}</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ot">{-# LANGUAGE BangPatterns #-}</span></span>
@@ -113,7 +113,7 @@ ex. <code>fromChunk</code>를 이용해서 <code>Strict ByteString Chunk</code>�
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="ex">*Main</span><span class="op">&gt;</span> snd t2</span>
 <span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;b&quot;</span></span>
 <span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="ex">*Main</span><span class="op">&gt;</span> snd t3</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;*** Exception: Prelude.undefined ...</span></span></code></pre></div>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="ex">***</span> Exception: Prelude.undefined ...</span></code></pre></div>
 <p><code>Data.ByteString</code>이 <code>Strict</code>라 하면 <code>t1</code>과 <code>Lazy</code>에 <code>bang</code>을 붙인 <code>t3</code>가 같은 동작을 해야 될 것 같은데 그렇지 않습니다. 예상했던 <code>Strict</code>의 동작인가요? <code>ByteString Strict</code>와 <code>ByteString Lazy</code> 차이가 뭘까요?</p>
 <h2 id="strict">Strict</h2>
 <p><code>Data.ByteString.Internal</code>에 있는 <a href="http://downloads.haskell.org/~ghc/latest/docs/html/libraries/bytestring-0.10.12.1/src/Data-ByteString-Internal.html#ByteString">정의</a></p>
