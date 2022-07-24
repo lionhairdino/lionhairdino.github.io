@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko" lang="ko">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <title>lionhairdino - 모나드가 함수형 프로그래밍에 찰떡인 이유</title>
+
+        <meta name="description" content="모나드를 완벽하게 설명하려고 하지 않습니다. 그저 함수형에서 상태를 다루는데 모나드가 어떻게 쓰이는지 보는게 목적인 글입니다." />
+        <meta property="og:description" content="모나드를 완벽하게 설명하려고 하지 않습니다. 그저 함수형에서 상태를 다루는데 모나드가 어떻게 쓰이는지 보는게 목적인 글입니다." />
+
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <link rel="icon" href="https://lionhairdino.github.io/favicon.svg" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino16px.png" sizes="16x16" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino24px.png" sizes="24x24" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino32px.png" sizes="32x32" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino48px.png" sizes="48x48" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino57px.png" sizes="57x57" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino60px.png" sizes="60x60" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino64px.png" sizes="64x64" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino72px.png" sizes="72x72" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino76px.png" sizes="76x76" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino114px.png" sizes="114x114" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino120px.png" sizes="120x120" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino144px.png" sizes="144x144" />
+        <link rel="shortcut icon" href="../favicon.ico" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino152px.png" sizes="152x152" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino180px.png" sizes="180x180" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino192px.png" sizes="192x192" />
+        <link rel="manifest" href="../site.webmanifest" />
+        <link rel="mask-icon" href="https://lionhairdino.github.io/Lionhairdino_black.svg" color="#ff7500" />
+        <meta name="msapplication-TileImage" content="/images/favicon/Lionhairdino144px.png" />
+        <meta name="msapplication-TileColor" content="#ff7500" />
+        <meta name="theme-color" content="#ffffff" />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="모나드가 함수형 프로그래밍에 찰떡인 이유" />
+        <meta property="og:site_name" content="Lionhairdino" />
+        <meta property="og:url" content="https://lionhairdino.github.io/posts/2022-07-24-monadForContext.html" />
+
+        <meta property="og:image" content="https://lionhairdino.github.io/images/state400px.png" />
+
+      <meta name="keywords" content="모나드, 상태, Monad, Context">
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-E9WZ6VXGHP"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-E9WZ6VXGHP');
+</script>
+<script src="../script/copycode.js"></script>
+<script async src="https://cse.google.com/cse.js?cx=9c53b4915cbb2605c"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.11.1/tocbot.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.11.1/tocbot.css" />
+    </head>
+    <body>
+        <div id="header">
+            <div style="display:inline-block;margin-right:5px;padding-top: 5px;" id="logo">
+                <a href="../"><img style="width:30px;border:none" src="../images/favicon/Lionhairdino48px.png"></a>
+            </div>
+            <div style="display:inline-block;vertical-align: top;padding-top:5px;" id="navigation">
+                <a href="../">lionhairdino</a>
+                <a href="../about.html">about</a>
+                <!--<a href="/archive.html">archive</a>-->
+            </div>
+            <div style="display:inline-block;font-size:0.8em;vertical-align: top;">
+                <div style="display:inline-block;vertical-align: top;padding-top: 5px">사이트내 검색</div>
+                <div style="display:inline-block;width:180px;"> 
+                    <div class="gcse-searchbox-only"></div>
+                </div>
+            </div>
+            <div>
+                여기 글들은 일종의 질문입니다. 주의! 틀린 내용이 있을 수 있습니다. 용어 선택도 학계, 업계에서 쓰는 걸로 되어 있지 않습니다.
+            </div>
+        </div>
+        <div class="js-toc-content">
+            <h1>모나드가 함수형 프로그래밍에 찰떡인 이유</h1>
+            <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+<div class="info">
+    Posted on July 24, 2022
+    
+</div>
+
+<h2 id="정보상태의-지역화localize">정보(상태)의 지역화Localize</h2>
+<p>프로그래밍의 모듈화는 모든 패러다임들의 궁극적인 목표입니다.
+코드에 가깝게 이 말을 들여다보면, 상태를 최대한 지역local적이게 만드는 게 목표입니다.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- 의사 코드</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>outer(){</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  localVal;</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  inner1(){</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    access localVal;</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  inner2(){</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    access localVal;</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>outer2(){</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  access localVal <span class="co">-- Error</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>위와 같이 변수들의 스코프를 최대한 지역적으로 만들면서 공유하는 방법을 고민합니다. <code>localVal</code>은 <code>outer</code>안에 있는 모든 함수들에선 접근 가능하지만, <code>outer2</code>에서는 접근할 수 없습니다.
+OOP에서는 outer에 해당하는 것이 오브젝트가 되어 지역적인 상태들을 오브젝트의 속성으로 두면서 모듈화 합니다.</p>
+<h2 id="참조-투명성과-불변성">참조 투명성과 불변성</h2>
+<p>하지만, 함수형에서는 바깥 스코프에 있는 변수에 접근 하는 것이 불가능합니다. 이유는,<br />
+첫 째, 순수 함수는 같은 인자가 들어 온다면 오늘 실행해도, 내일 실행해도 항상 같은 결과가 나와야 합니다. 참조 투명성Referential Transparency<br />
+둘 째, 값을 변경할 수 있는 변수, 즉 mutable variable을 만들 수 없습니다. 불변성Immutability</p>
+<p>※ 비 함수형 언어에서 함수형스럽게 작성하기 위한 라이브러리들은, 언어가 위 두 가지를 강요하지 않지만, 위 두가지 제약이 있는 것처럼 생각하고 풀어나가는 코드로 되어 있습니다.</p>
+<p>의례 상태를 저장하는 mutable 변수를 만들 수 없기 때문에 “상태가 없다”라고 말하기도 하지만, 상태는 실용 프로그램을 만들 때는 반드시 있어야 하는 요소입니다.
+참조 투명성, 불변성을 지키며 상태를 처리하는 방법은 두 가지가 있습니다.</p>
+<h2 id="상태를-저장할-매개-변수를-따로-두기">상태를 저장할 매개 변수를 따로 두기</h2>
+<p>첫 째, 매개 변수parameter로 모든 상태를 계속 이어지는 함수에 넘기는 방법</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>func1 (val)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>func2 (val)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="op">...</span></span></code></pre></div>
+<p>이런 함수들에 모두 매개 변수를 추가합니다.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>func1 (context, val)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>func2 (context, val)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="op">...</span></span></code></pre></div>
+<h2 id="람다-변수">람다 변수</h2>
+<p>둘 째, 람다 변수에 상태를 넣어서 안쪽에 있는 람다에서는 바깥 쪽 람다 변수에 접근 가능한 걸 이용하는 방법</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>\a <span class="ot">-&gt;</span> \b <span class="ot">-&gt;</span> \c <span class="ot">-&gt;</span> a<span class="op">..</span> b<span class="op">..</span> c<span class="op">..</span></span></code></pre></div>
+<p><code>\c -&gt; a.. b.. c..</code> 람다 함수는 바깥 람다 함수의 헤드에 있는 <code>a</code>, <code>b</code>에 접근 가능합니다.</p>
+<h2 id="변수-자체가-상태를-가질-수-있는-타입으로-정의하기">변수 자체가 상태를 가질 수 있는 타입으로 정의하기</h2>
+<p>여기 첫 째 방법을 살짝 변형한 테크닉이 있습니다. 매개 변수를 이용하긴 하지만, 보이지 않게 하는 방법입니다.
+<code>val</code>이라는 타입에 <code>context</code>를 보관할 곳을 따로 두어 <code>context</code> 매개 변수가 따로 보이지 않게 하는 방법입니다.
+(실제 사용할 때는 람다 변수도 같이 활용하는 패턴(모나드 제3법칙)을 쓰지만 여기선 잠시, 첫 째 방법에 집중해서 보겠습니다.)</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>func1 (<span class="ot">val ::</span> <span class="dt">Int</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>func2 (<span class="ot">val ::</span> <span class="dt">Int</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="op">...</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co">-- 이렇게 정수만 있던 타입에</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">IntWithContext</span> context <span class="ot">=</span> <span class="dt">IntWithContext</span> <span class="dt">Int</span> context</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>func1 (<span class="ot">val ::</span> <span class="dt">IntWithContext</span>)</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>func2 (<span class="ot">val ::</span> <span class="dt">IntWithContext</span>)</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="op">...</span></span></code></pre></div>
+<p>이렇게 타입 안에 지역적인 정보를 가지고 있을 수 있는 공간을 마련할 수 있습니다.</p>
+<h2 id="합성">합성</h2>
+<p><code>context</code>를 만들어 내는 함수를 여러번 적용하는 상황을 보면</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ot">addContextFunc1 ::</span> some <span class="ot">-&gt;</span> <span class="dt">IntWithContext</span> some</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ot">addContextFunc2 ::</span> some <span class="ot">-&gt;</span> <span class="dt">IntWithContext</span> some</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="ot">addContextFunc3 ::</span> some <span class="ot">-&gt;</span> <span class="dt">IntWithContext</span> some</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="op">...</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> valWithMultiContext <span class="ot">=</span> addContextFunc3 (addContextFunc2 (addContextFunc1 s)) <span class="co">-- error</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co">-- 타입이 달라 위에처럼 계속 적용할 수는 없습니다.</span></span></code></pre></div>
+<p><code>context</code>가 계속 추가되고, 타입은 <code>IntWithContext</code>로 같게 유지하면서 <code>context</code>들을 모두 잃어버리지 않아야 합니다.</p>
+<h2 id="컴비네이터">컴비네이터</h2>
+<p>서로 타입이 다르지만, 특수한 경우에는 컴비네이터(접착 함수)를 써서 합성하는 모양을 만들 수 있습니다.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ot">combinator ::</span> <span class="dt">IntWithContext</span> context <span class="ot">-&gt;</span> (context <span class="ot">-&gt;</span> <span class="dt">IntWithContext</span>) <span class="ot">-&gt;</span> <span class="dt">IntWithContext</span> context</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>combinator (<span class="dt">IntWithContext</span> intval context) func <span class="ot">=</span> {</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- 첫 번째 인자로 받은 IntWithContext에서 int와 context를 꺼내서</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- context를 잠시 보관하고, int에 func를 적용해서 새로운 IntWithContext 값을 만듭니다.</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- 그 후 보관했던 context를 새로운 IntWithContext에 합쳐서 반환합니다.</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> result <span class="ot">=</span> (<span class="dt">IntWithContext</span> <span class="dv">0</span> someContext) <span class="ot">`combinator`</span> addContextFunc1</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>                                            <span class="ot">`combinator`</span> addContextFunc2</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>                                            <span class="ot">`combinator`</span> addContextFunc3</span></code></pre></div>
+<p><code>IntWithContext</code>에는 <code>context</code>를 넣어 둘 곳이 하나 뿐이 없습니다. 그런데, 두 번의 <code>context</code>가 생기면 어떻게 할까요?
+<em>두 번의 <code>context</code>를 합쳐서 하나의 <code>context</code>로 만들어 <code>IntWithContext</code> 타입에 넣습니다.</em> 이 부분이 모나드의 핵심 동작입니다.
+(이렇게 두 번의 <code>context</code>를 하나의 <code>context</code>로 합칠 수 없으면 모나드로 만들 수 없습니다.)</p>
+<p>모나드로 여러가지 <code>effect</code>를 해결할 수 있는데, 여기서는 그 중 참조 투명성, 불변성으로 인해 상태를 유지할 수 없는 문제를 모나드로 해결하는 방법을 다뤘습니다.</p>
+<h2 id="정리">정리</h2>
+<p>모나드로 상태 처리 하기<br />
+상태를 상위 스코프의 변수로 두어 유지할 방법이 없는 함수형에선, 상태를 끌고 다닐 방법이 필요합니다. 타입 자체에 <code>context</code>를 위한 공간을 만들고, 컴비네이터가 합성을 하면서 <code>context</code>를 계속 합성해주는데, 이 때 <code>context</code> 합성이 가능한 구조를 모나드라 합니다. 이렇게 하면, 프로그래머는 컴비네이터에게 상태를 끌고 다니는 것을 맡기고, 크게 신경쓰지 않아도 됩니다.</p>
+<p>이 글에선, 모나드의 모든 걸 설명한 게 아니라, 모나드로 상태를 다루는 방법을 설명했습니다. 모나드는 이해하기도 어렵고, 설명하기도 어렵습니다. 블로그에 몇 개의 모나드 글을 올렸는데, 모나드 이해가 어려워서 반복적으로 공부하듯이 모나드 설명도 반복적으로 하다 보면 늘지 않을까 하는 생각을 합니다. 카테고리 이론과 물려 공부하다보면 시원스럽게 이해하지 못한 것들이 쌓입니다. “내가 알고 있는 것이 과연 모나드의 본질인가?”라는 의심도 계속 들고요. 모나드를 통찰하는 글이 아니라, 이 방향에서 보는 사람도 있구나 정도의 글로 봐주시기 바랍니다.</p>
+<p>※ 위 설명에서 나오는 <code>context</code>를 모두 <code>effect</code>로 바꾸어 읽어도 됩니다만, 여기서는 <code>effect</code>중 상태<code>side effect</code>를 유지할 수 있는 패턴이란 것에 집중하도록 <code>effect</code> 대신 <code>context</code>란 용어를 사용했습니다.</p>
+
+<div class="comment">
+<script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
+</script>
+</div>
+<div style="text-align:right">Github 계정이 없는 분은 메일로 보내주세요. lionhairdino at gmail.com </div>
+        </div>
+        <nav class="toc toc-right js-toc relative z-1 transition--300 absolute pa4 pt5 is-position-fixed"></nav>
+        <div id="footer">
+            © 2022 lionhairdino. All rights reserved. Generated by <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+        <script>
+            tocbot.init({
+                tocSelector: '.js-toc',
+                contentSelector: '.js-toc-content',
+                headingSelector: 'h2, h3',
+                hasInnerContainers: true,
+            });
+        </script>
+    </body>
+</html>
