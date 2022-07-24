@@ -136,9 +136,9 @@ OOP에서는 outer에 해당하는 것이 오브젝트가 되어 지역적인 �
 <p>이렇게 타입 안에 지역적인 정보를 가지고 있을 수 있는 공간을 마련할 수 있습니다.</p>
 <h2 id="합성">합성</h2>
 <p><code>context</code>를 만들어 내는 함수를 여러번 적용하는 상황을 보면</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ot">addContextFunc1 ::</span> some <span class="ot">-&gt;</span> <span class="dt">IntWithContext</span> some</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ot">addContextFunc2 ::</span> some <span class="ot">-&gt;</span> <span class="dt">IntWithContext</span> some</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="ot">addContextFunc3 ::</span> some <span class="ot">-&gt;</span> <span class="dt">IntWithContext</span> some</span>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ot">addContextFunc1 ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">IntWithContext</span> some</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ot">addContextFunc2 ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">IntWithContext</span> some</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="ot">addContextFunc3 ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">IntWithContext</span> some</span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="op">...</span></span>
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> valWithMultiContext <span class="ot">=</span> addContextFunc3 (addContextFunc2 (addContextFunc1 s)) <span class="co">-- error</span></span>
 <span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co">-- 타입이 달라 위에처럼 계속 적용할 수는 없습니다.</span></span></code></pre></div>
@@ -152,9 +152,13 @@ OOP에서는 outer에 해당하는 것이 오브젝트가 되어 지역적인 �
 <span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- 그 후 보관했던 context를 새로운 IntWithContext에 합쳐서 반환합니다.</span></span>
 <span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> result <span class="ot">=</span> (<span class="dt">IntWithContext</span> <span class="dv">0</span> someContext) <span class="ot">`combinator`</span> addContextFunc1</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>                                            <span class="ot">`combinator`</span> addContextFunc2</span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>                                            <span class="ot">`combinator`</span> addContextFunc3</span></code></pre></div>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="co">--           아래처럼 context를 갖고 있게</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="co">--           바꿔주는 함수가 필요합니다.</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="co">--           pure또는 return이라 부르는데</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="co">--           여기선 자세히 보지 않겠습니다.</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> result <span class="ot">=</span> (<span class="dt">IntWithContext</span> <span class="dv">0</span> someContext) <span class="ot">`combinator`</span> addContextFunc1</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>                                            <span class="ot">`combinator`</span> addContextFunc2</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>                                            <span class="ot">`combinator`</span> addContextFunc3</span></code></pre></div>
 <p><code>IntWithContext</code>에는 <code>context</code>를 넣어 둘 곳이 하나 뿐이 없습니다. 그런데, 두 번의 <code>context</code>가 생기면 어떻게 할까요?
 <em>두 번의 <code>context</code>를 합쳐서 하나의 <code>context</code>로 만들어 <code>IntWithContext</code> 타입에 넣습니다.</em> 이 부분이 모나드의 핵심 동작입니다.
 (이렇게 두 번의 <code>context</code>를 하나의 <code>context</code>로 합칠 수 없으면 모나드로 만들 수 없습니다.)</p>
@@ -162,7 +166,7 @@ OOP에서는 outer에 해당하는 것이 오브젝트가 되어 지역적인 �
 <h2 id="정리">정리</h2>
 <p>모나드로 상태 처리 하기<br />
 상태를 상위 스코프의 변수로 두어 유지할 방법이 없는 함수형에선, 상태를 끌고 다닐 방법이 필요합니다. 타입 자체에 <code>context</code>를 위한 공간을 만들고, 컴비네이터가 합성을 하면서 <code>context</code>를 계속 합성해주는데, 이 때 <code>context</code> 합성이 가능한 구조를 모나드라 합니다. 이렇게 하면, 프로그래머는 컴비네이터에게 상태를 끌고 다니는 것을 맡기고, 크게 신경쓰지 않아도 됩니다.</p>
-<p>이 글에선, 모나드의 모든 걸 설명한 게 아니라, 모나드로 상태를 다루는 방법을 설명했습니다. 모나드는 이해하기도 어렵고, 설명하기도 어렵습니다. 블로그에 몇 개의 모나드 글을 올렸는데, 모나드 이해가 어려워서 반복적으로 공부하듯이 모나드 설명도 반복적으로 하다 보면 늘지 않을까 하는 생각을 합니다. 카테고리 이론과 물려 공부하다보면 시원스럽게 이해하지 못한 것들이 쌓입니다. “내가 알고 있는 것이 과연 모나드의 본질인가?”라는 의심도 계속 들고요. 모나드를 통찰하는 글이 아니라, 이 방향에서 보는 사람도 있구나 정도의 글로 봐주시기 바랍니다.</p>
+<p>이 글에선, 모나드의 모든 걸 설명한 게 아니라, 모나드로 상태를 다루는 방법만을 설명했습니다. 모나드는 이해하기도 어렵고, 설명하기도 어렵습니다. 블로그에 몇 개의 모나드 글을 올렸는데, 모나드 이해가 어려워서 반복적으로 공부하듯이 모나드 설명도 반복적으로 하다 보면 늘지 않을까 하는 생각을 합니다. 카테고리 이론과 물려 공부하다보면 시원스럽게 이해하지 못한 것들이 쌓입니다. “내가 알고 있는 것이 과연 모나드의 본질인가?”라는 의심도 계속 들고요. 모나드를 통찰하는 글이 아니라, 이 방향에서 보는 사람도 있구나 정도의 글로 봐주시기 바랍니다.</p>
 <p>※ 위 설명에서 나오는 <code>context</code>를 모두 <code>effect</code>로 바꾸어 읽어도 됩니다만, 여기서는 <code>effect</code>중 상태<code>side effect</code>를 유지할 수 있는 패턴이란 것에 집중하도록 <code>effect</code> 대신 <code>context</code>란 용어를 사용했습니다.</p>
 
 <div class="comment">
