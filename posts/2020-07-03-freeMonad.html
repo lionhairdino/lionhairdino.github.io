@@ -444,7 +444,7 @@
 <span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">MyReader</span> e a <span class="ot">=</span> <span class="dt">MyReader</span> {<span class="ot"> runMyReader ::</span> e <span class="ot">-&gt;</span> a }</span>
 <span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a><span class="co">-- 펑터까지만 인스턴스를 만들고, 그 다음 인터프리터 정의</span></span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a><span class="co">-- 펑크터까지만 인스턴스를 만들고, 그 다음 인터프리터 정의</span></span>
 <span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Functor</span> (<span class="dt">MyReader</span> e) <span class="kw">where</span></span>
 <span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmap</span> f mr <span class="ot">=</span> <span class="dt">MyReader</span> (\r <span class="ot">-&gt;</span> f (runMyReader mr r))</span>
 <span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a></span>
@@ -471,7 +471,7 @@
 <div class="sourceCode" id="cb42"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>((<span class="dt">Free0</span> <span class="ot">`그냥 연결`</span> <span class="dt">Free1</span>생성)</span>
 <span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>        <span class="ot">`그냥 연결`</span> <span class="dt">Free2</span>생성)</span>
 <span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>        <span class="ot">`그냥 연결`</span> <span class="dt">Free3</span>생성</span></code></pre></div>
-<p>이렇게 해놓으면, <code>그냥 연결</code>은 말 그대로 아무 작업도 안하고 그냥 <code>연결</code>만 해 둡니다. 나중에 인터프리터에서 <code>Free</code>를 벗기면서 어떻게 <code>이펙트 합치기</code>를 할지 결정 합니다. 어떤 펑터든 <code>Free</code>로 감싸 놓으면, <code>Free</code>의 바인드를 이용해 <code>((...functor...) ...functor...) ...functor...</code> 모양으로 만들어 둘 수 있습니다. 리스트가 뭘 담든 상관 안하듯, <code>Free</code>도 어떤 펑터를 담는지 신경쓰지 않습니다.</p>
+<p>이렇게 해놓으면, <code>그냥 연결</code>은 말 그대로 아무 작업도 안하고 그냥 <code>연결</code>만 해 둡니다. 나중에 인터프리터에서 <code>Free</code>를 벗기면서 어떻게 <code>이펙트 합치기</code>를 할지 결정 합니다. 어떤 펑크터든 <code>Free</code>로 감싸 놓으면, <code>Free</code>의 바인드를 이용해 <code>((...functor...) ...functor...) ...functor...</code> 모양으로 만들어 둘 수 있습니다. 리스트가 뭘 담든 상관 안하듯, <code>Free</code>도 어떤 펑크터를 담는지 신경쓰지 않습니다.</p>
 <h2 id="freer모나드"><code>Freer</code>모나드</h2>
 <p><code>Free</code>는 펑크터를 받아 모나드로 만드는데, 펑크터가 아닌 아무 <code>Type -&gt; Type</code>을 받아 모나드로 만드는 <code>Freer</code>도 있습니다.(끝에 <code>r</code>이 있습니다.) 둘 차이는,</p>
 <p><code>free</code> : 작업을 엮으면서, 이펙트는 발생하는데, 합치는 건 나중에 인터프리터가 알아서 해<br />
