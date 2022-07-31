@@ -81,6 +81,8 @@
     
 </div>
 
+<p>2022.7.31 추가
+effect와 context를 구별해서 써야 합니다. 모나드는 effect가 있는 계산을 위한 것이고, 코모나드는 context를 처리합니다. 구체적 내용을 따로 올리겠습니다.</p>
 <p>모나드 트라우마로 움찔한 분들은 코모나드란 용어가 나오기 전까진 코모나드는 잠깐 잊어버리고 보는 게 더 나을 수 있습니다.</p>
 <p>지금까지 알게 모르게 이미 아래 같은 패턴으로 코딩한 적이 있을 수도 있습니다. 아래서 참조한 가브리엘 글의 제목도 you could have invented comonads 입니다.</p>
 <h2 id="몸풀기">몸풀기</h2>
@@ -186,7 +188,7 @@
 <h2 id="모나드와-비교">모나드와 비교</h2>
 <p>직관적으로 지니는 의미가 뭘지 살펴보겠습니다.</p>
 <div class="sourceCode" id="cb18"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="ot">duplicate ::</span> w a <span class="ot">-&gt;</span> w (w a)</span></code></pre></div>
-<p>모나드에서는 <code>m</code>이 만들어내는 effect를 잃어버리지 않기 위해 <code>join</code>으로 effect algebra를 했는데, 코모나드는 <code>effect</code>를 <code>duplicate</code>하고 있습니다.모나드가 effect 두 개를 합쳐서 하나로 표현할 수 있는 것들만 모나드 구조로 만들 수 있듯이, 코모나드는 effect 하나를 복사<code>duplicate</code>해서 또 적용해도 의미가 있는 것들만 코모나드로 만들 수 있습니다.</p>
+<p>모나드에서는 <code>m</code>이 만들어내는 effect를 잃어버리지 않기 위해 <code>join</code>으로 effect algebra를 했는데, 코모나드는 <code>context</code>를 <code>duplicate</code>하고 있습니다.모나드가 effect 두 개를 합쳐서 하나로 표현할 수 있는 것들만 모나드 구조로 만들 수 있듯이, 코모나드는 <code>context</code> 하나를 복사<code>duplicate</code>해서 또 적용해도 의미가 있는 것들만 코모나드로 만들 수 있습니다.</p>
 <p>모든 모나드들과 대응하는 코모나드가 있는 건 아닙니다. - 검증 필요</p>
 <p><code>List</code> 모나드가</p>
 <div class="sourceCode" id="cb19"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>[[<span class="dv">1</span>],[<span class="dv">2</span>,<span class="dv">3</span>],[<span class="dv">4</span>,<span class="dv">5</span>,<span class="dv">6</span>]]</span>
@@ -208,7 +210,7 @@
 <p>이기 때문에 코모나드로 만들 수 없습니다.</p>
 <p><code>Stream</code> 코모나드는 포커싱된 하나를 꺼내는 걸로 <code>extract</code>를 정하고 있습니다.</p>
 <p>effect를 만들어 내는 함수들을 컴포지션할 때 생겨나는 모든 effect를 잃어버리지 않기 위해 모나드 패턴이 필요했는데,
-<em>effect를 버려도 의미있는 함수들을 커포지션 할 때 코모나드를 쓰고 있습니다</em></p>
+<em>context를 버려도 의미있는 함수들을 커포지션 할 때 코모나드를 쓰고 있습니다</em></p>
 <p>바인드의 듀얼인 <code>extend</code>를 보면</p>
 <div class="sourceCode" id="cb23"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="ot">extend ::</span> (w a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> w a <span class="ot">-&gt;</span> w b</span></code></pre></div>
 <blockquote>
@@ -216,20 +218,20 @@
 A. 마치 <code>w a</code>에 <code>(w a -&gt; b)</code>를 바로 적용해도 될 것처럼 보입니다. 그런데, 그렇게 적용해 버리면 <code>b</code>가 나오고, 코모나드는 이 걸 <code>w b</code>로 만들 방법을 제공하지 않습니다. 그래서 컨텍스트를 유지한채로 적용하기 위해 <code>fmap</code>을 정의하면 <code>duplicate :: w a -&gt; w (w a)</code>가 필요한 모양이 나옵니다. (꼭, <code>w</code>가 새로 생기거나 하는 게 아니라, shift 하는 느낌입니다.)</p>
 </blockquote>
 <blockquote>
-<p>Q. <code>fmap</code>으로 적용해도 <code>w</code>가 없어지는 것 아닌가요?<br />
+<p>Q. <code>fmap</code>으로 적용해도 <code>w</code>가 없어지는 것 아닌가요?
 A. <code>m a</code>에서 <code>m</code>을 떼어내고 <code>a</code>를 반환하는 순간 <code>m</code>은 다시 살려낼 수 없습니다. 그런데 <code>fmap</code>도 내부 동작을 보면 패턴 매칭으로 <code>m</code>을 벗겨내고 있습니다. 하지만, 그 <code>m</code>은 스코프에 남아 있는 상태로 처리하고, <code>a</code>에 함수 적용을 마치고 난 후 그 걸 다시 가져와 합친 다음 반환합니다. 그래서, 이 걸 컨텍스트를 유지한다고 말합니다.</p>
 </blockquote>
 <h2 id="왜-a---w-a는-안되는데-w-a---w-w-a는-가능한가">왜 a -&gt; w a는 안되는데 w a -&gt; w (w a)는 가능한가?</h2>
-<p><a href="../posts/2022-03-25-beforeMonad.html">모나드</a>에서 <code>m a -&gt; a</code> 는 effect를 담아둘 곳이 없어 불가능하지만, <code>m (m a) -&gt; m a</code> 는 effect 두 개를 <code>join</code>해서 <code>m</code>에 담아 둘 수 있어 가능했습니다. 이와 비슷하게 코모나드는 <code>a -&gt; w a</code> 는 <code>w</code>를 만들어내질 못하니 불가능하지만, <code>w a -&gt; w (w a)</code>는 기존 가지고 있던 <code>w</code>를 <code>duplicate</code>하니 가능합니다.<br />
-다르게 표현하면,<br />
+<p><a href="../posts/2022-03-25-beforeMonad.html">모나드</a>에서 <code>m a -&gt; a</code> 는 effect를 담아둘 곳이 없어 불가능하지만, <code>m (m a) -&gt; m a</code> 는 effect 두 개를 <code>join</code>해서 <code>m</code>에 담아 둘 수 있어 가능했습니다. 이와 비슷하게 코모나드는 <code>a -&gt; w a</code> 는 <code>w</code>를 만들어내질 못하니 불가능하지만, <code>w a -&gt; w (w a)</code>는 기존 가지고 있던 <code>w</code>를 <code>duplicate</code>하니 가능합니다.
+다르게 표현하면,
 <code>join</code>으로 합친 것이 effect를 잃어버리지 않는 경우만 모나드로 만들 수 있었던 것처럼,
-<code>duplicate</code>로 복사한게 effect로써의 의미가 있는 경우만 코모나드로 만들 수 있습니다.</p>
-<h2 id="코모나드는-모든-가능한-겅우의-이펙트를-가지고-시작한다.">코모나드는 모든 가능한 겅우의 이펙트를 가지고 시작한다.</h2>
-<p>모나드는 컨텍스트를 유지하며 computation하는 동안 effect를 언제든 만들어내지만, 코모나드는 처음 컨텍스트 computation을 시작할 때부터 필요한 모든 effect를 가지고 시작해야 합니다. <code>duplicate</code>의 아이디어는 시작할 때부터 갖고 있는, 여러 effect 중 현재 가리키는 effect를 달리하며 <code>w</code>로 감싸는 것입니다. <code>w a</code>와 <code>w(w a)</code>가 가리키는 effect는 다를 수 있습니다. <code>Product</code> 코모나드는 이 effect가 하나의 값인 특수한 경우입니다. 정리하면 <em>duplicate는 완전 똑같이 복사하는 게 아니라 current값, 또는 focus되는 정보는 다르게 복사</em>한다고 말합니다.</p>
-<h2 id="이펙트-복사duplicate">이펙트 복사duplicate</h2>
-<p>CoKleisli arrow <code>w a -&gt; b</code>가 effect를 지우는 것에 눈이가 어떻게 effect를 없애면서 의미가 있을 수 있을까 고민했습니다. 바인드의 듀얼인 <code>extend</code>의 반환값은 <code>b</code>가 아니라 effect가 살아 있는 <code>w b</code>입니다. effect가 지워지는 것은 아니었습니다. <code>w</code>를 조금씩 다르게 복사, 유지하며 computation을 한다가 코모나드의 직관입니다.</p>
-<h2 id="이펙트가-하나로-고정일-때-reader-모나드-product-코모나드">이펙트가 하나로 고정일 때 Reader 모나드, Product 코모나드</h2>
-<p>새로 effect가 계속 추가되는 computation은 모나드가 어울리고, 필요한 effect는 모두 있는 상황에서 조금씩 다른 걸 고르는 computation은 코모나드가 어울립니다. 그래서 변하지 않는 환경값을 참조하는 effect는 <code>Reader</code> 모나드로도 <code>Product</code> 코모나드로도 표현될 수 있었던 겁니다.</p>
+<code>duplicate</code>로 복사한게 context로써의 의미가 있는 경우만 코모나드로 만들 수 있습니다.</p>
+<h2 id="코모나드는-모든-가능한-겅우의-context를-가지고-시작한다.">코모나드는 모든 가능한 겅우의 context를 가지고 시작한다.</h2>
+<p>모나드는 컨텍스트를 유지하며 computation하는 동안 effect를 언제든 만들어내지만, 코모나드는 처음 컨텍스트 computation을 시작할 때부터 필요한 모든 context를 가지고 시작해야 합니다. <code>duplicate</code>의 아이디어는 시작할 때부터 갖고 있는, 여러 context중 현재 가리키는 context를 달리하며 <code>w</code>로 감싸는 것입니다. <code>w a</code>와 <code>w(w a)</code>가 가리키는 context는 다를 수 있습니다. <code>Product</code> 코모나드는 이 context가 하나의 값인 특수한 경우입니다. 정리하면 <em>duplicate는 완전 똑같이 복사하는 게 아니라 current값, 또는 focus되는 정보는 다르게 복사</em>한다고 말합니다.</p>
+<h2 id="context-복사duplicate">Context 복사duplicate</h2>
+<p>CoKleisli arrow <code>w a -&gt; b</code>가 context를 지우는 것에 눈이가 어떻게 context를 없애면서 의미가 있을 수 있을까 고민했습니다. 바인드의 듀얼인 <code>extend</code>의 반환값은 <code>b</code>가 아니라 context가 살아 있는 <code>w b</code>입니다. context가 지워지는 것은 아니었습니다. <code>w</code>를 조금씩 다르게 복사, 유지하며 computation을 한다가 코모나드의 직관입니다.</p>
+<h2 id="context가-하나로-고정일-때-reader-모나드-product-코모나드">context가 하나로 고정일 때 Reader 모나드, Product 코모나드</h2>
+<p>새로 effect가 계속 추가되는 computation은 모나드가 어울리고, 필요한 context는 모두 있는 상황에서 조금씩 다른 걸 고르는 computation은 코모나드가 어울립니다. 그래서 변하지 않는 환경값을 참조하는 effect는 <code>Reader</code> 모나드로도 <code>Product</code> 코모나드로도 표현될 수 있었던 겁니다.</p>
 <h2 id="store-코모나드">Store 코모나드</h2>
 <p>대표적인 코모나드로 Store 코모나드가 있습니다.</p>
 <div class="sourceCode" id="cb24"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">Functor</span> w <span class="ot">=&gt;</span> <span class="dt">Comonad</span> w <span class="kw">where</span></span>
@@ -283,7 +285,7 @@ A. <code>m a</code>에서 <code>m</code>을 떼어내고 <code>a</code>를 반�
 <h2 id="언제-코모나드를-떠올리면-될까">언제 코모나드를 떠올리면 될까?</h2>
 <p><code>State</code>는 창고가 변하고,<br />
 <code>Store</code>는 창고는 그대로인데, 가리키는 함수만 변합니다.</p>
-<p>가능한 모든 이펙트를 모아 놓고 골라야 하는 상황일 때 코모나드를 떠올리면 됩니다.</p>
+<p>가능한 모든 context를 모아 놓고 골라야 하는 상황일 때 코모나드를 떠올리면 됩니다.</p>
 <p>참고<br />
 <a href="https://functorial.com/the-future-is-comonadic/main.pdf">필 프리먼의 the future is comonadic</a><br />
 <a href="https://fmapfixreturn.wordpress.com/2008/07/09/comonads-in-everyday-life/">웹사이트 UI로 설명</a><br />
