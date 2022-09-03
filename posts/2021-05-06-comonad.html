@@ -157,7 +157,7 @@ effect와 context를 구별해서 써야 합니다. 모나드는 effect가 있�
 <p><code>opt1</code> 안에 들어 있는 옵션과 <code>opt2</code> 안에 들어 있는 옵션을 묶어 놓고, 바깥에서 들어온 <code>builder</code>를 적용하는 모양이 되어야 합니다. 처음엔 함수를 변형한다고 하니, 함수를 어떻게 해체해야 하는지 난감했습니다. <em>opt1 함수를 변형하는 방법 중 하나는 어떤 함수를 넣어 정보를 해체하는 겁니다.</em></p>
 <h2 id="완성되어-있는-고차-함수-내부를-조작하려면">완성되어 있는 고차 함수 내부를 조작하려면?</h2>
 <p>함수가 외부와 소통하는 방법은 매개 변수뿐이 없습니다. 값을 주고 받을 때 뿐만 아니라, 함수 동작을 조작할때도 이용할 수 있는 통로는 매개 변수뿐이 없습니다. 안 쪽에 들어가서 변형시켜 놓을 함수(가)를 매개 변수에 넣어주면 됩니다. 변형된 모양은</p>
-<pre class="hasekll"><code>\o -&gt; \builder -&gt; ... builder ( ... )  </code></pre>
+<pre class="hasekll"><code>\o -&gt; \builder -&gt; ... builder ( ... )</code></pre>
 <p>빌더 타입이어야 합니다.</p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>\builder <span class="ot">-&gt;</span> \o2 <span class="ot">-&gt;</span>     (\bf <span class="ot">-&gt;</span> bf [<span class="st">&quot;-opt1&quot;</span>,<span class="st">&quot;-opt1-1&quot;</span>])      (\o1 <span class="ot">-&gt;</span> builder (o1 <span class="op">++</span> o2))</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>                       <span class="op">^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</span>      <span class="op">^^^^^^^^^^^^^^^^^^^^^^^^^^^</span></span>
@@ -226,7 +226,7 @@ A. <code>m a</code>에서 <code>m</code>을 떼어내고 <code>a</code>를 반�
 다르게 표현하면,
 <code>join</code>으로 합친 것이 effect를 잃어버리지 않는 경우만 모나드로 만들 수 있었던 것처럼,
 <code>duplicate</code>로 복사한게 context로써의 의미가 있는 경우만 코모나드로 만들 수 있습니다.</p>
-<h2 id="코모나드는-모든-가능한-겅우의-context를-가지고-시작한다.">코모나드는 모든 가능한 겅우의 context를 가지고 시작한다.</h2>
+<h2 id="코모나드는-모든-가능한-경우의-context를-가지고-시작한다.">코모나드는 모든 가능한 경우의 context를 가지고 시작한다.</h2>
 <p>모나드는 컨텍스트를 유지하며 computation하는 동안 effect를 언제든 만들어내지만, 코모나드는 처음 컨텍스트 computation을 시작할 때부터 필요한 모든 context를 가지고 시작해야 합니다. <code>duplicate</code>의 아이디어는 시작할 때부터 갖고 있는, 여러 context중 현재 가리키는 context를 달리하며 <code>w</code>로 감싸는 것입니다. <code>w a</code>와 <code>w(w a)</code>가 가리키는 context는 다를 수 있습니다. <code>Product</code> 코모나드는 이 context가 하나의 값인 특수한 경우입니다. 정리하면 <em>duplicate는 완전 똑같이 복사하는 게 아니라 current값, 또는 focus되는 정보는 다르게 복사</em>한다고 말합니다.</p>
 <h2 id="context-복사duplicate">Context 복사duplicate</h2>
 <p>CoKleisli arrow <code>w a -&gt; b</code>가 context를 지우는 것에 눈이가 어떻게 context를 없애면서 의미가 있을 수 있을까 고민했습니다. 바인드의 듀얼인 <code>extend</code>의 반환값은 <code>b</code>가 아니라 context가 살아 있는 <code>w b</code>입니다. context가 지워지는 것은 아니었습니다. <code>w</code>를 조금씩 다르게 복사, 유지하며 computation을 한다가 코모나드의 직관입니다.</p>

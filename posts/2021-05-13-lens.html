@@ -217,7 +217,7 @@
 <div class="sourceCode" id="cb21"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">traverse</span><span class="ot"> ::</span> (<span class="dt">Traversable</span> t, <span class="dt">Applicative</span> f) <span class="ot">=&gt;</span> (a <span class="ot">-&gt;</span> f b) <span class="ot">-&gt;</span> ( t a <span class="ot">-&gt;</span> f (t b))</span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>(point <span class="op">.</span> x)<span class="ot"> ::</span> <span class="dt">Functor</span> f <span class="ot">=&gt;</span> (<span class="dt">Double</span> <span class="ot">-&gt;</span> f <span class="dt">Double</span>) <span class="ot">-&gt;</span> (<span class="dt">Atom</span> <span class="ot">-&gt;</span> f <span class="dt">Atom</span>)</span></code></pre></div>
 <p><code>a</code>, <code>b</code>를 <code>Atom</code>으로 맞추면 <code>(point . x)</code>의 결과를 <code>traverse</code>가 받을 수 있습니다. 타입은 이렇게 맞춰 컴포지션이 가능하다는 건 알겠는데, 동작이 눈에 잘 들어오지 않습니다.</p>
-<p><code>traverse</code>는 펑크터로 싸인 함수를 받아서, 펑크터 안에 들어 있는 값에 적용합니다. <em>인자로 받아야 할 함수를 컴포지션으로 연결</em>하는 모양이라 눈에 금방 안들어 옵니다.<br />
+<p><code>traverse</code>는 펑크터로 싸인 함수를 받아서, 펑크터 안에 들어 있는 값에 적용합니다. <em>인자로 받아야 할 함수를 컴포지션으로 연결</em>하는 모양이라 눈에 금방 안들어 옵니다.
 <code>(point . x)</code>는 적용할 함수가 아니라, 적용할 <em>함수를 만드는 함수</em>입니다.</p>
 <p><code>(point . x)</code>는 <code>(+1)</code>을 주면 <code>Atom</code>에 적용할 수 있는 함수를 만들어주는 브로커같은 함수입니다.</p>
 <p>※ 생각하는 팁<br />
@@ -335,6 +335,7 @@
 <span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">LensGetter</span> s a <span class="ot">=</span> s <span class="ot">-&gt;</span> <span class="dt">Const</span> a s</span></code></pre></div>
 <p>비슷한 모양을 가지도록 <code>LensGetter</code>를 다시 정의하면,<br />
 (이런 아이디어가 어디서 왔을까요? 가설처럼 일단 서명을 세우고 고민한 건 아닐까요?)</p>
+<p>2022.8.11 추가 - Yoneda lemma를 보면, 이런 아이디어가 나온 이유를 알 수 있다고 합니다. 카테고리 이론을 알고 싶긴 한데, 수학 베이스가 없어 들었다 놨다 합니다.</p>
 <div class="sourceCode" id="cb42"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">LensGetter</span> p a <span class="ot">=</span> (a <span class="ot">-&gt;</span> <span class="dt">Const</span> a p) <span class="ot">-&gt;</span> (s <span class="ot">-&gt;</span> <span class="dt">Const</span> a p)</span>
 <span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a><span class="ot">view ::</span> <span class="dt">LensGetter</span> p a <span class="ot">-&gt;</span> p <span class="ot">-&gt;</span> a</span>

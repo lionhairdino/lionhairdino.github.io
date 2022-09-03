@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko" lang="ko">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <title>lionhairdino - Effect</title>
+
+        <meta name="description" content="lionhairdino - Effect" />
+        <meta property="og:description" content="하스켈 함수형 프로그래밍" />
+
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <link rel="icon" href="https://lionhairdino.github.io/favicon.svg" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino16px.png" sizes="16x16" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino24px.png" sizes="24x24" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino32px.png" sizes="32x32" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino48px.png" sizes="48x48" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino57px.png" sizes="57x57" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino60px.png" sizes="60x60" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino64px.png" sizes="64x64" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino72px.png" sizes="72x72" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino76px.png" sizes="76x76" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino114px.png" sizes="114x114" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino120px.png" sizes="120x120" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino144px.png" sizes="144x144" />
+        <link rel="shortcut icon" href="../favicon.ico" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino152px.png" sizes="152x152" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino180px.png" sizes="180x180" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino192px.png" sizes="192x192" />
+        <link rel="manifest" href="../site.webmanifest" />
+        <link rel="mask-icon" href="https://lionhairdino.github.io/Lionhairdino_black.svg" color="#ff7500" />
+        <meta name="msapplication-TileImage" content="/images/favicon/Lionhairdino144px.png" />
+        <meta name="msapplication-TileColor" content="#ff7500" />
+        <meta name="theme-color" content="#ffffff" />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="Effect" />
+        <meta property="og:site_name" content="Lionhairdino" />
+        <meta property="og:url" content="https://lionhairdino.github.io/posts/2022-09-03-effect.html" />
+
+        <meta property="og:image" content="https://lionhairdino.github.io/images/state400px.png" />
+
+      <meta name="keywords" content="computational effect, context, monad">
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-E9WZ6VXGHP"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-E9WZ6VXGHP');
+</script>
+<script src="../script/copycode.js"></script>
+<script async src="https://cse.google.com/cse.js?cx=9c53b4915cbb2605c"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.11.1/tocbot.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.11.1/tocbot.css" />
+    </head>
+    <body>
+        <div id="header">
+            <div style="display:inline-block;margin-right:5px;padding-top: 5px;" id="logo">
+                <a href="../"><img style="width:30px;border:none" src="../images/favicon/Lionhairdino48px.png"></a>
+            </div>
+            <div style="display:inline-block;vertical-align: top;padding-top:5px;" id="navigation">
+                <a href="../">lionhairdino</a>
+                <a href="../about.html">about</a>
+                <!--<a href="/archive.html">archive</a>-->
+            </div>
+            <div style="display:inline-block;font-size:0.8em;vertical-align: top;">
+                <div style="display:inline-block;vertical-align: top;padding-top: 5px">사이트내 검색</div>
+                <div style="display:inline-block;width:180px;"> 
+                    <div class="gcse-searchbox-only"></div>
+                </div>
+            </div>
+            <div>
+                여기 글들은 일종의 질문입니다. 주의! 틀린 내용이 있을 수 있습니다. 용어 선택도 학계, 업계에서 쓰는 걸로 되어 있지 않습니다.
+            </div>
+        </div>
+        <div class="js-toc-content">
+            <h1>Effect</h1>
+            <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+<div class="info">
+    Posted on September  3, 2022
+    
+</div>
+
+<p>미완성 문서이지만 공개합니다. 틀린 부분이라 생각되면 꼭 댓글 부탁드립니다.</p>
+<p>하스켈(또는 함수형)을 공부하면서 가장 시작 단계에서 만나게 되고, 그 후로도 계속 중요한 역할을 하는데, 정작 <code>Effect</code>가 뭔지 다루는 글이 드뭅니다. 입문자들이 이해할 수 있는 글을 아직 본 적이 없습니다. 이렇게 기초적이고 중요한 개념의 구체적 정의를 찾기 힘들다는게 이상하단 생각이 듭니다. 아마도 정규 교육을 받을 때 보는 텍스트(교재)들에는 분명 있을텐데, 너무 쉬워서 그런가 웹에서 가볍게 설명하는 텍스트는 없습니다.</p>
+<p>주의) 이 글은 충분한 자료(인터넷에 공개된 자료)를 찾지 못해, 일부는 <em>제 의견과 상상으로</em> 채운 글이니, 댓글로 여러 의견들이 오갔으면 좋겠습니다.</p>
+<p>어디서 힌트를 얻어야 할지 난감할 때, Ailrun님의 자세한 설명이 많은 도움이 되었습니다. 감사드립니다. 혹 틀린 내용이 있다면, 분명 제가 잘 못 이해하고 기록한 것입니다.</p>
+<h2 id="영단어-뜻">영단어 뜻</h2>
+<p><code>Effect</code>가 뭘까요? 함수형을 공부하다 보면, 절차형(명령형)은 별 신경쓰지 않고 해결하던 문제들을 <code>Effect</code>개념을 써서 복잡하게 해결하는 모습을 자주 만나게 됩니다. 인터넷 검색을 해도 쉽게 답이 나오지 않습니다. 다들 당연히 알고 있고, 저만 모르는 용어인가 싶습니다.</p>
+<p>일단 원래 단어가 가지고 있는 뜻을 보겠습니다.</p>
+<p>영단어 뜻 :<br />
+Effect<br />
+something that inevitably follows an antecedent (such as a cause or agent)<br />
+to cause to come into being<br />
+a change that results when something is done or happens :an event, condition, or state of affairs that is produced by a cause</p>
+<p><a href="https://www.merriam-webster.com/dictionary/effect">Merriam-Webster</a></p>
+<p>우리말로는 영향, 결과, 효과등으로 번역합니다. 제가 주목하는 뜻은 먼저antecedent 일어난 어떤 결과가 다음에 영향을 미친다입니다.</p>
+<h2 id="세상사를-함수의-합성composition으로-표현한다">세상사를 함수의 합성Composition으로 표현한다</h2>
+<p>세상 일을 정확히 원자적atomic으로 나누어서 보긴 어렵겠지만, 모델링을 위해 어떤 단위로 구분했다고 보겠습니다. 그럼 현재 일어난 일이, 다음 일에 영향을 미치며 세상이 굴러간다고 볼 수 있습니다. 세상에서 일어나는 일을 모두 함수로 표현하려면 어떻게 할까요? 수학 함수는 매개 변수로 받은 입력에 항상 일정한 출력을 내뱉습니다. 함수형에서 pure 함수라 부르는 것들도 마찬가지입니다. pure 함수로만 체이닝(연속된 합성)을 해서 세상사를 표현하려면, 이전 함수가 만들어 낸 결과 중 다음 함수가 필요한 정보는 모조리 다음 함수의 입력으로 전달 받아야 합니다.</p>
+<blockquote>
+<p>잠시, 명령형(또는 절차형)에서 다음 작업들을 어떻게 처리하는지 생각해 봅시다.</p>
+<ul>
+<li>전역 변수에 있는 값이나, 환경 값에서 읽어온 값과 입력 값을 가지고 출력을 만든다.</li>
+<li>사용자가 키보드로 타이핑해서 입력한 값과 매개 변수로 넘어온 값으로 출력을 만든다.</li>
+<li>매개 변수로 넘어오지 않은 디스플레이를 통해 출력을 한다.</li>
+<li>동시에 실행하는 작업이 있고, 다른 작업의 종료 여부등이 현재 작업 결과에 영향을 미친다.</li>
+</ul>
+<p>환경 값이나, 키보드로 타이핑한 값들은 특별히 함수의 입출력으로 받지않고 해결했었습니다.</p>
+</blockquote>
+<p>하지만, 순수 함수가 외부와 소통하는 방법은 오직 입출력 뿐입니다. 연결된 순수 함수에서 <em>이전 함수</em>가 만들어 낸 무언가가 있는데, <em>다음 함수</em>가 필요한 정보가 있다면, 함수 입출력에 드러내지 않을 수 없습니다.</p>
+<h2 id="세상사가-다-effect다-넓은-의미">세상사가 다 Effect다 (넓은 의미)</h2>
+<p>함수 연결에서 이전 함수의 결과를 다음 함수가 받아다 쓰면 Effect라 볼 수 있습니다. 영단어 뜻으로 본다면 세상 모든 일이, 함수의 합성이 모두 Effect의 연속입니다.</p>
+<p>위키에서 side effect 설명을 보면
+&gt; if it has any observable effect other than its <em>primary effect</em> of returning a value to the invoker of the operation.</p>
+<p>side effect를 설명하기 위해 primary effect란 말을 쓰고 있습니다.</p>
+<h2 id="프로그래밍에서의-effect-좁은-의미">프로그래밍에서의 Effect (좁은 의미)</h2>
+<p>하지만, 함수형 프로그래밍에서는 특정한 경우만 Effect라 부릅니다. 넓의 의미의 Effect 중 입출력에 드러나지 않는 것들만 Effect라 부릅니다. 다음 작업에 영향을 주려면, 그냥 다음 작업이 이전 작업의 출력을 입력으로 받으면 될텐데, 어떤 건 입출력으로 다루고, 어떤 건 Effect로 다룰까요?</p>
+<h2 id="effect와-context의-차이">Effect와 Context의 차이</h2>
+<h3 id="context">Context</h3>
+<p>어원: text는 해석이 필요한 모든 정보를 가리키며, 글자는 text중 하나입니다.(그림, 영상, 소리, 건축… 뭐든 해석이 필요한 대상은 모두 text가 될 수 있습니다) con text는 text와 함께con 있는 text 해석을 도와주는 정보입니다.</p>
+<p>좁은 의미론 프로그램에서 함수 실행을 위해 필요한 정보들 (입력값, caller, 결과 타입..등)을 context라 합니다.</p>
+<p>일반적인 단어 뜻으로 보면 <strong><em>effect도 context의 하나</em></strong>이고, 좁은 의미로 보면 내연에 들어있는 정보는 context이고 effect는 외연에 있는 정보입니다.</p>
+<p>항상 어떤 대상, 동작이 Effect이거나 Context인 것이 아니라, 어떻게 다루냐에 따라 Effect 또는 Context로 부릅니다.</p>
+<p><span class="citation" data-cites="todo">@todo</span></p>
+<h2 id="computational-effect">Computational Effect</h2>
+<p><span class="citation" data-cites="todo">@todo</span>
+## 왜 모나드가 Effect를 표현하는데 딱일까?
+카테고리 이론에서는 펑터로 한 번 트랜스폼한 것과, 두 번 트랜스폼한 게 다른 정도를 같은 류로 만들어 주는 걸 모나드라 하는데, 이 모나드가 Effect를 처리하기에 가장 좋은 패턴일까요?</p>
+<blockquote>
+<ol type="1">
+<li>매개 변수를 통하지 않은 정보를 필요로 하는 작업</li>
+<li>순수 함수로 표현하면, 타입에 자리 하나를 만들고, 관련 함수들이 이 타입들을 주고 받게 만든다.</li>
+</ol>
+</blockquote>
+<p>1번을 Effect라 부르고, 2번 패턴으로 타입을 써서 구현하기 위해 <code>join</code>이 필요합니다.
+2번 모양으로 만들어 놓으면, <strong><em>개념</em></strong>상으론 매개 변수에 없는 값에 접근하여 어떤 작업을 하는 것 같지만, 실제 구현은, <strong><em>모나드</em></strong>로 안보이게 할 자리(타입으로 표현)를 하나 만들어 매개 변수가 아닌 것에 접근 하는 것처럼 만듭니다.
+<strong><em>Monad가 아닌 Effect가 없다</em></strong>는 말은, 하스켈에서 Effect 표현은 모두 Monad로 된다고 생각했다가, 추상화해서 생각하면 <strong><em>세상사를 pure함수로 표현한다면 모든 Effect는 join으로 계속 정보를 유지하는 모나드와 같은 모양</em></strong>으로 볼 수 있다고 생각을 넓힐 수 있습니다.</p>
+<h3 id="유지니오-모기의-effect-분류">유지니오 모기의 Effect 분류</h3>
+<p><a href="https://www.cs.cmu.edu/~crary/819-f09/Moggi91.pdf">Notion of computation and monads - Eugenio Moggi</a>
+- partiality
+- nondeterminism
+- side-effect
+- exceptions
+- continuations
+- interactive input
+- interactive output</p>
+<p>위에 나열한 것들이 모두 내포의 예시입니다.</p>
+<p>※ 유지니오 모기가 effect를 해결하는데 모나드를 쓰자고 처음 얘기하고, 필립 와들러가 하스켈에서 effect를 모나드를 써서 해결한 구현이 haskell1998 표준에 채택되었다고 합니다.</p>
+<h3 id="side-effect는-effect중의-하나">Side-effect는 Effect중의 하나</h3>
+<p>어떤 논문은 Side-effect를 Computational Effect 전반을 가리키는 용어로 쓰고, 어떤 논문들은 Effect 중 mutation을 가리키는 용어로만 씁니다. 오래된 논문일수록 전자처럼 쓰고, 요즘은 후자로 자리잡아 가고 있다고 합니다.<br />
+<a href="https://dl.acm.org/doi/10.1145/73560.73564">Polymorphic effect systems (Online: 1988) - J. M. Lucassen, D. K. Gifford</a> 여기서는 전자처럼 쓰이고 있습니다. 논문들을 읽을 때 알아서 잘 구별해서 읽어야 합니다.</p>
+<h2 id="하스켈에서-유명한-effect들">하스켈에서 유명한 Effect들</h2>
+<h3 id="maybe">Maybe</h3>
+<p>Maybe의 Effect는 “실패할 수도 있어”입니다. 무엇이 외연이고, 무엇이 내포일까요?
+실패하지 않는 계산 <code>g :: Int -&gt; Int</code>는 외연으로 동작이 모두 결정 됩니다. 이 연산이 실패할 수도 있다는 건, <code>g</code>만으로, 즉 외연만으로 표현이 안됩니다. 섬에 홀로 덩그러니 두면 뭔지 알 필요가 없습니다. 다른 것과 관계를 맺을 때 Effect가 필요하게 됩니다.</p>
+<h3 id="reader">Reader</h3>
+<p><span class="citation" data-cites="todo">@todo</span></p>
+<h3 id="status">Status</h3>
+<p><span class="citation" data-cites="todo">@todo</span></p>
+<h3 id="io">IO</h3>
+<p><span class="citation" data-cites="todo">@todo</span></p>
+<h2 id="하스켈에선-effect를-어떻게-표현할까">하스켈에선 Effect를 어떻게 표현할까?</h2>
+<p>하스켈의 함수는 모두 순수 함수입니다. Effect 동작을 할 수 없는 순수 함수는 어떻게 할까요?<br />
+당연히 다른 함수 하나를 갖다 대서, 순수하지 않은 부분을 맡기면 됩니다. 순수 함수를 두고, 그 순수 함수가 자체적으로 해결 못하는, 즉 Effect는 당연하게도 <strong><em>다른 고차 함수(컴비네이터)</em></strong>의 도움을 받아 해결합니다. 함수에 값을 넣어 줄 때, 그냥 넣어주지 않고, Effect에 맞는 작업을 컴비네이터와 타입 으로 해결합니다.</p>
+<p><span class="citation" data-cites="todo">@todo</span></p>
+<h2 id="현재-effect-정의와-가장-유사하다고-생각하는-것">현재 Effect 정의와 가장 유사하다고 생각하는 것</h2>
+<p>명시적으로(매개 변수를 통해서) 받지 않고, 결과로 내보내지 않는, 계산computation(혹은 evaluation)에 필요한 (내포intensional) 정보가 있는 작업을 effect가 있는 작업이라 합니다.</p>
+<blockquote>
+<p>they(computaional effect) describe intensional information about what takes place during evaluation of the program unlike what was the case above<br />
+<a href="http://www.imm.dtu.dk/~fnie/Papers/NiNi99tes.pdf">Type and Effect Systems - Flemming Nielson &amp; Hanne Riis Nielson</a><br />
+함수를 평가할 때 발생하는 내포적인 것들을 effect라 한다.</p>
+</blockquote>
+<p>세상에 일어나는 일을 Pure 함수로 표현하려고 합니다. Pure 함수는 입력이 같으면 출력이 같아야 합니다. 하지만, 세상사는 그렇지 않습니다. Pure 함수를 체이닝 하는 동안(세상사를 표현하는 동안) 입력값이 달라지지 않았는데도 출력값이 달라야 할 때가 있습니다.</p>
+<p>내포intensional와 외연extensional이란 용어가 익숙하지 않으면, 여기서만은 다음 처럼 바꿔 읽어도 됩니다.
+&gt; 함수의 외연extensional은 함수의 입력과 출력을 말하며, 함수를 평가할 때 이 외연 이외의 것들을 모두 내포intensional(적)라 말한다.
+내포의 예시를 몇 개 보면</p>
+<ul>
+<li>같은 입력에 출력이 달라져야 할 때</li>
+<li>같은 입력에 같은 출력이 나왔지만, 프로그램에서 봤을 때 의미가 달라졌을 때 (concurrent 경우)</li>
+</ul>
+<p>등이 있습니다. (내포는 자체적으로 나열하며 정의하기엔 범위가 정해져 있지 않습니다. 앞으로 무슨 일을 하든, 입력, 출력 이외의 것은 모두 내포입니다.)</p>
+<h2 id="한-문장으로-내리는-결론">한 문장으로 내리는 결론</h2>
+<p><em>함수 입출력에 드러나지 않지만</em>, 현재 계산에 필요하거나 다음 연결되는 함수가 필요로 하는 정보는 모두 Effect입니다.</p>
+<h2 id="참고">참고</h2>
+<p><a href="https://web.cs.ucla.edu/~todd/research/tldi09.pdf">A Generic Type-and-Effect System - Daniel Marino, Todd Millstein</a><br />
+<a href="https://www.cs.tufts.edu/~nr/cs257/archive/phil-wadler/effectstocl.pdf">The Marriage of Effects and Monads - Philip Wadler</a><br />
+<a href="https://dl.acm.org/doi/pdf/10.1145/319838.319848">Integrating Functional and Imperative Programming - David K. Gifford and John M. Lucassen</a> <a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
+<p>※ 아래는 볼 필요는 없지만, 혹시 동일한 상상을 하고 계신 분들을 위해, 조금씩 부족한 상상이었음을 알리드리기 위해 남겨 놓습니다. Effect를 공부하면서 다음 순서로 생각을 바꿔갔습니다.</p>
+<p>1일차: 지금 당장 결정할 수 없는 정보<br />
+2일차: 원인이 되어 다음 액션에 영향을 주는 부차적인 것<br />
+3일차: 매개 변수를 통하지 않는 정보로 하는 작업<br />
+4일차: 언제든, 실행중에도 값이 바뀔지도 모르는 메모리를 할당, 읽기, 쓰기</p>
+<section class="footnotes" role="doc-endnotes">
+<hr />
+<ol>
+<li id="fn1" role="doc-endnote"><p><a href="https://dl.acm.org/doi/pdf/10.1145/319838.319848">Integrating Functional and Imperative Programming - David K. Gifford and John M. Lucassen</a><br />
+fluent 언어에서 Effect는 effect classes 용어로 설명합니다. fluent 언어에서 모든 표현식은 Effect를 가지고 있습니다. 표현식의 type은 표현식을 계산compute한 값value이 무엇인지 의미하고, 표현식의 effect classes는 표현식이 어떻게 계산compute될 수 있는지를 설명합니다.<br />
+effect classes는 “관찰자OBSERVER”와 “함수FUNCTION”를 가지고 있습니다.<br />
+표현식은 Effect를 보는 “관찰자Observer”이고, Effect를 만들어cause 낼 순 없습니다.<br />
+luent 언어에서는 return이 없는 procedures는 effect가 있고(executed solely for their side-effects), function은 effect가 없이 실행됩니다.<br />
+이 논문은 절차형imperative과 함수형을 한 언어에서 어떻게 섞는가에 관한 논문입니다.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section>
+
+<div class="comment">
+<script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
+</script>
+</div>
+<div style="text-align:right">Github 계정이 없는 분은 메일로 보내주세요. lionhairdino at gmail.com </div>
+        </div>
+        <nav class="toc toc-right js-toc relative z-1 transition--300 absolute pa4 pt5 is-position-fixed"></nav>
+        <div id="footer">
+            © 2022 lionhairdino. All rights reserved. Generated by <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+        <script>
+            tocbot.init({
+                tocSelector: '.js-toc',
+                contentSelector: '.js-toc-content',
+                headingSelector: 'h2, h3',
+                hasInnerContainers: true,
+            });
+        </script>
+    </body>
+</html>
