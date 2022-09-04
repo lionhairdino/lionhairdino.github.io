@@ -136,14 +136,16 @@ a change that results when something is done or happens :an event, condition, or
 2번 모양으로 만들어 놓으면, <strong><em>개념</em></strong>상으론 매개 변수에 없는 값에 접근하여 어떤 작업을 하는 것 같지만, 실제 구현은, <strong><em>모나드</em></strong>로 안보이게 할 자리(타입으로 표현)를 하나 만들어 매개 변수가 아닌 것에 접근 하는 것처럼 만듭니다.
 <strong><em>Monad가 아닌 Effect가 없다</em></strong>는 말은, 하스켈에서 Effect 표현은 모두 Monad로 된다고 생각했다가, 추상화해서 생각하면 <strong><em>세상사를 pure함수로 표현한다면 모든 Effect는 join으로 계속 정보를 유지하는 모나드와 같은 모양</em></strong>으로 볼 수 있다고 생각을 넓힐 수 있습니다.</p>
 <h3 id="유지니오-모기의-effect-분류">유지니오 모기의 Effect 분류</h3>
-<p><a href="https://www.cs.cmu.edu/~crary/819-f09/Moggi91.pdf">Notion of computation and monads - Eugenio Moggi</a>
-- partiality
-- nondeterminism
-- side-effect
-- exceptions
-- continuations
-- interactive input
-- interactive output</p>
+<p><a href="https://www.cs.cmu.edu/~crary/819-f09/Moggi91.pdf">Notion of computation and monads - Eugenio Moggi</a></p>
+<ul>
+<li>partiality</li>
+<li>nondeterminism</li>
+<li>side-effect</li>
+<li>exceptions</li>
+<li>continuations</li>
+<li>interactive input</li>
+<li>interactive output</li>
+</ul>
 <p>위에 나열한 것들이 모두 내포의 예시입니다.</p>
 <p>※ 유지니오 모기가 effect를 해결하는데 모나드를 쓰자고 처음 얘기하고, 필립 와들러가 하스켈에서 effect를 모나드를 써서 해결한 구현이 haskell1998 표준에 채택되었다고 합니다.</p>
 <h3 id="side-effect는-effect중의-하나">Side-effect는 Effect중의 하나</h3>
@@ -164,17 +166,20 @@ a change that results when something is done or happens :an event, condition, or
 <p>하스켈의 함수는 모두 순수 함수입니다. Effect 동작을 할 수 없는 순수 함수는 어떻게 할까요?<br />
 당연히 다른 함수 하나를 갖다 대서, 순수하지 않은 부분을 맡기면 됩니다. 순수 함수를 두고, 그 순수 함수가 자체적으로 해결 못하는, 즉 Effect는 당연하게도 <strong><em>다른 고차 함수(컴비네이터)</em></strong>의 도움을 받아 해결합니다. 함수에 값을 넣어 줄 때, 그냥 넣어주지 않고, Effect에 맞는 작업을 컴비네이터와 타입 으로 해결합니다.</p>
 <p><span class="citation" data-cites="todo">@todo</span></p>
-<h2 id="현재-effect-정의와-가장-유사하다고-생각하는-것">현재 Effect 정의와 가장 유사하다고 생각하는 것</h2>
+<h2 id="현재-effect-정의로-생각하는-것">현재 Effect 정의로 생각하는 것</h2>
 <p>명시적으로(매개 변수를 통해서) 받지 않고, 결과로 내보내지 않는, 계산computation(혹은 evaluation)에 필요한 (내포intensional) 정보가 있는 작업을 effect가 있는 작업이라 합니다.</p>
+<p>아래는 Effect 정의나 구체적 설명이 있는 텍스트를 찾는다는 말에, Ailrun님이 인용해 주신 문장입니다.</p>
 <blockquote>
-<p>they(computaional effect) describe intensional information about what takes place during evaluation of the program unlike what was the case above<br />
+<p>… they(computaional effect) describe intensional information about what takes place during evaluation of the program unlike what was the case above …<br />
 <a href="http://www.imm.dtu.dk/~fnie/Papers/NiNi99tes.pdf">Type and Effect Systems - Flemming Nielson &amp; Hanne Riis Nielson</a><br />
 함수를 평가할 때 발생하는 내포적인 것들을 effect라 한다.</p>
 </blockquote>
 <p>세상에 일어나는 일을 Pure 함수로 표현하려고 합니다. Pure 함수는 입력이 같으면 출력이 같아야 합니다. 하지만, 세상사는 그렇지 않습니다. Pure 함수를 체이닝 하는 동안(세상사를 표현하는 동안) 입력값이 달라지지 않았는데도 출력값이 달라야 할 때가 있습니다.</p>
-<p>내포intensional와 외연extensional이란 용어가 익숙하지 않으면, 여기서만은 다음 처럼 바꿔 읽어도 됩니다.
-&gt; 함수의 외연extensional은 함수의 입력과 출력을 말하며, 함수를 평가할 때 이 외연 이외의 것들을 모두 내포intensional(적)라 말한다.
-내포의 예시를 몇 개 보면</p>
+<p>내포intensional와 외연extensional이란 용어가 익숙하지 않으면, 여기서만은 다음 처럼 바꿔 읽어도 됩니다.</p>
+<blockquote>
+<p>함수의 외연extensional은 함수의 입력과 출력을 말하며, 함수를 평가할 때 이 외연 이외의 것들을 모두 내포intensional(적)라 말한다.</p>
+</blockquote>
+<p>내포의 예시를 몇 개 보면</p>
 <ul>
 <li>같은 입력에 출력이 달라져야 할 때</li>
 <li>같은 입력에 같은 출력이 나왔지만, 프로그램에서 봤을 때 의미가 달라졌을 때 (concurrent 경우)</li>
@@ -195,7 +200,7 @@ a change that results when something is done or happens :an event, condition, or
 <hr />
 <ol>
 <li id="fn1" role="doc-endnote"><p><a href="https://dl.acm.org/doi/pdf/10.1145/319838.319848">Integrating Functional and Imperative Programming - David K. Gifford and John M. Lucassen</a><br />
-fluent 언어에서 Effect는 effect classes 용어로 설명합니다. fluent 언어에서 모든 표현식은 Effect를 가지고 있습니다. 표현식의 type은 표현식을 계산compute한 값value이 무엇인지 의미하고, 표현식의 effect classes는 표현식이 어떻게 계산compute될 수 있는지를 설명합니다.<br />
+fluent 언어에서 Effect는 effect classes 용어로 설명합니다. fluent 언어에서 모든 표현식은 Effect를 가지고 있습니다. 표현식의 type은 표현식을 계산한 값이 무엇인지 의미하고, 표현식의 effect classes는 표현식이 어떻게 계산될 수 있는지를 설명합니다.<br />
 effect classes는 “관찰자OBSERVER”와 “함수FUNCTION”를 가지고 있습니다.<br />
 표현식은 Effect를 보는 “관찰자Observer”이고, Effect를 만들어cause 낼 순 없습니다.<br />
 fluent 언어에서는 return이 없는 procedures는 effect가 있고(executed solely for their side-effects), function은 effect가 없이 실행됩니다.<br />
