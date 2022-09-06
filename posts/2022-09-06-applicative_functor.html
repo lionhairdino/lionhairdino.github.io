@@ -82,7 +82,7 @@
 </div>
 
 <p>Applicative Functor 또는 줄여서 Applicatives라 부릅니다.<br />
-Applicatives의 기본 개념은 <a href="http://learnyouahaskell.com/functors-applicative-functors-and-monoids">learnyouahaskell</a>를 참고해 주시고, 여기서는 Applicatives와 Monad의 다른 점을 주로 보겠습니다. 저는 하스켈 학교 디스코드 서버에서 두 개가 어떻게 다른가란 질문만 하고, Ailrun님, 준규님, 기정님, 찬우님이 답변해 주신 것들을 정리한 글입니다. 답변해 주신 모든분께 감사드리고, 특히 최종 결론에 이르도록 많은 도움을 주신 Ailrun님께 감사드립니다.</p>
+Applicatives의 기본 개념은 <a href="http://learnyouahaskell.com/functors-applicative-functors-and-monoids">learnyouahaskell</a>를 참고해 주시고, 여기서는 Applicatives와 Monad의 다른 점을 주로 보겠습니다. 저는 하스켈 학교 디스코드 서버에서 두 개가 어떻게 다른가란 질문만 하고, Ailrun님, 재원님, 준규님, 기정님, 찬우님이 답변해 주신 것들을 정리한 글입니다. 답변해 주신 모든분께 감사드리고, 특히 최종 결론에 이르도록 많은 도움을 주신 Ailrun님께 감사드립니다.</p>
 <h2 id="moi와-state">Moi와 State</h2>
 <div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- Moi Applicative Functor @준규: State스러운 Applicatives</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">Moi</span> s a <span class="ot">=</span> <span class="dt">Moi</span> {<span class="ot"> runMoi ::</span> s <span class="ot">-&gt;</span> (a, s) }</span>
@@ -103,7 +103,7 @@ Applicatives의 기본 개념은 <a href="http://learnyouahaskell.com/functors-a
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="kw">in</span>  newfunc state1</span></code></pre></div>
 <p><code>&gt;&gt;=</code> 체인을 거치면서 바뀐 <code>state1</code>에 <strong><em>새로 생성된 함수를 적용</em></strong>해서 새로운 <code>state</code>를 반환합니다.</p>
 <p>추상화해서 말하면, 계산 결과가 Effect에 영향을 주느냐 아니냐의 차이가 있습니다. Monad는 계산 결과를 Effect에 반영할 수 있고, Applicatives는 그렇게 할 수 없습니다. <span class="citation" data-cites="Ailrun">@Ailrun</span></p>
-<p><code>Moi</code> 구현에선 <code>state1</code>, <code>state2</code>를 통해 모나드처럼 실행 순서가 생겨, 이게 일반적인 속성으로 오해할 수 있는데, 순서는 Applicatives의 일반적인 특징은 아닙니다.</p>
+<p><code>Moi</code> 구현에선 <code>state1</code>, <code>state2</code>를 통해 모나드처럼 실행 순서가 생겨, 이게 일반적인 속성으로 오해할 수 있는데, 순서는 Applicatives의 일반적인 특징은 아닙니다. <code>join</code>의 경우 <code>m (m a)</code>이니 바깥 <code>m</code>이 안의 <code>m</code>을 감싸고 있으니 의존도가 생기지만, <code>&lt;*&gt;</code>의 경우 <code>f(a -&gt; b) -&gt; f a -&gt; ...</code>에서 두 <code>f</code>는 서로 의존성을 가질 필요가 없습니다. <span class="citation" data-cites="재원">@재원</span></p>
 <p>위에 <code>&lt;*&gt;</code>의 구현을 보면서 <code>state</code>를 주고 받는 것에 정신이 팔렸는데, <code>&lt;*&gt;</code>의 목적은 끝에 <code>func arg</code>, 즉 <code>apply</code>입니다.</p>
 <h2 id="reader의-와">Reader의 <code>&lt;*&gt;</code>와 <code>&gt;&gt;=</code></h2>
 <div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>g <span class="op">&gt;&gt;=</span> f <span class="ot">=</span> \x <span class="ot">-&gt;</span> f (g x) x <span class="co">-- f :: a -&gt; (r -&gt; b)</span></span>
