@@ -147,6 +147,33 @@ Functor, Applicatives, Monad를 하나의 계보에 올려 놓고,<br />
 “모나드가 꼭 있어야 되는 일이 아니고, Applicatives로 해결할 수도 있다”<br />
 등의 말이 종종 보입니다.</p>
 <p>물론, 모나드에 정의되어 있는 <code>ap</code>가 <code>&lt;*&gt;</code>와 다를게 없으니 Applicatives가 할 수 있는 일은, Monad가 다 할 수 있긴 하나, 둘의 속성과 용도는 전혀 다른게 아닌가 합니다. Applicatives는 체인을 무한정 연결하는게 아니라, 초기 함수나 생성자를 두고, 그들이 필요하는 인자 수 만큼만 체인을 만듭니다. 그 와중에 Effect를 처리하던 모나드와 비슷한 동작을 하기도 하는데, 원래 목적 자체가 모나드와 같지는 않습니다.</p>
+<p><code>Functor</code>로 할 수 있는 모든 일은 <code>Applicatives</code>로 할 수 있고, <code>Applicatives</code>로 할 수 있는 모든 일은 <code>Monad</code>로 할 수 있습니다. 각 Class의 핵심 메소드로 얘기하면,
+<code>fmap</code>으로 할 수 있는 일은 <code>&lt;*&gt;</code>로 할 수 있고, <code>&lt;*&gt;</code>로 할 수 있는 일은 <code>&gt;&gt;=</code>로 할 수 있습니다. 그래서 뭐가 뭐보다 더 강하다는 표현을 씁니다.</p>
+<p>2022.9.10 추가</p>
+<p>Ailrun님께 2~3일에 걸쳐 집요하게 질문드려 이해하게 된 내용들을 정리해서 추가합니다. 혹시 틀린 내용이 있다면, 분명 제가 이해를 잘 못한 것입니다.</p>
+<blockquote>
+<p>Q. Applicatives에서도 이전 Effect가 다음 Effect에 영향을 주고 있습니다. <code>f a &lt;*&gt; f b</code>에서 어떻게 <code>f a</code>와 <code>f b</code>가 독립적으로 동작할 수 있을까요?</p>
+<p>A. <code>a</code>와 <code>b</code>가 <code>f</code>에, 즉 Effect에 영향을 주지 않습니다. Lazy하게 생각하면, Effect에 따라 <code>a</code>작업을 만들어 놓고, 그 다음 바뀐 Effect에 따라 <code>b</code>작업을 만들어 놓습니다. 그럼, 이렇게 만들어진 <code>a</code>와 <code>b</code>사이에는 아무런 연관이 없습니다. <del>f a와 f b는 독립적으로 동작하지 못하지만<code>a</code>와 <code>b</code>는 독립적으로 동작합니다.</del>, <code>f a</code>와 <code>f b</code>는 서로 독립입니다. Effect 끼리는 영향을 줄 수 있지만, <code>f a</code>와 <code>f b</code>끼리가 아닌 <code>f a &lt;*&gt; f b</code>가 될 때만 그 둘이 가지는 Effect가 연관성이 생깁니다. <code>f a &lt;*&gt; f b</code>는 <code>f a</code>에 의존할 수 있고, <code>f b</code>에 의존할 수 있지만, <code>f a</code>와 <code>f b</code>는 서로 의존성이 없다는 말입니다.</p>
+</blockquote>
+<blockquote>
+<p>Q. <code>bind</code>는 Effect합성을 하며 값이 Effect에 영향을 미칩니다. 어떻게 <code>bind</code>를 쓰면서 <code>&lt;*&gt;</code>를 구현할 수 있을까요?</p>
+<p>A. <code>bind</code>가 하는 일은 Effect를 합치는 일이지, 누가 무슨 Effect를 어떻게 만들어 내는가에는 관여하지 않습니다. bind <strong><em>컴비네이터</em></strong>는 Effect가 있는 <code>m a</code>와 Effect를 만들어내는 <code>a -&gt; m b</code>를 받아서 어떤 작업을 합니다. <em>어떻게 Effect를 만들어내느냐는</em> <code>bind</code>가 하는 일이 아닙니다. Effect를 만들어내는 건 인자로 들어오는 <code>a -&gt; m b</code>에 달렸습니다.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ot">bind ::</span> m1 a <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> m2 b) <span class="ot">-&gt;</span> m3 b</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- (모두 똑같은 타입 `m`이지만 편의를 위해 숫자를 붙이겠습니다.)</span></span></code></pre></div>
+<p><code>bind</code>는 <code>m1 a</code>에서 <code>a</code>를 꺼내어 <code>f :: a -&gt; m2 b</code>를 적용하고, <code>m1</code>과 <code>m2</code>를 합처 <code>m3 b</code>를 반환합니다.<br />
+<code>f</code>의 서명을 보이는대로 해석하면 <code>m2</code>와 <code>b</code>는 <code>a</code>에 의존하고 있습니다. 그런데, *f 내부에서 a를 받아 <del>m2에 영향을 주지 않고 있다면</del> <code>m2</code>가 <code>return</code>이 만들었다든지 하는 trivial한 Effect만 가진다면, <code>bind</code>를 썼지만, 값이 Effect에 영향을 주지 않는 상태가 됩니다. <code>bind</code>를 썼기 때문에 반드시 값이 Effect에 영향을 미치고 있는 게 아니라, <code>f</code>가 어떤 동작을 하냐에 따라 다릅니다. Effect에 값이 영향을 미치면 안되는 Applicatives를 <code>bind</code>를 써서 구현할 수도 있다는 얘기입니다.</p>
+<p>State 모나드에서 <code>bind</code>로 <code>&lt;*&gt;</code>를 구현하는 걸 살펴 보겠습니다.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- State의 &lt;*&gt;</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="dt">StateT</span> mf <span class="op">&lt;*&gt;</span> <span class="dt">StateT</span> mx <span class="ot">=</span> <span class="dt">StateT</span> <span class="op">$</span> \ s <span class="ot">-&gt;</span> <span class="kw">do</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>   <span class="op">~</span>(unwrapf, s') <span class="ot">&lt;-</span> mf s</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>   <span class="op">~</span>(unwrapx, s'') <span class="ot">&lt;-</span> mx s'</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>   <span class="fu">return</span> (unwrapf unwrapx, s'')</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="co">-- Lazy 패턴 매칭은 무시하고, `bind`의 동작을 살펴 보겠습니다.</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>mf <span class="op">&gt;&gt;=</span> \(unwrapf, s') <span class="ot">-&gt;</span> mx <span class="op">&gt;&gt;=</span> \(unwrapx, s'') <span class="ot">-&gt;</span> <span class="fu">return</span> (unwrapf unwrapx, s'')</span></code></pre></div>
+<p><code>\(unwrapf, s') -&gt; mx</code>는 패턴 바인딩으로 <code>mf</code>에서 <code>m</code>을 벗겨 <code>unwrapf</code>에 바인딩해 놓을 뿐 Effect에 영향을 미치는 동작이 없습니다.<br />
+<code>\(unwrapx, s'') -&gt; return (unwrapf unwrapx, s'')</code>는 패턴 바인딩으로 <code>mx</code>에서 <code>m</code>을 벗겨 <code>unwrapx</code>에 바인딩해 놓을 뿐 Effect에 영향을 미치는 동작이 없습니다.</p>
+</blockquote>
 <section class="footnotes" role="doc-endnotes">
 <hr />
 <ol>
