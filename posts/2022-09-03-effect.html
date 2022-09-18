@@ -118,25 +118,28 @@ Effect<br />
 <h2 id="프로그래밍에서의-effect-좁은-의미">프로그래밍에서의 Effect (좁은 의미)</h2>
 <p>하지만, 함수형 프로그래밍에서는 특정한 경우만 Effect라 부릅니다. 넓의 의미의 Effect 중 입출력에 드러나지 않는 것들만 Effect라 부릅니다. 다음 작업에 영향을 주려면, 그냥 다음 작업이 이전 작업의 출력을 입력으로 받으면 될텐데, 어떤 건 입출력으로 다루고, 어떤 건 Effect로 다룰까요?</p>
 <h2 id="effect와-context의-차이">Effect와 Context의 차이</h2>
-<h3 id="context">Context</h3>
-<p>어원: text는 해석이 필요한 모든 정보를 가리키며, 글자는 text중 하나입니다.(그림, 영상, 소리, 건축… 뭐든 해석이 필요한 대상은 모두 text가 될 수 있습니다) con text는 text와 함께con 있는 text 해석을 도와주는 정보입니다.</p>
+<p>Context 어원: text는 해석이 필요한 모든 정보를 가리키며, 글자는 text중 하나입니다.(그림, 영상, 소리, 건축… 뭐든 해석이 필요한 대상은 모두 text가 될 수 있습니다) con text는 text와 함께con 있는 text 해석을 도와주는 정보입니다.</p>
 <p>좁은 의미론 프로그램에서 함수 실행을 위해 필요한 정보들 (입력값, caller, 결과 타입..등)을 context라 합니다.</p>
 <p>일반적인 단어 뜻으로 보면 <strong><em>effect도 context의 하나</em></strong>이고, 좁은 의미로 보면 내연에 들어있는 정보는 context이고 effect는 외연에 있는 정보입니다.</p>
 <p>항상 어떤 대상, 동작이 Effect이거나 Context인 것이 아니라, 어떻게 다루냐에 따라 Effect 또는 Context로 부릅니다.</p>
-<p><span class="citation" data-cites="todo">@todo</span></p>
+<p>※ 하지만, 전공자분들과 대화하면 일반 단어 뜻으로 받아 들이지 않는 경우가 많습니다. 당장 함수를 실행하기 위해 필요한 정보들만 모아둔 것을 Context라 부릅니다.</p>
 <h2 id="computational-effect">Computational Effect</h2>
-<p><span class="citation" data-cites="todo">@todo</span></p>
+<p>사전적으로는 컴퓨터가 계산하는 작업을 Computation으로 부릅니다. 튜링 머신으로 reduce되는 어떤 것이든 Computation이라 부릅니다. <code>1+1</code>이란 식을 그대로 바라보면 Computation이라 부르지 않지만, 이 식을 컴퓨터에 넣어 결과를 가져오기 위해, 컴퓨터에 준비한 <code>1+1</code>은 Computation이라 부릅니다. Computation으로 인해 생기는 정보를 Computational Effect로 부릅니다. <em>검증 필요</em></p>
+<h2 id="effectful-함수">Effectful 함수</h2>
+<p>effect를 만들어내는 함수, effect가 있는 타입을 다루는 함수</p>
+<h2 id="effect-대수algebra">Effect 대수algebra</h2>
+<p>두 번의 computation으로 생기는 두 개의 effect를 합칠수 있는 연산 정의가 가능해야먄 모나드로 만들 수 있습니다. effect algebra가 가능한 effect만 모나드로 만들 수 있습니다.</p>
 <h2 id="왜-모나드가-effect를-표현하는데-딱일까">왜 모나드가 Effect를 표현하는데 딱일까?</h2>
 <p>카테고리 이론에서는 펑터로 한 번 트랜스폼한 것과, 두 번 트랜스폼한 게 다른 정도를 같은 류로 만들어 주는 걸 모나드라 하는데, 이 모나드가 Effect를 처리하기에 가장 좋은 패턴일까요?</p>
 <blockquote>
 <ol type="1">
-<li>매개 변수를 통하지 않은 정보를 필요로 하는 작업</li>
+<li>입출력을 통하지 않은 정보를 필요로 하는 작업</li>
 <li>순수 함수로 표현하면, 타입에 자리 하나를 만들고, 관련 함수들이 이 타입들을 주고 받게 만든다.</li>
 </ol>
 </blockquote>
-<p>1번을 Effect라 부르고, 2번 패턴으로 타입을 써서 구현하기 위해 <code>join</code>이 필요합니다.
-2번 모양으로 만들어 놓으면, <strong><em>개념</em></strong>상으론 매개 변수에 없는 값에 접근하여 어떤 작업을 하는 것 같지만, 실제 구현은, <strong><em>모나드</em></strong>로 안보이게 할 자리(타입으로 표현)를 하나 만들어 매개 변수가 아닌 것에 접근 하는 것처럼 만듭니다.
-<strong><em>Monad가 아닌 Effect가 없다</em></strong>는 말은, 하스켈에서 Effect 표현은 모두 Monad로 된다고 생각했다가, 추상화해서 생각하면 <strong><em>세상사를 pure함수로 표현한다면 모든 Effect는 join으로 계속 정보를 유지하는 모나드와 같은 모양</em></strong>으로 볼 수 있다고 생각을 넓힐 수 있습니다.</p>
+<p>1번을 Effect라 부르고, 2번 패턴으로 타입을 써서 구현하기 위해 Effect를 합치는 <code>join</code>이 필요합니다.
+2번 모양으로 만들어 놓으면, <strong><em>개념</em></strong>상으론 입출력에 없는 값에 접근하여 어떤 작업을 하는 것 같지만, 실제 구현은, <strong><em>모나드</em></strong>로 안보이게 할 자리(타입으로 표현)를 만들어 매개 변수가 아닌 것에 접근 하는 것처럼 만듭니다.
+<strong><em>Monad가 아닌 Effect가 없다</em></strong>는 말은, 하스켈에서 Effect 표현은 모두 Monad로 된다는 말이라고 생각했었습니다. 그런데, 좀 더 추상화해서 생각하면 <strong><em>세상사를 pure함수로 표현한다면 모든 Effect는 join으로 계속 정보Effect를 합치며 유지하는 모나드와 같은 모양</em></strong>으로 볼 수 있다고 생각을 넓힐 수 있습니다.</p>
 <h3 id="유지니오-모기의-effect-분류">유지니오 모기의 Effect 분류</h3>
 <p><a href="https://www.cs.cmu.edu/~crary/819-f09/Moggi91.pdf">Notion of computation and monads - Eugenio Moggi</a></p>
 <ul>
@@ -153,21 +156,23 @@ Effect<br />
 <h3 id="side-effect는-effect중의-하나">Side-effect는 Effect중의 하나</h3>
 <p>어떤 논문은 Side-effect를 Computational Effect 전반을 가리키는 용어로 쓰고, 어떤 논문들은 Effect 중 mutation을 가리키는 용어로만 씁니다. 오래된 논문일수록 전자처럼 쓰고, 요즘은 후자로 자리잡아 가고 있다고 합니다.<br />
 <a href="https://dl.acm.org/doi/10.1145/73560.73564">Polymorphic effect systems (Online: 1988) - J. M. Lucassen, D. K. Gifford</a> 여기서는 전자처럼 쓰이고 있습니다. 논문들을 읽을 때 알아서 잘 구별해서 읽어야 합니다.</p>
+<blockquote>
+<p>추측<br />
+필요한 정보들을 모두 입출력을 통해 주고 받게 하면 Effect 없이 Main Computation으로 같은 목표를 달성할 수 있습니다. 이 전 용어를 쓴다면(넓은 의미에서는 모두 Effect), Main Computation을 Primary Effect라 부르고, 입출력에 드러나지 않게 처리하는 걸 Side-effect로 불렀습니다.</p>
+</blockquote>
 <h2 id="하스켈에서-유명한-effect들">하스켈에서 유명한 Effect들</h2>
 <h3 id="maybe">Maybe</h3>
-<p>Maybe의 Effect는 “실패할 수도 있어”입니다. 무엇이 외연이고, 무엇이 내포일까요?
-실패하지 않는 계산 <code>g :: Int -&gt; Int</code>는 외연으로 동작이 모두 결정 됩니다. 이 연산이 실패할 수도 있다는 건, <code>g</code>만으로, 즉 외연만으로 표현이 안됩니다. 섬에 홀로 덩그러니 두면 뭔지 알 필요가 없습니다. 다른 것과 관계를 맺을 때 Effect가 필요하게 됩니다.</p>
-<p><span class="citation" data-cites="todo">@todo</span></p>
+<p>Maybe Effect가 해결하는 작업은 “실패할 수도 있어”입니다. 무엇이 외연이고, 무엇이 내포일까요?
+실패하지 않는 계산 <code>g :: Int -&gt; Int</code>는 외연으로 동작이 모두 결정 됩니다. 이 연산이 실패할 수도 있다는 건, <code>g</code>만으로, 즉 외연만으로 표현이 안됩니다. 섬에 홀로 덩그러니 두면 뭔지 알 필요가 없습니다. 다른 것과 관계를 맺을 때 Effect가 필요하게 됩니다. 다른 것과 관계를 맺을 때, 즉 compose할 때 실패 여부를 판단하는 가드를 세우면 됩니다. 바인드가 바로 이 가드 역할을 하고, 바인드가 실패 여부를 처리하도록 한 구현을 <code>Maybe</code>라 이름 붙였습니다.</p>
 <h3 id="reader">Reader</h3>
-<p><span class="citation" data-cites="todo">@todo</span></p>
+<p>Reader Effect가 해결하는 작업은 “외부 스코프에 넣어 둔 환경값에 접근하는 작업”입니다. <code>f :: env -&gt; arg -&gt; res</code>, <code>g :: env -&gt; arg -&gt; res</code> 함수에 <code>env</code>를 넣어주는 작업이 외연에 드러나게 하지 않고, Wrapping 함수가 먼저 <code>env</code>를 한 번만 받아 <code>f</code>와 <code>g</code>에 각 각 넣어주도록 구현한 걸 <code>Reader</code>라 이름 붙였습니다.</p>
 <h3 id="status">Status</h3>
-<p><span class="citation" data-cites="todo">@todo</span></p>
+<p>Status Effect는 “변하는 상태를 참조”를 해결합니다. Wrapping함수가 상태를 매개 변수로 주고 받으며 관리하고, 안에 있는 함수는 이 값이 어디에서 왔는지 알 필요가 없습니다. 이렇게 구현한 걸 <code>Status</code>라 이름 붙였습니다.</p>
 <h3 id="io">IO</h3>
-<p><span class="citation" data-cites="todo">@todo</span></p>
+<p>위 Status와 방식은 같고, 상태로 Realworld를 넣어주게 만들었습니다. 세상의 변화를 모두 가지고 있다는 설정이지만, 사실 실제 컴파일하면 Realworld는 몇 바이트로 표현되는 표식같은 존재입니다. 프리미티브하게 Realworld에 관한 동작이 들어가 있다고 보시면 됩니다.</p>
 <h2 id="하스켈에선-effect를-어떻게-표현할까">하스켈에선 Effect를 어떻게 표현할까?</h2>
 <p>하스켈의 함수는 모두 순수 함수입니다. Effect 동작을 할 수 없는 순수 함수는 어떻게 할까요?<br />
-당연히 다른 함수 하나를 갖다 대서, 순수하지 않은 부분을 맡기면 됩니다. 순수 함수를 두고, 그 순수 함수가 자체적으로 해결 못하는, 즉 Effect는 당연하게도 <strong><em>다른 고차 함수(컴비네이터)</em></strong>의 도움을 받아 해결합니다. 함수에 값을 넣어 줄 때, 그냥 넣어주지 않고, Effect에 맞는 작업을 컴비네이터와 타입 으로 해결합니다.</p>
-<p><span class="citation" data-cites="todo">@todo</span></p>
+당연히 다른 함수 하나를 갖다 대서, 순수하지 않은 부분을 맡기면 됩니다. 순수 함수를 두고, 그 순수 함수가 자체적으로 해결 못하는, 즉 Effect는 당연하게도 <strong><em>다른 고차 함수(컴비네이터)</em></strong>의 도움을 받아 해결합니다. 함수에 값을 넣어 줄 때, 그냥 넣어주지 않고, Effect에 맞는 작업을 컴비네이터와 타입 으로 해결합니다. 이를 모나드라 합니다.</p>
 <h2 id="현재-effect-정의로-생각하는-것">현재 Effect 정의로 생각하는 것</h2>
 <p>명시적으로(매개 변수를 통해서) 받지 않고, 결과로 내보내지 않는, 계산computation(혹은 evaluation)에 필요한 (내포intensional) 정보가 있는 작업을 effect가 있는 작업이라 합니다.</p>
 <p>아래는 Effect 정의나 구체적 설명이 있는 텍스트를 찾는다는 말에, Ailrun님이 인용해 주신 문장입니다.</p>
@@ -189,11 +194,28 @@ Effect<br />
 <p>등이 있습니다. (내포는 자체적으로 나열하며 정의하기엔 범위가 정해져 있지 않습니다. 앞으로 무슨 일을 하든, 입력, 출력 이외의 것은 모두 내포입니다.)</p>
 <h2 id="한-문장으로-내리는-결론">한 문장으로 내리는 결론</h2>
 <p><em>함수 입출력에 드러나지 않지만</em>, 현재 계산에 필요하거나 다음 연결되는 함수가 필요로 하는 정보는 모두 Effect입니다.</p>
+<h2 id="문장속에서-뜻">문장속에서 뜻</h2>
+<p>다음 처럼 질문을 했습니다.</p>
+<blockquote>
+<p>lionhairdino: 비결정성이 Effect라는 말보다, 비결정성을 Effect로 구현했다라는 말이 더 맞지 않나요?<br />
+Ailrun: 비결정성은 Effect고…</p>
+</blockquote>
+<p><code>Reader</code> 모나드를 예를 들면, “외부 스코프 변수에 환경값을 넣어 놓고 접근하는 작업(이하 환경값 접근 작업이라 부르겠습니다.)”을 Effect로 해결할 수도 있고, 매개 변수만으로 해결할 수도 있다고 말하고 싶었습니다. 그래서 전 목표 작업 자체를 <code>Reader</code>로 부르고,<br />
+“<code>Reader</code>를 Effect로 구현할 수도 있고, 아닐 수도 있다”라고 얘기했습니다. <em>이 건 틀린 말입니다.</em><br />
+“환경값에 접근 하는 작업”을 Effect로 구현한 걸 <code>Reader</code>라 부릅니다. <code>Reader</code> 자체가 Effect의 이름입니다. 비결정성, mutation 등의 말 자체가 Effect입니다.</p>
+<p>Effect로 구현하지 않아도, 즉 <code>Reader</code>를 쓰지 않아도 매개 변수로 모두 전달하게 만들면 “환경값에 접근하는 작업”을 해결할 수 있습니다. “환경값에 접근하는 작업” 자체가 Effect인 건 아닙니다.</p>
+<p>“<code>Reader</code>의 Effect는 무엇인가, 환경값에 접근하는 작업이다” 라고 얘기하는 경우를 자주 만나는데, 엄밀히 얘기하면<br />
+“<code>Reader</code>는 환경값에 접근하는 작업을 Effect로 구현한 것에 붙인 이름입니다” 입니다.</p>
+<p>“<code>Reader</code>가 하는 일을 매개 변수로 구현한다면”<br />
+“<code>State</code>는 상태를 유지하는 작업(mutation effect)인데, 이를 매개 변수로만 구현하면(할 수 있다면) (mutation이란 뜻을 포함한) <strong><em>상태</em></strong>는 사라집니다.”<br />
+“<code>List</code>는 non-deterministic effect인데, 이게 <strong><em>해결하는 문제</em></strong>를 매개 변수로만 구현하면(할 수 있다면) non-deterministic effect는 사라집니다.”<br />
+…<br />
+이런 식으로 말해야 합니다.</p>
 <h2 id="참고">참고</h2>
 <p><a href="https://web.cs.ucla.edu/~todd/research/tldi09.pdf">A Generic Type-and-Effect System - Daniel Marino, Todd Millstein</a><br />
 <a href="https://www.cs.tufts.edu/~nr/cs257/archive/phil-wadler/effectstocl.pdf">The Marriage of Effects and Monads - Philip Wadler</a><br />
 <a href="https://dl.acm.org/doi/pdf/10.1145/319838.319848">Integrating Functional and Imperative Programming - David K. Gifford and John M. Lucassen</a> <a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
-<p>※ 아래는 볼 필요는 없지만, 혹시 동일한 상상을 하고 계신 분들을 위해, 조금씩 부족한 상상이었음을 알리드리기 위해 남겨 놓습니다. Effect를 공부하면서 다음 순서로 생각을 바꿔 갔습니다.</p>
+<p>※ 아래는 볼 필요는 없지만, 혹시 동일한 상상을 하고 계신 분들을 위해, 조금씩 부족한 상상이었음을 알리드리기 위해 남겨 놓습니다. Effect를 공부하면서 다음 순서로 생각을 바꿔 갔습니다. 모두 부족한 추측이었습니다.</p>
 <p>1일차: 지금 당장 결정할 수 없는 정보<br />
 2일차: 원인이 되어 다음 액션에 영향을 주는 부차적인 것<br />
 3일차: 매개 변수를 통하지 않는 정보로 하는 작업<br />
