@@ -120,7 +120,7 @@ Effect<br />
 <h2 id="effect와-context의-차이">Effect와 Context의 차이</h2>
 <p>Context 어원: text는 해석이 필요한 모든 정보를 가리키며, 글자는 text중 하나입니다.(그림, 영상, 소리, 건축… 뭐든 해석이 필요한 대상은 모두 text가 될 수 있습니다) con text는 text와 함께con 있는 text 해석을 도와주는 정보입니다.</p>
 <p>좁은 의미론 프로그램에서 함수 실행을 위해 필요한 정보들 (입력값, caller, 결과 타입..등)을 context라 합니다.</p>
-<p>일반적인 단어 뜻으로 보면 <strong><em>effect도 context의 하나</em></strong>이고, 좁은 의미로 보면 내연에 들어있는 정보는 context이고 effect는 외연에 있는 정보입니다.</p>
+<p>일반적인 단어 뜻으로 보면 <strong><em>effect도 context의 하나</em></strong>이고, 좁은 의미로 보면 내포된 정보는 effect이고 context는 외연에 있는 정보입니다. (외연은 함수 서명을 의미하고, 내포는 그 외의 모든 것입니다.)</p>
 <p>항상 어떤 대상, 동작이 Effect이거나 Context인 것이 아니라, 어떻게 다루냐에 따라 Effect 또는 Context로 부릅니다.</p>
 <p>※ 하지만, 전공자분들과 대화하면 일반 단어 뜻으로 받아 들이지 않는 경우가 많습니다. 당장 함수를 실행하기 위해 필요한 정보들만 모아둔 것을 Context라 부릅니다.</p>
 <h2 id="computational-effect">Computational Effect</h2>
@@ -166,10 +166,10 @@ Effect<br />
 실패하지 않는 계산 <code>g :: Int -&gt; Int</code>는 외연으로 동작이 모두 결정 됩니다. 이 연산이 실패할 수도 있다는 건, <code>g</code>만으로, 즉 외연만으로 표현이 안됩니다. 섬에 홀로 덩그러니 두면 뭔지 알 필요가 없습니다. 다른 것과 관계를 맺을 때 Effect가 필요하게 됩니다. 다른 것과 관계를 맺을 때, 즉 compose할 때 실패 여부를 판단하는 가드를 세우면 됩니다. 바인드가 바로 이 가드 역할을 하고, 바인드가 실패 여부를 처리하도록 한 구현을 <code>Maybe</code>라 이름 붙였습니다.</p>
 <h3 id="reader">Reader</h3>
 <p>Reader Effect가 해결하는 작업은 “외부 스코프에 넣어 둔 환경값에 접근하는 작업”입니다. <code>f :: env -&gt; arg -&gt; res</code>, <code>g :: env -&gt; arg -&gt; res</code> 함수에 <code>env</code>를 넣어주는 작업이 외연에 드러나게 하지 않고, Wrapping 함수가 먼저 <code>env</code>를 한 번만 받아 <code>f</code>와 <code>g</code>에 각 각 넣어주도록 구현한 걸 <code>Reader</code>라 이름 붙였습니다.</p>
-<h3 id="status">Status</h3>
-<p>Status Effect는 “변하는 상태를 참조”를 해결합니다. Wrapping함수가 상태를 매개 변수로 주고 받으며 관리하고, 안에 있는 함수는 이 값이 어디에서 왔는지 알 필요가 없습니다. 이렇게 구현한 걸 <code>Status</code>라 이름 붙였습니다.</p>
+<h3 id="state">State</h3>
+<p>State Effect는 “변하는 상태를 참조”를 해결합니다. Wrapping함수가 상태를 매개 변수로 주고 받으며 관리하고, 안에 있는 함수는 이 값이 어디에서 왔는지 알 필요가 없습니다. 이렇게 구현한 걸 <code>State</code>라 이름 붙였습니다.</p>
 <h3 id="io">IO</h3>
-<p>위 Status와 방식은 같고, 상태로 Realworld를 넣어주게 만들었습니다. 세상의 변화를 모두 가지고 있다는 설정이지만, 사실 실제 컴파일하면 Realworld는 몇 바이트로 표현되는 표식같은 존재입니다. 프리미티브하게 Realworld에 관한 동작이 들어가 있다고 보시면 됩니다.</p>
+<p>위 State와 방식은 같고, 상태로 Realworld를 넣어주게 만들었습니다. 세상의 변화를 모두 가지고 있다는 설정이지만, 사실 실제 컴파일하면 Realworld는 몇 바이트로 표현되는 표식같은 존재입니다. 프리미티브하게 Realworld에 관한 동작이 들어가 있다고 보시면 됩니다.</p>
 <h2 id="하스켈에선-effect를-어떻게-표현할까">하스켈에선 Effect를 어떻게 표현할까?</h2>
 <p>하스켈의 함수는 모두 순수 함수입니다. Effect 동작을 할 수 없는 순수 함수는 어떻게 할까요?<br />
 당연히 다른 함수 하나를 갖다 대서, 순수하지 않은 부분을 맡기면 됩니다. 순수 함수를 두고, 그 순수 함수가 자체적으로 해결 못하는, 즉 Effect는 당연하게도 <strong><em>다른 고차 함수(컴비네이터)</em></strong>의 도움을 받아 해결합니다. 함수에 값을 넣어 줄 때, 그냥 넣어주지 않고, Effect에 맞는 작업을 컴비네이터와 타입 으로 해결합니다. 이를 모나드라 합니다.</p>
