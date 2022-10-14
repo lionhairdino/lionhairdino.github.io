@@ -115,16 +115,15 @@
 <ul>
 <li><code>No instance</code>인 이유는, 리터럴 <code>1</code>이 <code>Int</code>나 <code>Integer</code> 같이 딱 하나의 타입으로 추론되지 않고 <code>Num</code> 클래스의 인스턴스란 것 까지만 추론되었기 때문입니다.<br />
 </li>
-<li><code>Couldn't match</code>는 딱 하나의 타입 <code>Char</code>로 추론됐는데 서명에는 <code>모든 타입</code>으로 지정<code>rigid</code>되어 있어, 서로 매치되지 않는다는 에러입니다. 참고 - <a href="../errors/2020-07-15-rigidTypeVariable.html">rigid type variable</a></li>
+<li><code>Couldn't match</code>는 딱 하나의 타입 <code>Char</code>로 추론됐는데 서명에는 <code>모든 타입</code>으로 지정rigid되어 있어, 서로 일치하지 않는다는 에러입니다. 참고 - <a href="../errors/2020-07-15-rigidTypeVariable.html">rigid type variable</a></li>
 </ul>
-<p><em>여기서부턴 추측입니다.</em><br />
-괄호로 감싸져 있을 땐, 서명에서 영향이 있는 게 아니라, 나중에 들어오는 값이 진짜 <code>forall a. [a]</code> 가 들어와야 합니다. 모든 타입 중에 어느 한 타입이 아니라, 진짜로 <code>모든 타입</code>을 받을 수 있는 무언가가 들어와야 합니다.</p>
+<p><em>여기서부턴 추측입니다.</em>
+괄호로 감싸져 있을 땐, 현재 함수 서명에서 영향이 있는 게 아니라, 나중에 들어오는 값이 진짜 <code>forall a. [a]</code> 가 들어와야 합니다. 모든 타입 중에 어느 한 타입이 아니라, 진짜로 <code>모든 타입</code>을 받을 수 있는 무언가가 들어와야 합니다.</p>
 <ol type="1">
 <li><code>No instance</code> : 클래스는 추론됐는데, 해당 타입을 키로 하는 인스턴스는 없다.</li>
 </ol>
 <ul>
-<li>서명 체크를 지나, 나중에 코드 조립 중 들어온 타입을 보니 <code>1</code>이 들어왔습니다.<br />
-</li>
+<li>서명 체크를 지나, 나중에 코드 조립 중 들어온 타입을 보니 <code>1</code>이 들어왔습니다.</li>
 <li><code>1</code>이란 리터럴로 추론한 타입은 <code>Num</code> 클래스의 인스턴스입니다.</li>
 <li>지금 정해지지 않은 타입, <code>모든 타입 a</code>가 <code>Num</code>의 인스턴스여야 한다는 말입니다. <code>a</code>는 <code>모든 타입</code>인데, <code>Num</code> 인스턴스 중 <em>모든 타입용 인스턴스</em>는 당연히 없습니다.</li>
 </ul>
@@ -132,8 +131,7 @@
 <li><code>Couldn't match</code> : 특정 타입까지 추론됐는데, 다른 조건에서 추론된 타입과 일치하지 않는다.</li>
 </ol>
 <ul>
-<li>서명 체크를 지나 , 나중에 코드 조립 중 들어온 타입을 보니 <code>'a'</code>가 들어왔습니다.<br />
-</li>
+<li>서명 체크를 지나 , 나중에 코드 조립 중 들어온 타입을 보니 <code>'a'</code>가 들어왔습니다.</li>
 <li><code>'a'</code>를 보고 추론할 수 있는 타입은 <code>Char</code> 하나입니다. 구체 타입 <code>Char</code>로 추론되었습니다.<br />
 </li>
 <li>지금 정해지지 않은 타입, <code>모든 a</code>는 <code>모든 타입</code>이지 아직 하나의 구체 타입이 아닙니다. <code>모든 타입</code>과 <code>Char</code>는 매치되지 않습니다.</li>
@@ -188,6 +186,82 @@ forall a. (Num a) =&gt; a 타입 : { 리터럴 0, 리터럴 1, 리터럴 2, … 
 <p><em>어디에도 서명, 조립 단계 이렇게 설명된 곳은 없습니다. forall a를 Bottom값으로 설명한 자료, 또는 타입을 매개 변수로 받는 함수 등으로 설명한 자료들을 찾았지만, 서명에 있는 괄호 (…)에 대해 명쾌하게 설명한 곳은 아직 찾지 못했습니다.</em></p>
 <p>GHC가 폴리모픽 타입을 만나면 구체 타입으로 추론한다는 것에서 혼동이 올 수 있습니다. <code>forall</code>은 타입 추론을 해서 <code>Bool</code>을 주면 <code>Bool</code>에 맞는 동작을 하고, <code>Int</code>를 주면 <code>Int</code>에 맞는 동작을 하겠다는 게 아닙니다.
 <code>Bool</code>을 주든, <code>Int</code>를 주든 같은 동작으로 문제 없이 처리 하겠다는 겁니다.</p>
+<p>2022.10.13 추가</p>
+<p>좋은 설명이 보여 옮겨 놓습니다. 나중에 covarint와 contravariant 글로 옮길 예정입니다.<br />
+<a href="https://stackoverflow.com/questions/60536279/unification-of-higher-rank-types-on-contravariant-positions">Unification of higher rank types on contravariant positions</a><br />
+위 링크의 chi란 분의 답변에서 발췌한 소스입니다.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ot">k ::</span> ((<span class="kw">forall</span> b<span class="op">.</span> [b] <span class="ot">-&gt;</span> [b]) <span class="ot">-&gt;</span> <span class="dt">Int</span>) <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>     <span class="op">^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>               <span class="op">...</span> <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>k f <span class="ot">=</span> f (\xs <span class="ot">-&gt;</span> xs<span class="op">++</span>xs)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="ot">k1 ::</span> (<span class="kw">forall</span> a<span class="op">.</span> a <span class="ot">-&gt;</span> a) <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>k1 x <span class="ot">=</span> x <span class="dv">10</span> <span class="op">+</span> <span class="fu">length</span> (x <span class="st">&quot;aaa&quot;</span>)</span></code></pre></div>
+<p><code>k</code>함수는 <code>... -&gt; Int</code> 타입의 함수를 받으면 <code>Int</code>값을 돌려 줍니다. 함수를 받았는데, <code>Int</code>를 돌려주려면, 이미 안에 <code>...</code>에 해당하는 걸 가지고 있어야 합니다.</p>
+<p>예를 들어, <code>(Int -&gt; Bool) -&gt; Bool</code> 타입의 함수는 <code>Int -&gt; Bool</code>함수를 받아서, 안에서 <code>Int</code>를 넣어 <code>Bool</code>을 뽑아 낼 거라 예상할 수 있습니다.</p>
+<p>마찬가지로 위는 <code>(forall b. [b] -&gt; [b]) -&gt; Int</code> 함수를 받아, 안에서 <code>forall b. [b] -&gt; [b]</code> 함수를 넣어 줄 거라 예상할 수 있습니다. 이 때 넣어 주는 함수를 타입에 맞춰 만들어 본 예시가 <code>(\xs -&gt; xs ++ xs)</code> 입니다. 이렇게 <code>forall b</code> 즉 모든 타입의 <code>b</code>가 들어와도 문제가 없는, <code>(\xs -&gt; xs ++ xs)</code> 같은 함수를 가지고 있다는 뜻입니다.</p>
+<p>실제로 <code>k</code>에 <code>k1</code>을 넣어 풀어 보면</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>k k1 <span class="ot">=</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>k1 (\xs <span class="ot">-&gt;</span> xs<span class="op">++</span>xs) <span class="ot">=</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>(\xs <span class="ot">-&gt;</span> xs<span class="op">++</span>xs) <span class="dv">10</span> <span class="op">+</span> <span class="fu">length</span> ((\xs <span class="ot">-&gt;</span> xs<span class="op">++</span>xs) <span class="st">&quot;aaa&quot;</span>) <span class="ot">=</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>(<span class="dv">10</span><span class="op">++</span><span class="dv">10</span>) <span class="op">+</span> <span class="fu">length</span> (<span class="st">&quot;aaa&quot;</span><span class="op">++</span><span class="st">&quot;aaa&quot;</span>)</span></code></pre></div>
+<p>문제가 생기는 ill 타입이 나옵니다.</p>
+<p>2022.10.14 추가</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ot">func1 ::</span> <span class="kw">forall</span> a<span class="op">.</span> a <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>func1 _ <span class="ot">=</span> <span class="dv">1</span></span></code></pre></div>
+<pre><code>ghci&gt; func1 &quot;a&quot;
+1
+ghci&gt; func1 1
+1
+ghci&gt; func1 True
+1
+g</code></pre>
+<div class="sourceCode" id="cb13"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="ot">func2 ::</span> (<span class="kw">forall</span> a<span class="op">.</span> a <span class="ot">-&gt;</span> <span class="dt">Int</span>) <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>func2 _ <span class="ot">=</span> <span class="dv">2</span></span></code></pre></div>
+<pre><code>hci&gt; func2 (\n -&gt; 2)
+2
+ghci&gt; func2 (\n -&gt; n)
+&lt;interactive&gt;:6:14: error:
+    • Couldn't match expected type ‘Int’ with actual type ‘a’
+      ‘a’ is a rigid type variable bound by</code></pre>
+<p><code>func1</code>은 어떤 타입이 들어와도 <code>Int</code>를 내뱉을 수 있습니다. =&gt; 모든 타입에 대응해서 <code>Int</code>를 뱉을 수 있습니다.
+<code>func2</code>는 반드시 “어떤 타입이 들어와도 <code>Int</code>를 내뱉을 수 있는 함수”만 들어와야 합니다.
+<code>\n -&gt; 2</code>는 어떤 타입이 들어와도 <code>2</code>를 내뱉을 수 있습니다.
+<code>\n -&gt; n</code>는 <code>True</code>를 주면 <code>True</code>를 내뱉는 함수라 안됩니다.</p>
+<p><code>func1</code>은 <code>forall a. a</code> 자리에 <code>"a"</code>, <code>1</code>, <code>True</code> 등 아무 타입이나 들어오는데
+<code>func2</code>는 <code>forall a. a -&gt; Int</code> 자리에 반드시 <code>forall a. a -&gt; Int</code>만 들어와야 합니다. <code>Int -&gt; Int</code>같은 함수는 안됩니다.</p>
+<p>아마도 많은 입문자들에게 혼란을 주는 부분이 여기지 않을까요?</p>
+<p><code>func1</code>은 모든 타입을 받을 수 있는 함수니 이런 저런 타입을 넣어 준 것이고,
+<code>func2</code>는 “모든 타입을 받을 수 있는 함수”만 받을 수 있습니다.</p>
+<p>이렇게 타입으로만 설명하면 말장난처럼 들릴 수도 있습니다.</p>
+<p>동작을 따라가며 예상하면 조금 나을 수 있습니다.<br />
+넣어 준 함수의 인자는 아직 정해지지 않았습니다. <code>func2</code> 안에서 어떤 인자가 들어 갈지(혹은 안 들어갈지) 모릅니다. 예를 들어, 나중에 <code>True</code>가 들어 갈 수도 있는데, 여기다 <code>Int -&gt; Int</code> 함수를 넣어 놓으면 문제가 생길거라 예상할 수 있습니다.</p>
+<p>다음 함수를 해석해 보면,</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="ot">func ::</span> <span class="kw">forall</span> a<span class="op">.</span> (a <span class="ot">-&gt;</span> <span class="dt">Bool</span>) <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>func f <span class="ot">=</span> <span class="kw">if</span> f <span class="dv">1</span> <span class="kw">then</span> <span class="dv">1</span> <span class="kw">else</span> <span class="dv">0</span></span></code></pre></div>
+<pre><code>• No instance for (Num a) arising from the literal ‘1’
+  Possible fix:
+    add (Num a) to the context of
+      the type signature for:
+        func :: forall a. (a -&gt; Bool) -&gt; Int
+• In the first argument of ‘f’, namely ‘1’
+  In the expression: f 1
+  In the expression: if f 1 then 1 else 0</code></pre>
+<p>모든 <code>a</code>를 다룰 수 있는 함수가 들어 왔으니 <code>1</code>을 넘겨줘도 되야 할 것 같은데, 그렇게 해석되지 않습니다.</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="ot">func ::</span> <span class="kw">forall</span> a<span class="op">.</span> (a <span class="ot">-&gt;</span> <span class="dt">Bool</span>) <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="co">------(가)</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>func f <span class="ot">=</span> <span class="kw">if</span> f <span class="dv">1</span> <span class="kw">then</span> <span class="dv">1</span> <span class="kw">else</span> <span class="dv">0</span></span></code></pre></div>
+<p>세상에 <code>Int</code>타입과 <code>Bool</code> 타입만 있다 가정하면,
+<code>func</code>는 <code>(Int -&gt; Bool) -&gt; Int</code>도 <code>(Bool -&gt; Bool) -&gt; Int</code>도 가능한 구현이어야 합니다.
+구현에서 <code>1</code>을 넣어주고 있기 때문에 <code>(Bool -&gt; Bool)</code>인 경우에는 문제가 됩니다.</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="ot">func ::</span> (<span class="kw">forall</span> a<span class="op">.</span> a <span class="ot">-&gt;</span> <span class="dt">Bool</span>) <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="co">------(나)</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>func f <span class="ot">=</span> <span class="kw">if</span> f <span class="dv">1</span> <span class="kw">then</span> <span class="dv">1</span> <span class="kw">else</span> <span class="dv">0</span></span></code></pre></div>
+<p><code>func</code>는 <code>(Int -&gt; Bool)</code>도 <code>(Bool -&gt; Bool)</code>도 가능한 함수를 받아 <code>Int</code>를 돌려줍니다.
+<code>Int</code>도, <code>Bool</code>도 받을 수 있는 함수를 받았기 때문에, 여기에 <code>1</code>을 넣는 건 문제가 되지 않습니다.</p>
+<p>이론적인 것보다 실제 동작으로 얘기하면,
+(가)는 외부에서 <code>Bool -&gt; Bool</code> 타입으로 결정된 함수가 들어오면 문제가 생기고,
+(나)는 외부에서는 모든 것이 가능한 함수가 들어오고, 내부에서 구체 타입이 결정됩니다.</p>
+<p>그래서 “내부에서 함수가 결정되도록 하려면 <code>RankNType</code>을 쓰면 된다고 얘기합니다. <span class="citation" data-cites="재원">@재원</span></p>
+<p>※ 위에 날짜별로 추가된 글은, 하스켈 학교에서 여러분들과 대화하며 올렸던 글들을 그대로 가져온 것입니다.</p>
 
 <div class="comment">
 <script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
