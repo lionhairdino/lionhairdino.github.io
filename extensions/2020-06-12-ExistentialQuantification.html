@@ -88,8 +88,9 @@
 조건을 만족하는 최소 하나 이상의 값 exists x <br></p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">ScopedTypeVariables</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="dt">RankNTypes</span><span class="op">/</span><span class="dt">Rank2Types</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="dt">ExistentialQuantification</span></span></code></pre></div>
-<p><code>forall</code>이 쓰이는 경우는 세 가지 확장을 켰을 때인데, 여기서는 <code>ExistentialQuantification</code> 확장의 <code>forall</code>만 다룹니다.</p>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="dt">ExistentialQuantification</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="op">...</span></span></code></pre></div>
+<p><code>forall</code>이 쓰는 확장은 매우 많은데, 여기서는 <code>ExistentialQuantification</code> 확장의 <code>forall</code>만 다룹니다.</p>
 <p>이 확장을 켜면, 여러 타입들을 뭉뚱그려 하나의 타입으로 취급할 수 있습니다. 좀 더 학문적으로 얘기하면, 여러 타입을 추상화한 타입을 만들 수 있다고 말할 수 있습니다.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- hetero 는 그리스어로 other, different를 의미한다.</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ot">{-# LANGUAGE ExistentialQuantification #-}</span></span>
@@ -106,8 +107,8 @@
 <em>“응, 그건 모든 타입이 다 될 수 있어”</em> <br>
 라고 대답 해주는 것과 같습니다. 그럼, 컴파일러는 <br>
 “응, 그러면 나중에 구체 타입이 결정되겠군” <br>
-하고 넘어갑니다. 다른 말로 하면, <em>타입 체크를 뒤로 미룬다</em>고도 볼 수 있습니다. 타입 추론 시점에 대한 확장으로 볼 수 있습니다.</p>
-<p><code>forall</code> 을 쓰면 <code>5, (), True, "Sartre"</code> 를 모두 다룰 수 있는 <code>MkT'</code> 이라는 타입을 만들 수 있습니다. <code>Show a</code>라는 제약(한정자)을 주면 모든 타입이 아닌, <code>show</code> 함수를 적용할 수 있는 타입(달리 표현하면, <code>Show</code> 클래스에 속한 타입)으로 대상이 축소 됩니다.</p>
+하고 넘어갑니다. 다른 말로 하면, <em>타입 체크를 뒤로 미룬다</em>고도 볼 수 있습니다.</p>
+<p><code>forall</code> 을 쓰면 <code>5, (), True, "Sartre"</code> 를 모두 다룰 수 있는 <code>MkT'</code> 이라는 타입을 만들 수 있습니다. <code>Show a</code>라는 제약(한정자)을 주면 모든 타입이 아닌, <code>show</code> 함수를 적용할 수 있는 타입(달리 표현하면, <code>Show</code> 클래스의 인스턴스인 타입)으로 대상이 축소 됩니다.</p>
 <p><code>forall</code> 폴리모픽 변수를 만나면, 컴파일 타임에 코드 조합에 따라 컴파일러가 구체 타입을 결정합니다. 예를 들어, 타입을 받는 곳에 <code>"a"</code> 가 넘어가는 상황을 만나면 <code>[Char]</code> 타입이 되고, <code>'a'</code> 를 만나면 <code>Char</code> 타입으로 추론됩니다.</p>
 <p>영단어 뜻<br>
 existentially 실체론적으로, 실존(주의)적으로<br>
@@ -119,7 +120,7 @@ quantified 뭔가를 울타리 안에 가두는, 한정, 제약<br></p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">S</span> <span class="ot">=</span> <span class="dt">S</span> a</span></code></pre></div>
 <p>이렇게 하면 컴파일러가 물어 볼 때, 아무런 대답을 안하는 것과 같습니다. 오류가 납니다.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">S</span> <span class="ot">=</span> <span class="kw">forall</span> a<span class="op">.</span> <span class="dt">Show</span> a <span class="ot">=&gt;</span> <span class="dt">S</span> a</span></code></pre></div>
-<p>“<code>a</code>가 폴리모픽”이라고 답하고, “a는 <code>Show</code> 클래스에 속한 타입이야” 라고 대답 하는겁니다. “<em>매개 변수로 받지 않아도 나중에 애매하지 않게 타입이 결정될거야</em>” 라고 대답하는 옵션입니다. 대답을 듣고, 컴파일러는 타입 추론을 나중으로 미룹니다.</p>
+<p>“<code>a</code>가 폴리모픽”이라고 답하고, “a는 <code>Show</code> 클래스의 인스턴스인 타입이야” 라고 대답 하는겁니다. “<em>매개 변수로 받지 않아도 나중에 애매하지 않게 타입이 결정될거야</em>” 라고 대답하는 옵션입니다. 대답을 듣고, 컴파일러는 타입 추론을 나중으로 미룹니다.</p>
 <p>이걸 <code>GADT</code> 문법으로 표현하면, <code>forall</code> 을 생략해도 같은 의미입니다.</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ot">{-# LANGUAGE GADTs #-}</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">S</span> <span class="kw">where</span></span>

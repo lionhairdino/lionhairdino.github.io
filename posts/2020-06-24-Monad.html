@@ -98,7 +98,7 @@
 <li><a href="#엮어-놓은-액션함수-뭉치-실행run">엮어 놓은 액션(함수) 뭉치 실행(run)</a></li>
 </ol>
 <h2 id="모나드가-뭘까">모나드가 뭘까?</h2>
-<p>펑크터 <code>m</code> 구조에 함수 두 개 <code>return: a -&gt; m a</code>,<code>join: m (m a) -&gt; m a</code>가 있어, <code>m (m (m ...))</code>합성이 가능한 구조를 모나드라 합니다. 말로 풀면, 두 함수의 도움으로 같은 펑크터를 몇 번이고 계속 적용(합성)이 가능한 구조를 모나드라 합니다. <code>m</code>을 두번 적용한 것을 한번 적용한 것으로 만들 수 있습니다.</p>
+<p>펑크터 <code>m</code> 구조에 함수 두 개 <code>return: a -&gt; m a</code>,<code>join: m (m a) -&gt; m a</code>가 있어, <code>m (m (m ...))</code>합성이 가능한 구조를 모나드라 합니다. 말로 풀면, 두 함수의 도움으로 같은 펑크터를 몇 번이고 계속 적용해도 한 번 적용한 것과 같은 타입으로 볼 수 있는 구조를 모나드라 합니다. <code>m</code>을 두 번 이상 적용한 것을 한번 적용한 것으로 만들 수 있습니다.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- m (m a) -&gt; m a 가 있어 아래처럼 할 수 있습니다.</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>m (m (m (m <span class="op">...</span>))) <span class="ot">-&gt;</span> m</span></code></pre></div>
 <h2 id="a---m-b-타입을-합성하면-모나드인가"><code>a -&gt; m b</code> 타입을 합성하면 모나드인가?</h2>
@@ -147,7 +147,7 @@
 <p>함수가 함수를 품을 때마다 반드시 <code>fmap</code>이 한 번씩 동작합니다. 체이닝할 때, 매 번 뭔가 작업을 반복해서 하고, 결과를 잃어버리지 않고 누적해야 한다면 딱 어울리는 패턴입니다.</p>
 <p><code>Maybe</code>는 컴포지션할 때마다 매 번 “<code>Nothing</code> 인지 검사하고”<br />
 <code>Status</code>는 컴포지션할 때마다 매 번 “상태값을 액션에 넣어줘야 하고”<br />
-<code>Writer</code>는 컴포지션할 때마다 매 번 “로그 ‘같은’ 값들을 계속 누적하고”<br />
+<code>Writer</code>는 컴포지션할 때마다 매 번 “로그 ‘같은’ 값들을 계속 누적하고”
 <code>IO</code>는 컴포지션할 때마다 매 번 “<code>Status</code>처럼 런타임 상태값<code>realworld</code>을 계속 끌고 다녀야 하고”<br />
 …<br />
 (거의 대부분 “<em>순수 함수는 매개 변수로만 소통할 수 있다</em>”라는 제약 때문에 등장한 난제들입니다.)</p>
