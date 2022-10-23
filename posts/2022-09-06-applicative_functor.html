@@ -111,8 +111,9 @@ Applicatives의 기본 개념은 <a href="http://learnyouahaskell.com/functors-a
 <p>둘이 거의 같아 보이지 않나요? 인자 순서만 좀 다르고 하는 일은 같은 걸로 보입니다. 저는 샘플 인스턴스를 찾아 볼 때, 이 걸 보는 바람에 잠깐동안 Applicatives도 Effect를 합성하는 것이 아닐까 생각했습니다. Reader 모나드의 Effect는 외부 스코프 변수를 참조하는 것입니다. (물론, 하스켈에서는 실제로 현재 함수의 스코프를 벗어나는 값에 접근하는 게 아니라, 외부 스코프인 척 하는 값을 컴비네이터<code>bind</code>가 끌고 다닙니다.) 이 값을 <code>r</code>이라고 할 때, <code>r</code>을 두 번 받는 Effect를 합치면 <code>r</code>을 한 번 받도록 만들면 됩니다. <code>r</code>을 한 번만 받아서 컴비네이터가 두 번 써먹으면 되게 만든게 바로 Reader의 <code>join</code>입니다. <code>bind</code>는 이 <code>join</code>을 이용합니다. 위 소스를 보시면 <code>\x -&gt; ...</code> 로 둘 다 한 번만 <code>r</code>을 받고, <code>g</code>에 한 번, <code>f</code>에 한 번 써먹고 있습니다. 이 코드를 보면서 <code>&lt;*&gt;</code>도 바인드와 비슷하게 Effect를 합성하는구나로 오해 했습니다.</p>
 <p>Applicatives의 속성은 Effect를 합성하는 걸 강요하지 않습니다. 물론, 합성해도 됩니다만, 합성을 하냐 안하냐는 Applicatives의 속성이 아닙니다. Applicatives를 공부하면서 기존 인스턴스<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>를 찾아봤는데, 하필 모나드이기도 한 것들만 찾아 보는 바람에 Applicatives도 Effect를 합성하는 일종이라 오해했습니다. 대부분 모나드이기도 한 Applicatives는 Effect를 모나드와 비슷하게 합성하고, 마지막에만 apply가 나타납니다. 모나드에 있는 <code>ap</code>로 <code>&lt;*&gt;</code>를 구현하기도 하고, <code>&gt;&gt;=</code>로도 <code>&lt;*&gt;</code>를 구현할 수 있습니다.</p>
 <h2 id="applicatives는-effect를-다루는가">Applicatives는 Effect를 다루는가?</h2>
-<p>Effect는 <code>join</code>이 있어야만 합니다. 즉 <code>Monad</code> 클래스의 인스턴스여야만 Effect로 볼 수 있습니다. 하지만, Applicatives에서 다루는 것은 <code>join</code>이 없어 딱 Effect라고 볼 수는 없습니다. 딱 지칭할 용어를 아직 찾지 못했습니다. 이 문서에서는 용어를 알게 될 때까지 Effect Like 라고 표기하겠습니다. 보통 모나드는 모두 Applicatives의 인스턴스를 만들 수 있기 때문에, 그냥 Effect로 표기하는 문서들도 많습니다. 그리고, 공식 문서들에서도 Effectful 함수를 지칭하는 action이란 용어를 쓰기도 합니다. Effect 정의에 따라, Effct로 불러도 되는 건지 아직 확실하지 않습니다.</p>
+<p>Effect는 <code>join</code>이 있어야만 합니다. 즉 <code>Monad</code> 클래스의 인스턴스여야만 Effect로 볼 수 있습니다. 하지만, Applicatives에서 다루는 것은 <code>join</code>이 없어 딱 Effect라고 볼 수는 없습니다. 딱 지칭할 용어를 아직 찾지 못했습니다. 이 문서에서는 용어를 알게 될 때까지 Effect Like 라고 표기하겠습니다. 보통 모나드는 모두 Applicatives의 인스턴스를 만들 수 있기 때문에, 그냥 Effect로 표기하는 문서들도 많습니다. 그리고, 공식 문서들에서도 Effectful 함수를 지칭하는 action이란 용어를 쓰기도 합니다. Effect 정의에 따라, Effct로 불러도 되는 건지 아직 확실하지 않습니다. – 2022.10.21 추가 : Monad의 Effect와 구별해서 Applicative Effect라 부릅니다.</p>
 <h2 id="의-타입">&lt;*&gt;의 타입</h2>
+<p>※ 아래는 모나드에서 다루는 Effect와는 반드시 같지 않을 수 있기에 Effect Like라고 임시 표기했는데, 특별한 이름 없이 Applicative Effect라 부르기도 합니다.</p>
 <p>타입만 보고도 추론할 수 있는게 있습니다.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ot">(&lt;*&gt;) ::</span> f(a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> f a <span class="ot">-&gt;</span> f b</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>         <span class="op">^^^^^^^^^</span>    <span class="op">^^^</span></span>
@@ -149,6 +150,9 @@ Functor, Applicatives, Monad를 하나의 계보에 올려 놓고,<br />
 <p>물론, Applicatives가 할 수 있는 일은, Monad가 다 할 수 있긴 하나, 둘의 용도는 전혀 다른게 아닌가 합니다. Applicatives는 체인을 무한정 연결하는게 아니라, 함수나 생성자를 두고, 그들이 필요하는 인자 수 만큼만 체인을 만듭니다. 그 와중에 Effect를 처리하던 모나드와 비슷한 동작을 하기도 하는데, 원래 목적 자체가 모나드와 같지는 않습니다.</p>
 <p><code>Functor</code>로 할 수 있는 모든 일은 <code>Applicatives</code>로 할 수 있고, <code>Applicatives</code>로 할 수 있는 모든 일은 <code>Monad</code>로 할 수 있습니다. 각 Class의 핵심 메소드로 얘기하면,
 <code>fmap</code>으로 할 수 있는 일은 <code>&lt;*&gt;</code>로 할 수 있고, <code>&lt;*&gt;</code>로 할 수 있는 일은 <code>&gt;&gt;=</code>로 할 수 있습니다. 그래서 뭐가 뭐보다 더 강하다는 표현을 씁니다.</p>
+<p><a href="https://ghc.gitlab.haskell.org/ghc/doc/users_guide/exts/applicative_do.html">Applicative do-notation</a><br />
+<a href="https://www.staff.city.ac.uk/~ross/papers/Applicative.pdf">Functional Pearl. Applicative programming with effects - Conor Mcbride, Ross paterson</a><br />
+<a href="https://stackoverflow.com/questions/23342184/difference-between-monad-and-applicative-in-haskell">Difference between Monad and Applicative in Haskell(Stackoverflow)</a></p>
 <p>2022.9.10 추가</p>
 <p>Ailrun님께 2~3일에 걸쳐 집요하게 질문드려 이해하게 된 내용들을 정리해서 추가합니다. 혹시 틀린 내용이 있다면, 분명 제가 이해를 잘 못한 것입니다.</p>
 <blockquote>
@@ -174,7 +178,6 @@ Functor, Applicatives, Monad를 하나의 계보에 올려 놓고,<br />
 <p><code>\(unwrapf, s') -&gt; mx</code>는 패턴 바인딩으로 <code>mf</code>에서 <code>m</code>을 벗겨 <code>unwrapf</code>에 바인딩해 놓을 뿐 Effect에 영향을 미치는 동작이 없습니다.<br />
 <code>\(unwrapx, s'') -&gt; return (unwrapf unwrapx, s'')</code>는 패턴 바인딩으로 <code>mx</code>에서 <code>m</code>을 벗겨 <code>unwrapx</code>에 바인딩해 놓을 뿐 Effect에 영향을 미치는 동작이 없습니다.</p>
 </blockquote>
-<p>※ 위에, 모나드에서 다루는 Effect와는 반드시 같지 않을 수 있기에 Effect Like라고 임시 표기했는데, 특별한 이름 없이 Applicative Effect라 부르기도 합니다.</p>
 <section class="footnotes" role="doc-endnotes">
 <hr />
 <ol>
