@@ -329,14 +329,14 @@
 <span id="cb21-104"><a href="#cb21-104" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
 <h3 id="abi-충돌">ABI 충돌</h3>
 <p>wrapper를 돌렸을 때, ABI 충돌이 나며 끝에 아래와 같은 메시지가 나올 때가 있습니다.</p>
-<pre><code>{&quot;jsonrpc&quot;:&quot;2.0&quot;, &quot;method&quot;:&quot;window/showMessage&quot;, &quot;params&quot;: {&quot;type&quot;: 1, &quot;message&quot;: &quot;Couldn't find a working/matching GHC installation. Consider installing ghc-9.2.4 via ghcup or build HLS from source.&quot;}}</code></pre>
+<div class="sourceCode" id="cb22"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="ex">{</span><span class="st">&quot;jsonrpc&quot;</span><span class="ex">:</span><span class="st">&quot;2.0&quot;</span><span class="ex">,</span> <span class="st">&quot;method&quot;</span>:<span class="st">&quot;window/showMessage&quot;</span>, <span class="st">&quot;params&quot;</span>: {<span class="st">&quot;type&quot;</span>: 1, <span class="st">&quot;message&quot;</span>: <span class="st">&quot;Couldn't find a working/matching GHC installation. Consider installing ghc-9.2.4 via ghcup or build HLS from source.&quot;</span>}}</span></code></pre></div>
 <p>ABI 충돌은 결국, 현재 쓰고 있는 GHC와, HLS를 컴파일한 GHC가 맞지 않아 생기는 오류입니다. ghcup로 싹다 지우고, cache도 지우고, 다시 깨끗한 환경에서 설치했는데도 아래와 같은 오류가 났습니다.</p>
-<pre><code>$ haskell-language-server-9.2.4
-
-No compiler found, expected minor version match with ghc-9.2.4 (x86_64-tinfo6) (based on resolver setting in /home/jacoo/.stack/global-project/stack.yaml).
-To install the correct GHC into /home/jacoo/.stack/programs/x86_64-linux/, try running &quot;stack setup&quot; or use the &quot;--install-ghc&quot; flag. To use your system GHC installation, run &quot;stack config set system-ghc --global true&quot;, or use the &quot;--system-ghc&quot; flag.
-All methods exhausted!
-Content-Length: 203</code></pre>
+<div class="sourceCode" id="cb23"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> haskell-language-server-9.2.4</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="ex">No</span> compiler found, expected minor version match with ghc-9.2.4 <span class="er">(</span><span class="ex">x86_64-tinfo6</span><span class="kw">)</span> <span class="kw">(</span><span class="ex">based</span> on resolver setting in /home/jacoo/.stack/global-project/stack.yaml<span class="kw">)</span><span class="bu">.</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="ex">To</span> install the correct GHC into /home/jacoo/.stack/programs/x86_64-linux/, try running <span class="st">&quot;stack setup&quot;</span> or use the <span class="st">&quot;--install-ghc&quot;</span> flag. To use your system GHC installation, run <span class="st">&quot;stack config set system-ghc --global true&quot;</span>, or use the <span class="st">&quot;--system-ghc&quot;</span> flag.</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="ex">All</span> methods exhausted!</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a><span class="ex">Content-Length:</span> 203</span></code></pre></div>
 <p>위와 같이 ABI 충돌을 해결하지 못할 때, HLS를 현재 시스템이 쓰는 GHC로 컴파일해서 해결을 시도할 수 있습니다.</p>
 <pre><code>ghcup compile hls --version 1.8.0.0 --ghc 9.2.4</code></pre>
 <p>저는 위 방법으로, 컴파일을 시도했는데, 제 데비안 환경과 맞지 않는 무엇이 있는지 계속 컴파일 에러가 났습니다.<br />
