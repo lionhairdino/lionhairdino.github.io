@@ -382,6 +382,40 @@ release 기준으로 빌드하면 Hackage에서 가져와서 빌드하는데, Ha
 <span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span>
 <span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> someFunc</span></code></pre></div>
 <p>장황하긴 한데, HLS가 동작하려면 필요한 조건과, <code>stack</code>이 일괄적인 동작을 하지 않는 부분은 알아두면 도움이 되는 곳이 있을 것 같습니다.</p>
+<p>※ vim에서 한글을 쓸 때
+vim은 modal(모드가 있는) 에디터이므로 편집 모드에서 한글 상태로 작업하다, 모드가 바뀌면 영문 상태로 가는 기능이 있으면 편리합니다. 그래서, 각종 입력기에는 이를 위해 <code>ESC</code>키를 누르면 영문 상태로 바뀌는 옵션들을 가지고 있습니다. 하지만, 손가락을 경제적으로 쓰기 위해 <code>ESC</code>키보다 가까운 <code>Ctrl [</code>를 쓰는 분들은 이 옵션의 혜택을 받지 못했습니다. 그런데, 최근에 <a href="https://github.com/Riey/kime">KIME</a>를 알게 되어, 셋팅 도중 아래와 같이 테스트하니 <code>Ctrl [</code>도 영문으로 바뀌도록 손쉽게 설정이 가능했습니다.</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="ex">.config/kime/config.yaml</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a><span class="ex">engine:</span></span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>  <span class="ex">default_category:</span> Latin</span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>  <span class="ex">global_category_state:</span> false</span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>  <span class="ex">global_hotkeys:</span></span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>    <span class="ex">M-C-Backslash:</span></span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>      <span class="ex">behavior:</span></span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>        <span class="ex">Mode:</span> Math</span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>      <span class="ex">result:</span> ConsumeIfProcessed</span>
+<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a>    <span class="ex">S-Space:</span></span>
+<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a>      <span class="ex">behavior:</span></span>
+<span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a>        <span class="ex">Toggle:</span></span>
+<span id="cb31-15"><a href="#cb31-15" aria-hidden="true" tabindex="-1"></a>          <span class="ex">-</span> Hangul</span>
+<span id="cb31-16"><a href="#cb31-16" aria-hidden="true" tabindex="-1"></a>          <span class="ex">-</span> Latin</span>
+<span id="cb31-17"><a href="#cb31-17" aria-hidden="true" tabindex="-1"></a>      <span class="ex">result:</span> Consume</span>
+<span id="cb31-18"><a href="#cb31-18" aria-hidden="true" tabindex="-1"></a>    <span class="ex">M-C-E:</span></span>
+<span id="cb31-19"><a href="#cb31-19" aria-hidden="true" tabindex="-1"></a>      <span class="ex">behavior:</span></span>
+<span id="cb31-20"><a href="#cb31-20" aria-hidden="true" tabindex="-1"></a>        <span class="ex">Mode:</span> Emoji</span>
+<span id="cb31-21"><a href="#cb31-21" aria-hidden="true" tabindex="-1"></a>      <span class="ex">result:</span> ConsumeIfProcessed</span>
+<span id="cb31-22"><a href="#cb31-22" aria-hidden="true" tabindex="-1"></a>    <span class="ex">Esc:</span></span>
+<span id="cb31-23"><a href="#cb31-23" aria-hidden="true" tabindex="-1"></a>      <span class="ex">behavior:</span></span>
+<span id="cb31-24"><a href="#cb31-24" aria-hidden="true" tabindex="-1"></a>        <span class="ex">Switch:</span> Latin</span>
+<span id="cb31-25"><a href="#cb31-25" aria-hidden="true" tabindex="-1"></a>      <span class="ex">result:</span> Bypass</span>
+<span id="cb31-26"><a href="#cb31-26" aria-hidden="true" tabindex="-1"></a>    <span class="ex">C-OpenBracket:</span> <span class="op">&lt;</span>---------------- 추가</span>
+<span id="cb31-27"><a href="#cb31-27" aria-hidden="true" tabindex="-1"></a>      <span class="ex">behavior:</span></span>
+<span id="cb31-28"><a href="#cb31-28" aria-hidden="true" tabindex="-1"></a>        <span class="ex">Switch:</span> Latin</span>
+<span id="cb31-29"><a href="#cb31-29" aria-hidden="true" tabindex="-1"></a>      <span class="ex">result:</span> Bypass</span>
+<span id="cb31-30"><a href="#cb31-30" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span></code></pre></div>
+<p>다른 입력기들은 셋팅 방법을 몰라, 혹은 사용자에게 드너내 놓지 않아 풀지 못한 문제였는데, 드디어 해결했습니다.<br />
+이미 훌륭하지만, 앞으로도 굉장히 기대되는 한글 입력기입니다. (수학에서 자주 쓰이는 기호와 Greek문자들을 입력하는 모드도 있습니다.!)</p>
 <section class="footnotes" role="doc-endnotes">
 <hr />
 <ol>
