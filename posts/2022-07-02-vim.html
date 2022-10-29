@@ -252,197 +252,209 @@ endif</code></pre>
 <div class="sourceCode" id="cb14"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="at">:CocRestart</span></span></code></pre></div>
 <p><code>init.vim</code>에 단축키 설정</p>
 <div class="sourceCode" id="cb15"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="at">map &lt;F10&gt; :CocRestart&lt;CR&gt;</span></span></code></pre></div>
-<p><code>:Coc</code>까지 입력하고 <code>tab</code>키를 입력하면 지원 명령들을 볼 수 있습니다.</p>
-<p>지원하는 명령들을 목록으로 볼 수도 있습니다.</p>
+<p><code>:Coc</code>까지 입력하고 <code>tab</code>키를 입력하면 지원 명령들을 볼 수 있습니다.<br />
+지원하는 명령들을 목록으로 볼 수도 있습니다.</p>
 <div class="sourceCode" id="cb16"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="at">:CocList</span></span></code></pre></div>
 <p>아래 명령을 이용하여 <code>LSP</code> 서버에게 여러가지 명령을 전달 할 수 있습니다.</p>
 <div class="sourceCode" id="cb17"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="at">:CocCommand</span></span></code></pre></div>
-<h4 id="윙맨wingman">윙맨Wingman</h4>
+<h3 id="정의로-점프go-to-definition-후-돌아-오기가-안될-때">정의로 점프Go to Definition 후 돌아 오기가 안될 때</h3>
+<p>2022.10.28 추가</p>
+<ul>
+<li><code>Ctrl i</code>, <code>Ctrl o</code>는 점프리스트를 순환하는 키로, 점프한 지점이 바로 다음 값이 아니면 직관적이지 않게 꼬입니다.</li>
+<li>새 탭을 열며 Definition으로 갔는데, <code>Ctrl o</code>를 누르면, 이전 탭으로 가는게 아니라 현재 탭에서 파일을 다시 여는 동작을 합니다.</li>
+</ul>
+<p>위 두가지 이유로 <code>Ctrl o</code>는 적합하지 않습니다.</p>
+<p>해결책은 tag시스템을 이용하는 방법입니다.</p>
+<p><code>.config/nvim/init.vim</code></p>
+<pre class="vim"><code>set tagfunc=CocTagFunc</code></pre>
+<p>설정을 마치고 vim을 다시 시작하면,<br />
+<code>gd</code>또는 <code>Ctrl ]</code>로 정의 위치로 점프하고, <code>Ctrl T</code>로 다시 돌아올 수 있습니다.</p>
+<h3 id="윙맨wingman">윙맨Wingman</h3>
 <p><code>HLS</code>는 다양한 기능들을 플러그인 구조로 구현하고 있습니다. 이 중 타입만 작성하고 hole<code>_</code>을 써 놓으면 코드를 추정해 주는 <a href="https://hackage.haskell.org/package/hls-tactics-plugin">Wingman</a>이란 플러그인이 있는데, 아직은 익숙하지 않은데, 원리를 좀 더 이해한다면 강력한 툴 중 하나가 될지도 모릅니다. 윙맨 플러그인은 <code>HLS</code>를 설치할 때 디폴트로 설치 됩니다.</p>
 <h3 id="설정-오류를-고칠-단서-얻는-방법">설정 오류를 고칠 단서 얻는 방법</h3>
 <p>이 소스, 저 소스들을 가져와서 실행해 보며 공부하다 보면, 버전 충돌로 인한 에러를 자주 만납니다. 작동을 제대로 하고 있는지 보는 방법 중 가장 간단한 방법은 HLS 프로세스가 떠있나 보는 방법이 있고, 아래 명령어들을 이용해 단서를 얻을 수 있습니다.</p>
 <p>꽤 오랫동안 인터넷 문서들을 보며 리눅스 관련 툴들을 설치하곤 했는데, 그 때마다 드는 생각이 “현재 잘 작동하고 있는지, 로그는 어떻게 보는지” 알려주는 문서가 제일 좋았던 것 같습니다.</p>
 <p>Neovim 안에서</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="at">:CocCommand workspace.showOutput</span></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="at">:CocOpenLog</span></span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="at">:messages</span></span></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="at">:CocCommand workspace.showOutput</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="at">:CocOpenLog</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="at">:messages</span></span></code></pre></div>
 <p>프로젝트 루트 폴더에서(stack.yaml이 있는 폴더) 커맨드 라인에서</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> haskell-language-server-wrapper</span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> haskell-language-server-9.0.2 <span class="kw">(</span><span class="ex">특정</span> 버전<span class="kw">)</span></span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> stack <span class="ex">build</span> <span class="at">--verbose</span></span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> haskell-language-server-wrapper</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> haskell-language-server-9.0.2 <span class="kw">(</span><span class="ex">특정</span> 버전<span class="kw">)</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> stack <span class="ex">build</span> <span class="at">--verbose</span></span></code></pre></div>
 <p>문제가 생겨 <code>HLS</code>가 올라오지 않을 때는 제일 먼저, <code>Neovim</code>에 연동되어 돌아가기 전에, standalone으로 정상 작동하는지 보는게 편합니다.</p>
 <p><code>HLS</code>가 정상적으로 올라왔는데 동작이 이상할 때 <code>CocConfig</code>를 열어 <code>args</code>에 다음을 추가하여, <code>HLS</code>의 로그를 볼 수 있습니다.</p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="er">...</span></span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="er">&quot;languageserver&quot;:</span> <span class="fu">{</span></span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;haskell&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;command&quot;</span><span class="fu">:</span> <span class="st">&quot;haskell-language-server-wrapper&quot;</span><span class="fu">,</span></span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;args&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;--lsp&quot;</span><span class="ot">,</span><span class="st">&quot;-d&quot;</span><span class="ot">,</span><span class="st">&quot;-l&quot;</span><span class="ot">,</span><span class="st">&quot;hls.log&quot;</span><span class="ot">]</span><span class="fu">,</span></span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="er">...</span></span></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="er">...</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="er">&quot;languageserver&quot;:</span> <span class="fu">{</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;haskell&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;command&quot;</span><span class="fu">:</span> <span class="st">&quot;haskell-language-server-wrapper&quot;</span><span class="fu">,</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;args&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;--lsp&quot;</span><span class="ot">,</span><span class="st">&quot;-d&quot;</span><span class="ot">,</span><span class="st">&quot;-l&quot;</span><span class="ot">,</span><span class="st">&quot;hls.log&quot;</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a><span class="er">...</span></span></code></pre></div>
 <p>※ <code>"args": ["--lsp","-d","--logfile=hls.log"]</code>라 둬서 정상 작동하지 않는 걸 Ailrun님 조언으로 해결했습니다.
 설정을 바꿨으니 <code>Coc</code>와 <code>HLS</code>를 재시작합니다.</p>
-<div class="sourceCode" id="cb21"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="at">:CocRestart</span></span></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="at">:CocRestart</span></span></code></pre></div>
 <h3 id="설정-목록">설정 목록</h3>
 <p>쉘에서 아래 명령어로 가능한 설정을 확인 할 수 있습니다.</p>
-<div class="sourceCode" id="cb22"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> haskell-language-server-wrapper <span class="ex">generate-default-config</span></span></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> haskell-language-server-wrapper <span class="ex">generate-default-config</span></span></code></pre></div>
 <p>2022.10 버전 1.8.0.0에서는 아래와 같이 나옵니다.</p>
-<div class="sourceCode" id="cb23"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;haskell&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;checkParents&quot;</span><span class="fu">:</span> <span class="st">&quot;CheckOnSave&quot;</span><span class="fu">,:</span></span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;checkProject&quot;</span><span class="er">:</span> <span class="kw">true</span><span class="fu">,</span></span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;formattingProvider&quot;</span><span class="fu">:</span> <span class="st">&quot;ormolu&quot;</span><span class="fu">,</span></span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;maxCompletions&quot;</span><span class="fu">:</span> <span class="dv">40</span><span class="fu">,</span></span>
-<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;plugin&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;alternateNumberFormat&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;globalOn&quot;</span><span class="fu">:</span> <span class="kw">true</span></span>
-<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>            <span class="fu">},</span></span>
-<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;callHierarchy&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;globalOn&quot;</span><span class="fu">:</span> <span class="kw">true</span></span>
-<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>            <span class="fu">},</span></span>
-<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;changeTypeSignature&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;globalOn&quot;</span><span class="fu">:</span> <span class="kw">true</span></span>
-<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a>            <span class="fu">},</span></span>
-<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;class&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;codeActionsOn&quot;</span><span class="fu">:</span> <span class="kw">true</span><span class="fu">,</span></span>
-<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;codeLensOn&quot;</span><span class="fu">:</span> <span class="kw">true</span></span>
-<span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a>            <span class="fu">},</span></span>
-<span id="cb23-21"><a href="#cb23-21" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;eval&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb23-22"><a href="#cb23-22" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;config&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb23-23"><a href="#cb23-23" aria-hidden="true" tabindex="-1"></a>                    <span class="dt">&quot;diff&quot;</span><span class="fu">:</span> <span class="kw">true</span><span class="fu">,</span></span>
-<span id="cb23-24"><a href="#cb23-24" aria-hidden="true" tabindex="-1"></a>                    <span class="dt">&quot;exception&quot;</span><span class="fu">:</span> <span class="kw">false</span></span>
-<span id="cb23-25"><a href="#cb23-25" aria-hidden="true" tabindex="-1"></a>                <span class="fu">},</span></span>
-<span id="cb23-26"><a href="#cb23-26" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;globalOn&quot;</span><span class="fu">:</span> <span class="kw">true</span></span>
-<span id="cb23-27"><a href="#cb23-27" aria-hidden="true" tabindex="-1"></a>            <span class="fu">},</span></span>
-<span id="cb23-28"><a href="#cb23-28" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;explicit-fixity&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb23-29"><a href="#cb23-29" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;globalOn&quot;</span><span class="fu">:</span> <span class="kw">true</span></span>
-<span id="cb23-30"><a href="#cb23-30" aria-hidden="true" tabindex="-1"></a>            <span class="fu">},</span></span>
-<span id="cb23-31"><a href="#cb23-31" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;fourmolu&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb23-32"><a href="#cb23-32" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;config&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb23-33"><a href="#cb23-33" aria-hidden="true" tabindex="-1"></a>                    <span class="dt">&quot;external&quot;</span><span class="fu">:</span> <span class="kw">false</span></span>
-<span id="cb23-34"><a href="#cb23-34" aria-hidden="true" tabindex="-1"></a>                <span class="fu">}</span></span>
-<span id="cb23-35"><a href="#cb23-35" aria-hidden="true" tabindex="-1"></a>            <span class="fu">},</span></span>
-<span id="cb23-36"><a href="#cb23-36" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;gadt&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb23-37"><a href="#cb23-37" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;globalOn&quot;</span><span class="fu">:</span> <span class="kw">true</span></span>
-<span id="cb23-38"><a href="#cb23-38" aria-hidden="true" tabindex="-1"></a>            <span class="fu">},</span></span>
-<span id="cb23-39"><a href="#cb23-39" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;ghcide-code-actions-bindings&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb23-40"><a href="#cb23-40" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;globalOn&quot;</span><span class="fu">:</span> <span class="kw">true</span></span>
-<span id="cb23-41"><a href="#cb23-41" aria-hidden="true" tabindex="-1"></a>            <span class="fu">},</span></span>
-<span id="cb23-42"><a href="#cb23-42" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;ghcide-code-actions-fill-holes&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb23-43"><a href="#cb23-43" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;globalOn&quot;</span><span class="fu">:</span> <span class="kw">true</span></span>
-<span id="cb23-44"><a href="#cb23-44" aria-hidden="true" tabindex="-1"></a>            <span class="fu">},</span></span>
-<span id="cb23-45"><a href="#cb23-45" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;ghcide-code-actions-imports-exports&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb23-46"><a href="#cb23-46" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;globalOn&quot;</span><span class="fu">:</span> <span class="kw">true</span></span>
-<span id="cb23-47"><a href="#cb23-47" aria-hidden="true" tabindex="-1"></a>            <span class="fu">},</span></span>
-<span id="cb23-48"><a href="#cb23-48" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;ghcide-code-actions-type-signatures&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb23-49"><a href="#cb23-49" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;globalOn&quot;</span><span class="fu">:</span> <span class="kw">true</span></span>
-<span id="cb23-50"><a href="#cb23-50" aria-hidden="true" tabindex="-1"></a>            <span class="fu">},</span></span>
-<span id="cb23-51"><a href="#cb23-51" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;ghcide-completions&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb23-52"><a href="#cb23-52" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;config&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb23-53"><a href="#cb23-53" aria-hidden="true" tabindex="-1"></a>                    <span class="dt">&quot;autoExtendOn&quot;</span><span class="fu">:</span> <span class="kw">true</span><span class="fu">,</span></span>
-<span id="cb23-54"><a href="#cb23-54" aria-hidden="true" tabindex="-1"></a>                    <span class="dt">&quot;snippetsOn&quot;</span><span class="fu">:</span> <span class="kw">true</span></span>
-<span id="cb23-55"><a href="#cb23-55" aria-hidden="true" tabindex="-1"></a>                <span class="fu">},</span></span>
-<span id="cb23-56"><a href="#cb23-56" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;globalOn&quot;</span><span class="fu">:</span> <span class="kw">true</span></span>
-<span id="cb23-57"><a href="#cb23-57" aria-hidden="true" tabindex="-1"></a>            <span class="fu">},</span></span>
-<span id="cb23-58"><a href="#cb23-58" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;ghcide-hover-and-symbols&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb23-59"><a href="#cb23-59" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;hoverOn&quot;</span><span class="fu">:</span> <span class="kw">true</span><span class="fu">,</span></span>
-<span id="cb23-60"><a href="#cb23-60" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;symbolsOn&quot;</span><span class="fu">:</span> <span class="kw">true</span></span>
-<span id="cb23-61"><a href="#cb23-61" aria-hidden="true" tabindex="-1"></a>            <span class="fu">},</span></span>
-<span id="cb23-62"><a href="#cb23-62" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;ghcide-type-lenses&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb23-63"><a href="#cb23-63" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;config&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb23-64"><a href="#cb23-64" aria-hidden="true" tabindex="-1"></a>                    <span class="dt">&quot;mode&quot;</span><span class="fu">:</span> <span class="st">&quot;always&quot;</span></span>
-<span id="cb23-65"><a href="#cb23-65" aria-hidden="true" tabindex="-1"></a>                <span class="fu">},</span></span>
-<span id="cb23-66"><a href="#cb23-66" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;globalOn&quot;</span><span class="fu">:</span> <span class="kw">true</span></span>
-<span id="cb23-67"><a href="#cb23-67" aria-hidden="true" tabindex="-1"></a>            <span class="fu">},</span></span>
-<span id="cb23-68"><a href="#cb23-68" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;hlint&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb23-69"><a href="#cb23-69" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;codeActionsOn&quot;</span><span class="fu">:</span> <span class="kw">true</span><span class="fu">,</span></span>
-<span id="cb23-70"><a href="#cb23-70" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;config&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb23-71"><a href="#cb23-71" aria-hidden="true" tabindex="-1"></a>                    <span class="dt">&quot;flags&quot;</span><span class="fu">:</span> <span class="ot">[]</span></span>
-<span id="cb23-72"><a href="#cb23-72" aria-hidden="true" tabindex="-1"></a>                <span class="fu">},</span></span>
-<span id="cb23-73"><a href="#cb23-73" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;diagnosticsOn&quot;</span><span class="fu">:</span> <span class="kw">true</span></span>
-<span id="cb23-74"><a href="#cb23-74" aria-hidden="true" tabindex="-1"></a>            <span class="fu">},</span></span>
-<span id="cb23-75"><a href="#cb23-75" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;importLens&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb23-76"><a href="#cb23-76" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;codeActionsOn&quot;</span><span class="fu">:</span> <span class="kw">true</span><span class="fu">,</span></span>
-<span id="cb23-77"><a href="#cb23-77" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;codeLensOn&quot;</span><span class="fu">:</span> <span class="kw">true</span></span>
-<span id="cb23-78"><a href="#cb23-78" aria-hidden="true" tabindex="-1"></a>            <span class="fu">},</span></span>
-<span id="cb23-79"><a href="#cb23-79" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;moduleName&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb23-80"><a href="#cb23-80" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;globalOn&quot;</span><span class="fu">:</span> <span class="kw">true</span></span>
-<span id="cb23-81"><a href="#cb23-81" aria-hidden="true" tabindex="-1"></a>            <span class="fu">},</span></span>
-<span id="cb23-82"><a href="#cb23-82" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;pragmas&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb23-83"><a href="#cb23-83" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;codeActionsOn&quot;</span><span class="fu">:</span> <span class="kw">true</span><span class="fu">,</span></span>
-<span id="cb23-84"><a href="#cb23-84" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;completionOn&quot;</span><span class="fu">:</span> <span class="kw">true</span></span>
-<span id="cb23-85"><a href="#cb23-85" aria-hidden="true" tabindex="-1"></a>            <span class="fu">},</span></span>
-<span id="cb23-86"><a href="#cb23-86" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;qualifyImportedNames&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb23-87"><a href="#cb23-87" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;globalOn&quot;</span><span class="fu">:</span> <span class="kw">true</span></span>
-<span id="cb23-88"><a href="#cb23-88" aria-hidden="true" tabindex="-1"></a>            <span class="fu">},</span></span>
-<span id="cb23-89"><a href="#cb23-89" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;refineImports&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb23-90"><a href="#cb23-90" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;codeActionsOn&quot;</span><span class="fu">:</span> <span class="kw">true</span><span class="fu">,</span></span>
-<span id="cb23-91"><a href="#cb23-91" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;codeLensOn&quot;</span><span class="fu">:</span> <span class="kw">true</span></span>
-<span id="cb23-92"><a href="#cb23-92" aria-hidden="true" tabindex="-1"></a>            <span class="fu">},</span></span>
-<span id="cb23-93"><a href="#cb23-93" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;rename&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb23-94"><a href="#cb23-94" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;config&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb23-95"><a href="#cb23-95" aria-hidden="true" tabindex="-1"></a>                    <span class="dt">&quot;crossModule&quot;</span><span class="fu">:</span> <span class="kw">false</span></span>
-<span id="cb23-96"><a href="#cb23-96" aria-hidden="true" tabindex="-1"></a>                <span class="fu">},</span></span>
-<span id="cb23-97"><a href="#cb23-97" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;globalOn&quot;</span><span class="fu">:</span> <span class="kw">true</span></span>
-<span id="cb23-98"><a href="#cb23-98" aria-hidden="true" tabindex="-1"></a>            <span class="fu">},</span></span>
-<span id="cb23-99"><a href="#cb23-99" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;retrie&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb23-100"><a href="#cb23-100" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;globalOn&quot;</span><span class="fu">:</span> <span class="kw">true</span></span>
-<span id="cb23-101"><a href="#cb23-101" aria-hidden="true" tabindex="-1"></a>            <span class="fu">}</span></span>
-<span id="cb23-102"><a href="#cb23-102" aria-hidden="true" tabindex="-1"></a>        <span class="fu">}</span></span>
-<span id="cb23-103"><a href="#cb23-103" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span></span>
-<span id="cb23-104"><a href="#cb23-104" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;haskell&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;checkParents&quot;</span><span class="fu">:</span> <span class="st">&quot;CheckOnSave&quot;</span><span class="fu">,:</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;checkProject&quot;</span><span class="er">:</span> <span class="kw">true</span><span class="fu">,</span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;formattingProvider&quot;</span><span class="fu">:</span> <span class="st">&quot;ormolu&quot;</span><span class="fu">,</span></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;maxCompletions&quot;</span><span class="fu">:</span> <span class="dv">40</span><span class="fu">,</span></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;plugin&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;alternateNumberFormat&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;globalOn&quot;</span><span class="fu">:</span> <span class="kw">true</span></span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>            <span class="fu">},</span></span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;callHierarchy&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;globalOn&quot;</span><span class="fu">:</span> <span class="kw">true</span></span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>            <span class="fu">},</span></span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;changeTypeSignature&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;globalOn&quot;</span><span class="fu">:</span> <span class="kw">true</span></span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>            <span class="fu">},</span></span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;class&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;codeActionsOn&quot;</span><span class="fu">:</span> <span class="kw">true</span><span class="fu">,</span></span>
+<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;codeLensOn&quot;</span><span class="fu">:</span> <span class="kw">true</span></span>
+<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a>            <span class="fu">},</span></span>
+<span id="cb24-21"><a href="#cb24-21" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;eval&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb24-22"><a href="#cb24-22" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;config&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb24-23"><a href="#cb24-23" aria-hidden="true" tabindex="-1"></a>                    <span class="dt">&quot;diff&quot;</span><span class="fu">:</span> <span class="kw">true</span><span class="fu">,</span></span>
+<span id="cb24-24"><a href="#cb24-24" aria-hidden="true" tabindex="-1"></a>                    <span class="dt">&quot;exception&quot;</span><span class="fu">:</span> <span class="kw">false</span></span>
+<span id="cb24-25"><a href="#cb24-25" aria-hidden="true" tabindex="-1"></a>                <span class="fu">},</span></span>
+<span id="cb24-26"><a href="#cb24-26" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;globalOn&quot;</span><span class="fu">:</span> <span class="kw">true</span></span>
+<span id="cb24-27"><a href="#cb24-27" aria-hidden="true" tabindex="-1"></a>            <span class="fu">},</span></span>
+<span id="cb24-28"><a href="#cb24-28" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;explicit-fixity&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb24-29"><a href="#cb24-29" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;globalOn&quot;</span><span class="fu">:</span> <span class="kw">true</span></span>
+<span id="cb24-30"><a href="#cb24-30" aria-hidden="true" tabindex="-1"></a>            <span class="fu">},</span></span>
+<span id="cb24-31"><a href="#cb24-31" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;fourmolu&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb24-32"><a href="#cb24-32" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;config&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb24-33"><a href="#cb24-33" aria-hidden="true" tabindex="-1"></a>                    <span class="dt">&quot;external&quot;</span><span class="fu">:</span> <span class="kw">false</span></span>
+<span id="cb24-34"><a href="#cb24-34" aria-hidden="true" tabindex="-1"></a>                <span class="fu">}</span></span>
+<span id="cb24-35"><a href="#cb24-35" aria-hidden="true" tabindex="-1"></a>            <span class="fu">},</span></span>
+<span id="cb24-36"><a href="#cb24-36" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;gadt&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb24-37"><a href="#cb24-37" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;globalOn&quot;</span><span class="fu">:</span> <span class="kw">true</span></span>
+<span id="cb24-38"><a href="#cb24-38" aria-hidden="true" tabindex="-1"></a>            <span class="fu">},</span></span>
+<span id="cb24-39"><a href="#cb24-39" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;ghcide-code-actions-bindings&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb24-40"><a href="#cb24-40" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;globalOn&quot;</span><span class="fu">:</span> <span class="kw">true</span></span>
+<span id="cb24-41"><a href="#cb24-41" aria-hidden="true" tabindex="-1"></a>            <span class="fu">},</span></span>
+<span id="cb24-42"><a href="#cb24-42" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;ghcide-code-actions-fill-holes&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb24-43"><a href="#cb24-43" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;globalOn&quot;</span><span class="fu">:</span> <span class="kw">true</span></span>
+<span id="cb24-44"><a href="#cb24-44" aria-hidden="true" tabindex="-1"></a>            <span class="fu">},</span></span>
+<span id="cb24-45"><a href="#cb24-45" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;ghcide-code-actions-imports-exports&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb24-46"><a href="#cb24-46" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;globalOn&quot;</span><span class="fu">:</span> <span class="kw">true</span></span>
+<span id="cb24-47"><a href="#cb24-47" aria-hidden="true" tabindex="-1"></a>            <span class="fu">},</span></span>
+<span id="cb24-48"><a href="#cb24-48" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;ghcide-code-actions-type-signatures&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb24-49"><a href="#cb24-49" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;globalOn&quot;</span><span class="fu">:</span> <span class="kw">true</span></span>
+<span id="cb24-50"><a href="#cb24-50" aria-hidden="true" tabindex="-1"></a>            <span class="fu">},</span></span>
+<span id="cb24-51"><a href="#cb24-51" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;ghcide-completions&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb24-52"><a href="#cb24-52" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;config&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb24-53"><a href="#cb24-53" aria-hidden="true" tabindex="-1"></a>                    <span class="dt">&quot;autoExtendOn&quot;</span><span class="fu">:</span> <span class="kw">true</span><span class="fu">,</span></span>
+<span id="cb24-54"><a href="#cb24-54" aria-hidden="true" tabindex="-1"></a>                    <span class="dt">&quot;snippetsOn&quot;</span><span class="fu">:</span> <span class="kw">true</span></span>
+<span id="cb24-55"><a href="#cb24-55" aria-hidden="true" tabindex="-1"></a>                <span class="fu">},</span></span>
+<span id="cb24-56"><a href="#cb24-56" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;globalOn&quot;</span><span class="fu">:</span> <span class="kw">true</span></span>
+<span id="cb24-57"><a href="#cb24-57" aria-hidden="true" tabindex="-1"></a>            <span class="fu">},</span></span>
+<span id="cb24-58"><a href="#cb24-58" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;ghcide-hover-and-symbols&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb24-59"><a href="#cb24-59" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;hoverOn&quot;</span><span class="fu">:</span> <span class="kw">true</span><span class="fu">,</span></span>
+<span id="cb24-60"><a href="#cb24-60" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;symbolsOn&quot;</span><span class="fu">:</span> <span class="kw">true</span></span>
+<span id="cb24-61"><a href="#cb24-61" aria-hidden="true" tabindex="-1"></a>            <span class="fu">},</span></span>
+<span id="cb24-62"><a href="#cb24-62" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;ghcide-type-lenses&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb24-63"><a href="#cb24-63" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;config&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb24-64"><a href="#cb24-64" aria-hidden="true" tabindex="-1"></a>                    <span class="dt">&quot;mode&quot;</span><span class="fu">:</span> <span class="st">&quot;always&quot;</span></span>
+<span id="cb24-65"><a href="#cb24-65" aria-hidden="true" tabindex="-1"></a>                <span class="fu">},</span></span>
+<span id="cb24-66"><a href="#cb24-66" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;globalOn&quot;</span><span class="fu">:</span> <span class="kw">true</span></span>
+<span id="cb24-67"><a href="#cb24-67" aria-hidden="true" tabindex="-1"></a>            <span class="fu">},</span></span>
+<span id="cb24-68"><a href="#cb24-68" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;hlint&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb24-69"><a href="#cb24-69" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;codeActionsOn&quot;</span><span class="fu">:</span> <span class="kw">true</span><span class="fu">,</span></span>
+<span id="cb24-70"><a href="#cb24-70" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;config&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb24-71"><a href="#cb24-71" aria-hidden="true" tabindex="-1"></a>                    <span class="dt">&quot;flags&quot;</span><span class="fu">:</span> <span class="ot">[]</span></span>
+<span id="cb24-72"><a href="#cb24-72" aria-hidden="true" tabindex="-1"></a>                <span class="fu">},</span></span>
+<span id="cb24-73"><a href="#cb24-73" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;diagnosticsOn&quot;</span><span class="fu">:</span> <span class="kw">true</span></span>
+<span id="cb24-74"><a href="#cb24-74" aria-hidden="true" tabindex="-1"></a>            <span class="fu">},</span></span>
+<span id="cb24-75"><a href="#cb24-75" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;importLens&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb24-76"><a href="#cb24-76" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;codeActionsOn&quot;</span><span class="fu">:</span> <span class="kw">true</span><span class="fu">,</span></span>
+<span id="cb24-77"><a href="#cb24-77" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;codeLensOn&quot;</span><span class="fu">:</span> <span class="kw">true</span></span>
+<span id="cb24-78"><a href="#cb24-78" aria-hidden="true" tabindex="-1"></a>            <span class="fu">},</span></span>
+<span id="cb24-79"><a href="#cb24-79" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;moduleName&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb24-80"><a href="#cb24-80" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;globalOn&quot;</span><span class="fu">:</span> <span class="kw">true</span></span>
+<span id="cb24-81"><a href="#cb24-81" aria-hidden="true" tabindex="-1"></a>            <span class="fu">},</span></span>
+<span id="cb24-82"><a href="#cb24-82" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;pragmas&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb24-83"><a href="#cb24-83" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;codeActionsOn&quot;</span><span class="fu">:</span> <span class="kw">true</span><span class="fu">,</span></span>
+<span id="cb24-84"><a href="#cb24-84" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;completionOn&quot;</span><span class="fu">:</span> <span class="kw">true</span></span>
+<span id="cb24-85"><a href="#cb24-85" aria-hidden="true" tabindex="-1"></a>            <span class="fu">},</span></span>
+<span id="cb24-86"><a href="#cb24-86" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;qualifyImportedNames&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb24-87"><a href="#cb24-87" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;globalOn&quot;</span><span class="fu">:</span> <span class="kw">true</span></span>
+<span id="cb24-88"><a href="#cb24-88" aria-hidden="true" tabindex="-1"></a>            <span class="fu">},</span></span>
+<span id="cb24-89"><a href="#cb24-89" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;refineImports&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb24-90"><a href="#cb24-90" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;codeActionsOn&quot;</span><span class="fu">:</span> <span class="kw">true</span><span class="fu">,</span></span>
+<span id="cb24-91"><a href="#cb24-91" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;codeLensOn&quot;</span><span class="fu">:</span> <span class="kw">true</span></span>
+<span id="cb24-92"><a href="#cb24-92" aria-hidden="true" tabindex="-1"></a>            <span class="fu">},</span></span>
+<span id="cb24-93"><a href="#cb24-93" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;rename&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb24-94"><a href="#cb24-94" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;config&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb24-95"><a href="#cb24-95" aria-hidden="true" tabindex="-1"></a>                    <span class="dt">&quot;crossModule&quot;</span><span class="fu">:</span> <span class="kw">false</span></span>
+<span id="cb24-96"><a href="#cb24-96" aria-hidden="true" tabindex="-1"></a>                <span class="fu">},</span></span>
+<span id="cb24-97"><a href="#cb24-97" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;globalOn&quot;</span><span class="fu">:</span> <span class="kw">true</span></span>
+<span id="cb24-98"><a href="#cb24-98" aria-hidden="true" tabindex="-1"></a>            <span class="fu">},</span></span>
+<span id="cb24-99"><a href="#cb24-99" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;retrie&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb24-100"><a href="#cb24-100" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;globalOn&quot;</span><span class="fu">:</span> <span class="kw">true</span></span>
+<span id="cb24-101"><a href="#cb24-101" aria-hidden="true" tabindex="-1"></a>            <span class="fu">}</span></span>
+<span id="cb24-102"><a href="#cb24-102" aria-hidden="true" tabindex="-1"></a>        <span class="fu">}</span></span>
+<span id="cb24-103"><a href="#cb24-103" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span></span>
+<span id="cb24-104"><a href="#cb24-104" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
 <h3 id="abi-충돌">ABI 충돌</h3>
 <p>wrapper를 돌렸을 때, ABI 충돌이 나며 끝에 아래와 같은 메시지가 나올 때가 있습니다.</p>
-<div class="sourceCode" id="cb24"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="ex">{</span><span class="st">&quot;jsonrpc&quot;</span><span class="ex">:</span><span class="st">&quot;2.0&quot;</span><span class="ex">,</span> <span class="st">&quot;method&quot;</span>:<span class="st">&quot;window/showMessage&quot;</span>, <span class="st">&quot;params&quot;</span>: {<span class="st">&quot;type&quot;</span>: 1, <span class="st">&quot;message&quot;</span>: <span class="st">&quot;Couldn't find a working/matching GHC installation. Consider installing ghc-9.2.4 via ghcup or build HLS from source.&quot;</span>}}</span></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="ex">{</span><span class="st">&quot;jsonrpc&quot;</span><span class="ex">:</span><span class="st">&quot;2.0&quot;</span><span class="ex">,</span> <span class="st">&quot;method&quot;</span>:<span class="st">&quot;window/showMessage&quot;</span>, <span class="st">&quot;params&quot;</span>: {<span class="st">&quot;type&quot;</span>: 1, <span class="st">&quot;message&quot;</span>: <span class="st">&quot;Couldn't find a working/matching GHC installation. Consider installing ghc-9.2.4 via ghcup or build HLS from source.&quot;</span>}}</span></code></pre></div>
 <p>ABI 충돌은 결국, 현재 쓰고 있는 GHC와, HLS를 컴파일한 GHC가 맞지 않아 생기는 오류입니다. ghcup로 싹다 지우고, cache도 지우고, 다시 깨끗한 환경에서 설치했는데도 아래와 같은 오류가 났습니다.</p>
-<div class="sourceCode" id="cb25"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> haskell-language-server-9.2.4</span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="ex">No</span> compiler found, expected minor version match with ghc-9.2.4 <span class="er">(</span><span class="ex">x86_64-tinfo6</span><span class="kw">)</span> <span class="kw">(</span><span class="ex">based</span> on resolver setting in /home/jacoo/.stack/global-project/stack.yaml<span class="kw">)</span><span class="bu">.</span></span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="ex">To</span> install the correct GHC into /home/jacoo/.stack/programs/x86_64-linux/, try running <span class="st">&quot;stack setup&quot;</span> or use the <span class="st">&quot;--install-ghc&quot;</span> flag. To use your system GHC installation, run <span class="st">&quot;stack config set system-ghc --global true&quot;</span>, or use the <span class="st">&quot;--system-ghc&quot;</span> flag.</span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="ex">All</span> methods exhausted!</span>
-<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a><span class="ex">Content-Length:</span> 203</span></code></pre></div>
+<div class="sourceCode" id="cb26"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> haskell-language-server-9.2.4</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="ex">No</span> compiler found, expected minor version match with ghc-9.2.4 <span class="er">(</span><span class="ex">x86_64-tinfo6</span><span class="kw">)</span> <span class="kw">(</span><span class="ex">based</span> on resolver setting in /home/jacoo/.stack/global-project/stack.yaml<span class="kw">)</span><span class="bu">.</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="ex">To</span> install the correct GHC into /home/jacoo/.stack/programs/x86_64-linux/, try running <span class="st">&quot;stack setup&quot;</span> or use the <span class="st">&quot;--install-ghc&quot;</span> flag. To use your system GHC installation, run <span class="st">&quot;stack config set system-ghc --global true&quot;</span>, or use the <span class="st">&quot;--system-ghc&quot;</span> flag.</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a><span class="ex">All</span> methods exhausted!</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a><span class="ex">Content-Length:</span> 203</span></code></pre></div>
 <p>위와 같이 ABI 충돌을 해결하지 못할 때, HLS를 현재 시스템이 쓰는 GHC로 컴파일해서 해결을 시도할 수 있습니다.</p>
-<div class="sourceCode" id="cb26"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="ex">ghcup</span> compile hls <span class="at">--version</span> 1.8.0.0 <span class="at">--ghc</span> 9.2.4</span></code></pre></div>
+<div class="sourceCode" id="cb27"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="ex">ghcup</span> compile hls <span class="at">--version</span> 1.8.0.0 <span class="at">--ghc</span> 9.2.4</span></code></pre></div>
 <p>저는 위 방법으로, 컴파일을 시도했는데, 제 데비안 환경과 맞지 않는 무엇이 있는지 계속 컴파일 에러가 났습니다.<br />
 Haskell Language Server 관리자이신 Airun님의 조언으로 아래와 같이 git repository에서 바로 소스를 가져오게 바꿔 해결했습니다. 컴파일이 안됐던 이유는,<br />
 release 기준으로 빌드하면 Hackage에서 가져와서 빌드하는데, Hackage에는 version bound가 이상하게 올라갈 때가 있다고 합니다. (무언가 수작업으로 해야 하는 작업이 있어, 사람 손을 타다 보니 생기는 경우라 합니다.) (Ailrun님 감사합니다.)</p>
-<div class="sourceCode" id="cb27"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="ex">ghcup</span> compile hls <span class="at">--git-ref</span> master <span class="at">--ghc</span> 9.2.4</span></code></pre></div>
+<div class="sourceCode" id="cb28"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="ex">ghcup</span> compile hls <span class="at">--git-ref</span> master <span class="at">--ghc</span> 9.2.4</span></code></pre></div>
 <p>컴파일을 마치고 나면, 지원되지 않는 플러그인이 있는지 확인해야 합니다. GHC버전이 올라감에 따라 바로 적용되지 않는 플러그인들이 생깁니다. 아래 명령어로 현재 컴파일된 hls가 지원하는 플러그인 목록을 볼 수 있습니다.</p>
-<div class="sourceCode" id="cb28"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> haskell-language-server-wrapper <span class="ex">--list-plugin</span></span></code></pre></div>
+<div class="sourceCode" id="cb29"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> haskell-language-server-wrapper <span class="ex">--list-plugin</span></span></code></pre></div>
 <p><a href="https://haskell-language-server.readthedocs.io/en/latest/support/plugin-support.html#current-plugin-support-tiers">HLS latest 버전 매뉴얼</a></p>
 <h3 id="stack-버그">Stack 버그</h3>
 <p>이제 막 셋팅한 분들은 아직 보지 않으셔도 되는 내용입니다. 같은 경우를 만나는 경우는 드물 것 같긴 한데, 혹시라도 HLS가 정상적으로 실행되지 않을 때 힌트를 얻을만한 부분이 있을까 해서 올려 놓습니다.</p>
 <p><code>stack new myApp</code>으로 새 프로젝트 폴더를 만들고, 아래와 같이 수정합니다.
 <code>package.yaml</code> 파일에 아래와 같이 <code>dependencies</code>에서 <code>myApp</code> 라이브러리를 빼고</p>
-<div class="sourceCode" id="cb29"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span><span class="kw">:</span></span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">source-dirs</span><span class="kw">:</span><span class="at"> src</span></span>
-<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a><span class="fu">executables</span><span class="kw">:</span></span>
-<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">myApp-exe</span><span class="kw">:</span></span>
-<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">main</span><span class="kw">:</span><span class="at">                Main.hs</span></span>
-<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">source-dirs</span><span class="kw">:</span><span class="at">         app</span></span>
-<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">ghc-options</span><span class="kw">:</span></span>
-<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> -threaded</span></span>
-<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> -rtsopts</span></span>
-<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> -with-rtsopts=-N</span></span>
-<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">dependencies</span><span class="kw">:</span><span class="at"> </span><span class="kw">[]</span></span>
-<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a><span class="co">      #- myApp</span></span></code></pre></div>
+<div class="sourceCode" id="cb30"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span><span class="kw">:</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">source-dirs</span><span class="kw">:</span><span class="at"> src</span></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a><span class="fu">executables</span><span class="kw">:</span></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">myApp-exe</span><span class="kw">:</span></span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">main</span><span class="kw">:</span><span class="at">                Main.hs</span></span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">source-dirs</span><span class="kw">:</span><span class="at">         app</span></span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">ghc-options</span><span class="kw">:</span></span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> -threaded</span></span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> -rtsopts</span></span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> -with-rtsopts=-N</span></span>
+<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">dependencies</span><span class="kw">:</span><span class="at"> </span><span class="kw">[]</span></span>
+<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a><span class="co">      #- myApp</span></span></code></pre></div>
 <p><code>Main.hs</code> 소스에서도 <code>import Lib</code>를 빼면</p>
-<div class="sourceCode" id="cb30"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="kw">module</span> <span class="dt">Main</span> <span class="kw">where</span></span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="co">--import Lib</span></span>
-<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span>
-<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> someFunc</span></code></pre></div>
+<div class="sourceCode" id="cb31"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="kw">module</span> <span class="dt">Main</span> <span class="kw">where</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="co">--import Lib</span></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> someFunc</span></code></pre></div>
 <p>아래와 같은 에러가 나며, HLS가 시작되지 않습니다.</p>
-<div class="sourceCode" id="cb31"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>  <span class="ex">ghcide</span> compiled by GHC 9.0 failed to load packages: <span class="op">&lt;</span>command line<span class="op">&gt;</span>: cannot satisfy <span class="at">-package</span></span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  <span class="ex">myApp-0.1.0.0</span></span>
-<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">(</span><span class="ex">use</span> <span class="at">-v</span> for more information<span class="kw">)</span><span class="bu">.</span></span>
-<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>  <span class="ex">Please</span> ensure that ghcide is compiled with the same GHC installation as the project.</span></code></pre></div>
+<div class="sourceCode" id="cb32"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>  <span class="ex">ghcide</span> compiled by GHC 9.0 failed to load packages: <span class="op">&lt;</span>command line<span class="op">&gt;</span>: cannot satisfy <span class="at">-package</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="ex">myApp-0.1.0.0</span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">(</span><span class="ex">use</span> <span class="at">-v</span> for more information<span class="kw">)</span><span class="bu">.</span></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>  <span class="ex">Please</span> ensure that ghcide is compiled with the same GHC installation as the project.</span></code></pre></div>
 <p>뜬금 없이 <code>HLS</code>에 포함되어 있는 <code>ghcide</code>가 프로젝트와 같은 <code>GHC</code> 버전으로 컴파일 되지 않았다는 에러입니다. 그런데, 그 위에 메시지를 보면 패키지 로드에 실패했다는 메시지도 보입니다. 이 상태에서 <code>stack build</code>를 하고 나면 <code>HLS</code>가 정상 동작합니다.</p>
 <p><code>hie-bios</code><a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>는 <code>stack repl</code>을 쓰는데, <code>stack repl</code>은 <code>executables</code>에 있는 파일을 볼 때 <code>dependencies</code>에 있는 <em>로컬 라이브러리 컴포넌트는 빌드하지 않는다</em>고 합니다. <code>stack build</code>는 <code>library</code>와 <code>executables</code>를 모두 빌드하는데, <code>stack repl</code>은 다른 동작을 합니다. <code>stack</code>의 버그로 볼 수 있다고 합니다. (Ailrun님, 조언 감사합니다.) 이런 이유로 <code>Cabal</code>이 아닌 <code>stack</code>을 쓸 때는 <code>stack build</code>를 한 번 해줘야 <code>HLS</code>가 정상 동작합니다.</p>
 <p><code>HLS</code>가 시작 못하는 진짜 이유는, <code>package.yaml</code>에 의존성이 지정되어 있는 패키지(여기 경우는 myApp)를 로드하려 하는데, 해당 패키지가 없기 때문입니다. 이 때, <code>stack build</code>를 하면 라이브러리가 쓰이든 안 쓰이든 모두 빌드됩니다.</p>
 <p>만일 <code>Main.hs</code>를 아래와 같이 <code>import Lib</code>를 넣어 주면, <code>stack build</code>를 하지 않아도 <code>HLS</code>가 작동합니다.</p>
-<div class="sourceCode" id="cb32"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="kw">module</span> <span class="dt">Main</span> <span class="kw">where</span></span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Lib</span></span>
-<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span>
-<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> someFunc</span></code></pre></div>
+<div class="sourceCode" id="cb33"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="kw">module</span> <span class="dt">Main</span> <span class="kw">where</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Lib</span></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> someFunc</span></code></pre></div>
 <p>장황하긴 한데, HLS가 동작하려면 필요한 조건과, <code>stack</code>이 일괄적인 동작을 하지 않는 부분은 알아두면 도움이 되는 곳이 있을 것 같습니다.</p>
 <section class="footnotes" role="doc-endnotes">
 <hr />
