@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko" lang="ko">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <title>lionhairdino - UnliftIO</title>
+
+        <meta name="description" content="lionhairdino - UnliftIO" />
+        <meta property="og:description" content="하스켈 함수형 프로그래밍" />
+
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <link rel="icon" href="https://lionhairdino.github.io/favicon.svg" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino16px.png" sizes="16x16" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino24px.png" sizes="24x24" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino32px.png" sizes="32x32" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino48px.png" sizes="48x48" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino57px.png" sizes="57x57" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino60px.png" sizes="60x60" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino64px.png" sizes="64x64" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino72px.png" sizes="72x72" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino76px.png" sizes="76x76" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino114px.png" sizes="114x114" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino120px.png" sizes="120x120" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino144px.png" sizes="144x144" />
+        <link rel="shortcut icon" href="../favicon.ico" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino152px.png" sizes="152x152" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino180px.png" sizes="180x180" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino192px.png" sizes="192x192" />
+        <link rel="manifest" href="../site.webmanifest" />
+        <link rel="mask-icon" href="https://lionhairdino.github.io/Lionhairdino_black.svg" color="#ff7500" />
+        <meta name="msapplication-TileImage" content="/images/favicon/Lionhairdino144px.png" />
+        <meta name="msapplication-TileColor" content="#ff7500" />
+        <meta name="theme-color" content="#ffffff" />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="UnliftIO" />
+        <meta property="og:site_name" content="Lionhairdino" />
+        <meta property="og:url" content="https://lionhairdino.github.io/posts/2022-11-13-unliftio.html" />
+
+        <meta property="og:image" content="https://lionhairdino.github.io/images/state400px.png" />
+
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-E9WZ6VXGHP"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-E9WZ6VXGHP');
+</script>
+<script src="../script/copycode.js"></script>
+<script async src="https://cse.google.com/cse.js?cx=9c53b4915cbb2605c"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.11.1/tocbot.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.11.1/tocbot.css" />
+    </head>
+    <body>
+        <div id="header">
+            <div style="display:inline-block;margin-right:5px;padding-top: 5px;" id="logo">
+                <a href="../"><img style="width:30px;border:none" src="../images/favicon/Lionhairdino48px.png"></a>
+            </div>
+            <div style="display:inline-block;vertical-align: top;padding-top:5px;" id="navigation">
+                <a href="../">lionhairdino</a>
+                <a href="../about.html">about</a>
+                <!--<a href="/archive.html">archive</a>-->
+            </div>
+            <div style="display:inline-block;font-size:0.8em;vertical-align: top;">
+                <div style="display:inline-block;vertical-align: top;padding-top: 5px">사이트내 검색</div>
+                <div style="display:inline-block;width:180px;"> 
+                    <div class="gcse-searchbox-only"></div>
+                </div>
+            </div>
+            <div>
+                여기 글들은 일종의 질문입니다. 용어 선택도 학계, 업계에서 쓰는 걸로 되어 있지 않고, 틀린 내용이 있을 수도 있습니다.
+            </div>
+        </div>
+        <div class="js-toc-content">
+            <h1>UnliftIO</h1>
+            <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+<div class="info">
+    Posted on November 13, 2022
+    
+</div>
+
+<p>모나드 스택에서 IO 작업들을 불러다 쓸 때, MonadTrans의 liftIO를 이용합니다. 그런데, IO가 contravariant (negative) 위치에 있을 때는 liftIO로 해결이 안됩니다. 이럴 때 리프팅 작업을 도와주는 클래스입니다.</p>
+<p><a href="https://hackage.haskell.org/package/unliftio">unliftio: The MonadUnliftIO typeclass for unlifting monads to IO (batteries included)</a></p>
+<h2 id="준비-운동">준비 운동</h2>
+<h3 id="고고차-함수-읽기">(고)고차 함수 읽기</h3>
+<p>C언어에서 포인터의 포인터를 업자들은 포포인터라 부르기도 하는데요. 고차 함수의 고차 함수로 차수가 올라가며 쓰이는 패턴들을 보니 포인터만큼 난해함을 주는 느낌이 들어 그와 비슷하게 불러 봤습니다. 다른데서는 이렇게 informal하게 쓰는 곳은 보진 못했습니다. ;-)</p>
+<p>고차 함수 형태를 보고 알 수 있는 것들이 있습니다. 아래 글을 참고해 주세요.</p>
+<p><a href="../posts/2022-11-10-coContraVarint.html">Covariant, Contravariant, Positive, Negative</a></p>
+<h3 id="반복-idiom">반복 idiom</h3>
+<p>처음 <code>withRunInIO</code> 코드를 볼 때, 잘 읽히지 않았습니다. 고차 함수 트레이닝을 위해, 핵심 동작을 하는 부분만 따로 떼어내어 봤습니다.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ot">loop ::</span> ((<span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span>) <span class="ot">-&gt;</span> <span class="dt">Int</span>) <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>loop f <span class="ot">=</span> <span class="kw">if</span> (f (<span class="op">+</span><span class="dv">1</span>) <span class="op">&lt;</span> <span class="dv">100</span>) <span class="kw">then</span> loop <span class="op">$</span> \next <span class="ot">-&gt;</span> f (next <span class="op">.</span> (<span class="op">+</span><span class="dv">1</span>))</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>                           <span class="kw">else</span> f <span class="fu">id</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> loop (\func <span class="ot">-&gt;</span> func <span class="dv">1</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="dv">99</span></span></code></pre></div>
+<p><code>loop</code>안에서 <code>loop</code>를 부를 때 합성하는 부분을 잘 봐 두세요. 재귀 반복을 하는데, 인자로 받은 함수를 계속 합성하고 있습니다. 재귀를 볼 때, 저는 아래처럼 보는 편입니다.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>f (next <span class="op">.</span> (<span class="op">+</span><span class="dv">1</span>))</span></code></pre></div>
+<ul>
+<li>잠시 <code>next</code> 바인딩을 빼고, 그저 언젠가는 바인딩 되겠지 하고 봅니다.</li>
+<li><code>f</code>에는 <code>(\func -&gt; func 1)</code>이 들어갈테니 reduce하면 <code>next . (+1) $ 1</code>이 됩니다.</li>
+<li>여기에 <code>next</code>를 람다 헤드와 걸어 함수로 만듭니다. <code>\next -&gt; next . (+1) $ 1</code></li>
+<li>이 걸, 다시 <code>f</code>에 넣어주면 <code>(\next -&gt; next . (+1) $ 1) (next2 . (+1))</code>이 되고,</li>
+<li>reduce하면 <code>(next2 . (+1)) . (+1) $ 1</code>이 됩니다.</li>
+<li>반복하면, 최종 결과는 <code>\next -&gt; next . (+1) . (+1) . (+1) ... $ 1</code> 모양이 됩니다.</li>
+<li>이 예시에서는 무한 루프 도는 걸 막기 위해 <code>f (+1) &lt; 100</code> 조건을 넣어, 이 조건에 만족하지 않는 순간 더 이상 <code>loop</code>를 부르지 않고, <code>id</code>를 인자로 넣어 <code>id . (+1) . (+1) . (+1) ...$ 1</code>로 마무리 됩니다.</li>
+</ul>
+<p><code>UnliftIO</code>에서는, 모나드 스택을 하나씩 내려가는 동작을 반복시키고, 내려갈 때 필요한 함수(<code>runXXXT</code>계열 - 위 소스에서 <code>(+1)</code>에 해당)를 클래스 인스턴스를 통해 고르도록 해서, <code>IO</code>에 도달하면 끝마치는 동작을 합니다.</p>
+<p><em>추상적으로 얘기하면, 컴포지션할 함수들을 클래스 인스턴스를 통해 고르게 해서 Compose하는 관용구입니다.</em></p>
+<h3 id="unliftio의-단순화-코드">UnliftIO의 단순화 코드</h3>
+<p>아래 <code>withRunInIO</code>소스와 같은 패턴으로, 단순화 시킨 코드입니다. <code>withRunInIO</code> 코드가 눈에 잘 안들어 오면 읽어보세요.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ot">{-# LANGUAGE DeriveFunctor #-}</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Layer</span> l a <span class="ot">=</span> <span class="dt">Layer</span> {<span class="ot">unLayer ::</span> l a} </span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Base</span> a <span class="ot">=</span> <span class="dt">Base</span> a <span class="kw">deriving</span> (<span class="dt">Functor</span>, <span class="dt">Show</span>)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">Peel</span> f <span class="kw">where</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="ot">  peel ::</span> ((f a <span class="ot">-&gt;</span> <span class="dt">Base</span> a) <span class="ot">-&gt;</span> <span class="dt">Base</span> b) <span class="ot">-&gt;</span> f b</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Peel</span> l <span class="ot">=&gt;</span> <span class="dt">Peel</span> (<span class="dt">Layer</span> l) <span class="kw">where</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  peel job <span class="ot">=</span> <span class="dt">Layer</span> <span class="op">$</span> peel <span class="op">$</span> \next <span class="ot">-&gt;</span> job (next <span class="op">.</span> unLayer)</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Peel</span> <span class="dt">Base</span> <span class="kw">where</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  peel job <span class="ot">=</span> job <span class="fu">id</span></span></code></pre></div>
+<h2 id="monadunliftio-클래스">MonadUnliftIO 클래스</h2>
+<p><a href="https://github.com/fpco/unliftio/blob/master/unliftio-core/src/Control/Monad/IO/Unlift.hs">MonadUnliftIO Class source</a></p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ot">withRunInIO ::</span> ((<span class="kw">forall</span> a<span class="op">.</span> m a <span class="ot">-&gt;</span> <span class="dt">IO</span> a) <span class="ot">-&gt;</span> <span class="dt">IO</span> b) <span class="ot">-&gt;</span> m b</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">MonadUnliftIO</span> m <span class="ot">=&gt;</span> <span class="dt">MonadUnliftIO</span> (<span class="dt">ReaderT</span> r m) <span class="kw">where</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="ot">{-# INLINE withRunInIO #-}</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  withRunInIO inner <span class="ot">=</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">ReaderT</span> <span class="op">$</span> \r <span class="ot">-&gt;</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    withRunInIO <span class="op">$</span> \run <span class="ot">-&gt;</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    inner (run <span class="op">.</span> <span class="fu">flip</span> runReaderT r)</span></code></pre></div>
+<ul>
+<li><code>inner</code>는 <code>runXXXT :: m a -&gt; IO a</code> 계열, 즉 unlifter를 받아 <code>IO</code>를 돌려주는 함수입니다.</li>
+<li>어떤 <code>runXXXT</code> 함수가 들어 올까요? 클래스의 인스턴스에서 미리 정해 가지고 있습니다. <code>withRunInIO</code>의 <code>ReaderT</code> 인스턴스는 <code>runReader</code>를 <em>미리</em> 가지고 있고, <code>IO</code>의 인스턴스는 <code>id</code>를 <em>미리</em> 가지고 있습니다.</li>
+<li><code>\run</code>에는 뭐가 들어 올까요? 다음 <code>withRunInIO</code>가 알아서 <code>runXXXT</code>계열을 넣어 줄 겁니다.</li>
+<li><em>종합 정리하면, withRunInIO가 재귀 돌 때마다 runXXXT가 하나씩 추가 되는데, id를 만날 때까지 반복합니다.</em> 그래서 알아서 <code>IO</code>까지 도달합니다.</li>
+</ul>
+<p>※ <code>forall</code>의 의미는, 모든 <code>a</code>에 대해서, 즉 어떠한 타입을 골라도 <code>m a -&gt; IO a</code>를 만족한다는 뜻이고, 이 말은 결과적으로 <code>a</code>에 의존하지 않는다는 말과 같습니다. “구조”만 변형하는 함수라 읽기도 합니다. 혹 이해가 어려우면, 여기서는 잠시 접어두고 넘어가도 됩니다.</p>
+<h3 id="monadio의-liftio">MonadIO의 liftIO</h3>
+<p>참고로, <code>liftIO</code>가 찾아 가는 방식은 <code>IO</code>에서, 모나드 스택 <code>m</code>에 도착할 때까지 계속 <code>lift</code>합니다.
+<code>lift . lift . lift . id</code> 같은 모양이 됩니다.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> (<span class="dt">Monad</span> m) <span class="ot">=&gt;</span> <span class="dt">MonadIO</span> m <span class="kw">where</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ot">    liftIO ::</span> <span class="dt">IO</span> a <span class="ot">-&gt;</span> m a</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">MonadIO</span> <span class="dt">IO</span> <span class="kw">where</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    liftIO <span class="ot">=</span> <span class="fu">id</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co">-- 트랜스포머의 인스턴스 예</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> (<span class="dt">MonadIO</span> m) <span class="ot">=&gt;</span> <span class="dt">MonadIO</span> (<span class="dt">StateT</span> s m) <span class="kw">where</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    liftIO <span class="ot">=</span> lift <span class="op">.</span> liftIO</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="co">-- MonadTrans의 lift</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">MonadTrans</span> t <span class="kw">where</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="ot">    lift ::</span> (<span class="dt">Monad</span> m) <span class="ot">=&gt;</span> m a <span class="ot">-&gt;</span> t m a</span></code></pre></div>
+<h3 id="왜-contravariant-위치에-io가-있을-땐-liftio로-해결이-안될까">왜 Contravariant 위치에 IO가 있을 땐 liftIO로 해결이 안될까?</h3>
+<p><span class="citation" data-cites="TODO">@TODO</span></p>
+<h3 id="liftio도-unliftio도-없이-해결">liftIO도 UnliftIO도 없이 해결</h3>
+<p><code>withBinaryFile</code>의 <code>(handle -&gt; ReaderT Env IO a)</code>를 <code>IO</code>로 Unlift하는 모양을 생각하는 방법입니다.
+<code>handle</code>을 하나 받는 함수로 <code>job</code>이라 두겠습니다.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>withBinaryFile fp mode job</span></code></pre></div>
+<p><code>job</code>은 <code>h</code>가 있어야 실행이 되는 것만 생각합니다.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>withBinaryFile fp mode (job h) </span></code></pre></div>
+<p><code>job</code>의 실행 결과는 <code>ReaderT</code>타입이니 <code>runReaderT</code>로 <code>env</code>을 주면 <code>IO</code>컨텍스트에 도달합니다.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>withBinaryFile fp mode (<span class="dt">ReaderT</span> (job h) env)</span></code></pre></div>
+<p><code>h</code>가 들어올 길을 만들기 위해 람다 헤드와 바인딩합니다. <code>withBinaryFile</code>이 받는 타입은 <code>handler -&gt; IO a</code>입니다.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>withBinaryFile fp mode (\h <span class="ot">-&gt;</span> <span class="dt">ReaderT</span> (job h) env)</span></code></pre></div>
+<p><code>env</code>가 들어올 길을 만들기 위해 람다 헤드와 바인딩합니다. 결과는 <code>ReaderT</code> 타입이니 <code>runReaderT</code>를 먹입니다.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>runRederT (\env <span class="ot">-&gt;</span> withBinaryFile fp mode (\h <span class="ot">-&gt;</span> <span class="dt">ReaderT</span> (job h) env)) </span></code></pre></div>
+<p>이제 <code>withBinaryFile</code>을 <code>ReaderT</code> 컨텍스트에서 쓸 수 있게 되었습니다. negative 위치에 있는 <code>IO</code>를 위해 <code>ReaderT</code>를 써서 Unlift 했습니다. 매 번 <code>m</code>을 <code>IO</code>로 Unlift하려면 이렇게 쫓아가며 하면 됩니다.</p>
+<h3 id="withruninio">withRunInIO</h3>
+<div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ot">withRunInIO ::</span> ((<span class="kw">forall</span> a<span class="op">.</span> m a <span class="ot">-&gt;</span> <span class="dt">IO</span> a) <span class="ot">-&gt;</span> <span class="dt">IO</span> b) <span class="ot">-&gt;</span> m b</span></code></pre></div>
+<ol type="1">
+<li><p>안쪽만 먼저 보면<br />
+<code>g :: ( f :: forall a. m a -&gt; IO a) -&gt; IO b</code>
+<code>f</code>모양의 함수를 받으면 <code>IO b</code>를 돌려주고 있습니다. <code>g</code>안에는 <code>a</code>에서 <code>b</code>를 만들어 내고, <code>m</code>을 떼어내는 작업이 있어야 합니다. 그래야 <code>IO b</code>가 나오는 게 말이 됩니다. 그런데, 이 함수는 <code>f</code>모양의 함수를 미리 가지고 있지 않습니다. 나중에 누군가한테 받아야 합니다.</p></li>
+<li><p><code>withRunInIO</code>는 이런 <code>g</code>모양의 함수를 받으면 <code>m b</code>를 돌려 줍니다.<br />
+<code>withRunInIO</code>는 안에 <code>g</code>에 넣어 줄 <code>f</code>모양의 함수를 미리 가지고 있다는 얘기입니다.</p></li>
+</ol>
+<p>아래는 위에 준비 운동에서 충분히 보셨다면 건너뛰셔도 됩니다.</p>
+<p>다시 한번, 가장 단순 버전부터 차근 차근 쫓아가 보겠습니다.<br />
+(사실은 <code>a</code>타입의 값, <code>b</code>타입의 값이라고 해야 하는데, 복잡함을 줄이기 위해 그냥 <code>a</code>, <code>b</code>로 표현하겠습니다.)</p>
+<ol type="1">
+<li><p><code>f :: a -&gt; b</code>라는 함수는 <code>a</code>를 주면 <code>b</code>를 돌려 줍니다.</p></li>
+<li><p><code>g :: (f :: a -&gt; b) -&gt; b</code>는 <code>f</code>모양의 함수를 받으면 <code>b</code>를 돌려줍니다.
+<code>g</code>는 내부에 <code>a</code>를 가지고 있고, <code>f a</code>같은 작업이 있을 겁니다.</p></li>
+<li><p><code>h :: (g :: (f :: a -&gt; b) -&gt; b) -&gt; b</code>는 <code>g</code>모양의 함수를 받으면 <code>b</code>를 돌려 줍니다.
+이 번엔 <code>h</code> 내부에 <code>a</code>가 아닌 <code>f</code>모양의 함수를 가지고 있을 겁니다. 물론 <code>g</code>에는 <code>a</code>가 있어야 합니다.
+정리하면, <em><code>a</code>를 이미 가지고 있고, <code>f</code>를 받을 자리만 있는 <code>g</code>를 넘기면 <code>b</code>를 돌려줍니다.</em>
+코드 모양은 이렇게 나올 겁니다.</p></li>
+</ol>
+<div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>h <span class="ot">=</span> \g <span class="ot">-&gt;</span> g alreadyHasF</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>g <span class="ot">=</span> \f <span class="ot">-&gt;</span> f alreadyHasA</span></code></pre></div>
+<p><code>h</code> 안에는 <code>f</code>모양의 함수alreadyHasF를 이미 가지고 있어, 이를 <code>g</code>의 <code>f</code>자리에 넣어 줄 겁니다.</p>
+<p>위에 고차함수 읽는 훈련을 한 대로 읽어 보겠습니다.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="ot">withRunInIO ::</span> ((<span class="kw">forall</span> a<span class="op">.</span> m a <span class="ot">-&gt;</span> <span class="dt">IO</span> a) <span class="ot">-&gt;</span> <span class="dt">IO</span> b) <span class="ot">-&gt;</span> m b</span></code></pre></div>
+<p><code>withRunInIO</code>는 내부에 <code>(forall a. m a -&gt; IO a) -&gt; IO b</code>를 받았을 때 넣어 줄 <code>alreadyHasF</code>가 있습니다.</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>withRunInIO inner <span class="ot">=</span> inner alreadyHasF</span></code></pre></div>
+<p><code>inner</code>는 아래 모양의 함수가 들어올 겁니다.</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>inner func <span class="ot">=</span> func alreadyHasA </span></code></pre></div>
+<h2 id="비슷한-목적의-솔루션">비슷한 목적의 솔루션</h2>
+<p><a href="https://github.com/basvandijk/monad-control">Monad Control</a></p>
+
+<div class="comment">
+<script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
+</script>
+</div>
+<div style="text-align:right">Github 계정이 없는 분은 메일로 보내주세요. lionhairdino at gmail.com </div>
+        </div>
+        <nav class="toc toc-right js-toc relative z-1 transition--300 absolute pa4 pt5 is-position-fixed"></nav>
+        <div id="footer">
+            © 2022 lionhairdino. All rights reserved. Generated by <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+        <script>
+            tocbot.init({
+                tocSelector: '.js-toc',
+                contentSelector: '.js-toc-content',
+                headingSelector: 'h2, h3',
+                hasInnerContainers: true,
+            });
+        </script>
+    </body>
+</html>
