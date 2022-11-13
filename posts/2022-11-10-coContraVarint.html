@@ -135,17 +135,22 @@ contra- “against, in oppsition” - <a href="https://www.etymonline.com/search
 <div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">Contravariant</span> f <span class="kw">where</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ot">  contramap ::</span> (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> f b <span class="ot">-&gt;</span> f a</span></code></pre></div>
 <p>이런 경우를 위해 <code>fmap</code> 대신 <code>contrafmap</code>을 가진 <code>Contravariant</code> 클래스가 있습니다.</p>
-<p><em>결과 타입은 고정되어 있는데, 입력 타입이 달라질 필요가 있을 때 쓸 수 있습니다.</em> (fmap은 covariant한 경우에 쓴다고 말하는데, 잘 생각해 보면, fmap은 입력 타입이 고정이고, 결과 타입이 달라질 필요가 있을 때 써왔습니다.)</p>
+<p><em>결과 타입은 고정되어 있는데, 입력 타입이 달라질 필요가 있을 때 쓸 수 있습니다.</em> (<code>fmap</code>은 covariant한 경우에 쓴다고 말하는데, 잘 생각해 보면, <code>fmap</code>은 입력 타입이 고정이고, 결과 타입이 달라질 필요가 있을 때 써왔습니다.)</p>
 <h2 id="입력-위치에-있으면-contravariant">입력 위치에 있으면 Contravariant</h2>
 <p>출력에 있으면 Covariant<br />
 입력에 있으면 Contravariant<br />
 </p>
-<p>위와 같은 상황에서도 같은 용어를 쓰는데, 무엇이 기준이고 무엇이 따라 변하는 건지 모호합니다. 이전 섹션의 Contravariant를 보면, <code>a</code>에서 <code>Some a</code>로 변환할 때, <code>Some</code> 정의안에 <code>a</code>의 위치가 <code>SomeType -&gt; a</code>이면, 특별히 “a와”란 말을 쓰지 않고도, 그냥 Covariant란 말을 쓰고, <code>a -&gt; SomeType</code>이면 <code>a</code>와 Contravariant라고 말합니다. functor의 성질이 <code>a</code>의 위치에 따라 Co, Contra로 바뀌니 그냥 이렇게 부르기도 하는 것 같습니다.</p>
+<p>위와 같은 상황에서도 같은 용어를 쓰는데, 무엇이 기준이고 무엇이 따라 변하는 건지 모호합니다. 이전 섹션의 Contravariant를 보면, <code>a</code>에서 <code>Some a</code>로 변환할 때, <code>Some</code> 정의안에 <code>a</code>의 위치가 <code>SomeType -&gt; a</code>이면, 특별히 “a와”란 말을 쓰지 않고도, 그냥 Covariant란 말을 쓰고, <code>a -&gt; SomeType</code>이면 <code>a</code>와 Contravariant라고 말합니다. functor의 성질이 <code>a</code>의 위치에 따라 Co, Contra로 바뀝니다.</p>
 <h2 id="consume하면-contravariant">Consume하면 Contravariant</h2>
 <p>Produce하면 Covariant<br />
 Consume하면 Contravariant</p>
 <p><code>SomeType -&gt; a</code>이면 결과로 <code>a</code>를 만들어내니 Produce한다고 말하고, <code>a -&gt; SomeType</code>은 <code>a</code>를 인자로 받아 써먹으니 Consume이라 말합니다.</p>
 <h2 id="consume하면-negative-produce하면-positive">Consume하면 Negative, Produce하면 Positive</h2>
+<blockquote>
+<p>준비 운동<br />
+<code>(a -&gt; b) -&gt; b</code> 타입만으로 알 수 있는 게 있습니다.<br />
+이 함수는 다른 걸 받는 건 없고, <code>(a -&gt; b)</code>함수만 받으면 <code>b</code>라는 값을 만들어 냅니다. <code>(a -&gt; b)</code>함수를 실행하면 <code>b</code>가 나올텐데, 실행하려면 <code>a</code>가 필요합니다. 함수만 받았는데, <code>b</code>가 나온다는 말은, 안에 이미 <code>a</code>가 있을거라 예상할 수 있습니다. (물론, 받은 함수를 무시할 수도 있겠지만, <code>b</code>를 generate할 방법은 어떤식으로든 존재해야 합니다.)</p>
+</blockquote>
 <p>위에서 말한 Consume 모양 중 <code>V -&gt; Int</code> 함수를 받는 고차 함수를 살펴 보겠습니다.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ot">func1 ::                 f ::</span> <span class="dt">V</span> <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ot">func2 ::</span>               (<span class="ot"> f ::</span> <span class="dt">V</span> <span class="ot">-&gt;</span> <span class="dt">Int</span> ) <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
@@ -176,7 +181,7 @@ Consume하면 Contravariant</p>
 <p><span class="citation" data-cites="재원님이">@재원님이</span> <code>(a -&gt; b) -&gt; b</code> 형태의 함수는 안에 <code>a</code>를 가지고 있다는 설명 방식에 헛점이 있다고 지적해 주셨습니다. 왜냐하면 꼭 <code>a</code>를 가지고 있지 않고, 함수 자체를 버려도 성립은 하니 “반드시” <code>a</code>를 가지고 있을 거라 설명하면 안된다는 말씀입니다. 물론, 맞는 말씀인데, 여기선 직관을 위해 “대부분” 그럴거란 가정하에 그대로 두었습니다.</p>
 </blockquote>
 <blockquote>
-<p><span class="citation" data-cites="다믜님이">@다믜님이</span> 설명하신 내용인데, 다믜님 허락하에 원문을 올립니다.</p>
+<p><span class="citation" data-cites="다믜님의">@다믜님의</span> Positive/Negative 설명입니다. 다믜님 허락하에 원문을 올립니다.</p>
 <p><code>a -&gt; b</code> 를 구현할 때에는 <code>a</code>가 주어지니 이걸 사용하기만 하면 되죠. negative입니다.<br />
 <code>(a -&gt; b) -&gt; c</code> 의 경우 <code>a -&gt; b</code>가 주어지는데, 이걸 사용하는 유일한 방법은 <code>a -&gt; b</code>에 인자로 <code>a</code>를 주는것입니다. 결국 <code>a</code>를 만들어줘야 하죠. positive입니다.<br />
 <code>((a -&gt; b) -&gt; c) -&gt; d</code> 에서는 <code>(a -&gt; b) -&gt; c</code> 가 주어지고 이걸 사용하려면 <code>a -&gt; b</code> 를 건네줘야 하죠. 그리고 <code>a -&gt; b</code> 를 만들 때에는 주어진 <code>a</code>를 사용하면 되니 결국 <code>a</code>를 받는 꼴이 됩니다. negative가 되지요</p>
