@@ -203,8 +203,41 @@
 <div class="sourceCode" id="cb14"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>withRunInIO inner <span class="ot">=</span> inner alreadyHasF</span></code></pre></div>
 <p><code>inner</code>는 아래 모양의 함수가 들어올 겁니다.</p>
 <div class="sourceCode" id="cb15"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>inner func <span class="ot">=</span> func alreadyHasA </span></code></pre></div>
+<p>※ 재귀 읽기</p>
+<p>위에 코드가 다 이해갔다면, 굳이 아래를 볼 필요는 없습니다. 위가 잘 안읽히는 분들은 재귀 반복을 아래처럼 따라가 보는 것도 한 방법입니다.</p>
+<p>재귀를 돌 때마다 다른 함수로 바라봅니다. 재귀가 잘 보이도록 일부 코드를 지웠습니다. - 참고 <a href="../posts/2022-07-27-recursive.html">재귀 생각법</a></p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>withRunInIO1 inner1 <span class="ot">=</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  withRunInIO2 <span class="op">$</span> \run1 <span class="ot">-&gt;</span> inner1 (run1 <span class="op">.</span> unlifter1)</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>                 <span class="co">------------ inner2 -------------</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>withRunInIO2 inner2 <span class="ot">=</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="co">--withRunInIO3 $ \run2 -&gt; inner2 (run2 . unlifter)</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>  withRunInIO2 <span class="op">$</span> \run2 <span class="ot">-&gt;</span> (\run1 <span class="ot">-&gt;</span> inner1 (run1 <span class="op">.</span> unlifter1))  (run2 <span class="op">.</span> unlifter2)</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>  withRunInIO2 <span class="op">$</span> \run2 <span class="ot">-&gt;</span> inner1 (run2 <span class="op">.</span> unlifter2 <span class="op">.</span> unlifter1)</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>                 <span class="co">------------------ inner3 -------------------</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>withRunInIO3 inner3 <span class="ot">=</span></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a><span class="co">--withRunInIO3 $ \run3 -&gt; inner3 (run3 . unlifter)</span></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>  withRunInIO3 <span class="op">$</span> \run3 <span class="ot">-&gt;</span>  \run2 <span class="ot">-&gt;</span> inner1 (run2 <span class="op">.</span> unlifter2 <span class="op">.</span> unlifter1)  (run3 <span class="op">.</span> unlifter3)</span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>  withRunInIO3 <span class="op">$</span> \run3 <span class="ot">-&gt;</span>  inner1 (run3 <span class="op">.</span> unlifter3 <span class="op">.</span> unlifter2 <span class="op">.</span> unlifter1)</span></code></pre></div>
+<p>GHC 컴파일러는 <code>withRunInIO</code>를 어떤 인스턴스의 것으로 고를 것이냐를 인자를 보고 결정합니다.<br />
+<code>inner1</code>이 받는 함수는 <code>forall a. m a -&gt; IO a</code>이어야 합니다.</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="ot">inner1 ::</span> <span class="kw">forall</span> a<span class="op">.</span> m a <span class="ot">-&gt;</span> <span class="dt">IO</span> a <span class="ot">=</span> \run1 <span class="ot">-&gt;</span> inner1 (run1 <span class="op">.</span> unlifter1)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="ot">inner2 ::</span> <span class="kw">forall</span> a<span class="op">.</span> m a <span class="ot">-&gt;</span> <span class="dt">IO</span> a <span class="ot">=</span> \run2 <span class="ot">-&gt;</span> inner1 (run2 <span class="op">.</span> unlifter2 <span class="op">.</span> unlifter1)</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="ot">inner3 ::</span> <span class="kw">forall</span> a<span class="op">.</span> m a <span class="ot">-&gt;</span> <span class="dt">IO</span> a <span class="ot">=</span> \run3 <span class="ot">-&gt;</span> inner1 (run3 <span class="op">.</span> unlifter3 <span class="op">.</span> unlifter2 <span class="op">.</span> unlifter1)</span></code></pre></div>
+<p>아래 타입을 설명할 때, 잠시 <code>a</code>를 생략하겠습니다.</p>
+<ul>
+<li><p><code>unlifter1 :: ... -&gt; ReaderT</code>면, <code>run1</code>은 <code>ReaderT-&gt; IO</code>여야 하고</p></li>
+<li><p>그러, 다음 번 <code>withRunInIO</code>는 <code>ReaderT</code> 인스턴스에서 가져오고, 그 인스턴스는 <code>runReaderT</code>를 <code>unlifter</code>로 넣어줄 것이고</p></li>
+<li><p><code>unlifter1 :: ... -&gt; LoggingT</code>면, <code>run1</code>은 <code>LoggingT -&gt; IO</code>여야 하고</p></li>
+<li><p>그럼, 다음 번 <code>withRunInIO</code>는 <code>LoggingT</code> 인스턴스에서 가져오고, 그 인스턴스는 <code>runLoggingT</code>를 <code>unlifter</code>로 넣어줄 것이고</p></li>
+<li><p><code>unlifter1 :: ... -&gt; IO</code>면, <code>run1</code>은 <code>IO -&gt; IO</code> 여야 하고</p></li>
+<li><p>그럼, 다음 번 <code>withRunInIO</code>는 <code>IO</code> 인스턴스에서 가져오고, 그 인스턴스는 <code>id</code>를 <code>unlifter</code>로 넣어줘서 반복이 끝납니다.</p></li>
+</ul>
+<p>영리한 GHC가 타입을 잘 추론해 줄 수 있는 단서들이 보입니다.</p>
 <h2 id="비슷한-목적의-솔루션">비슷한 목적의 솔루션</h2>
-<p><a href="https://github.com/basvandijk/monad-control">Monad Control</a></p>
+<p><span class="citation" data-cites="TODO">@TODO</span> 다른 솔루션을 찾는대로 적어 놓도록 하겠습니다.<br />
+<a href="https://github.com/basvandijk/monad-control">Monad Control</a></p>
 
 <div class="comment">
 <script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
