@@ -145,7 +145,7 @@
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a> <span class="kw">in</span> res1 <span class="op">&gt;&gt;&gt;&gt;</span> f2 <span class="op">&gt;&gt;&gt;&gt;</span> f3</span></code></pre></div>
 <p>의도적으로 <code>combinator</code>의 실제 구현은 주석에 넣어 놨습니다. <a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a></p>
 <p>첫 번째 예시 <code>Maybe</code>와 <code>State</code>의 다른 점을 확인해 보시기 바랍니다. <code>Maybe</code> 예시와 <code>State</code> 예시의 공통점을 인지하고, Effect가 뭔지 감을 잡는 게 이 글의 목표입니다. 둘 다 <em>함수 서명에 드러나지 않는 Effect를 combinator를 통해 합성</em>하며 해결하고 있습니다.</p>
-<h2 id="결론">결론</h2>
+<h2 id="결론posts">결론posts</h2>
 <p>아직, 위의 예시 둘 다 모나드는 아닙니다. 여기서는 모나드 없이 Effect를 개별적으로 어떻게 해결하는지를 보는 게 목적입니다.</p>
 <section class="footnotes" role="doc-endnotes">
 <hr />
@@ -160,11 +160,11 @@
 <a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></li>
 <li id="fn2" role="doc-endnote"><p><code>Compensation</code>을 분리해서 잠시 보관하고, <code>f2</code>에 넘겨 계산한 후, 분리해놨던 <code>Compensation</code>을 적용합니다. 그 뒤, <code>f2</code>가 계산하며 새로 만들어 낸 <code>Compensation</code>값과 함께 <code>State 계산값 Compensation</code> 형태로 돌려주면 됩니다.</p>
 <p>State <code>combinator</code> 구현</p>
-<p>```haskell
-combinator (State (a,c)) f =
-let res1 = f a
-in if (abs (a - res1)) &gt; 10 then State (res1 * c, 0.5)
-else State (res1 * c, 2)<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<div class="sourceCode" id="cb20"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>combinator (<span class="dt">State</span> (a,c)) f <span class="ot">=</span> </span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> res1 <span class="ot">=</span> f a </span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>   <span class="kw">in</span> <span class="kw">if</span> (<span class="fu">abs</span> (a <span class="op">-</span> res1)) <span class="op">&gt;</span> <span class="dv">10</span> <span class="kw">then</span> <span class="dt">State</span> (res1 <span class="op">*</span> c, <span class="fl">0.5</span>)</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>                               <span class="kw">else</span> <span class="dt">State</span> (res1 <span class="op">*</span> c, <span class="dv">2</span>)</span></code></pre></div>
+<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></li>
 </ol>
 </section>
 
