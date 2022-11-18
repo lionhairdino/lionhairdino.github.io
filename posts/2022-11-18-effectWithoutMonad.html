@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko" lang="ko">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <title>lionhairdino - Monad없이 Maybe, State의 Effect 해결하기</title>
+
+        <meta name="description" content="Maybe와 State의 Effect는 무엇이고, 그 걸 어떻게 해결하는가 본 후, 둘의 공통점에서 모나드를 향해 출발하기 위한 사전 포석입니다." />
+        <meta property="og:description" content="Maybe와 State의 Effect는 무엇이고, 그 걸 어떻게 해결하는가 본 후, 둘의 공통점에서 모나드를 향해 출발하기 위한 사전 포석입니다." />
+
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <link rel="icon" href="https://lionhairdino.github.io/favicon.svg" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino16px.png" sizes="16x16" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino24px.png" sizes="24x24" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino32px.png" sizes="32x32" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino48px.png" sizes="48x48" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino57px.png" sizes="57x57" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino60px.png" sizes="60x60" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino64px.png" sizes="64x64" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino72px.png" sizes="72x72" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino76px.png" sizes="76x76" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino114px.png" sizes="114x114" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino120px.png" sizes="120x120" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino144px.png" sizes="144x144" />
+        <link rel="shortcut icon" href="../favicon.ico" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino152px.png" sizes="152x152" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino180px.png" sizes="180x180" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino192px.png" sizes="192x192" />
+        <link rel="manifest" href="../site.webmanifest" />
+        <link rel="mask-icon" href="https://lionhairdino.github.io/Lionhairdino_black.svg" color="#ff7500" />
+        <meta name="msapplication-TileImage" content="/images/favicon/Lionhairdino144px.png" />
+        <meta name="msapplication-TileColor" content="#ff7500" />
+        <meta name="theme-color" content="#ffffff" />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="Monad없이 Maybe, State의 Effect 해결하기" />
+        <meta property="og:site_name" content="Lionhairdino" />
+        <meta property="og:url" content="https://lionhairdino.github.io/posts/2022-11-18-effectWithoutMonad.html" />
+
+        <meta property="og:image" content="https://lionhairdino.github.io/images/state400px.png" />
+
+      <meta name="keywords" content="Monad, Maybe, State, Effect">
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-E9WZ6VXGHP"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-E9WZ6VXGHP');
+</script>
+<script src="../script/copycode.js"></script>
+<script async src="https://cse.google.com/cse.js?cx=9c53b4915cbb2605c"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.11.1/tocbot.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.11.1/tocbot.css" />
+    </head>
+    <body>
+        <div id="header">
+            <div style="display:inline-block;margin-right:5px;padding-top: 5px;" id="logo">
+                <a href="../"><img style="width:30px;border:none" src="../images/favicon/Lionhairdino48px.png"></a>
+            </div>
+            <div style="display:inline-block;vertical-align: top;padding-top:5px;" id="navigation">
+                <a href="../">lionhairdino</a>
+                <a href="../about.html">about</a>
+                <!--<a href="/archive.html">archive</a>-->
+            </div>
+            <div style="display:inline-block;font-size:0.8em;vertical-align: top;">
+                <div style="display:inline-block;vertical-align: top;padding-top: 5px">사이트내 검색</div>
+                <div style="display:inline-block;width:180px;"> 
+                    <div class="gcse-searchbox-only"></div>
+                </div>
+            </div>
+            <div>
+                여기 글들은 일종의 질문입니다. 용어 선택도 학계, 업계에서 쓰는 걸로 되어 있지 않고, 틀린 내용이 있을 수도 있습니다.
+            </div>
+        </div>
+        <div class="js-toc-content">
+            <h1>Monad없이 Maybe, State의 Effect 해결하기</h1>
+            <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+<div class="info">
+    Posted on November 18, 2022
+    
+</div>
+
+<h2 id="첫-번째-maybe">첫 번째, Maybe</h2>
+<p>계산이 실패하면 무슨 일이 생길까요? 계산이 성공하거나 실패한 건, 그 계산 이후 아무 일도 할 필요가 없다면 의미 없는 정보일 뿐입니다. 다음 함수가 받아야 비로소 의미가 생깁니다. 이전 함수의 성공 결과와 실패를 다음 함수가 받아야 의미가 있습니다. ※ 다음 함수로 넘기지 않고, 우리가 답을 확인한다면, 그 행위도 다음 이어지는 작업 중 하나입니다.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ot">f1 ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ot">f2 ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span></span></code></pre></div>
+<p>이런 함수가 있는데, <code>f1</code>도 <code>f2</code>도 실패를 결과로 가질 수 있는 상황입니다. 실패를 표현하기 위해, 새로운 Sum 형태의 타입을 만듭니다. (Sum 형태란, 여러 가능한 타입 중 한가지를 가질 수 있는 타입을 말합니다.)<br />
+</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Maybe</span> a <span class="ot">=</span> <span class="dt">Just</span> a <span class="op">|</span> <span class="dt">Nothing</span></span></code></pre></div>
+<p>계산의 결과가 <code>Int</code>일 때, <code>Maybe Int</code>로 표현하면, 성공이면 <code>Just Int</code>로, 실패하면 <code>Nothing</code>으로 표현할 수 있습니다. 이제 실패를 표현할 수 있는 타입은 마련 됐고, <code>Int</code>를 받아 실패할 수도 있는 계산을 하는 함수는 다음처럼 표현할 수 있습니다.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ot">f1 ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Maybe</span> <span class="dt">Int</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ot">f2 ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Maybe</span> <span class="dt">Int</span></span></code></pre></div>
+<p>이제, <code>f1</code>의 실행 결과를 <code>f2</code>가 받아야 되는 상황입니다. <code>f2</code>는 서명에 분명히 <code>Int</code>만 받을 수 있는 함수라 되어 있습니다. 이전 함수의 계산 실패 <code>Nothing</code>의 영향을 받아야만 합니다. 함수의 입출력으로 드러나지 않은 정보를 어떻게 해결할까요? 함수형에서 도구는 함수 뿐이 없습니다. <code>f2</code>가 못 받는 값은, 받을 수 있는 함수를 만들어 앞에서 <em>먼저</em> 받고, <code>f2</code>에는 <code>f2</code>가 처리할 수 있는 값일 때만 넘기면 됩니다.</p>
+<p><code>f1</code>이 받지 못하는 값 <code>Maybe Int</code>를 먼저 받고</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ot">combinator ::</span> <span class="dt">Maybe</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> </span></code></pre></div>
+<p>이 중 <code>f2</code>가 해결할 수 있는 값은 이어지는 함수 <code>f2</code>가 해결하고,</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ot">combinator ::</span> <span class="dt">Maybe</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> (<span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Maybe</span> <span class="dt">Int</span>) <span class="ot">-&gt;</span> </span></code></pre></div>
+<p>결과는 또 다시 <code>f2</code>의 실패할 수도 있는 결과를 돌려주면 됩니다.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ot">combinator ::</span> <span class="dt">Maybe</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> (<span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Maybe</span> <span class="dt">Int</span>) <span class="ot">-&gt;</span> <span class="dt">Maybe</span> <span class="dt">Int</span></span></code></pre></div>
+<p>이제, 이 함수만 있으면 <code>f1</code>과 <code>f2</code>를 붙일 수 있습니다. <code>f1</code>과 <code>f2</code>의 서명 <code>Int -&gt; Maybe Int</code>에 드러나지 않는 정보지만, 다음 함수에 영향을 미치는 즉, Effect는 <code>combinator</code>가 알아서 해결합니다.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> res1 <span class="ot">=</span> f1 <span class="dv">100</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a> <span class="kw">in</span> combinator res1 f2</span></code></pre></div>
+<p>이어지는 함수 <code>f3 :: Int -&gt; Maybe Int</code>가 있다면,</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> res1 <span class="ot">=</span> f1 <span class="dv">100</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a> <span class="kw">in</span> combinator (combinator res1 f2) f3</span></code></pre></div>
+<p>그럼, <code>combinator</code>는 어떤 작업을 하면 될까요? 이 번 글에서는 <em>다른 함수 하나를 래핑해서 Effect를 처리하면 된다</em>는 걸 보이는 게 목표이니, 실 구현은 지금 여기서 중요하지 않긴 합니다. 눈을 분산하지 않기 위해 실 구현은 주석에 달아 두겠습니다.<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
+<p>※ 하스켈에선 중위infix 연산자로 표현하는 방법이 있으니 보기 좋게 바꾸면,</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> res1 <span class="ot">=</span> f1 <span class="dv">100</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a> <span class="kw">in</span> res1 <span class="ot">`combinator`</span> f2 <span class="ot">`combinator`</span> f3</span></code></pre></div>
+<p>함수 이름을 연산자 모양으로 바꾸고 다음처럼 표현할 수 있습니다.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ot">(&gt;&gt;&gt;&gt;) ::</span> <span class="dt">Maybe</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> (<span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Maybe</span> <span class="dt">Int</span>) <span class="ot">-&gt;</span> <span class="dt">Maybe</span> <span class="dt">Int</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> res1 <span class="ot">=</span> f1 <span class="dv">100</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a> <span class="kw">in</span> res1 <span class="op">&gt;&gt;&gt;&gt;</span> f2 <span class="op">&gt;&gt;&gt;&gt;</span> f3</span></code></pre></div>
+<h2 id="두-번째-예시-state">두 번째 예시, State</h2>
+<p>전역 State를 유지하며 계산을 해야 되는 상황을 보겠습니다. 첫 번째 계산이 결과와 별도로 상태를 바꿨는데, 그 상태를 아무도 가져다 쓰지 않으면 의미 없는 정보일 뿐입니다. 상태 값은 다음 상태나 계산의 동작에 영향을 미쳐야 비로소 의미가 생깁니다.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ot">f1 ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="ot">f2 ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span></span></code></pre></div>
+<p>이런 함수가 있는데, 계산 결과가 원래의 값과<br />
+10 이상 차이나면, 다음 계산 때, 계산 결과를 반으로 줄이고,<br />
+10 보다 작게 차이나면, 다음 계산 때, 계산 결과를 두 배하도록 한다고 해 봅시다.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">Compensation</span> <span class="ot">=</span> <span class="dt">Int</span> <span class="co">-- 보정한다는 의미</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">State</span> a s <span class="ot">=</span> <span class="dt">State</span> (a, s)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="ot">f1 ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">State</span> <span class="dt">Int</span> <span class="dt">Compensation</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="ot">f2 ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">State</span> <span class="dt">Int</span> <span class="dt">Compensation</span></span></code></pre></div>
+<p><code>f1</code>, <code>f2</code> 각각은 다음 계산의 결과를 두배로 할지, 반으로 할지 알려주는 상태값을 만들어 냅니다. 지금 모양의 <code>f1</code>, <code>f2</code>는 상태값에 따라 계산 결과가 바뀔 수 있다는 정보는 받을 수가 없습니다. <em>상태값을 받는 다는 동작, 상태값에 따라 최종 결과를 바꾼다</em>는 동작은 함수의 서명에 드러나 있지 않습니다. 이들 함수가 상태값을 받아서 필요한 동작을 하게 하려면 어떻게 할까요? 함수형에서 쓸 수 있는 도구는 함수 뿐입니다. 당연히, 다른 함수가 먼저 받으면 됩니다. <code>f1</code>, <code>f2</code>가 받지 못하는 값을 <em>먼저</em> 받아 <code>f1</code>, <code>f2</code>의 계산이 나오면 2배 또는 반으로 보정해주는 작업을 함수를 두면 됩니다.</p>
+<p><code>f1</code>이 받지 못하는 상태값이 포함되어 있는 <code>State Int Compensation</code>을 먼저 받고,</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="ot">combinator ::</span> <span class="dt">State</span> <span class="dt">Int</span> <span class="dt">Compensation</span> <span class="ot">-&gt;</span> </span></code></pre></div>
+<p>계산 후 보정Compensation을 적용하게 될 이어지는 함수를 받고</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="ot">combinator ::</span> <span class="dt">State</span> <span class="dt">Int</span> <span class="dt">Compensation</span> <span class="ot">-&gt;</span> (<span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">State</span> <span class="dt">Int</span> <span class="dt">Compensation</span>) <span class="ot">-&gt;</span> </span></code></pre></div>
+<p>보정Compensation을 적용하고, 새로운 보정값과 함께 결과를 돌려주면 됩니다.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="ot">combinator ::</span> <span class="dt">State</span> <span class="dt">Int</span> <span class="dt">Compensation</span> <span class="ot">-&gt;</span> (<span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">State</span> <span class="dt">Int</span> <span class="dt">Compensation</span>) <span class="ot">-&gt;</span> <span class="dt">State</span> <span class="dt">Int</span> <span class="dt">Compensation</span> </span></code></pre></div>
+<p>이 함수만 있으면 <code>Compensation</code>을 받지도 ,적용하지도 못하던 <code>f1</code>과, <code>f2</code>를 합성할 수 있습니다. <code>f1</code>,<code>f2</code>에는 이 부분<br />
+“<code>Compensation</code>을 받고, 계산이 끝나면 <code>Compensation</code>을 적용하여 보정, 그리고 새로운 보정값을 돌려주는 것”<br />
+이 서명에 드러나 있지 않습니다. 이렇게 서명에 보이지 않게, 다음 함수에 영향을 미치는, 즉 Effect는 <code>Combinator</code>가 알아서 해결합니다.</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> res1 <span class="ot">=</span> f1 <span class="dv">100</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a> <span class="kw">in</span> combinator res1 f2</span></code></pre></div>
+<p>이어지는 함수 <code>f3 :: Int -&gt; State Int Compensation</code>가 있다면,</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> res1 <span class="ot">=</span> f1 <span class="dv">100</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a> <span class="kw">in</span> combinator (combinator res1 f2) f3</span></code></pre></div>
+<p>함수 이름을 연산자 모양으로 바꾸고 다음처럼 표현할 수 있습니다.</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="ot">(&gt;&gt;&gt;&gt;) ::</span> <span class="dt">State</span> <span class="dt">Int</span> <span class="dt">Compensation</span> <span class="ot">-&gt;</span> (<span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">State</span> <span class="dt">Int</span> <span class="dt">Compensation</span>) <span class="ot">-&gt;</span> <span class="dt">State</span> <span class="dt">Int</span> <span class="dt">Compensation</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> res1 <span class="ot">=</span> f1 <span class="dv">100</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a> <span class="kw">in</span> res1 <span class="op">&gt;&gt;&gt;&gt;</span> f2 <span class="op">&gt;&gt;&gt;&gt;</span> f3</span></code></pre></div>
+<p>의도적으로 <code>combinator</code>의 실제 구현은 주석에 넣어 놨습니다. <a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a></p>
+<p>첫 번째 예시 <code>Maybe</code>와 <code>State</code>의 다른 점을 확인해 보시기 바랍니다. <code>Maybe</code> 예시와 <code>State</code> 예시의 공통점을 인지하고, Effect가 뭔지 감을 잡는 게 이 글의 목표입니다. 둘 다 <em>함수 서명에 드러나지 않는 Effect를 combinator를 통해 합성</em>하며 해결하고 있습니다.</p>
+<h2 id="결론">결론</h2>
+<p>아직, 위의 예시 둘 다 모나드는 아닙니다. 여기서는 모나드 없이 Effect를 개별적으로 어떻게 해결하는지를 보는 게 목적입니다.</p>
+<section class="footnotes" role="doc-endnotes">
+<hr />
+<ol>
+<li id="fn1" role="doc-endnote"><p>이전 함수의 계산 결과가<br />
+성공했으면 <code>Just 200</code> 같은 값일테니, 다음 함수에 <code>Just</code> 없이 <code>200</code>을 넘겨 주면 되고<br />
+실패했으면 <code>Nothing</code>이어서 다음 함수 <code>f2</code>는 받을 수 없습니다. <code>f2</code>를 부르지 않고, 그냥 <code>Nothing</code>을 돌려주면 됩니다.</p>
+<p>Maybe <code>combinator</code> 구현</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>combinator mv f <span class="ot">=</span> <span class="kw">case</span> mv <span class="kw">of</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>                    <span class="dt">Just</span> v <span class="ot">-&gt;</span> f v</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>                    <span class="dt">Nothing</span> <span class="ot">-&gt;</span> <span class="dt">Nothing</span></span></code></pre></div>
+<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></li>
+<li id="fn2" role="doc-endnote"><p><code>Compensation</code>을 분리해서 잠시 보관하고, <code>f2</code>에 넘겨 계산한 후, 분리해놨던 <code>Compensation</code>을 적용합니다. 그 뒤, <code>f2</code>가 계산하며 새로 만들어 낸 <code>Compensation</code>값과 함께 <code>State 계산값 Compensation</code> 형태로 돌려주면 됩니다.</p>
+<p>State <code>combinator</code> 구현</p>
+<p>```haskell
+combinator (State (a,c)) f =
+let res1 = f a
+in if (abs (a - res1)) &gt; 10 then State (res1 * c, 0.5)
+else State (res1 * c, 2)<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section>
+
+<div class="comment">
+<script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
+</script>
+</div>
+<div style="text-align:right">Github 계정이 없는 분은 메일로 보내주세요. lionhairdino at gmail.com </div>
+        </div>
+        <nav class="toc toc-right js-toc relative z-1 transition--300 absolute pa4 pt5 is-position-fixed"></nav>
+        <div id="footer">
+            © 2022 lionhairdino. All rights reserved. Generated by <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+        <script>
+            tocbot.init({
+                tocSelector: '.js-toc',
+                contentSelector: '.js-toc-content',
+                headingSelector: 'h2, h3',
+                hasInnerContainers: true,
+            });
+        </script>
+    </body>
+</html>
