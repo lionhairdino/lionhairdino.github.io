@@ -92,7 +92,7 @@ contra- “against, in oppsition” - <a href="https://www.etymonline.com/search
 <h2 id="variant">Variant</h2>
 <p>어원은 “tending to change”인데, 변하려는 성향정도 번역할 수 있을까요? 자료들을 보면 “변성”이라고 번역하기도 합니다. 위 접두어와 합치면, 같은 방향으로 변하면 공변covariant, 반대 방향으로 변하면 반변contravariant입니다. 반변은 반공변으로 번역하기도 합니다.</p>
 <h2 id="기저-벡터">기저 벡터</h2>
-<p>웹에서 Covariant, Contravariant를 검색하면, 수학쪽 용어도 같이 검색됩니다. 예를 들어 기저 벡터를 phi만큼 회전하면, 좌표 변환은 -phi만큼 돌린 것과 같습니다. 이럴 때 Contravariant라 합니다.</p>
+<p>웹에서 Covariant, Contravariant를 검색하면, 수학쪽 용어도 같이 검색됩니다. 예를 들어 기저 벡터를 phi만큼 회전하면, 좌표 변환은 -phi만큼 돌린 것과 같습니다. 이럴 때 반대로Contra 변성variant, Contravariant 합니다.</p>
 <h2 id="oop에서">OOP에서</h2>
 <p>※ <code>P</code> : Parent 의미, <code>C</code> : Child 의미</p>
 <p>아래와 같은 상황을 가정하면<br />
@@ -102,19 +102,17 @@ contra- “against, in oppsition” - <a href="https://www.etymonline.com/search
 <p>이럴 때 <code>P</code>가 필요한 자리에, <code>C</code>를 넣을 수 있습니다. <code>P</code>타입을 받는다는 건, <code>a</code>, <code>b</code>, <code>c</code> 메소드를 쓰겠다는 건데, <code>C</code>타입도 이들 메소드를 모두 가지고 있으니 문제가 생기지 않습니다.</p>
 <p><code>P(super) &lt;- C(sub)</code> 관계가 있을 때, <code>P</code>와 <code>C</code>에 의존하는 어떤 Generic 클래스, 타입 등이
 <code>SomeVariant P &lt;- SomeVariant C</code>
-와 같이 변성(변환) 전의 것과 같은 방향의 관계가 있을 때 Covariant, 반대일 때 Contravariant라 합니다.</p>
+와 같이 변성(변환) 전의 것과 같은 방향의 관계가 있을 때는 Covariant, 반대일 때는 Contravariant라 합니다.</p>
 <h2 id="하스켈에서는-무엇이-변할까">하스켈에서는 무엇이 변할까?</h2>
-<p>다른 곳에서도 이 용어는 많이 쓰입니다. 여기서는 하스켈에서 타입 얘기를 할 때 나오는 뜻만 보겠습니다. 적어도 두 가지가 변화하는 게 있어야, 이 용어를 쓸텐데, 무엇이 변화할 때 무엇이 co, contra란 말 없이 그냥 covariant와 contravariant로 설명하는 경우가 있어, 금방 이해가 가지 않을 때가 있습니다.</p>
+<p>위에 예를 든 것처럼, 다른 곳에서도 이 용어는 많이 쓰입니다. 여기서는 하스켈에서 타입 얘기를 할 때 나오는 뜻만 보겠습니다. 적어도 두 가지가 변화하는 게 있어야, 이 용어를 쓸텐데, 무엇이 변화할 때 무엇이 co, contra란 말 없이 그냥 covariant와 contravariant로 설명하는 경우가 있어, 금방 이해가 가지 않을 때가 있습니다.</p>
 <p>하스켈에선 Functor로 타입이 변환 되었을 때, 기존 관계(함수)가 어떻게 되느냐에 관한 용어입니다.</p>
 <p><code>P</code>, <code>C</code> 타입이 있고, <code>f :: P -&gt; C</code> 란 함수가 있을 때 <code>SomeFunctor</code>로 변환한다면,
-<code>SomeFunctor P</code>, <code>SomeFunctor C</code> 로 변환하고,
+<code>SomeFunctor P</code>, <code>SomeFunctor C</code> 로 변환하고, 함수가<br />
 <code>f 변환 :: SomeFunctor P -&gt; SomeFunctor C</code> 이면 Covariant 이고,
 <code>f 변환 :: SomeFunctor P &lt;- SomeFunctor C</code> 이면 Contravariant 라 합니다.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fmap</span><span class="ot"> ::</span> (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> <span class="dt">Maybe</span> a <span class="ot">-&gt;</span> <span class="dt">Maybe</span> b</span></code></pre></div>
-<p><code>a -&gt; b</code> 인데, <code>Maybe</code>로 변환하면 <code>Maybe a -&gt; Maybe b</code>로 만들기 때문에 Covariant functor라고 부릅니다.</p>
-<p><code>Int -&gt; String</code> 함수를 covariant functor로 변환해서 <code>Maybe Int</code> 에 적용할 수 있습니다.
-하지만, <code>Double -&gt; Int</code> 같은 함수는 covariant functor로 적용할 수 없습니다.</p>
-<p>만일, <code>a -&gt; b</code>가 <code>Some b -&gt; Some a</code>로 변환되면 <code>Some</code>은 <code>a</code>에 Contravariant라 말하는데, 다음 섹션에서 예시를 보겠습니다.</p>
+<p>이 <code>fmap</code>은 <code>a -&gt; b</code>를 <code>Maybe</code>로 변환하면 <code>Maybe a -&gt; Maybe b</code>로 만들기 때문에 Covariant functor라고 부릅니다. 예를 들면, <code>Int -&gt; String</code> 함수를 covariant functor로 변환해서 <code>Maybe Int</code> 에 적용할 수 있습니다. 여기까진 자주 보던 것으로 그리 낯설지 않습니다. 그런데, <code>Int</code>가 출력에 있는 <code>Double -&gt; Int</code> 같은 함수는 <code>Maybe Int</code>에 적용할 수 없습니다.</p>
+<p>만일, <code>a -&gt; b</code>가 <code>Some b -&gt; Some a</code>로 변환되면 <code>Some</code>은 <code>a</code>에 Contravariant라 말하는데, 다음에서 예시를 보겠습니다.</p>
 <h2 id="contravariant">Contravariant</h2>
 <p><a href="https://www.fpcomplete.com/blog/2016/11/covariance-contravariance/">FPcomplete Covariance and Contravariance 에서 발췌</a></p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">MakeString</span> a <span class="ot">=</span> <span class="dt">MakeString</span> {<span class="ot"> makeString ::</span> a <span class="ot">-&gt;</span> <span class="dt">String</span> }</span>
@@ -131,10 +129,19 @@ contra- “against, in oppsition” - <a href="https://www.etymonline.com/search
 <span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span>
 <span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="fu">putStrLn</span> <span class="op">$</span> makeString plus3ShowInt <span class="dv">5</span></span></code></pre></div>
-<p>소스를 잘 읽어보면 <code>(b -&gt; a)</code>로 뒤집혀 있기 때문에 그냥 covariant functor로 구현할 수 없습니다.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">Contravariant</span> f <span class="kw">where</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ot">  contramap ::</span> (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> f b <span class="ot">-&gt;</span> f a</span></code></pre></div>
-<p>이런 경우를 위해 <code>fmap</code> 대신 <code>contrafmap</code>을 가진 <code>Contravariant</code> 클래스가 있습니다.</p>
+<p><code>makeString</code> 함수는 어떤 타입이든 받아서 <code>String</code> 타입을 돌려주는 함수입니다. 예를 들면 타입에 따라 타입 이름을 돌려 준다든지 하는 함수일 수 있습니다. 일단 시작부터 의도가 보입니다. <code>a</code>가 출력에 있지 않고, 입력에 있습니다. 이게 <code>fmap</code>을 구현할 때 어떤 영향을 미치는지 보겠습니다.<br />
+<code>showInt</code>는 정수를 받아 문자열로 바꾸는 함수입니다. 그런데, 이 함수로 출력하기 전에, 정수값을 변화 시키는 함수(+3)를 먼저 적용 후 문자열로 출력하게 하고 싶습니다. 이럴 경우, 자주 썼던 covariant functor로 시도해 보겠습니다. 위 <code>FPcomplete</code>의 예시는 <code>(+1) :: Int -&gt; Int</code>으로 입력과 출력이 <code>Int</code>로 같아 잘 미스 매치되는게 잘 안보이니, 원래 타입 그대로 두고 매칭 여부를 보겠습니다.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ot">mapMakeString ::</span> (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> <span class="dt">MakeString</span> a <span class="ot">-&gt;</span> <span class="dt">MakeString</span> b</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>mapMakeString f (<span class="dt">MakeString</span> g) <span class="ot">=</span> <span class="dt">MakeString</span> (g <span class="op">.</span> f)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>mapMakeString (<span class="op">+</span><span class="dv">3</span><span class="ot"> ::</span> a <span class="ot">-&gt;</span> b) (<span class="fu">showInt</span><span class="ot"> ::</span> a <span class="ot">-&gt;</span> <span class="dt">String</span>) </span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="ot">=</span> <span class="dt">MakeString</span> ( <span class="fu">showInt</span> <span class="op">.</span> (<span class="op">+</span><span class="dv">3</span>)<span class="ot"> ::</span> b <span class="ot">-&gt;</span> <span class="dt">String</span>)</span></code></pre></div>
+<p>이렇게 하면 될 것 같지만, 타입을 적어보면 출력이 맞지 않습니다. <code>(+3) :: a -&gt; b</code> 이니, 그 다음 함수 <code>showInt</code>는 <code>b -&gt; String</code>을 받아야 합니다. 하지만 <code>showInt</code>는 <code>a -&gt; String</code>입니다. 말로 풀어 보면, <code>(+3)</code>을 나중에 적용하는 게 아니라, 먼저 적용한 후 <code>showInt</code>를 적용하고 있습니다. <code>MakeString</code> 타입의 폴리모픽 부분은 출력이 아니라, 입력입니다. <code>mapMakeString</code>을 적용해서 합성이 이루어질 때, 이 폴리모픽한 부분은 먼저 들어 온 함수의 입력과 만나지 않고, 출력과 만납니다. 소스를 잘 읽어보면 <code>(b -&gt; a)</code>로 뒤집힌 걸 요구하기 때문에 그냥 covariant functor로 구현할 수 없습니다.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ot">mapMakeString ::</span> (b <span class="ot">-&gt;</span> a) <span class="ot">-&gt;</span> <span class="dt">MakeString</span> a <span class="ot">-&gt;</span> <span class="dt">MakeString</span> b</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>mapMakeString f (<span class="dt">MakeString</span> g) <span class="ot">=</span> <span class="dt">MakeString</span> (g <span class="op">.</span> f)</span></code></pre></div>
+<p>이렇게 Contravariant하게 변하는 걸 fmap하기 위해 아래와 같이 뒤집힌 타입을 메소드로 가진 클래스가 있습니다.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">Contravariant</span> f <span class="kw">where</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ot">  contramap ::</span> (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> f b <span class="ot">-&gt;</span> f a</span></code></pre></div>
 <p><em>결과 타입은 고정되어 있는데, 입력 타입이 달라질 필요가 있을 때 쓸 수 있습니다.</em> (<code>fmap</code>은 covariant한 경우에 쓴다고 말하는데, 잘 생각해 보면, <code>fmap</code>은 입력 타입이 고정이고, 결과 타입이 달라질 필요가 있을 때 써왔습니다.)</p>
 <h2 id="입력-위치에-있으면-contravariant">입력 위치에 있으면 Contravariant</h2>
 <p>출력에 있으면 Covariant<br />
@@ -152,10 +159,10 @@ Consume하면 Contravariant</p>
 이 함수는 다른 걸 받는 건 없고, <code>(a -&gt; b)</code>함수만 받으면 <code>b</code>라는 값을 만들어 냅니다. <code>(a -&gt; b)</code>함수를 실행하면 <code>b</code>가 나올텐데, 실행하려면 <code>a</code>가 필요합니다. 함수만 받았는데, <code>b</code>가 나온다는 말은, 안에 이미 <code>a</code>가 있을거라 예상할 수 있습니다. (물론, 받은 함수를 무시할 수도 있겠지만, <code>b</code>를 generate할 방법은 어떤식으로든 존재해야 합니다.)</p>
 </blockquote>
 <p>위에서 말한 Consume 모양 중 <code>V -&gt; Int</code> 함수를 받는 고차 함수를 살펴 보겠습니다.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ot">func1 ::                 f ::</span> <span class="dt">V</span> <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ot">func2 ::</span>               (<span class="ot"> f ::</span> <span class="dt">V</span> <span class="ot">-&gt;</span> <span class="dt">Int</span> ) <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="ot">func3 ::</span>        (<span class="ot"> g ::</span> (<span class="ot"> f ::</span> <span class="dt">V</span> <span class="ot">-&gt;</span> <span class="dt">Int</span> ) <span class="ot">-&gt;</span> <span class="dt">Int</span> ) <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="ot">func4 ::</span> (<span class="ot"> h ::</span> (<span class="ot"> g ::</span> (<span class="ot"> f ::</span> <span class="dt">V</span> <span class="ot">-&gt;</span> <span class="dt">Int</span> ) <span class="ot">-&gt;</span> <span class="dt">Int</span> ) <span class="ot">-&gt;</span> <span class="dt">Int</span> ) <span class="ot">-&gt;</span> <span class="dt">Int</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ot">func1 ::                 f ::</span> <span class="dt">V</span> <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ot">func2 ::</span>               (<span class="ot"> f ::</span> <span class="dt">V</span> <span class="ot">-&gt;</span> <span class="dt">Int</span> ) <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="ot">func3 ::</span>        (<span class="ot"> g ::</span> (<span class="ot"> f ::</span> <span class="dt">V</span> <span class="ot">-&gt;</span> <span class="dt">Int</span> ) <span class="ot">-&gt;</span> <span class="dt">Int</span> ) <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="ot">func4 ::</span> (<span class="ot"> h ::</span> (<span class="ot"> g ::</span> (<span class="ot"> f ::</span> <span class="dt">V</span> <span class="ot">-&gt;</span> <span class="dt">Int</span> ) <span class="ot">-&gt;</span> <span class="dt">Int</span> ) <span class="ot">-&gt;</span> <span class="dt">Int</span> ) <span class="ot">-&gt;</span> <span class="dt">Int</span></span></code></pre></div>
 <p>실행되는 코드는 아니고, 고차 함수들이 함수를 인자로 받는 부분에 <code>f</code>,<code>g</code>,<code>h</code> 이름을 붙여 놨습니다.</p>
 <ul>
 <li><code>func1</code>은 외부에서 <code>V</code>값을 받을테고, - 외부에서 들어온 값을 Consume합니다.<br />
