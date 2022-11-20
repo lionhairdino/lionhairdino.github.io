@@ -6,8 +6,8 @@
 
         <title>lionhairdino - Covariant, Contravariant, Positive, Negative</title>
 
-        <meta name="description" content="단어 뜻만으로 보면 그리 어렵지 않은 뜻인데요. 무언가가 변할 때 함께 변하느냐, 역으로 변하느냐. 얼핏 이렇게만 들으면 금방 이해갈 것 같아 보이지만," />
-        <meta property="og:description" content="단어 뜻만으로 보면 그리 어렵지 않은 뜻인데요. 무언가가 변할 때 함께 변하느냐, 역으로 변하느냐. 얼핏 이렇게만 들으면 금방 이해갈 것 같아 보이지만," />
+        <meta name="description" content="단어 뜻만으로 보면 그리 어렵지 않은 뜻인데요. 무언가가 변할 때 함께 변하느냐, 역으로 변하느냐. 얼핏 이렇게만 들으면 금방 이해갈 것 같아 보이지만, 역시나 문서들은 친절하게 설명해 주지 않습니다. 왜 Consume하면 Contravarint고 Negative 위치라 부르는지." />
+        <meta property="og:description" content="단어 뜻만으로 보면 그리 어렵지 않은 뜻인데요. 무언가가 변할 때 함께 변하느냐, 역으로 변하느냐. 얼핏 이렇게만 들으면 금방 이해갈 것 같아 보이지만, 역시나 문서들은 친절하게 설명해 주지 않습니다. 왜 Consume하면 Contravarint고 Negative 위치라 부르는지." />
 
         <link rel="stylesheet" type="text/css" href="../css/default.css" />
         <link rel="icon" href="https://lionhairdino.github.io/favicon.svg" />
@@ -136,7 +136,7 @@ contra- “against, in oppsition” - <a href="https://www.etymonline.com/search
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>mapMakeString (<span class="op">+</span><span class="dv">3</span><span class="ot"> ::</span> a <span class="ot">-&gt;</span> b) (<span class="fu">showInt</span><span class="ot"> ::</span> a <span class="ot">-&gt;</span> <span class="dt">String</span>) </span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="ot">=</span> <span class="dt">MakeString</span> ( <span class="fu">showInt</span> <span class="op">.</span> (<span class="op">+</span><span class="dv">3</span>)<span class="ot"> ::</span> b <span class="ot">-&gt;</span> <span class="dt">String</span>)</span></code></pre></div>
-<p>이렇게 하면 될 것 같지만, 타입을 적어보면 출력이 맞지 않습니다. <code>(+3) :: a -&gt; b</code> 이니, 그 다음 함수 <code>showInt</code>는 <code>b -&gt; String</code>을 받아야 합니다. 하지만 <code>showInt</code>는 <code>a -&gt; String</code>입니다. 말로 풀어 보면, <code>(+3)</code>을 나중에 적용하는 게 아니라, 먼저 적용한 후 <code>showInt</code>를 적용하고 있습니다. <code>MakeString</code> 타입의 폴리모픽 부분은 출력이 아니라, 입력입니다. <code>mapMakeString</code>을 적용해서 합성이 이루어질 때, 이 폴리모픽한 부분은 먼저 들어 온 함수의 입력과 만나지 않고, 출력과 만납니다. 소스를 잘 읽어보면 <code>(b -&gt; a)</code>로 뒤집힌 걸 요구하기 때문에 그냥 covariant functor로 구현할 수 없습니다.</p>
+<p>이렇게 하면 될 것 같지만, 타입을 적어보면 출력이 맞지 않습니다. <code>(+3) :: a -&gt; b</code> 이니, 그 다음 함수 <code>showInt</code>는 <code>b -&gt; String</code>을 받아야 합니다. 하지만 <code>showInt</code>는 <code>a -&gt; String</code>입니다. 말로 풀어 보면, <code>(+3)</code>을 나중에 적용하는 게 아니라, 먼저 적용한 후 <code>showInt</code>를 적용하고 있습니다. <code>MakeString</code> 타입의 폴리모픽 부분은 출력이 아니라, 입력입니다. <code>mapMakeString</code>을 적용해서 합성이 이루어질 때, 이 폴리모픽한 부분은 먼저 들어 온 함수의 입력과 만나지 않고, 출력과 만나야만 원하는 동작을 합니다. 소스를 잘 읽어보면 <code>(b -&gt; a)</code>로 뒤집힌 걸 요구하기 때문에 그냥 covariant functor로 구현할 수 없습니다.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ot">mapMakeString ::</span> (b <span class="ot">-&gt;</span> a) <span class="ot">-&gt;</span> <span class="dt">MakeString</span> a <span class="ot">-&gt;</span> <span class="dt">MakeString</span> b</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>mapMakeString f (<span class="dt">MakeString</span> g) <span class="ot">=</span> <span class="dt">MakeString</span> (g <span class="op">.</span> f)</span></code></pre></div>
 <p>이렇게 Contravariant하게 변하는 걸 fmap하기 위해 아래와 같이 뒤집힌 타입을 메소드로 가진 클래스가 있습니다.</p>
@@ -158,7 +158,7 @@ Consume하면 Contravariant</p>
 <code>(a -&gt; b) -&gt; b</code> 타입만으로 알 수 있는 게 있습니다.<br />
 이 함수는 다른 걸 받는 건 없고, <code>(a -&gt; b)</code>함수만 받으면 <code>b</code>라는 값을 만들어 냅니다. <code>(a -&gt; b)</code>함수를 실행하면 <code>b</code>가 나올텐데, 실행하려면 <code>a</code>가 필요합니다. 함수만 받았는데, <code>b</code>가 나온다는 말은, 안에 이미 <code>a</code>가 있을거라 예상할 수 있습니다. (물론, 받은 함수를 무시할 수도 있겠지만, <code>b</code>를 generate할 방법은 어떤식으로든 존재해야 합니다.)</p>
 </blockquote>
-<p>위에서 말한 Consume 모양 중 <code>V -&gt; Int</code> 함수를 받는 고차 함수를 살펴 보겠습니다.</p>
+<p>위에서 말한 Consume 모양 중 <code>V -&gt; Int</code> 함수를 받는 고차 함수를 살펴 보겠습니다. reduce하려면 필요한 정보가 어디에 있는지 살펴 보겠습니다.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ot">func1 ::                 f ::</span> <span class="dt">V</span> <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ot">func2 ::</span>               (<span class="ot"> f ::</span> <span class="dt">V</span> <span class="ot">-&gt;</span> <span class="dt">Int</span> ) <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="ot">func3 ::</span>        (<span class="ot"> g ::</span> (<span class="ot"> f ::</span> <span class="dt">V</span> <span class="ot">-&gt;</span> <span class="dt">Int</span> ) <span class="ot">-&gt;</span> <span class="dt">Int</span> ) <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
@@ -169,9 +169,9 @@ Consume하면 Contravariant</p>
 </li>
 <li><code>func2</code>는 내부에 <code>f</code>에 넣을 정해진 <code>V</code>값이 이미 있고, - 내부에서 Produce합니다.<br />
 </li>
-<li><code>func3</code>는 <code>f</code>모양의 “함수” 인자를 가지고 있고, <code>V</code>값은 <code>g</code>의 자리로 들어오는 함수가 가지고 있습니다. 즉 외부에서 값이 들어 옵니다. - Consume<br />
+<li><code>func3</code>는 <code>f</code>모양의 “함수” 인자를 가지고 있고, <code>V</code>값은 <code>g</code>의 자리로 들어오는 함수가 가지고 있습니다. 즉 외부에서 값이 들어 옵니다. - 외부에서 들어온 값을 Consume합니다.<br />
 </li>
-<li><code>func4</code>는 <code>g</code>모양의 “함수” 인자를 가지고 있습니다. 이 함수 안에는 이미 정해진 <code>V</code>값이 들어 있습니다. - Produce</li>
+<li><code>func4</code>는 <code>g</code>모양의 “함수” 인자를 가지고 있습니다. 이 함수 안에는 이미 정해진 <code>V</code>값이 들어 있습니다. - 내부에서 Produce합니다.</li>
 </ul>
 <p>잘 보면, <code>V</code>가 contravariant 위치에 있는 함수를 받는 고차 함수를, 차수를 올릴 때마다 Consume, Produce가 반복되고 있습니다.</p>
 <ul>
