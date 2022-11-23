@@ -126,8 +126,8 @@ say (   (\f -&gt; f &quot;hi&quot;)   (\x -&gt; (\y -&gt; y (x &lt;&gt; &quot; e
 ghci&gt; sound @Cat
 &quot;야옹!&quot;</code></pre>
 <h3 id="반복-작업-추상화">반복 작업 추상화</h3>
-<p>함수를 데이터 타입안에 넣어버리면, 함수 합성을 할 때, 항상 특정 동작을 하도록 할 수 있습니다.</p>
-<p>타입이 없는 함수는 보통 특별한 동작 없이 합성합니다.</p>
+<p>함수를 데이터 타입 안에 넣어버리면, 함수 합성을 할 때, 항상 특정 동작을 하도록 할 수 있습니다.</p>
+<p>특별히 이름 붙인 타입이 없는 함수는 보통 특별한 동작 없이 합성합니다.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ot">noTypeF1 ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>noTypeF1 n <span class="ot">=</span> n <span class="op">+</span> <span class="dv">1</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -140,46 +140,25 @@ ghci&gt; sound @Cat
 <div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">SomeType</span> a <span class="ot">=</span> <span class="dt">SomeType</span> (<span class="dt">Int</span> <span class="ot">-&gt;</span> a)</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="ot">someTypeF1 ::</span> <span class="dt">SomeType</span> <span class="dt">Int</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>someTypeF1 <span class="ot">=</span> noTypeF1</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>someTypeF1 <span class="ot">=</span> <span class="dt">SomeType</span> noTypeF1</span>
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="ot">someTypeF2 ::</span> <span class="dt">SomeType</span> <span class="dt">Int</span></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>someTypeF2 <span class="ot">=</span> noTypeF2</span></code></pre></div>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>someTypeF2 <span class="ot">=</span> <span class="dt">SomeType</span> noTypeF2</span></code></pre></div>
 <p>예를 들어, 합성할 때마다, 첫 계산 이 후부터는 <code>1000</code>씩 보너스를 준다면</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ot">combinator ::</span> <span class="dt">SomeType</span> a <span class="ot">-&gt;</span> <span class="dt">SomeType</span> a <span class="ot">-&gt;</span> <span class="dt">SomeType</span> a</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>combinator (<span class="dt">SomeType</span> f1) (<span class="dt">SomeType</span> f2) <span class="ot">=</span> \n <span class="ot">-&gt;</span> f2 <span class="op">$</span> (f1 n) <span class="op">+</span> <span class="dv">1000</span></span></code></pre></div>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>combinator (<span class="dt">SomeType</span> f1) (<span class="dt">SomeType</span> f2) <span class="ot">=</span> <span class="dt">SomeType</span> <span class="op">$</span> \n <span class="ot">-&gt;</span> f2 <span class="op">$</span> (f1 n) <span class="op">+</span> <span class="dv">1000</span></span></code></pre></div>
 <p>이런 컴비네이터를 이용해 합성할 수 있습니다.</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>compSomeType <span class="ot">=</span> someTypeF2 <span class="ot">`combinator`</span> someTypeF1</span></code></pre></div>
 <p>별도의 타입을 만든다는 건, 그 타입만이 가지는 속성에 의존해서 돌아가는 함수(메소드)가 필요하기 때문입니다. 값이 됐든, 함수가 됐든 상관이 없습니다. 생성자로 감싸wrap 놓으면, 반드시 어떤 절차를 거쳐야만 벗길unwrap 수 있습니다.</p>
 <p>또한, 타입 체킹하는데도 도움을 줍니다.</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">SomeType</span> a <span class="ot">=</span> <span class="dt">SomeType</span> (<span class="dt">Int</span> <span class="ot">-&gt;</span> a)</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="ot">someTypeF1 ::</span> <span class="dt">SomeType</span> <span class="dt">Int</span></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>someTypeF1 <span class="ot">=</span> <span class="dt">SomeType</span> noTypeF1</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="ot">someTypeF2 ::</span> <span class="dt">SomeType</span> <span class="dt">Int</span></span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>someTypeF2 <span class="ot">=</span> <span class="dt">SomeType</span> noTypeF2</span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="ot">noTypeF1 ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>noTypeF1 n <span class="ot">=</span> n <span class="op">+</span> <span class="dv">1</span></span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a><span class="ot">noTypeF2 ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
-<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>noTypeF2 n <span class="ot">=</span> n <span class="op">-</span> <span class="dv">1</span></span>
-<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a><span class="ot">compNoType ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
-<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>compNoType <span class="ot">=</span> noTypeF2 <span class="op">.</span> noTypeF1</span>
-<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a><span class="ot">combinator ::</span> <span class="dt">SomeType</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">SomeType</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">SomeType</span> <span class="dt">Int</span> </span>
-<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>combinator (<span class="dt">SomeType</span> f1) (<span class="dt">SomeType</span> f2) <span class="ot">=</span> <span class="dt">SomeType</span> <span class="op">$</span> \n <span class="ot">-&gt;</span> f2 <span class="op">$</span> (f1 n <span class="op">+</span> <span class="dv">1000</span>) <span class="op">+</span> <span class="dv">2000</span></span>
-<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>compSomeType <span class="ot">=</span> someTypeF2 <span class="ot">`combinator`</span> someTypeF1</span></code></pre></div>
+<p>패턴 매칭을 위해 <code>runSomeType</code>을 만듭니다.</p>
 <pre><code>ghci&gt; let runSomeType (SomeType f) = \n -&gt; f n
 ghci&gt; runSomeType compSomeType 1
 1001</code></pre>
 <h3 id="로컬-스코프를-만들-수-있다.">로컬 스코프를 만들 수 있다.</h3>
 <p><span class="citation" data-cites="todo">@todo</span> 감싼nested람다 함수 헤드에 있는 변수들을, 타 언어의 전역 변수나 한정된 모듈 혹은 블록에서 유효한 변수처럼 사용하는 예시 추가할 것</p>
 <h2 id="todo-계속-함수의-속성을-추가할-예정입니다."><span class="citation" data-cites="TODO">@TODO</span> 계속 함수의 속성을 추가할 예정입니다.</h2>
-<p>함수를 연결 연결해서 프로그램의 흐름을 만들어 내는 함수형에서는, 굉장히 중요한 특징들입니다. 순수형 함수만 쓸 수 있을 때는 더더욱 중요한 특징들입니다. <em>튜링 완전한 프로그램을 함수형으로 만들 수 있는 이유는, 역시 함수</em>에 있습니다. 명령형 프로그래밍과는 다른 완전 개념들를 채워진 세계처럼 얘기하지만, 꼭 그렇지만은 않습니다. 예를 들면, 보통 함수형 프로그래밍 입문서들이, 한 번 정해지면 바뀔 수 없는 불변immutable 변수만 있는 것처럼 얘기하지만, 사실은 다른 형태로 동일한 목적을 달성하는 방법을 만들어 두었습니다.</p>
+<p>함수를 연결 연결해서 프로그램의 흐름을 만들어 내는 함수형에서는, 굉장히 중요한 특징들입니다. 순수형 함수만 쓸 수 있을 때는 더더욱 중요한 특징들입니다. <em>튜링 완전한 프로그램을 함수형으로 만들 수 있는 이유는, 역시 함수</em>에 있습니다. 명령형 프로그래밍과는 완전 다른 개념들로 채워진 세계처럼 얘기하지만, 꼭 그렇지만은 않습니다. 예를 들면, 보통 함수형 프로그래밍 입문서들이, 한 번 정해지면 바뀔 수 없는 불변immutable 변수만 있는 것처럼 얘기하지만, 사실은 다른 형태로 동일한 목적을 달성하는 방법을 만들어 두었습니다.</p>
 <p>조금 더 특징들이 손에 잡히면 같이 올리려 했는데, 지금 내용만으로도 충분히 중요하단 생각이 들어 미완성이지만 일단 올려 둡니다.</p>
 
 <div class="comment">
