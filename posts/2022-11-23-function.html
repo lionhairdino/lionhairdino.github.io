@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko" lang="ko">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <title>lionhairdino - 함수형 프로그래밍에서 함수</title>
+
+        <meta name="description" content="함수의 어떤 특징들 때문에, (순수) 함수만으로 절차형, 명령헝 프로그래밍이 하는 일을 모두 할 수 있는 걸까 궁금했습니다. 물론 지금도 다 알진 못하지만, 중요한 내용을 알게 된 것 같아 정리했습니다." />
+        <meta property="og:description" content="함수의 어떤 특징들 때문에, (순수) 함수만으로 절차형, 명령헝 프로그래밍이 하는 일을 모두 할 수 있는 걸까 궁금했습니다. 물론 지금도 다 알진 못하지만, 중요한 내용을 알게 된 것 같아 정리했습니다." />
+
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <link rel="icon" href="https://lionhairdino.github.io/favicon.svg" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino16px.png" sizes="16x16" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino24px.png" sizes="24x24" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino32px.png" sizes="32x32" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino48px.png" sizes="48x48" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino57px.png" sizes="57x57" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino60px.png" sizes="60x60" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino64px.png" sizes="64x64" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino72px.png" sizes="72x72" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino76px.png" sizes="76x76" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino114px.png" sizes="114x114" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino120px.png" sizes="120x120" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino144px.png" sizes="144x144" />
+        <link rel="shortcut icon" href="../favicon.ico" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino152px.png" sizes="152x152" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino180px.png" sizes="180x180" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino192px.png" sizes="192x192" />
+        <link rel="manifest" href="../site.webmanifest" />
+        <link rel="mask-icon" href="https://lionhairdino.github.io/Lionhairdino_black.svg" color="#ff7500" />
+        <meta name="msapplication-TileImage" content="/images/favicon/Lionhairdino144px.png" />
+        <meta name="msapplication-TileColor" content="#ff7500" />
+        <meta name="theme-color" content="#ffffff" />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="함수형 프로그래밍에서 함수" />
+        <meta property="og:site_name" content="Lionhairdino" />
+        <meta property="og:url" content="https://lionhairdino.github.io/posts/2022-11-23-function.html" />
+
+        <meta property="og:image" content="https://lionhairdino.github.io/images/state400px.png" />
+
+      <meta name="keywords" content="function, 함수, 약속, 준비, 고차 함수, 캡슐">
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-E9WZ6VXGHP"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-E9WZ6VXGHP');
+</script>
+<script src="../script/copycode.js"></script>
+<script async src="https://cse.google.com/cse.js?cx=9c53b4915cbb2605c"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.11.1/tocbot.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.11.1/tocbot.css" />
+    </head>
+    <body>
+        <div id="header">
+            <div style="display:inline-block;margin-right:5px;padding-top: 5px;" id="logo">
+                <a href="../"><img style="width:30px;border:none" src="../images/favicon/Lionhairdino48px.png"></a>
+            </div>
+            <div style="display:inline-block;vertical-align: top;padding-top:5px;" id="navigation">
+                <a href="../">lionhairdino</a>
+                <a href="../about.html">about</a>
+                <!--<a href="/archive.html">archive</a>-->
+            </div>
+            <div style="display:inline-block;font-size:0.8em;vertical-align: top;">
+                <div style="display:inline-block;vertical-align: top;padding-top: 5px">사이트내 검색</div>
+                <div style="display:inline-block;width:180px;"> 
+                    <div class="gcse-searchbox-only"></div>
+                </div>
+            </div>
+            <div>
+                여기 글들은 일종의 질문입니다. 용어 선택도 학계, 업계에서 쓰는 걸로 되어 있지 않고, 틀린 내용이 있을 수도 있습니다.
+            </div>
+        </div>
+        <div class="js-toc-content">
+            <h1>함수형 프로그래밍에서 함수</h1>
+            <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+<div class="info">
+    Posted on November 23, 2022
+    
+</div>
+
+<p>(미완성 글입니다.)<br />
+쓸모 없는 글일지, 어떨지 잘 모르겠습니다. 목표는, 함수의 숨은 뜻과 고차 함수를 활용하는 다양한 관용구idiom를 정리하는 것입니다. 고차 함수의 활용은 OOP의 GOF패턴 같은 패턴이라기보다, 그보다 더 기본에 가까운 도구들입니다. 이 도구들의 활용이 익숙해져야 각 종 고급 개념들을 보는데 도움이 됩니다.</p>
+<p>단순히 무엇을 매핑한다는 정도의 함수 정의만 봐서는 금방 머리에 들어오지 않는 내용들입니다. 사실은 하스켈 말고 만지는 함수형 언어가 없어, 하스켈에서의 함수라 해야 맞긴 한데요. 작성하고 보니, 다른 함수형에도 해당하는 것 같아 제목을 지금처럼 바꿨습니다.</p>
+<p>아직 아래처럼 정리한 내용을 본 적은 없지만, 비전공자가 해석 머리를 갖는데 중요한 역할을 하고 있습니다.</p>
+<h2 id="왜-값이-아닌-함수를-주고-받을까">왜 값이 아닌 함수를 주고 받을까?</h2>
+<p>값으로 받지 않고, 함수로 주고 받았다는 건 어떤 의미가 있을까요?</p>
+<h3 id="준비-혹은-약속">준비 혹은 약속</h3>
+<p>함수란 아직 시작되지 않은 작업입니다. <em>인자를 주는 트리거</em>가 있어야 작업이 시작됩니다.(잠시 Lazy 개념은 치워두고 생각하겠습니다.) 어떤 변수든 람다 헤드에 걸어두면binding 실행되지 않고 인자를 기다리게 됩니다.</p>
+<p>순수 함수는 결과를 이어지는 함수가 받지 않으면 둘 곳도 없기 때문에, 미리 실행하면 안됩니다.</p>
+<p>예를 들면, 지금 당장 사용할 수 있는 값을 주는 게 아니라, “어떤 작업이 끝나면 쓸 수 있는, 약속(함수)”만 주는 겁니다.</p>
+<h3 id="미래의-값을-당겨-쓰기">미래의 값을 당겨 쓰기</h3>
+<p>매개 변수는 미래와 연결되는 곳입니다. 함수를 정의할 때, 아직 인자argument와 바인딩 없이 매개 변수parameter를 사용합니다. 이렇게 사용한 매개 변수는 미래에 어느날 (함수를 실행할 때) 인자와 바인딩이 될 것입니다. 이런 방식의 생각이 도움이 될 때도 있습니다.</p>
+<h3 id="합성해도-같은-타입">합성해도 같은 타입</h3>
+<p>다른 작업과 묶어서 하나의 작업처럼 처리할 수 있습니다. 함수를 받는 곳에는 여러 함수들을 합성composition한, 함수 엮음을 넘겨 줄 수도 있습니다. <code>(String -&gt; String)</code> 함수를 받는 곳에 <code>(Bool -&gt; String) . (Int -&gt; Bool) . (String -&gt; Int)</code> 이런 함수들도 넘길 수 있습니다.</p>
+<h3 id="캡슐화">캡슐화</h3>
+<p>값과 필요한 함수를, 즉 정보를 묶어서 다닐 수 있습니다.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ot">say ::</span> ((<span class="dt">String</span> <span class="ot">-&gt;</span> <span class="dt">String</span>) <span class="ot">-&gt;</span> <span class="dt">String</span>) <span class="ot">-&gt;</span> (<span class="dt">String</span> <span class="ot">-&gt;</span> <span class="dt">String</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>say needFunc <span class="ot">=</span> \name <span class="ot">-&gt;</span> needFunc (\s <span class="ot">-&gt;</span> name <span class="op">&lt;&gt;</span> <span class="st">&quot; says &quot;</span> <span class="op">&lt;&gt;</span> s <span class="op">&lt;&gt;</span> <span class="st">&quot;!&quot;</span>)</span></code></pre></div>
+<pre><code>ghci&gt; say (\f -&gt; f &quot;hi&quot;) &quot;Jack&quot;
+&quot;Jack says hi!&quot;
+ghci&gt; say (   (\f -&gt; f &quot;hi&quot;)   (\x -&gt; (\yf -&gt; yf (x &lt;&gt; &quot; everybody&quot;)))   ) &quot;Jack&quot;
+&quot;Jack says hi everybody&quot;
+
+ghci&gt; :t say (   (\f -&gt; f &quot;hi&quot;)   (\x -&gt; (\y -&gt; y (x &lt;&gt; &quot; everybody&quot;)))   )
+say (   (\f -&gt; f &quot;hi&quot;)   (\x -&gt; (\y -&gt; y (x &lt;&gt; &quot; everybody&quot;)))   )
+  :: String -&gt; String</code></pre>
+<p>원하는 만큼 함수도, 값도 안에 넣어 놓을 수 있습니다.</p>
+<h3 id="폴리모픽">폴리모픽</h3>
+<p>타입 클래스와 함께 쓰면, 컴파일러가 알아서 적당한 구현을 골라주는 ad-hoc polymorphic을 구현할 수 있습니다.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">HasName</span> a <span class="kw">where</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ot">  sound ::</span> <span class="dt">String</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Dog</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Cat</span> </span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">HasName</span> <span class="dt">Dog</span> <span class="kw">where</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  sound <span class="ot">=</span> <span class="st">&quot;멍&quot;</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">HasName</span> <span class="dt">Cat</span> <span class="kw">where</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  sound <span class="ot">=</span> <span class="st">&quot;야옹&quot;</span></span></code></pre></div>
+<pre><code>ghci&gt; sound @Dog
+&quot;멍!&quot;
+ghci&gt; sound @Cat
+&quot;야옹!&quot;</code></pre>
+<h3 id="반복-작업-추상화">반복 작업 추상화</h3>
+<p>함수를 데이터 타입안에 넣어버리면, 함수 합성을 할 때, 항상 특정 동작을 하도록 할 수 있습니다.</p>
+<p>타입이 없는 함수는 보통 특별한 동작 없이 합성합니다.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ot">noTypeF1 ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>noTypeF1 n <span class="ot">=</span> n <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="ot">noTypeF2 ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>noTypeF2 n <span class="ot">=</span> n <span class="op">-</span> <span class="dv">1</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="ot">compNoType ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>compNoType <span class="ot">=</span> noTypeF2 <span class="op">.</span> noTypeF1</span></code></pre></div>
+<p>만일 <em>이런 류</em>의 함수를 합성할 때, 항상 어떤 작업을 하고 싶다면 <code>SomeType</code>으로 감싸서, 앞으로 이 타입을 합성할 때는 특정한 일을 할거라는 걸(혹은 해야만 된다는 걸) 하스켈에게 알려줄 수 있습니다.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">SomeType</span> a <span class="ot">=</span> <span class="dt">SomeType</span> (<span class="dt">Int</span> <span class="ot">-&gt;</span> a)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="ot">someTypeF1 ::</span> <span class="dt">SomeType</span> <span class="dt">Int</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>someTypeF1 <span class="ot">=</span> noTypeF1</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="ot">someTypeF2 ::</span> <span class="dt">SomeType</span> <span class="dt">Int</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>someTypeF2 <span class="ot">=</span> noTypeF2</span></code></pre></div>
+<p>예를 들어, 합성할 때마다, 첫 계산 이 후부터는 <code>1000</code>씩 보너스를 준다면</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ot">combinator ::</span> <span class="dt">SomeType</span> a <span class="ot">-&gt;</span> <span class="dt">SomeType</span> a <span class="ot">-&gt;</span> <span class="dt">SomeType</span> a</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>combinator (<span class="dt">SomeType</span> f1) (<span class="dt">SomeType</span> f2) <span class="ot">=</span> \n <span class="ot">-&gt;</span> f2 <span class="op">$</span> (f1 n) <span class="op">+</span> <span class="dv">1000</span></span></code></pre></div>
+<p>이런 컴비네이터를 이용해 합성할 수 있습니다.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>compSomeType <span class="ot">=</span> someTypeF2 <span class="ot">`combinator`</span> someTypeF1</span></code></pre></div>
+<p>별도의 타입을 만든다는 건, 그 타입만이 가지는 속성에 의존해서 돌아가는 함수(메소드)가 필요하기 때문입니다. 값이 됐든, 함수가 됐든 상관이 없습니다. 생성자로 감싸wrap 놓으면, 반드시 어떤 절차를 거쳐야만 벗길unwrap 수 있습니다.</p>
+<p>또한, 타입 체킹하는데도 도움을 줍니다.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">SomeType</span> a <span class="ot">=</span> <span class="dt">SomeType</span> (<span class="dt">Int</span> <span class="ot">-&gt;</span> a)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="ot">someTypeF1 ::</span> <span class="dt">SomeType</span> <span class="dt">Int</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>someTypeF1 <span class="ot">=</span> <span class="dt">SomeType</span> noTypeF1</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="ot">someTypeF2 ::</span> <span class="dt">SomeType</span> <span class="dt">Int</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>someTypeF2 <span class="ot">=</span> <span class="dt">SomeType</span> noTypeF2</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="ot">noTypeF1 ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>noTypeF1 n <span class="ot">=</span> n <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a><span class="ot">noTypeF2 ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>noTypeF2 n <span class="ot">=</span> n <span class="op">-</span> <span class="dv">1</span></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a><span class="ot">compNoType ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>compNoType <span class="ot">=</span> noTypeF2 <span class="op">.</span> noTypeF1</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a><span class="ot">combinator ::</span> <span class="dt">SomeType</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">SomeType</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">SomeType</span> <span class="dt">Int</span> </span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>combinator (<span class="dt">SomeType</span> f1) (<span class="dt">SomeType</span> f2) <span class="ot">=</span> <span class="dt">SomeType</span> <span class="op">$</span> \n <span class="ot">-&gt;</span> f2 <span class="op">$</span> (f1 n <span class="op">+</span> <span class="dv">1000</span>) <span class="op">+</span> <span class="dv">2000</span></span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>compSomeType <span class="ot">=</span> someTypeF2 <span class="ot">`combinator`</span> someTypeF1</span></code></pre></div>
+<pre><code>ghci&gt; let runSomeType (SomeType f) = \n -&gt; f n
+ghci&gt; runSomeType compSomeType 1
+1001</code></pre>
+<h3 id="로컬-스코프를-만들-수-있다.">로컬 스코프를 만들 수 있다.</h3>
+<p><span class="citation" data-cites="todo">@todo</span> 감싼nested람다 함수 헤드에 있는 변수들을, 타 언어의 전역 변수나 한정된 모듈 혹은 블록에서 유효한 변수처럼 사용하는 예시 추가할 것</p>
+<h2 id="todo-계속-함수의-속성을-추가할-예정입니다."><span class="citation" data-cites="TODO">@TODO</span> 계속 함수의 속성을 추가할 예정입니다.</h2>
+<p>함수를 연결 연결해서 프로그램의 흐름을 만들어 내는 함수형에서는, 굉장히 중요한 특징들입니다. 순수형 함수만 쓸 수 있을 때는 더더욱 중요한 특징들입니다. <em>튜링 완전한 프로그램을 함수형으로 만들 수 있는 이유는, 역시 함수</em>에 있습니다. 명령형 프로그래밍과는 다른 완전 개념들를 채워진 세계처럼 얘기하지만, 꼭 그렇지만은 않습니다. 예를 들면, 보통 함수형 프로그래밍 입문서들이, 한 번 정해지면 바뀔 수 없는 불변immutable 변수만 있는 것처럼 얘기하지만, 사실은 다른 형태로 동일한 목적을 달성하는 방법을 만들어 두었습니다.</p>
+<p>조금 더 특징들이 손에 잡히면 같이 올리려 했는데, 지금 내용만으로도 충분히 중요하단 생각이 들어 미완성이지만 일단 올려 둡니다.</p>
+
+<div class="comment">
+<script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
+</script>
+</div>
+<div style="text-align:right">Github 계정이 없는 분은 메일로 보내주세요. lionhairdino at gmail.com </div>
+        </div>
+        <nav class="toc toc-right js-toc relative z-1 transition--300 absolute pa4 pt5 is-position-fixed"></nav>
+        <div id="footer">
+            © 2022 lionhairdino. All rights reserved. Generated by <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+        <script>
+            tocbot.init({
+                tocSelector: '.js-toc',
+                contentSelector: '.js-toc-content',
+                headingSelector: 'h2, h3',
+                hasInnerContainers: true,
+            });
+        </script>
+    </body>
+</html>
