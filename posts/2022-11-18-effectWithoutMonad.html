@@ -81,11 +81,11 @@
     
 </div>
 
-<p>Effect와 모나드 시리즈
-1. Effect란?
-1. <strong>모나드 없이 Maybe, State 해결하기</strong>
-1. 모나드 없이 List [], Logger 해결하기
-1. Functor로 다른 세계로 옮기기
+<p>Effect와 모나드 시리즈<br />
+1. Effect란?<br />
+1. <strong>모나드 없이 Maybe, State 해결하기</strong><br />
+1. 모나드 없이 List [], Logger 해결하기<br />
+1. Functor로 다른 세계로 옮기기<br />
 1. Functor로 Effect 코드를 추상화하면 모나드가 보인다</p>
 <p>결국, 모나드로 가는 발판으로 삼으려고 쓰는 글이지만, 이 글만 보면 Effect 감을 잡는게 목표입니다. 무엇을 Effect라 하고, Effect를 해결하는 코드 모양은 어떻게 나올 수 있는가를 보려 합니다.</p>
 <h2 id="첫-번째-maybe">첫 번째, Maybe</h2>
@@ -150,10 +150,11 @@
 <div class="sourceCode" id="cb19"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="ot">(&gt;&gt;&gt;&gt;) ::</span> <span class="dt">State</span> <span class="dt">Double</span> <span class="dt">Compensation</span> <span class="ot">-&gt;</span> (<span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">State</span> <span class="dt">Double</span> <span class="dt">Compensation</span>) <span class="ot">-&gt;</span> <span class="dt">State</span> <span class="dt">Double</span> <span class="dt">Compensation</span></span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> res1 <span class="ot">=</span> f1 <span class="fl">100.0</span></span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a> <span class="kw">in</span> res1 <span class="op">&gt;&gt;&gt;&gt;</span> f2 <span class="op">&gt;&gt;&gt;&gt;</span> f3</span></code></pre></div>
-<p>의도적으로 <code>combinator</code>의 실제 구현은 주석에 넣어 놨습니다. <a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a></p>
+<p>역시, 의도적으로 <code>combinator</code>의 실제 구현은 주석에 넣어 놨습니다. <a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a></p>
 <p>첫 번째 예시 <code>Maybe</code>와 <code>State</code>의 다른 점을 확인해 보시기 바랍니다. <code>Maybe</code> 예시와 <code>State</code> 예시의 공통점을 인지하고, Effect가 뭔지 감을 잡는 게 이 글의 목표입니다. 둘 다 <em>함수 서명에 드러나지 않는 Effect를 combinator를 통해 합성</em>하며 해결하고 있습니다.</p>
 <h2 id="결론">결론</h2>
 <p>아직, 위의 예시 둘 다 모나드는 아닙니다. 여기서는 모나드 없이 Effect를 개별적으로 어떻게 해결하는지를 보는 게 목적입니다. 모나드를 도입 전에도 Effect 개념은 있었으며, Effect 훈련이 충분히 된 상태에서 모나드를 만났을 것이다란 상상입니다. 그냥, 천재여서 훈련이 필요 없었을 가능성도 물론 존재하지만요.</p>
+<p>※ 나중 마지막 글에 넣을 최종 결론을 일부 먼저 살펴보면, 위 얘기에 하스켈의 모나드 “클래스”를 쓰지는 않았지만, 모나드 “개념”은 이미 존재합니다. Effect가 모나드고, 모나드가 Effect입니다. 같은 개념, 대상, 상황을 서로 다른 학문에서 기술했다고 볼 수 있습니다. 프로그래밍에서는 Effect란 말을 쓰고, 수학에서는 Monad란 말을 썼을 뿐, 두 개가 지칭하는 개념은 서로 같습니다.</p>
 <section class="footnotes" role="doc-endnotes">
 <hr />
 <ol>
