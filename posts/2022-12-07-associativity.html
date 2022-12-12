@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko" lang="ko">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <title>lionhairdino - 결합 법칙</title>
+
+        <meta name="description" content="lionhairdino - 결합 법칙" />
+        <meta property="og:description" content="하스켈 함수형 프로그래밍" />
+
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <link rel="icon" href="https://lionhairdino.github.io/favicon.svg" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino16px.png" sizes="16x16" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino24px.png" sizes="24x24" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino32px.png" sizes="32x32" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino48px.png" sizes="48x48" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino57px.png" sizes="57x57" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino60px.png" sizes="60x60" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino64px.png" sizes="64x64" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino72px.png" sizes="72x72" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino76px.png" sizes="76x76" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino114px.png" sizes="114x114" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino120px.png" sizes="120x120" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino144px.png" sizes="144x144" />
+        <link rel="shortcut icon" href="../favicon.ico" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino152px.png" sizes="152x152" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino180px.png" sizes="180x180" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino192px.png" sizes="192x192" />
+        <link rel="manifest" href="../site.webmanifest" />
+        <link rel="mask-icon" href="https://lionhairdino.github.io/Lionhairdino_black.svg" color="#ff7500" />
+        <meta name="msapplication-TileImage" content="/images/favicon/Lionhairdino144px.png" />
+        <meta name="msapplication-TileColor" content="#ff7500" />
+        <meta name="theme-color" content="#ffffff" />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="결합 법칙" />
+        <meta property="og:site_name" content="Lionhairdino" />
+        <meta property="og:url" content="https://lionhairdino.github.io/posts/2022-12-07-associativity.html" />
+
+        <meta property="og:image" content="https://lionhairdino.github.io/images/state400px.png" />
+
+      <meta name="keywords" content="결합 법칙, Monad, Associativity">
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-E9WZ6VXGHP"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-E9WZ6VXGHP');
+</script>
+<script src="../script/copycode.js"></script>
+<script async src="https://cse.google.com/cse.js?cx=9c53b4915cbb2605c"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.11.1/tocbot.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.11.1/tocbot.css" />
+    </head>
+    <body>
+        <div id="header">
+            <div style="display:inline-block;margin-right:5px;padding-top: 5px;" id="logo">
+                <a href="../"><img style="width:30px;border:none" src="../images/favicon/Lionhairdino48px.png"></a>
+            </div>
+            <div style="display:inline-block;vertical-align: top;padding-top:5px;" id="navigation">
+                <a href="../">lionhairdino</a>
+                <a href="../about.html">about</a>
+                <!--<a href="/archive.html">archive</a>-->
+            </div>
+            <div style="display:inline-block;font-size:0.8em;vertical-align: top;">
+                <div style="display:inline-block;vertical-align: top;padding-top: 5px">사이트내 검색</div>
+                <div style="display:inline-block;width:180px;"> 
+                    <div class="gcse-searchbox-only"></div>
+                </div>
+            </div>
+            <div>
+                여기 글들은 일종의 질문입니다. 용어 선택도 학계, 업계에서 쓰는 걸로 되어 있지 않고, 틀린 내용이 있을 수도 있습니다.
+            </div>
+        </div>
+        <div class="js-toc-content">
+            <h1>결합 법칙</h1>
+            <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+<div class="info">
+    Posted on December  7, 2022
+    
+</div>
+
+<p>어떤 구조가 교환 법칙을 만족한다든지, 결합 법칙을 만족한다든지 하면 어떤 효과가 있을까요?</p>
+<ul>
+<li>교환 법칙을 만족하면 실행 시점과 순서도 자유롭지만,</li>
+<li>결합 법칙을 만족하면 실행 시점엔 자유롭지만, 순서는 자유롭지 못합니다.</li>
+</ul>
+<p>프로그래밍에선 결합 법칙이 있고, 항등원이 있는 모노이드가 매우 중요한 대접을 받고 있습니다. 왜 그럴까요?</p>
+<p>실행 시점에 자유롭지만 순서는 지켜야 하는 구조가 주는 이점을 고민해 봤습니다. (역시나, 관련 텍스트나 언급하는 자료들을 거의 볼 수 없어 상상 반입니다.)</p>
+<h2 id="결합-법칙을-따르지-않으면">결합 법칙을 따르지 않으면?</h2>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>f1 <span class="ot">=</span> \x <span class="ot">-&gt;</span> x <span class="op">*</span> <span class="dv">2</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>f2 <span class="ot">=</span> \x <span class="ot">-&gt;</span> x <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>f3 <span class="ot">=</span> \x <span class="ot">-&gt;</span> x <span class="op">+</span><span class="dv">10</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>odot f1 f2 <span class="ot">=</span> \x <span class="ot">-&gt;</span> f2 (f1 x)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>ndot f1 f2 <span class="ot">=</span> \x <span class="ot">-&gt;</span> f2 (f1 <span class="op">$</span> x <span class="op">+</span> <span class="dv">2</span>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span> <span class="op">$</span> (f1 <span class="ot">`odot`</span> f2) <span class="ot">`odot`</span> f3  <span class="op">$</span> <span class="dv">1</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span> <span class="op">$</span>  f1 <span class="ot">`odot`</span> (f2 <span class="ot">`odot`</span> f3) <span class="op">$</span> <span class="dv">1</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span> <span class="op">$</span> (f1 <span class="ot">`ndot`</span> f2) <span class="ot">`ndot`</span> f3  <span class="op">$</span> <span class="dv">1</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span> <span class="op">$</span>  f1 <span class="ot">`ndot`</span> (f2 <span class="ot">`ndot`</span> f3) <span class="op">$</span> <span class="dv">1</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> main</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="dv">13</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="dv">13</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="dv">21</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="dv">19</span></span></code></pre></div>
+<p><code>odot</code>은 결합 법칙이 성립하지만, <code>ndot</code>은 그렇지 않습니다.<br />
+※ odot은 original dot (.)을 의미하고, ndot은 new dot이란 의미입니다.</p>
+<h2 id="effect가-만들어지는-순간에는-이전-effect에-의존하지-않아야-한다.">effect가 만들어지는 순간에는 이전 effect에 의존하지 않아야 한다.</h2>
+<p>bind의 경우 결합 법칙을 만족하려면, 새로 effect가 만들어 질 때는 어디에도 의존하지 않고 effect가 만들어져야 합니다. bind 타입을 봐도 알 수 있습니다. 두 번 째 인자로 effect를 새로 만드는 <code>a -&gt; m b</code> 함수를 받는데, <code>m</code>은 이 전 effect에 의존하지 않고 만들어집니다. 만일, 이전 effect에 의존한다면 <code>m a -&gt; m b</code> 함수 모양이었을 겁니다.</p>
+<p>값을 받기 전 함수들을 먼저 Compose한 걸 함수에 넘겨 주거나 받기 어렵습니다. 즉 고차 함수에 쓰기 어렵습니다.</p>
+<p>아직 들어오지 않은(알지 못한 값에 의존하는) 경우와 그렇지 않은 경우의 차이를 보겠습니다. 말만 들어서는 금방 이해가지 않을 수 있습니다. 아래 예를 보겠습니다.</p>
+<p><code>odot</code>은 결합 법칙이 성립하지만, <code>ndot</code>은 그렇지 않습니다.</p>
+<p>-&gt; f3 ( (-&gt; f2 (f1 $ y + 2)) $ x + 2)
+*2
++1
++10
+1을 넣으면 결과는 21</p>
+<p>-&gt; (-&gt; f3 (f2 $ y + 2)) (f1 $ x + 2)
+*2
++1
++10
+1을 넣으면 결과는 19</p>
+<p>f1, f2, f3 실행 순서는 둘 다 같지만, ndot이 +2를 몇 번 하고 시작하는지가 다릅니다.</p>
+
+<div class="comment">
+<script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
+</script>
+</div>
+<div style="text-align:right">Github 계정이 없는 분은 메일로 보내주세요. lionhairdino at gmail.com </div>
+        </div>
+        <nav class="toc toc-right js-toc relative z-1 transition--300 absolute pa4 pt5 is-position-fixed"></nav>
+        <div id="footer">
+            © 2022 lionhairdino. All rights reserved. Generated by <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+        <script>
+            tocbot.init({
+                tocSelector: '.js-toc',
+                contentSelector: '.js-toc-content',
+                headingSelector: 'h2, h3',
+                hasInnerContainers: true,
+            });
+        </script>
+    </body>
+</html>
