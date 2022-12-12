@@ -82,32 +82,45 @@
 </div>
 
 <p>Applicative Functor 또는 줄여서 Applicatives라 부릅니다.<br />
-Applicatives의 기본 개념은 <a href="http://learnyouahaskell.com/functors-applicative-functors-and-monoids">learnyouahaskell</a>를 참고해 주시고, 여기서는 Applicatives와 Monad의 다른 점을 주로 보겠습니다. 저는 하스켈 학교 디스코드 서버에서 두 개가 어떻게 다른가란 질문만 하고, Ailrun님, 재원님, 준규님, 기정님, 찬우님이 답변해 주신 것들을 정리한 글입니다. 답변해 주신 모든분께 감사드리고, 특히 최종 결론에 이르도록 많은 도움을 주신 Ailrun님께 감사드립니다.</p>
+Applicatives의 기본 개념은 <a href="http://learnyouahaskell.com/functors-applicative-functors-and-monoids">learnyouahaskell</a>를 참고해 주시고, 여기서는 Applicatives와 Monad의 다른 점을 주로 보겠습니다.</p>
+<blockquote>
+<p>타입으로 읽기<br />
+2022-12-12 추가<br />
+</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">m</span> a, a <span class="at">-</span><span class="op">&gt;</span> m b</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">f</span> a, a <span class="er">(</span><span class="ex">a</span> <span class="at">-</span><span class="op">&gt;</span> b<span class="kw">)</span></span></code></pre></div>
+<p>모나드와 applicative를 타입으로 읽어 보겠습니다.</p>
+<p>의존성은 함수로 표현됩니다. <code>b</code>가 <code>a</code>에 의존한다면 <code>a -&gt; b</code> 함수로 표현됩니다. <code>a</code>에 의존해서 <code>b</code>를 만들어낸다고 볼 수도 있습니다.</p>
+<p>모나드에는 <code>m a</code>로, <code>m</code> 하나를 인자로 받고, <code>a -&gt; m b</code>가 있으니, <code>a</code>에 의존해서 새로운 <code>m</code> effect를 만듭니다. 반면 Applicative는 <code>f a</code>로 <code>f</code>하나, <code>f (a -&gt; b)</code>로 <code>f</code> 하나, 이렇게 두 개를 받습니다. <em>새로 만들어지는 m이 없습니다.</em> 타입만으로 읽을 수 있는 가장 큰 차이입니다.</p>
+<p>모나드도 <code>m</code> 두 개를 하나로 만들어 내보내고, Applicative도 <code>f</code> 두 개를 하나로 만들어 내보내는 건 같습니다.</p>
+</blockquote>
+<p>저는 하스켈 학교 디스코드 서버에서 두 개가 어떻게 다른가란 질문만 하고, Ailrun님, 재원님, 준규님, 기정님, 찬우님이 답변해 주신 것들을 정리한 글입니다. 답변해 주신 모든분께 감사드리고, 특히 최종 결론에 이르도록 많은 도움을 주신 Ailrun님께 감사드립니다.</p>
 <h2 id="moi와-state">Moi와 State</h2>
-<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- Moi Applicative Functor @준규: State스러운 Applicatives</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">Moi</span> s a <span class="ot">=</span> <span class="dt">Moi</span> {<span class="ot"> runMoi ::</span> s <span class="ot">-&gt;</span> (a, s) }</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="dt">Moi</span> moifunc <span class="op">&lt;*&gt;</span> <span class="dt">Moi</span> moiarg <span class="ot">=</span> <span class="dt">Moi</span> <span class="op">$</span> \state0 <span class="ot">-&gt;</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> (func, state1) <span class="ot">=</span> moifunc state0</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>      (arg, state2) <span class="ot">=</span> moiarg state1</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="kw">in</span>  (func arg, state2)</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>       <span class="op">^^^^^^^^</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>        apply</span></code></pre></div>
-<p><code>&lt;*&gt;</code> 체인을 거치면서 바뀐 <code>state2</code>를 반환합니다.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- State Monad</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">State</span> s a <span class="ot">=</span> <span class="dt">State</span> {<span class="ot"> runState ::</span> s <span class="ot">-&gt;</span> (a,s) }</span>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- Moi Applicative Functor @준규: State스러운 Applicatives</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">Moi</span> s a <span class="ot">=</span> <span class="dt">Moi</span> {<span class="ot"> runMoi ::</span> s <span class="ot">-&gt;</span> (a, s) }</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>(<span class="dt">State</span> statefunc) <span class="op">&gt;&gt;=</span> make_st <span class="ot">=</span> <span class="dt">State</span> <span class="op">$</span> \state0 <span class="ot">-&gt;</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> (val, state1) <span class="ot">=</span> statefunc state0</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>      (<span class="dt">State</span> newfunc) <span class="ot">=</span> make_st val</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="kw">in</span>  newfunc state1</span></code></pre></div>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="dt">Moi</span> moifunc <span class="op">&lt;*&gt;</span> <span class="dt">Moi</span> moiarg <span class="ot">=</span> <span class="dt">Moi</span> <span class="op">$</span> \state0 <span class="ot">-&gt;</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> (func, state1) <span class="ot">=</span> moifunc state0</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>      (arg, state2) <span class="ot">=</span> moiarg state1</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="kw">in</span>  (func arg, state2)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>       <span class="op">^^^^^^^^</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>        apply</span></code></pre></div>
+<p><code>&lt;*&gt;</code> 체인을 거치면서 바뀐 <code>state2</code>를 반환합니다.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- State Monad</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">State</span> s a <span class="ot">=</span> <span class="dt">State</span> {<span class="ot"> runState ::</span> s <span class="ot">-&gt;</span> (a,s) }</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>(<span class="dt">State</span> statefunc) <span class="op">&gt;&gt;=</span> make_st <span class="ot">=</span> <span class="dt">State</span> <span class="op">$</span> \state0 <span class="ot">-&gt;</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> (val, state1) <span class="ot">=</span> statefunc state0</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>      (<span class="dt">State</span> newfunc) <span class="ot">=</span> make_st val</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="kw">in</span>  newfunc state1</span></code></pre></div>
 <p><code>&gt;&gt;=</code> 체인을 거치면서 바뀐 <code>state1</code>에 <strong><em>새로 생성된 함수를 적용</em></strong>해서 새로운 <code>state</code>를 반환합니다.</p>
 <p>추상화해서 말하면, 계산 결과가 Effect에 영향을 주느냐 아니냐의 차이가 있습니다. Monad는 계산 결과를 Effect에 반영할 수 있고, Applicatives는 그렇게 할 수 없습니다. <span class="citation" data-cites="Ailrun">@Ailrun</span></p>
 <p><code>Moi</code> 구현에선 <code>state1</code>, <code>state2</code>를 통해 모나드처럼 실행 순서가 생겨, 이게 일반적인 속성으로 오해할 수 있는데, 순서는 Applicatives의 일반적인 특징은 아닙니다. <code>join</code>의 경우 <code>m (m a)</code>이니 바깥 <code>m</code>이 안의 <code>m</code>을 감싸고 있으니 의존도가 생기지만, <code>&lt;*&gt;</code>의 경우 <code>f(a -&gt; b) -&gt; f a -&gt; ...</code>에서 두 <code>f</code>는 서로 의존성을 가질 필요가 없습니다. <span class="citation" data-cites="재원">@재원</span></p>
 <p>위에 <code>&lt;*&gt;</code>의 구현을 보면서 <code>state</code>를 주고 받는 것에 정신이 팔렸는데, <code>&lt;*&gt;</code>의 목적은 끝에 <code>func arg</code>, 즉 <code>apply</code>입니다.</p>
 <h2 id="reader의-와">Reader의 &lt;*&gt;와 &gt;&gt;=</h2>
-<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>g <span class="op">&gt;&gt;=</span> f <span class="ot">=</span> \x <span class="ot">-&gt;</span> f (g x) x <span class="co">-- f :: a -&gt; (r -&gt; b)</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>f <span class="op">&lt;*&gt;</span> g <span class="ot">=</span> \x <span class="ot">-&gt;</span> f x (g x) <span class="co">-- f :: r -&gt; (a -&gt; b)</span></span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>g <span class="op">&gt;&gt;=</span> f <span class="ot">=</span> \x <span class="ot">-&gt;</span> f (g x) x <span class="co">-- f :: a -&gt; (r -&gt; b)</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>f <span class="op">&lt;*&gt;</span> g <span class="ot">=</span> \x <span class="ot">-&gt;</span> f x (g x) <span class="co">-- f :: r -&gt; (a -&gt; b)</span></span></code></pre></div>
 <p>둘이 거의 같아 보이지 않나요? 인자 순서만 좀 다르고 하는 일은 같은 걸로 보입니다. 저는 샘플 인스턴스를 찾아 볼 때, 이 걸 보는 바람에 잠깐동안 Applicatives도 Effect를 합성하는 것이 아닐까 생각했습니다. Reader 모나드의 Effect는 외부 스코프 변수를 참조하는 것입니다. (물론, 하스켈에서는 실제로 현재 함수의 스코프를 벗어나는 값에 접근하는 게 아니라, 외부 스코프인 척 하는 값을 컴비네이터<code>bind</code>가 끌고 다닙니다.) 이 값을 <code>r</code>이라고 할 때, <code>r</code>을 두 번 받는 Effect를 합치면 <code>r</code>을 한 번 받도록 만들면 됩니다. <code>r</code>을 한 번만 받아서 컴비네이터가 두 번 써먹으면 되게 만든게 바로 Reader의 <code>join</code>입니다. <code>bind</code>는 이 <code>join</code>을 이용합니다. 위 소스를 보시면 <code>\x -&gt; ...</code> 로 둘 다 한 번만 <code>r</code>을 받고, <code>g</code>에 한 번, <code>f</code>에 한 번 써먹고 있습니다. 이 코드를 보면서 <code>&lt;*&gt;</code>도 바인드와 비슷하게 Effect를 합성하는구나로 오해 했습니다.</p>
 <p>Applicatives의 속성은 Effect를 합성하는 걸 강요하지 않습니다. 물론, 합성해도 됩니다만, 합성을 하냐 안하냐는 Applicatives의 속성이 아닙니다. Applicatives를 공부하면서 기존 인스턴스<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>를 찾아봤는데, 하필 모나드이기도 한 것들만 찾아 보는 바람에 Applicatives도 Effect를 합성하는 일종이라 오해했습니다. 대부분 모나드이기도 한 Applicatives는 Effect를 모나드와 비슷하게 합성하고, 마지막에만 apply가 나타납니다. 모나드에 있는 <code>ap</code>로 <code>&lt;*&gt;</code>를 구현하기도 하고, <code>&gt;&gt;=</code>로도 <code>&lt;*&gt;</code>를 구현할 수 있습니다.</p>
 <h2 id="applicatives는-effect를-다루는가">Applicatives는 Effect를 다루는가</h2>
@@ -115,28 +128,28 @@ Applicatives의 기본 개념은 <a href="http://learnyouahaskell.com/functors-a
 <h2 id="의-타입">&lt;*&gt;의 타입</h2>
 <p>※ 아래는 모나드에서 다루는 Effect와는 반드시 같지 않을 수 있기에 Effect Like라고 임시 표기했는데, 특별한 이름 없이 Applicative Effect라 부르기도 합니다.</p>
 <p>타입만 보고도 추론할 수 있는게 있습니다.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ot">(&lt;*&gt;) ::</span> f(a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> f a <span class="ot">-&gt;</span> f b</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>         <span class="op">^^^^^^^^^</span>    <span class="op">^^^</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>            함수       값</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ot">(&lt;*&gt;) ::</span> f(a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> f a <span class="ot">-&gt;</span> f b</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>         <span class="op">^^^^^^^^^</span>    <span class="op">^^^</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>            함수       값</span></code></pre></div>
 <p>이름 그대로, Effect Like를 가진 함수를 Effect Like를 가진 값에 적용apply하는 컴비네이터입니다.</p>
 <p>Effect Like를 가지고 있는 함수 <code>f (a -&gt; b)</code>와 Effect Like를 가진 <code>f a</code>를 받아서 <code>f b</code>를 만들어 내려면, 어찌됐건 <code>a</code>에 <code>a -&gt; b</code>를 적용해서 <code>b</code>를 얻어야 합니다. 그럼 <code>f</code> 두 개가 있는데, 어느 <code>f</code>가 가지고 있던 Effect Like를 살려야 할까요? 모나드의 바인드는 (편의상, 다 같은 <code>m</code>이지만 번호를 붙이겠습니다.) <code>m1 a -&gt; (a -&gt; m2 b) -&gt; m3 b</code>에서 <code>m1</code>이 이미 있고, <code>m2</code>가 새로 생깁니다. 그럼, 이 두 개의 Effect를 합쳐join서 <code>m3</code>를 만들어 냅니다. <code>&lt;*&gt;</code>도 Effect Like를 합칠까요? 답은, 합쳐도 되고, 버려도 되고, 둘 중 하나를 골라도 되고, 따로 Applicatives가 되기 위한 제약은 없습니다.</p>
 <p>※ Theorem for free로 유니크한 <code>&lt;*&gt;</code>가 정의되는 걸 보일 수 있다하니 신기하기도 합니다. 타입만으로 구현이 정해진다는 게 신기하다까지만 보고 넘어간 상태인데, 언젠가 자세히 봐야겠습니다.</p>
 <h2 id="리스트의-와">리스트의 &lt;*&gt;와 &gt;&gt;=</h2>
-<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> [(\x <span class="ot">-&gt;</span> <span class="fu">replicate</span> x <span class="dv">1</span>)] <span class="op">&lt;*&gt;</span> [<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>]</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>[[<span class="dv">1</span>],[<span class="dv">1</span>,<span class="dv">1</span>],[<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>]]</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> [(\x <span class="ot">-&gt;</span> <span class="fu">replicate</span> x <span class="dv">1</span>)] <span class="op">&lt;*&gt;</span> [<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>]</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>[[<span class="dv">1</span>],[<span class="dv">1</span>,<span class="dv">1</span>],[<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>]]</span></code></pre></div>
 <p>위와 비슷하지만, <code>join</code>이 동작해서 <code>[[]]</code>를 <code>[]</code>로 만듭니다.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- @찬우: Applicatives가 할 수 없는 일</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> [<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>] <span class="op">&gt;&gt;=</span> \x <span class="ot">-&gt;</span> <span class="fu">replicate</span> x <span class="dv">1</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>]</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- @찬우: Applicatives가 할 수 없는 일</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> [<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>] <span class="op">&gt;&gt;=</span> \x <span class="ot">-&gt;</span> <span class="fu">replicate</span> x <span class="dv">1</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>]</span></code></pre></div>
 <h2 id="병렬-작업">병렬 작업</h2>
 <p><code>&lt;*&gt;</code>로 엮은 체인에서 실행 순서는 따로 정해져 있지 않습니다. 물론, Moi나 State처럼 순서가 생기도록 할 수도 있지만, 일반적인 경우는 아닙니다. 따로, 실행 순서에 대한 제약은 없으니 병렬 작업을 표현하는데도 Applicatives를 활용할 수 있습니다.</p>
 <p>아래는 Ailrun님이 예를 들어 주신 <code>Concurrently</code> 타입입니다.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>testFunc <span class="ot">=</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  runConcurrently</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="op">$</span> (,,)</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;$&gt;</span> <span class="dt">Concurrently</span> (<span class="fu">print</span> <span class="dv">1</span>)</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;*&gt;</span> <span class="dt">Concurrently</span> (<span class="fu">print</span> <span class="dv">2</span>)</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;*&gt;</span> <span class="dt">Concurrently</span> (<span class="fu">print</span> <span class="dv">3</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>testFunc <span class="ot">=</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  runConcurrently</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="op">$</span> (,,)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;$&gt;</span> <span class="dt">Concurrently</span> (<span class="fu">print</span> <span class="dv">1</span>)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;*&gt;</span> <span class="dt">Concurrently</span> (<span class="fu">print</span> <span class="dv">2</span>)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;*&gt;</span> <span class="dt">Concurrently</span> (<span class="fu">print</span> <span class="dv">3</span>)</span></code></pre></div>
 <h2 id="결론">결론</h2>
 <p>이름 그대로 함수를 어딘가에 적용하는 겁니다. 일반 함수를 위한 <code>($) :: (a -&gt; b) -&gt; a -&gt; b</code>처럼, 함수와 인자를 받아, 함수를 인자에 적용하는 일을 하는데, 단 함수와 인자가 Effect Like를 가지고 있습니다.</p>
 <p>일반적인 용도는 <a href="../posts/2020-07-02-Context.html">컨텍스트, Applicative Functor, Traversable</a>에서 일부 다루었습니다.</p>
@@ -162,19 +175,19 @@ Functor, Applicatives, Monad를 하나의 계보에 올려 놓고,<br />
 <blockquote>
 <p>Q. <code>bind</code>는 Effect합성을 하며 값이 Effect에 영향을 미칩니다. 어떻게 <code>bind</code>를 쓰면서 <code>&lt;*&gt;</code>를 구현할 수 있을까요?</p>
 <p>A. <code>bind</code>가 하는 일은 Effect를 합치는 일이지, 누가 무슨 Effect를 어떻게 만들어 내는가에는 관여하지 않습니다. bind <strong><em>컴비네이터</em></strong>는 Effect가 있는 <code>m a</code>와 Effect를 만들어내는 <code>a -&gt; m b</code>를 받아서 어떤 작업을 합니다. <em>어떻게 Effect를 만들어내느냐는</em> <code>bind</code>가 하는 일이 아닙니다. Effect를 만들어내는 건 인자로 들어오는 <code>a -&gt; m b</code>에 달렸습니다.</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ot">bind ::</span> m1 a <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> m2 b) <span class="ot">-&gt;</span> m3 b</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- (모두 똑같은 타입 `m`이지만 편의를 위해 숫자를 붙이겠습니다.)</span></span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ot">bind ::</span> m1 a <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> m2 b) <span class="ot">-&gt;</span> m3 b</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- (모두 똑같은 타입 `m`이지만 편의를 위해 숫자를 붙이겠습니다.)</span></span></code></pre></div>
 <p><code>bind</code>는 <code>m1 a</code>에서 <code>a</code>를 꺼내어 <code>f :: a -&gt; m2 b</code>를 적용하고, <code>m1</code>과 <code>m2</code>를 합처 <code>m3 b</code>를 반환합니다.<br />
 <code>f</code>의 서명을 보이는대로 해석하면 <code>m2</code>와 <code>b</code>는 <code>a</code>에 의존하고 있습니다. 그런데, *f 내부에서 a를 받아 <del>m2에 영향을 주지 않고 있다면</del> <code>m2</code>가 <code>return</code>이 만들었다든지 하는 trivial한 Effect만 가진다면, <code>bind</code>를 썼지만, 값이 Effect에 영향을 주지 않는 상태가 됩니다. <code>bind</code>를 썼기 때문에 반드시 값이 Effect에 영향을 미치고 있는 게 아니라, <code>f</code>가 어떤 동작을 하냐에 따라 다릅니다. Effect에 값이 영향을 미치면 안되는 Applicatives를 <code>bind</code>를 써서 구현할 수도 있다는 얘기입니다.</p>
 <p>State 모나드에서 <code>bind</code>로 <code>&lt;*&gt;</code>를 구현하는 걸 살펴 보겠습니다.</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- State의 &lt;*&gt;</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="dt">StateT</span> mf <span class="op">&lt;*&gt;</span> <span class="dt">StateT</span> mx <span class="ot">=</span> <span class="dt">StateT</span> <span class="op">$</span> \ s <span class="ot">-&gt;</span> <span class="kw">do</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>   <span class="op">~</span>(unwrapf, s') <span class="ot">&lt;-</span> mf s</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>   <span class="op">~</span>(unwrapx, s'') <span class="ot">&lt;-</span> mx s'</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>   <span class="fu">return</span> (unwrapf unwrapx, s'')</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="co">-- Lazy 패턴 매칭은 무시하고, `bind`의 동작을 살펴 보겠습니다.</span></span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>mf <span class="op">&gt;&gt;=</span> \(unwrapf, s') <span class="ot">-&gt;</span> mx <span class="op">&gt;&gt;=</span> \(unwrapx, s'') <span class="ot">-&gt;</span> <span class="fu">return</span> (unwrapf unwrapx, s'')</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- State의 &lt;*&gt;</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="dt">StateT</span> mf <span class="op">&lt;*&gt;</span> <span class="dt">StateT</span> mx <span class="ot">=</span> <span class="dt">StateT</span> <span class="op">$</span> \ s <span class="ot">-&gt;</span> <span class="kw">do</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>   <span class="op">~</span>(unwrapf, s') <span class="ot">&lt;-</span> mf s</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>   <span class="op">~</span>(unwrapx, s'') <span class="ot">&lt;-</span> mx s'</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>   <span class="fu">return</span> (unwrapf unwrapx, s'')</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="co">-- Lazy 패턴 매칭은 무시하고, `bind`의 동작을 살펴 보겠습니다.</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>mf <span class="op">&gt;&gt;=</span> \(unwrapf, s') <span class="ot">-&gt;</span> mx <span class="op">&gt;&gt;=</span> \(unwrapx, s'') <span class="ot">-&gt;</span> <span class="fu">return</span> (unwrapf unwrapx, s'')</span></code></pre></div>
 <p><code>\(unwrapf, s') -&gt; mx</code>는 패턴 바인딩으로 <code>mf</code>에서 <code>m</code>을 벗겨 <code>unwrapf</code>에 바인딩해 놓을 뿐 Effect에 영향을 미치는 동작이 없습니다.<br />
 <code>\(unwrapx, s'') -&gt; return (unwrapf unwrapx, s'')</code>는 패턴 바인딩으로 <code>mx</code>에서 <code>m</code>을 벗겨 <code>unwrapx</code>에 바인딩해 놓을 뿐 Effect에 영향을 미치는 동작이 없습니다.</p>
 </blockquote>
@@ -182,58 +195,58 @@ Functor, Applicatives, Monad를 하나의 계보에 올려 놓고,<br />
 <hr />
 <ol>
 <li id="fn1" role="doc-endnote"><p>Applicative 인스턴스이며 Monad인 예시</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Applicative</span> <span class="dt">STM</span> <span class="kw">where</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  (<span class="op">&lt;*&gt;</span>) <span class="ot">=</span> ap</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  liftA2 <span class="ot">=</span> liftM2</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Applicative</span> <span class="dt">IO</span> <span class="kw">where</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  (<span class="op">&lt;*&gt;</span>) <span class="ot">=</span> ap</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  liftA2 <span class="ot">=</span> liftM2</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>nstance <span class="dt">Applicative</span> <span class="dt">Maybe</span> <span class="kw">where</span></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  <span class="dt">Just</span> f  <span class="op">&lt;*&gt;</span> m       <span class="ot">=</span> <span class="fu">fmap</span> f m</span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  <span class="dt">Nothing</span> <span class="op">&lt;*&gt;</span> _m      <span class="ot">=</span> <span class="dt">Nothing</span></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  liftA2 f (<span class="dt">Just</span> x) (<span class="dt">Just</span> y) <span class="ot">=</span> <span class="dt">Just</span> (f x y)</span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>  liftA2 _ _ _ <span class="ot">=</span> <span class="dt">Nothing</span></span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Monoid</span> a <span class="ot">=&gt;</span> <span class="dt">Applicative</span> ((,) a) <span class="kw">where</span></span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>  (u, f) <span class="op">&lt;*&gt;</span> (v, x) <span class="ot">=</span> (u <span class="op">&lt;&gt;</span> v, f x)</span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>  liftA2 f (u, x) (v, y) <span class="ot">=</span> (u <span class="op">&lt;&gt;</span> v, f x y)</span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> (<span class="dt">Functor</span> m, <span class="dt">Monad</span> m) <span class="ot">=&gt;</span> <span class="dt">Applicative</span> (<span class="dt">StateT</span> s m) <span class="kw">where</span></span>
-<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>  <span class="dt">StateT</span> mf <span class="op">&lt;*&gt;</span> <span class="dt">StateT</span> mx <span class="ot">=</span> <span class="dt">StateT</span> <span class="op">$</span> \ s <span class="ot">-&gt;</span> <span class="kw">do</span></span>
-<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>      <span class="op">~</span>(f, s') <span class="ot">&lt;-</span> mf s</span>
-<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>      <span class="op">~</span>(x, s'') <span class="ot">&lt;-</span> mx s'</span>
-<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>      <span class="fu">return</span> (f x, s'')</span>
-<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a><span class="co">--            ^^^</span></span>
-<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a><span class="co">--           apply</span></span>
-<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Applicative</span> [] <span class="kw">where</span></span>
-<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>  fs <span class="op">&lt;*&gt;</span> xs <span class="ot">=</span> [f x <span class="op">|</span> f <span class="ot">&lt;-</span> fs, x <span class="ot">&lt;-</span> xs]</span>
-<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a><span class="co">--             ^^^</span></span>
-<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a><span class="co">--            apply</span></span>
-<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Applicative</span> ((<span class="ot">-&gt;</span>) r) <span class="kw">where</span>  </span>
-<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>  f <span class="op">&lt;*&gt;</span> g <span class="ot">=</span> \x <span class="ot">-&gt;</span> f x (g x)</span>
-<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a><span class="co">--                ^^^</span></span>
-<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a><span class="co">--               apply</span></span>
-<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> (<span class="dt">Functor</span> m, <span class="dt">Monad</span> m) <span class="ot">=&gt;</span> <span class="dt">Applicative</span> (<span class="dt">WriterT</span> w m) <span class="kw">where</span></span>
-<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>  <span class="dt">WriterT</span> mf <span class="op">&lt;*&gt;</span> <span class="dt">WriterT</span> mx <span class="ot">=</span> <span class="dt">WriterT</span> <span class="op">$</span> \ w <span class="ot">-&gt;</span> <span class="kw">do</span></span>
-<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a>      (f, w') <span class="ot">&lt;-</span> mf w</span>
-<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a>      (x, w'') <span class="ot">&lt;-</span> mx w'</span>
-<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a>      <span class="fu">return</span> (f x, w'')</span>
-<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a><span class="co">--            ^^^</span></span>
-<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a><span class="co">--           apply</span></span>
-<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a><span class="co">-- 참고</span></span>
-<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a><span class="co">-- 모나드에 있는 ap를 쓰지 않고 구현한다면 아래같이 ap와 똑같은 모양이 됩니다.</span></span>
-<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a><span class="co">--instance Applicative IO where</span></span>
-<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a><span class="co">--  a &lt;*&gt; b = do</span></span>
-<span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a><span class="co">--    f &lt;- a</span></span>
-<span id="cb4-51"><a href="#cb4-51" aria-hidden="true" tabindex="-1"></a><span class="co">--    x &lt;- b</span></span>
-<span id="cb4-52"><a href="#cb4-52" aria-hidden="true" tabindex="-1"></a><span class="co">--    return (f x)</span></span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Applicative</span> <span class="dt">STM</span> <span class="kw">where</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  (<span class="op">&lt;*&gt;</span>) <span class="ot">=</span> ap</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  liftA2 <span class="ot">=</span> liftM2</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Applicative</span> <span class="dt">IO</span> <span class="kw">where</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  (<span class="op">&lt;*&gt;</span>) <span class="ot">=</span> ap</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  liftA2 <span class="ot">=</span> liftM2</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>nstance <span class="dt">Applicative</span> <span class="dt">Maybe</span> <span class="kw">where</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="dt">Just</span> f  <span class="op">&lt;*&gt;</span> m       <span class="ot">=</span> <span class="fu">fmap</span> f m</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  <span class="dt">Nothing</span> <span class="op">&lt;*&gt;</span> _m      <span class="ot">=</span> <span class="dt">Nothing</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  liftA2 f (<span class="dt">Just</span> x) (<span class="dt">Just</span> y) <span class="ot">=</span> <span class="dt">Just</span> (f x y)</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>  liftA2 _ _ _ <span class="ot">=</span> <span class="dt">Nothing</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Monoid</span> a <span class="ot">=&gt;</span> <span class="dt">Applicative</span> ((,) a) <span class="kw">where</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>  (u, f) <span class="op">&lt;*&gt;</span> (v, x) <span class="ot">=</span> (u <span class="op">&lt;&gt;</span> v, f x)</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>  liftA2 f (u, x) (v, y) <span class="ot">=</span> (u <span class="op">&lt;&gt;</span> v, f x y)</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> (<span class="dt">Functor</span> m, <span class="dt">Monad</span> m) <span class="ot">=&gt;</span> <span class="dt">Applicative</span> (<span class="dt">StateT</span> s m) <span class="kw">where</span></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>  <span class="dt">StateT</span> mf <span class="op">&lt;*&gt;</span> <span class="dt">StateT</span> mx <span class="ot">=</span> <span class="dt">StateT</span> <span class="op">$</span> \ s <span class="ot">-&gt;</span> <span class="kw">do</span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>      <span class="op">~</span>(f, s') <span class="ot">&lt;-</span> mf s</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>      <span class="op">~</span>(x, s'') <span class="ot">&lt;-</span> mx s'</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>      <span class="fu">return</span> (f x, s'')</span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a><span class="co">--            ^^^</span></span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a><span class="co">--           apply</span></span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Applicative</span> [] <span class="kw">where</span></span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>  fs <span class="op">&lt;*&gt;</span> xs <span class="ot">=</span> [f x <span class="op">|</span> f <span class="ot">&lt;-</span> fs, x <span class="ot">&lt;-</span> xs]</span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a><span class="co">--             ^^^</span></span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a><span class="co">--            apply</span></span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Applicative</span> ((<span class="ot">-&gt;</span>) r) <span class="kw">where</span>  </span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>  f <span class="op">&lt;*&gt;</span> g <span class="ot">=</span> \x <span class="ot">-&gt;</span> f x (g x)</span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a><span class="co">--                ^^^</span></span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a><span class="co">--               apply</span></span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> (<span class="dt">Functor</span> m, <span class="dt">Monad</span> m) <span class="ot">=&gt;</span> <span class="dt">Applicative</span> (<span class="dt">WriterT</span> w m) <span class="kw">where</span></span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>  <span class="dt">WriterT</span> mf <span class="op">&lt;*&gt;</span> <span class="dt">WriterT</span> mx <span class="ot">=</span> <span class="dt">WriterT</span> <span class="op">$</span> \ w <span class="ot">-&gt;</span> <span class="kw">do</span></span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>      (f, w') <span class="ot">&lt;-</span> mf w</span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>      (x, w'') <span class="ot">&lt;-</span> mx w'</span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>      <span class="fu">return</span> (f x, w'')</span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a><span class="co">--            ^^^</span></span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a><span class="co">--           apply</span></span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a><span class="co">-- 참고</span></span>
+<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a><span class="co">-- 모나드에 있는 ap를 쓰지 않고 구현한다면 아래같이 ap와 똑같은 모양이 됩니다.</span></span>
+<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a><span class="co">--instance Applicative IO where</span></span>
+<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a><span class="co">--  a &lt;*&gt; b = do</span></span>
+<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a><span class="co">--    f &lt;- a</span></span>
+<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a><span class="co">--    x &lt;- b</span></span>
+<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a><span class="co">--    return (f x)</span></span></code></pre></div>
 <a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></li>
 </ol>
 </section>
