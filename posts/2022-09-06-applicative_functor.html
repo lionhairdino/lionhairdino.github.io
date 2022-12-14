@@ -91,7 +91,7 @@ Applicatives의 기본 개념은 <a href="http://learnyouahaskell.com/functors-a
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">f</span> a, a <span class="er">(</span><span class="ex">a</span> <span class="at">-</span><span class="op">&gt;</span> b<span class="kw">)</span></span></code></pre></div>
 <p>모나드와 applicative를 타입으로 읽어 보겠습니다.</p>
-<p>의존성은 함수로 표현됩니다. <code>b</code>가 <code>a</code>에 의존한다면 <code>a -&gt; b</code> 함수로 표현됩니다. <code>a</code>에 의존해서 <code>b</code>를 만들어낸다고 볼 수도 있습니다.</p>
+<p>의존성은 함수로 표현됩니다. <code>b</code>가 <code>a</code>에 의존한다면 <code>a -&gt; b</code> 함수로 표현됩니다. <code>a</code>에 의존해서 <code>b</code>를 만들어낸다고 읽기도 합니다.</p>
 <p>모나드에는 <code>m a</code>로, <code>m</code> 하나를 인자로 받고, <code>a -&gt; m b</code>가 있으니, <code>a</code>에 의존해서 새로운 <code>m</code> effect를 만듭니다. 반면 Applicative는 <code>f a</code>로 <code>f</code>하나, <code>f (a -&gt; b)</code>로 <code>f</code> 하나, 이렇게 두 개를 받습니다. <em>새로 만들어지는 m이 없습니다.</em> 타입만으로 읽을 수 있는 가장 큰 차이입니다.</p>
 <p>모나드도 <code>m</code> 두 개를 하나로 만들어 내보내고, Applicative도 <code>f</code> 두 개를 하나로 만들어 내보내는 건 같습니다.</p>
 </blockquote>
@@ -115,7 +115,8 @@ Applicatives의 기본 개념은 <a href="http://learnyouahaskell.com/functors-a
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>      (<span class="dt">State</span> newfunc) <span class="ot">=</span> make_st val</span>
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="kw">in</span>  newfunc state1</span></code></pre></div>
 <p><code>&gt;&gt;=</code> 체인을 거치면서 바뀐 <code>state1</code>에 <strong><em>새로 생성된 함수를 적용</em></strong>해서 새로운 <code>state</code>를 반환합니다.</p>
-<p>추상화해서 말하면, 계산 결과가 Effect에 영향을 주느냐 아니냐의 차이가 있습니다. Monad는 계산 결과를 Effect에 반영할 수 있고, Applicatives는 그렇게 할 수 없습니다. <span class="citation" data-cites="Ailrun">@Ailrun</span></p>
+<p>추상화해서 말하면, 계산 결과가 Effect에 영향을 주느냐 아니냐의 차이가 있습니다. Monad는 계산 결과를 Effect에 반영할 수 있고, Applicatives는 그렇게 할 수 없습니다. <span class="citation" data-cites="Ailrun">@Ailrun</span><br />
+(왜 그런지는 위에 타입으로 읽기에 설명해 두었습니다.)</p>
 <p><code>Moi</code> 구현에선 <code>state1</code>, <code>state2</code>를 통해 모나드처럼 실행 순서가 생겨, 이게 일반적인 속성으로 오해할 수 있는데, 순서는 Applicatives의 일반적인 특징은 아닙니다. <code>join</code>의 경우 <code>m (m a)</code>이니 바깥 <code>m</code>이 안의 <code>m</code>을 감싸고 있으니 의존도가 생기지만, <code>&lt;*&gt;</code>의 경우 <code>f(a -&gt; b) -&gt; f a -&gt; ...</code>에서 두 <code>f</code>는 서로 의존성을 가질 필요가 없습니다. <span class="citation" data-cites="재원">@재원</span></p>
 <p>위에 <code>&lt;*&gt;</code>의 구현을 보면서 <code>state</code>를 주고 받는 것에 정신이 팔렸는데, <code>&lt;*&gt;</code>의 목적은 끝에 <code>func arg</code>, 즉 <code>apply</code>입니다.</p>
 <h2 id="reader의-와">Reader의 &lt;*&gt;와 &gt;&gt;=</h2>
