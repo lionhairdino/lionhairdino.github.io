@@ -157,13 +157,38 @@ Consume하면 Contravariant</p>
 <p>준비 운동<br />
 <code>(a -&gt; b) -&gt; b</code> 타입만으로 알 수 있는 게 있습니다.<br />
 이 함수는 다른 걸 받는 건 없고, <code>(a -&gt; b)</code>함수만 받으면 <code>b</code>라는 값을 만들어 냅니다. <code>(a -&gt; b)</code>함수를 실행하면 <code>b</code>가 나올텐데, 실행하려면 <code>a</code>가 필요합니다. 함수만 받았는데, <code>b</code>가 나온다는 말은, 안에 이미 <code>a</code>가 있을거라 예상할 수 있습니다. (물론, 받은 함수를 무시할 수도 있겠지만, <code>b</code>를 generate할 방법은 어떤식으로든 존재해야 합니다.)</p>
-</blockquote>
 <p>※ 엄밀히 얘기하면, <code>forall a =&gt; (a -&gt; b) -&gt; b</code> 일 때, 이 함수는 <code>a</code>가 뭔지 모르니, <code>a</code>를 가지고 있을 방법이 없습니다.(딱 한가지 undefined(bottom)을 가지고 있다고 말할 순 있겠습니다만) 예시는 조금 더 다듬어야 하지만, 이해하는데 도움은 되는 예시니 일단 그대로 두겠습니다. <span class="citation" data-cites="jason님이">@jason님이</span> 놓친 걸 지적해 주셨습니다. 감사합니다.</p>
+<p>아래는 사장, 팀장, 요리사, 레시피가 모여 요리를 만드는 코드입니다.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Meat</span> <span class="ot">=</span> <span class="dt">Beef</span> <span class="op">|</span> <span class="dt">Pork</span> <span class="kw">deriving</span> <span class="dt">Show</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Cooking</span> a <span class="ot">=</span> <span class="dt">Steak</span> a <span class="op">|</span> <span class="dt">Stew</span> a <span class="kw">deriving</span> <span class="dt">Show</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">Cookbook</span> <span class="ot">=</span> <span class="dt">Cookbook</span> {<span class="ot"> runCook ::</span> <span class="dt">Meat</span> <span class="ot">-&gt;</span> <span class="dt">Cooking</span> <span class="dt">Meat</span> }</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="ot">steakRecipe ::</span> <span class="dt">Meat</span> <span class="ot">-&gt;</span> <span class="dt">Cooking</span> <span class="dt">Meat</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>steakRecipe <span class="ot">=</span> <span class="dt">Steak</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="ot">chef ::</span> <span class="dt">Cookbook</span> <span class="ot">-&gt;</span> <span class="dt">Cooking</span> <span class="dt">Meat</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>chef cb <span class="ot">=</span> runCook cb <span class="dt">Beef</span> </span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="co">-- leader는 chef가 들어오면 준비된 steak recipe를 넣어 줍니다.</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="ot">leader ::</span> (<span class="dt">Cookbook</span> <span class="ot">-&gt;</span> <span class="dt">Cooking</span> <span class="dt">Meat</span>) <span class="ot">-&gt;</span> <span class="dt">Cooking</span> <span class="dt">Meat</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>leader ch <span class="ot">=</span> ch (<span class="dt">Cookbook</span> steakRecipe) </span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="co">-- boss는 외부에서 leader가 들어오면 Beef를 다루는 chef를 붙여 줍니다.</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="ot">boss ::</span> ((<span class="dt">Cookbook</span> <span class="ot">-&gt;</span> <span class="dt">Cooking</span> <span class="dt">Meat</span>) <span class="ot">-&gt;</span> <span class="dt">Cooking</span> <span class="dt">Meat</span>) <span class="ot">-&gt;</span> <span class="dt">Cooking</span> <span class="dt">Meat</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>boss ld <span class="ot">=</span> ld chef </span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="fu">print</span> <span class="op">$</span> boss leader</span></code></pre></div>
+<p>위 예시는 <code>boss, leader, chef, recipe</code> 가 모두 있어야 요리가 만들어 집니다.<br />
+<code>boss</code>는 <code>leader</code>없이 <code>chef</code>만 데리고 있습니다.<br />
+<code>leader</code>는 <code>recipe</code>만 가지고 있습니다.<br />
+<code>boss</code>에 <code>leader</code>를 넣어 주면, <code>boss</code>가 가진 <code>chef</code>를 <code>leader</code>에게 넣어 주고,<br />
+<code>leader</code>는 가지고 있는 <code>recipe</code>를 <code>chef</code>에 넣어 줘서 요리를 만들게 됩니다.</p>
+</blockquote>
 <p>위에서 말한 Consume 모양 중 <code>V -&gt; Int</code> 함수를 받는 고차 함수를 살펴 보겠습니다. reduce하려면 필요한 정보가 어디에 있는지 살펴 보겠습니다.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ot">func1 ::                 f ::</span> <span class="dt">V</span> <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ot">func2 ::</span>               (<span class="ot"> f ::</span> <span class="dt">V</span> <span class="ot">-&gt;</span> <span class="dt">Int</span> ) <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="ot">func3 ::</span>        (<span class="ot"> g ::</span> (<span class="ot"> f ::</span> <span class="dt">V</span> <span class="ot">-&gt;</span> <span class="dt">Int</span> ) <span class="ot">-&gt;</span> <span class="dt">Int</span> ) <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="ot">func4 ::</span> (<span class="ot"> h ::</span> (<span class="ot"> g ::</span> (<span class="ot"> f ::</span> <span class="dt">V</span> <span class="ot">-&gt;</span> <span class="dt">Int</span> ) <span class="ot">-&gt;</span> <span class="dt">Int</span> ) <span class="ot">-&gt;</span> <span class="dt">Int</span> ) <span class="ot">-&gt;</span> <span class="dt">Int</span></span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ot">func1 ::                 f ::</span> <span class="dt">V</span> <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="ot">func2 ::</span>               (<span class="ot"> f ::</span> <span class="dt">V</span> <span class="ot">-&gt;</span> <span class="dt">Int</span> ) <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="ot">func3 ::</span>        (<span class="ot"> g ::</span> (<span class="ot"> f ::</span> <span class="dt">V</span> <span class="ot">-&gt;</span> <span class="dt">Int</span> ) <span class="ot">-&gt;</span> <span class="dt">Int</span> ) <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="ot">func4 ::</span> (<span class="ot"> h ::</span> (<span class="ot"> g ::</span> (<span class="ot"> f ::</span> <span class="dt">V</span> <span class="ot">-&gt;</span> <span class="dt">Int</span> ) <span class="ot">-&gt;</span> <span class="dt">Int</span> ) <span class="ot">-&gt;</span> <span class="dt">Int</span> ) <span class="ot">-&gt;</span> <span class="dt">Int</span></span></code></pre></div>
 <p>실행되는 코드는 아니고, 고차 함수들이 함수를 인자로 받는 부분에 <code>f</code>,<code>g</code>,<code>h</code> 이름을 붙여 놨습니다.</p>
 <ul>
 <li><code>func1</code>은 외부에서 <code>V</code>값을 받을테고, - 외부에서 들어온 값을 Consume합니다.<br />
