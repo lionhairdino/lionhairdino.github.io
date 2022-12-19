@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko" lang="ko">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <title>lionhairdino - Unboxed, Boxed, Unlifted, Lifted</title>
+
+        <meta name="description" content="의미상으로 Bottom이 될 수 있냐 없냐, 값을 힙에 올리고 가리키는 포인터를 두냐 아니냐에 따라 붙이는 용어입니다." />
+        <meta property="og:description" content="의미상으로 Bottom이 될 수 있냐 없냐, 값을 힙에 올리고 가리키는 포인터를 두냐 아니냐에 따라 붙이는 용어입니다." />
+
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <link rel="icon" href="https://lionhairdino.github.io/favicon.svg" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino16px.png" sizes="16x16" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino24px.png" sizes="24x24" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino32px.png" sizes="32x32" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino48px.png" sizes="48x48" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino57px.png" sizes="57x57" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino60px.png" sizes="60x60" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino64px.png" sizes="64x64" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino72px.png" sizes="72x72" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino76px.png" sizes="76x76" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino114px.png" sizes="114x114" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino120px.png" sizes="120x120" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino144px.png" sizes="144x144" />
+        <link rel="shortcut icon" href="../favicon.ico" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino152px.png" sizes="152x152" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino180px.png" sizes="180x180" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino192px.png" sizes="192x192" />
+        <link rel="manifest" href="../site.webmanifest" />
+        <link rel="mask-icon" href="https://lionhairdino.github.io/Lionhairdino_black.svg" color="#ff7500" />
+        <meta name="msapplication-TileImage" content="/images/favicon/Lionhairdino144px.png" />
+        <meta name="msapplication-TileColor" content="#ff7500" />
+        <meta name="theme-color" content="#ffffff" />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="Unboxed, Boxed, Unlifted, Lifted" />
+        <meta property="og:site_name" content="Lionhairdino" />
+        <meta property="og:url" content="https://lionhairdino.github.io/posts/2022-12-20-unboxed.html" />
+
+        <meta property="og:image" content="https://lionhairdino.github.io/images/state400px.png" />
+
+      <meta name="keywords" content="힙 객체, 포인터, Bottom, Primitive, Magic Hash, Int#, Double#">
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-E9WZ6VXGHP"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-E9WZ6VXGHP');
+</script>
+<script src="../script/copycode.js"></script>
+<script async src="https://cse.google.com/cse.js?cx=9c53b4915cbb2605c"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.11.1/tocbot.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.11.1/tocbot.css" />
+    </head>
+    <body>
+        <div id="header">
+            <div style="display:inline-block;margin-right:5px;padding-top: 5px;" id="logo">
+                <a href="../"><img style="width:30px;border:none" src="../images/favicon/Lionhairdino48px.png"></a>
+            </div>
+            <div style="display:inline-block;vertical-align: top;padding-top:5px;" id="navigation">
+                <a href="../">lionhairdino</a>
+                <a href="../about.html">about</a>
+                <!--<a href="/archive.html">archive</a>-->
+            </div>
+            <div style="display:inline-block;font-size:0.8em;vertical-align: top;">
+                <div style="display:inline-block;vertical-align: top;padding-top: 5px">사이트내 검색</div>
+                <div style="display:inline-block;width:180px;"> 
+                    <div class="gcse-searchbox-only"></div>
+                </div>
+            </div>
+            <div>
+                여기 글들은 일종의 질문입니다. 용어 선택도 학계, 업계에서 쓰는 걸로 되어 있지 않고, 틀린 내용이 있을 수도 있습니다.
+            </div>
+        </div>
+        <div class="js-toc-content">
+            <h1>Unboxed, Boxed, Unlifted, Lifted</h1>
+            <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+<div class="info">
+    Posted on December 20, 2022
+    
+</div>
+
+<h2 id="몸-풀기">몸 풀기</h2>
+<p>현실에서 상자Box에 담아둔다는 어떤 효과가 생길까요?<br />
+사과를 박스에 넣고, 귤을 박스에 넣어 놓는다면, 둘 모두 하나의 이름 Box라고 부를 수 있습니다.<br />
+상자가 없는 상태에서는 <code>Int#</code>이지만, 이 걸 Box에 넣고, 때에 따라 <code>Bottom</code>도 넣을 수 있도록 하면 상자안에 <code>Int#</code>이 있거나, 상자 안에 <code>Bottom</code>이 있어도 상자라고 부를 수 있습니다. 이 <code>상자 Int# | Bottom</code>을 <code>Int</code>라고 부릅니다.</p>
+<p>무언가 타입으로 감싼다wrap는 것도, 위와 같은 목표를 포함하고 있습니다. 여러 요소를 묶어 하나로 부를 수 있게, 같은 타입으로 취급할 수 있게 해주는, 즉 <em>추상화</em>를 하는 방법입니다. <code>Just n</code>도 <code>Nothing</code>도 <code>Maybe</code>로 취급할 수 있습니다. 이런 의미를 알면, Boxed이면 뭔가 추상화 할 것으로 금방 추측 할 수 있습니다.</p>
+<h2 id="boxed">Boxed</h2>
+<p>힙에 있는 객체를 가리키는 포인터입니다. 하스켈은 Lazy 때문에 <code>&lt;thunk&gt;</code>로 머물러 있다가, 평가되면 값으로 바뀌어야 합니다. 적어도 두 가지 형태를 하나로 볼 수 있어야 합니다. 포인터로 두면 <code>&lt;thunk&gt;</code>를 가리키거나 <code>평가된 값</code>을 가리킬 수 있게 됩니다.</p>
+<p>예) <code>Int</code>는 2Word 크기의 힙 객체를 가리키는 포인터입니다.</p>
+<p>※ unboxed 값 보다는 한 단계 과정을 거쳐야 하니, 당연히 unboxed보다는 퍼포먼스가 좋지 않고, 컴파일러 unboxed 타입으로 바꿀 수 있으면, 컴파일 과정에서 unboxed로 바꿉니다.</p>
+<h2 id="unboxed">Unboxed</h2>
+<p>포인터가 아니라, 값 자체로 raw machine 타입입니다.<br />
+예) <code>Int#</code>은 C의 <code>long int</code><br />
+<code>Double#</code>은 C의 <code>double</code><br />
+<code>Addr#</code>은 C의 <code>void*</code><br />
+<code>+#</code>은 primitive operation<br />
+primitive가 붙은 것들은 하스켈로 코드로 구현되어 있지 않다고 생각하면 됩니다. 런타임 베이스에 들어 있는 타입이나 연산입니다.</p>
+<p>하스켈 타입 변수는 <code>&lt;thunk&gt;</code>일 수 있어야 하기 때문에, <code>#</code>이 붙어 있는 unboxed가 될 수 없습니다.<br />
+같은 이유로, 폴리모픽 함수에겐 unboxed를 넘길 수 없습니다.</p>
+<p>※ 하스켈에선 특별한 기능이 있어서 아니라, 그저 관행적으로 unboxed 타입에는 해시 마크 <code>#</code>을 붙입니다. <code>#</code>이 붙어 있다고 특별한 작업을 하는 것은 아니란 뜻입니다.</p>
+<h2 id="lifted">Lifted</h2>
+<p><code>Bottom</code>이 될 수 있는 타입을 lifted 타입이라 부르고,
+예) 가능한 값<code>0 | 1 | 2 | 3...</code>이 있는 <code>Int#</code> 타입에 <code>Bottom</code>을 추가해서 <code>0 | 1 | 2 | 3...| Bottom</code>이 되는 걸 lifted 되었다고 표현합니다. 포인터로 가리키지 않는, primitive 타입들로는 <code>Bottom</code>을 표현할 수가 없습니다. <code>Int</code>는 <code>Int# | Bottom</code>를 가리키는 것으로 볼 수 있습니다.</p>
+<p>※ 기존 것에 무언가 추가된 요소, 즉 다시 말해, 기존 세계와 비슷하지만 어떤 요소가 추가된 세계로 바뀌었을 때 쓰는 표현입니다. 펑터로 변형되어 추가적인 어떤 요소가 있는 타입으로 바뀌는 걸 lifted 되었다고 말하기도 합니다. 여기 4가지 형태를 거론할 때는 특히 <code>Bottom</code>이 가능하냐 안하냐로 읽으면 무리가 없습니다.</p>
+<h2 id="unlifted">Unlifted</h2>
+<p><code>Bottom</code>이 될 수 있는 값으로 lift하지 않은 타입을 unlifted 타입이라 부릅니다. unboxed 타입들, <code>#</code>이 붙은 타입들은 <code>Bottom</code>이 될 수 없으니 모두 다 unlifted입니다.</p>
+<h2 id="주의">주의</h2>
+<p>unlited라고 다 unboxed는 아니지만, lifted는 모두 다 boxed입니다.</p>
+<p>boxed, unboxed 구분은 힙 객체를 가리키는 포인터냐 아니냐,<br />
+lifted, unlited 구분은 <code>Bottom</code>이 될 수 있냐 없냐로 구분합니다.</p>
+<p><code>Array#</code>은 unlifted, boxed 타입입니다. - unlifted이니 <code>Bottom</code>은 될 수 없지만, boxed이니 힙 객체를 가리키는 포인터입니다.<br />
+하지만 unboxed이면서 lifted일 순 없습니다. - 포인터가 아니면 <code>Bottom</code>을 가리킬 수가 없습니다.</p>
+
+<div class="comment">
+<script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
+</script>
+</div>
+<div style="text-align:right">Github 계정이 없는 분은 메일로 보내주세요. lionhairdino at gmail.com </div>
+        </div>
+        <nav class="toc toc-right js-toc relative z-1 transition--300 absolute pa4 pt5 is-position-fixed"></nav>
+        <div id="footer">
+            © 2022 lionhairdino. All rights reserved. Generated by <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+        <script>
+            tocbot.init({
+                tocSelector: '.js-toc',
+                contentSelector: '.js-toc-content',
+                headingSelector: 'h2, h3',
+                hasInnerContainers: true,
+            });
+        </script>
+    </body>
+</html>
