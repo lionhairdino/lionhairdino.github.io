@@ -4,10 +4,10 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-        <title>lionhairdino - 타입 레벨로 가는 문턱 - 타입에 정보 담아 두기 (작성 예정)</title>
+        <title>lionhairdino - 타입 레벨로 가는 문턱 - 타입에 정보 담아 두기</title>
 
-        <meta name="description" content="lionhairdino - 타입 레벨로 가는 문턱 - 타입에 정보 담아 두기 (작성 예정)" />
-        <meta property="og:description" content="하스켈 함수형 프로그래밍" />
+        <meta name="description" content="타입에 정보를 넣어 두기 시작하면, 혹은 타입으로 로직을 만들기 시작하면, 페어 프로그래밍을 해주는 든든한 조력자가 생깁니다. 바로, 컴파일러에 있는 타입 체커입니다." />
+        <meta property="og:description" content="타입에 정보를 넣어 두기 시작하면, 혹은 타입으로 로직을 만들기 시작하면, 페어 프로그래밍을 해주는 든든한 조력자가 생깁니다. 바로, 컴파일러에 있는 타입 체커입니다." />
 
         <link rel="stylesheet" type="text/css" href="../css/default.css" />
         <link rel="icon" href="https://lionhairdino.github.io/favicon.svg" />
@@ -33,13 +33,13 @@
         <meta name="msapplication-TileColor" content="#ff7500" />
         <meta name="theme-color" content="#ffffff" />
         <meta property="og:type" content="website" />
-        <meta property="og:title" content="타입 레벨로 가는 문턱 - 타입에 정보 담아 두기 (작성 예정)" />
+        <meta property="og:title" content="타입 레벨로 가는 문턱 - 타입에 정보 담아 두기" />
         <meta property="og:site_name" content="Lionhairdino" />
         <meta property="og:url" content="https://lionhairdino.github.io/posts/2022-12-12-beforetypelevel.html" />
 
         <meta property="og:image" content="https://lionhairdino.github.io/images/state400px.png" />
 
-      <meta name="keywords" content="type level programming">
+      <meta name="keywords" content="type level programming, 검증, 파싱, 컴파일러와 짝 프로그래밍, pair programming">
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-E9WZ6VXGHP"></script>
 <script>
@@ -74,15 +74,25 @@
             </div>
         </div>
         <div class="js-toc-content">
-            <h1>타입 레벨로 가는 문턱 - 타입에 정보 담아 두기 (작성 예정)</h1>
+            <h1>타입 레벨로 가는 문턱 - 타입에 정보 담아 두기</h1>
             <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
 <div class="info">
     Posted on December 12, 2022
     
 </div>
 
+<p>타입에 정보를 넣어 두기 시작하면, 혹은 타입으로 로직을 만들기 시작하면, 페어 프로그래밍을 해주는 든든한 조력자가 생깁니다. 바로, 컴파일러에 있는 타입 체커입니다. 내가 놓치더라도, 컴파일러가 잡아 준다니 얼마나 든든합니까. 컴파일러와 짝pair 프로그래밍을 하는 게 목표입니다.</p>
+<p>타입에 정보를 담아 둔다고 따로 떼어 생각해 본 적이 없어 말이 낯설지 몰라도, 늘상 타입으로 해오던 일이 바로 타입에 정보를 담아 두는 일입니다. 아래 링크에 있는 글을 보고, 여기에 관해 글을 쓰려 했는데, 더 쉬운 설명이 나오지 않아, 우선은 링크 글에 들어가기 전 몸 풀기 정도의 짧은 글만 남깁니다.</p>
+<p><a href="https://eatchangmyeong.github.io/2022/12/04/parse-don-t-validate.html">검증하지 말고 파싱하라 - Alexis King, 번역 잇창명</a></p>
 <h2 id="타입에-정보-담아-두기">타입에 정보 담아 두기</h2>
-<p>(아직 내용 없음)</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Some</span> <span class="ot">=</span> <span class="dt">Base1</span> <span class="op">|</span> <span class="dt">Base2</span> <span class="op">|</span> <span class="dt">Ext3</span></span></code></pre></div>
+<p>어딘가에서 <code>Some</code>을 패턴 매칭해서 <code>Ext3</code>가 없다는 걸 확인한 경우, 이 걸 타입에다 남겨 놓는 방법이 있습니다.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Some2</span> <span class="ot">=</span> <span class="dt">Base1</span> <span class="op">|</span> <span class="dt">Base2</span></span></code></pre></div>
+<p>바로 <code>Some2</code>로 타입 변환하면 됩니다. 당연한 얘기 같지만, 텍스트들에서 자연스레 나오는 설명은 아닙니다.</p>
+<p>어쨌든, 이러면 <code>Ext3</code>가 없다는 건 타입 체커가 보증해 줍니다.</p>
+<p>서로 다른 걸 모아서 추상화하던 작업(예. <code>Just</code>와 <code>Nothing</code>을 <code>Maybe</code>로 만들기)의 반대 작업처럼 느껴집니다. 하지만, 추상화 반대 작업과 차이점을 보자면, 확연하게 차이나는 것들만 분리해서 보는 게 아니라, 범위만 다르다든지, 조금만 차이나는 것들도 별도 타입으로 정의하면 유리할 때가 있다는 눈입니다.</p>
+<p>이 짧은 아이디어를 가지고 위 링크로 가시면 조금 도움이 될 수 있습니다. Alexis의 글은 이 아이디어를 고급스럽게, 친절하게 실제 사용 예를 들어가며 설명한 글입니다.</p>
+<p>참고로, <code>newtype</code>으로 새로운 타입을 계속 만들어 내면, 새로운 타입에 대한 비용은 전혀 없습니다. 컴파일러단에서만 다른 타입으로 취급하고, 런타임으로 넘어가면 <code>newtype</code>은 구별하지 않습니다.</p>
 
 <div class="comment">
 <script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
