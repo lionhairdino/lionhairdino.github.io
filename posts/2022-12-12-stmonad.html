@@ -82,8 +82,16 @@
 </div>
 
 <p>IO와 비슷하지만, <code>forall</code>의 추가로 타입 체커가 많은 걸 보장합니다.</p>
-<h2 id="st-모나드">ST 모나드</h2>
-<p>(아직 내용 없음)</p>
+<h2 id="forall">forall</h2>
+<p><a href="../posts/2021-05-04-forall.html">forall - 아무거나와 모든 것의 차이</a></p>
+<h2 id="st모나드와-forall">ST모나드와 forall</h2>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ot">runsST ::</span> <span class="kw">forall</span> a<span class="op">.</span> (<span class="kw">forall</span> s<span class="op">.</span> <span class="dt">ST</span> s a) <span class="ot">-&gt;</span> a</span></code></pre></div>
+<p><code>ST</code>안에서 <code>s</code>에 의존하는 값을 만들어 이리 저리 사용하다가 나중에 이 값을 꺼내려고 <code>runST</code>를 돌린다고 가정하면,</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ot">runST ::</span> <span class="kw">forall</span> a<span class="op">.</span> (<span class="kw">forall</span> s<span class="op">.</span> <span class="dt">ST</span> s (s에 의존하는 a값)) <span class="ot">-&gt;</span> (s에 의존하는 a값)</span></code></pre></div>
+<p>이 타입이 말이 돼야 하는데, 매개 변수 <code>(forall s. ST s (s에 의존하는 a값))</code> 안에 들어있는 <code>s</code>와 결과값 <code>(s에 의존하는 a값)</code>의 <code>s</code>를 같게 만들 방법이 없습니다. <code>forall</code>의 위치를 잘 보시기 바랍니다. <code>RankN</code> 상황입니다.</p>
+<p>생각을 안에 있던 데이터를 직접 꺼내오는 작업으로 바로 연결하지 말고, 작업을 하기 전 컴파일러 입장에서 타입이 맞는지 결정을 내릴 수 있는지 없는지를 생각해 보시기 바랍니다.</p>
+<p>The forall ensures that the internal state used by the ST computation is inaccessible to the rest of the program.</p>
+<p>즉 타입만으로 <code>ST</code>안에서 만든 <code>Ref</code>가 <code>ST</code>를 벗어날 수 없음을 보장할 수 있습니다.</p>
 
 <div class="comment">
 <script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
