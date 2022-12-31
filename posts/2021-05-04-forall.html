@@ -171,13 +171,13 @@ False</code></pre>
 <ul>
 <li>서명과 구현의 모순 여부 체크를 지나 , 나중에 코드 조립 중 들어온 타입을 보니 <code>'a'</code>가 들어왔습니다.</li>
 <li><code>'a'</code>를 보고 추론할 수 있는 타입은 <code>Char</code> 하나입니다. 구체 타입 <code>Char</code>로 추론되었습니다.</li>
-<li>지금 정해지지 않은 타입, <code>모든 a</code>는 <code>모든 타입</code>이지 아직 하나의 구체 타입이 아닙니다. <code>모든 타입</code>과 <code>Char</code>는 매치되지 않습니다.</li>
+<li>지금 정해지지 않은 타입, <code>모든 a</code>는 <code>모든 타입</code>이지 하나의 구체 타입이 아닙니다. <code>모든 타입</code>과 <code>Char</code>는 매치되지 않습니다.</li>
 </ul>
 <p>2022.2.25 추가</p>
 <blockquote>
 <p>함수 서명에 아무런 제약 없이 <code>a</code>만 써주면, GHC는 <code>a</code>를 무엇으로 결정할지 모릅니다. 반드시, <code>타입 정보</code>를 줘야 합니다.
 함수 안에서 폴리모픽 <code>a</code>를 다룰 때, 특정 클래스의 인스턴스만 다룰지, 아니면 어떤 타입이든 들어와도 처리할 수 있는지 <em>함수 서명</em>에서 알려줘야, 코드 조립할 때, 함수 내용을 보지않고 서명으로만 체크할 수 있게 됩니다. 그래서, 컴파일할 때는 함수 몸체(구현)에 있는 타입의 쓰임과 함수 서명이 일치하는지 체크하고, 나중에 다른 코드와 만날 때는 서명만 가지고 일치하는 타입이 들어오는지 체크하리라 예상합니다. ※ 2022.10.17 추가 - 이게 non-dependent type checking이 동작하는 방식이라 합니다. <span class="citation" data-cites="Ailrun님">@Ailrun님</span> 감사합니다.
-<code>forall a.</code> 를 앞에 붙여 주면, <code>아무 타입</code>이나 들어와도 처리할 수 있다는 <em>타입 정보</em>를 준 것으로 받아들입니다. 보통 폴리모픽하게 쓸 때 <code>forall a.</code>를 명시적으로 써주지 않지만, GHC가 안보이게 붙인다고 보면 됩니다.</p>
+<code>forall a.</code> 를 앞에 붙여 주면, <code>아무 타입</code>이나 들어와도 처리할 수 있다는 <em>타입 정보</em>를 준 것으로 받아들입니다. <code>아무 타입</code>이나 받으려면, 구현은 <code>모든 타입</code> 대응할 수 있어야 합니다. 보통 폴리모픽하게 쓸 때 <code>forall a.</code>를 명시적으로 써주지 않지만, GHC가 안보이게 붙인다고 보면 됩니다.</p>
 </blockquote>
 <p>2022.9.17 추가</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ot">{-# LANGUAGE RankNTypes #-}</span></span>
@@ -202,7 +202,7 @@ False</code></pre>
 <p>세상에 타입은 <code>Bool</code>, <code>Int</code>만 있다고 가정하면</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">forall</span> a<span class="op">.</span> a <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="co">----(가)</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- forall a.(a -&gt; Int)와 같습니다.</span></span></code></pre></div>
-<p>의 구현은 <code>Bool -&gt; Int</code>로 봐도, <code>Int -&gt; Int</code>로 봐도 문제가 없는 구현이어야 합니다.
+<p>의 구현은 <code>Bool -&gt; Int</code>로 봐도, <code>Int -&gt; Int</code>로 봐도 문제가 없는, 즉 둘 모두에 대응할 수 있는 구현이어야 합니다.
 구현은 <code>Bool</code>에 의존하지도, <code>Int</code>에 의존하지도 않기 때문에 <code>1</code>을 넣어 줄 수 있습니다.</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>(<span class="kw">forall</span> a<span class="op">.</span> a) <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="co">----(나)</span></span></code></pre></div>
 <p>괄호안만 떼어내서 보면</p>
