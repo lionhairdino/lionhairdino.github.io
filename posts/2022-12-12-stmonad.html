@@ -84,14 +84,41 @@
 <p>IO와 비슷하지만, <code>forall</code>의 추가로 타입 체커가 많은 걸 보장합니다.</p>
 <h2 id="forall">forall</h2>
 <p><a href="../posts/2021-05-04-forall.html">forall - 아무거나와 모든 것의 차이</a></p>
+<h2 id="준비-운동">준비 운동</h2>
+<h3 id="rankntype">RankNType</h3>
+<p><a href="https://stackoverflow.com/questions/45287954/is-having-a-a-b-b-equivalent-to-having-an-a" class="uri">https://stackoverflow.com/questions/45287954/is-having-a-a-b-b-equivalent-to-having-an-a</a> 답변에서 소스 발췌</p>
+<pre><code>forall b. (a -&gt; b) -&gt; b</code></pre>
+<p>이 타입 함수는 <code>(a -&gt; b)</code> 함수를 받으면 <code>b</code>를 돌려줍니다. 안에 <code>a</code>를 가지고 있어야 합니다. 하지만 <code>a</code>가 뭔지를 모르니 구현이 안되겠구나로 생각했습니다. 그런데, <code>a</code>가 당장은 뭔지 모르지만, 나중에 알려 줄 방법이 있다면 어떻게 될까요?<br />
+보기 좋게 하기 위해, 위 서명으로 타입을 만들고,</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- 여기서 a는 forall이 아니라, 나중에 Box a 타입이 만들어질 때 결정됩니다.</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">Box</span> a <span class="ot">=</span> <span class="kw">forall</span> b<span class="op">.</span> (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> b</span></code></pre></div>
+<p>이 타입을 만들어내는 함수를 따로 두면 됩니다.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ot">box ::</span> a <span class="ot">-&gt;</span> <span class="dt">Box</span> a</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>box a <span class="ot">=</span> \f <span class="ot">-&gt;</span> f a</span></code></pre></div>
+<p><code>forall b. (a -&gt; b) -&gt; b</code> 타입을 말로 읽어 보았습니다.<br />
+예를 들어 10이상이면 big, 아래면 small이라 하고, 이를 구분하는 함수를 isBig이라 하면, “5라는 숫자는 isBig을 만나면 small이 될 수” 입니다. 즉,</p>
+<p><em>“a는 (a-&gt;b)를 만나면 b가 될 놈” 입니다.</em></p>
+<p>그래서 <code>a</code>는 <code>forall b. (a -&gt; b) -&gt; b</code>로 표현할 수 있다는 얘기입니다.</p>
+<h3 id="폴리모픽-자리에는-언젠가는-구체-타입이-들어온다.">폴리모픽 자리에는 언젠가는 구체 타입이 들어온다.</h3>
+<p><code>forall a. Show a =&gt; a</code>라고 되어 있으면, 언젠가 Show 인스턴스가 정의되어 있는 타입이 들어올테고,<br />
+<code>forall a. a</code>라고 되어 있으면, 제한 없이 어떤 타입이든 들어올 겁니다.<br />
+<code>(forall a. a -&gt; b)</code>라고 되어 있으면, “모든 타입을 받아도 문제 없이 <code>b</code>를 내뱉는 함수”가 들어 옵니다.</p>
+<p>이 제한을 따르는 나중에 들어올 값에, 문제가 생기지 않게 구현되어 있다는 얘기입니다. 서명은 함수가 어떻게 구현되어 있는지 알리는 역할을 합니다. 제한된 타입들이 공통적으로 갖고 있는 메소드만을 써야, 해당 타입들이 들어왔을 때 문제가 생기지 않습니다. 모든 타입이 공통적으로 가지고 있는 메소드는 없습니다. <code>forall a</code> 즉 모든 타입에 문제가 생기지 않으려면, <code>a</code> 타입에 의존하는 동작이 아예 없어야 합니다. 아니면, 모든 타입에는 <code>bottom</code>이 있으니, <code>undefined</code>로 구현하는 방법이 있을 순 있습니다.</p>
+<h3 id="return-type-polymorphic">Return Type Polymorphic</h3>
+<p>Return 타입은 들어오는 값에 따라 결정 됩니다.</p>
 <h2 id="st모나드와-forall">ST모나드와 forall</h2>
-<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ot">runsST ::</span> <span class="kw">forall</span> a<span class="op">.</span> (<span class="kw">forall</span> s<span class="op">.</span> <span class="dt">ST</span> s a) <span class="ot">-&gt;</span> a</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- 암시적으로 들어 있는 forall을 같이 써주면 </span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- forall a. (forall s. ST s a) -&gt; a </span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="ot">runsST ::</span> (<span class="kw">forall</span> s<span class="op">.</span> <span class="dt">ST</span> s a) <span class="ot">-&gt;</span> a</span></code></pre></div>
 <p><code>ST</code>안에서 <code>s</code>에 의존하는 값을 만들어 이리 저리 사용하다가 나중에 이 값을 꺼내려고 <code>runST</code>를 돌린다고 가정하면,</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ot">runST ::</span> <span class="kw">forall</span> a<span class="op">.</span> (<span class="kw">forall</span> s<span class="op">.</span> <span class="dt">ST</span> s (s에 의존하는 a값)) <span class="ot">-&gt;</span> (s에 의존하는 a값)</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ot">runST ::</span> <span class="kw">forall</span> a<span class="op">.</span> (<span class="kw">forall</span> s<span class="op">.</span> <span class="dt">ST</span> s (s에 의존하는 a값)) <span class="ot">-&gt;</span> (s에 의존하는 a값)</span></code></pre></div>
 <p>이 타입이 말이 돼야 하는데, 매개 변수 <code>(forall s. ST s (s에 의존하는 a값))</code> 안에 들어있는 <code>s</code>와 결과값 <code>(s에 의존하는 a값)</code>의 <code>s</code>를 같게 만들 방법이 없습니다. <code>forall</code>의 위치를 잘 보시기 바랍니다. <code>RankN</code> 상황입니다.</p>
 <p>생각을 안에 있던 데이터를 직접 꺼내오는 작업으로 바로 연결하지 말고, 작업을 하기 전 컴파일러 입장에서 타입이 맞는지 결정을 내릴 수 있는지 없는지를 생각해 보시기 바랍니다.</p>
 <p>The forall ensures that the internal state used by the ST computation is inaccessible to the rest of the program.</p>
 <p>즉 타입만으로 <code>ST</code>안에서 만든 <code>Ref</code>가 <code>ST</code>를 벗어날 수 없음을 보장할 수 있습니다.</p>
+<p>newtype ST s a = ST (STRep s a)
+type STRep s a = State# s -&gt; (# State# s, a #)</p>
+<p>runST :: (forall s. ST s a) -&gt; a</p>
 
 <div class="comment">
 <script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
