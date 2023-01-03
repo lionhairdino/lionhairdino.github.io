@@ -96,29 +96,47 @@
 <div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ot">box ::</span> a <span class="ot">-&gt;</span> <span class="dt">Box</span> a</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>box a <span class="ot">=</span> \f <span class="ot">-&gt;</span> f a</span></code></pre></div>
 <p><code>forall b. (a -&gt; b) -&gt; b</code> 타입을 말로 읽어 보았습니다.<br />
-예를 들어 10이상이면 big, 아래면 small이라 하고, 이를 구분하는 함수를 isBig이라 하면, “5라는 숫자는 isBig을 만나면 small이 될 수” 입니다. 즉,</p>
-<p><em>“a는 (a-&gt;b)를 만나면 b가 될 놈” 입니다.</em></p>
-<p>그래서 <code>a</code>는 <code>forall b. (a -&gt; b) -&gt; b</code>로 표현할 수 있다는 얘기입니다.</p>
+예를 들어 <code>10</code>이상이면 <code>big</code>, 아래면 <code>small</code>이라 하고, 이를 구분하는 함수를 <code>isBig</code>이라 하면, “<code>5</code>라는 숫자는 <code>isBig</code>을 만나면 <code>small</code>이 될 수” 입니다. 즉,</p>
+<p><em>“a는 (a -&gt; b)를 만나면 b가 될 놈” 입니다.</em></p>
+<p>그런데 그냥 <code>b</code>가 될 놈이 아니라, <code>forall b. (a -&gt; b) -&gt; b</code>가 될 놈입니다. 이 함수의 구현은 <code>b</code>에 전혀 의존하지 않는 구현이란 얘깁니다. <code>b</code>가 무슨 타입이 들어오든 <code>(a -&gt; b) -&gt; b</code> 구현이 문제가 생기지 않아야 합니다. 위 예처럼 <code>box</code>함수가 하듯이 먼저 <code>a</code>를 넣어 놓으면, <code>b</code>가 어떤 함수든 <code>(a -&gt; b)</code>인 함수를 넣어줄 수 있습니다.</p>
+<p>※ 그래서 <code>a</code>는 <code>forall b. (a -&gt; b) -&gt; b</code>로 표현할 수 있습니다.</p>
 <h3 id="폴리모픽-자리에는-언젠가는-구체-타입이-들어온다.">폴리모픽 자리에는 언젠가는 구체 타입이 들어온다.</h3>
 <p><code>forall a. Show a =&gt; a</code>라고 되어 있으면, 언젠가 Show 인스턴스가 정의되어 있는 타입이 들어올테고,<br />
 <code>forall a. a</code>라고 되어 있으면, 제한 없이 어떤 타입이든 들어올 겁니다.<br />
 <code>(forall a. a -&gt; b)</code>라고 되어 있으면, “모든 타입을 받아도 문제 없이 <code>b</code>를 내뱉는 함수”가 들어 옵니다.</p>
-<p>이 제한을 따르는 나중에 들어올 값에, 문제가 생기지 않게 구현되어 있다는 얘기입니다. 서명은 함수가 어떻게 구현되어 있는지 알리는 역할을 합니다. 제한된 타입들이 공통적으로 갖고 있는 메소드만을 써야, 해당 타입들이 들어왔을 때 문제가 생기지 않습니다. 모든 타입이 공통적으로 가지고 있는 메소드는 없습니다. <code>forall a</code> 즉 모든 타입에 문제가 생기지 않으려면, <code>a</code> 타입에 의존하는 동작이 아예 없어야 합니다. 아니면, 모든 타입에는 <code>bottom</code>이 있으니, <code>undefined</code>로 구현하는 방법이 있을 순 있습니다.</p>
+<p>이 제한을 따르는 나중에 들어올 값에, 문제가 생기지 않게 구현되어 있다는 얘기입니다. 서명은 함수가 어떻게 구현되어 있는지 알리는 역할을 합니다. 제한된 타입들이 공통적으로 갖고 있는 메소드만을 써야만, 해당 타입들이 들어왔을 때 문제가 생기지 않습니다. 모든 타입이 공통적으로 가지고 있는 메소드는 없습니다. <code>forall a. a</code> (<code>forall a. a -&gt; b</code>가 아닙니다.)의 경우, 즉 모든 타입에 문제가 생기지 않으려면, <code>a</code> 타입에 의존하는 동작이 아예 없어야 합니다. 아니면, 모든 타입에는 <code>bottom</code>이 있으니, <code>undefined</code>로 구현하는 방법이 있을 순 있습니다.</p>
 <h3 id="return-type-polymorphic">Return Type Polymorphic</h3>
 <p>Return 타입은 들어오는 값에 따라 결정 됩니다.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">read</span><span class="ot"> ::</span> <span class="dt">Read</span> a <span class="ot">=&gt;</span> <span class="dt">String</span> <span class="ot">-&gt;</span> a</span></code></pre></div>
+<p><code>a</code>는 <code>Read</code>클래스 인스턴스라는 것만 아는데, 최종 무슨 타입이 될까요?<br />
+나중에 부르고 있는 맥락에 따라 결정됩니다. 다른 함수와 만나게(조립하게) 되면, 그 함수들의 접점 타입을 참조해서 추론합니다.</p>
 <h2 id="st모나드와-forall">ST모나드와 forall</h2>
-<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- 암시적으로 들어 있는 forall을 같이 써주면 </span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- forall a. (forall s. ST s a) -&gt; a </span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="ot">runsST ::</span> (<span class="kw">forall</span> s<span class="op">.</span> <span class="dt">ST</span> s a) <span class="ot">-&gt;</span> a</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">ST</span> s a <span class="ot">=</span> <span class="dt">ST</span> (<span class="dt">STRep</span> s a)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">STRep</span> s a <span class="ot">=</span> <span class="dt">State</span><span class="op">#</span> s <span class="ot">-&gt;</span> (<span class="op">#</span> <span class="dt">State</span><span class="op">#</span> s, a <span class="op">#</span>)</span></code></pre></div>
+<p><code>ST</code>타입은 <code>State# s</code>를 받아 순서쌍을 돌려주는 함수를 가지고 있습니다.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- 암시적으로 들어 있는 forall을 같이 써주면 </span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- forall a. (forall s. ST s a) -&gt; a </span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="ot">runsST ::</span> (<span class="kw">forall</span> s<span class="op">.</span> <span class="dt">ST</span> s a) <span class="ot">-&gt;</span> a</span></code></pre></div>
+<p><code>runState :: State s a -&gt; s -&gt; (a, s)</code>와 비교하면 인자로 <code>s</code>를 받는 부분이 없습니다.</p>
+<h3 id="s는-어디서-올까요">s는 어디서 올까요?</h3>
+<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>runST (<span class="dt">ST</span> st_rep) <span class="ot">=</span> <span class="kw">case</span> runRW<span class="op">#</span> st_rep <span class="kw">of</span> (<span class="op">#</span> _, a <span class="op">#</span>) <span class="ot">-&gt;</span> a</span></code></pre></div>
+<p><code>GHC.Exts</code>에 프리미티브로 다음과 같이 정의되어 있습니다.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>runRW<span class="op">#</span><span class="ot"> ::</span> <span class="kw">forall</span> (<span class="ot">r ::</span> <span class="dt">RuntimeRep</span>) (<span class="ot">o ::</span> <span class="dt">TYPE</span> r)<span class="op">.</span> (<span class="dt">State</span><span class="op">#</span> <span class="dt">RealWorld</span> <span class="ot">-&gt;</span> o) <span class="ot">-&gt;</span> o</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>runRW<span class="op">#</span> m <span class="ot">=</span> m realWorld<span class="op">#</span></span></code></pre></div>
+<p>컴파일러가 특별하게 처리할 <code>realWorld#</code>을 <code>s</code>자리에 넣어주고 있습니다.<br />
+인자로 넘어 오는 ST계산computation을 보면 <code>(forall s. ST s a)</code>가 들어 오게 될테니, <code>s</code>는 어떤 타입을 줘도 상관 없다는 얘기입니다.</p>
+<h3 id="rankn인-것과-아닌-것의-차이가-뭘까요">RankN인 것과 아닌 것의 차이가 뭘까요?</h3>
+<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ot">runST ::</span> <span class="kw">forall</span> a s<span class="op">.</span> (<span class="dt">ST</span> s a) <span class="ot">-&gt;</span> a <span class="co">-- 가정</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="ot">runST ::</span> <span class="kw">forall</span> a<span class="op">.</span> (<span class="kw">forall</span> s<span class="op">.</span> <span class="dt">ST</span> s a) <span class="ot">-&gt;</span> a <span class="co">-- 실제 구현</span></span></code></pre></div>
+<p>위부터 얘기하면, <code>s</code>가 꼭 모든 타입을 받아도 문제가 없는 ST계산이 들어 올 필요가 없습니다.<br />
+반면 <code>RankN</code>은 반드시 모든 타입을 받아도 문제가 생기지 않는 ST계산이 들어와야 합니다.</p>
+<p>“The forall ensures that the internal state used by the ST computation is inaccessible to the rest of the program.”</p>
+<p>이 차이가 어째서 이런 결과를 만들어 낼까요?</p>
+<p><code>forall</code>이 붙지 않은 위의 경우, 모든 타입을 받아도 문제가 없는 ST계산이 아니라, <code>Int</code>를 State로 받는 계산이거나, <code>String</code>을 State로 받는 계산 등, 특정 타입을 State로 받는 ST계산이 들어올 수 있습니다. 즉, State가 무슨 타입인지 알 수 있습니다. 나중에라도 State가 무슨 타입인지 알 수 있다는 얘기입니다.</p>
+<p>반면, <code>RankN</code>으로 <code>(forall s. ST s a)</code>로, 괄호 안에 <code>forall</code>가 있을 경우, <em>반드시 모든 타입을 받을 수 있는 ST계산만</em> 들어와야 합니다. 이 타입이 뭔지는 알 수가 없다는 얘기입니다. 이 타입이 뭔지 모르기 때문에, 만일 이 타입을 쓰는 코드가 있다면 컴파일 체커를 통과하지 못합니다.</p>
 <p><code>ST</code>안에서 <code>s</code>에 의존하는 값을 만들어 이리 저리 사용하다가 나중에 이 값을 꺼내려고 <code>runST</code>를 돌린다고 가정하면,</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ot">runST ::</span> <span class="kw">forall</span> a<span class="op">.</span> (<span class="kw">forall</span> s<span class="op">.</span> <span class="dt">ST</span> s (s에 의존하는 a값)) <span class="ot">-&gt;</span> (s에 의존하는 a값)</span></code></pre></div>
-<p>이 타입이 말이 돼야 하는데, 매개 변수 <code>(forall s. ST s (s에 의존하는 a값))</code> 안에 들어있는 <code>s</code>와 결과값 <code>(s에 의존하는 a값)</code>의 <code>s</code>를 같게 만들 방법이 없습니다. <code>forall</code>의 위치를 잘 보시기 바랍니다. <code>RankN</code> 상황입니다.</p>
-<p>생각을 안에 있던 데이터를 직접 꺼내오는 작업으로 바로 연결하지 말고, 작업을 하기 전 컴파일러 입장에서 타입이 맞는지 결정을 내릴 수 있는지 없는지를 생각해 보시기 바랍니다.</p>
-<p>The forall ensures that the internal state used by the ST computation is inaccessible to the rest of the program.</p>
-<p>즉 타입만으로 <code>ST</code>안에서 만든 <code>Ref</code>가 <code>ST</code>를 벗어날 수 없음을 보장할 수 있습니다.</p>
-<p>newtype ST s a = ST (STRep s a)
-type STRep s a = State# s -&gt; (# State# s, a #)</p>
-<p>runST :: (forall s. ST s a) -&gt; a</p>
+<p>생각을, 안에 있던 데이터를 직접 꺼내오는 작업으로 바로 연결하지 말고, 작업을 하기 전 컴파일러 입장에서 우선 타입이 맞는지 결정을 내릴 수 있는가를 생각해 보시기 바랍니다.</p>
+<p>즉 타입만으로 <code>ST</code>안에서 만든 <code>Ref</code>값 같은 것들이 <code>ST</code>를 벗어날 수 없음을 보장할 수 있습니다.</p>
 
 <div class="comment">
 <script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
