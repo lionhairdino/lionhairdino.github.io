@@ -131,11 +131,12 @@
 <p>위부터 얘기하면, <code>s</code>가 꼭 모든 타입을 받아도 문제가 없는 ST계산이 들어 올 필요가 없습니다.<br />
 반면 <code>RankN</code>은 반드시 모든 타입을 받아도 문제가 생기지 않는 ST계산이 들어와야 합니다.</p>
 <p>“The forall ensures that the internal state used by the ST computation is inaccessible to the rest of the program.”</p>
-<p>이 차이가 어째서 이런 결과를 만들어 낼까요?</p>
+<p>이 차이가 어째서 이런 결과를 만들어 낼까요? (아직 고민 중)</p>
+<p>ST모나드의 목표는 <code>ST s (STRef s a)</code>를 안전하게 쓰자입니다.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">STRef</span> s a <span class="ot">=</span> <span class="dt">STRef</span> (<span class="dt">MutVar</span><span class="op">#</span> s a)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">MutVar</span><span class="op">#</span> s a</span></code></pre></div>
 <p><code>forall</code>이 붙지 않은 위의 경우, 모든 타입을 받아도 문제가 없는 ST계산이 아니라, <code>Int</code>를 State로 받는 계산이거나, <code>String</code>을 State로 받는 계산 등, 특정 타입을 State로 받는 ST계산이 들어올 수 있습니다. 즉, State가 무슨 타입인지 알 수 있습니다. 나중에라도 State가 무슨 타입인지 알 수 있다는 얘기입니다.</p>
-<p>반면, <code>RankN</code>으로 <code>(forall s. ST s a)</code>로, 괄호 안에 <code>forall</code>가 있을 경우, <em>반드시 모든 타입을 받을 수 있는 ST계산만</em> 들어와야 합니다. 이 타입이 뭔지는 알 수가 없다는 얘기입니다. 이 타입이 뭔지 모르기 때문에, 만일 이 타입을 쓰는 코드가 있다면 컴파일 체커를 통과하지 못합니다.</p>
-<p><code>ST</code>안에서 <code>s</code>에 의존하는 값을 만들어 이리 저리 사용하다가 나중에 이 값을 꺼내려고 <code>runST</code>를 돌린다고 가정하면,</p>
-<p>생각을, 안에 있던 데이터를 직접 꺼내오는 작업으로 바로 연결하지 말고, 작업을 하기 전 컴파일러 입장에서 우선 타입이 맞는지 결정을 내릴 수 있는가를 생각해 보시기 바랍니다.</p>
+<p>반면, <code>RankN</code>으로 <code>(forall s. ST s a)</code>로, 괄호 안에 <code>forall</code>가 있을 경우, <em>반드시 State로 모든 타입을 받을 수 있는 ST계산만</em> 들어와야 합니다. State 타입이 뭔지 알 수가 없다는 얘기입니다. 이 타입이 뭔지 모르기 때문에, … (고민중)</p>
 <p>즉 타입만으로 <code>ST</code>안에서 만든 <code>Ref</code>값 같은 것들이 <code>ST</code>를 벗어날 수 없음을 보장할 수 있습니다.</p>
 
 <div class="comment">
