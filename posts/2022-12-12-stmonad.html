@@ -101,6 +101,7 @@
 <p>그런데 그냥 <code>b</code>가 될 놈이 아니라, <code>forall b. (a -&gt; b) -&gt; b</code>가 될 놈입니다. 이 함수의 구현은 <code>b</code>에 전혀 의존하지 않는 구현이란 얘깁니다. <code>b</code>가 무슨 타입이 들어오든 <code>(a -&gt; b) -&gt; b</code> 구현이 문제가 생기지 않아야 합니다. 위 예처럼 <code>box</code>함수가 하듯이 먼저 <code>a</code>를 넣어 놓으면, <code>b</code>가 어떤 함수든 <code>(a -&gt; b)</code>인 함수를 넣어줄 수 있습니다.</p>
 <p>※ 그래서 <code>a</code>는 <code>forall b. (a -&gt; b) -&gt; b</code>로 표현할 수 있습니다.</p>
 <h3 id="폴리모픽-자리에는-언젠가는-구체-타입이-들어온다.">폴리모픽 자리에는 언젠가는 구체 타입이 들어온다.</h3>
+<p>(들어오긴 하지만 꼭 인지해야 하는 건 아닙니다.)</p>
 <p><code>forall a. Show a =&gt; a</code>라고 되어 있으면, 언젠가 Show 인스턴스가 정의되어 있는 타입이 들어올테고,<br />
 <code>forall a. a</code>라고 되어 있으면, 제한 없이 어떤 타입이든 들어올 겁니다.<br />
 <code>(forall a. a -&gt; b)</code>라고 되어 있으면, “모든 타입을 받아도 문제 없이 <code>b</code>를 내뱉는 함수”가 들어 옵니다.</p>
@@ -126,18 +127,25 @@
 <p>컴파일러가 특별하게 처리할 <code>realWorld#</code>을 <code>s</code>자리에 넣어주고 있습니다.<br />
 인자로 넘어 오는 ST계산computation을 보면 <code>(forall s. ST s a)</code>가 들어 오게 될테니, <code>s</code>는 어떤 타입을 줘도 상관 없다는 얘기입니다.</p>
 <h3 id="rankn인-것과-아닌-것의-차이가-뭘까요">RankN인 것과 아닌 것의 차이가 뭘까요?</h3>
-<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ot">runST ::</span> <span class="kw">forall</span> a s<span class="op">.</span> (<span class="dt">ST</span> s a) <span class="ot">-&gt;</span> a <span class="co">-- 가정</span></span>
+<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ot">runSTLike ::</span> <span class="kw">forall</span> a s<span class="op">.</span> (<span class="dt">ST</span> s a) <span class="ot">-&gt;</span> a <span class="co">-- 가정</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="ot">runST ::</span> <span class="kw">forall</span> a<span class="op">.</span> (<span class="kw">forall</span> s<span class="op">.</span> <span class="dt">ST</span> s a) <span class="ot">-&gt;</span> a <span class="co">-- 실제 구현</span></span></code></pre></div>
 <p>위부터 얘기하면, <code>s</code>가 꼭 모든 타입을 받아도 문제가 없는 ST계산이 들어 올 필요가 없습니다.<br />
 반면 <code>RankN</code>은 반드시 모든 타입을 받아도 문제가 생기지 않는 ST계산이 들어와야 합니다.</p>
 <p>“The forall ensures that the internal state used by the ST computation is inaccessible to the rest of the program.”</p>
 <p>이 차이가 어째서 이런 결과를 만들어 낼까요? (아직 고민 중)</p>
+<p><code>forall</code>이 붙지 않은 위의 경우, 모든 타입을 받아도 문제가 없는 ST계산이 아니라, <code>Int</code>를 State로 받는 계산이거나, <code>String</code>을 State로 받는 계산 등, 특정 타입을 State로 받는 ST계산이 들어올 수 있습니다. 즉, State가 무슨 타입인지 알 수 있습니다. 나중에라도 State가 무슨 타입인지 알 수 있다는 얘기입니다.</p>
+<p>반면, <code>RankN</code>으로 <code>(forall s. ST s a)</code>로, 괄호 안에 <code>forall</code>가 있을 경우, <em>반드시 State로 모든 타입을 받을 수 있는 ST계산만</em> 들어와야 합니다. State 타입이 뭔지 알 수가 없다는 얘기입니다. 이 타입이 뭔지 모르기 때문에,</p>
 <p>ST모나드의 목표는 <code>ST s (STRef s a)</code>를 안전하게 쓰자입니다.</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">STRef</span> s a <span class="ot">=</span> <span class="dt">STRef</span> (<span class="dt">MutVar</span><span class="op">#</span> s a)</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">MutVar</span><span class="op">#</span> s a</span></code></pre></div>
-<p><code>forall</code>이 붙지 않은 위의 경우, 모든 타입을 받아도 문제가 없는 ST계산이 아니라, <code>Int</code>를 State로 받는 계산이거나, <code>String</code>을 State로 받는 계산 등, 특정 타입을 State로 받는 ST계산이 들어올 수 있습니다. 즉, State가 무슨 타입인지 알 수 있습니다. 나중에라도 State가 무슨 타입인지 알 수 있다는 얘기입니다.</p>
-<p>반면, <code>RankN</code>으로 <code>(forall s. ST s a)</code>로, 괄호 안에 <code>forall</code>가 있을 경우, <em>반드시 State로 모든 타입을 받을 수 있는 ST계산만</em> 들어와야 합니다. State 타입이 뭔지 알 수가 없다는 얘기입니다. 이 타입이 뭔지 모르기 때문에, … (고민중)</p>
-<p>즉 타입만으로 <code>ST</code>안에서 만든 <code>Ref</code>값 같은 것들이 <code>ST</code>를 벗어날 수 없음을 보장할 수 있습니다.</p>
+<p>위 <code>runSTLike</code>와 <code>runST</code>에 넣어주면 어떻게 되나 보겠습니다.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ot">runSTFake ::</span> <span class="kw">forall</span> a s<span class="op">.</span> <span class="dt">ST</span> s (<span class="dt">STRef</span> s a) <span class="ot">-&gt;</span> <span class="dt">STRef</span> s a</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="ot">runST ::</span> <span class="kw">forall</span> a<span class="op">.</span> (<span class="kw">forall</span> s<span class="op">.</span> <span class="dt">ST</span> s (<span class="dt">STRef</span> s a)) <span class="ot">-&gt;</span> <span class="dt">STRef</span> s a</span></code></pre></div>
+<p><code>runSTFake</code>에서 <code>ST s (STRef s a)</code>가 아니라, 전체 <code>runSTFake</code>는 <code>s</code>가 어떤 타입이 들어와도 문제 없는 구현이란 뜻입니다. <code>ST</code>안에 들어 있는 <code>s</code>와 결과 <code>STRef s a</code>에 있는 <code>s</code>는 같은 <code>s</code>입니다. 이럴 경우 원래 <code>ST</code>의 목적과는 달리 <code>State</code>가, 즉 <code>STRef</code>형태의 값들이 빠져 나갑니다.<br />
+<code>runST</code>는 어떤 타입의 <code>s</code>에도 문제 없는 ST계산을 받아서, 즉 <code>s</code>가 뭔지 모르는 계산을 받아서, 모르는 <code>s</code>에 의존하는 <code>STRef s a</code>를 내뱉고 있습니다. <code>forall s</code>가 Rank2로 걸려 있어, 마지막 결과 <code>s</code>와는 다른 값입니다. 헛갈리지 않게 다시 쓰면</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ot">runST ::</span> <span class="kw">forall</span> a s'<span class="op">.</span> (<span class="kw">forall</span> s<span class="op">.</span> <span class="dt">ST</span> s (<span class="dt">STRef</span> s a)) <span class="ot">-&gt;</span> <span class="dt">STRef</span> s' a</span></code></pre></div>
+<p>즉, <code>ST</code>안에 있는 <code>s</code>와 바깥의 <code>s'</code>은 같은 값이 아닙니다. 이 경우 타입 불일치 에러가 납니다. 즉 타입 체커가 <code>forall</code> 하나를 추가하는 것 만으로 <code>ST</code>안에서 만든 <code>Ref</code>값 같은 것들이 <code>ST</code>를 벗어날 수 없음을 보장할 수 있습니다.</p>
+<p><a href="https://github.com/damhiya/Presentations/blob/master/HaskellSchoolSeminar/presentation.pdf">Haskell School Seminar - ST Monad - 다믜</a></p>
 
 <div class="comment">
 <script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
