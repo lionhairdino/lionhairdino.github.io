@@ -81,7 +81,14 @@
     
 </div>
 
-<p>IO와 비슷하지만, <code>forall</code>의 추가로 타입 체커가 많은 걸 보장합니다.</p>
+<p><code>IO</code>와 비슷하지만, <code>forall</code>의 추가로 타입 체커가 많은 걸 보장합니다.</p>
+<h2 id="st-모나드의-용도">ST 모나드의 용도</h2>
+<p>용도 요약<br />
+Mutation이 위험한 이유가 뭘까요? 한 쓰레드가 값을 읽고, 값을 수정해서 다시 쓰려고 할 때, 다른 쓰레드가 바꿔놨다면 안정성이 깨기게 됩니다. 바로 여러 쓰레드가 비동기로 접근하는 경우입니다. 만일, Mutation이 일어나는 동안 하나의 프로세스만 접근한다는 걸 보장한다면 어떨까요?<br />
+한 쓰레드 내에서만 Mutation이 일어나고, 이 Mutation이 이 쓰레드를 벗어나는 일이 없다면, Mutation도 안전해질 수 있습니다.</p>
+<p>자세한 내용은 아래 슬라이드를 참고해 주세요.<br />
+<a href="https://github.com/damhiya/Presentations/blob/master/HaskellSchoolSeminar/presentation.pdf">Haskell School Seminar - ST Monad - 다믜님</a></p>
+<p>여기서는 한 쓰레드에서만 쓴다는 걸 어떻게 타입으로 보장하는지를 보는 게 목표입니다.</p>
 <h2 id="forall">forall</h2>
 <p><a href="../posts/2021-05-04-forall.html">forall - 아무거나와 모든 것의 차이</a></p>
 <h2 id="준비-운동">준비 운동</h2>
@@ -145,7 +152,6 @@
 <code>runST</code>는 어떤 타입의 <code>s</code>에도 문제 없는 ST계산을 받아서, 즉 <code>s</code>가 뭔지 모르는 계산을 받아서, 모르는 <code>s</code>에 의존하는 <code>STRef s a</code>를 내뱉고 있습니다. <code>forall s</code>가 Rank2로 걸려 있어, 마지막 결과 <code>s</code>와는 다른 값입니다. 헛갈리지 않게 다시 쓰면</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ot">runST ::</span> <span class="kw">forall</span> a s'<span class="op">.</span> (<span class="kw">forall</span> s<span class="op">.</span> <span class="dt">ST</span> s (<span class="dt">STRef</span> s a)) <span class="ot">-&gt;</span> <span class="dt">STRef</span> s' a</span></code></pre></div>
 <p>즉, <code>ST</code>안에 있는 <code>s</code>와 바깥의 <code>s'</code>은 같은 값이 아닙니다. 이 경우 타입 불일치 에러가 납니다. 즉 타입 체커가 <code>forall</code> 하나를 추가하는 것 만으로 <code>ST</code>안에서 만든 <code>Ref</code>값 같은 것들이 <code>ST</code>를 벗어날 수 없음을 보장할 수 있습니다.</p>
-<p><a href="https://github.com/damhiya/Presentations/blob/master/HaskellSchoolSeminar/presentation.pdf">Haskell School Seminar - ST Monad - 다믜님</a></p>
 
 <div class="comment">
 <script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
