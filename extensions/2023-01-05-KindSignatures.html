@@ -4,9 +4,9 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-        <title>lionhairdino - 확장 PolyKinds(작성예정)</title>
+        <title>lionhairdino - 확장 KindSignatures(작성예정)</title>
 
-        <meta name="description" content="lionhairdino - 확장 PolyKinds(작성예정)" />
+        <meta name="description" content="lionhairdino - 확장 KindSignatures(작성예정)" />
         <meta property="og:description" content="하스켈 함수형 프로그래밍" />
 
         <link rel="stylesheet" type="text/css" href="../css/default.css" />
@@ -33,9 +33,9 @@
         <meta name="msapplication-TileColor" content="#ff7500" />
         <meta name="theme-color" content="#ffffff" />
         <meta property="og:type" content="website" />
-        <meta property="og:title" content="확장 PolyKinds(작성예정)" />
+        <meta property="og:title" content="확장 KindSignatures(작성예정)" />
         <meta property="og:site_name" content="Lionhairdino" />
-        <meta property="og:url" content="https://lionhairdino.github.io/extensions/2023-01-05-PolyKinds.html" />
+        <meta property="og:url" content="https://lionhairdino.github.io/extensions/2023-01-05-KindSignatures.html" />
 
         <meta property="og:image" content="https://lionhairdino.github.io/images/state400px.png" />
 
@@ -74,38 +74,31 @@
             </div>
         </div>
         <div class="js-toc-content">
-            <h1>확장 PolyKinds(작성예정)</h1>
+            <h1>확장 KindSignatures(작성예정)</h1>
             <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
 <div class="info">
     Posted on January  5, 2023
     
 </div>
 
-<p><a href="https://ghc.gitlab.haskell.org/ghc/doc/users_guide/exts/poly_kinds.html">GHC 공식 가이드 - 6.4.12. Kind polymorphism</a></p>
-<h2 id="준비-운동">준비 운동</h2>
-<p>타입이 들어갈 자리를 <code>a</code>로 두면, 필요에 따라 여러 타입으로 바뀔 수 있는 걸 폴리모픽 타입이라 했습니다.<br />
-여러 타입을 <code>a</code>로 추상화해서 표현했다 말할 수도 있습니다.<br />
-</p>
-<p>폴리모픽 카인드는 필요에 따라 카인드를 다른 것으로 볼 수 있다는 얘기입니다.<br />
-</p>
-<h2 id="다형polymorphic-카인드">다형Polymorphic 카인드</h2>
-<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">App</span> f a <span class="ot">=</span> <span class="dt">MkApp</span> (f a)</span></code></pre></div>
-<p><code>App</code>의 카인드를 보면<br />
-<code>Type -&gt; Type</code>인 <code>f</code>를 받고, <code>Type</code>을 받아 <code>Type</code>을 돌려주는 걸로 읽을 수 있습니다.</p>
-<pre><code>(Type -&gt; Type) -&gt; Type -&gt; Type</code></pre>
-<p>그런데, 더 일반적인 상황까지 고려하면 <code>a</code>를 <code>Type</code>으로 보지 않고, <code>Type -&gt; Type</code>으로 볼 수도 있습니다. (<code>a</code>, <code>1</code>,… 보다 일반화해서 표현하면, 어떤 생성자 안에 들어 있는 타입 <code>Just 1</code>, <code>[1]</code>, … 등으로 볼 수도 있습니다.) 그럼, <code>a</code>에 <code>(Type -&gt; Type)</code>을 넣으면,</p>
-<pre><code>((Type -&gt; Type) -&gt; Type)) -&gt; (Type -&gt; Type) -&gt; Type</code></pre>
-<p>로 일반화할 수 있습니다. <code>KindSignatures</code> 확장을 켜지 않고, GHC가 이렇게 카인드를 추론하게 하려면, <code>a</code>에 더미 생성자를 추가해서 <code>Type -&gt; Type</code>으로 추론하게 할 수 있긴 있습니다만, <code>PolyKinds</code> 확장을 켜면, 더 일반적인 카인드로 추론하게 할 수 있습니다.</p>
-<p><code>PolyKinds</code>확장을 켜면 <code>App</code>의 카인드를 이렇게 추론합니다.</p>
-<pre><code>forall k. (k -&gt; Type) -&gt; k -&gt; Type</code></pre>
-<p>아래 같이 구체 카인드로 추론하는 걸 인스턴스를 만들었다, 인스턴스화 되었다, 인스턴스다라고 말합니다.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">App</span> f a <span class="ot">=</span> <span class="dt">MkApp</span> (f a)</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="dt">App</span> <span class="dt">Maybe</span> <span class="dt">Int</span> <span class="co">-- App의 카인드안에 있는 k가 Type으로 인스턴스화 됐다고 말합니다. (is instantiated to)</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">T</span> a <span class="ot">=</span> mkT (a <span class="dt">Int</span>) <span class="co">-- `a`는 `(Type -&gt; Type)`으로 추론하고,</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="dt">App</span> <span class="dt">T</span> <span class="dt">Maybe</span> <span class="co">-- `k`는 (Type -&gt; Type) 으로 추론됩니다.</span></span></code></pre></div>
-<p>(작성중)</p>
+<p><a href="https://ghc.gitlab.haskell.org/ghc/doc/users_guide/exts/kind_signatures.html#extension-KindSignatures">GHC 공식 가이드 - 6.11.3. Explicitly-kinded quantification</a></p>
+<p>폴리모픽 <code>a</code>의 카인드를 명시적으로 지정할 수 있습니다.</p>
+<p>하스켈 워크숍 1999에서 John Hughes는 <code>cxt</code>를 <code>Type</code>이 아닌, <code>Type -&gt; Type</code>으로 추론되도록 다음과 같이 정의해야만 했다고 합니다.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Set</span> cxt a <span class="ot">=</span> <span class="dt">Set</span> [a] <span class="op">|</span> <span class="dt">Unused</span> (cxt a <span class="ot">-&gt;</span> ())</span></code></pre></div>
+<p>이렇게 쓰지 않을 <code>Unused</code>를 만들어 <code>cxt</code>가 <code>Type -&gt; Type</code>으로 추론되게끔 했다고 합니다. 하지만 지금은 이 확장을 쓰면 됩니다.</p>
+<p><code>data</code> 선언에서</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Set</span> (<span class="ot">cxt ::</span> <span class="dt">Type</span> <span class="ot">-&gt;</span> <span class="dt">Type</span>) a <span class="ot">=</span> [a]</span></code></pre></div>
+<p><code>type</code> 선언에서</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">T</span> (<span class="ot">f ::</span> <span class="dt">Type</span> <span class="ot">-&gt;</span> <span class="dt">Type</span>) <span class="ot">=</span> f <span class="dt">Int</span></span></code></pre></div>
+<p><code>class</code> 선언에서</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> (<span class="dt">Eq</span> a) <span class="ot">=&gt;</span> <span class="dt">C</span> (<span class="ot">f ::</span> <span class="dt">Type</span> <span class="ot">-&gt;</span> <span class="dt">Type</span>) a <span class="kw">where</span> <span class="op">...</span></span></code></pre></div>
+<p>타입 서명의 <code>forall</code> 안에서</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ot">f ::</span> <span class="kw">forall</span> (<span class="ot">cxt ::</span> <span class="dt">Type</span> <span class="ot">-&gt;</span> <span class="dt">Type</span>)<span class="op">.</span> <span class="dt">Set</span> cxt <span class="dt">Int</span></span></code></pre></div>
+<p>함수 서명에서</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ot">g ::</span> (<span class="dt">Int</span><span class="ot"> ::</span> <span class="dt">Type</span>) <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ot">g ::</span> <span class="kw">forall</span> a<span class="op">.</span> a <span class="ot">-&gt;</span> (<span class="ot">a ::</span> <span class="dt">Type</span>)</span></code></pre></div>
+<p>이렇게 카인드를 지정해 줄 수 있습니다.</p>
+<p>(작성 중)</p>
 
 <div class="comment">
 <script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
