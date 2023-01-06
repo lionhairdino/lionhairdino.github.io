@@ -4,9 +4,9 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-        <title>lionhairdino - Reverse State 모나드 - 교차 재귀 끝판왕 (작성 예정)</title>
+        <title>lionhairdino - Reverse State 모나드 - 교차 재귀 끝판왕 (작성 중)</title>
 
-        <meta name="description" content="lionhairdino - Reverse State 모나드 - 교차 재귀 끝판왕 (작성 예정)" />
+        <meta name="description" content="lionhairdino - Reverse State 모나드 - 교차 재귀 끝판왕 (작성 중)" />
         <meta property="og:description" content="하스켈 함수형 프로그래밍" />
 
         <link rel="stylesheet" type="text/css" href="../css/default.css" />
@@ -33,7 +33,7 @@
         <meta name="msapplication-TileColor" content="#ff7500" />
         <meta name="theme-color" content="#ffffff" />
         <meta property="og:type" content="website" />
-        <meta property="og:title" content="Reverse State 모나드 - 교차 재귀 끝판왕 (작성 예정)" />
+        <meta property="og:title" content="Reverse State 모나드 - 교차 재귀 끝판왕 (작성 중)" />
         <meta property="og:site_name" content="Lionhairdino" />
         <meta property="og:url" content="https://lionhairdino.github.io/posts/2022-12-12-reversestatemonad.html" />
 
@@ -74,7 +74,7 @@
             </div>
         </div>
         <div class="js-toc-content">
-            <h1>Reverse State 모나드 - 교차 재귀 끝판왕 (작성 예정)</h1>
+            <h1>Reverse State 모나드 - 교차 재귀 끝판왕 (작성 중)</h1>
             <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
 <div class="info">
     Posted on December 12, 2022
@@ -83,23 +83,38 @@
 
 <p>(아직 작성 중)</p>
 <h2 id="준비-운동">준비 운동</h2>
-<p>교차 재귀를 읽는 연습</p>
-<p>odd, even</p>
+<p>교차 재귀를 읽는 연습<br />
+“Programming in Haskell - Graham Hutton”에서 발췌</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">even</span><span class="ot"> ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Bool</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">even</span> <span class="dv">0</span>       <span class="ot">=</span> <span class="dt">True</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">even</span> n <span class="ot">=</span> <span class="fu">odd</span> (n <span class="op">-</span> <span class="dv">1</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">odd</span><span class="ot"> ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Bool</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">odd</span> <span class="dv">0</span>       <span class="ot">=</span> <span class="dt">False</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">odd</span> n <span class="ot">=</span> <span class="fu">even</span> (n <span class="op">-</span> <span class="dv">1</span>)</span></code></pre></div>
+<p><code>even</code>은 <code>odd</code>를 부르고, <code>odd</code>는 <code>even</code>을 부릅니다. 종료 조건이 없다면 무한히 부를 겁니다. 이런 재귀들은 실용적이려면 어떻게든 종료하는 방법이 필요합니다.<br />
+</p>
+<ol type="1">
+<li>종료되는 조건으로 향해 가든,</li>
+<li>무한한 것 중 지정 개수만 가져오든,</li>
+<li>종료되는 함수를 넘겨 주든</li>
+</ol>
+<p>해야합니다. 마지막 3번째가 낯선 분이 많을 것 같은데요. Reverse State Monad가 이 방법을 씁니다. (처음 읽을 때, 종료 조건이 안보여 이 건 뭐지 했습니다.)</p>
 <h2 id="reverse-state-모나드">Reverse State 모나드</h2>
-<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">RState</span> s a <span class="ot">=</span> <span class="dt">RState</span> {<span class="ot"> runRState ::</span> s <span class="ot">-&gt;</span> (a,s) }</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Monad</span> (<span class="dt">RState</span> s) <span class="kw">where</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span> x <span class="ot">=</span> <span class="dt">RState</span> <span class="op">$</span> (,) x</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">RState</span> sf <span class="op">&gt;&gt;=</span> f <span class="ot">=</span> <span class="dt">RState</span> <span class="op">$</span> \s <span class="ot">-&gt;</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>        <span class="kw">let</span> (a,past) <span class="ot">=</span> sf future</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>            (b,future) <span class="ot">=</span> runRState (f a) s</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>        <span class="kw">in</span> (b,past)</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>rget <span class="ot">=</span> <span class="dt">RState</span> <span class="op">$</span> \s <span class="ot">-&gt;</span> (s,s)</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>rmodify f <span class="ot">=</span> <span class="dt">RState</span> <span class="op">$</span> \s <span class="ot">-&gt;</span> ((),f s)</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>rput <span class="ot">=</span> rmodify <span class="op">.</span> <span class="fu">const</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>execRState f s <span class="ot">=</span> <span class="fu">snd</span> (runRState f s)</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">RState</span> s a <span class="ot">=</span> <span class="dt">RState</span> {<span class="ot"> runRState ::</span> s <span class="ot">-&gt;</span> (a,s) }</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Monad</span> (<span class="dt">RState</span> s) <span class="kw">where</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span> x <span class="ot">=</span> <span class="dt">RState</span> <span class="op">$</span> (,) x</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">RState</span> sf <span class="op">&gt;&gt;=</span> f <span class="ot">=</span> <span class="dt">RState</span> <span class="op">$</span> \s <span class="ot">-&gt;</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>        <span class="kw">let</span> (a,past) <span class="ot">=</span> sf future</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>            (b,future) <span class="ot">=</span> runRState (f a) s</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>        <span class="kw">in</span> (b,past)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>rget <span class="ot">=</span> <span class="dt">RState</span> <span class="op">$</span> \s <span class="ot">-&gt;</span> (s,s)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>rmodify f <span class="ot">=</span> <span class="dt">RState</span> <span class="op">$</span> \s <span class="ot">-&gt;</span> ((),f s)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>rput <span class="ot">=</span> rmodify <span class="op">.</span> <span class="fu">const</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>execRState f s <span class="ot">=</span> <span class="fu">snd</span> (runRState f s)</span></code></pre></div>
 <p><a href="https://kseo.github.io/tags/reverse%20state%20monad.html">Reverse State Monad - 서광열</a></p>
 <ol type="1">
 <li><code>RState</code> bind를 읽으려고 하면 아무리 Lazy로 읽어도(odd, even 교차 호출 읽듯이) 읽히지 않는다. 특정 형태의 <code>s -&gt; (a, s)</code> 가 있어야 될 것 같다.</li>
@@ -108,7 +123,7 @@
 </ol>
 <p>Lazy한 것들도 손으로 풀면서 쫓아가면 <strong><em>종료 컨디션이나, 일부분만 평가할 필요가 있거나</em></strong> 하는 식으로 파악이 되는데, 위 <code>RState</code> 바인드는 애초에 아무 <code>s -&gt; (a, s)</code> 가 들어온다고 생각하고 읽으면 돌아가는 모양이 눈에 안들어 옵니다. 무한히 교차 호출이 일어나기만 하고, 이 걸 나중에 어떤식으로 쓸 수 있을지 파악이 안됩니다.</p>
 <p><code>rput</code>을 넣은 다음, <code>rmodify</code>몇 번하고 <code>rget</code>을 넣으면, 동작이, 언젠가 들어올 state에다 계속 함수를 적용해 놓는 모양이 됩니다. 마치 아래 같은 모양이요.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>\s <span class="ot">-&gt;</span> (<span class="op">+</span><span class="dv">1</span>) <span class="op">.</span> (<span class="op">+</span><span class="dv">2</span>) <span class="op">.</span> (<span class="op">+</span><span class="dv">3</span>) <span class="op">$</span> s</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>\s <span class="ot">-&gt;</span> (<span class="op">+</span><span class="dv">1</span>) <span class="op">.</span> (<span class="op">+</span><span class="dv">2</span>) <span class="op">.</span> (<span class="op">+</span><span class="dv">3</span>) <span class="op">$</span> s</span></code></pre></div>
 <p>그래서 미래의 <code>s</code>에 모아 두었던 함수를 내리 적용하게 됩니다. <code>rput</code>도 <code>rget</code>도 넣지 않으면 그냥 무한 교차 재귀일 뿐입니다.</p>
 <p>무한 교차 재귀 구조를 만들어 놓고, 당장은 종료 컨디션이나, 필요한 부분이 알려져 있지 않지만, <em>교차 재귀를 할 때 필요한 함수로 뭘 넣느냐에 따라 의미있는 값이 나오는 구조</em>입니다. 그러는 와중에 값은 각 단계의 effect에 의존하며 값이 바뀌니 그야말로 과거와 미래가 짬뽕된 느낌입니다.</p>
 <h2 id="state-모나드와의-차이">State 모나드와의 차이</h2>
