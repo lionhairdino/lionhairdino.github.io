@@ -122,7 +122,7 @@ bottom은 아예 값 개념이 없습니다.</p>
 <p>“모든 타입에는 bottom이 존재합니다.”</p>
 <p>실제 데이터 타입을 선언할 때 Bottom을 같이 선언하지 않아도, 자동으로 모든 타입에는 Bottom 타입이 함께 있다 볼 수 있습니다. (볼 수 있습니다라 적은 이유는, 개념 설명을 이렇게 하는 자료는 있는데, 정말 명시적으로 Int | Bottom 이런식의 코딩, 구현으로 바뀐다는 자료는 못 찾았습니다. 아마도 구현 자체를 바꾸는게 아니라, 이 개념을 염두하고 내부 처리를 하겠지요)<br />
 참고 - <a href="https://medium.com/@hgiasac/typeable-a-long-journey-to-type-safe-dynamic-type-representation-part-3-80a2a34329dd">Toan Nguyen - Typeable</a>에 lifted 타입 설명에 보면 Bool 타입은 3가지 값 True, False, Bottom을 갖는다고 합니다.</p>
-<p>※ type theory에서 bottom은 모든 타입의 서브 타입인데, 상대적인 개념으로 “모든 타입”을 의미하는 top 타입이란 용어도 있습니다.</p>
+<p>※ type theory에서 bottom은 모든 타입의 서브 타입인데, 상대적인 개념으로 모든 타입의 슈퍼 타입을 의미하는 top 타입이란 용어도 있습니다.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ot">f ::</span> <span class="dt">Bool</span> <span class="ot">-&gt;</span> <span class="dt">Bool</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>f x <span class="ot">=</span> <span class="fu">undefined</span></span></code></pre></div>
 <p><code>Bool</code>에 있는 bottom을 쓴다는 뜻이고,</p>
@@ -147,7 +147,7 @@ bottom은 아예 값 개념이 없습니다.</p>
 <h2 id="unit">unit</h2>
 <p><code>Bool</code> 타입 값을 위한 비트는 <code>1</code>비트가 필요합니다. <code>0</code>이면 <code>False</code>, <code>1</code>이면 <code>True</code>로 처리하면 되니 <code>1</code>비트만 있으면 됩니다. 그럼 될 수 있는 값이 하나인 타입은 몇 비트가 필요할까요? <code>0</code>비트입니다. 데이터가 <code>0</code>비트라면 데이터가 없다는 말과 같습니다. 타입만 알려줘서 컴파일 타임에 타입 체커만 통과 하는 거면 Void로도 되지 않았을까요? 왜 unit이 필요했을까요?</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> () <span class="ot">=</span> ()</span></code></pre></div>
-<p>Void 타입은, 타입 체커는 통과하지만 언제든 절대 값이 들어오면 안되는 곳에 써주는 안전 장치입니다. 막다른 골목 표시 같은 겁니다.<br />
+<p>Void 타입은, 타입 체커는 통과하지만 언제든 절대 값이 들어오면 안되는 곳에 써주는 안전 장치입니다. 막다른 골목 표시 같은 겁니다. <br />
 unit은 평가하게 되도 에러가 나지 않습니다. 또한 폴리모픽이 아니기 때문에 명시적으로 ()를 지정해 줬을 때만 타입 체커를 통과합니다. 값이 고정이니 의미있는 정보를 담을 순 없습니다. 더미값이 필요할 때 써주는데, 필요한 크기가 0이므로 메모리를 효율적으로 씁니다. Void는 GHC가 값이 들어오면 안된다는 걸 체크하는 <em>안전 장치</em>라면, ()는 프로그래머가 명시적으로 <em>패턴 매칭 통과</em>를 위해 쓰는 표시입니다.</p>
 <h2 id="참고---각-타입들을-인자로-받을-때의-동작">참고 - 각 타입들을 인자로 받을 때의 동작</h2>
 <div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Data.Void</span></span>
