@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko" lang="ko">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <title>lionhairdino - Template Haskell(작성 중)</title>
+
+        <meta name="description" content="하스켈에서 메타 프로그래밍하기 - 템플릿 하스켈" />
+        <meta property="og:description" content="하스켈에서 메타 프로그래밍하기 - 템플릿 하스켈" />
+
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <link rel="icon" href="https://lionhairdino.github.io/favicon.svg" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino16px.png" sizes="16x16" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino24px.png" sizes="24x24" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino32px.png" sizes="32x32" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino48px.png" sizes="48x48" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino57px.png" sizes="57x57" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino60px.png" sizes="60x60" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino64px.png" sizes="64x64" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino72px.png" sizes="72x72" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino76px.png" sizes="76x76" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino114px.png" sizes="114x114" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino120px.png" sizes="120x120" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino144px.png" sizes="144x144" />
+        <link rel="shortcut icon" href="../favicon.ico" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino152px.png" sizes="152x152" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino180px.png" sizes="180x180" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino192px.png" sizes="192x192" />
+        <link rel="manifest" href="../site.webmanifest" />
+        <link rel="mask-icon" href="https://lionhairdino.github.io/Lionhairdino_black.svg" color="#ff7500" />
+        <meta name="msapplication-TileImage" content="/images/favicon/Lionhairdino144px.png" />
+        <meta name="msapplication-TileColor" content="#ff7500" />
+        <meta name="theme-color" content="#ffffff" />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="Template Haskell(작성 중)" />
+        <meta property="og:site_name" content="Lionhairdino" />
+        <meta property="og:url" content="https://lionhairdino.github.io/posts/2023-01-13-TemplateHaskell.html" />
+
+        <meta property="og:image" content="https://lionhairdino.github.io/images/state400px.png" />
+
+      <meta name="keywords" content="template, meta, Quotations, Quotes, quasiquotation">
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-E9WZ6VXGHP"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-E9WZ6VXGHP');
+</script>
+<script src="../script/copycode.js"></script>
+<script async src="https://cse.google.com/cse.js?cx=9c53b4915cbb2605c"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.11.1/tocbot.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.11.1/tocbot.css" />
+    </head>
+    <body>
+        <div id="header">
+            <div style="display:inline-block;margin-right:5px;padding-top: 5px;" id="logo">
+                <a href="../"><img style="width:30px;border:none" src="../images/favicon/Lionhairdino48px.png"></a>
+            </div>
+            <div style="display:inline-block;vertical-align: top;padding-top:5px;" id="navigation">
+                <a href="../">lionhairdino</a>
+                <a href="../about.html">about</a>
+                <!--<a href="/archive.html">archive</a>-->
+            </div>
+            <div style="display:inline-block;font-size:0.8em;vertical-align: top;">
+                <div style="display:inline-block;vertical-align: top;padding-top: 5px">사이트내 검색</div>
+                <div style="display:inline-block;width:180px;"> 
+                    <div class="gcse-searchbox-only"></div>
+                </div>
+            </div>
+            <div>
+                여기 글들은 일종의 질문입니다. 용어 선택도 학계, 업계에서 쓰는 걸로 되어 있지 않고, 틀린 내용이 있을 수도 있습니다.
+            </div>
+        </div>
+        <div class="js-toc-content">
+            <h1>Template Haskell(작성 중)</h1>
+            <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+<div class="info">
+    Posted on January 13, 2023
+    
+</div>
+
+<p><a href="https://downloads.haskell.org/ghc/latest/docs/users_guide/exts/template_haskell.html#template-haskell">GHC 공식 문서 - 6.13. Template Haskell</a><br />
+<a href="https://github.com/leonidas/codeblog/blob/master/2011/2011-12-27-template-haskell.md">Basic Tutorial of Template Haskell</a><br />
+<a href="https://blog.ocharles.org.uk/guest-posts/2014-12-22-template-haskell.html">24 Days of GHC Extensions: Template Haskell</a><br />
+<a href="https://velog.io/@todd/%ED%94%84%EB%A1%9C%EA%B7%B8%EB%9E%98%EB%B0%8D-%ED%9D%91%EB%A7%88%EB%B2%95-TemplateHaskell-1">프로그래밍 흑마법: TemplateHaskell - 김은민님</a></p>
+<p>C언어의 전처리기쯤으로 생각하고, 특정 <code>$(...)</code>을 만나면 코드로 대체하겠거니 하고, 자세한 공부 없이 써오고 있었습니다. 미루다 미루다 드디어 보기 시작했는데, 전처리기보다는 더 강력한 작업을 할 수 있는 걸로 보입니다. 여기서는 Template Haskell을 쓰는 정도의 이해를 하는 게 목표입니다. 자세한 동작 방식을 공부하려면 역시나 논문에 논문으로 들어 갑니다.</p>
+<p>“Metaprogramming은 C보다는 LISP 쪽에서 접근하는 게 더 낫습니다.
+LISP의 quasiquotation을 좀 더 복잡한, 컴파일 하는 언어에 맞춰 적용한 것으로 TemplateHaskell 등이 있습니다. - <span class="citation" data-cites="Ailrun">@Ailrun</span>”</p>
+<p><a href="https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/meta-haskell.pdf">Template Meta-programming for haskell - Tim Sheard, SPJ</a></p>
+<h2 id="template-haskell은-하스켈-코드를-생성하는-하스켈-코드-작성이-목표입니다.-라이브러리가-template-haskell을-쓴다고-하면-제일-먼저-구문을-만납니다.-여기다-하스켈-코드를-생성하는-하스켈-코드를-넣어주면-template-haskell-컴파일을-거쳐-생성된-하스켈-코드로-대체됩니다.-여기서-하스켈-코드를-생성하는-하스켈-코드는"><span class="math inline">$(...) Template Haskell은 *하스켈 코드를 생성하는 하스켈 코드 작성*이 목표입니다. 라이브러리가 Template Haskell을 쓴다고 하면, 제일 먼저 `$</span>(…)` 구문을 만납니다. 여기다 “하스켈 코드”를 생성하는 하스켈 코드를 넣어주면, Template Haskell 컴파일을 거쳐 생성된 “하스켈 코드”로 대체됩니다. 여기서 “하스켈 코드”를 생성하는 하스켈 코드는</h2>
+<pre><code>InfixE (Just (LitE (IntegerL 1))) (VarE GHC.Num.+) (Just (LitE (IntegerL 2)))</code></pre>
+<p>이런 모양을 넣어주게 됩니다. 보기 까다롭긴 한데, 일반적으로 작성하는 하스켈 문법과 다를 바 없습니다. 이 코드의 의미는 하스켈 문법의 <a href="http://en.wikipedia.org/wiki/Abstract_syntax_tree">AST(Abstract Syntax Tree)</a>입니다.</p>
+<p>※ 사람이 작성한 보통의 하스켈 코드는 GHC가 컴파일 타임에 AST로 뽑아내는데,이 때 나오는 AST와는 다른 것으로 보입니다. (추측) 아마도 TH가 하스켈 코드를 생성하기 위한 룰에만 적합한 AST를 따로 만든 것 같습니다.</p>
+<p>예를 들어, 함수를 호출하는 코드 <code>f x</code>의 AST는 <code>AppE (VarE f) (VarE x)</code>입니다. (당장 <code>VarE</code>가 뭔지, <code>AppE</code>가 뭔지 알 필요는 없습니다.) 이런 AST를 만들어서 <code>$(...)</code> 안에 두면, 나중에 Template Haskell 컴파일을 거치면 <code>f x</code>를 써 준 것과 같은 상태가 됩니다. 이하 Template Haskell은 <code>TH</code>로 표기하겠습니다.</p>
+<p>위와 같은 <code>InfixE ...</code>같은 구문 트리Syntax Tree를 직접 작성하려면 여간 까다로운게 아닙니다. 그래서 <code>TH</code>는 Quotations를 제공합니다. Quotations는 AST를 생성하는 편의sugar 문법으로 볼 수 있습니다.</p>
+<h2 id="quotations">Quotations</h2>
+<pre><code>[| 1 + 2 |]</code></pre>
+<p>이렇게 쓰면 위와 동일한 AST, 즉 <code>InfixE (Just (...</code>를 생성해 줍니다.<br />
+그 다음, 이 AST를 <code>$(...)</code>에 넣으면, 하스켈 코드를 생성하는 걸 볼 수 있습니다.</p>
+<pre><code>ghci&gt; [| 1 + 2 |]
+InfixE (Just (LitE (IntegerL 1))) (VarE GHC.Num.+) (Just (LitE (IntegerL 2)))
+ghci&gt; $(pure it)
+3</code></pre>
+<p><code>$(pure it)</code>는 <code>1 + 2</code> 코드를 생성했습니다.<br />
+※ 여기서 <code>it</code>을 안쓰고 직접 써주면 예상과 달리 오류가 나옵니다.<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
+<p>※ splice <a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> 는 <code>$x</code> 형태로 씁니다. <code>x</code>에는 표현식이 들어 갑니다. 이미 중위 연산자로 쓰이는 <code>$</code>가 있으므로, 이와 구별하기 위해 <code>$</code>와 <code>x</code> 사이에 공백이 있으면 안됩니다. <code>M.x</code>가 중위 연산자 <code>.</code>와 구별하기 위해 붙여쓰는 것과 마찬가지입니다. <code>$</code>와 <code>.</code>을 중위 연산자로 쓰려면 앞뒤로 공백을 넣어 주면 됩니다.</p>
+<h2 id="하스켈-코드-표현을-위한-adt">하스켈 코드 표현을 위한 ADT</h2>
+<p><code>TH</code>에서는 보통의 algebraic data types로 하스켈 프로그램을 표현합니다. 하스켈 언어 문법에 맞게 모델링하고, 하스켈 코드에 대응하는 AST(Abstract Syntax Tree)로 다음과 같이 표현합니다.</p>
+<pre><code>하스켈 Expression  은 Exp 타입으로,
+하스켈 Pattern     은 Pat 타입으로,
+하스켈 Literal     은 Lit 타입으로,
+하스켈 Declaration 은 Dec 타입으로 표현한다.</code></pre>
+<p><code>varx = VarE (mkName "x")</code>는 Expression <code>x</code><br />
+<code>patx = VarP (mkName "x")</code>는 Pattern <code>x</code><br />
+<code>str = LitE (StringL "str")</code>는 constant expression “str”<br />
+<code>tuple =TupE [varx, str]</code>는 Expression <code>(x, "str")</code><br />
+<code>LamE[patx]</code> 튜플은 람다식 <code>(\x -&gt; (x, "str"))</code></p>
+<p>Expressoin인 생성자들은 모두 <code>~E</code>가 붙어 있고, Pattern인 생성자들은 모두 <code>~P</code>가 붙어 있습니다.<br />
+<code>mkName</code>함수는 함수명이나 타입명 같은 식별자Identifier들에 대응하는 값을 생성합니다.</p>
+<p>표현식 quote는 옥스포드 브라켓(<code>[|...|]</code>)으로 감싸져 있습니다.</p>
+<p><code>[| 표현식 |]</code> 또는 <code>[e| 표현식 |]</code> quotes는 <code>Quote m =&gt; m Exp</code> 타입<br />
+<code>[d| 표현식 |]</code> quotes는 <code>Quote m =&gt; m [Dec]</code> 타입<br />
+<code>[t| 표현식 |]</code> quotes는 <code>Quote m =&gt; m Type</code> 타입<br />
+<code>[p| 표현식 |]</code> quotes는 <code>Quote m =&gt; m Pat</code> 타입</p>
+<h2 id="예시">예시</h2>
+<h3 id="tuplereplicate">TupleReplicate</h3>
+<p>아래는 Bulat’s 튜토리얼에서 발췌했습니다. (원 사이트에 있는 소스가 현재 제가 쓰는 GHC 9.4.2와는 맞지 않아 <code>VarP id</code>를 <code>[VarP id]</code>로, <code>VarE id</code>를 <code>Just (VarE id)</code>로 수정했습니다.)</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">module</span> <span class="dt">TupleReplicate</span> <span class="kw">where</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Language.Haskell.TH</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="ot">tupleReplicate ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Q</span> <span class="dt">Exp</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>tupleReplicate n <span class="ot">=</span> <span class="kw">do</span> <span class="fu">id</span> <span class="ot">&lt;-</span> newName <span class="st">&quot;x&quot;</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>                      <span class="fu">return</span> <span class="op">$</span> <span class="dt">LamE</span> [<span class="dt">VarP</span> <span class="fu">id</span>]</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>                                    (<span class="dt">TupE</span> <span class="op">$</span> <span class="fu">replicate</span> n <span class="op">$</span> <span class="dt">Just</span> (<span class="dt">VarE</span> <span class="fu">id</span>))</span></code></pre></div>
+<p>이 걸 splice에 집어 넣으면, 아래 코드를 생성합니다.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>(\x <span class="ot">-&gt;</span> (x, x, x))</span></code></pre></div>
+<p>이 코드에 <code>"x"</code> 인자를 주어 실행하면,</p>
+<pre><code>ghci&gt; :set -XTemplateHaskell
+ghci&gt; $(tupleReplicate 3) &quot;x&quot;
+(&quot;x&quot;,&quot;x&quot;,&quot;x&quot;)</code></pre>
+<h3 id="printf">printf</h3>
+<div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>yell file line <span class="ot">=</span> <span class="fu">fail</span> (<span class="op">$</span>(printf <span class="st">&quot;Error in file %s line %d&quot;</span>) file line)</span></code></pre></div>
+<p><code>TH</code>가 아래 코드를 생성합니다.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>yell file line <span class="ot">=</span> <span class="fu">fail</span> ((\x1 x2 <span class="ot">-&gt;</span> <span class="st">&quot;Error in file &quot;</span><span class="op">++</span>x1<span class="op">++</span><span class="st">&quot; line &quot;</span><span class="op">++</span><span class="fu">show</span> x2) file line)</span></code></pre></div>
+<h3 id="deriveshow">deriveShow</h3>
+<div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">T</span> <span class="ot">=</span> <span class="dt">A</span> <span class="dt">Int</span> <span class="dt">String</span> <span class="op">|</span> <span class="dt">B</span> <span class="dt">Integer</span> <span class="op">|</span> <span class="dt">C</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="op">$</span>(deriveShow '<span class="dt">'T</span>)</span></code></pre></div>
+<p><code>TH</code>가 아래 코드를 생성합니다.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">T</span> <span class="ot">=</span> <span class="dt">A</span> <span class="dt">Int</span> <span class="dt">String</span> <span class="op">|</span> <span class="dt">B</span> <span class="dt">Integer</span> <span class="op">|</span> <span class="dt">C</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Show</span> <span class="dt">T</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">show</span> (<span class="dt">A</span> x1 x2) <span class="ot">=</span> <span class="st">&quot;A &quot;</span><span class="op">++</span><span class="fu">show</span> x1<span class="op">++</span><span class="st">&quot; &quot;</span><span class="op">++</span><span class="fu">show</span> x2</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">show</span> (<span class="dt">B</span> x1)    <span class="ot">=</span> <span class="st">&quot;B &quot;</span><span class="op">++</span><span class="fu">show</span> x1</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">show</span> <span class="dt">C</span>         <span class="ot">=</span> <span class="st">&quot;C&quot;</span></span></code></pre></div>
+<h2 id="quotation-모나드">Quotation 모나드</h2>
+<p>(작성 중)</p>
+<section class="footnotes" role="doc-endnotes">
+<hr />
+<ol>
+<li id="fn1" role="doc-endnote"><p>Identifier는 <code>mkName</code>이나 <code>dyn</code>으로 정의해야 합니다.</p>
+<pre><code>ghci&gt; $(pure $ InfixE (Just (LitE (IntegerL 1))) (VarE GHC.Num.+) (Just (LitE (IntegerL 2))))
+
+&lt;interactive&gt;:56:45: error:
+    • Couldn't match expected type ‘Exp’
+                  with actual type ‘(Name -&gt; Exp) -&gt; Name -&gt; Exp’
+    • In the second argument of ‘InfixE’, namely ‘(VarE +)’</code></pre>
+<p>“Variable identifier가 show로 그냥 나온 거예요” - <span class="citation" data-cites="Ailrun">@Ailrun</span></p>
+<p>위와 같이 <code>GHC.Num.+</code>가 코드에 쓰이면 바로 함수로 인식합니다. splice에서 쓰려면 <code>mkName</code>으로 <code>captureable name</code>을 만들어 써야 합니다.</p>
+<pre><code>ghci&gt; $(pure $ InfixE (Just (LitE (IntegerL 1))) (VarE $ mkName &quot;GHC.Num.+&quot;) (Just (LitE (IntegerL 2))))
+3</code></pre>
+<p><code>+</code>라는 식별자identifier는 AST에서 쓰려면 mkName으로 정의되어야 합니다.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2" role="doc-endnote"><p>Splice: 메타 프로그래밍에서 쓰는 용어로, 나중에 대체될 대상들을 의미합니다. <code>TH</code>에서는 <code>$(...)</code>를 의미합니다. 영단어 뜻은 필름과 필름을 이어 붙인 부분을 의미합니다.</p>
+<p>add a splice plate</p>
+<p>는 무언거에 덧대어 붙이는 걸 말합니다. 우리말로 번역하면 중첩부, 연결부, 이음부 쯤입니다.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section>
+
+<div class="comment">
+<script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
+</script>
+</div>
+<div style="text-align:right">Github 계정이 없는 분은 메일로 보내주세요. lionhairdino at gmail.com </div>
+        </div>
+        <nav class="toc toc-right js-toc relative z-1 transition--300 absolute pa4 pt5 is-position-fixed"></nav>
+        <div id="footer">
+            © 2022 lionhairdino. All rights reserved. Generated by <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+        <script>
+            tocbot.init({
+                tocSelector: '.js-toc',
+                contentSelector: '.js-toc-content',
+                headingSelector: 'h2, h3',
+                hasInnerContainers: true,
+            });
+        </script>
+    </body>
+</html>
