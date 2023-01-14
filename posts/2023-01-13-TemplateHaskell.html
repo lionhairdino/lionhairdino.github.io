@@ -168,7 +168,11 @@ ghci&gt; $(tupleReplicate 3) &quot;x&quot;
     • In the second argument of ‘InfixE’, namely ‘(VarE +)’</code></pre>
 <p>“Variable identifier가 show로 그냥 나온 거예요” - <span class="citation" data-cites="Ailrun">@Ailrun</span></p>
 <p>위와 같이 <code>GHC.Num.+</code>가 코드에 쓰이면 바로 함수로 인식합니다. splice에서 쓰려면 <code>mkName</code>으로 <code>captureable name</code>을 만들어 써야 합니다.</p>
-<pre><code>ghci&gt; $(pure $ InfixE (Just (LitE (IntegerL 1))) (VarE $ mkName &quot;GHC.Num.+&quot;) (Just (LitE (IntegerL 2))))
+<pre><code>ghci&gt; :{
+ghci| $(pure $ InfixE (Just (LitE (IntegerL 1)))
+ghci| (VarE $ mkName &quot;GHC.Num.+&quot;)
+ghci| (Just (LitE (IntegerL 2))))
+ghci| :}
 3</code></pre>
 <p><code>+</code>라는 식별자identifier는 AST에서 쓰려면 mkName으로 정의되어야 합니다.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 <li id="fn2" role="doc-endnote"><p>Splice: 메타 프로그래밍에서 쓰는 용어로, 나중에 대체될 대상들을 의미합니다. <code>TH</code>에서는 <code>$(...)</code>를 의미합니다. 영단어 뜻은 필름과 필름을 이어 붙인 부분을 의미합니다.</p>
