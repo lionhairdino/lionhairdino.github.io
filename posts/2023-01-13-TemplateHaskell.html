@@ -88,18 +88,17 @@
 <p>C언어의 전처리기쯤으로 생각하고, 특정 <code>$(...)</code>을 만나면 코드로 대체하겠거니 하고, 자세한 공부 없이 써오고 있었습니다. 미루다 미루다 드디어 보기 시작했는데, 전처리기보다는 더 강력한 작업을 할 수 있는 걸로 보입니다. 여기서는 Template Haskell을 쓰는 정도의 이해를 하는 게 목표입니다. 자세한 동작 방식을 공부하려면 역시나 논문에 논문으로 들어 갑니다.</p>
 <p>“Metaprogramming은 C보다는 LISP 쪽에서 접근하는 게 더 낫습니다.
 LISP의 quasiquotation을 좀 더 복잡한, 컴파일 하는 언어에 맞춰 적용한 것으로 TemplateHaskell 등이 있습니다. - <span class="citation" data-cites="Ailrun">@Ailrun</span>”</p>
-<p>하스켈 코드를 생성하기 위한 언어(문법), 즉 메타 언어를 별도의 다른 문법을 가져온 게 아니라, 일반 하스켈을 그대로 썼기 때문에 더 파워풀 할 거라 예상합니다.
-C는 <code>#if</code>, <code>#define</code> 등의 간소한 문법을 채택했고,</p>
+<p>하스켈 코드를 생성하기 위한 언어(문법), 즉 메타 언어를 별도의 다른 언어나, 문법을 가져온 게 아니라, 일반 하스켈을 그대로 썼기 때문에 더 강력다고 합니다.</p>
 <p><a href="https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/meta-haskell.pdf">Template Meta-programming for haskell - Tim Sheard, SPJ</a></p>
 <h2 id="section">$(…)</h2>
 <p>Template Haskell은 <em>하스켈 코드를 생성하는 하스켈 코드 작성</em>이 목표입니다. 라이브러리가 Template Haskell을 쓴다고 하면, 제일 먼저 <code>$(...)</code> 구문을 만납니다. 여기다 “하스켈 코드”를 생성하는 하스켈 코드를 넣어주면, Template Haskell 컴파일을 거쳐 생성된 “하스켈 코드”로 대체됩니다. 여기서 “하스켈 코드”를 생성하는 하스켈 코드는</p>
 <pre><code>InfixE (Just (LitE (IntegerL 1))) (VarE GHC.Num.+) (Just (LitE (IntegerL 2)))</code></pre>
 <p>이런 모양을 넣어주게 됩니다. 보기 까다롭긴 한데, 일반적으로 작성하는 하스켈 문법과 다를 바 없습니다. 이 코드의 의미는 하스켈 문법의 <a href="http://en.wikipedia.org/wiki/Abstract_syntax_tree">AST(Abstract Syntax Tree)</a>입니다.</p>
-<p>※ 사람이 작성한 보통의 하스켈 코드는 GHC가 컴파일 타임에 AST로 뽑아내는데,이 때 나오는 AST와는 다른 것으로 보입니다. (추측) 아마도 TH가 하스켈 코드를 생성하기 위한 룰에만 적합한 AST를 따로 만든 것 같습니다.</p>
+<p>※ 사람이 작성한 보통의 하스켈 코드는 GHC가 컴파일 타임에 AST로 뽑아내는데,이 때 나오는 AST와는 다른 것입니다. TH가 하스켈 코드를 생성하기 위한 룰에만 적합한 AST를 따로 만들어서 씁니다.</p>
 <p>예를 들어, 함수를 호출하는 코드 <code>f x</code>의 AST는 <code>AppE (VarE f) (VarE x)</code>입니다. (당장 <code>VarE</code>가 뭔지, <code>AppE</code>가 뭔지 알 필요는 없습니다.) 이런 AST를 만들어서 <code>$(...)</code> 안에 두면, 나중에 Template Haskell 컴파일을 거치면 <code>f x</code>를 써 준 것과 같은 상태가 됩니다. 이하 Template Haskell은 <code>TH</code>로 표기하겠습니다.</p>
 <p>위와 같은 <code>InfixE ...</code>같은 구문 트리Syntax Tree를 직접 작성하려면 여간 까다로운게 아닙니다. 그래서 <code>TH</code>는 Quotations를 제공합니다. Quotations는 AST를 생성하는 편의sugar 문법으로 볼 수 있습니다.</p>
 <h2 id="quotations">Quotations</h2>
-<p>TH의 “템플릿”으로 볼 수 있습니다. the “template” of Template Haskell. Quasi-quotation이라 부릅니다.</p>
+<p>TH의 “템플릿”으로 볼 수 있습니다. the “template” of Template Haskell. Quasi-quotation이라 부릅니다. 따옴표로 인용Quote하듯 바와 각괄호가 있는 <code>[| ... |]</code>을 써서 인용Quote합니다. ※ 이 괄호를 옥스포드 괄호라 부릅니다. 찾아 보니 <code>⟦ ⟧</code> 이렇게 생긴 괄호라 하는데, 똑같이 보이진 않지만, 어쨌든 그렇게 부른다고 합니다.</p>
 <pre><code>[| 1 + 2 |]</code></pre>
 <p>이렇게 쓰면 위와 동일한 AST, 즉 <code>InfixE (Just (...</code>를 생성해 줍니다.<br />
 그 다음, 이 AST를 <code>$(...)</code>에 넣으면, 하스켈 코드를 생성하는 걸 볼 수 있습니다.</p>
