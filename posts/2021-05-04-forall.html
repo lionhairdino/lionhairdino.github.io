@@ -82,7 +82,7 @@
 </div>
 
 <p>에러 관련 포스트들에서 몇 번 강조했는데 <code>forall</code>은 말 그대로 모든 타입입니다. 어떤 타입으로든 카멜레온처럼 변할 수 있다가 아니라, 어떤 타입도 처리할 수 있어야 한다는 뜻입니다. ( 참고 - <a href="../errors/2020-07-15-rigidTypeVariable.html">컴파일 에러 읽기 - rigid type variable</a> ) 그런데, 이 걸 명시적으로 써야 하는 경우가 있습니다. 바로 Rank 개념이 필요한 경우입니다.</p>
-<h2 id="몸-풀기">몸 풀기</h2>
+<h2 id="생각-스트레칭">생각 스트레칭</h2>
 <p>2022.12.31 추가</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ot">foo ::</span> <span class="kw">forall</span> a<span class="op">.</span> a <span class="ot">-&gt;</span> <span class="dt">Bool</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>foo _ <span class="ot">=</span> <span class="dt">True</span></span>
@@ -131,7 +131,7 @@ False</code></pre>
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="kw">do</span></span>
 <span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">print</span> <span class="op">$</span> foo <span class="fu">length</span> [<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>] [<span class="ch">'a'</span>,<span class="ch">'b'</span>,<span class="ch">'c'</span>]</span></code></pre></div>
-<p><code>foo</code> 함수가 실행될 때, 각 <code>a</code>들은 모두 다른 타입이 될 수 있습니다. <code>forall</code>을 특정 범위에 한정되게 붙이면 <code>a</code> 글자를 <code>b</code>나 <code>c</code>등으로 바꿔도 상관 없습니다. 람다 대수학의 alpha equivalance와 같은 의미입니다. 그런데 아래와 같이 영향을 미치는 범위를 명확히 표시하기 위해 괄호로 감싸주면</p>
+<p><code>foo</code> 함수가 실행될 때, 각 <code>a</code>들은 모두 다른 타입이 될 수 있습니다. <code>forall</code>을 특정 범위에 한정되게 붙이면 <code>a</code> 글자를 <code>b</code>나 <code>c</code>등으로 바꿔도 상관 없습니다. 람다 대수의 alpha equivalance와 같은 의미입니다. 그런데 아래와 같이 영향을 미치는 범위를 명확히 표시하기 위해 괄호로 감싸주면</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ot">foo ::</span> (<span class="kw">forall</span> a<span class="op">.</span> [a] <span class="ot">-&gt;</span> <span class="dt">Int</span>) <span class="ot">-&gt;</span> (<span class="kw">forall</span> a<span class="op">.</span> [a]) <span class="ot">-&gt;</span> (<span class="kw">forall</span> a<span class="op">.</span> [a]) <span class="ot">-&gt;</span> <span class="dt">Bool</span></span></code></pre></div>
 <p>에러가 납니다.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>    • <span class="dt">No</span> <span class="kw">instance</span> for (<span class="dt">Num</span> a) arising from the literal ‘1’ <span class="co">------------------(1)</span></span>
