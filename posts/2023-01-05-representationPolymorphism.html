@@ -4,7 +4,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-        <title>lionhairdino - Representation 다형성 (작성 예정)</title>
+        <title>lionhairdino - Representation 다형성 (작성 중)</title>
 
         <meta name="description" content="타입을 분류할 수 있는 요소로, Representation이 있습니다." />
         <meta property="og:description" content="타입을 분류할 수 있는 요소로, Representation이 있습니다." />
@@ -33,7 +33,7 @@
         <meta name="msapplication-TileColor" content="#ff7500" />
         <meta name="theme-color" content="#ffffff" />
         <meta property="og:type" content="website" />
-        <meta property="og:title" content="Representation 다형성 (작성 예정)" />
+        <meta property="og:title" content="Representation 다형성 (작성 중)" />
         <meta property="og:site_name" content="Lionhairdino" />
         <meta property="og:url" content="https://lionhairdino.github.io/posts/2023-01-05-representationPolymorphism.html" />
 
@@ -74,16 +74,75 @@
             </div>
         </div>
         <div class="js-toc-content">
-            <h1>Representation 다형성 (작성 예정)</h1>
+            <h1>Representation 다형성 (작성 중)</h1>
             <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
 <div class="info">
     Posted on January  5, 2023
     
 </div>
 
-<p><a href="https://ghc.gitlab.haskell.org/ghc/doc/users_guide/exts/representation_polymorphism.html?highlight=representation%20polymorphic#representation-polymorphism">GHC 공식 문서 - 6.4.13. Representation polymorphism</a>
-(작성 예정)</p>
-<p>Levity 다형성</p>
+<p>Represent 뜻 - 사전을 찾아보면 대표자, 대리인, 특정 방식으로 묘사, 표현등으로 나옵니다. 저는 이 걸 조금 풀어서 받아들이고 있습니다. 한 가지를 가리키는 여러 말이나, 표현, 명칭등이 있는데, 그 중 하나를 고를 때 represent란 말을 쓴다고 이해하고 있습니다.</p>
+<p><a href="https://ghc.gitlab.haskell.org/ghc/doc/users_guide/exts/representation_polymorphism.html?highlight=representation%20polymorphic#representation-polymorphism">GHC 공식 문서 - 6.4.13. Representation polymorphism</a></p>
+<p>하스켈에선 bottom이 될 수 있냐, 없냐로 lifted type, unlifted type으로 나누고, 힙에 올리고 포인터로 가리키는 간접 모양이냐, 바로 데이터냐에 따라 boxed, unboxed로 구분합니다. 참고 - <a href="../posts/2022-12-20-unboxed.html">Unboxed, Boxed, Unlifted, Lifted</a></p>
+<p>어떤 타입이든 간에 런타임에는 boxed냐 unboxed냐, lifted냐 unlifted냐로 구분지을 수 있습니다. 이들 구분에 따라 메모리를 차지하는 모양, 접근하는 구조가 달라지는데, 이렇게 구분 짓는 걸 Representation에 따른 구분이라 합니다.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">TYPE</span><span class="ot"> ::</span> <span class="dt">RuntimeRep</span> <span class="ot">-&gt;</span> <span class="dt">Type</span>   <span class="co">-- GHC에 프리미티브로 구현되어 있다.</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Levity</span> <span class="ot">=</span> <span class="dt">Lifted</span>    <span class="co">-- `Int`같은 평상시에 자주 쓰던 타입</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>            <span class="op">|</span> <span class="dt">Unlifted</span>  <span class="co">-- `Array#` 포인터를 통하지 않고, 바로 데이터에 접근하는 타입</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">RuntimeRep</span> <span class="ot">=</span> <span class="dt">BoxedRep</span> <span class="dt">Levity</span>  <span class="co">-- GC가 관리하는 포인터로 represent되는 모든 타입</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>                <span class="op">|</span> <span class="dt">IntRep</span>           <span class="co">-- `Int#`을 위한 represent</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>                <span class="op">|</span> <span class="dt">TupleRep</span> [<span class="dt">RuntimeRep</span>]  <span class="co">-- unboxed tuples </span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>                <span class="op">|</span> <span class="dt">SumRep</span> [<span class="dt">RuntimeRep</span>]    <span class="co">-- unboxed sums</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>                <span class="op">|</span> <span class="op">...</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">LiftedRep</span> <span class="ot">=</span> <span class="dt">BoxedRep</span> <span class="dt">Lifted</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">Type</span> <span class="ot">=</span> <span class="dt">TYPE</span> <span class="dt">LiftedRep</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- Lifted 되어 있으니 Bottom값을 가질 수 있고,</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- Boxed되어 있으니, 힙에 넣고 포인터를 통해 접근한다.</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- 입문 때부터 가장 많이 써왔던 보통의 타입이다.</span></span></code></pre></div>
+<p>조금 복잡하긴 한데, 하스켈의 타입들은 모두 위에서 얘기한 속성으로 구분지을 수 있습니다.</p>
+<h3 id="levity-다형성">Levity 다형성</h3>
+<p>representation 다형성 중에 특별한 경우로 levity 다형성이 있습니다. 위 소스에서 보 듯 <code>Lifted | Unlifted</code>를 <code>Levity</code>라고 합니다. 어떤 구현이 <code>Lifted</code>일 때도 대응하고, <code>Unlifted</code>일 때도 대응하면 <code>Levity</code> 다형성을 갖고 있다고 말합니다.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ot">example ::</span> <span class="kw">forall</span> (<span class="ot">l ::</span> <span class="dt">Levity</span>) (<span class="ot">a ::</span> <span class="dt">TYPE</span> (<span class="dt">BoxedRep</span> l))<span class="op">.</span> (<span class="dt">Int</span> <span class="ot">-&gt;</span> a) <span class="ot">-&gt;</span> a</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>example f <span class="ot">=</span> f <span class="dv">42</span></span></code></pre></div>
+<p><code>forall l</code>, 즉 <code>Lifted</code>이든, <code>Unlifted</code>이든 상관없는 구현이란 뜻입니다.</p>
+<p>※ 타입 다형성Polymorphic Type을 가진 함수를 떠올려 보면,<br />
+<code>length :: forall a. [a] -&gt; Int</code>는 <code>a</code>가 무슨 타입이든 상관없는 구현이란 뜻입니다. 참고 - <a href="../posts/2021-05-04-forall.html">forall - 아무거나 모든 것의 차이</a></p>
+<p><code>UnliftedDatatypes</code> 확장을 켜고, levity 다형성을 가진 데이터 타입을 선언할 수도 있습니다.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">PEither</span><span class="ot"> ::</span> <span class="dt">Type</span> <span class="ot">-&gt;</span> <span class="dt">Type</span> <span class="ot">-&gt;</span> <span class="dt">TYPE</span> (<span class="dt">BoxedRep</span> l)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">PEither</span> l r <span class="ot">=</span> <span class="dt">PLeft</span> l <span class="op">|</span> <span class="dt">PRight</span> r</span></code></pre></div>
+<p>※ <code>UnliftedDatatypes</code> 확장: unlifted 또는 levity 다형성을 가진 result를 갖는 타입을 정의할 수 있습니다.</p>
+<h3 id="no-representation-polymorphic-변수나-인자">No representation-polymorphic 변수나 인자</h3>
+<p>GHC가 real world에서 돌아가게 컴파일할 필요가 없다면 모르지만, real world용으로 컴파일 할 때, representation_polymorphism이 까다로운 요소라 합니다.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ot">bad ::</span> <span class="kw">forall</span> (<span class="ot">r1 ::</span> <span class="dt">RuntimeRep</span>) (<span class="ot">r2 ::</span> <span class="dt">RuntimeRep</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>              (<span class="ot">a ::</span> <span class="dt">TYPE</span> r1) (<span class="ot">b ::</span> <span class="dt">TYPE</span> r2)<span class="op">.</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>       (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> b</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>bad f x <span class="ot">=</span> f x</span></code></pre></div>
+<p><code>a</code>와 <code>b</code>는 <code>RuntimeRep</code>에 폴리모픽한 변수들입니다. 어떤 Representation이 들어와도 문제 없는 구현이어야 합니다. 그냥 <code>$</code> 함수를 general하게 표현한 것으로 보이지만, 이 걸 컴파일한다고 가정하면 문제가 있습니다. <code>bad</code>를 부를 때, 어떤 <code>x</code>를 넘기게 될텐데, <code>x</code>는 몇 bit 크기의 데이터가 들어 올까요? 아님 포인터가 들어 올까요? 어떤 종류의 레지스터(floating-point 또는 integral)를 준비해야 할까요? 그 걸 알아야 메모리를 준비할텐데, representation-polymorphic이라 뭐가 들어올지 알 수가 없습니다.</p>
+<p>변수는 representation-polymorphic 타입일 수 없습니다.</p>
+<p>하지만, 다음은 가능합니다.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ot">($) ::</span> <span class="kw">forall</span> r (<span class="ot">a ::</span> <span class="dt">Type</span>) (<span class="ot">b ::</span> <span class="dt">TYPE</span> r)<span class="op">.</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>       (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> b</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>f <span class="op">$</span> x <span class="ot">=</span> f x</span></code></pre></div>
+<p><code>a</code>는 <code>Type</code>으로 고정이고, <code>b</code>만 representation-polymorphic합니다. <code>($)</code>가 받는 인자는 함수 포인터, lifted representation이니 힙에 있는 값을 가리키는 포인터, 이렇게 두 개의 포인터만 들어옵니다. 그래서 문제가 없습니다.</p>
+<h3 id="representation-polymorphic-bottoms">Representation-polymorphic bottoms</h3>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">undefined</span><span class="ot"> ::</span> <span class="kw">forall</span> (<span class="ot">r ::</span> <span class="dt">RuntimeRep</span>) (<span class="ot">a ::</span> <span class="dt">TYPE</span> r)<span class="op">.</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>             <span class="dt">HasCallStack</span> <span class="ot">=&gt;</span> a</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="fu">error</span><span class="ot"> ::</span> <span class="kw">forall</span> (<span class="ot">r ::</span> <span class="dt">RuntimeRep</span>) (<span class="ot">a ::</span> <span class="dt">TYPE</span> r)<span class="op">.</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>         <span class="dt">HasCallStack</span> <span class="ot">=&gt;</span> <span class="dt">String</span> <span class="ot">-&gt;</span> a</span></code></pre></div>
+<p>이들 함수들은 representation-polymorphic 변수를 바인딩하지 않습니다. 그래서 문제가 안 생깁니다. 사용자는 이 함수들의 다형성을 이용해서, 어떤 함수가 <code>unboxed</code> 타입을 반환하는 걸 못하게 할 때 통상 사용합니다.</p>
+<h3 id="representation-polymorphic-타입-출력하기">representation-polymorphic 타입 출력하기</h3>
+<p><code>-fprint-explicit-runtime-reps</code> 옵션을 주고 GHCi를 실행하면, <code>RuntimeRep</code>과 <code>Levity</code>를 출력해 줍니다.</p>
+<pre><code>ghci&gt; :t ($)
+($) :: (a -&gt; b) -&gt; a -&gt; b
+ghci&gt; :set -fprint-explicit-runtime-reps
+ghci&gt; :t ($)
+($)
+  :: forall (r :: GHC.Types.RuntimeRep) a (b :: TYPE r).
+     (a -&gt; b) -&gt; a -&gt; b</code></pre>
+<p><code>Generics</code>를 보기 위해 살펴 봤는데, 문서에도 말하듯이, 다행히 일반 하스켈 사용자들은 Representation들을 굳이 따지며 쓰지 않아도 된다고 합니다. 다행입니다. 알아야 될 것도 많은데…</p>
 
 <div class="comment">
 <script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
