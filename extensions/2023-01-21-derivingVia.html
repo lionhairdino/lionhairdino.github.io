@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko" lang="ko">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <title>lionhairdino - 확장 DerivingVia</title>
+
+        <meta name="description" content="인스턴스 레졸루션, instance resolution, liftA, deriving" />
+        <meta property="og:description" content="인스턴스 레졸루션, instance resolution, liftA, deriving" />
+
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <link rel="icon" href="https://lionhairdino.github.io/favicon.svg" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino16px.png" sizes="16x16" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino24px.png" sizes="24x24" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino32px.png" sizes="32x32" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino48px.png" sizes="48x48" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino57px.png" sizes="57x57" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino60px.png" sizes="60x60" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino64px.png" sizes="64x64" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino72px.png" sizes="72x72" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino76px.png" sizes="76x76" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino114px.png" sizes="114x114" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino120px.png" sizes="120x120" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino144px.png" sizes="144x144" />
+        <link rel="shortcut icon" href="../favicon.ico" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino152px.png" sizes="152x152" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino180px.png" sizes="180x180" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino192px.png" sizes="192x192" />
+        <link rel="manifest" href="../site.webmanifest" />
+        <link rel="mask-icon" href="https://lionhairdino.github.io/Lionhairdino_black.svg" color="#ff7500" />
+        <meta name="msapplication-TileImage" content="/images/favicon/Lionhairdino144px.png" />
+        <meta name="msapplication-TileColor" content="#ff7500" />
+        <meta name="theme-color" content="#ffffff" />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="확장 DerivingVia" />
+        <meta property="og:site_name" content="Lionhairdino" />
+        <meta property="og:url" content="https://lionhairdino.github.io/extensions/2023-01-21-derivingVia.html" />
+
+        <meta property="og:image" content="https://lionhairdino.github.io/images/state400px.png" />
+
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-E9WZ6VXGHP"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-E9WZ6VXGHP');
+</script>
+<script src="../script/copycode.js"></script>
+<script async src="https://cse.google.com/cse.js?cx=9c53b4915cbb2605c"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.11.1/tocbot.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.11.1/tocbot.css" />
+    </head>
+    <body>
+        <div id="header">
+            <div style="display:inline-block;margin-right:5px;padding-top: 5px;" id="logo">
+                <a href="../"><img style="width:30px;border:none" src="../images/favicon/Lionhairdino48px.png"></a>
+            </div>
+            <div style="display:inline-block;vertical-align: top;padding-top:5px;" id="navigation">
+                <a href="../">lionhairdino</a>
+                <a href="../about.html">about</a>
+                <!--<a href="/archive.html">archive</a>-->
+            </div>
+            <div style="display:inline-block;font-size:0.8em;vertical-align: top;">
+                <div style="display:inline-block;vertical-align: top;padding-top: 5px">사이트내 검색</div>
+                <div style="display:inline-block;width:180px;"> 
+                    <div class="gcse-searchbox-only"></div>
+                </div>
+            </div>
+            <div>
+                여기 글들은 일종의 질문입니다. 용어 선택도 학계, 업계에서 쓰는 걸로 되어 있지 않고, 틀린 내용이 있을 수도 있습니다.
+            </div>
+        </div>
+        <div class="js-toc-content">
+            <h1>확장 DerivingVia</h1>
+            <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+<div class="info">
+    Posted on January 21, 2023
+    
+</div>
+
+<p><a href="https://ghc.gitlab.haskell.org/ghc/doc/users_guide/exts/deriving_via.html">GHC 공식 문서 - 6.6.8. Deriving via</a><br />
+<a href="https://ryanglscott.github.io/papers/deriving-via.pdf">Deriving Via or, How to Turn Hand-Written Instances into an Anti-Pattern</a></p>
+<h2 id="완전히-같은-모양의-인스턴스들">완전히 같은 모양의 인스턴스들</h2>
+<p>아래는 GHC base 라이브러리에 있는 인스턴스입니다.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Monoid</span> a <span class="ot">=&gt;</span> <span class="dt">Monoid</span> (<span class="dt">IO</span> a) <span class="kw">where</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mempty</span> <span class="ot">=</span> <span class="fu">pure</span> <span class="fu">mempty</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mappend</span> <span class="ot">=</span> liftA2 <span class="fu">mappend</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Monoid</span> a <span class="ot">=&gt;</span> <span class="dt">Monoid</span> (<span class="dt">ST</span> s a) <span class="kw">where</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mempty</span> <span class="ot">=</span> <span class="fu">pure</span> <span class="fu">mempty</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mappend</span> <span class="ot">=</span> liftA2 <span class="fu">mappend</span></span></code></pre></div>
+<p>완전히 똑같은 모양instance body을 가지고 있습니다. 뭔가 추상화할 수 있을 것처럼 보입니다. 이런 모양은 <code>IO</code>와 <code>ST s</code> 뿐만 아니라, <code>applicative f</code>면 다 가능합니다. 다음과 갈이 특정 제약을 만족하는 경우에 대한 인스턴스를 만들면 한 번에 해결될 것처럼 보입니다. 아래는 <code>Applicative</code> functor, <code>Monoid</code>를 만족하는 모든 <code>f</code>에 대한 인스턴스입니다.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> (<span class="dt">Applicative</span> f, <span class="dt">Monoid</span> a) <span class="co">-- (가) 제약을 만족하는 모든 f a 를 위한</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="ot">=&gt;</span> <span class="dt">Monoid</span> (f a) <span class="kw">where</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mempty</span> <span class="ot">=</span> <span class="fu">pure</span> <span class="fu">mempty</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mappend</span> <span class="ot">=</span> liftA2 <span class="fu">mappend</span></span></code></pre></div>
+<h3 id="instance-resolution">Instance Resolution</h3>
+<p>이렇게 하면 추상화가 될 것 같은데, 문제가 있습니다. 이러면 <code>Applicative f</code>, <code>Monoid a</code> 제약이 있는 것이 아니라 모든 <code>(f a)</code> 인스턴스를 덮어 씌우게 됩니다. 이렇게 되는 이유는, <em>인스턴스 레졸루션resolution은 제약context을 보기 전에 head와 일치하는지 먼저 보기 때문에</em>, <code>f</code>가 <code>applicative</code>이든 아니든 간에 모두 매치돼버립니다. 일단, head가 매치되면 더 이상 살펴보지 않습니다. It will nerver backtrack.</p>
+<p>예를 들면, 아래 <code>Endo</code>타입은 <code>Applicative</code> 인스턴스가 아니고, 별도의 Monoid 인스턴스가 있음에도, 위 General 인스턴스에 걸려듭니다.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">Endo</span> a <span class="ot">=</span> <span class="dt">MkEndo</span> (a <span class="ot">-&gt;</span> a)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Monoid</span> (<span class="dt">Endo</span> a) <span class="kw">where</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mempty</span> <span class="ot">=</span> <span class="dt">MkEndo</span> <span class="fu">id</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mappend</span> (<span class="dt">MkEndo</span> f) (<span class="dt">MkEndo</span> g) <span class="ot">=</span> <span class="dt">MkEndo</span> (f <span class="op">.</span> g)</span></code></pre></div>
+<p>또는, <code>Applicative f</code>이지만, 인스턴스가 위의 모양이 아닐 때도 어찌할 방법이 없습니다.
+또는, 안에 있는 <code>a</code>가 <code>Monoid</code>가 아니더라도, 리스트 <code>[]</code>의 경우도 <code>f a</code>이고 free Monoid로 별도의 인스턴스가 있지만, 위 인스턴스에 걸리게 됩니다.</p>
+<p>사실, 리스트 Monoid 인스턴스는 Alternative 클래스 제약을 건 인스턴스에 걸려captured듭니다.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Alternative</span> f <span class="co">-- (나)</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="ot">=&gt;</span> <span class="dt">Monoid</span> (f a) <span class="kw">where</span> </span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mempty</span> <span class="ot">=</span> empty</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mappend</span> <span class="ot">=</span> (<span class="op">&lt;|&gt;</span>)</span></code></pre></div>
+<p>인스턴스 레졸루션은 한 번 매칭되면 더 이상 찾질 않습니다. 아마도 이 걸, 매칭 됐던 부분으로 돌아가 다른 선택지가 있는 지 보지 않는다 해서 backtrack이 없다고 표현하는 것 같습니다. 그래서, <code>(가)</code> 와 <code>(나)</code>를 구별해서 만들 방법도 없습니다.</p>
+<p>※ resolution: a breaking or reducing into parts; process of breaking up, dissolution<br />
+process of reduction things into simpler form<br />
+<a href="https://www.etymonline.com/search?q=resolution">Online Etymology Dictionary - resolution</a></p>
+<p>영단어 뜻은 이렇긴 한데, 적절한 인스턴스를 찾는 작업을 resolution이라 합니다.</p>
+<h3 id="lifta-lifta2">liftA, liftA2</h3>
+<p>어떤 펑크터가 안에 <code>Num</code> 클래스 인스턴스를 가지고 있다면, 이 펑크터 타입의 <code>Num</code> 인스턴스는 다음처럼 수작업으로 만들 수 있습니다.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> (<span class="dt">Applicative</span> f, <span class="dt">Num</span> a) <span class="ot">=&gt;</span> <span class="dt">Num</span> (f a) <span class="kw">where</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  (<span class="op">+</span>) <span class="ot">=</span> liftA2 (<span class="op">+</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  (<span class="op">-</span>) <span class="ot">=</span> liftA2 (<span class="op">-</span>)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  (∗) <span class="ot">=</span> liftA2 (∗)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">negate</span> <span class="ot">=</span> liftA <span class="fu">negate</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">abs</span> <span class="ot">=</span> liftA <span class="fu">abs</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">signum</span> <span class="ot">=</span> liftA <span class="fu">signum</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fromInteger</span> <span class="ot">=</span> <span class="fu">pure</span> <span class="op">.</span> <span class="fu">fromInteger</span></span></code></pre></div>
+<p>지루하게, <code>liftA</code>, <code>liftA2</code>등을 이용해 리프팅 작업을 해야 합니다.</p>
+<h3 id="deriving-via">Deriving Via</h3>
+<p>제약을 이용해서 Generic하게 인스턴스를 정의하면, 필요 이상으로 덮어 씌우던 문제를, adapter로 <code>newtype</code>을 정의하고, 이 <code>newtype</code>으로 인스턴스 head를 감싸 해결할 수 있습니다.</p>
+<p>인스턴스 헤드를 <code>newtype</code>으로 한 번 래핑해서, 해당 타입만을 위한 인스턴스를 General하게 만들면 다음처럼 됩니다.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">Ap</span> f a <span class="ot">=</span> <span class="dt">Ap</span> (f a)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> (<span class="dt">Applicative</span> f, <span class="dt">Monoid</span> a)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="ot">=&gt;</span> <span class="dt">Monoid</span> (<span class="dt">Ap</span> f a) <span class="kw">where</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mempty</span> <span class="ot">=</span> <span class="dt">Ap</span> (<span class="fu">pure</span> <span class="fu">mempty</span>)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mappend</span> (<span class="dt">Ap</span> f) (<span class="dt">Ap</span> g) <span class="ot">=</span> <span class="dt">Ap</span> (liftA2 <span class="fu">mappend</span> f g)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> (<span class="dt">Applicative</span> f, <span class="dt">Semigroup</span> a)</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="ot">=&gt;</span> <span class="dt">Semigroup</span> (<span class="dt">Ap</span> f a) <span class="kw">where</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  <span class="dt">Ap</span> f <span class="op">&lt;&gt;</span> <span class="dt">Ap</span> g <span class="ot">=</span> <span class="dt">Ap</span> (liftA2 (<span class="op">&lt;&gt;</span>) f g)</span></code></pre></div>
+<p>이제 새로운 규칙을 GHC에게 알려주기 위해 다음처럼 새로운 구문 <code>via</code>를 덧 붙입니다.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Maybe</span> a <span class="ot">=</span> <span class="dt">Nothing</span> <span class="op">|</span> <span class="dt">Just</span> a</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">deriving</span> <span class="dt">Monoid</span> via (<span class="dt">Ap</span> <span class="dt">Maybe</span> a)</span></code></pre></div>
+<p><code>Maybe</code>의 <code>Monoid</code>인스턴스를 자동으로 <code>deriving</code>하는데, <code>Ap Maybe a</code>의 <code>Monoid</code>인스턴스를 보고via 베껴 오라는 말입니다.</p>
+<p><code>derivingVia</code>는 General하게 인스턴스를 정의하면 제약에 관계없이 모두 다 덮어 씌워버리던 문제를,
+1. Adapter로 쓸 <code>newtype</code>을 만들고, 이 타입의 인스턴스를 general한 모양으로 만들고,
+2. <code>via</code> 문법으로 이 Adapter의 인스턴스를 참고해서 만들어라
+라고 GHC에게 알려주는 확장입니다.</p>
+
+<div class="comment">
+<script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
+</script>
+</div>
+<div style="text-align:right">Github 계정이 없는 분은 메일로 보내주세요. lionhairdino at gmail.com </div>
+        </div>
+        <nav class="toc toc-right js-toc relative z-1 transition--300 absolute pa4 pt5 is-position-fixed"></nav>
+        <div id="footer">
+            © 2022 lionhairdino. All rights reserved. Generated by <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+        <script>
+            tocbot.init({
+                tocSelector: '.js-toc',
+                contentSelector: '.js-toc-content',
+                headingSelector: 'h2, h3',
+                hasInnerContainers: true,
+            });
+        </script>
+    </body>
+</html>
