@@ -4,7 +4,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-        <title>lionhairdino - Representation 다형성 (작성 중)</title>
+        <title>lionhairdino - Representation 다형성</title>
 
         <meta name="description" content="타입을 분류할 수 있는 요소로, Representation이 있습니다." />
         <meta property="og:description" content="타입을 분류할 수 있는 요소로, Representation이 있습니다." />
@@ -33,13 +33,13 @@
         <meta name="msapplication-TileColor" content="#ff7500" />
         <meta name="theme-color" content="#ffffff" />
         <meta property="og:type" content="website" />
-        <meta property="og:title" content="Representation 다형성 (작성 중)" />
+        <meta property="og:title" content="Representation 다형성" />
         <meta property="og:site_name" content="Lionhairdino" />
         <meta property="og:url" content="https://lionhairdino.github.io/posts/2023-01-05-representationPolymorphism.html" />
 
         <meta property="og:image" content="https://lionhairdino.github.io/images/state400px.png" />
 
-      <meta name="keywords" content="polymorphism">
+      <meta name="keywords" content="polymorphism, boxed, unboxed, lifted, unlifted, primitive value, levity">
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-E9WZ6VXGHP"></script>
 <script>
@@ -74,7 +74,7 @@
             </div>
         </div>
         <div class="js-toc-content">
-            <h1>Representation 다형성 (작성 중)</h1>
+            <h1>Representation 다형성</h1>
             <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
 <div class="info">
     Posted on January  5, 2023
@@ -114,7 +114,7 @@ Bool 은 TYPE LiftedRep
 <p>※ GHC공식 문서의 아래 문장을 잘못 해석했는데, Ailrun님이 바로 잡아 주셨습니다.<br />
 “We can thus say that <code>-&gt;</code> has type <code>TYPE r1 -&gt; TYPE r2 -&gt; TYPE LiftedRep</code>. <em>The result is always lifted</em> because all functions are lifted in GHC.”<br />
 함수는 예외를 받으면 언제든 끝날 수 있어야 하니, GHC의 모든 함수의 결과는 항상 Lifted겠거니로 해석했는데, 그 뜻이 아닙니다. 함수의 결과값은 항상 Lifted일 필요는 없습니다. 함수의 결과값은 Unlifted로 지정할 수도 있습니다. 위 말은 <code>-&gt;</code>의 결과 타입, 즉 모든 함수의 결과가 아니라, <code>-&gt;</code> 함수의 결과 타입은 항상 Lifted란 얘기입니다.</p>
-<p>함수는 람다 <thunk>를 가리키는 포인터입니다.</p>
+<p>함수는 람다 <code>&lt;thunk&gt;</code>를 가리키는 포인터입니다.</p>
 <p>함수의 결과 값이 아니라, 즉 <em>-&gt; 함수의 결과값</em>인 GHC의 모든 “함수 자체”는 항상 Lifted란 얘기입니다.</p>
 </blockquote>
 <h3 id="levity-다형성">Levity 다형성</h3>
@@ -149,7 +149,7 @@ Bool 은 TYPE LiftedRep
 <p>이들 함수들은 representation-polymorphic 변수를 바인딩하지 않습니다. 결과값이 representation-polymorphic입니다. 그래서 문제가 없습니다. 위 함수들이 반환하는 결과값인 <code>bottom</code>이 representation-polymorphic하니 어떤 함수에서든 이들을 사용할 수 있다는 얘기입니다. 이 걸 문서에서는 이렇게 얘기합니다.</p>
 <p>“사용자는 이 함수들의 다형성을 이용해서, 어떤 함수가 <code>unboxed</code> 타입을 반환하는 걸 못하게 할 때 통상 사용한다.”</p>
 <p><code>unboxed</code>라고 찝어서 얘기했지만, 그렇다고 다른 타입은 반환할 수 있다는 얘기는 아닙니다. 어떤 타입도 반환할 수 없는 <code>undefined</code>와 <code>error</code> 함수를 이용해, <code>unboxed</code>를 반환하는 보통의 함수들의 실행을 끊을 때 쓴다는 얘기입니다.</p>
-<h3 id="representation-polymorphic-타입-출력하기">representation-polymorphic 타입 출력하기</h3>
+<h3 id="representation-polymorphic-타입-출력하기">Representation-polymorphic 타입 출력하기</h3>
 <p><code>-fprint-explicit-runtime-reps</code> 옵션을 주고 GHCi를 실행하면, <code>RuntimeRep</code>과 <code>Levity</code>를 출력해 줍니다.</p>
 <pre><code>ghci&gt; :t ($)
 ($) :: (a -&gt; b) -&gt; a -&gt; b
