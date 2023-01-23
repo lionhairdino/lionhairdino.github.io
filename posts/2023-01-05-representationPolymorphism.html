@@ -81,58 +81,74 @@
     
 </div>
 
-<p>Represent 뜻 - 사전을 찾아보면 대표자, 대리인, 특정 방식으로 묘사, 표현등으로 나옵니다. 저는 이 걸 조금 풀어서 받아들이고 있습니다. 한 가지를 가리키는 여러 말이나, 표현, 명칭등이 있는데, 그 중 하나를 고를 때 represent란 말을 쓴다고 이해하고 있습니다.</p>
+<p>Represent 뜻 - 사전을 찾아보면 대표자, 대리인, 특정 방식으로 묘사, 표현등으로 나옵니다. 저는 이 걸 조금 풀어서 받아들이고 있습니다. 한 가지를 가리키는 여러 말이나, 표현, 명칭등이 있는데, 그 중 하나를 골랐을 때 represent란 말을 쓴다고 이해하고 있습니다. 변수를 표현하는 여러 방식 중, 혹은 변수를 구분하는(나누는) 여러 방식 중, 하나를 골랐을 때 쓰는 말입니다.<br />
+</p>
+<p><code>2 + 2</code>, <code>1 * 4</code>, <code>2 * 2</code>, <code>5 - 1</code>… 모두 <code>4</code>를 표현Represent하는 Representation입니다.</p>
 <p><a href="https://ghc.gitlab.haskell.org/ghc/doc/users_guide/exts/representation_polymorphism.html?highlight=representation%20polymorphic#representation-polymorphism">GHC 공식 문서 - 6.4.13. Representation polymorphism</a></p>
-<p>하스켈에선 bottom이 될 수 있냐, 없냐로 lifted type, unlifted type으로 나누고, 힙에 올리고 포인터로 가리키는 간접 모양이냐, 바로 데이터냐에 따라 boxed, unboxed로 구분합니다. 참고 - <a href="../posts/2022-12-20-unboxed.html">Unboxed, Boxed, Unlifted, Lifted</a></p>
-<p>어떤 타입이든 간에 런타임에는 boxed냐 unboxed냐, lifted냐 unlifted냐로 구분지을 수 있습니다. 이들 구분에 따라 메모리를 차지하는 모양, 접근하는 구조가 달라지는데, 이렇게 구분 짓는 걸 Representation에 따른 구분이라 합니다.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">TYPE</span><span class="ot"> ::</span> <span class="dt">RuntimeRep</span> <span class="ot">-&gt;</span> <span class="dt">Type</span>   <span class="co">-- GHC에 프리미티브로 구현되어 있다.</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Levity</span> <span class="ot">=</span> <span class="dt">Lifted</span>    <span class="co">-- `Int`같은 평상시에 자주 쓰던 타입</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>            <span class="op">|</span> <span class="dt">Unlifted</span>  <span class="co">-- `Array#` 포인터를 통하지 않고, 바로 데이터에 접근하는 타입</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">RuntimeRep</span> <span class="ot">=</span> <span class="dt">BoxedRep</span> <span class="dt">Levity</span>  <span class="co">-- GC가 관리하는 포인터로 represent되는 모든 타입</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>                <span class="op">|</span> <span class="dt">IntRep</span>           <span class="co">-- `Int#`을 위한 represent</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>                <span class="op">|</span> <span class="dt">TupleRep</span> [<span class="dt">RuntimeRep</span>]  <span class="co">-- unboxed tuples </span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>                <span class="op">|</span> <span class="dt">SumRep</span> [<span class="dt">RuntimeRep</span>]    <span class="co">-- unboxed sums</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>                <span class="op">|</span> <span class="op">...</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">LiftedRep</span> <span class="ot">=</span> <span class="dt">BoxedRep</span> <span class="dt">Lifted</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">Type</span> <span class="ot">=</span> <span class="dt">TYPE</span> <span class="dt">LiftedRep</span></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- Lifted 되어 있으니 Bottom값을 가질 수 있고,</span></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- Boxed되어 있으니, 힙에 넣고 포인터를 통해 접근한다.</span></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- 입문 때부터 가장 많이 써왔던 보통의 타입이다.</span></span></code></pre></div>
-<p>조금 복잡하긴 한데, 하스켈의 타입들은 모두 위에서 얘기한 속성으로 구분지을 수 있습니다.</p>
+<p>하스켈에선 bottom이 될 수 있냐, 없냐로 lifted type, unlifted type으로 나누고, 힙에 올리고 포인터로 가리키는 간접 모양이냐, 바로 데이터(primitive value)냐에 따라 boxed, unboxed로 구분합니다. 참고 - <a href="../posts/2022-12-20-unboxed.html">Unboxed, Boxed, Unlifted, Lifted</a></p>
+<p>어떤 타입이든 간에 런타임에는 boxed냐 unboxed냐, lifted냐 unlifted냐로 구분지을 수 있습니다. 이들 구분에 따라 메모리를 차지하는 모양, 접근하는 절차가 달라지는데, 이렇게 구분 짓는 걸 Representation에 따른 구분이라 합니다.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- GHC.Exts에 아래와 같이 정의되어 있다.</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="dt">TYPE</span><span class="ot"> ::</span> <span class="dt">RuntimeRep</span> <span class="ot">-&gt;</span> <span class="dt">Type</span>   <span class="co">-- GHC에 프리미티브로 구현되어 있다.</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Levity</span> <span class="ot">=</span> <span class="dt">Lifted</span>    <span class="co">-- `Int`같은 평상시에 자주 쓰던 타입</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>            <span class="op">|</span> <span class="dt">Unlifted</span>  <span class="co">-- `Array#` 포인터를 통하지 않고, 바로 데이터에 접근하는 타입</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">RuntimeRep</span> <span class="ot">=</span> <span class="dt">BoxedRep</span> <span class="dt">Levity</span>  <span class="co">-- GC가 관리하는 포인터로 represent되는 모든 타입</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>                <span class="op">|</span> <span class="dt">IntRep</span>           <span class="co">-- `Int#`을 위한 represent</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>                <span class="op">|</span> <span class="dt">TupleRep</span> [<span class="dt">RuntimeRep</span>]  <span class="co">-- unboxed tuples </span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>                <span class="op">|</span> <span class="dt">SumRep</span> [<span class="dt">RuntimeRep</span>]    <span class="co">-- unboxed sums</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>                <span class="op">|</span> <span class="op">...</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">LiftedRep</span> <span class="ot">=</span> <span class="dt">BoxedRep</span> <span class="dt">Lifted</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">Type</span> <span class="ot">=</span> <span class="dt">TYPE</span> <span class="dt">LiftedRep</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- Lifted 되어 있으니 Bottom값을 가질 수 있고,</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- Boxed되어 있으니, 힙에 넣고 포인터를 통해 접근한다.</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- 하스켈 입문 때부터 가장 많이 써왔던 보통의 타입으로 힙을 가리키는 포인터입니다.</span></span></code></pre></div>
+<pre><code>Int# 는 TYPE IntRep
+Bool 은 TYPE LiftedRep
+-&gt; 는 TYPE r1 -&gt; TYPE r2 -&gt; TYPE LiftedRep
+...</code></pre>
+<p>조금 복잡하긴 한데, 하스켈의 타입들은 모두 위에서 얘기한 속성representation으로 구분지을 수 있습니다.</p>
+<blockquote>
+<p>※ GHC공식 문서의 아래 문장을 잘못 해석했는데, Ailrun님이 바로 잡아 주셨습니다.<br />
+“We can thus say that <code>-&gt;</code> has type <code>TYPE r1 -&gt; TYPE r2 -&gt; TYPE LiftedRep</code>. <em>The result is always lifted</em> because all functions are lifted in GHC.”<br />
+함수는 예외를 받으면 언제든 끝날 수 있어야 하니, GHC의 모든 함수의 결과는 항상 Lifted겠거니로 해석했는데, 그 뜻이 아닙니다. 함수의 결과값은 항상 Lifted일 필요는 없습니다. 함수의 결과값은 Unlifted로 지정할 수도 있습니다. 위 말은 <code>-&gt;</code>의 결과 타입, 즉 모든 함수의 결과가 아니라, <code>-&gt;</code> 함수의 결과 타입은 항상 Lifted란 얘기입니다.</p>
+<p>함수는 람다 <thunk>를 가리키는 포인터입니다.</p>
+<p>함수의 결과 값이 아니라, 즉 <em>-&gt; 함수의 결과값</em>인 GHC의 모든 “함수 자체”는 항상 Lifted란 얘기입니다.</p>
+</blockquote>
 <h3 id="levity-다형성">Levity 다형성</h3>
 <p>representation 다형성 중에 특별한 경우로 levity 다형성이 있습니다. 위 소스에서 보 듯 <code>Lifted | Unlifted</code>를 <code>Levity</code>라고 합니다. 어떤 구현이 <code>Lifted</code>일 때도 대응하고, <code>Unlifted</code>일 때도 대응하면 <code>Levity</code> 다형성을 갖고 있다고 말합니다.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ot">example ::</span> <span class="kw">forall</span> (<span class="ot">l ::</span> <span class="dt">Levity</span>) (<span class="ot">a ::</span> <span class="dt">TYPE</span> (<span class="dt">BoxedRep</span> l))<span class="op">.</span> (<span class="dt">Int</span> <span class="ot">-&gt;</span> a) <span class="ot">-&gt;</span> a</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>example f <span class="ot">=</span> f <span class="dv">42</span></span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ot">example ::</span> <span class="kw">forall</span> (<span class="ot">l ::</span> <span class="dt">Levity</span>) (<span class="ot">a ::</span> <span class="dt">TYPE</span> (<span class="dt">BoxedRep</span> l))<span class="op">.</span> (<span class="dt">Int</span> <span class="ot">-&gt;</span> a) <span class="ot">-&gt;</span> a</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>example f <span class="ot">=</span> f <span class="dv">42</span></span></code></pre></div>
 <p><code>forall l</code>, 즉 <code>Lifted</code>이든, <code>Unlifted</code>이든 상관없는 구현이란 뜻입니다.</p>
 <p>※ 타입 다형성Polymorphic Type을 가진 함수를 떠올려 보면,<br />
-<code>length :: forall a. [a] -&gt; Int</code>는 <code>a</code>가 무슨 타입이든 상관없는 구현이란 뜻입니다. 참고 - <a href="../posts/2021-05-04-forall.html">forall - 아무거나 모든 것의 차이</a></p>
+<code>length :: forall a. [a] -&gt; Int</code>는 <code>a</code>가 무슨 타입이든 상관없이 대응할 수 있는 구현이란 뜻입니다. 참고 - <a href="../posts/2021-05-04-forall.html">forall - 아무거나 모든 것의 차이</a></p>
 <p><code>UnliftedDatatypes</code> 확장을 켜고, levity 다형성을 가진 데이터 타입을 선언할 수도 있습니다.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">PEither</span><span class="ot"> ::</span> <span class="dt">Type</span> <span class="ot">-&gt;</span> <span class="dt">Type</span> <span class="ot">-&gt;</span> <span class="dt">TYPE</span> (<span class="dt">BoxedRep</span> l)</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">PEither</span> l r <span class="ot">=</span> <span class="dt">PLeft</span> l <span class="op">|</span> <span class="dt">PRight</span> r</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">PEither</span><span class="ot"> ::</span> <span class="dt">Type</span> <span class="ot">-&gt;</span> <span class="dt">Type</span> <span class="ot">-&gt;</span> <span class="dt">TYPE</span> (<span class="dt">BoxedRep</span> l)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">PEither</span> l r <span class="ot">=</span> <span class="dt">PLeft</span> l <span class="op">|</span> <span class="dt">PRight</span> r</span></code></pre></div>
 <p>※ <code>UnliftedDatatypes</code> 확장: unlifted 또는 levity 다형성을 가진 result를 갖는 타입을 정의할 수 있습니다.</p>
 <h3 id="no-representation-polymorphic-변수나-인자">No representation-polymorphic 변수나 인자</h3>
 <p>GHC가 real world에서 돌아가게 컴파일할 필요가 없다면 모르지만, real world용으로 컴파일 할 때, representation_polymorphism이 까다로운 요소라 합니다.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ot">bad ::</span> <span class="kw">forall</span> (<span class="ot">r1 ::</span> <span class="dt">RuntimeRep</span>) (<span class="ot">r2 ::</span> <span class="dt">RuntimeRep</span>)</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>              (<span class="ot">a ::</span> <span class="dt">TYPE</span> r1) (<span class="ot">b ::</span> <span class="dt">TYPE</span> r2)<span class="op">.</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>       (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> b</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>bad f x <span class="ot">=</span> f x</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ot">bad ::</span> <span class="kw">forall</span> (<span class="ot">r1 ::</span> <span class="dt">RuntimeRep</span>) (<span class="ot">r2 ::</span> <span class="dt">RuntimeRep</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>              (<span class="ot">a ::</span> <span class="dt">TYPE</span> r1) (<span class="ot">b ::</span> <span class="dt">TYPE</span> r2)<span class="op">.</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>       (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> b</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>bad f x <span class="ot">=</span> f x</span></code></pre></div>
 <p><code>a</code>와 <code>b</code>는 <code>RuntimeRep</code>에 폴리모픽한 변수들입니다. 어떤 Representation이 들어와도 문제 없는 구현이어야 합니다. 그냥 <code>$</code> 함수를 general하게 표현한 것으로 보이지만, 이 걸 컴파일한다고 가정하면 문제가 있습니다. <code>bad</code>를 부를 때, 어떤 <code>x</code>를 넘기게 될텐데, <code>x</code>는 몇 bit 크기의 데이터가 들어 올까요? 아님 포인터가 들어 올까요? 어떤 종류의 레지스터(floating-point 또는 integral)를 준비해야 할까요? 그 걸 알아야 메모리를 준비할텐데, representation-polymorphic이라 뭐가 들어올지 알 수가 없습니다.</p>
-<p>변수는 representation-polymorphic 타입일 수 없습니다.</p>
+<p>결론은, 현실적으론 변수는(혹은 인자는) representation-polymorphic 타입일 수 없습니다.</p>
 <p>하지만, 다음은 가능합니다.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ot">($) ::</span> <span class="kw">forall</span> r (<span class="ot">a ::</span> <span class="dt">Type</span>) (<span class="ot">b ::</span> <span class="dt">TYPE</span> r)<span class="op">.</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>       (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> b</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>f <span class="op">$</span> x <span class="ot">=</span> f x</span></code></pre></div>
-<p><code>a</code>는 <code>Type</code>으로 고정이고, <code>b</code>만 representation-polymorphic합니다. <code>($)</code>가 받는 인자는 함수 포인터, lifted representation이니 힙에 있는 값을 가리키는 포인터, 이렇게 두 개의 포인터만 들어옵니다. 그래서 문제가 없습니다.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ot">($) ::</span> <span class="kw">forall</span> r (<span class="ot">a ::</span> <span class="dt">Type</span>) (<span class="ot">b ::</span> <span class="dt">TYPE</span> r)<span class="op">.</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>       (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> b</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>f <span class="op">$</span> x <span class="ot">=</span> f x</span></code></pre></div>
+<p><code>a</code>는 <code>Type</code>으로 고정이고, <code>b</code>만 representation-polymorphic합니다. <code>($)</code>가 받는 첫 번째 인자는 함수를 가리키는 포인터, 두 번째 인자 <code>a</code>는 lifted representation이니 힙에 있는 값을 가리키는 포인터, 이렇게 두 개의 포인터만 들어옵니다. 그래서 문제가 없습니다.</p>
 <h3 id="representation-polymorphic-bottoms">Representation-polymorphic bottoms</h3>
-<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">undefined</span><span class="ot"> ::</span> <span class="kw">forall</span> (<span class="ot">r ::</span> <span class="dt">RuntimeRep</span>) (<span class="ot">a ::</span> <span class="dt">TYPE</span> r)<span class="op">.</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>             <span class="dt">HasCallStack</span> <span class="ot">=&gt;</span> a</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="fu">error</span><span class="ot"> ::</span> <span class="kw">forall</span> (<span class="ot">r ::</span> <span class="dt">RuntimeRep</span>) (<span class="ot">a ::</span> <span class="dt">TYPE</span> r)<span class="op">.</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>         <span class="dt">HasCallStack</span> <span class="ot">=&gt;</span> <span class="dt">String</span> <span class="ot">-&gt;</span> a</span></code></pre></div>
-<p>이들 함수들은 representation-polymorphic 변수를 바인딩하지 않습니다. 그래서 문제가 안 생깁니다. 사용자는 이 함수들의 다형성을 이용해서, 어떤 함수가 <code>unboxed</code> 타입을 반환하는 걸 못하게 할 때 통상 사용합니다.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">undefined</span><span class="ot"> ::</span> <span class="kw">forall</span> (<span class="ot">r ::</span> <span class="dt">RuntimeRep</span>) (<span class="ot">a ::</span> <span class="dt">TYPE</span> r)<span class="op">.</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>             <span class="dt">HasCallStack</span> <span class="ot">=&gt;</span> a</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">error</span><span class="ot"> ::</span> <span class="kw">forall</span> (<span class="ot">r ::</span> <span class="dt">RuntimeRep</span>) (<span class="ot">a ::</span> <span class="dt">TYPE</span> r)<span class="op">.</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>         <span class="dt">HasCallStack</span> <span class="ot">=&gt;</span> <span class="dt">String</span> <span class="ot">-&gt;</span> a</span></code></pre></div>
+<p>이들 함수들은 representation-polymorphic 변수를 바인딩하지 않습니다. 결과값이 representation-polymorphic입니다. 그래서 문제가 없습니다. 위 함수들이 반환하는 결과값인 <code>bottom</code>이 representation-polymorphic하니 어떤 함수에서든 이들을 사용할 수 있다는 얘기입니다. 이 걸 문서에서는 이렇게 얘기합니다.</p>
+<p>“사용자는 이 함수들의 다형성을 이용해서, 어떤 함수가 <code>unboxed</code> 타입을 반환하는 걸 못하게 할 때 통상 사용한다.”</p>
+<p><code>unboxed</code>라고 찝어서 얘기했지만, 그렇다고 다른 타입은 반환할 수 있다는 얘기는 아닙니다. 어떤 타입도 반환할 수 없는 <code>undefined</code>와 <code>error</code> 함수를 이용해, <code>unboxed</code>를 반환하는 보통의 함수들의 실행을 끊을 때 쓴다는 얘기입니다.</p>
 <h3 id="representation-polymorphic-타입-출력하기">representation-polymorphic 타입 출력하기</h3>
 <p><code>-fprint-explicit-runtime-reps</code> 옵션을 주고 GHCi를 실행하면, <code>RuntimeRep</code>과 <code>Levity</code>를 출력해 줍니다.</p>
 <pre><code>ghci&gt; :t ($)
