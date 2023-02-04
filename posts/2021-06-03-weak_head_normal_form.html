@@ -81,6 +81,7 @@
     
 </div>
 
+<p>2023.2.4 수정</p>
 <h2 id="람다식의-head-body">람다식의 Head, Body</h2>
 <p>람다식lambda expression에서 아래와 같이, 외부 인자가 들어올 통로 부분을 <code>head</code>, 그 인자에 적용할 구현을 <code>body</code>라 부릅니다.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>\x    <span class="ot">-&gt;</span>  x <span class="op">+</span> <span class="dv">1</span></span>
@@ -93,21 +94,24 @@
 <p><code>+</code> 함수는 필요한 인자를 모두 갖고 있으니, 또 reduce가 가능하고,</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span></span></code></pre></div>
 <h2 id="normal-form">Normal Form</h2>
-<p>최종 <code>3</code>이 되면 더 이상 reduce할 수 없습니다. 이렇게 더 이상 reduce할 수 없는 형태를 NF(Normal Form)라 합니다. 여기까지는 따로 설명 없이도 그렇겠거니 합니다. 그런데, 만일 인자가 없으면 뭐라고 부를까요?</p>
-<p>※ 왜 <code>2 + 1</code>보다는 <code>3</code>이 더 <code>Normal</code>할까요? <code>2 + 1</code>은 <code>3</code>이긴 한데, 특별히 추가 작업을 해야 <code>3</code>이 됩니다. 특별한 게 없는 걸 <code>Normal</code>이라 부르는게 아닐까요?</p>
+<p>최종 <code>3</code>이 되면 더 이상 reduce할 수 없습니다. 이렇게 더 이상 reduce할 수 없는 형태를 NF(Normal Form)<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>라 합니다. 여기까지는 따로 설명 없이도 그렇겠거니 합니다. 그런데, 만일 인자가 없으면 뭐라고 부를까요?</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>\x <span class="ot">-&gt;</span> x <span class="op">+</span> <span class="dv">1</span></span></code></pre></div>
 <p>인자가 없기 때문에 이 식 또한 <em>더 이상 reduce할 수 없습니다.</em> 이 것도 역시 NF입니다.</p>
 <p>여기까지 용어를 익히셨으면, 이제 본론으로 들어가 보겠습니다.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>\y <span class="ot">-&gt;</span> ((\x <span class="ot">-&gt;</span> x <span class="op">+</span> y) (<span class="dv">1</span> <span class="op">+</span> <span class="dv">1</span>)) <span class="co">--(가)</span></span></code></pre></div>
 <p>일단, 전체를 보면 <code>\y -&gt; (...)</code>에 들어가는 인자가 없습니다. 더 이상 reduce할 수 없으니 NF입니다. 안에 reduce할 수 있는 게 보이니, reduce하면</p>
+<p>※ reduce는 축약으로 번역하는데, 아직 입에 잘 안 붙습니다.</p>
 <h2 id="head-normal-form-weak-head-normal-form">Head Normal Form, Weak Head Normal Form</h2>
 <div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>\y <span class="ot">-&gt;</span> (\x <span class="ot">-&gt;</span> x <span class="op">+</span> y) <span class="dv">2</span> <span class="co">--(나)</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a> <span class="co">-- head에 있는 x에 들어갈 인자를 NF로 만들었습니다.</span></span></code></pre></div>
-<p>(가)와 (나)의 차이는 뭘까요? (가)는 <code>x</code>에 넣어 줄 인자가 redex지만, (나)는 <code>x</code>에 넣어 줄 인자가 NF입니다. 물론, 둘 다 <code>y</code>를 알기 전까진 더 이상 reduce할 수 없는 NF입니다. Lazy하게 쫓아가 보면 (가)는 NF상태로 있다가, <code>y</code>가 들어오면, head <code>x</code>를 위해 <code>(1 + 1)</code>을 reduce해서 <code>2</code>라는 NF를 만들어 <code>x</code>에 넣어 NF에 도달하고, (나)는 <code>y</code>가 들어오면, head <code>x</code> 를 위한 reduce절차 없이 NF가 됩니다. (나)처럼 head가 모두 NF상태이면 HNF(Head Normal Form)로 부릅니다. WHNF 중에 HNF인 게 있고, HNF 중에 NF인 게 있습니다.</p>
-<p>위 예시를 보면, <code>\y -&gt; ...</code>상태에서만 보면 HNF일지 아닐지 알 수 없습니다. 이렇게 가장 바깥만 NF인 것만 확실할 때 WHNF(Weak Head Normal Form)이라 부릅니다. (우균님은 이 걸 최상위정규형으로 번역하고 있습니다.)</p>
+<p>(가)와 (나)의 차이는 뭘까요? (가)는 <code>x</code>에 넣어 줄 인자가 redex지만, (나)는 <code>x</code>에 넣어 줄 인자가 NF입니다. 물론, 둘 다 <code>y</code>를 알기 전까진 더 이상 reduce할 수 없는 NF입니다. Lazy하게 쫓아가 보면</p>
+<p>(가)는 NF상태로 있다가, <code>y</code>가 들어오면, head <code>x</code>를 위해 <code>(1 + 1)</code>을 reduce해서 <code>2</code>라는 NF를 만들어 <code>x</code>에 넣어 NF에 도달하고,</p>
+<p>(나)는 <code>y</code>가 들어오면, head <code>x</code> 를 위한 reduce절차 없이 NF가 됩니다. (나)처럼 head가 모두 NF상태이면 HNF(Head Normal Form)로 부릅니다.</p>
+<p>WHNF 중에 HNF인 게 있고, HNF 중에 NF인 게 있습니다.</p>
+<p>위 예시를 보면, <code>\y -&gt; ...</code>상태에서만 보면 HNF일지 아닐지 알 수 없습니다. 이렇게 가장 바깥만 NF인 것만 확실할 때 WHNF(Weak Head Normal Form)라 부릅니다. (<a href="https://woogyun.tistory.com/520">우균님</a>은 이 걸 최상위정규형으로 번역하고 있습니다.)</p>
 <h2 id="lazy-평가---whnf까지만">Lazy 평가 - WHNF까지만</h2>
-<p>Lazy 평가란, 수식을 만났을 때 정말 아무 것도 안하고 <code>&lt;thunk&gt;</code>로 그냥 두고 넘어가는 게 아닙니다. 여러 reduce 단계가 필요할 때 WHNF까지만 평가하고, 필요한 때가 되어서야 NF로 만드는 걸 말합니다.</p>
-<p>“하스켈의 Lazy 평가는 WHNF까지만 합니다.”</p>
+<p>Lazy 평가란, 수식을 만났을 때 정말 아무 것도 안하고 <code>&lt;thunk&gt;</code>로 그냥 두고 넘어가는 게 아닙니다. 여러 reduce 단계가 필요할 때 WHNF까지만 평가하고, 필요한 때가 되면, 필요한 만큼만 평가 하는 걸 말합니다.</p>
+<p>“하스켈의 지연Lazy평가는 WHNF까지만 합니다.”</p>
 <p>이 말을 살펴 보겠습니다.</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">seq</span><span class="ot"> ::</span> a <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> b</span></code></pre></div>
 <p><code>seq</code>는 <code>a</code>계산식이 <code>bottom</code>이면 결과가 <code>bottom</code>이 되고, 그렇지 않으면, 결과는 <code>b</code> 계산식의 결과가 됩니다.</p>
@@ -138,6 +142,12 @@ ghci&gt; </code></pre>
 <a href="https://stackoverflow.com/questions/6872898/what-is-weak-head-normal-form">Stackoverflow hammar 답변</a><br />
 <a href="https://en.wikipedia.org/wiki/Beta_normal_form">Wiki - Beta_normal_form</a><br />
 <a href="https://math.stackexchange.com/questions/2768395/head-position-in-lambda-calculus">Stackoverflow 람다 대수에서 head 위치</a></p>
+<section class="footnotes" role="doc-endnotes">
+<hr />
+<ol>
+<li id="fn1" role="doc-endnote"><p>왜 <code>2 + 1</code>보다는 <code>3</code>이 더 <code>Normal</code>할까요? <code>2 + 1</code>은 <code>3</code>이긴 한데, 특별히 추가 작업을 해야 <code>3</code>이 됩니다. 특별한 게 없는 걸 <code>Normal</code>이라 부르는게 아닐까요?<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section>
 
 <div class="comment">
 <script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
