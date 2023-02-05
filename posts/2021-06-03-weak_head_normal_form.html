@@ -101,13 +101,13 @@
 <div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>\y <span class="ot">-&gt;</span> ((\x <span class="ot">-&gt;</span> x <span class="op">+</span> y) (<span class="dv">1</span> <span class="op">+</span> <span class="dv">1</span>)) <span class="co">--(가)</span></span></code></pre></div>
 <p>일단, 전체를 보면 <code>\y -&gt; (...)</code>에 들어가는 인자가 없습니다. 더 이상 reduce할 수 없으니 NF입니다. 안에 reduce할 수 있는 게 보이니, reduce하면</p>
 <p>※ reduce는 축약으로 번역하는데, 아직 입에 잘 안 붙습니다.</p>
-<h2 id="head-normal-form-weak-head-normal-form">Head Normal Form, Weak Head Normal Form</h2>
 <div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>\y <span class="ot">-&gt;</span> (\x <span class="ot">-&gt;</span> x <span class="op">+</span> y) <span class="dv">2</span> <span class="co">--(나)</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a> <span class="co">-- head에 있는 x에 들어갈 인자를 NF로 만들었습니다.</span></span></code></pre></div>
 <p>(가)와 (나)의 차이는 뭘까요? (가)는 <code>x</code>에 넣어 줄 인자가 redex지만, (나)는 <code>x</code>에 넣어 줄 인자가 NF입니다. 물론, 둘 다 <code>y</code>를 알기 전까진 더 이상 reduce할 수 없는 NF입니다. Lazy하게 쫓아가 보면</p>
 <p>(가)는 NF상태로 있다가, <code>y</code>가 들어오면, head <code>x</code>를 위해 <code>(1 + 1)</code>을 reduce해서 <code>2</code>라는 NF를 만들어 <code>x</code>에 넣어 NF에 도달하고,</p>
+<h2 id="head-normal-form-weak-head-normal-form">Head Normal Form, Weak Head Normal Form</h2>
 <p>(나)는 <code>y</code>가 들어오면, head <code>x</code> 를 위한 reduce절차 없이 NF가 됩니다. (나)처럼 head가 모두 NF상태이면 HNF(Head Normal Form)로 부릅니다.</p>
-<p>WHNF 중에 HNF인 게 있고, HNF 중에 NF인 게 있습니다.</p>
+<p>WHNF 중에 HNF인 게 있고, HNF 중에 NF인 게 있습니다. 다시 말해, NF이면, HNF, WHNF이기도 합니다.</p>
 <p>위 예시를 보면, <code>\y -&gt; ...</code>상태에서만 보면 HNF일지 아닐지 알 수 없습니다. 이렇게 가장 바깥만 NF인 것만 확실할 때 WHNF(Weak Head Normal Form)라 부릅니다. (<a href="https://woogyun.tistory.com/520">우균님</a>은 이 걸 최상위정규형으로 번역하고 있습니다.)</p>
 <h2 id="lazy-평가---whnf까지만">Lazy 평가 - WHNF까지만</h2>
 <p>Lazy 평가란, 수식을 만났을 때 정말 아무 것도 안하고 <code>&lt;thunk&gt;</code>로 그냥 두고 넘어가는 게 아닙니다. 여러 reduce 단계가 필요할 때 WHNF까지만 평가하고, 필요한 때가 되면, 필요한 만큼만 평가 하는 걸 말합니다.</p>
