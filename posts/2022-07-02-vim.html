@@ -82,6 +82,8 @@
 </div>
 
 <p>저는 nn년 전부터 시스템 관리를 위해 <code>Vim</code>을 써오고 있고 한동안 순정 <code>Vim</code>으로 아무 생각없이 써왔습니다. 그리고 하스켈을 공부하면서 부터는 <code>vscode</code>를 주로 썼습니다. 간단한 편집 기능키들은 손에 익은 <code>Vim</code>모드로 해놓고 별 불만없이 썼습니다. 전 완전 키보드파는 아니라, 마우스가 전혀 작동하지 않는 환경은 오히려 좀 답답해서, <code>Vim</code>을 하스켈의 메인 편집 툴로 쓸 생각은 안하고 있던 차에, 우연히 다른 분의 <code>Vim</code> 문제를 도우려 살펴 보다 보니, nn년 전에 비하면 설정이 굉장히 쉬워진 것 같아, <code>Vim</code>에 제대로 <code>Haskell</code> 셋팅을 시도하게 됐습니다. 아래는 현재2022 제가 쓰고 있는 설정들인데, 계속 발전하고 있으니 최신 정보들을 확인해 보세요.</p>
+<p>2023.2.6 추가<br />
+<a href="https://discord.gg/TwaYqgtQYf">한국 Vim 사용자 그룹</a> 디스코드가 새로 생겼습니다.</p>
 <h2 id="neovim">Neovim</h2>
 <p><code>vi</code>를 쓴다 하면 대부분 <code>vi</code>에서 확장된 <code>vim</code>을 의미하지 않나요? 그리고 <code>vim</code>을 그래픽컬하게 쓰기 위해 <code>GUI</code>를 입힌 <code>gvim</code>, <code>spacevim</code>, <code>oni</code>등 있는데, 저는 터미널에서 가장 빠르게 부트업 되는 <code>vi</code>를 버릴 수가 없어 <code>neovim</code>을 선택했습니다. <code>vim</code>과의 차이점은 여러 가지가 있는데, 제가 체감하는 정도는 <code>Lua</code> 스크립트 내장으로 퍼포먼스가 올라간 게 가장 큰 차이점이 아닐까 합니다. 시스템 설정 파일들을 주로 만지는 분들은 <code>vim</code>과 <code>neovim</code>이 큰 차이가 있어 보이지 않을 수 있는데, 프로그래머가 메인 툴로 쓰려면 이제는 <code>neovim</code>으로 넘어가는 게 편할 것 같습니다. (케케묵은 <code>vi</code>와 <code>emacs</code> 논쟁을 얘기 하고 싶은게 아니라, 이미 <code>vi (vim)</code>을 쓰시는 분들 얘기입니다.)</p>
 <p>참고 : <a href="https://alpha2phi.medium.com/learn-neovim-the-practical-way-8818fcf4830f#545a">Learn Neovim The Practical Way</a></p>
@@ -118,7 +120,7 @@ Plug 'junegunn/fzf'</code></pre></li>
 <ul>
 <li><code>:Telescope</code> 같은 대문자로 시작하는 관련 명령어들이 생깁니다. 적당히 앞글자 치면서 <code>&lt;tab&gt;</code>을 누르면 가용한 명령어들을 보여줍니다. 또는 <code>:command</code>로 전체 명령어를 볼 수 있습니다.</li>
 <li>특정 이벤트에 따라 자동으로 활성화 되는 플러그인인 경우 <code>:autocmd</code>를 이용해 이벤트별 등록된 기능 목록을 볼 수 있습니다.</li>
-<li><code>:verbose map &lt;C-space&gt;</code> 같은 식으로 단축키 목록을 볼 수 있습니다. <code>map</code>부분을 <code>imap</code>, <code>nmap</code>등으로 모드별 지정 단축키를 볼 수 있습니다.</li>
+<li><code>:verbose map &lt;C-space&gt;</code> 같은 식으로 단축키 목록을 볼 수 있습니다. <code>map</code>부분을 <code>imap</code>, <code>nmap</code>등으로 모드별 지정 단축키를 볼 수 있습니다. <code>verbose</code>를 붙여야만 중복 정의로 덮어 씌워지는 게 있는지 확인 할 수 있습니다.</li>
 </ul>
 </blockquote>
 <h3 id="plugin---nerdtree">Plugin - NerdTree</h3>
@@ -155,6 +157,10 @@ Hoogle 검색 플러그인</p>
 <h3 id="plugin---lazygit">Plugin - lazygit</h3>
 <p><a href="https://github.com/kdheepak/lazygit.nvim" class="uri">https://github.com/kdheepak/lazygit.nvim</a><br />
 쉘에서 git을 사용할 때 쓰는 tui인 lazygit을 Telescope에 얹혀서 쓸 수 있습니다.</p>
+<h3 id="plugin---iron">Plugin - Iron</h3>
+<p>REPL과 소통하는 걸 도와주는 플러그인입니다.<br />
+<a href="https://github.com/hkupty/iron.nvim" class="uri">https://github.com/hkupty/iron.nvim</a><br />
+</p>
 <h3 id="팁---esc-이외의-키를-영문-변환키로-쓰기">팁 - ESC 이외의 키를 영문 변환키로 쓰기</h3>
 <p>vim은 modal(모드가 있는) 에디터이므로 편집 모드에서 한글 상태로 작업하다, 모드가 바뀌면 영문 상태로 가는 기능이 있으면 편리합니다. 그래서, 각 종 입력기에는 이를 위해 <code>ESC</code>키를 누르면 영문 상태로 바뀌는 옵션들을 가지고 있습니다. 하지만, 손가락을 경제적으로 쓰기 위해 <code>ESC</code>키보다, 기본 위치에서 가까운 <code>Ctrl [</code>를 쓰는 분들은 이 옵션의 혜택을 받지 못했습니다. 그런데, 최근에 <a href="https://github.com/Riey/kime">KIME</a>를 알게 되어, 셋팅 도중 아래와 같이 테스트하니 <code>Ctrl [</code>도 영문으로 바뀌도록 손쉽게 설정이 가능했습니다.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="at">.config/kime/config.yaml</span></span>
@@ -485,6 +491,10 @@ release 기준으로 빌드하면 Hackage에서 가져와서 빌드하는데, Ha
 <p>바뀐 설정을 적용하기 위해</p>
 <div class="sourceCode" id="cb36"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> source <span class="ex">~/.bashrc</span></span></code></pre></div>
 <p>이제 쉘 커맨드 환경에서도 vim 바인딩이 먹습니다.</p>
+<h3 id="키-반복이-아닌-명령어-반복">키 반복이 아닌, 명령어 반복</h3>
+<p><code>@:</code></p>
+<h3 id="클립보드-내용을-vim-명령행에-붙여-넣기">클립보드 내용을 vim 명령행에 붙여 넣기</h3>
+<p><code>Ctrl r</code> , <code>+</code></p>
 <section class="footnotes" role="doc-endnotes">
 <hr />
 <ol>
