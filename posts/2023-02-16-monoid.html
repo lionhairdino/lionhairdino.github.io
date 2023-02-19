@@ -138,8 +138,11 @@
 <p>이 되게 하면, 비로소 <code>id</code>를 포함한 모든 구성 요소를 한 가지 <code>(.) 적용 후 join</code> 모양으로 표현할 수 있게 되었습니다.</p>
 <h2 id="생각-스트레칭">생각 스트레칭</h2>
 <p>2튜플 둘을 비교하는 함수가 있습니다.</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ot">equal ::</span> (<span class="dt">Height</span>, <span class="dt">Age</span>) <span class="ot">-&gt;</span> (<span class="dt">Height</span>, <span class="dt">Age</span>) <span class="ot">-&gt;</span> <span class="dt">Bool</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>equal x y <span class="ot">=</span> x <span class="op">==</span> y</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">Height</span> <span class="ot">=</span> <span class="dt">Int</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">Age</span> <span class="ot">=</span> <span class="dt">Int</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="ot">equal ::</span> (<span class="dt">Height</span>, <span class="dt">Age</span>) <span class="ot">-&gt;</span> (<span class="dt">Height</span>, <span class="dt">Age</span>) <span class="ot">-&gt;</span> <span class="dt">Bool</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>equal x y <span class="ot">=</span> x <span class="op">==</span> y</span></code></pre></div>
 <p>그런데, 현재는 키만 같으면 같은 것으로 보려 합니다.</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ot">equalH ::</span> (<span class="dt">Height</span>, <span class="dt">Age</span>) <span class="ot">-&gt;</span> (<span class="dt">Height</span>, <span class="dt">Age</span>) <span class="ot">-&gt;</span> <span class="dt">Bool</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>equalH x y <span class="ot">=</span> <span class="fu">fst</span>(x) <span class="op">==</span> <span class="fu">fst</span>(y)</span></code></pre></div>
@@ -147,8 +150,9 @@
 <div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ot">equalA ::</span> (<span class="dt">Height</span>, <span class="dt">Age</span>) <span class="ot">-&gt;</span> (<span class="dt">Height</span>, <span class="dt">Age</span>) <span class="ot">-&gt;</span> <span class="dt">Bool</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>equalA x y <span class="ot">=</span> <span class="fu">snd</span>(x) <span class="op">==</span> <span class="fu">snd</span>(y)</span></code></pre></div>
 <p>둘이 유사하니, 같은지 비교하기 전에, 필요한 부분만 남기는 함수를 넘겨 아래와 같이 합칠 수 있습니다.</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ot">equal ::</span> f <span class="ot">-&gt;</span> (<span class="dt">Height</span>, <span class="dt">Age</span>) <span class="ot">-&gt;</span> (<span class="dt">Height</span>, <span class="dt">Age</span>) <span class="ot">-&gt;</span> <span class="dt">Bool</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>equal f x y <span class="ot">=</span> f(x) <span class="op">==</span> f(y)</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">F</span> <span class="ot">=</span> (<span class="dt">Height</span>, <span class="dt">Age</span>) <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="ot">equal ::</span> <span class="dt">F</span> <span class="ot">-&gt;</span> (<span class="dt">Height</span>, <span class="dt">Age</span>) <span class="ot">-&gt;</span> (<span class="dt">Height</span>, <span class="dt">Age</span>) <span class="ot">-&gt;</span> <span class="dt">Bool</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>equal f x y <span class="ot">=</span> f(x) <span class="op">==</span> f(y)</span></code></pre></div>
 <p>이제 <code>equal</code>을 부를 때, <code>equal fst t1 t2</code> 혹은 <code>equal snd t1 t2</code>로 부르면 됩니다.</p>
 <p>그럼, 튜플 전체를 비교하던, 원래 <code>f</code>를 받기 전 <code>equal</code>의 동작을 하게 하려면 어떻게 하면 될까요?</p>
 <p><code>equal id t1 t2</code>로 부르면 됩니다.</p>
