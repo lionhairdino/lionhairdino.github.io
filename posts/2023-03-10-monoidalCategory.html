@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko" lang="ko">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <title>lionhairdino - 비수학인이 해석한 모노이달 카테고리</title>
+
+        <meta name="description" content="lionhairdino - 비수학인이 해석한 모노이달 카테고리" />
+        <meta property="og:description" content="하스켈 함수형 프로그래밍" />
+
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <link rel="icon" href="https://lionhairdino.github.io/favicon.svg" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino16px.png" sizes="16x16" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino24px.png" sizes="24x24" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino32px.png" sizes="32x32" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino48px.png" sizes="48x48" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino57px.png" sizes="57x57" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino60px.png" sizes="60x60" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino64px.png" sizes="64x64" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino72px.png" sizes="72x72" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino76px.png" sizes="76x76" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino114px.png" sizes="114x114" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino120px.png" sizes="120x120" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino144px.png" sizes="144x144" />
+        <link rel="shortcut icon" href="../favicon.ico" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino152px.png" sizes="152x152" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino180px.png" sizes="180x180" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino192px.png" sizes="192x192" />
+        <link rel="manifest" href="../site.webmanifest" />
+        <link rel="mask-icon" href="https://lionhairdino.github.io/Lionhairdino_black.svg" color="#ff7500" />
+        <meta name="msapplication-TileImage" content="/images/favicon/Lionhairdino144px.png" />
+        <meta name="msapplication-TileColor" content="#ff7500" />
+        <meta name="theme-color" content="#ffffff" />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="비수학인이 해석한 모노이달 카테고리" />
+        <meta property="og:site_name" content="Lionhairdino" />
+        <meta property="og:url" content="https://lionhairdino.github.io/posts/2023-03-10-monoidalCategory.html" />
+
+        <meta property="og:image" content="https://lionhairdino.github.io/images/state400px.png" />
+
+      <meta name="keywords" content="monoid, monidal category">
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-E9WZ6VXGHP"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-E9WZ6VXGHP');
+</script>
+<script src="../script/copycode.js"></script>
+<script async src="https://cse.google.com/cse.js?cx=9c53b4915cbb2605c"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.11.1/tocbot.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.11.1/tocbot.css" />
+    </head>
+    <body>
+        <div id="header">
+            <div style="display:inline-block;margin-right:5px;padding-top: 5px;" id="logo">
+                <a href="../"><img style="width:30px;border:none" src="../images/favicon/Lionhairdino48px.png"></a>
+            </div>
+            <div style="display:inline-block;vertical-align: top;padding-top:5px;" id="navigation">
+                <a href="../">lionhairdino</a>
+                <a href="../about.html">about</a>
+                <!--<a href="/archive.html">archive</a>-->
+            </div>
+            <div style="display:inline-block;font-size:0.8em;vertical-align: top;">
+                <div style="display:inline-block;vertical-align: top;padding-top: 5px">사이트내 검색</div>
+                <div style="display:inline-block;width:180px;"> 
+                    <div class="gcse-searchbox-only"></div>
+                </div>
+            </div>
+            <div>
+                여기 글들은 일종의 질문입니다. 용어 선택도 학계, 업계에서 쓰는 걸로 되어 있지 않고, 틀린 내용이 있을 수도 있습니다.
+            </div>
+        </div>
+        <div class="js-toc-content">
+            <h1>비수학인이 해석한 모노이달 카테고리</h1>
+            <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+<div class="info">
+    Posted on March 10, 2023
+    
+</div>
+
+<p><br />
+카테시안 카테고리, 프로덕트 카테고리, 2카테고리, 바이카테고리를 거쳐 모노이달 카테고리에 도착했는데, 다른 텍스트에선 명시적으로 언급하지 않는, 실용적인 개념이 보여 글을 남깁니다.</p>
+<p>아래는 전공자 혹은, 유관 전공자 분들이 보시고 이상한 생각이라 했던 내용들이 다수 들어가 있습니다. 조심해서 신뢰 없는 브레인 스토밍쯤으로 의심하며 보세요.</p>
+<h2 id="생각-스트레칭">생각 스트레칭</h2>
+<p>어떤 결과에 도달하기 위해서 해야 되는 절차가 1단계가 있는 걸, 절차를 2단계를 거치게 하면 어떤 효과, 장점이 있을까요?</p>
+<pre><code>1단계 밥을 먹는다.
+
+1단계 씻고
+2단계 밥을 먹는다.
+
+1단계 - 1.1 얼굴을 씻고
+      - 1.2 손을 씻고
+2단계 밥을 먹는다.</code></pre>
+<p>2단계로 되어있는 시스템은 1단계로만 이루어진 시스템을 표현 가능합니다. 결과에 영향을 미치지 않는 아무 것도 안함이란 동작을 만들어 두면</p>
+<pre><code>1단계 아무것도 안함
+2단계 밥을 먹는다.</code></pre>
+<p>총 3단계처럼 보이는 세 번째 예시의 경우는 각 단계마다 받을 수 있는 절차가 세분화되어 하나로 표현되는 절차를 받을 수 있게 해놨습니다. 아래로 갈수록 더 많은 케이스를 표현할 수 있는 표현력이 생기는 걸 알 수 있습니다.</p>
+<h2 id="모노이드">모노이드</h2>
+<blockquote>
+<p>어떤 시스템에 이항 연산이 있고, 항등원이 존재하고, 이 이항 연산이 결합 법칙을 만족하고 닫혀 있으면 어떤 것이든 모노이드라 부릅니다.</p>
+</blockquote>
+<p>결합법칙과 이항연산이 있는 반군semigroupd은 집합에서 두 원소를 꺼내 이항연산을 적용하면, 다시 집합내의 한 원소가 나옵니다. 여기에 항등원 조건을 넣으면 어떤 변화가 생길까요?</p>
+<p>자연수와 이항 연산으로 더하기의 동작을 보면</p>
+<pre><code>1 + 1 = 2
+1 + 2 = 3
+...
+100+1000 = 1100
+...</code></pre>
+<p>자연수의 모든 수를 더하기를 이용해 표현할 수 있습니다. 보통은 자연수 둘을 연산해서 자연수가 나오는, 자연수라는 것으로 설명하는데, 여기서 다음과 같이 항등원의 필요성이 잘 보이게 조금 비틀어서 상상해 봤습니다. (같이 공부를 하며, 여러가지 알려주던 분들이 너무 자기 생각에 빠졌다 했던 생각인 만큼, 믿고 보진 마세요. 이런 아이디어도 있구나란 생각으로 보시기 바랍니다.)</p>
+<p>어차피 모든 <code>_ + _</code>는 이항 연산을 통해 하나의 자연수가 됩니다. 이 걸 최종 모양으로 가기전 <code>+</code>가 들어가 있는 모양으로 모두 표현하는 걸로 바꿔서 바라 봤습니다.</p>
+<pre><code>2는 1 + 1로 표현할 수 있고,
+3은 1 + 2로 표현할 수 있는데,
+1은 어떻게 할까요?</code></pre>
+<p><code>+</code> 이항연산과 만나면 아무일도 하지 않는, 즉 <code>+</code>연산의 항등원 <code>0</code>을 시스템에 추가하면 모든 0포함 자연수를 한 가지 모양 <code>_ + _</code>으로 표현할 수 있게 됩니다. 보통 연산이 작업을 끝내서, 자연수에 도달한 모양으로 보는데, 항등원의 동작을 보기 위해 연산을 넣은 상태를 봤습니다.</p>
+<pre><code>0은 0 + 0
+1은 1 + 0
+2는 1 + 1
+...</code></pre>
+<p>항등원이 추가 되면서 비로소 모든 원소를 한 가지 모양으로 표현할 수 있게 되었습니다. 다시 말하지만, 보통의 텍스트에선 위 연산을 reduce해서 자연수로 같아짐을 보입니다. 여기서는 0이 잘보이게 위 상태로 멈춰 놓았습니다. (저는 여기서 <code>+</code>가 타입으로 보이기도 하는데, 이와 관련된 얘기는 별도로 올리겠습니다.)</p>
+<h2 id="모노이달-카테고리">모노이달 카테고리</h2>
+<p>집합에서 원소들이 모노이드가 되는 동작을 보듯, 카테고리에서도 한 카테고리에서 두 개의 대상object을 뽑아, 어떤 연산을 거치면 다시 같은 카테고리의 원소가 나와야 합니다. 카테고리간 연산은 펑터로 표현됩니다. 카테고리 하나와 하나를 매핑하는 건 펑터였고, 카테고리 둘에서 하나로 매핑하는 건 바이펑터(이항펑터bifunctor)라 부릅니다. 모노이드와 마찬가지로 바이펑터가 결합 법칙을 따르고, 항등 법칙을 따라야 모노이드 성질을 같게 됩니다. 추상 대수에서 처럼, 아무런 별도 처리 없이 결합 법칙을 따르고, 항등 법칙을 따르는 게 아니라, 다음과 같이 조건을 위한 새로운 절차를 추가합니다.</p>
+<pre><code>A ⨂ (B ⨂ C) = (A ⨂ B) ⨂ C </code></pre>
+<p>그냥 이렇게 결합 법칙을 만족하는 게 아니라,</p>
+<pre><code>α_{ABC}: A ⨂ (B ⨂ C) -&gt; (A ⨂ B) ⨂ C</code></pre>
+<p>그냥은 같지 않을 수도 있지만, <code>α</code>라는 절차를 거치면 같아집니다.<br />
+항등 법칙도 마찬가지입니다.<br />
+그냥은 안되지만, 좌 항등원은 <code>λ</code>라는 절차가 있고, 우 항등원은 <code>ρ</code>라는 절차가 있으면 항등원이 됩니다.</p>
+<pre><code>λ_{A}: I ⨂ A -&gt; A
+ρ_{A}: A ⨂ I -&gt; A</code></pre>
+<p>왜 모노이달 카테고리에선 <code>α, λ, p</code>를 두었을까요? 생각 스트레칭에 쓴 것과 같이 좀 일반화하기 위한 장치일까요.</p>
+<p><code>α</code>에는 아래 첨자 <code>{abc}</code>가 있고, <code>λ</code>, <code>ρ</code>에는 아래 첨자 <code>{A}</code>가 있습니다. 이 말은 모든 세가지 구성원 조합마다 <code>α</code>가 각 각 있고, 모든 구성원 각각 별 개로 <code>λ</code>, <code>ρ</code>를 가지고 있다는 얘기입니다. 이러면 결합 법칙, 항등 법칙이 성립하지 않는 경우가 있을까 싶은 막무가내 규칙처럼 보이기도 하는데, 깊이 들어 가보질 못해, 이런 조건이 어떤 결과를 가져오는지 궁금합니다. 특별히 이들 <code>α, λ, p</code>가 <code>identity</code>인 경우를 strict monoidal category라 합니다. (하스켈에서 모나드를 얘기할 때 만나는 엔도펑터 모노이달 카테고리는 strict monoidal category입니다.)</p>
+<h2 id="모노이달-카테고리에서-모노이드">모노이달 카테고리에서 모노이드</h2>
+<p>엔도펑터를 대상으로 가지고 있는 카테고리를, 바이펑터 ⨂로 펑터 합성을 넣어 모노이달 카테고리를 만들고, 펑터 합성으로 만들어진 T ⨂ T를 하나 뽑고, 여기에 T ⨂ T -&gt; T 가 있으면 모나드라 합니다. 매우 불친절한 설명입니다.</p>
+<p>지금부터 제가 이해한 방법으로 설명을 하는데, 상상이 많이 들어가 있습니다.</p>
+<p>모노이드의 이항 연산을 아래와 같이 절차를 쪼갭니다.</p>
+<p>위의 생각 스트레칭에서 얘기했던 아이디어를 한 번 더 적용하겠습니다.<br />
+구성원 둘을 받아 하나로 만드는 작업은 둘을 받아오는 작업, 이렇게 받아 온 둘을 하나로 만드는 작업 둘로 나눠 볼 수 있습니다. 한 번이었던 절차가 두 번으로 됐으니, 조금 더 일반화 됐다고 볼 수 있습니다.</p>
+<pre><code>이항 연산multiplier----&gt; 2번 하나로 만드는 작업join . 1번 둘을 붙이는 작업(bifunctor)</code></pre>
+<p>모노이드에서 얘기했던 것과 비슷하게 모노이달 카테고리의 모든 구성원은 바이펑터가 적용된 모양입니다. 즉 1번 둘을 붙이는 작업은 이미 모든 구성원이 갖고 있다고 볼 수 있습니다. 이제 둘을 2번 하나로 만드는 작업이 있으면 모노이드가 될 수 있습니다. (2023.3.12 작성 중)</p>
+<blockquote>
+<p>Q. 이항이어야지 결합 법칙을 볼텐데, <code>join</code>은 단항입니다.</p>
+</blockquote>
+<blockquote>
+<p>Q. 그냥 <code>join</code>으로 모노이드가 되는 걸 설명하면 될텐데, 왜 굳이 모노이달 카테고리를 언급할까요?</p>
+</blockquote>
+<blockquote>
+<p>Q. 모노이달 카테고리가 모노이드인가요?</p>
+</blockquote>
+<blockquote>
+<p>Q. 모노이달 카테고리가 모노이드의 일반화인가요?</p>
+</blockquote>
+<blockquote>
+<p>Q. 왜 모노이달 카테고리의 모노이드가 그리 대단한 대우를 받을까요?</p>
+</blockquote>
+<blockquote>
+<p>Q. 모나드를 이해하는데, 모노이달 카테고리를 이해하는 게 도움이 될까요?</p>
+</blockquote>
+<blockquote>
+<p>Q. 타입 합성과 함수 합성</p>
+</blockquote>
+
+<div class="comment">
+<script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
+</script>
+</div>
+<div style="text-align:right">Github 계정이 없는 분은 메일로 보내주세요. lionhairdino at gmail.com </div>
+        </div>
+        <nav class="toc toc-right js-toc relative z-1 transition--300 absolute pa4 pt5 is-position-fixed"></nav>
+        <div id="footer">
+            © 2022 lionhairdino. All rights reserved. Generated by <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+        <script>
+            tocbot.init({
+                tocSelector: '.js-toc',
+                contentSelector: '.js-toc-content',
+                headingSelector: 'h2, h3',
+                hasInnerContainers: true,
+            });
+        </script>
+    </body>
+</html>
