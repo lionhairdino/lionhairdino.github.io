@@ -105,10 +105,10 @@
 <span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- Lifted 되어 있으니 Bottom값을 가질 수 있고,</span></span>
 <span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- Boxed되어 있으니, 힙에 넣고 포인터를 통해 접근한다.</span></span>
 <span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- 하스켈 입문 때부터 가장 많이 써왔던 보통의 타입으로 힙을 가리키는 포인터입니다.</span></span></code></pre></div>
-<pre><code>Int# 는 TYPE IntRep
-Bool 은 TYPE LiftedRep
--&gt; 는 TYPE r1 -&gt; TYPE r2 -&gt; TYPE LiftedRep
-...</code></pre>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Int</span><span class="op">#</span> 는 <span class="dt">TYPE</span> <span class="dt">IntRep</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="dt">Bool</span> 은 <span class="dt">TYPE</span> <span class="dt">LiftedRep</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ot">-&gt;</span> 는 <span class="dt">TYPE</span> r1 <span class="ot">-&gt;</span> <span class="dt">TYPE</span> r2 <span class="ot">-&gt;</span> <span class="dt">TYPE</span> <span class="dt">LiftedRep</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="op">...</span></span></code></pre></div>
 <p>조금 복잡하긴 한데, 하스켈의 타입들은 모두 위에서 얘기한 속성representation으로 구분지을 수 있습니다.</p>
 <blockquote>
 <p>※ GHC공식 문서의 아래 문장을 잘못 해석했는데, Ailrun님이 바로 잡아 주셨습니다.<br />
@@ -151,13 +151,13 @@ Bool 은 TYPE LiftedRep
 <p><code>unboxed</code>라고 찝어서 얘기했지만, 그렇다고 다른 타입은 반환할 수 있다는 얘기는 아닙니다. 어떤 타입도 반환할 수 없는 <code>undefined</code>와 <code>error</code> 함수를 이용해, <code>unboxed</code>를 반환하는 보통의 함수들의 실행을 끊을 때 쓴다는 얘기입니다.</p>
 <h3 id="representation-polymorphic-타입-출력하기">Representation-polymorphic 타입 출력하기</h3>
 <p><code>-fprint-explicit-runtime-reps</code> 옵션을 주고 GHCi를 실행하면, <code>RuntimeRep</code>과 <code>Levity</code>를 출력해 줍니다.</p>
-<pre><code>ghci&gt; :t ($)
-($) :: (a -&gt; b) -&gt; a -&gt; b
-ghci&gt; :set -fprint-explicit-runtime-reps
-ghci&gt; :t ($)
-($)
-  :: forall (r :: GHC.Types.RuntimeRep) a (b :: TYPE r).
-     (a -&gt; b) -&gt; a -&gt; b</code></pre>
+<div class="sourceCode" id="cb8"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>ghci&gt; :t ($)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>($) :: (a -&gt; b) -&gt; a -&gt; b</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>ghci&gt; :set -fprint-explicit-runtime-reps</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>ghci&gt; :t ($)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>($)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  :: forall (r :: GHC.Types.RuntimeRep) a (b :: TYPE r).</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>     (a -&gt; b) -&gt; a -&gt; b</span></code></pre></div>
 <p><code>Generics</code>를 보기 위해 살펴 봤는데, 문서에도 말하듯이, 다행히 일반 하스켈 사용자들은 Representation들을 굳이 따지며 쓰지 않아도 된다고 합니다. 다행입니다. 알아야 될 것도 많은데…</p>
 
 <div class="comment">

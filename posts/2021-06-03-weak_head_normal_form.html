@@ -115,26 +115,26 @@
 <p>이 말을 살펴 보겠습니다.</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">seq</span><span class="ot"> ::</span> a <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> b</span></code></pre></div>
 <p><code>seq</code>는 <code>a</code>계산식이 <code>bottom</code>이면 결과가 <code>bottom</code>이 되고, 그렇지 않으면, 결과는 <code>b</code> 계산식의 결과가 됩니다.</p>
-<pre><code>ghci&gt; seq (평가가 됐는지 판단하고 싶은 식) ()</code></pre>
+<div class="sourceCode" id="cb9"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>ghci&gt; seq (평가가 됐는지 판단하고 싶은 식) ()</span></code></pre></div>
 <p>평가되면 결과가 <code>undefined</code>가 나오도록 해서 <code>seq</code>에 넘깁니다. 결과가 <code>Exception</code>이 나오면 평가됐다는 말이고, <code>()</code>가 나오면 평가되지 않았다는 뜻입니다. 이를 이용해서, 식이 평가 됐는 지 안됐는 지 볼 수 있습니다.</p>
-<pre><code>ghci&gt; let p = (undefined, 2)
-ghci&gt; let l = [p]
-ghci&gt; let m = [undefined]
-ghci&gt; seq (\a -&gt; undefined) ()
-()
-ghci&gt; seq p ()
-()
-ghci&gt; seq (fst p) ()
-*** Exception: Prelude.undefined...
-ghci&gt; seq l ()
-()
-ghci&gt; seq (head l) ()
-()
-ghci&gt; seq m ()
-()
-ghci&gt; seq (head m) ()
-*** Exception: Prelude.undefined...
-ghci&gt; </code></pre>
+<div class="sourceCode" id="cb10"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>ghci&gt; let p = (undefined, 2)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>ghci&gt; let l = [p]</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>ghci&gt; let m = [undefined]</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>ghci&gt; seq (\a -&gt; undefined) ()</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>()</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>ghci&gt; seq p ()</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>()</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>ghci&gt; seq (fst p) ()</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>*** Exception: Prelude.undefined...</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>ghci&gt; seq l ()</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>()</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>ghci&gt; seq (head l) ()</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>()</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>ghci&gt; seq m ()</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>()</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>ghci&gt; seq (head m) ()</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>*** Exception: Prelude.undefined...</span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>ghci&gt; </span></code></pre></div>
 <h2 id="참고">참고</h2>
 <p><a href="https://woogyun.tistory.com/520">우균님의 WHNF</a><br />
 <a href="https://opentutorials.org/module/1941/11208">남현욱님의 WHNF</a><br />

@@ -99,14 +99,14 @@
 <p>값과 필요한 함수를, 즉 정보를 묶어서 다닐 수 있습니다.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ot">say ::</span> ((<span class="dt">String</span> <span class="ot">-&gt;</span> <span class="dt">String</span>) <span class="ot">-&gt;</span> <span class="dt">String</span>) <span class="ot">-&gt;</span> (<span class="dt">String</span> <span class="ot">-&gt;</span> <span class="dt">String</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>say needFunc <span class="ot">=</span> \name <span class="ot">-&gt;</span> needFunc (\s <span class="ot">-&gt;</span> name <span class="op">&lt;&gt;</span> <span class="st">&quot; says &quot;</span> <span class="op">&lt;&gt;</span> s <span class="op">&lt;&gt;</span> <span class="st">&quot;!&quot;</span>)</span></code></pre></div>
-<pre><code>ghci&gt; say (\f -&gt; f &quot;hi&quot;) &quot;Jack&quot;
-&quot;Jack says hi!&quot;
-ghci&gt; say (   (\f -&gt; f &quot;hi&quot;)   (\x -&gt; (\yf -&gt; yf (x &lt;&gt; &quot; everybody&quot;)))   ) &quot;Jack&quot;
-&quot;Jack says hi everybody&quot;
-
-ghci&gt; :t say (   (\f -&gt; f &quot;hi&quot;)   (\x -&gt; (\y -&gt; y (x &lt;&gt; &quot; everybody&quot;)))   )
-say (   (\f -&gt; f &quot;hi&quot;)   (\x -&gt; (\y -&gt; y (x &lt;&gt; &quot; everybody&quot;)))   )
-  :: String -&gt; String</code></pre>
+<div class="sourceCode" id="cb2"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>ghci&gt; say (\f -&gt; f &quot;hi&quot;) &quot;Jack&quot;</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>&quot;Jack says hi!&quot;</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>ghci&gt; say (   (\f -&gt; f &quot;hi&quot;)   (\x -&gt; (\yf -&gt; yf (x &lt;&gt; &quot; everybody&quot;)))   ) &quot;Jack&quot;</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>&quot;Jack says hi everybody&quot;</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>ghci&gt; :t say (   (\f -&gt; f &quot;hi&quot;)   (\x -&gt; (\y -&gt; y (x &lt;&gt; &quot; everybody&quot;)))   )</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>say (   (\f -&gt; f &quot;hi&quot;)   (\x -&gt; (\y -&gt; y (x &lt;&gt; &quot; everybody&quot;)))   )</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  :: String -&gt; String</span></code></pre></div>
 <p>원하는 만큼 함수도, 값도 안에 넣어 놓을 수 있습니다.</p>
 <h3 id="폴리모픽">폴리모픽</h3>
 <p>타입 클래스와 함께 쓰면, 컴파일러가 알아서 적당한 구현을 골라주는 ad-hoc polymorphic을 구현할 수 있습니다.</p>
@@ -121,10 +121,10 @@ say (   (\f -&gt; f &quot;hi&quot;)   (\x -&gt; (\y -&gt; y (x &lt;&gt; &quot; e
 <span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">HasName</span> <span class="dt">Cat</span> <span class="kw">where</span></span>
 <span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  sound <span class="ot">=</span> <span class="st">&quot;야옹&quot;</span></span></code></pre></div>
-<pre><code>ghci&gt; sound @Dog
-&quot;멍!&quot;
-ghci&gt; sound @Cat
-&quot;야옹!&quot;</code></pre>
+<div class="sourceCode" id="cb4"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>ghci&gt; sound @Dog</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>&quot;멍!&quot;</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>ghci&gt; sound @Cat</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>&quot;야옹!&quot;</span></code></pre></div>
 <h3 id="반복-작업-추상화">반복 작업 추상화</h3>
 <p>함수를 데이터 타입 안에 넣어버리면, 함수 합성을 할 때, 항상 특정 동작을 하도록 할 수 있습니다.</p>
 <p>특별히 이름 붙인 타입이 없는 함수는 보통 특별한 동작 없이 합성합니다.</p>
@@ -152,9 +152,9 @@ ghci&gt; sound @Cat
 <p>별도의 타입을 만든다는 건, 그 타입만이 가지는 속성에 의존해서 돌아가는 함수(메소드)가 필요하기 때문입니다. 값이 됐든, 함수가 됐든 상관이 없습니다. 생성자로 감싸wrap 놓으면, 반드시 어떤 절차를 거쳐야만 벗길unwrap 수 있습니다.</p>
 <p>또한, 타입 체킹하는데도 도움을 줍니다.</p>
 <p>패턴 매칭을 위해 <code>runSomeType</code>을 만듭니다.</p>
-<pre><code>ghci&gt; let runSomeType (SomeType f) = \n -&gt; f n
-ghci&gt; runSomeType compSomeType 1
-1001</code></pre>
+<div class="sourceCode" id="cb9"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>ghci&gt; let runSomeType (SomeType f) = \n -&gt; f n</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>ghci&gt; runSomeType compSomeType 1</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>1001</span></code></pre></div>
 <h3 id="클로저를-만들-수-있다.">클로저를 만들 수 있다.</h3>
 <p><span class="citation" data-cites="todo">@todo</span> 감싼nested람다 함수 헤드에 있는 변수들을, 타 언어의 전역 변수나 한정된 모듈 혹은 블록에서 유효한 변수처럼 사용하는 예시 추가할 것</p>
 <h3 id="시간이-존재한다.">시간이 존재한다.</h3>

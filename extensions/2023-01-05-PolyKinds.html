@@ -92,12 +92,12 @@
 <div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">App</span> f a <span class="ot">=</span> <span class="dt">MkApp</span> (f a)</span></code></pre></div>
 <p><code>App</code>의 카인드를 보면<br />
 <code>Type -&gt; Type</code>인 <code>f</code>를 받고, <code>Type</code>을 받아 <code>Type</code>을 돌려주는 걸로 읽을 수 있습니다.</p>
-<pre><code>(Type -&gt; Type) -&gt; Type -&gt; Type</code></pre>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>(<span class="dt">Type</span> <span class="ot">-&gt;</span> <span class="dt">Type</span>) <span class="ot">-&gt;</span> <span class="dt">Type</span> <span class="ot">-&gt;</span> <span class="dt">Type</span></span></code></pre></div>
 <p>그런데, 더 일반적인 상황까지 고려하면 <code>a</code>를 <code>Type</code>으로 보지 않고, <code>Type -&gt; Type</code>으로 볼 수도 있습니다. (<code>a</code>, <code>1</code>,… 보다 일반화해서 표현하면, 어떤 생성자 안에 들어 있는 타입 <code>Just 1</code>, <code>[1]</code>, … 등으로 볼 수도 있습니다.) 그럼, <code>a</code>에 <code>(Type -&gt; Type)</code>을 넣으면,</p>
-<pre><code>((Type -&gt; Type) -&gt; Type)) -&gt; (Type -&gt; Type) -&gt; Type</code></pre>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>((<span class="dt">Type</span> <span class="ot">-&gt;</span> <span class="dt">Type</span>) <span class="ot">-&gt;</span> <span class="dt">Type</span>)) <span class="ot">-&gt;</span> (<span class="dt">Type</span> <span class="ot">-&gt;</span> <span class="dt">Type</span>) <span class="ot">-&gt;</span> <span class="dt">Type</span></span></code></pre></div>
 <p>로 일반화할 수 있습니다. <code>KindSignatures</code> 확장을 켜지 않고, GHC가 이렇게 카인드를 추론하게 하려면, <code>a</code>에 더미 생성자를 추가해서 <code>Type -&gt; Type</code>으로 추론하게 할 수 있긴 있습니다만, <code>PolyKinds</code> 확장을 켜면, 더 일반적인 카인드로 추론하게 할 수 있습니다.</p>
 <p><code>PolyKinds</code>확장을 켜면 <code>App</code>의 카인드를 이렇게 추론합니다.</p>
-<pre><code>forall k. (k -&gt; Type) -&gt; k -&gt; Type</code></pre>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">forall</span> k<span class="op">.</span> (k <span class="ot">-&gt;</span> <span class="dt">Type</span>) <span class="ot">-&gt;</span> k <span class="ot">-&gt;</span> <span class="dt">Type</span></span></code></pre></div>
 <p>아래 같이 구체 카인드로 추론하는 걸 인스턴스를 만들었다, 인스턴스화 되었다, 인스턴스다라고 말합니다.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">App</span> f a <span class="ot">=</span> <span class="dt">MkApp</span> (f a)</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>

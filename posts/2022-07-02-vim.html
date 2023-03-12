@@ -95,8 +95,8 @@
 <p><a href="https://github.com/henriquehbr/lua-vs-vimscript">벤치마크</a> 결과만 보면 압도적이긴 한데, 항상 그럴지는 아직 모르겠습니다.</p>
 <h4 id="마우스-설정">마우스 설정</h4>
 <p>전 완벽하게 키보드만 쓰는 스타일은 아니고, 창pane 크기 조절, 텍스트 선택 등은 마우스가 편합니다. 아마도 최소한의 마우스 기능이 지원되지 않았으면 <code>vscode</code>를 썼을지도 모르겠습니다. 추가로 다른 앱과 복사, 붙이기를 위해 시스템 클립 보드를 사용하도록 설정합니다.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="at">set mouse=a &quot; 마우스로 창 크기 조절, 탭 선택 등..</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="at">set clipboard+=unnamedplus &quot; 시스템 클립보드 쓰기</span></span></code></pre></div>
+<pre class="vim"><code>set mouse=a &quot; 마우스로 창 크기 조절, 탭 선택 등..
+set clipboard+=unnamedplus &quot; 시스템 클립보드 쓰기</code></pre>
 <blockquote>
 <p>[Vim 플러그인 설치 과정]<br />
 지정된 폴더에 소스를 받아 넣어놔도 되지만, 지금은 대부분 플러그인 매니저를 이용합니다. 여기선 <a href="https://github.com/junegunn/vim-plug">vim-plug</a>를 기준으로 설명합니다.</p>
@@ -108,10 +108,10 @@
 <pre class="vim"><code>call plug#begin()
 Plug 'junegunn/fzf'</code></pre></li>
 <li><p>설정 파일을 <code>vim</code>이 인식하도록</p>
-<pre><code>:source %</code></pre>
+<div class="sourceCode" id="cb3"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>:source %</span></code></pre></div>
 <p>를 하거나, <code>vim</code>을 재시작 합니다.</p></li>
 <li><p>그 후 아래 명령을 통해 플러그인을 설치합니다.</p>
-<pre><code>:PlugInstall</code></pre></li>
+<div class="sourceCode" id="cb4"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>:PlugInstall</span></code></pre></div></li>
 <li><p>플러그인에 필요한 설정들을 추가합니다.
 역시 설정 파일을 vim이 인식하도록 <code>:source %</code>를 해주거나 재시작합니다. <code>%</code>는 현재 파일의 처음부터 끝까지의 내용, 즉 파일 전체를 의미합니다. 파일 전체를 읽어 설정 파일에 적용하란 의미입니다. ※ 명령행command-line에서는 다른 뜻입니다. <code>:!echo %</code> 하면 현재 파일명을 의미하고, 여기에 파일명 modifier중 <code>:h</code>를 붙이면, 현재 파일이 있는 디렉토리를 의미합니다.(<code>:help %:h</code>로 도움말을 볼 수 있습니다.)</p></li>
 <li><p>설치 확인 방법<br />
@@ -213,10 +213,10 @@ endif</code></pre>
 <img src="../images/neovim_lsp.png" alt="Neovim + HLS" /><figcaption aria-hidden="true">Neovim + HLS</figcaption>
 </figure>
 <p>가장 흔한 설정이 아래 4가지로 보입니다.</p>
-<pre><code>1.    Vim -&gt; 플러그인 Coc                   ------ LSP -----&gt; HLS
-2. Neovim -&gt; 빌트인 LSP 클라이언트          ------ LSP -----&gt; HLS
-3. Neovim -&gt; 플러그인 LanguageClient-neovim ------ LSP -----&gt; HLS
-4. Neovim -&gt; 플러그인 Coc                   ------ LSP -----&gt; HLS</code></pre>
+<div class="sourceCode" id="cb7"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>1.    Vim -&gt; 플러그인 Coc                   ------ LSP -----&gt; HLS</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>2. Neovim -&gt; 빌트인 LSP 클라이언트          ------ LSP -----&gt; HLS</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>3. Neovim -&gt; 플러그인 LanguageClient-neovim ------ LSP -----&gt; HLS</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>4. Neovim -&gt; 플러그인 Coc                   ------ LSP -----&gt; HLS</span></code></pre></div>
 <p><code>Neovim</code>을 <code>LSP</code>서버와 붙이려면 많이 쓰는 방식은 빌트인 되어 있는 <code>Native LSP Client</code>, <code>Vim</code>과 호환되는 <code>Coc</code> 또는 <code>LanguageClient</code> 플러그인을 씁니다. 저는 이 중 <code>Coc</code>를 선택했습니다. <code>Vim + LSP</code> 관련 내용을 서핑으로 찾아 볼 때, 어떤 플러그인 글인가 자세히 보셔야 합니다.</p>
 <h3 id="빌트인-lsp">빌트인 LSP</h3>
 <p><a href="https://smarttech101.com/nvim-lsp-autocompletion-mapping-snippets-fuzzy-search/">Nvim lsp autocompletion: mapping, snippets, fuzzy search</a></p>
@@ -225,7 +225,7 @@ endif</code></pre>
 이 전에는 꽤 여러개의 플러그인을 동원해서 IDE스러운 설정들을 했었던 것 같은데, 지금은 <code>LSP</code> 클라이언트와 각 언어에 맞는 Language Server를 띄워서 붙이면 어지간한 IDE 동작들은 다 하는 것 같습니다.</p>
 <h4 id="lsp-클라이언트자동-완성audo-completion-포함-플러그인-설치">LSP 클라이언트(자동 완성audo-completion 포함) 플러그인 설치</h4>
 <p>여러가지 방법이 있는데, 여기서는 <code>coc</code>를 선택했습니다.</p>
-<pre><code>Plug 'neoclide/coc.nvim', {'branch': 'release'}</code></pre>
+<pre class="vim"><code>Plug 'neoclide/coc.nvim', {'branch': 'release'}</code></pre>
 <h3 id="haskell-language-server-이하-hls">Haskell Language Server (이하 HLS)</h3>
 <p>에디터들이 <code>LSP</code> (Language Server Protocol)에 맞춰 요청을 보내면, 이를 받아 언어 컴파일러나 기타 툴의 도움을 받아 필요한 정보를 돌려주는 툴을 Language Server라 합니다. 하스켈 생태계에서 에디터들의 IDE스런 동작을 도와주는 여러 툴들이 있었는데, 지금은 거의 <a href="https://haskell-language-server.readthedocs.io/en/latest/index.html">Haskell Language Server</a>로 흡수 및 통일 된 것 같습니다.</p>
 <p><code>GHC</code>, <code>Stack</code>, <code>Cabal</code>, <code>HLS</code>를 설치할 때, 지금(2022) 가장 권장되는 방식은 <code>ghcup</code>를 이용하는 방식인 듯 합니다.</p>
@@ -234,7 +234,7 @@ endif</code></pre>
 <div class="sourceCode" id="cb10"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> haskell-language-server-wrapper</span></code></pre></div>
 <h3 id="coc와-hls-연결">Coc와 HLS 연결</h3>
 <p>아래 명령어를 입력해서 <code>Coc</code>설정 파일을 엽니다.</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="at">:CocConfig</span></span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>:CocConfig</span></code></pre></div>
 <div class="sourceCode" id="cb12"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;coc.preferences.extensionUpdateCheck&quot;</span><span class="fu">:</span> <span class="st">&quot;daily&quot;</span><span class="fu">,</span></span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;languageserver&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
@@ -270,16 +270,16 @@ endif</code></pre>
 <p><code>vim</code>도 설정 파일 위치만 다를 뿐 똑같은 절차로 동작합니다.</p>
 <h3 id="사용-방법">사용 방법</h3>
 <p>예전엔 <code>tmux</code>로 <code>ghcid</code>를 별도로 띄워놓고 작업하는 경우가 많았는데, 요즘은 많이들 <code>HLS</code>로 넘어가고 있는 것 같습니다. <code>ghcid</code>를 보듯 창을 띄우려면 아래 명령어를 이용합니다.</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="at">:CocDiagnostics</span></span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>:CocDiagnostics</span></code></pre></div>
 <p>아직 이유를 제대로 알지 못하는 오작동 경우가 종종 있는데, 재시작으로 해결해야 하는 경우가 많습니다. 아래 명령어를 입력하거나, 단축키를 지정해 놓고 쓰는 것을 추천드립니다.</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="at">:CocRestart</span></span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>:CocRestart</span></code></pre></div>
 <p><code>init.vim</code>에 단축키 설정</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="at">map &lt;F10&gt; :CocRestart&lt;CR&gt;</span></span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>map &lt;F10&gt; :CocRestart&lt;CR&gt;</span></code></pre></div>
 <p><code>:Coc</code>까지 입력하고 <code>tab</code>키를 입력하면 지원 명령들을 볼 수 있습니다.<br />
 지원하는 명령들을 목록으로 볼 수도 있습니다.</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="at">:CocList</span></span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>:CocList</span></code></pre></div>
 <p>아래 명령을 이용하여 <code>LSP</code> 서버에게 여러가지 명령을 전달 할 수 있습니다.</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="at">:CocCommand</span></span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>:CocCommand</span></code></pre></div>
 <h3 id="정의로-점프go-to-definition-후-돌아-오기가-안될-때">정의로 점프Go to Definition 후 돌아 오기가 안될 때</h3>
 <p>2022.10.28 추가</p>
 <ul>
@@ -298,9 +298,9 @@ endif</code></pre>
 <p>이 소스, 저 소스들을 가져와서 실행해 보며 공부하다 보면, 버전 충돌로 인한 에러를 자주 만납니다. 작동을 제대로 하고 있는지 보는 방법 중 가장 간단한 방법은 HLS 프로세스가 떠있나 보는 방법이 있고, 아래 명령어들을 이용해 단서를 얻을 수 있습니다.</p>
 <p>꽤 오랫동안 인터넷 문서들을 보며 리눅스 관련 툴들을 설치하곤 했는데, 그 때마다 드는 생각이 “현재 잘 작동하고 있는지, 로그는 어떻게 보는지” 알려주는 문서가 제일 좋았던 것 같습니다.</p>
 <p>Neovim 안에서</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="at">:CocCommand workspace.showOutput</span></span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="at">:CocOpenLog</span></span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="at">:messages</span></span></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>:CocCommand workspace.showOutput</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>:CocOpenLog</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>:messages</span></code></pre></div>
 <p>프로젝트 루트 폴더에서(stack.yaml이 있는 폴더) 커맨드 라인에서</p>
 <div class="sourceCode" id="cb20"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> haskell-language-server-wrapper</span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> haskell-language-server-9.0.2 <span class="kw">(</span><span class="ex">특정</span> 버전<span class="kw">)</span></span>
@@ -315,7 +315,7 @@ endif</code></pre>
 <span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a><span class="er">...</span></span></code></pre></div>
 <p>※ <code>"args": ["--lsp","-d","--logfile=hls.log"]</code>라 둬서 정상 작동하지 않는 걸 Ailrun님 조언으로 해결했습니다.
 설정을 바꿨으니 <code>Coc</code>와 <code>HLS</code>를 재시작합니다.</p>
-<div class="sourceCode" id="cb22"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="at">:CocRestart</span></span></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>:CocRestart</span></code></pre></div>
 <h3 id="설정-목록">설정 목록</h3>
 <p>쉘에서 아래 명령어로 가능한 설정을 확인 할 수 있습니다.</p>
 <div class="sourceCode" id="cb23"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> haskell-language-server-wrapper <span class="ex">generate-default-config</span></span></code></pre></div>
@@ -426,14 +426,14 @@ endif</code></pre>
 <span id="cb24-104"><a href="#cb24-104" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
 <h3 id="abi-충돌">ABI 충돌</h3>
 <p>wrapper를 돌렸을 때, ABI 충돌이 나며 끝에 아래와 같은 메시지가 나올 때가 있습니다.</p>
-<div class="sourceCode" id="cb25"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="ex">{</span><span class="st">&quot;jsonrpc&quot;</span><span class="ex">:</span><span class="st">&quot;2.0&quot;</span><span class="ex">,</span> <span class="st">&quot;method&quot;</span>:<span class="st">&quot;window/showMessage&quot;</span>, <span class="st">&quot;params&quot;</span>: {<span class="st">&quot;type&quot;</span>: 1, <span class="st">&quot;message&quot;</span>: <span class="st">&quot;Couldn't find a working/matching GHC installation. Consider installing ghc-9.2.4 via ghcup or build HLS from source.&quot;</span>}}</span></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>{&quot;jsonrpc&quot;:&quot;2.0&quot;, &quot;method&quot;:&quot;window/showMessage&quot;, &quot;params&quot;: {&quot;type&quot;: 1, &quot;message&quot;: &quot;Couldn't find a working/matching GHC installation. Consider installing ghc-9.2.4 via ghcup or build HLS from source.&quot;}}</span></code></pre></div>
 <p>ABI 충돌은 결국, 현재 쓰고 있는 GHC와, HLS를 컴파일한 GHC가 맞지 않아 생기는 오류입니다. ghcup로 싹다 지우고, cache도 지우고, 다시 깨끗한 환경에서 설치했는데도 아래와 같은 오류가 났습니다.</p>
-<div class="sourceCode" id="cb26"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> haskell-language-server-9.2.4</span>
+<div class="sourceCode" id="cb26"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>$ haskell-language-server-9.2.4</span>
 <span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="ex">No</span> compiler found, expected minor version match with ghc-9.2.4 <span class="er">(</span><span class="ex">x86_64-tinfo6</span><span class="kw">)</span> <span class="kw">(</span><span class="ex">based</span> on resolver setting in /home/jacoo/.stack/global-project/stack.yaml<span class="kw">)</span><span class="bu">.</span></span>
-<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="ex">To</span> install the correct GHC into /home/jacoo/.stack/programs/x86_64-linux/, try running <span class="st">&quot;stack setup&quot;</span> or use the <span class="st">&quot;--install-ghc&quot;</span> flag. To use your system GHC installation, run <span class="st">&quot;stack config set system-ghc --global true&quot;</span>, or use the <span class="st">&quot;--system-ghc&quot;</span> flag.</span>
-<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a><span class="ex">All</span> methods exhausted!</span>
-<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a><span class="ex">Content-Length:</span> 203</span></code></pre></div>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>No compiler found, expected minor version match with ghc-9.2.4 (x86_64-tinfo6) (based on resolver setting in /home/jacoo/.stack/global-project/stack.yaml).</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>To install the correct GHC into /home/jacoo/.stack/programs/x86_64-linux/, try running &quot;stack setup&quot; or use the &quot;--install-ghc&quot; flag. To use your system GHC installation, run &quot;stack config set system-ghc --global true&quot;, or use the &quot;--system-ghc&quot; flag.</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>All methods exhausted!</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>Content-Length: 203</span></code></pre></div>
 <p>위와 같이 ABI 충돌을 해결하지 못할 때, HLS를 현재 시스템이 쓰는 GHC로 컴파일해서 해결을 시도할 수 있습니다.</p>
 <div class="sourceCode" id="cb27"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="ex">ghcup</span> compile hls <span class="at">--version</span> 1.8.0.0 <span class="at">--ghc</span> 9.2.4</span></code></pre></div>
 <p>저는 위 방법으로, 컴파일을 시도했는데, 제 데비안 환경과 맞지 않는 무엇이 있는지 계속 컴파일 에러가 났습니다.<br />
@@ -441,7 +441,7 @@ Haskell Language Server 관리자이신 Airun님의 조언으로 아래와 같�
 release 기준으로 빌드하면 Hackage에서 가져와서 빌드하는데, Hackage에는 version bound가 이상하게 올라갈 때가 있다고 합니다. (무언가 수작업으로 해야 하는 작업이 있어, 사람 손을 타다 보니 생기는 경우라 합니다.) (Ailrun님 감사합니다.)</p>
 <div class="sourceCode" id="cb28"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="ex">ghcup</span> compile hls <span class="at">--git-ref</span> master <span class="at">--ghc</span> 9.2.4</span></code></pre></div>
 <p>컴파일을 마치고 나면, 지원되지 않는 플러그인이 있는지 확인해야 합니다. GHC버전이 올라감에 따라 바로 적용되지 않는 플러그인들이 생깁니다. 아래 명령어로 현재 컴파일된 hls가 지원하는 플러그인 목록을 볼 수 있습니다.</p>
-<div class="sourceCode" id="cb29"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> haskell-language-server-wrapper <span class="ex">--list-plugin</span></span></code></pre></div>
+<div class="sourceCode" id="cb29"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>&gt; haskell-language-server-wrapper --list-plugin</span></code></pre></div>
 <p><a href="https://haskell-language-server.readthedocs.io/en/latest/support/plugin-support.html#current-plugin-support-tiers">HLS latest 버전 매뉴얼</a></p>
 <h3 id="stack-버그">Stack 버그</h3>
 <p>이제 막 셋팅한 분들은 아직 보지 않으셔도 되는 내용입니다. 같은 경우를 만나는 경우는 드물 것 같긴 한데, 혹시라도 HLS가 정상적으로 실행되지 않을 때 힌트를 얻을만한 부분이 있을까 해서 올려 놓습니다.</p>
@@ -466,10 +466,10 @@ release 기준으로 빌드하면 Hackage에서 가져와서 빌드하는데, Ha
 <span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span>
 <span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> someFunc</span></code></pre></div>
 <p>아래와 같은 에러가 나며, HLS가 시작되지 않습니다.</p>
-<div class="sourceCode" id="cb32"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>  <span class="ex">ghcide</span> compiled by GHC 9.0 failed to load packages: <span class="op">&lt;</span>command line<span class="op">&gt;</span>: cannot satisfy <span class="at">-package</span></span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="ex">myApp-0.1.0.0</span></span>
-<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">(</span><span class="ex">use</span> <span class="at">-v</span> for more information<span class="kw">)</span><span class="bu">.</span></span>
-<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>  <span class="ex">Please</span> ensure that ghcide is compiled with the same GHC installation as the project.</span></code></pre></div>
+<div class="sourceCode" id="cb32"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>  ghcide compiled by GHC 9.0 failed to load packages: &lt;command line&gt;: cannot satisfy -package</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  myApp-0.1.0.0</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>  (use -v for more information).</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>  Please ensure that ghcide is compiled with the same GHC installation as the project.</span></code></pre></div>
 <p>뜬금 없이 <code>HLS</code>에 포함되어 있는 <code>ghcide</code>가 프로젝트와 같은 <code>GHC</code> 버전으로 컴파일 되지 않았다는 에러입니다. 그런데, 그 위에 메시지를 보면 패키지 로드에 실패했다는 메시지도 보입니다. 이 상태에서 <code>stack build</code>를 하고 나면 <code>HLS</code>가 정상 동작합니다.</p>
 <p><code>hie-bios</code><a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>는 <code>stack repl</code>을 쓰는데, <code>stack repl</code>은 <code>executables</code>에 있는 파일을 볼 때 <code>dependencies</code>에 있는 <em>로컬 라이브러리 컴포넌트는 빌드하지 않는다</em>고 합니다. <code>stack build</code>는 <code>library</code>와 <code>executables</code>를 모두 빌드하는데, <code>stack repl</code>은 다른 동작을 합니다. <code>stack</code>의 버그로 볼 수 있다고 합니다. (Ailrun님, 조언 감사합니다.) 이런 이유로 <code>Cabal</code>이 아닌 <code>stack</code>을 쓸 때는 <code>stack build</code>를 한 번 해줘야 <code>HLS</code>가 정상 동작합니다.</p>
 <p><code>HLS</code>가 시작 못하는 진짜 이유는, <code>package.yaml</code>에 의존성이 지정되어 있는 패키지(여기 경우는 myApp)를 로드하려 하는데, 해당 패키지가 없기 때문입니다. 이 때, <code>stack build</code>를 하면 라이브러리가 쓰이든 안 쓰이든 모두 빌드됩니다.</p>
