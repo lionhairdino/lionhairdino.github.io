@@ -135,7 +135,7 @@
 <p>왜 모노이달 카테고리에선 <code>α, λ, p</code>를 두었을까요? 생각 스트레칭에 쓴 것과 같이 좀 일반화하기 위한 장치일까요.</p>
 <p><code>α</code>에는 아래 첨자 <code>{abc}</code>가 있고, <code>λ</code>, <code>ρ</code>에는 아래 첨자 <code>{A}</code>가 있습니다. 이 말은 모든 세가지 구성원 조합마다 <code>α</code>가 각 각 있고, 모든 구성원 각각 별 개로 <code>λ</code>, <code>ρ</code>를 가지고 있다는 얘기입니다. 이러면 결합 법칙, 항등 법칙이 성립하지 않는 경우가 있을까 싶은 막무가내 규칙처럼 보이기도 하는데, 깊이 들어 가보질 못해, 이런 조건이 어떤 결과를 가져오는지 궁금합니다. 특별히 이들 <code>α, λ, p</code>가 모두 <code>identity</code>이어서 아무 일도 하지 않는 경우를 strict monoidal category라 합니다. (하스켈에서 모나드를 얘기할 때 만나는 엔도펑터 모노이달 카테고리는 strict monoidal category입니다.)</p>
 <h2 id="모노이달-카테고리에서-모노이드">모노이달 카테고리에서 모노이드</h2>
-<p>엔도펑터를 대상으로 가지고 있는 카테고리를, 바이펑터 ⨂로 <code>펑터 합성</code>을 넣어 모노이달 카테고리를 만들고, <code>펑터 합성</code>으로 만들어진 <code>T ⨂ T</code>를 하나 뽑고, 여기에 <code>T ⨂ T -&gt; T</code> 가 있으면 모나드라 합니다. 매우 불친절한 설명입니다.</p>
+<p>엔도펑터를 대상으로 가지고 있는 카테고리를, 바이펑터 <code>⨂</code>로 <code>펑터 합성</code>을 넣어 모노이달 카테고리를 만들고, <code>펑터 합성</code>으로 만들어진 <code>T ⨂ T</code>를 하나 뽑고, 여기에 <code>T ⨂ T -&gt; T</code> 가 있으면 모나드라 합니다. 매우 불친절한 설명입니다.</p>
 <p>지금부터 제가 이해한 방법으로 설명을 하는데, 상상이 많이 들어가 있습니다.</p>
 <p>모노이드의 이항 연산을 아래와 같이 절차를 쪼갭니다.</p>
 <p>위의 생각 스트레칭에서 얘기했던 아이디어를 한 번 더 적용하겠습니다.<br />
@@ -146,7 +146,7 @@
 </p>
 <blockquote>
 <p>펑터 합성은 함수 합성과 다릅니다.
-<code>Maybe</code>와 <code>Mabye</code>를 함수 합성한다면, 마치 값 생성자 <code>Just</code>를 두 번 써서 <code>Just(Just 1)</code>로 표현하면 될 것처럼 보입니다. 하지만 펑터는 한 가지 작업만을 의미하는 게 아닙니다. <code>Maybe</code>의 경우는 <code>Just</code>와 <code>Nothing</code>이 있습니다. 이 둘을 다음 둘과 함수 합성으로는 표현할 수 없습니다.<br />
+<code>Maybe</code>와 <code>Mabye</code>를 함수 합성한다면, 마치 값 생성자 <code>Just</code>를 두 번 써서 <code>Just(Just 1)</code>로 표현하면 될 것처럼 보입니다. 하지만 펑터는 한 가지 작업만을 의미하는 게 아닙니다. <code>Maybe</code>의 경우는 <code>Just</code>와 <code>Nothing</code>이 있습니다. 처음 둘을 다음 둘과 함수 합성으로는 표현할 수 없습니다.<br />
 <code>Maybe</code>와 <code>[]</code>를 합성한다면 값 수준에서는 타입이 달라 함수 합성처럼 생각하면 합성할 수 없습니다. 타입 수준 합성으로 생각하면 <code>Maybe [_]</code> 혹은 <code>[Maybe _]</code>가 됩니다. 펑터 합성은 타입 수준 합성으로 생각해햐 합니다. -<span class="citation" data-cites="다믜님이">@다믜님이</span> 타입 레벨 합성에 대해 알려주셨습니다. 감사합니다.</p>
 </blockquote>
 <p>모노이드가 되려면 결합 법칙과 항등 법칙을 따라야 합니다.</p>
@@ -172,11 +172,11 @@ join(T ⨂        T) = join(T        ⨂ T)
 <p>즉 이 시스템은 <code>join</code>이 이항 연산 역할을 하고, <code>return</code>이 항등원 역할을 해서 모노이드가 됩니다.</p>
 <p>정리해서 말하면 1번 둘을 붙이는 작업<code>⨂</code>은 이미 되어 있는 시스템은 <code>join</code>, <code>return</code>이 있으면 모노이드가 됩니다.</p>
 <p><code>⨂</code>로 모노이달 카테고리일 때, 오브젝트 중 <code>join</code>, <code>return</code> 이 있는 것은 모노이드가 될 수 있습니다.</p>
-<p>엔도펑터가 <code>펑터 합성 ⋅</code>으로 모노이달 카테고리일 때, 그 중 한 엔도펑터(ex. <code>Maybe</code>, <code>[]</code>, <code>Reader</code>, <code>Writer</code>…)들이 <code>join</code>, <code>return</code>이 있어 모노이드가 됩니다.<br />
+<p>엔도펑터가 <code>펑터 합성 ⋅</code>으로 모노이달 카테고리일 때, 그 중 어떤 한 엔도펑터(ex. <code>Maybe</code>, <code>[]</code>, <code>Reader</code>, <code>Writer</code>…)가 <code>join</code>, <code>return</code>이 있으면 모노이드가 됩니다.<br />
 ※ 하스켈에서 <code>펑터 합성</code>은 보통 생략해서 <code>Maybe ⋅ Maybe</code>가 아닌 <code>Maybe (Maybe a)</code>로 보통 만납니다.</p>
 <p>모나드는 엔도펑터 모노이달 카테고리의 대상object중 모노이드인 대상입니다.</p>
 <blockquote>
-<p>“엔도펑터”를 오브젝트로 하는 카테고리 <code>C</code>는 <code>[C(T), ⊗, id, α=id, λ=id, ρ=id]</code>가 모노이달 카테고리일 때, 이 중 오브젝트 하나 <code>T</code>를 뽑고, <code>⊗</code>으로 <code>functor composition</code>을 주면, <code>[T, μ, η ]</code>가 모노이드가 될 때, 엔도펑터 <code>T</code>를 모나드라 부릅니다.</p>
+<p>“엔도펑터 <code>T</code>”를 오브젝트로 하는 카테고리 <code>C</code>는 <code>[C(T), ⊗, id, α=id, λ=id, ρ=id]</code>가 모노이달 카테고리일 때, 이 중 오브젝트 하나 <code>T</code>를 뽑고, <code>⊗</code>으로 <code>functor composition</code>을 주면, <code>[T, μ, η ]</code>가 모노이드가 될 때, 엔도펑터 <code>T</code>를 모나드라 부릅니다.</p>
 </blockquote>
 <h2 id="정리">정리</h2>
 <p>제가 보는 핵심 아이디어는 “이항 연산을 두 번의 절차로 나눠 놓은 것”입니다. 두 번의 절차 중 한 절차는 이미 디폴트처럼 가지고 있는 시스템에서 모노이드를 만들려면, 나머지 한 절차를 추가해서 보면 됩니다. 아래 정리에 도달하려고 지금까지 길게 설명을 적었습니다.</p>
@@ -191,8 +191,8 @@ join(T ⨂        T) = join(T        ⨂ T)
 <p><code>Maybe</code> 엔도펑터를 예를 들면,</p>
 <pre><code>Maybe ⋅ Maybe = Maybe 가 아니지만
 join (Maybe ⋅ Maybe) = Maybe 가 될 수 있습니다.</code></pre>
-<p>더 정확히 말하면, <code>join</code>과 <code>return</code>을 잘 정의하면 모노이드로 만들 수 있습니다.<br />
-더 공부하면, 또 깊은 뜻을 알게 될지도 모르지만, 지금은 “<em>이항 연산의 일반화</em>”가 가장 눈에 들어오는 특징입니다. (생각을 검증해 주신 <span class="citation" data-cites="Ailrun님">@Ailrun님</span> 감사합니다. - 혹 틀린 설명이 있을까봐 부연하자면, 여기 설명 자체를 읽고 검증해주신 건 아니고, 아이디어를 말씀 드렸을 때, 다른 데서 볼 수 없는 모노이달 카테고리에 대한 자세한 설명과, 생각이 맞는 길로 가고 있다 정도를 알려주셨습니다.)</p>
+<p>더 정확히 말하면, <code>join</code>과 <code>return</code>을 잘 정의할 수 있다면 모노이드로 만들 수 있습니다.<br />
+더 공부하면, 또 깊은 뜻을 알게 될지도 모르지만, 지금은 “<em>이항 연산의 일반화</em>”가 가장 눈에 들어오는 특징입니다. (생각을 검증해 주신 <span class="citation" data-cites="Ailrun님">@Ailrun님</span> 감사합니다. - 혹 여기 글에 틀린 설명이 있을까봐 부연하자면, 여기 설명 자체를 읽고 검증해주신 건 아니고, 아이디어를 말씀 드렸을 때, 다른 데서 볼 수 없는 모노이달 카테고리에 대한 자세한 설명과, 생각이 맞는 길로 가고 있다 정도를 알려주셨습니다.)</p>
 <p><em>두 구성원을 받아 작업을 한 후 하나의 다른 구성원이 된다는 말에서, 두 번의 작업이 한 번의 작업과 같아지는 걸로 개념이 확대된 모노이드</em>를 봤습니다. 이항 연산의 일반화로 모노이드의 일반화 즉, 좀 더 모노이드의 본질을 생각하는데 도움이 됐습니다. (아마도, 이 말은 더 더욱 욕을 먹을 수도 있는데, 이렇게 생각을 확장하는데 아이디어가 되는 바탕은 모든 값을 Computation으로 보는데서 시작하지 않았을까 합니다. 이 건 다른 글에서 더 떠들어 보겠습니다.)</p>
 <h2 id="궁금했던-의문들">궁금했던 의문들</h2>
 <blockquote>
@@ -201,7 +201,7 @@ A. 결합법칙은 어떤 작업(연산)을 어떤 것을 먼저 하느냐가 �
 </blockquote>
 <blockquote>
 <p>Q. 그냥 <code>join</code>으로 모노이드가 되는 걸 설명하면 될텐데, 왜 굳이 모노이달 카테고리를 언급할까?<br />
-A. 이항 연산이 둘로 나뉘어 동작하는 시스템을 만들기 위해, 모노이달 카테고리의 바이펑터가, 모노이드 이항 연산의 “1번 둘을 붙이는 작업”이 미리 되어 있는 시스템을 만들어야 합니다.</p>
+A. 이항 연산이 둘로 나뉘어 동작하는 시스템을 보이기 위해, 모노이달 카테고리의 바이펑터가, 모노이드 이항 연산의 “1번 둘을 붙이는 작업”을 미리 해 놓은 시스템을 만들어야 합니다.</p>
 </blockquote>
 <blockquote>
 <p>Q. 모노이달 카테고리가 모노이드인가?<br />
@@ -213,7 +213,7 @@ A. Set 카테고리와 바이펑터로 product를 넣으면 추상 대수의 모
 </blockquote>
 <blockquote>
 <p>Q. 왜 모노이달 카테고리의 모노이드가 그리 대단한 대우를 받을까?<br />
-A. 함수형은 모노이드 개념이 곳곳에 들어가 있습니다. 모노이달 카테고리의 모노이드는 더 표현력이 늘어나, 원래 모노이드로 볼 수 없었던 것도, 몇 가지 장치로 모노이드로 볼 수 있게 만들어 줍니다. <code>Maybe a</code>를 받는 곳에 <code>Maybe(Maybe a)</code>를 넣을 방법이 생기도록 도와 줍니다.</p>
+A. 함수형은 모노이드 개념이 곳곳에 들어가 있습니다. 모노이달 카테고리의 모노이드는 더 표현력이 늘어나, 원래 모노이드로 볼 수 없었던 것도, 몇 가지 장치로 모노이드로 볼 수 있게 만들어 줍니다. 예를 들어 <code>Maybe a</code>를 받는 곳에 <code>Maybe(Maybe a)</code>를 넣을 방법이 생기도록 도와 줍니다.</p>
 </blockquote>
 <blockquote>
 <p>Q. 모나드를 이해하는데, 모노이달 카테고리를 이해하는 게 도움이 될까?<br />
