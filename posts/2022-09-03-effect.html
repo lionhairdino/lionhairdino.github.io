@@ -96,7 +96,7 @@
 </ol>
 <p>하스켈(또는 함수형)을 공부하면서 가장 시작 단계에서 만나게 되고, 그 후로도 계속 중요한 역할을 하는데, 정작 <code>Effect</code>가 뭔지 다루는 글이 드뭅니다. 입문자들이 이해할 수 있는 글을 아직 본 적이 없습니다. 이렇게 기초적이고 중요한 개념의 구체적 정의를 찾기 힘들다는 게 이상하단 생각이 듭니다. 아마도 정규 교육을 받을 때 보는 텍스트(교재)들에는 분명 있을텐데, 너무 쉬워서 그런가 웹에서 가볍게 설명하는 텍스트는 없습니다.</p>
 <p>주의) 이 글은 충분한 자료(인터넷에 공개된 자료)를 찾지 못해, 일부는 <em>제 의견과 상상으로</em> 채운 글이니, 댓글로 여러 의견들이 오갔으면 좋겠습니다.</p>
-<p>어디서 힌트를 얻어야 할지 난감할 때, Ailrun님의 자세한 설명이 많은 도움이 되었습니다. 감사드립니다. 혹 틀린 내용이 있다면, 분명 제가 잘 못 이해하고 기록한 것입니다.</p>
+<p>어디서 힌트를 얻어야 할지 난감할 때, <span class="citation" data-cites="Ailrun님의">@Ailrun님의</span> 자세한 설명이 많은 도움이 되었습니다. 감사드립니다. 혹 틀린 내용이 있다면, 분명 제가 잘 못 이해하고 기록한 것입니다.</p>
 <h2 id="영단어-뜻">영단어 뜻</h2>
 <p><code>Effect</code>가 뭘까요? 함수형을 공부하다 보면, 절차형(명령형)은 별 신경쓰지 않고 해결하던 문제들을 <code>Effect</code>개념을 써서 복잡하게 해결하는 모습을 자주 만나게 됩니다. 인터넷 검색을 해도 쉽게 답이 나오지 않습니다. 다들 당연히 알고 있고, 저만 모르는 용어인가 싶습니다.</p>
 <p>일단 원래 단어가 가지고 있는 뜻을 보겠습니다.</p>
@@ -165,7 +165,7 @@
 <li>interactive output</li>
 </ul>
 <p>위에 나열한 것들이 모두 내포의 예시입니다.</p>
-<p>※ 유지니오 모기가 effect를 해결하는데 모나드를 쓰자고 처음 얘기하고, 필립 와들러가 하스켈에서 모나드를 써서 effect를 해결한 구현이 haskell198 표준에 채택되었다고 합니다.</p>
+<p>※ 유지니오 모기 교수가 effect를 해결하는데 모나드를 쓰자고 처음 얘기하고, 필립 와들러 교수가 하스켈에서 모나드를 써서 effect를 해결한 구현이 haskell198 표준에 채택되었다고 합니다.</p>
 <h3 id="side-effect는-effect중의-하나">Side-effect는 Effect중의 하나</h3>
 <p>어떤 논문은 Side-effect를 Computational Effect 전반을 가리키는 용어로 쓰고, 어떤 논문들은 Effect 중 mutation을 가리키는 용어로만 씁니다. 오래된 논문일수록 전자처럼 쓰고, 요즘은 후자로 자리잡아 가고 있다고 합니다.<br />
 <a href="https://dl.acm.org/doi/10.1145/73560.73564">Polymorphic effect systems (Online: 1988) - J. M. Lucassen, D. K. Gifford</a> 여기서는 전자처럼 쓰이고 있습니다. 논문들을 읽을 때 알아서 잘 구별해서 읽어야 합니다.</p>
@@ -180,15 +180,15 @@
 <h3 id="reader">Reader</h3>
 <p>Reader Effect가 해결하는 작업은 “외부 스코프에 넣어 둔 환경값에 접근하는 작업”입니다. <code>f :: env -&gt; arg -&gt; res</code>, <code>g :: env -&gt; arg -&gt; res</code> 함수에 <code>env</code>를 넣어주는 작업이 외연에 드러나게 하지 않고, Wrapping 함수가 먼저 <code>env</code>를 한 번만 받아 <code>f</code>와 <code>g</code>에 각 각 넣어주도록 구현한 걸 <code>Reader</code>라 이름 붙였습니다.</p>
 <h3 id="state">State</h3>
-<p>State Effect는 “변하는 상태를 참조”를 해결합니다. Wrapping함수가 상태를 매개 변수로 주고 받으며 관리하고, 안에 있는 함수는 이 값이 어디에서 왔는지 알 필요가 없습니다. 이렇게 구현한 걸 <code>State</code>라 이름 붙였습니다.</p>
+<p>State Effect는 “변하는 상태를 참조”를 해결합니다. Wrapping함수(Combinator, 하스켈 모나드에선 <code>bind</code>)가 상태를 매개 변수로 주고 받는 걸 담당하고, 안에 있는 함수는 이 값이 어디에서 왔는지 알 필요가 없습니다. 이렇게 구현한 걸 <code>State</code>라 이름 붙였습니다.</p>
 <h3 id="io">IO</h3>
-<p>위 State와 방식은 같고, 상태로 Realworld를 넣어주게 만들었습니다. 세상의 변화를 모두 가지고 있다는 설정이지만, 사실 실제 컴파일하면 Realworld는 몇 바이트로 표현되는 표식같은 존재입니다. 프리미티브하게 Realworld에 관한 동작이 들어가 있다고 보시면 됩니다.</p>
+<p>위 <code>State</code>와 방식은 같고, 상태로 <code>Realworld</code>를 넣어주게 만들었습니다. 세상의 변화를 모두 가지고 있다는 설정이지만, 사실 실제 컴파일하면 <code>Realworld</code>는 몇(아마도 1바이트?) 바이트로 표현되는 표식같은 존재입니다. 하스켈 런타임에 프리미티브하게 <code>Realworld</code>에 관한 동작이 들어가 있다고 보시면 됩니다.</p>
 <h2 id="하스켈에선-effect를-어떻게-표현할까">하스켈에선 Effect를 어떻게 표현할까?</h2>
 <p>하스켈의 함수는 모두 순수 함수입니다. Effect 동작을 할 수 없는 순수 함수는 어떻게 할까요?<br />
-당연히 다른 함수 하나를 갖다 대서, 순수하지 않은 부분을 맡기면 됩니다. 순수 함수를 두고, 그 순수 함수가 자체적으로 해결 못하는, 즉 Effect는 당연하게도 <strong><em>다른 고차 함수(컴비네이터)</em></strong>의 도움을 받아 해결합니다. 함수에 값을 넣어 줄 때, 그냥 넣어주지 않고, Effect에 맞는 작업을 컴비네이터와 타입 으로 해결합니다. 이 게 모나드가 하는 일입니다.</p>
+<em>당연히 다른 함수 하나를 갖다 대서, 순수하지 않은 부분을 맡기면 됩니다.</em> 순수 함수를 두고, 그 순수 함수가 자체적으로 해결 못하는, 즉 Effect는 당연하게도 <em>다른 고차 함수(컴비네이터)</em>의 도움을 받아 해결합니다. 함수에 값을 넣어 줄 때, 그냥 넣어주지 않고, Effect에 맞는 작업을 컴비네이터와 타입 으로 해결합니다. 이 게 모나드가 하는 일입니다.</p>
 <h2 id="현재-effect-정의로-생각하는-것">현재 Effect 정의로 생각하는 것</h2>
 <p>명시적으로(매개 변수를 통해서) 받지 않고, 결과로 내보내지 않는, 계산computation(혹은 evaluation)에 필요한 (내포intensional) 정보가 있는 작업을 effect가 있는 작업이라 합니다.</p>
-<p>아래는 Effect 정의나 구체적 설명이 있는 텍스트를 찾는다는 말에, Ailrun님이 인용해 주신 문장입니다.</p>
+<p>아래는 Effect 정의나 구체적 설명이 있는 텍스트를 찾는다는 말에, <span class="citation" data-cites="Ailrun님이">@Ailrun님이</span> 인용해 주신 문장입니다.</p>
 <blockquote>
 <p>… they(computaional effect) describe intensional information about what takes place during evaluation of the program unlike what was the case above …<br />
 <a href="http://www.imm.dtu.dk/~fnie/Papers/NiNi99tes.pdf">Type and Effect Systems - Flemming Nielson &amp; Hanne Riis Nielson</a><br />
@@ -211,7 +211,7 @@
 <p>다음 처럼 질문을 했습니다.</p>
 <blockquote>
 <p>lionhairdino: 비결정성이 Effect라는 말보다, 비결정성을 Effect로 구현했다라는 말이 더 맞지 않나요?<br />
-Ailrun: 비결정성은 Effect고…</p>
+<span class="citation" data-cites="Ailrun">@Ailrun</span>: 비결정성은 Effect고…</p>
 </blockquote>
 <p><code>Reader</code> 모나드를 예를 들면, “외부 스코프 변수에 환경값을 넣어 놓고 접근하는 작업(이하 환경값 접근 작업이라 부르겠습니다.)”을 Effect로 해결할 수도 있고, 매개 변수만으로 해결할 수도 있다고 말하고 싶었습니다. 그래서 전 목표 작업 자체를 <code>Reader</code>로 부르고,<br />
 “<code>Reader</code>를 Effect로 구현할 수도 있고, 아닐 수도 있다”라고 얘기했습니다. <em>이 건 틀린 말입니다.</em><br />
@@ -220,9 +220,8 @@ Ailrun: 비결정성은 Effect고…</p>
 <p>“<code>Reader</code>의 Effect는 무엇인가, 환경값에 접근하는 작업이다” 라고 얘기하는 경우를 자주 만나는데, 엄밀히 얘기하면<br />
 “<code>Reader</code>는 환경값에 접근하는 작업을 Effect로 구현한 것에 붙인 이름입니다” 입니다.</p>
 <p>“<code>Reader</code>가 하는 일을 매개 변수로 구현한다면”<br />
-“<code>State</code>는 상태를 유지하는 작업(mutation effect)인데, 이를 매개 변수로만 구현하면(할 수 있다면) <strong><em>상태</em></strong>는 사라집니다. 상태란 낱말에 이미 mutation 뜻이 들어가 있습니다. 고정적으로 있는, 즉 변경되지 않는 값은 상태라 부르지 않고, 상수라 부릅니다.”<br />
-“<code>List</code>는 non-deterministic effect인데, 이게 <strong><em>해결하는 문제</em></strong>를 매개 변수로만 구현하면(할 수 있다면) non-deterministic effect는 사라집니다.”<br />
-…<br />
+“<code>State</code>는 상태를 유지하는 작업(mutation effect)인데, 이를 매개 변수로만 구현하면(할 수 있다면) <em>상태는 사라집니다</em>. 상태란 낱말에 이미 mutation 뜻이 들어가 있습니다. 고정적으로 있는, 즉 변경되지 않는 값은 상태라 부르지 않고, 상수라 부릅니다.”<br />
+“<code>List</code>는 non-deterministic effect인데, 이게 <em>해결하는 문제</em>를 매개 변수로만 구현하면(할 수 있다면) non-deterministic effect는 사라집니다.”<br />
 이런 식으로 말해야 합니다.</p>
 <h2 id="참고">참고</h2>
 <p><a href="https://web.cs.ucla.edu/~todd/research/tldi09.pdf">A Generic Type-and-Effect System - Daniel Marino, Todd Millstein</a><br />
@@ -237,10 +236,10 @@ Ailrun: 비결정성은 Effect고…</p>
 <hr />
 <ol>
 <li id="fn1" role="doc-endnote"><p><a href="https://dl.acm.org/doi/pdf/10.1145/319838.319848">Integrating Functional and Imperative Programming - David K. Gifford and John M. Lucassen</a><br />
-fluent 언어에서 Effect는 effect classes 용어로 설명합니다. fluent 언어에서 모든 표현식은 Effect를 가지고 있습니다. 표현식의 type은 표현식을 계산한 값이 무엇인지 의미하고, 표현식의 effect classes는 표현식이 어떻게 계산될 수 있는지를 설명합니다.<br />
-effect classes는 “관찰자OBSERVER”와 “함수FUNCTION”를 가지고 있습니다.<br />
+fluent 언어에서 Effect는 <code>effect classes</code> 용어로 설명합니다. fluent 언어에서 모든 표현식은 Effect를 가지고 있습니다. 표현식의 type은 표현식을 계산한 값이 무엇인지 의미하고, 표현식의 <code>effect classes</code>는 표현식이 어떻게 계산될 수 있는지를 설명합니다.<br />
+<code>effect classes</code>는 “관찰자OBSERVER”와 “함수FUNCTION”를 가지고 있습니다.<br />
 표현식은 Effect를 보는 “관찰자Observer”이고, Effect를 만들어cause 낼 순 없습니다.<br />
-fluent 언어에서는 return이 없는 procedures는 effect가 있고(executed solely for their side-effects), function은 effect가 없이 실행됩니다.<br />
+fluent 언어에서는 <code>return</code>이 없는 procedures는 effect가 있고(executed solely for their side-effects), <code>function</code>은 effect가 없이 실행됩니다.<br />
 이 논문은 절차형imperative과 함수형을 한 언어에서 어떻게 섞는가에 관한 논문입니다.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section>

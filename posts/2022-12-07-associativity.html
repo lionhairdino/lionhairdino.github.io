@@ -114,17 +114,17 @@
 <p>값을 받기 전 함수들을 먼저 Compose한 걸 함수에 넘겨 주거나 받기 어렵습니다. 즉 고차 함수에 쓰기 어렵습니다.</p>
 <p>아직 들어오지 않은(알지 못한 값에 의존하는) 경우와 그렇지 않은 경우의 차이를 보겠습니다. 말만 들어서는 금방 이해가지 않을 수 있습니다. 아래 예를 보겠습니다.</p>
 <p><code>odot</code>은 결합 법칙이 성립하지만, <code>ndot</code>은 그렇지 않습니다.</p>
-<p>-&gt; f3 ( (-&gt; f2 (f1 $ y + 2)) $ x + 2)
-*2
-+1
-+10
-1을 넣으면 결과는 21</p>
-<p>-&gt; (-&gt; f3 (f2 $ y + 2)) (f1 $ x + 2)
-*2
-+1
-+10
-1을 넣으면 결과는 19</p>
-<p>f1, f2, f3 실행 순서는 둘 다 같지만, ndot이 +2를 몇 번 하고 시작하는지가 다릅니다.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>\x <span class="ot">-&gt;</span> f3 (  (\y <span class="ot">-&gt;</span> f2 (f1 <span class="op">$</span> y <span class="op">+</span> <span class="dv">2</span>))  <span class="op">$</span> x <span class="op">+</span> <span class="dv">2</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>                       <span class="op">*</span><span class="dv">2</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>                   <span class="op">+</span><span class="dv">1</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>      <span class="op">+</span><span class="dv">10</span></span></code></pre></div>
+<p><code>1</code>을 넣으면 결과는 <code>21</code></p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>\x <span class="ot">-&gt;</span>  (\y <span class="ot">-&gt;</span> f3 (f2 <span class="op">$</span> y <span class="op">+</span> <span class="dv">2</span>)) (f1 <span class="op">$</span> x <span class="op">+</span> <span class="dv">2</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>                                <span class="op">*</span><span class="dv">2</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>                  <span class="op">+</span><span class="dv">1</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>              <span class="op">+</span><span class="dv">10</span></span></code></pre></div>
+<p><code>1</code>을 넣으면 결과는 <code>19</code></p>
+<p><code>f1</code>, <code>f2</code>, <code>f3</code> 실행 순서는 둘 다 같지만, <code>ndot</code>이 <code>+2</code>를 몇 번 하고 시작하는지가 다릅니다.</p>
 
 <div class="comment">
 <script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
