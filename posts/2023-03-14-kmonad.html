@@ -86,56 +86,62 @@
 이름에 monad가 들어가 있지만, 하스켈 지식을 필요로 하진 않습니다.<br />
 다른 매크로 앱을 써보지 않아 얼마나 좋은지는 잘 모르겠습니다. Readme에 원하는 동작에 관한 설명이 찾기가 어려워 설정에 좀 노력이 들어가다 보니, 이렇게까지 해서 쓸까 말까 하는 생각이 들긴 했습니다.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode lisp"><code class="sourceCode commonlisp"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>(defcfg</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  input  (device-file <span class="st">&quot;/dev/input/by-id/usb-04d9_a097-event-kbd&quot;</span>)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  output (uinput-sink <span class="st">&quot;My KMonad output&quot;</span> <span class="st">&quot;sleep 1 &amp;&amp; setxkbmap -option compose:ralt&quot;</span>)</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  cmp-seq ralt    <span class="co">;; Set the compose key to `RightAlt'</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  cmp-seq-delay <span class="dv">5</span> <span class="co">;; 5ms delay between each compose-key sequence press</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  fallthrough true</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  allow-cmd true</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co">;; 아래 키보드의 레이아웃은 자신의 키보드에 맞게 바꿔야 합니다.</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>(defsrc</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  grv  <span class="dv">1</span>    <span class="dv">2</span>    <span class="dv">3</span>    <span class="dv">4</span>    <span class="dv">5</span>    <span class="dv">6</span>    <span class="dv">7</span>    <span class="dv">8</span>    <span class="dv">9</span>    <span class="dv">0</span>    <span class="op">-</span>    <span class="op">=</span>    bspc</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  tab  q    w    e    r    <span class="kw">t</span>    y    u    i    o    p    [    ]    \</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  lctl a    s    d    f    g    h    j    k    l    <span class="co">;    '    ret</span></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  lsft z    x    c    v    b    n    m    ,    .    <span class="op">/</span>    rsft</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  caps lmet lalt           spc            ralt rctl     </span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>(defalias</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>  ccr  (around (layer-toggle ccr) ctl)</span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>  sbs  (around (layer-toggle sbs) sft)</span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>  ctj  (around ctl j)</span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>  ctx  (around ctl x)</span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="co">;; 처음 설정하는 레이어가 디폴트 레이어</span></span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>(deflayer default</span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>  _    _    _    _    _    _    _    _    _    _    _    _    _    _</span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>  _    _    _    _    _    _    _    _    _    _    _    _    _    _</span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>  @ccr _    _    _    _    _    _    _    _    _    _    _    _   </span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>  @sbs _    _    _    _    _    _    _    _    _    _    _</span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>  _    _    _              _              _    _    </span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a><span class="co">;; Control 조합</span></span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>(deflayer ccr</span>
-<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>  _    _    _    _    _    _    _    _    _    _    _    _    _    _</span>
-<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>  _    _    _    _    _    _    _    _    _    _    _    _    _    _</span>
-<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>  _    _    _    _    _    _    _    _    _    _    _    _    @ctj</span>
-<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>  _    _    _    _    _    _    _    _    _    _    _    _</span>
-<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>  _    _    _              _              _    _    </span>
-<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a><span class="co">;; Shift 조합</span></span>
-<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>(deflayer sbs</span>
-<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>  _    _    _    _    _    _    _    _    _    _    _    _    _    @ctx</span>
-<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>  _    _    _    _    _    _    _    _    _    _    _    _    _    _</span>
-<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>  _    _    _    _    _    _    _    _    _    _    _    _    _</span>
-<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>  _    _    _    _    _    _    _    _    _    _    _    _</span>
-<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>  _    _    _              _              _    _    </span>
-<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="co">;; 공식 튜토리얼 리눅스 설정 중 device-file 만 바꿨습니다.</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  input  (device-file <span class="st">&quot;/dev/input/by-id/usb-04d9_a097-event-kbd&quot;</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  output (uinput-sink <span class="st">&quot;My KMonad output&quot;</span> <span class="st">&quot;sleep 1 &amp;&amp; setxkbmap -option compose:ralt&quot;</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  cmp-seq ralt    <span class="co">;; Set the compose key to `RightAlt'</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  cmp-seq-delay <span class="dv">5</span> <span class="co">;; 5ms delay between each compose-key sequence press</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  fallthrough true</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  allow-cmd true</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co">;; 아래 키보드의 레이아웃은 자신의 키보드에 맞게 바꿔야 합니다.</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co">;; 전 Leopold FC660 기계식 키보드를 쓰고 있습니다.</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>(defsrc</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  grv  <span class="dv">1</span>    <span class="dv">2</span>    <span class="dv">3</span>    <span class="dv">4</span>    <span class="dv">5</span>    <span class="dv">6</span>    <span class="dv">7</span>    <span class="dv">8</span>    <span class="dv">9</span>    <span class="dv">0</span>    <span class="op">-</span>    <span class="op">=</span>    bspc</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  tab  q    w    e    r    <span class="kw">t</span>    y    u    i    o    p    [    ]    \</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  lctl a    s    d    f    g    h    j    k    l    <span class="co">;    '    ret</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  lsft z    x    c    v    b    n    m    ,    .    <span class="op">/</span>    rsft</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>  caps lmet lalt           spc            ralt rctl     </span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>(defalias</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>  ccr  (around (layer-toggle ccr) ctl) <span class="co">;; ccr 레이어를 켜고, 본래 control키도 같이 넘기기</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>  sbs  (around (layer-toggle sbs) sft) <span class="co">;; sbs 레이어를 켜고, 본래 shift키도 같이 넘기기</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>  ctj  (around ctl j) <span class="co">;; Control + j 조합이 눌린 상태</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>  ctx  (around ctl x) <span class="co">;; Control + x 조합이 눌린 상태</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="co">;; 처음 설정하는 레이어가 디폴트 레이어</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>(deflayer default</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>  _    _    _    _    _    _    _    _    _    _    _    _    _    _</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>  _    _    _    _    _    _    _    _    _    _    _    _    _    _</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>  @ccr _    _    _    _    _    _    _    _    _    _    _    _   </span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>  @sbs _    _    _    _    _    _    _    _    _    _    _</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>  _    _    _              _              _    _    </span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a><span class="co">;; 디폴트 레이어 상태에서 ctrl 이나 shift를 누르면</span></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a><span class="co">;; @ccr로 지정한 동작을 실행, 혹은 @sbs로 지정한 동작을 실행</span></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a><span class="co">;; 아래 레이어들이 활성화 되고,</span></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a><span class="co">;; 이 상태에서 Enter키를 누르면, 이 ccr레이어가 받아 ctj를 실행합니다.</span></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>(deflayer ccr</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>  _    _    _    _    _    _    _    _    _    _    _    _    _    _</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>  _    _    _    _    _    _    _    _    _    _    _    _    _    _</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>  _    _    _    _    _    _    _    _    _    _    _    _    @ctj</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>  _    _    _    _    _    _    _    _    _    _    _    _</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>  _    _    _              _              _    _    </span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a><span class="co">;; 이 상태에서 Backspace키를 누르면, 이 ctx레이어가 받아 ctx를 실행합니다.</span></span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>(deflayer sbs</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>  _    _    _    _    _    _    _    _    _    _    _    _    _    @ctx</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>  _    _    _    _    _    _    _    _    _    _    _    _    _    _</span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>  _    _    _    _    _    _    _    _    _    _    _    _    _</span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>  _    _    _    _    _    _    _    _    _    _    _    _</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>  _    _    _              _              _    _    </span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 <p><code>ccr  (around (layer-toggle ccr) ctl)</code> 이 부분을 <code>ccr (layer-toggle ccr)</code>로 해두고 한참 헤맸습니다. <code>around</code>로 <code>ctl</code>을 같이 넘기지 않으면, <code>ctl</code>정보가 사라져서, 위에 아무 설정없이 <code>_</code>로 통과 시킨 <code>ctl + d</code>같은 키들이 모두 먹통이 됩니다. 즉, ctl(Control)키로 ccr이 레이어만 활성화toggle시키기만 하면, 본래 Control 키 의미는 사라져 버립니다. 그래서 <code>around</code>로 감싸 같이 넘겨야 합니다.</p>
 
 <div class="comment">
