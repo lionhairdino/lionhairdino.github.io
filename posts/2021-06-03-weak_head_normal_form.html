@@ -135,6 +135,27 @@
 <span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>ghci&gt; seq (head m) ()</span>
 <span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>*** Exception: Prelude.undefined...</span>
 <span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>ghci&gt; </span></code></pre></div>
+<p>2023.3.15 추가</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>ghci&gt; putStrLn $ (\ x y -&gt; (x,y))    1    ((\z -&gt; undefined) 2) `seq` &quot;ok&quot;</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>                                  ^^^^^^  ^^^^^^^^^^^^^^^^^^^^^</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>                                  head x          head y</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>                               넣을 표현식      넣을 표현식   </span></code></pre></div>
+<p><code>seq</code>는 <code>head x</code>와 <code>head y</code>에 넣을 것들을 NF로 만듭니다.<br />
+<code>1</code>은 NF이고, <code>y</code>에 넣을 표현식엔 redex가 보입니다. reduce하면 <code>undefined</code>가 됩니다.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>ghci&gt; putStrLn $ (\ x y -&gt; (x,y))    1    undefined `seq` &quot;ok&quot;</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>                 ^^^^^^^^^^^^^^^^ ^^^^^^  ^^^^^^^^^</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>                      (나)          NF       NF</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>                                (가)</span></code></pre></div>
+<p>(가)의 헤드는 모두 NF가 되었습니다. 안 쪽 (나)는 관심없습니다.<br />
+안쪽은 모르지만Weak, (가)의 Head는 모두 Normal Form입니다.<br />
+“OK”를 출력합니다.</p>
+<p>만일, strict 함수면</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>ghci&gt; :set -XBangPatterns</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>ghci&gt; putStrLn $ (\ !x !y -&gt; (x,y))    1    undefined `seq` &quot;ok&quot;</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>                 ^^^^^^^^^^^^^^^^^^ ^^^^^^  ^^^^^^^^^</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>                        (나)          NF       NF</span></code></pre></div>
+<p><code>!x</code>와 <code>!y</code>에 들어갈 값도 평가해야 합니다. <code>undefined</code>를 평가하니 예외가 일어납니다.</p>
 <h2 id="참고">참고</h2>
 <p><a href="https://woogyun.tistory.com/520">우균님의 WHNF</a><br />
 <a href="https://opentutorials.org/module/1941/11208">남현욱님의 WHNF</a><br />
