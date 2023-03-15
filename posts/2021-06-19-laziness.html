@@ -147,9 +147,9 @@ Lenient같은 것도 그렇다.</p>
 <p>별도 포스트 참고 - <a href="../posts/2021-06-03-weak_head_normal_form.html">WHNF에서 head의 뜻</a></p>
 <h2 id="lazy-함수-strict-함수">Lazy 함수, Strict 함수</h2>
 <p>[“ab”,“bc”,“cd”]를 다음 함수들에 인자로 넘긴다면</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span> [<span class="st">&quot;ab&quot;</span>,<span class="st">&quot;bc&quot;</span>,<span class="st">&quot;cd&quot;</span>]</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>(<span class="fu">length</span> <span class="op">.</span> <span class="fu">show</span> ) [<span class="st">&quot;ab&quot;</span>,<span class="st">&quot;bc&quot;</span>,<span class="st">&quot;cd&quot;</span>]</span></code></pre></div>
-<p><code>length</code> 함수는 <code>thunk : thunk : thunk : []</code> 까지만 reduce해도 3이라는 값을 구할 수 있습니다. <code>length . show</code> 는 thunk를 남기지 않고, 모두 reduce 해야 합니다. 이럴 때 <code>length . show</code> 함수가 <code>length</code>보다 좀 더 Strict하다고 말합니다. 인자로 들어온 값을 <em>한 단계라도</em> WHNF로 만들면 Strict 함수라 부릅니다. 아예 한 단계도 reduce하지 않는 함수를 Lazy 함수라 부릅니다.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span> [<span class="dv">1</span>]</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">show</span> [<span class="dv">1</span>] <span class="co">-- 1을 show, []을 show</span></span></code></pre></div>
+<p><code>length</code> 함수는 <code>thunk : []</code> 까지만 reduce해도 1이라는 값을 구할 수 있습니다. <code>show</code> 는 thunk를 남기지 않고, 모두 reduce 해야 합니다. 이럴 때 <code>show</code> 함수가 <code>length</code>보다 더 Strict하다고 말합니다. 인자로 들어온 값을 <em>한 단계라도</em> WHNF로 만들면 Strict 함수라 부릅니다. 아예 한 단계도 reduce하지 않는 함수를 Lazy 함수라 부릅니다.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>f x y <span class="ot">=</span> <span class="fu">length</span> <span class="op">$</span> <span class="fu">show</span> x</span></code></pre></div>
 <p>이 경우 <code>f</code>는 <code>x</code>를 NF가 될 때까지 fully reduce하고, <code>y</code>는 전혀 손대지 않습니다. 그럼 <code>x</code>에 대해선 Strict하고, <code>y</code>에 대해선 Lazy하다고 말합니다.</p>
 <h2 id="black-box-strictness-analysis">Black-box Strictness analysis</h2>
@@ -164,8 +164,8 @@ Lenient같은 것도 그렇다.</p>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> (x, y) <span class="ot">=</span> <span class="fu">id</span> <span class="fu">undefined</span> <span class="kw">in</span> x <span class="co">-- Error</span></span></code></pre></div>
 <p>Lazy동작 예를 들어보면,</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> (x, y) <span class="ot">=</span> <span class="fu">undefined</span> <span class="kw">in</span> x <span class="co">-- Error</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> (x, y) <span class="ot">=</span> <span class="fu">const</span> (<span class="dv">3</span>, <span class="dv">4</span>) <span class="fu">undefined</span> <span class="kw">in</span> x <span class="co">-- No error</span></span></code></pre></div>
-<p><code>const</code> 함수는 에러가 나지 않습니다. <code>undefined</code>를 평가하지 않고, <code>const (3,4)</code>에서 멈춥니다.</p>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> (x, y) <span class="ot">=</span> <span class="fu">const</span> (<span class="dv">3</span>, <span class="dv">4</span>) <span class="fu">undefined</span> <span class="kw">in</span> x <span class="co">-- No error (패턴 매칭 중)</span></span></code></pre></div>
+<p><code>const</code> 함수는 에러가 나지 않습니다. <code>undefined</code>를 평가하지 않고, <code>(3,4)</code>를 결과로 뱉습니다.</p>
 <h2 id="lazy-패턴-매칭">Lazy 패턴 매칭</h2>
 <p>별도 포스트 참고 - <a href="../posts/2020-07-11-LazyPatternMatch.html">Lazy Pattern Match</a></p>
 <h2 id="미래에서-값-빌려오기">미래에서 값 빌려오기</h2>
