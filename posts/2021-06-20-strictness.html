@@ -92,6 +92,7 @@ Bang patterns - 느낌표exclamation mark <code>!</code>를 Bang이라 부릅니
 Bang은 seq 함수의 편의 문법syntactic sugar입니다.<br />
 데이터 구조의 Strictness: lazy, spine(가시,등골)-strict, 그리고 value-strict<br />
 적절한 보조helper 함수 고르기. 특히 folds를 쓸 때.</div>
+<p>사전에서 프로그래밍과 관련되지 않은 예문들을 보면 reduce나 execution의 의미는 보이지 않긴 합니다.</p>
 <ol type="1">
 <li><a href="#지연-평가-기본-개념">지연 평가 기본 개념</a></li>
 <li><a href="#bang">Bang!</a></li>
@@ -164,7 +165,7 @@ thunk 안에 add 함수를 가리키는 포인터, (1 + 1) thunk를 가리키는
 <p>※ 정수 관련해선 최적화가 이루어지므로 딱 이대로 동작하진 않지만, 이론상 이렇게 보면 됩니다.</p>
 <p>C언어와 비교하면 10배의 메모리를 씁니다.</p>
 <h2 id="bang">Bang!</h2>
-<p>느낌표를 bang이라 부르는데, BangPatterns 확장을 켜면 !를 추가해서 strict하게 동작을 바꿀 수 있습니다.</p>
+<p>느낌표를 bang이라 부르는데, <code>BangPatterns</code> 확장을 켜면 <code>!</code>를 추가해서 strict하게 동작을 바꿀 수 있습니다.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ot">{-# LANGUAGE BangPatterns #-}</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ot">add ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>add <span class="op">!</span>x <span class="op">!</span>y <span class="ot">=</span> x <span class="op">+</span> y</span>
@@ -175,7 +176,7 @@ thunk 안에 add 함수를 가리키는 포인터, (1 + 1) thunk를 가리키는
 <span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>      <span class="op">!</span>seven <span class="ot">=</span> add (<span class="dv">1</span> <span class="op">+</span> <span class="dv">2</span>) (<span class="dv">1</span> <span class="op">+</span> <span class="dv">3</span>)</span>
 <span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">putStrLn</span> <span class="op">$</span> <span class="st">&quot;Five: &quot;</span> <span class="op">++</span> <span class="fu">show</span> five</span></code></pre></div>
-<p>!를 붙이는 위치가 헛갈리는데, !를 붙인 건 thunk로 놔둘 수 없다 정도로 생각하고 진도 나가겠습니다. five = thunk 상태가 안된다는 말입니다. !은 seq 함수의 편의 문법입니다.</p>
+<p><code>!</code>를 붙이는 위치가 헛갈리는데, <code>!</code>를 붙인 건 thunk로 놔둘 수 없다 정도로 생각하고 진도 나가겠습니다. <code>five = thunk</code> 상태가 안된다는 말입니다. <code>!</code>은 <code>seq</code> 함수의 편의 문법입니다.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">seq</span><span class="ot"> ::</span> a <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> b</span></code></pre></div>
 <p><code>b</code>가 평가될 때 항상 <code>a</code>도 평가되는 걸 보장하기 위해 GHC의 primitive operation<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a>을 씁니다. bang 편의 문법이 아니라 seq로 쓰면</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ot">add ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
@@ -205,11 +206,11 @@ answer = x + y</div>
 <span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> <span class="op">!</span>five <span class="ot">=</span> trace <span class="st">&quot;five&quot;</span> (add (<span class="dv">1</span> <span class="op">+</span> <span class="dv">1</span>) (<span class="dv">1</span> <span class="op">+</span> <span class="dv">2</span>))</span>
 <span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>      <span class="op">!</span>seven <span class="ot">=</span> trace <span class="st">&quot;seven&quot;</span> (add (<span class="dv">1</span> <span class="op">+</span> <span class="dv">2</span>) (<span class="dv">1</span> <span class="op">+</span> <span class="dv">3</span>))</span>
 <span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">putStrLn</span> <span class="op">$</span> <span class="st">&quot;Five: &quot;</span> <span class="op">++</span> <span class="fu">show</span> five</span></code></pre></div>
-<p>이렇게 하면 항상 <code>"five"</code>가 출력되고, 그 다음 <code>"seven"</code>이 출력되야 할 것 같은데, 거꾸로 출력되기도 하고, 어쩔 땐 섞여서 출력되기도 합니다. 반면에, <code>five</code>seq<code>seven</code>seq<code>putStrLn ("Five: " ++ show five)</code> 라고 쓰면 순서대로 “five”, “seven”, “Five: 5” 로 출력됩니다. bang 패턴은 seq의 편의 문법이라 했는데, 출력 결과가 다릅니다. 원문에는 다음과 같이 쓰여 있는데, 완전히 편의 문법으로 봐도 되는 건지 아닌지 얘기가 따로 없습니다.</p>
+<p>이렇게 하면 항상 <code>"five"</code>가 출력되고, 그 다음 <code>"seven"</code>이 출력되야 할 것 같은데, 거꾸로 출력되기도 하고, 어쩔 땐 섞여서 출력되기도 합니다. 반면에, <code>five \</code>seq` seven `seq` putStrLn (“Five:” ++ show five)<code>라고 쓰면 순서대로</code>“five”<code>,</code>“seven”<code>,</code>“Five: 5”<code>로 출력됩니다. bang 패턴은</code>seq`의 편의 문법이라 했는데, 출력 결과가 다릅니다. 원문에는 다음과 같이 쓰여 있는데, 완전히 편의 문법으로 봐도 되는 건지 아닌지 얘기가 따로 없습니다.</p>
 <p>This gives a bit of a lie to my claim that bang patterns are always a simple translation to seqs. However, the fact is that with an expression x <code>seq</code> y, GHC is free to choose whether it evaluates x or y first, as long as it ensure that when that expression finishes evaluating, both x and y are evaluated.</p>
-<p>seq x y에서 x,y가 pure하면 사실 먼저 x를 평가하고 y를 평가하든, y를 평가하고 x를 평가하든 결과가 같게 나옵니다. (좀 헛갈릴 때는 이렇게 생각해 보세요. x를 평가하려면 y의 평가 결과가 필요한 상황이었다면 굳이 seq를 쓰지 않아도 됩니다. 런타임이 알아서 순서대로 평가합니다. seq는 서로 직접적인 선후 관계가 없는 상태에서, 강제로 평가를 해서 메모리를 적게 쓰기위한 장치입니다.) 위의 경우는 trace를 써서 impure한 함수가 끼어들었기 때문에 순서에 민감해 진 것이지, pure한 함수끼리 묶는다면 평가 순서는 상관이 없습니다.</p>
+<p><code>seq x y</code>에서 <code>x</code>,<code>y</code>가 pure하면 사실 먼저 <code>x</code>를 평가하고 <code>y</code>를 평가하든, <code>y</code>를 평가하고 <code>x</code>를 평가하든 결과가 같게 나옵니다. (좀 헛갈릴 때는 이렇게 생각해 보세요. <code>x</code>를 평가하려면 <code>y</code>의 평가 결과가 필요한 상황이었다면 굳이 <code>seq</code>를 쓰지 않아도 됩니다. 런타임이 알아서 순서대로 평가합니다. <code>seq</code>는 서로 직접적인 선후 관계가 없는 상태에서, 강제로 평가를 해서 메모리를 적게 쓰기위한 장치입니다.) 위의 경우는 trace를 써서 impure한 함수가 끼어들었기 때문에 순서에 민감해 진 것이지, pure한 함수끼리 묶는다면 평가 순서는 상관이 없습니다.</p>
 <h2 id="bottom">bottom</h2>
-<p>인자를 strict하게 처리하는지, lazy하게 처리하는지 궁금하면 bottom을 의미하는 undefined 함수를 넣어보면 압니다.<br />
+<p>인자를 strict하게 처리하는지, lazy하게 처리하는지 궁금하면 bottom을 의미하는 <code>undefined</code> 함수를 넣어보면 압니다.<br />
 참고로, 하스켈은 기본이 lazy 전략을 쓰며, strict가 필요할 때 bang!을 씁니다. 다른 strict가 기본인 언어들은 closure를 이용하여 lazy를 구현할 수 있습니다. 원문에서 rust로 구현한 걸 보여줍니다. 지금은 rust에 손 댈 여력이 없어, rust 소스를 굳이 옮기지 않겠습니다.</p>
 <h2 id="소모하는-메모리-체크-방법">소모하는 메모리 체크 방법</h2>
 <div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">RunningTotal</span> <span class="ot">=</span> <span class="dt">RunningTotal</span></span>
@@ -259,17 +260,17 @@ answer = x + y</div>
 <p>위 코드는 예상대로 에러가 나지만</p>
 <div class="sourceCode" id="cb15"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="fu">putStrLn</span> <span class="op">$</span> <span class="dt">Just</span> <span class="fu">undefined</span> <span class="ot">`seq`</span> <span class="st">&quot;Hello World&quot;</span></span></code></pre></div>
 <p>값 생성자로 한 번 감싸져 있는 <code>undefined</code>는 에러가 나지 않습니다. <code>seq</code> 동작을 설명하는 forcing evaluation이 thunk가 하나도 남지 않을 때(이 걸 Normal Form, NF라 합니다.)까지 evaluate하는 걸 의미하진 않습니다. <code>seq</code>에서 얘기하는 forcing evaluation은 WHNF 한 단계까지만 평가합니다. 많은 경우, 한 단계란 생성자 하나를 벗겨내는 작업을 의미합니다. <code>seq</code>는 <code>Just</code>까지만 벗겨내고 안에 들어있는 건 건드리지 않습니다.</p>
-<p>보통의 값 생성자로 둘러 쌓인 값을 seq에 넣는 건, 가장 바깥 쪽 생성자와 패턴 매칭하는 것과 같은 동작을 합니다.</p>
+<p>보통의 값 생성자로 둘러 쌓인 값을 <code>seq</code>에 넣는 건, 가장 바깥 쪽 생성자와 패턴 매칭하는 것과 같은 동작을 합니다.</p>
 <p>다음 중 첫 번째, 두 번째는 에러가 나지 않지만, 세 번째는 에러가 납니다. 이유를 알려면 WHNF를 알아야 합니다.</p>
 <div class="sourceCode" id="cb16"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="kw">do</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">putStrLn</span> <span class="op">$</span> <span class="fu">error</span> <span class="ot">`seq`</span> <span class="st">&quot;Hello&quot;</span></span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">putStrLn</span> <span class="op">$</span> (\x <span class="ot">-&gt;</span> <span class="fu">undefined</span>) <span class="ot">`seq`</span> <span class="st">&quot;World&quot;</span></span>
 <span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">putStrLn</span> <span class="op">$</span> <span class="fu">error</span> <span class="st">&quot;foo&quot;</span> <span class="ot">`seq`</span> <span class="st">&quot;Goodbye!&quot;</span></span></code></pre></div>
-<p>seq가 forcing evaluation 하는 건 WHNF까지입니다. 인자를 모두 받지 않은 함수나 람다식은 이미 WHNF입니다. 하지만 세 번째 error “foo”는 필요한 인자를 모두 받았기 때문에 값으로 reduce됩니다. (값에 가까워지게 식을 푸는 작업은 평가eval보다는 reduce란 말이 더 직관적이긴 합니다.)</p>
+<p><code>seq</code>가 forcing evaluation 하는 건 WHNF까지입니다. 인자를 모두 받지 않은 함수나 람다식은 이미 WHNF입니다. 하지만 세 번째 <code>error "foo"</code>는 필요한 인자를 모두 받았기 때문에 값으로 reduce됩니다. (값에 가까워지게 식을 푸는 작업은 평가eval보다는 reduce란 말이 더 직관적이긴 합니다.)</p>
 <p>이제 WHNF를 알았으니 위 <code>!rt</code> 코드를 다시 보면,</p>
 <div class="sourceCode" id="cb17"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>go <span class="op">!</span>rt [] <span class="ot">=</span> printAverage rt</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="op">...</span></span></code></pre></div>
-<p>rt는 RunningTotal 생성자로 감싸져 있으므로, rt에 bang을 붙여봤자, RunningTotal 생성자만 벗겨내고 안에 있는 <code>sum</code>, <code>count</code>는 건드리지 않습니다. 여전히 thunk로 남아 있다는 말입니다. 이걸 해결하려면</p>
+<p><code>rt</code>는 <code>RunningTotal</code> 생성자로 감싸져 있으므로, <code>rt</code>에 bang을 붙여봤자, <code>RunningTotal</code> 생성자만 벗겨내고 안에 있는 <code>sum</code>, <code>count</code>는 건드리지 않습니다. 여전히 thunk로 남아 있다는 말입니다. 이걸 해결하려면</p>
 <div class="sourceCode" id="cb18"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>go rt [] <span class="ot">=</span> printAverage rt</span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>go (<span class="dt">RunningTotal</span> <span class="op">!</span><span class="fu">sum</span> <span class="op">!</span>count) (x<span class="op">:</span>xs) <span class="ot">=</span></span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> rt <span class="ot">=</span> <span class="dt">RunningTotal</span> (<span class="fu">sum</span> <span class="op">+</span> x) (count <span class="op">+</span> <span class="dv">1</span>)</span>
@@ -333,11 +334,11 @@ A. <code>deepseq</code> 내부에서 부릅니다.</p>
 A. <code>rnf</code>가 단독으로 쓰일 수도 있고, 다른 함수에서도 쓰고 있을거라 추측할 수 있습니다.</p>
 </blockquote>
 <h2 id="strict-데이터">Strict 데이터</h2>
-<p>lazy하게 RunningTotal값을 가지고 있다는 말은,<br />
-두 개의 Int를 가지고 있을 수도 있고,<br />
-Int를 만들어 낼 thunk를 가지고 있을 수도 있고,<br />
+<p>lazy하게 <code>RunningTotal</code>값을 가지고 있다는 말은,<br />
+두 개의 <code>Int</code>를 가지고 있을 수도 있고,<br />
+<code>Int</code>를 만들어 낼 thunk를 가지고 있을 수도 있고,<br />
 예외를 던질 thunk를 가지고 있을 수도 있다는 말입니다.</p>
-<p>RunningTotal이 아예 lazy한 동작을 못하게 막으려면, 데이터 타입을 선언할 때 strictness annotations를 쓰면 됩니다.</p>
+<p><code>RunningTotal</code>이 아예 lazy한 동작을 못하게 막으려면, 데이터 타입을 선언할 때 strictness annotations를 쓰면 됩니다.</p>
 <div class="sourceCode" id="cb24"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">RunningTotal</span> <span class="ot">=</span> <span class="dt">RunningTotal</span></span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  {<span class="ot"> sum ::</span> <span class="op">!</span><span class="dt">Int</span></span>
 <span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>  ,<span class="ot"> count ::</span> <span class="op">!</span><span class="dt">Int</span></span>
@@ -361,7 +362,7 @@ Int를 만들어 낼 thunk를 가지고 있을 수도 있고,<br />
 <span id="cb24-21"><a href="#cb24-21" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb24-22"><a href="#cb24-22" aria-hidden="true" tabindex="-1"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span>
 <span id="cb24-23"><a href="#cb24-23" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> printListAverage [<span class="dv">1</span><span class="op">..</span><span class="dv">1000000</span>]</span></code></pre></div>
-<p>이렇게 데이터 선언에 bang을 붙여 놓으면 RunningTotal을 다음과 같이 쓰겠다는 말입니다.</p>
+<p>이렇게 데이터 선언에 bang을 붙여 놓으면 <code>RunningTotal</code>을 다음과 같이 쓰겠다는 말입니다.</p>
 <p><em>“RunningTotal 타입의 값을 평가할 때는, 안에 들어 있는 두 개의 Int도 항상 평가해야 한다.”</em></p>
 <blockquote>
 <p>Q. 안에 들어 있는 <code>Int</code>에 bang을 붙이면, 굳이 <code>deriving Generic</code>을 안해도 되지 않을까요?</p>
@@ -468,9 +469,9 @@ Map류의 Lazy 버전은 spine-strict, value-lazy이고 Strict 버전은 둘 다
 <h2 id="함수-인자">함수 인자</h2>
 <p>bottom값을 주면 bottom값을 리턴할 때, strict하다고 말합니다. Int를 받는 <code>+</code>는 strict입니다. <code>undefined + x</code>도 bottom값을 리턴하고 <code>x + undefined</code>도 bottom값을 리턴합니다.<br />
 const 함수는 const a b = a 로 정의되어 있는데, 첫 번째 인자에 strict하고, 두 번째 인자에 lazy합니다.
-리스트의 (:) 값 생성자는 첫 인자와 두 번째 인자에 lazy합니다. 하지만 data List = Cons !a !(List a) | Nil 이렇게 정의하면 Cons는 첫 번째, 두 번째 인자에 strict 합니다.</p>
+리스트의 <code>(:)</code> 값 생성자는 첫 인자와 두 번째 인자에 lazy합니다. 하지만 <code>data List = Cons !a !(List a) | Nil</code> 이렇게 정의하면 <code>Cons</code>는 첫 번째, 두 번째 인자에 strict 합니다.</p>
 <h2 id="folds">Folds</h2>
-<p>foldl의 strict 버전인 fold’도 NF까지 strict하진 않습니다. NF까지 도달하는 strict한 foldl’이 필요할 때 다음처럼 force를 통해 불러주면 됩니다.</p>
+<p><code>foldl</code>의 strict 버전인 <code>fold'</code>도 NF까지 strict하진 않습니다. NF까지 도달하는 strict한 <code>foldl'</code>이 필요할 때 다음처럼 force를 통해 불러주면 됩니다.</p>
 <div class="sourceCode" id="cb40"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Data.List</span> (foldl')</span>
 <span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Control.DeepSeq</span> (force)</span>
 <span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -485,7 +486,7 @@ const 함수는 const a b = a 로 정의되어 있는데, 첫 번째 인자에 s
 <span id="cb40-12"><a href="#cb40-12" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="fu">print</span> <span class="op">$</span> average [<span class="dv">1</span><span class="op">..</span><span class="dv">1000000</span>]</span></code></pre></div>
 <h2 id="streaming-data">Streaming data</h2>
 <p>conduit같은 스트리밍 라이브러리들이 내세우는 것 중 하나가 고정된 크기의 메모리constant memory 사용입니다. 메모리 누수 걱정없이 쓸 수 있는 것처럼 보이지만 WHNF까지인지, NF까지인지 살펴봐야 합니다.</p>
-<p>뭘 조심해야 하는지 보이도록 average 함수를 conduit을 이용해서 안 좋은 방식으로 정의해 보겠습니다.</p>
+<p>뭘 조심해야 하는지 보이도록 <code>average</code> 함수를 <code>conduit</code>을 이용해서 안 좋은 방식으로 정의해 보겠습니다.</p>
 <div class="sourceCode" id="cb41"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Conduit</span></span>
 <span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a><span class="ot">average ::</span> <span class="dt">Monad</span> m <span class="ot">=&gt;</span> <span class="dt">ConduitM</span> <span class="dt">Int</span> o m <span class="dt">Double</span></span>
@@ -500,7 +501,7 @@ const 함수는 const a b = a 로 정의되어 있는데, 첫 번째 인자에 s
 <p>메모리 사용량을 보려면</p>
 <div class="sourceCode" id="cb42"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="op">$</span> stack <span class="co">--resolver lts-9.3 ghc --package conduit-combinators -- Main.hs -O2</span></span>
 <span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a><span class="op">$</span> <span class="op">./</span><span class="dt">Main</span> <span class="op">+</span><span class="dt">RTS</span> <span class="op">-</span>s</span></code></pre></div>
-<p>아직 conduit이 익숙하지 않아, 원 글에 아직은 추가할 게 없습니다.</p>
+<p>아직 <code>conduit</code>이 익숙하지 않아, 원 글에 아직은 추가할 게 없습니다.</p>
 <h2 id="chain-reaction">Chain reaction</h2>
 <p>아래는 아주 빡빡하게 strict로 만들어 놓은 작업입니다. 메모리를 얼마나 쓰는지 확인해 보세요.</p>
 <div class="sourceCode" id="cb43"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#!/usr/bin/env stack</span></span>
@@ -539,10 +540,9 @@ const 함수는 const a b = a 로 정의되어 있는데, 첫 번째 인자에 s
 <section class="footnotes" role="doc-endnotes">
 <hr />
 <ol>
-<li id="fn1" role="doc-endnote"><p>strict 번역을 뭐라 하는게 좋을까요? lazy를 지연으로, strict를 즉시로 하면 말이 안되게 붙을 때가 있습니다. 뒤에 평가란 낱말을 추가하면 조금 더 부드러워지긴 합니다. strict 함수는 (인자를) 즉시 평가 함수, lazy 함수는 (인자를) 지연 평가 함수. 그럼 strictness는 뭘로 번역할까요? 즉시 평가 정도? 사실, 시간과 관련된 말이 아니라, thunk가 될 수 있느냐 없느냐에 따른 구분입니다. 단어 뜻 그대로 엄격이라고 번역된 자료가 자주 보이긴 하는데 딱 맞아 보이는 번역은 아닙니다. spine-strict는 즉시 구조(골격, 뼈대) 평가 함수쯤 될까요?<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn1" role="doc-endnote"><p>strict 번역을 뭐라 하는게 좋을까요? lazy를 지연으로, strict를 즉시로 하면 말이 안되게 붙을 때가 있습니다. 뒤에 평가란 낱말을 추가하면 조금 더 부드러워지긴 합니다. strict 함수는 (인자를) 즉시 평가 함수, lazy 함수는 (인자를) 지연 평가 함수. 그럼 strictness는 뭘로 번역할까요? 즉시 평가 정도? 사실, 시간과 관련된 말이 아니라, bottom을 받았을 때 바로 bottom을 돌려 주냐 마냐에 따른 구분입니다. 단어 뜻 그대로 엄격이라고 번역된 자료가 자주 보이긴 하는데 딱 맞아 보이는 번역은 아닙니다. spine-strict는 즉시 구조(골격, 뼈대) 평가 함수쯤 될까요?<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 <li id="fn2" role="doc-endnote"><p>evaluation을 평가말고 다른 어떤 말이 어울릴까요? 보통 가치를 매길 때 평가란 말을 씁니다. 지금 문장이 가치가 있는지를 살펴보는 게 아니라, reduce하거나 실행하거나 하는 동작을 evaluation이라고 합니다. 평가로 번역하면 딱 맞는 느낌은 아닌데, 어쨌든 자리 잡은 용어긴 합니다.
-하스켈 문서들에선 reduce와 evaluate가 거의 동의어로 쓰입니다. 람다 대수에서 reduce하는 걸, 프로그래밍에선 evaluate라고 합니다.</p>
-<p>사전에서 프로그래밍과 관련되지 않은 예문들을 보면 reduce나 execution의 의미는 보이지 않긴 합니다.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+하스켈 문서들에선 reduce와 evaluate가 거의 동의어로 쓰입니다. 람다 대수에서 reduce하는 걸, 프로그래밍에선 evaluate라고 합니다.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 <li id="fn3" role="doc-endnote"><p>primitive operation은 라이브러리등에 있는게 아니라, GHC가 만들어내는 런타임 베이스에 들어있는 작업입니다. 라이브러리 소스들을 보면 <code>#</code>(MagicHash라고 부릅니다)이 붙은 코드들이 보이는데, 이들이 primitive operation입니다. 하스켈 코드로 구현되어 있지 않다고 하는데, 아마도 C로 구현되어 있지 않을까요? 참고 - <a href="https://medium.com/@hgiasac/typeable-a-long-journey-to-type-safe-dynamic-type-representation-part-3-80a2a34329dd">Toan Ngyen - Typeable</a><br />
 힙에 값을 넣어 놓고 가리키도록 만든 포인터를 boxed value라고 하고(eg. Int는 힙에 2 word 크기를 차지하는 객체를 가리키는 포인터), 다이렉트로 값에 접근하는 걸 unboxed value라고 합니다. #이 붙은 primitive value를 unboxed value라고 부릅니다. 참고 - <a href="https://downloads.haskell.org/~ghc/7.8.3/docs/html/users_guide/primitives.html">Unboxed types and primitive operations</a><a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 <li id="fn4" role="doc-endnote"><p>아직 표준으로 정해지진 않았지만 GHC와 함께 배포되는 라이브러리<a href="#fnref4" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
