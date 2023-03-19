@@ -92,9 +92,9 @@
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="ot">=</span> ( (<span class="dv">1</span> <span class="op">+</span> <span class="dv">2</span>), (add <span class="dv">3</span> <span class="dv">4</span>)) ) 또는 ( (add <span class="dv">1</span> <span class="dv">2</span>), (<span class="dv">3</span> <span class="op">+</span> <span class="dv">4</span>) )     <span class="co">------(나) WHNF</span></span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="ot">=</span> ( (<span class="dv">1</span> <span class="op">+</span> <span class="dv">2</span>), (<span class="dv">3</span> <span class="op">+</span> <span class="dv">4</span>))                                     <span class="co">------(다) WHNF</span></span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="ot">=</span> (<span class="dv">3</span> , <span class="dv">7</span>)                                                  <span class="co">-----(라) WHNF, NF</span></span></code></pre></div>
-<p>Q: (+)는 .-&gt; x + y로 여기에 인자를 넣어주는 작업이 beta reduce이고, (+) 매핑은 그냥 reduce라 부르면 될까요? (+ 는 (1,2)와 3을 매핑한 것으로 볼 수 있습니다.)<br />
-<em>추측</em> A: 람다 대수에서는 +의 동작이 별도로 정의된 개념, 형식, 용어로 표현되는 게 아니라, 람다 대수의 abstraction과 application으로 표현됩니다. 람다 대수에서 함수의 실행은 beta reduce로 나타납니다. 그럼 reduce와 beta reduce를 구별할 필요는 없을 것 같습니다.</p>
-<p>(가)를 만나면, 어느 단계까지 평가하고 뒤로 미룰까요? 처음엔, 전체를 thunk로 두고 아무 것도 reduce하지 않습니다. 튜플이 필요한 시점이 오면 (thunk, thunk)로 reduce 합니다. 튜플안의 것들이 필요한 시점이 오면 (3, thunk) 또는 (thunk, 7), 둘 모두 필요해지면 최종 (3, 7)에 도달합니다. thunk가 들어간 중간 단계의 모양을 WHNF라 합니다. 왜 이런 이름이 붙었는지 살펴 보겠습니다.</p>
+<p>Q: <code>(+)</code>는 <code>\x.\y-&gt; x + y</code>로 여기에 인자를 넣어주는 작업이 beta reduce이고, <code>(+)</code> 매핑은 그냥 reduce라 부르면 될까요? (<code>+</code> 는 <code>(1,2)</code>와 <code>3</code>을 매핑한 것으로 볼 수 있습니다.)<br />
+<em>추측</em> A: 람다 대수에서는 <code>+</code>의 동작이 별도로 정의된 개념, 형식, 용어로 표현되는 게 아니라, 람다 대수의 abstraction과 application으로 표현됩니다. 람다 대수에서 함수의 실행은 beta reduce로 나타납니다. 그럼 reduce와 beta reduce를 구별할 필요는 없을 것 같습니다.</p>
+<p>(가)를 만나면, 어느 단계까지 평가하고 뒤로 미룰까요? 처음엔, 전체를 <code>thunk</code>로 두고 아무 것도 reduce하지 않습니다. 튜플이 필요한 시점이 오면 <code>(thunk, thunk)</code>로 reduce 합니다. 튜플안의 것들이 필요한 시점이 오면 <code>(3, thunk)</code> 또는 <code>(thunk, 7)</code>, 둘 모두 필요해지면 최종 <code>(3, 7)</code>에 도달합니다. thunk가 들어간 중간 단계의 모양을 WHNF라 합니다. 왜 이런 이름이 붙었는지 살펴 보겠습니다.</p>
 <p>※ 계산 되지 않은 식을 thunk라 부릅니다. 번역하면 수식 덩어리쯤 될까요? 코드 덩어리?</p>
 <ol type="1">
 <li><a href="#normal-form---nf">Normal Form - NF</a></li>
@@ -190,7 +190,7 @@ reduce 순서는 어떻게 될까요?<br />
 <li><p>인자를 가지고만 있고 reduce하지 않은 함수<br />
 가능한 reduction 작업을 모두 적용하지는 않은 상태. 지연lazy 평가를 통해 얻게 되는 결과입니다. 하스켈에서는 인자를 모두, 또는 일부를 아직 적용하지 않은 함수를 말합니다. <em>아직 적용하진 않았지만, 인자가 없는 상태는 아닙니다.</em></p>
 <p><code>add x y = x + y</code> 일 때,<br />
-<code>add</code> 만 있다면, 인자 없이 더 이상 reduce할 수 없습니다. 안 쪽에 관심이 없다면 HNF , 안 쪽에 뭐가 있을지 모르면 WHNF<br />
+<code>add</code> 만 있다면, 인자 없이 더 이상 reduce할 수 없습니다. 안 쪽에 redex가 없는 걸 안다면 HNF , 안 쪽에 뭐가 있을지 모르면 WHNF<br />
 <code>add 1 2</code> 람다 대수의 application. 인자를 모두 주었어도 이대로 있으면 redex — (ㄷ)<br />
 <code>1 + 2</code> 까지 도달해도 redex<br />
 <code>3</code> 이 되면 NF</p>
@@ -198,7 +198,7 @@ reduce 순서는 어떻게 될까요?<br />
 <code>(𝜆x1.A) M1 M2</code> 와 같은 구조입니다. 헤드에 redex가 있으므로 NF,HNF,WHNF 모두 아닙니다. 더 자세한 설명이 아래 쪽에 있습니다.</p></li>
 <li><p>값 생성자<br />
 값 생성자로 싸여 있다는 게 왜 redex가 있을지도 모르는 상태일까요?<br />
-생성자도 하나의 함수로 볼 수 있으니, 아직 필요한 인자를 받지 않은 Just 등이 단독으로 있으면 WHNF일 것 같은데, Just 1도 WHNF로 보고, True도 WHNF로 본다고 합니다. 왜 그럴까요? True 안에는 어떤 reduction이 있을 가능성이 있을까요? 이럴 때는 WHNF가 아니라 HNF이며 NF일 것 같이 보입니다.</p>
+생성자도 하나의 함수로 볼 수 있으니, 아직 필요한 인자를 받지 않은 <code>Just</code> 등이 단독으로 있으면 WHNF일 것 같은데, <code>Just 1</code>도 WHNF로 보고, <code>True</code>도 WHNF로 본다고 합니다. 왜 그럴까요? <code>True</code> 안에는 어떤 reduction이 있을 가능성이 있을까요? 이럴 때는 WHNF가 아니라 HNF이며 NF일 것 같이 보입니다.</p>
 <p>힌트는 <em>생성자constructor</em>란 말에 있는 것 같습니다. 생성자 자체가 값은 아니라, 값을 만들어 내는 걸 생성자라 부릅니다. 생성자가 값을 만들어내는 절차를 reduction으로 보는 겁니다. 값을 만들어 낼 때 redex가 있을 수도 있다면 WHNF입니다.</p>
 <p><code>Just (1 + 2)</code>가 있을 때, <code>(1 + 2)</code>가 계산reduce되는 시점은 <code>Just</code>를 벗겨 낼 때(패턴 매칭할 때)입니다. 그 전에는 계산되지 않은 WHNF상태로 머물게 됩니다. 가장 바깥쪽 생성자가 안쪽을 가리고 있다고 봐도 됩니다. 우리 눈에는 <code>Just</code> 안 쪽이 보이지만, GHC는 패턴 매칭을 만날 때까지 안 쪽을 보지 않습니다. 안 쪽에 <code>1 + 2</code> 같은 redex가 있을지도 모르니 Weak HNF입니다.</p></li>
 <li><p>람다 함수<br />
