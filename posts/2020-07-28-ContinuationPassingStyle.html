@@ -429,13 +429,15 @@
 <p>용어를 보면, “현재 contiunation을 가지고 호출”인데, 어째서 흐름을 끊는 역할을 할까요? 다음과 같은 흐름이 있다고 할 때,</p>
 <div class="sourceCode" id="cb33"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="dt">A</span></span>
 <span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>callcc(\k <span class="ot">-&gt;</span> <span class="dt">B</span> <span class="op">:</span> {<span class="dt">B1</span>; <span class="dt">B2</span>; k <span class="dt">B3</span>; <span class="dt">B4</span>;})</span>
-<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="dt">C</span></span></code></pre></div>
-<p><code>A</code>의 continuation은 <code>callCC</code>이고, <code>callCC</code>의 continuation은 <code>C</code>입니다.<br />
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="dt">C</span></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a><span class="dt">D</span></span></code></pre></div>
+<p><code>A</code>의 continuation은 <code>callCC부터 나머지 코드</code>이고, <code>callCC</code>의 continuation은 <code>C부터 나머지 코드</code>입니다.<br />
 <code>callCC</code> 안으로 들어가면<br />
-<code>B1</code>의 continuation은 <code>B2</code>,<br />
-<code>B2</code>의 continuation은 <code>B3</code>,<br />
-<code>B3</code>의 continuation은 <code>B4</code>가 될텐데, 이때 <code>k</code>가 continuation을 <code>C</code>로 만들면, <code>B4</code>로 이어지지 않고 <code>C</code>로 이어지니, 결과적으로 <code>callcc</code>를 바로 벗어나게 하는 <code>break</code> 효과를 가지게 됩니다.</p>
-<p><code>callCC</code>의 현재 continuation은 <code>C</code>인데, 이 걸 가지고 <code>B</code>를 호출한다는 얘기입니다.</p>
+<code>B1</code>의 continuation은 <code>B2부터</code>,<br />
+<code>B2</code>의 continuation은 <code>B3부터</code>,<br />
+<code>B3</code>의 continuation은 <code>B4부터</code>가 될텐데, 이때 <code>k</code>가 continuation을 <code>C부터</code>로 만들면, <code>B4부터</code>로 이어지지 않고 <code>C부터</code>로 이어지니, 결과적으로 <code>callcc</code>를 바로 벗어나게 하는 <code>break</code> 효과를 가지게 됩니다.</p>
+<p><code>callCC</code>의 현재 continuation은 <code>C부터</code>인데, 이 걸 가지고 <code>B</code>를 호출한다는 얘기입니다. 내부에서 <code>k</code>를 쓰는 곳이 없으면, 그냥 <code>A</code>, <code>B</code>, <code>C</code>를 쓴 것과 같은 상황입니다.</p>
+<p><code>Cont</code>모나드의 <code>callCC</code>는 이런 동작을 모델링한 것으로, 구현은 <code>\_ -&gt; ...</code>로 버리는 아이디어를 이용해, 위의 예시로 말하면 <code>B4</code>를 건너 뛰는 동작을 하게 해서, <code>C</code>와 이어지는 걸 표현했습니다.</p>
 <hr />
 <p>참고<br />
 <a href="https://cms2.ks.ac.kr/riet/contents/20190304/%ED%95%A8%EC%88%98%ED%98%95%20%ED%94%84%EB%A1%9C%EA%B7%B8%EB%9E%98%EB%B0%8D%EC%9D%98%20Continuation%EC%9D%84%20%EC%9D%B4%EC%9A%A9%ED%95%9C%20%ED%9D%90%EB%A6%84%EC%A0%9C%EC%96%B4.pdf">변석우님 - 함수형 프로그래밍의 Continuation을 이용한 흐름제어</a><br />
