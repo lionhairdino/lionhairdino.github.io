@@ -4,7 +4,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-        <title>lionhairdino - CPS 스타일 - Continuation Passing Style</title>
+        <title>lionhairdino - CPS - Continuation Passing Style</title>
 
         <meta name="description" content="프로그램의 다음 흐름이 어디로 갈지 명시적으로 지정하는 함수형과 어울리는 패턴입니다. 정의를 큰 어려움 없이 좇아가다 보면 callcc에서 멈칫하게 됩니다." />
         <meta property="og:description" content="프로그램의 다음 흐름이 어디로 갈지 명시적으로 지정하는 함수형과 어울리는 패턴입니다. 정의를 큰 어려움 없이 좇아가다 보면 callcc에서 멈칫하게 됩니다." />
@@ -33,13 +33,13 @@
         <meta name="msapplication-TileColor" content="#ff7500" />
         <meta name="theme-color" content="#ffffff" />
         <meta property="og:type" content="website" />
-        <meta property="og:title" content="CPS 스타일 - Continuation Passing Style" />
+        <meta property="og:title" content="CPS - Continuation Passing Style" />
         <meta property="og:site_name" content="Lionhairdino" />
         <meta property="og:url" content="https://lionhairdino.github.io/posts/2020-07-28-ContinuationPassingStyle.html" />
 
         <meta property="og:image" content="https://lionhairdino.github.io/images/state400px.png" />
 
-      <meta name="keywords" content="cps, continuation passing style, cont monad, 모나드, callcc">
+      <meta name="keywords" content="cps, continuation passing style, cont monad, 모나드, callcc, 후속문">
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-E9WZ6VXGHP"></script>
 <script>
@@ -74,13 +74,15 @@
             </div>
         </div>
         <div class="js-toc-content">
-            <h1>CPS 스타일 - Continuation Passing Style</h1>
+            <h1>CPS - Continuation Passing Style</h1>
             <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
 <div class="info">
     Posted on July 28, 2020
     
 </div>
 
+<p>2023-03-22 추가<br />
+아직 어떤 말로 자리 잡았는지는 확실하지 않지만, 몇 몇 글에서 “후속문”이란 번역 용어가 보입니다. 나름 뜻을 제대로 가진 용어 아닌가 싶은데, 아래는 용어를 알기 전이라 Continuation 용어를 그대로 썼습니다.</p>
 <p>아이디어는 “<em>함수가 결과를 리턴하지 않고, 바로 이어질 함수를 같이 넘겨서, 항상 작업이 끝나면 이어진 함수로 넘어가도록 만들자</em>” 입니다. 함수형 프로그래밍은 스코프가 오래가는 변수가 없기 때문에 함수의 결과를 붙잡아 둘 때가 마땅히 없습니다. 그래서 굉장히 자주 쓰는 테크닉이 함수가 함수를 감싸도록 하는 겁니다. CPS스타일도 목표는 다르지 않습니다. 이어질 함수가 함수 컴포지션처럼 바깥에서 기다리냐, 아님 안 쪽에 들어가서 기다리냐 차이입니다.</p>
 <p>아래 설명에 <em>준비</em>란 말이 나오면, 언젠가 나중에 인자를 받으면 실행하게 될 함수를 뜻합니다. 함수 뭉치를 바라 볼 때, 준비 상태로 보면 한 결 이해가 편할 때가 있습니다.</p>
 <p><a href="../posts/2020-07-03-freeMonad.html">Free 모나드</a>와 같이 보면 모나드 개념을 얻는데 도움이 됩니다.</p>
@@ -458,7 +460,7 @@
 <span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>                                      (다)callCC가 받은</span>
 <span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>                                   (f <span class="ot">=</span> \k <span class="ot">-&gt;</span> <span class="op">...</span>k<span class="op">...</span>)에서</span>
 <span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>                                       \k에 들어갈 함수</span></code></pre></div>
-<p><code>(가)</code>의 <code>\k</code>로 들어갈 <code>(다)</code>에 있는 <code>h</code>는 뭐가 될까요? <code>h</code>에는 <em>&gt;&gt;=가 (나)를 넣어 줍니다.</em>
+<p><code>(가)</code>의 <code>\k</code>로 <code>(다)</code>가 들어갑니다. <code>(다)</code>에 있는 <code>h</code>는 뭐가 될까요? <em>h에는 &gt;&gt;=가 (나)를 넣어 줍니다.</em>
 <code>k</code>는 바로 다음 액션인 <code>job2</code>만 가지고 있는 게 아니라, <code>job3</code>도 가지고 있습니다. 다시 말해, <code>callCC</code> 이후의 나머지 작업을 가지고 있습니다. 이를 기억시켰다가 나중에 부르면, 나머지 작업을 이어 붙이게 됩니다.</p>
 <div class="sourceCode" id="cb41"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="kw">do</span></span>
 <span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>  job1</span>
