@@ -84,19 +84,6 @@
 <p>아이디어는 “<em>함수가 결과를 리턴하지 않고, 바로 이어질 함수를 같이 넘겨서, 항상 작업이 끝나면 이어진 함수로 넘어가도록 만들자</em>” 입니다. 함수형 프로그래밍은 스코프가 오래가는 변수가 없기 때문에 함수의 결과를 붙잡아 둘 때가 마땅히 없습니다. 그래서 굉장히 자주 쓰는 테크닉이 함수가 함수를 감싸도록 하는 겁니다. CPS스타일도 목표는 다르지 않습니다. 이어질 함수가 함수 컴포지션처럼 바깥에서 기다리냐, 아님 안 쪽에 들어가서 기다리냐 차이입니다.</p>
 <p>아래 설명에 <em>준비</em>란 말이 나오면, 언젠가 나중에 인자를 받으면 실행하게 될 함수를 뜻합니다. 함수 뭉치를 바라 볼 때, 준비 상태로 보면 한 결 이해가 편할 때가 있습니다.</p>
 <p><a href="../posts/2020-07-03-freeMonad.html">Free 모나드</a>와 같이 보면 모나드 개념을 얻는데 도움이 됩니다.</p>
-<h3 id="목차">목차</h3>
-<ol type="1">
-<li><a href="#생각-스트레칭">생각 스트레칭</a></li>
-<li><a href="#고차-함수-읽기">고차 함수 읽기</a></li>
-<li><a href="#인자로-받은-걸-버리기">인자로 받은 걸 버리기</a></li>
-<li><a href="#고차-함수와-고차-함수를-받는-고차-함수">고차 함수와 고차 함수를 받는 고차 함수</a></li>
-<li><a href="#함수형에선-함수를-바꾸고-명령형에선-값을-바꾼다">함수형에선 함수를 바꾸고, 명령형에선 값을 바꾼다.</a></li>
-<li><a href="#continuation">Continuation</a></li>
-<li><a href="#cont-모나드">Cont 모나드</a></li>
-<li><a href="#그냥-함수-모나드와-뭐가-다를까">그냥 함수 모나드와 뭐가 다를까?</a></li>
-<li><a href="#callcc">callCC</a></li>
-<li><a href="#break">Break!</a></li>
-</ol>
 <h2 id="생각-스트레칭">생각 스트레칭</h2>
 <h3 id="고차-함수-읽기">고차 함수 읽기</h3>
 <p>값을 넣고, 나중에 함수를 넣어, 이미 있는 값에 함수를 적용하는 모양을 생각해 봅시다.</p>
@@ -272,7 +259,7 @@
 <span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    \actionResult <span class="ot">-&gt;</span> runCont (nextf actionResult) lastFunc</span>
 <span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>    ))</span></code></pre></div>
 <p>위에 나왔던 cps 예시 코드를 비교를 위해 두 개만 엮는 모양으로 다시 쓰면,</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>cps x <span class="ot">=</span> \k <span class="ot">-&gt;</span> func1_cps x (\x' <span class="ot">-&gt;</span> func2_cps x' k)</span>
+<div class="sourceCode" id="cb17"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>cps x <span class="ot">=</span> \k        <span class="ot">-&gt;</span> func1_cps x (\x'          <span class="ot">-&gt;</span> func2_cps x'          k       )</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- 설명하기 좋게 함수, 변수명을 바꾸면</span></span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>cps x <span class="ot">=</span> \lastFunc <span class="ot">-&gt;</span> func1_cps x (\func1Result <span class="ot">-&gt;</span> func2_cps func1Result lastFunc)</span></code></pre></div>
 <p>바인드 정의가 조금 감이 오지 않나요?</p>
@@ -431,17 +418,104 @@
 <span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>callcc(\k <span class="ot">-&gt;</span> <span class="dt">B</span> <span class="op">:</span> {<span class="dt">B1</span>; <span class="dt">B2</span>; k <span class="dt">B3</span>; <span class="dt">B4</span>;})</span>
 <span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="dt">C</span></span>
 <span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a><span class="dt">D</span></span></code></pre></div>
-<p><code>A</code>의 continuation은 <code>callCC부터 나머지 코드</code>이고, <code>callCC</code>의 continuation은 <code>C부터 나머지 코드</code>입니다.<br />
+<p><code>A</code>의 continuation은 <code>callCC부터 나머지 코드</code>이고,<br />
+<em>callCC의 continuation은 C부터 나머지 코드</em>입니다.<br />
 <code>callCC</code> 안으로 들어가면<br />
 <code>B1</code>의 continuation은 <code>B2부터</code>,<br />
 <code>B2</code>의 continuation은 <code>B3부터</code>,<br />
-<code>B3</code>의 continuation은 <code>B4부터</code>가 될텐데, 이때 <code>k</code>가 continuation을 <code>C부터</code>로 만들면, <code>B4부터</code>로 이어지지 않고 <code>C부터</code>로 이어지니, 결과적으로 <code>callcc</code>를 바로 벗어나게 하는 <code>break</code> 효과를 가지게 됩니다.</p>
+<code>B3</code>의 continuation은 <code>B4부터</code>가 될텐데, 이때 <code>k</code>가 continuation을 <code>callCC</code>의 with current continuation인 <code>C부터</code>로 만들면, <code>B4부터</code>로 이어지지 않고 <code>C부터</code>로 이어지니, 결과적으로 <code>callcc</code>를 바로 벗어나게 하는 <code>break</code> 효과를 가지게 됩니다.</p>
 <p><code>callCC</code>의 현재 continuation은 <code>C부터</code>인데, 이 걸 가지고 <code>B</code>를 호출한다는 얘기입니다. 내부에서 <code>k</code>를 쓰는 곳이 없으면, 그냥 <code>A</code>, <code>B</code>, <code>C</code>를 쓴 것과 같은 상황입니다.</p>
 <p><code>Cont</code>모나드의 <code>callCC</code>는 이런 동작을 모델링한 것으로, 구현은 <code>\_ -&gt; ...</code>로 버리는 아이디어를 이용해, 위의 예시로 말하면 <code>B4</code>를 건너 뛰는 동작을 하게 해서, <code>C</code>와 이어지는 걸 표현했습니다.</p>
+<h2 id="resume">Resume</h2>
+<div class="sourceCode" id="cb34"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>callCC f <span class="ot">=</span> cont <span class="op">$</span> \h <span class="ot">-&gt;</span> runCont (f (\a <span class="ot">-&gt;</span> cont <span class="op">$</span> \_ <span class="ot">-&gt;</span> h a)) h</span></code></pre></div>
+<p>마치, 이 부분이 마법처럼 느껴지는데요. Lazy스럽게 쫓아가 보도록 하겠습니다.</p>
+<blockquote>
+<p>생각 스트레칭</p>
+<div class="sourceCode" id="cb35"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>\lastf <span class="ot">-&gt;</span> job1 <span class="dv">1</span> (\y <span class="ot">-&gt;</span> job2 y (\x <span class="ot">-&gt;</span> job3 x lastf))</span></code></pre></div>
+<p><code>job1</code>이 받는 continuation은 <code>job2</code>만이 아닙니다. <code>job3</code>까지 포함한</p>
+<div class="sourceCode" id="cb36"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>(\y <span class="ot">-&gt;</span> job2 y (\x <span class="ot">-&gt;</span> job3 x lastf))</span></code></pre></div>
+<p>를 continuation으로 받습니다.</p>
+</blockquote>
+<p>아래 작업을 보겠습니다.</p>
+<div class="sourceCode" id="cb37"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="kw">do</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>  job1</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>  callCC <span class="op">$</span> \k <span class="ot">-&gt;</span> <span class="op">...</span> </span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>  job2</span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>  job3</span></code></pre></div>
+<p><code>&gt;&gt;=</code>가 보이도록 풀어 보면,</p>
+<div class="sourceCode" id="cb38"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>job1 <span class="op">&gt;&gt;=</span> \_ <span class="ot">-&gt;</span> callCC (\k<span class="op">...</span>) <span class="op">&gt;&gt;=</span> \_ <span class="ot">-&gt;</span> job2 <span class="op">&gt;&gt;=</span> \_ <span class="ot">-&gt;</span> job3</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- 람다 함수의 정의는 {}나 let ~ in 같은 pair가 없다면 끝까지입니다.</span></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- 괄호를 넣어 표현하면,</span></span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>job1 <span class="op">&gt;&gt;=</span> (\_ <span class="ot">-&gt;</span> callCC (\k<span class="op">...</span>)    <span class="op">&gt;&gt;=</span>     (\_ <span class="ot">-&gt;</span> job2 <span class="op">&gt;&gt;=</span> (\_ <span class="ot">-&gt;</span> job3)))</span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>                <span class="op">^^^^^^^^^^^^^^</span>            <span class="op">^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</span></span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>                     (가)                             (나)</span></code></pre></div>
+<p><code>Cont</code> <code>&gt;&gt;=</code> 정의와 <code>callCC</code> 정의를 보면,</p>
+<div class="sourceCode" id="cb39"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>s <span class="op">&gt;&gt;=</span> f <span class="ot">=</span> cont <span class="op">$</span> \c <span class="ot">-&gt;</span> runCont s (\x <span class="ot">-&gt;</span> runCont (f x) c)</span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>callCC f <span class="ot">=</span> cont <span class="op">$</span> \h <span class="ot">-&gt;</span> runCont (  f    (\a <span class="ot">-&gt;</span> cont <span class="op">$</span> \_ <span class="ot">-&gt;</span> h a)    ) h</span></code></pre></div>
+<p>잠시 핵심을 보기 위해 <code>cont</code>, <code>runCont</code>를 가리고 보면,</p>
+<div class="sourceCode" id="cb40"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>callCC f <span class="ot">=</span>        \h <span class="ot">-&gt;</span>         (f    (\a <span class="ot">-&gt;</span> \_ <span class="ot">-&gt;</span> h a)    ) h</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>                                      <span class="op">^^^^^^^^^^^^^^^^^</span></span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>                                      (다)callCC가 받은</span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>                                   (f <span class="ot">=</span> \k <span class="ot">-&gt;</span> <span class="op">...</span>k<span class="op">...</span>)에서</span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>                                       \k에 들어갈 함수</span></code></pre></div>
+<p><code>(가)</code>의 <code>\k</code>로 들어갈 <code>(다)</code>에 있는 <code>h</code>는 뭐가 될까요? <code>h</code>에는 <em>&gt;&gt;=가 (나)를 넣어 줍니다.</em>
+<code>k</code>는 바로 다음 액션인 <code>job2</code>만 가지고 있는 게 아니라, <code>job3</code>도 가지고 있습니다. 다시 말해, <code>callCC</code> 이후의 나머지 작업을 가지고 있습니다. 이를 기억시켰다가 나중에 부르면, 나머지 작업을 이어 붙이게 됩니다.</p>
+<div class="sourceCode" id="cb41"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="kw">do</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>  job1</span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>  k <span class="ot">&lt;-</span> callCC <span class="op">$</span> \k <span class="ot">-&gt;</span> <span class="op">...</span> </span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a><span class="op">*</span> job2</span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a><span class="op">*</span> job3</span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a><span class="op">*</span> k</span></code></pre></div>
+<p><code>k</code>는 <code>job2, job3 k</code>를 뜻합니다. <code>k</code>가 또 들어 있으니, 재귀가 일어납니다.</p>
+<p>타이핑하기 편하게 continuation을 꼬리 작업, 그냥 꼬리로 부르겠습니다.<br />
+다른 글들 보면, <code>k</code>를 부르면 이 전에 멈췄던 곳으로 다시 돌아간다고 설명하는 곳이 있는데, 전 <em>잘라 놨던 꼬리를 다시 이어 붙인다</em>고 보는 편이 편합니다. “돌아간다”는 표현에는 트랜잭션 롤백 같은 느낌이 있는데, <code>k</code>호출은 기존에 벌어졌던 일을 다시 취소하거나 하는 게 아닙니다.</p>
+<p>아래 예시 코드는 <a href="https://www.schoolofhaskell.com/user/jwiegley/understanding-continuations">Understanding Continuations - School of Haskell - jwiegley</a>에서 발췌했습니다.</p>
+<div class="sourceCode" id="cb42"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Control.Monad.Trans.Class</span></span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Control.Monad.Trans.Cont</span></span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="fu">flip</span> runContT <span class="fu">return</span> <span class="op">$</span> <span class="kw">do</span></span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>    lift <span class="op">$</span> <span class="fu">putStrLn</span> <span class="st">&quot;alpha&quot;</span></span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>    (k, num) <span class="ot">&lt;-</span> callCC <span class="op">$</span> \k <span class="ot">-&gt;</span> <span class="kw">let</span> f x <span class="ot">=</span> k (f, x)</span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>                               <span class="kw">in</span> <span class="fu">return</span> (f, <span class="dv">0</span>)</span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a><span class="op">*</span>   lift <span class="op">$</span> <span class="fu">putStrLn</span> <span class="st">&quot;beta&quot;</span>          <span class="co">-- k</span></span>
+<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a><span class="op">*</span>   lift <span class="op">$</span> <span class="fu">putStrLn</span> <span class="st">&quot;gamma&quot;</span>         <span class="co">-- j</span></span>
+<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a><span class="op">*</span>   <span class="kw">if</span> num <span class="op">&lt;</span> <span class="dv">5</span></span>
+<span id="cb42-11"><a href="#cb42-11" aria-hidden="true" tabindex="-1"></a><span class="op">*</span>       <span class="kw">then</span> k (num <span class="op">+</span> <span class="dv">1</span>) <span class="op">&gt;&gt;</span> <span class="fu">return</span> ()</span>
+<span id="cb42-12"><a href="#cb42-12" aria-hidden="true" tabindex="-1"></a><span class="op">*</span>       <span class="kw">else</span> lift <span class="op">$</span> <span class="fu">print</span> num       <span class="co">-- l</span></span></code></pre></div>
+<p>실행 결과는 *표시 부분이 재귀가 돌아, <code>beta</code>, <code>gamma</code>가 <code>k</code>부르기 전에 1번, <code>k</code>로 5번 반복됩니다.</p>
+<div class="sourceCode" id="cb43"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>alpha</span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>beta</span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>gamma</span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>beta</span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>gamma</span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a>beta</span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a>gamma</span>
+<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a>beta</span>
+<span id="cb43-9"><a href="#cb43-9" aria-hidden="true" tabindex="-1"></a>gamma</span>
+<span id="cb43-10"><a href="#cb43-10" aria-hidden="true" tabindex="-1"></a>beta</span>
+<span id="cb43-11"><a href="#cb43-11" aria-hidden="true" tabindex="-1"></a>gamma</span>
+<span id="cb43-12"><a href="#cb43-12" aria-hidden="true" tabindex="-1"></a>beta</span>
+<span id="cb43-13"><a href="#cb43-13" aria-hidden="true" tabindex="-1"></a>gamma</span>
+<span id="cb43-14"><a href="#cb43-14" aria-hidden="true" tabindex="-1"></a>5</span></code></pre></div>
+<h2 id="어느-꼬리continuation가-실행된-것인가">어느 꼬리continuation가 실행된 것인가?</h2>
+<div class="sourceCode" id="cb44"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Control.Monad.Trans.Class</span></span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Control.Monad.Trans.Cont</span></span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="fu">flip</span> runContT <span class="fu">return</span> <span class="op">$</span> <span class="kw">do</span></span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>    lift <span class="op">$</span> <span class="fu">putStrLn</span> <span class="st">&quot;alpha&quot;</span></span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a>    callCC <span class="op">$</span> \k <span class="ot">-&gt;</span> <span class="kw">do</span></span>
+<span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a>      k ()</span>
+<span id="cb44-8"><a href="#cb44-8" aria-hidden="true" tabindex="-1"></a>    lift <span class="op">$</span> <span class="fu">putStrLn</span> <span class="st">&quot;beta&quot;</span>          <span class="co">-- k</span></span>
+<span id="cb44-9"><a href="#cb44-9" aria-hidden="true" tabindex="-1"></a>    lift <span class="op">$</span> <span class="fu">putStrLn</span> <span class="st">&quot;gamma&quot;</span>         <span class="co">-- j</span></span></code></pre></div>
+<p>출력 결과는 <code>callCC</code>가 없는 것처럼</p>
+<div class="sourceCode" id="cb45"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>alpha</span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>beta</span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>gamma</span></code></pre></div>
+<p>입니다. 위에 출력된 <code>beta</code>, <code>gamma</code>는 <code>k</code>가 실행된 것입니다. 기존 연결된 continuation은 <code>cont $ \c -&gt; h ...</code> 에서 <code>\c</code>로 들어가 버려지고 <code>h</code>에 캡처되어 있던 continuation이 실행된 것입니다. 만일 <code>k</code>가 실행되지 않는, <code>callCC $ \k -&gt; cont(\f -&gt; f ())</code> 같은 상황이면, 그냥 <code>callCC</code>를 쓰지 않은 것과 같은 상황입니다.</p>
 <hr />
 <p>참고<br />
-<a href="https://cms2.ks.ac.kr/riet/contents/20190304/%ED%95%A8%EC%88%98%ED%98%95%20%ED%94%84%EB%A1%9C%EA%B7%B8%EB%9E%98%EB%B0%8D%EC%9D%98%20Continuation%EC%9D%84%20%EC%9D%B4%EC%9A%A9%ED%95%9C%20%ED%9D%90%EB%A6%84%EC%A0%9C%EC%96%B4.pdf">변석우님 - 함수형 프로그래밍의 Continuation을 이용한 흐름제어</a><br />
-<a href="https://en.wikibooks.org/wiki/Haskell/Continuation_passing_style">wikibooks - Continuation passing style</a><br />
+<a href="https://cms2.ks.ac.kr/riet/contents/20190304/%ED%95%A8%EC%88%98%ED%98%95%20%ED%94%84%EB%A1%9C%EA%B7%B8%EB%9E%98%EB%B0%8D%EC%9D%98%20Continuation%EC%9D%84%20%EC%9D%B4%EC%9A%A9%ED%95%9C%20%ED%9D%90%EB%A6%84%EC%A0%9C%EC%96%B4.pdf">변석우님 - 함수형 프로그래밍의 Continuation을 이용한 흐름제어</a> 
+<a href="https://en.wikibooks.org/wiki/Haskell/Continuation_passing_style">wikibooks - Continuation passing style</a> 
 <a href="http://guruma.github.io/posts/2018-11-18-Continuation-Concept/">guruma.github.io - Continuation concept</a></p>
 
 <div class="comment">
