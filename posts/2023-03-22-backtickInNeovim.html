@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko" lang="ko">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <title>lionhairdino - 마크다운에서 백틱backtick 입력에 시달릴 때</title>
+
+        <meta name="description" content="lionhairdino - 마크다운에서 백틱backtick 입력에 시달릴 때" />
+        <meta property="og:description" content="하스켈 함수형 프로그래밍" />
+
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <link rel="icon" href="https://lionhairdino.github.io/favicon.svg" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino16px.png" sizes="16x16" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino24px.png" sizes="24x24" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino32px.png" sizes="32x32" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino48px.png" sizes="48x48" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino57px.png" sizes="57x57" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino60px.png" sizes="60x60" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino64px.png" sizes="64x64" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino72px.png" sizes="72x72" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino76px.png" sizes="76x76" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino114px.png" sizes="114x114" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino120px.png" sizes="120x120" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino144px.png" sizes="144x144" />
+        <link rel="shortcut icon" href="../favicon.ico" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino152px.png" sizes="152x152" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino180px.png" sizes="180x180" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino192px.png" sizes="192x192" />
+        <link rel="manifest" href="../site.webmanifest" />
+        <link rel="mask-icon" href="https://lionhairdino.github.io/Lionhairdino_black.svg" color="#ff7500" />
+        <meta name="msapplication-TileImage" content="/images/favicon/Lionhairdino144px.png" />
+        <meta name="msapplication-TileColor" content="#ff7500" />
+        <meta name="theme-color" content="#ffffff" />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="마크다운에서 백틱backtick 입력에 시달릴 때" />
+        <meta property="og:site_name" content="Lionhairdino" />
+        <meta property="og:url" content="https://lionhairdino.github.io/posts/2023-03-22-backtickInNeovim.html" />
+
+        <meta property="og:image" content="https://lionhairdino.github.io/images/state400px.png" />
+
+      <meta name="keywords" content="backtick, neovim, keymap, surround, autopair">
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-E9WZ6VXGHP"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-E9WZ6VXGHP');
+</script>
+<script src="../script/copycode.js"></script>
+<script async src="https://cse.google.com/cse.js?cx=9c53b4915cbb2605c"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.11.1/tocbot.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.11.1/tocbot.css" />
+    </head>
+    <body>
+        <div id="header">
+            <div style="display:inline-block;margin-right:5px;padding-top: 5px;" id="logo">
+                <a href="../"><img style="width:30px;border:none" src="../images/favicon/Lionhairdino48px.png"></a>
+            </div>
+            <div style="display:inline-block;vertical-align: top;padding-top:5px;" id="navigation">
+                <a href="../">lionhairdino</a>
+                <a href="../about.html">about</a>
+                <!--<a href="/archive.html">archive</a>-->
+            </div>
+            <div style="display:inline-block;font-size:0.8em;vertical-align: top;">
+                <div style="display:inline-block;vertical-align: top;padding-top: 5px">사이트내 검색</div>
+                <div style="display:inline-block;width:180px;"> 
+                    <div class="gcse-searchbox-only"></div>
+                </div>
+            </div>
+            <div>
+                여기 글들은 일종의 질문입니다. 용어 선택도 학계, 업계에서 쓰는 걸로 되어 있지 않고, 틀린 내용이 있을 수도 있습니다.
+            </div>
+        </div>
+        <div class="js-toc-content">
+            <h1>마크다운에서 백틱backtick 입력에 시달릴 때</h1>
+            <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+<div class="info">
+    Posted on March 22, 2023
+    
+</div>
+
+<p>뾰족한 수는 없겠거니 하고, 지금까지 아무런 조치없이 꿋꿋이 백틱을 입력하고 있었습니다. 그런데, 최근 kmonad를 설치하면서 쓸만한 키 조합이 많아져서, 어떻게든 해결 보겠다고 덤볐습니다.</p>
+<p>환경<br />
+linux, xwindow, 세벌식, Neovim, 레오폴드 키보드 FC660M</p>
+<p>필요 앱<br />
+KIME, KMonad, Neovim (nvim-autopairs, nvim-surround)</p>
+<p>FC660M은 숫자 키패드가 없는 키보드로 <code>ESC</code>, <code>~</code>, <code>※</code>, <code>`</code> 키가 하나의 키에 모두 모여 있습니다. 한글을 입력 중이라면, 영문 모드로 바꿔 <code>FN</code>과 <code>ESC</code>를 함께 눌러 <code>`</code>를 입력합니다. 블로그 글을 많이 쓰면 쓸수록 점점 더 귀찮아지고 있는 상태였습니다.</p>
+<h2 id="kmonad">KMonad</h2>
+<p>오른쪽 Ctrl키가 놀고 있습니다. <code>FN</code>과 같이 누르지 않고 입력하기 위해, 아래 설정으로 키값을 바꿔 놓습니다.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>(deflayer default</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  _    _    _    _    _    _    _    _    _    _    _    _    _    _</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  _    _    _    _    _    _    _    _    _    _    _    _    _    _</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  @ccr _    _    _    _    _    _    _    _    _    _    _    _   </span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  @sbs _    _    _    _    _    _    _    _    _    _    _</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  _    _    _              _              _    `    </span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<p>자세한 설정 방법은 <a href="../posts/2023-03-14-kmonad.html">터미널 Neovim에서 Ctrl + Enter 바인딩 잡기 - Kmonad</a> 글을 참고해 주세요.</p>
+<h2 id="kime">KIME</h2>
+<p>한글 모드건, 영문 모드건 오른쪽 <code>Ctrl</code>키를 누르면 <code>`</code>가 입력될 줄 알았는데, 한글 모드 상태에선 세벌식이 <code>`</code> 키가 눌리면 별을 입력합니다. 세벌식 키보드 레이아웃을 바꿔야 합니다.</p>
+<ol type="1">
+<li><code>.bashrc</code> (zsh 쓰시면 <code>.zshrc</code>)<br />
+디폴트로 있을 것 같은데, 아래 환경 변수가 안보여 만들었습니다.</li>
+</ol>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">XDG_CONFIG_HOME</span><span class="op">=</span>/home/user/.config</span></code></pre></div>
+<ol start="2" type="1">
+<li><code>/home/user/.config/kime/layouts/</code>에<br />
+<a href="https://github.com/Riey/kime/tree/develop/src/engine/backends/hangul/data" class="uri">https://github.com/Riey/kime/tree/develop/src/engine/backends/hangul/data</a>에서<br />
+<code>sebeolsik-3-91.yaml</code>를 다운 받습니다.(저는 세벌식 최종을 씁니다.)</li>
+</ol>
+<p>그리고 62번줄을 다음으로 바꿉니다.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="at"> </span><span class="fu">`Grave </span><span class="kw">:</span><span class="at"> </span><span class="st">'`'</span></span></code></pre></div>
+<h2 id="neovim">Neovim</h2>
+<p>위 설정으로 영문 한글 모드 상관없이 키 하나로 <code>`</code>를 입력할 수 있게 됐습니다. 이제 Neovim에서 편의를 위한 기능을 설정할 차례입니다.</p>
+<h3 id="nvim-autopairs">nvim-autopairs</h3>
+<p><a href="https://github.com/windwp/nvim-autopairs" class="uri">https://github.com/windwp/nvim-autopairs</a></p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode lua"><code class="sourceCode lua"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">'windwp/nvim-autopairs'</span><span class="op">,</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  config <span class="op">=</span> <span class="kw">function</span><span class="op">()</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">local</span> npairs <span class="op">=</span> <span class="fu">require</span><span class="op">(</span><span class="st">&quot;nvim-autopairs&quot;</span><span class="op">)</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    npairs<span class="op">.</span>setup<span class="op">({</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>      fast_wrap <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>        map <span class="op">=</span> <span class="st">'&lt;C-a&gt;'</span><span class="op">,</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>        chars <span class="op">=</span> <span class="op">{</span> <span class="st">'{'</span><span class="op">,</span> <span class="st">'['</span><span class="op">,</span> <span class="st">'('</span><span class="op">,</span> <span class="st">'&quot;'</span><span class="op">,</span> <span class="st">&quot;'&quot;</span><span class="op">,</span> <span class="st">'`'</span> <span class="op">},</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>      <span class="op">}</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>      <span class="op">...</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    <span class="op">})</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="op">},</span></span></code></pre></div>
+<p><code>`</code>를 감싸고 싶은 문자열 앞에 입력하면, 자동으로 <code>`</code> <code>`</code> 두 개가 입력되고, 그 사이에서 <code>&lt;Ctrl + a&gt;</code> 누르면 아래와 같이 몇 가지 룰에 따라 입력될 위치를 단축키로 선택할 수 있게 해줍니다.</p>
+<figure>
+<img src="../images/fastwrap.png" alt="autopair fast wrap" /><figcaption aria-hidden="true">autopair fast wrap</figcaption>
+</figure>
+<h3 id="nvim-surround">nvim-surround</h3>
+<p><a href="https://github.com/kylechui/nvim-surround" class="uri">https://github.com/kylechui/nvim-surround</a></p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode lua"><code class="sourceCode lua"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;kylechui/nvim-surround&quot;</span><span class="op">,</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  lazy <span class="op">=</span> <span class="kw">false</span><span class="op">,</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  config <span class="op">=</span> <span class="kw">function</span><span class="op">()</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="co">-- 닫는 백틱 바로 다음에 커서가 있어야 하는데,</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="co">-- 줄 끝일 경우 a로는 백틱 바로 앞에 커서가 있다.</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    <span class="co">-- 줄 끝일 때는 A를 입력한다.</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">local</span> right <span class="op">=</span> <span class="kw">function</span> <span class="op">()</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>      <span class="kw">local</span> nowCol <span class="op">=</span> vim<span class="op">.</span>api<span class="op">.</span>nvim_eval<span class="op">(</span><span class="vs">[[virtcol('.')]]</span><span class="op">)</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>      <span class="kw">local</span> lastCol <span class="op">=</span> vim<span class="op">.</span>api<span class="op">.</span>nvim_eval<span class="op">(</span><span class="vs">[[virtcol('$')]]</span><span class="op">)</span> <span class="op">-</span> <span class="dv">1</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> nowCol <span class="op">==</span> lastCol <span class="cf">then</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>        vim<span class="op">.</span>cmd<span class="op">(</span><span class="st">&quot;startinsert!&quot;</span><span class="op">)</span> <span class="co">-- !가 붙으면 A</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>      <span class="cf">else</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>        vim<span class="op">.</span>cmd<span class="op">(</span><span class="st">&quot;norm! a&quot;</span><span class="op">)</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>      <span class="cf">end</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    <span class="kw">end</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">require</span><span class="op">(</span><span class="st">&quot;nvim-surround&quot;</span><span class="op">).</span>setup <span class="op">{}</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>    <span class="co">-- 디폴트 `ys`를 선행키로 잡으면 약간의 딜레이가 생긴다.</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>    <span class="co">-- 여기선 v모드를 이용한다.</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>    vim<span class="op">.</span>keymap<span class="op">.</span>set<span class="op">(</span><span class="st">'n'</span><span class="op">,</span> <span class="st">'s'</span><span class="op">,</span> <span class="kw">function</span><span class="op">()</span> vim<span class="op">.</span>cmd<span class="op">.</span>normal<span class="op">(</span><span class="st">&quot;viwS`f`l&quot;</span><span class="op">)</span> <span class="kw">end</span><span class="op">,</span> <span class="op">{</span> desc <span class="op">=</span> <span class="st">'Surround backtick'</span> <span class="op">})</span></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>    vim<span class="op">.</span>keymap<span class="op">.</span>set<span class="op">(</span><span class="st">'i'</span><span class="op">,</span> <span class="st">'&lt;C-s&gt;'</span><span class="op">,</span> <span class="kw">function</span><span class="op">()</span> vim<span class="op">.</span>cmd<span class="op">.</span>normal<span class="op">(</span><span class="st">&quot;hviwS`f`l&quot;</span><span class="op">);</span> right<span class="op">()</span> <span class="kw">end</span><span class="op">,</span> <span class="op">{</span> silent <span class="op">=</span> <span class="kw">false</span> <span class="op">})</span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>    vim<span class="op">.</span>keymap<span class="op">.</span>set<span class="op">(</span><span class="st">'v'</span><span class="op">,</span> <span class="st">'&lt;C-s&gt;'</span><span class="op">,</span> <span class="kw">function</span><span class="op">()</span> vim<span class="op">.</span>cmd<span class="op">.</span>normal<span class="op">(</span><span class="st">&quot;S`f`&quot;</span><span class="op">);</span> right<span class="op">()</span> <span class="kw">end</span><span class="op">,</span> <span class="op">{</span> silent <span class="op">=</span> <span class="kw">false</span> <span class="op">})</span></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>  <span class="kw">end</span><span class="op">,</span></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- vi{ v모드 {괄호 안쪽 선택</span></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a><span class="op">},</span></span></code></pre></div>
+<p>아래 설명에서 <code>[]</code>는 노멀모드 커서 위치, <code>|</code>는 입력모드 커서 위치</p>
+<p>노멀 모드에서 단어 중간에 커서가 있을 때</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>abc[d]ef ---- s키 ----&gt; `abcdef`|</span></code></pre></div>
+<p>입력 모드에서 한 단어 끝에 있을 때</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>abcdef| ---- &lt;ctrl + s&gt; ----&gt; `abcdef`|</span></code></pre></div>
+<p>비주얼 모드에서 감쌀 문자열 선택했을 때</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>[abc def ghi] ---- &lt;ctrl + s&gt; ----&gt; `abc def ghi`|</span></code></pre></div>
+<p>할 수 있는 건 다한 듯 합니다. 위 설정들로 백틱 입력에서 어느 정도는 해방됐는데, 앉으면 눕고 싶다고, 특정 선택 영역에 있는 모든 영어 단어를 백틱으로 감싸 주기, Ai가 똑똑하게 감싸 주기…등이 떠오르지만, 지금만으로도 좀 과하게 노력을 투자했습니다. 하스켈 진도가 잘 안나가 Neovim만 만지작 하고 있습니다.</p>
+<p>※ <a href="https://discord.gg/TwaYqgtQYf">Korea Vim User Group 디스코드</a>에 올렸던 내용들입니다. 아마도 딱 환경이 같은 분은 없을테지만, 이런 저런 힌트로 쓰일 곳이 있을 것 같아 정리해서 올립니다.</p>
+
+<div class="comment">
+<script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
+</script>
+</div>
+<div style="text-align:right">Github 계정이 없는 분은 메일로 보내주세요. lionhairdino at gmail.com </div>
+        </div>
+        <nav class="toc toc-right js-toc relative z-1 transition--300 absolute pa4 pt5 is-position-fixed"></nav>
+        <div id="footer">
+            © 2022 lionhairdino. All rights reserved. Generated by <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+        <script>
+            tocbot.init({
+                tocSelector: '.js-toc',
+                contentSelector: '.js-toc-content',
+                headingSelector: 'h2, h3',
+                hasInnerContainers: true,
+            });
+        </script>
+    </body>
+</html>
