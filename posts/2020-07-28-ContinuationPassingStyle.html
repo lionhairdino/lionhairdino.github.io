@@ -327,7 +327,7 @@
 <span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>\c <span class="ot">-&gt;</span> <span class="op">$</span> c (<span class="dv">1</span> <span class="op">+</span> <span class="dv">2</span>) <span class="co">--c2에 c가 들어갑니다.</span></span></code></pre></div>
 <p><code>Cont</code> 모나드를 이런식으로 쓰진 않습니다. 단순하게 보이도록 특별한 작업이 아닌 상수1, 상수2로 작업을 표현했습니다. 이해를 돕기 위해 만든 조금은 억지스러운 예시입니다.</p>
 <h2 id="callcc">callCC</h2>
-<p><code>Cont</code> 모나드를 익힐 때 <code>callCC</code>가 걸림돌이었습니다. 지금도 속시원하게 이해했다고 보기는 어려운 것 같습니다. 아직도 값이 아닌 함수가 움직이는 것에 대해 불편함이 남아 있어 그런 것 같습니다.</p>
+<p><code>Cont</code> 모나드를 익힐 때 <code>callCC</code>가 첫 걸림돌이었습니다. 동작은 그리 어렵지 않은데, 코드 이해는 좀 봐야 합니다. 아직도 값이 아닌 함수가 움직이는 것에 대해 불편함이 남아 있어 그런 것 같습니다.</p>
 <div class="sourceCode" id="cb23"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="ot">callCC ::</span> ((a <span class="ot">-&gt;</span> <span class="dt">ContT</span> r m b) <span class="ot">-&gt;</span> <span class="dt">ContT</span> r m a) <span class="ot">-&gt;</span> <span class="dt">ContT</span> r m a</span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>callCC f <span class="ot">=</span> <span class="dt">ContT</span> <span class="op">$</span> \c <span class="ot">-&gt;</span> runContT (f (\x <span class="ot">-&gt;</span> <span class="dt">ContT</span> <span class="op">$</span> \_ <span class="ot">-&gt;</span> c x)) c</span>
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- 실제 라이브러리에는 위와 같이 ContT 트랜스포머로 구현되어 있습니다.</span></span>
@@ -415,13 +415,14 @@
 <span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>  b조건과 맞으면 breakfunc</span>
 <span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>  <span class="op">...</span></span></code></pre></div>
 <h2 id="call-with-current-continuation">Call-with-Current-Continuation</h2>
-<p>용어를 보면, “현재 contiunation을 가지고 호출”인데, 어째서 흐름을 끊는 역할을 할까요? 다음과 같은 흐름이 있다고 할 때,</p>
+<p>용어를 보면, “현재 contiunation을 가지고 호출”인데, 어째서 흐름을 끊는 역할을 할까요? 다음과 같은 코드의 흐름이 있다고 할 때, <code>callCC</code>가 <code>A--B--C--D</code>의 흐름을 끊는게 아니라 <code>B</code>안에서의 흐름을 끊습니다.</p>
 <div class="sourceCode" id="cb33"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="dt">A</span></span>
 <span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>callcc(\k <span class="ot">-&gt;</span> <span class="dt">B</span> <span class="op">:</span> {<span class="dt">B1</span>; <span class="dt">B2</span>; k <span class="dt">B3</span>; <span class="dt">B4</span>;})</span>
 <span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="dt">C</span></span>
 <span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a><span class="dt">D</span></span></code></pre></div>
 <p><code>A</code>의 continuation은 <code>callCC부터 나머지 코드</code>이고,<br />
 <em>callCC의 continuation은 C부터 나머지 코드</em>입니다.<br />
+※ “나머지 코드”란 말은 생략하겠습니다.<br />
 <code>callCC</code> 안으로 들어가면<br />
 <code>B1</code>의 continuation은 <code>B2부터</code>,<br />
 <code>B2</code>의 continuation은 <code>B3부터</code>,<br />

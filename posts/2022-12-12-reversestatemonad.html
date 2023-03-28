@@ -118,11 +118,11 @@
 <p><a href="https://kseo.github.io/tags/reverse%20state%20monad.html">Reverse State Monad - 서광열</a></p>
 <ol type="1">
 <li><code>RState</code> bind를 읽으려고 하면 아무리 Lazy로 읽어도(odd, even 교차 호출 읽듯이) 읽히지 않는다. 특정 형태의 <code>s -&gt; (a, s)</code> 가 있어야 될 것 같다.</li>
-<li>State<code>가 평가 되려면 결국</code>rget<code>,</code>rmodify<code>,</code>rput`을 만나야 한다.</li>
+<li><code>State</code>가 평가 되려면 결국 <code>rget</code>, <code>rmodify</code>, <code>rput</code>을 만나야 한다.</li>
 <li>이들을 넣어서 읽으면 비로소 읽힌다.</li>
 </ol>
 <p>Lazy한 것들도 손으로 풀면서 쫓아가면 <strong><em>종료 컨디션이나, 일부분만 평가할 필요가 있거나</em></strong> 하는 식으로 파악이 되는데, 위 <code>RState</code> 바인드는 애초에 아무 <code>s -&gt; (a, s)</code> 가 들어온다고 생각하고 읽으면 돌아가는 모양이 눈에 안들어 옵니다. 무한히 교차 호출이 일어나기만 하고, 이 걸 나중에 어떤식으로 쓸 수 있을지 파악이 안됩니다.</p>
-<p><code>rput</code>을 넣은 다음, <code>rmodify</code>몇 번하고 <code>rget</code>을 넣으면, 동작이, 언젠가 들어올 state에다 계속 함수를 적용해 놓는 모양이 됩니다. 마치 아래 같은 모양이요.</p>
+<p><code>rput</code>을 넣은 다음, <code>rmodify</code>몇 번하고 <code>rget</code>을 넣으면, 동작이, 언젠가 들어올 State에다 계속 함수를 적용해 놓는 모양이 됩니다. 마치 아래 같은 모양이요.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>\s <span class="ot">-&gt;</span> (<span class="op">+</span><span class="dv">1</span>) <span class="op">.</span> (<span class="op">+</span><span class="dv">2</span>) <span class="op">.</span> (<span class="op">+</span><span class="dv">3</span>) <span class="op">$</span> s</span></code></pre></div>
 <p>그래서 미래의 <code>s</code>에 모아 두었던 함수를 내리 적용하게 됩니다. <code>rput</code>도 <code>rget</code>도 넣지 않으면 그냥 무한 교차 재귀일 뿐입니다.</p>
 <p>무한 교차 재귀 구조를 만들어 놓고, 당장은 종료 컨디션이나, 필요한 부분이 알려져 있지 않지만, <em>교차 재귀를 할 때 필요한 함수로 뭘 넣느냐에 따라 의미있는 값이 나오는 구조</em>입니다. 그러는 와중에 값은 각 단계의 effect에 의존하며 값이 바뀌니 그야말로 과거와 미래가 짬뽕된 느낌입니다.</p>
