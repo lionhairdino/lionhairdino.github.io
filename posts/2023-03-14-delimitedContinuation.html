@@ -39,7 +39,7 @@
 
         <meta property="og:image" content="https://lionhairdino.github.io/images/state400px.png" />
 
-      <meta name="keywords" content="Continuation, 후속문, 한정, 구분, Cont 모나드, Algegraic Effect">
+      <meta name="keywords" content="Continuation, 후속문, 한정, 구분, Cont 모나드, Algebraic Effect">
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-E9WZ6VXGHP"></script>
 <script>
@@ -100,22 +100,22 @@
 <p>보통 봐왔던 Continuation과 차이는 <code>1+</code>는 후속문에 안들어갑니다.<br />
 <code>reset</code>이하로 후속문 실행 작업이 끝나 (<code>k</code>로 <code>2 *</code>가 들어가) <code>2 * (2 * 5) = 20</code>이되고, 최종 결과는 <code>20 + 1</code>해서 <code>21</code>이 됩니다.</p>
 <p>※ 왠 일로, 후속문을 받는 람다 헤드에 있는 변수는, 거의 모든 텍스트에서 <code>\k</code>로 통일되어 있습니다. <code>k</code>가 보이면, 그 자리로 후속문이 들어가겠거니 생각해도 됩니다.</p>
+<h2 id="하스켈에서-reset-shift-구현">하스켈에서 reset, shift 구현</h2>
 <p><a href="../posts/2020-07-28-ContinuationPassingStyle.html#resume">CPS - Continuation Passing Style</a>에서 <code>callCC</code> 코드를 뜯어 봤던 것처럼 <code>reset</code>과 <code>shift</code>를 뜯어보겠습니다.</p>
-<p><code>Cont</code> 모나드의 바인드는 마치, 같은 모양의 레고 블럭을 끼우듯 연결합니다.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ot">callCC ::</span> ((a <span class="ot">-&gt;</span> <span class="dt">Cont</span> r b) <span class="ot">-&gt;</span> <span class="dt">Cont</span> r a) <span class="ot">-&gt;</span> <span class="dt">Cont</span> r a</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>           <span class="op">^^^^^^^^^^^^^^^</span></span></code></pre></div>
 <p><code>shift</code>와 비슷한 고(고)차 함수 모양입니다. <code>callCC</code> 안에서 밑줄 친 서명 모양의 함수를 넣어줄 거라 예상할 수 있습니다.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ot">runC ::</span> <span class="dt">Cont</span> r r <span class="ot">-&gt;</span> r</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>runC ct <span class="ot">=</span> runCont ct <span class="fu">id</span></span></code></pre></div>
-<h2 id="continuation을-더-이상-못-붙이도록-만든-후-다시-붙이게-하는-이유">Continuation을 더 이상 못 붙이도록 만든 후, 다시 붙이게 하는 이유</h2>
 <p><code>runC</code>가 꼬리로 <code>id</code>를 붙여, 마치 더 이상 꼬리를 연결할 수 없도록 마감하는 역할을 합니다.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ot">reset ::</span> <span class="dt">Cont</span> a a <span class="ot">-&gt;</span> <span class="dt">Cont</span> r a</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>reset <span class="dt">CONT</span> <span class="ot">=</span> <span class="dt">Cont</span> <span class="op">$</span> \k <span class="ot">-&gt;</span> k (runC <span class="dt">CONT</span>)</span></code></pre></div>
 <p><code>runC</code>로 마감을 해 놓고는, 또 다시 꼬리를 붙일 수 있도록 <code>k</code>를 받게끔 만들고 있습니다. 왜 이렇게 할까요?</p>
+<h2 id="continuation을-더-이상-못-붙이도록-만든-후-다시-붙이게-하는-이유">Continuation을 더 이상 못 붙이도록 만든 후, 다시 붙이게 하는 이유</h2>
 <div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ot">shift ::</span> ((a <span class="ot">-&gt;</span> r) <span class="ot">-&gt;</span> <span class="dt">Cont</span> r r) <span class="ot">-&gt;</span> <span class="dt">Cont</span> r a</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>          <span class="op">^^^^^^^</span>mkCONT<span class="op">^^^^^^^</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>shift mkCONT <span class="ot">=</span> <span class="dt">Cont</span> <span class="op">$</span> \k <span class="ot">-&gt;</span> runC (mkCONT k)</span></code></pre></div>
-<p><code>callCC</code>와 비슷하게 고(고)차 함수를 받습니다. 바인드가 다른 <code>Cont</code>와 붙일 때, 꼬리를 넣어주는데, 이 걸 써먹는 모양의 함수입니다. 위 예시를 보면 꼬리를 두 번 써먹는 <code>k (k 5)</code> 모양입니다. 물론 결과는 다시 <code>Cont</code> 액션인데, 여기서 또 <code>runC</code>를 돌려 마감시킵니다. 어떻게 <code>reset</code>, <code>shift</code> 조합이 흐름의 변화를 만들어내는지 이해가 안가 다음처럼 다 펼쳐놔 봤습니다.</p>
+<p><code>callCC</code>와 비슷하게 고(고)차 함수를 받습니다. 바인드가 다른 <code>Cont</code>와 붙일 때, 꼬리를 넣어주는데, 이 걸 써먹는 모양의 함수입니다. 위 예시에서는 꼬리를 두 번 써먹는 <code>k (k 5)</code> 모양입니다. 물론 결과는 다시 <code>Cont</code> 액션인데, 여기서 또 <code>runC</code>를 돌려 마감시킵니다. 어떻게 <code>reset</code>, <code>shift</code> 조합이 흐름의 변화를 만들어내는지 이해가 안가 다음처럼 다 펼쳐놔 봤습니다.</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span> <span class="op">+</span> reset (<span class="dv">2</span> <span class="op">*</span> shift \k <span class="ot">-&gt;</span> k (k <span class="dv">5</span>))</span></code></pre></div>
 <p>Calvin 글에선 아래와 같이 <code>liftM2</code>를 이용해 하스켈 <code>Cont</code>모나드로 구현한 예시를 보여주는데, 전 <code>bind</code>로 구현한 예시가 궁금했습니다.</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ot">example ::</span> <span class="dt">Cont</span> <span class="dt">Int</span> <span class="dt">Int</span></span>
@@ -150,7 +150,8 @@
 <div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">return</span> <span class="dv">2</span> <span class="op">&gt;&gt;=</span> \y <span class="ot">-&gt;</span> shift (\k <span class="ot">-&gt;</span> <span class="fu">return</span> <span class="op">$</span> k (k <span class="dv">5</span>)) <span class="op">&gt;&gt;=</span> \z <span class="ot">-&gt;</span> <span class="fu">return</span> y <span class="op">*</span> z</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>             <span class="op">^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</span>(다)</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>             <span class="op">^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</span>(라)</span></code></pre></div>
-<p><code>return 2</code>의 후속문은 (다)가 아니라, (라)입니다. ※ 모나드 3법칙으로 봐도 마찬가지입니다. <code>\y...</code>문은 (다)가 아니라 (라)입니다.</p>
+<p><code>Cont</code> 모나드의 바인드는 마치, 같은 모양의 레고 블럭을 끼우듯 연결합니다.
+<code>return 2</code>의 후속문은 (다)가 아니라, (라)입니다. ※ 모나드 3법칙으로 봐도 마찬가지입니다. <code>\y...</code>문은 (다)가 아니라 (라)입니다.</p>
 <p>(라)를 <code>2</code>에 적용하니, <code>\y</code>에 <code>2</code>를 넣어 주면</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>shift (\k <span class="ot">-&gt;</span> <span class="fu">return</span> <span class="op">$</span> k (k <span class="dv">5</span>)) <span class="op">&gt;&gt;=</span> \z <span class="ot">-&gt;</span> <span class="fu">return</span> <span class="dv">2</span> <span class="op">*</span> z</span></code></pre></div>
 <p><code>shift</code>를 풀어 보겠습니다.</p>
@@ -168,13 +169,14 @@
 <p>바깥 컨텍스트 속에 있는 값과 관계 없이 <code>\y{...}</code>만 경계를 두려면 어떻게 하면 될까요?<br />
 <code>\y1, \y2, \y3</code>는 외부와 소통하는 유일한 길인<code>y</code>와 관계없는 상태로 일단 만들어야 한다는 게 명확합니다. <code>runC</code>가 하는 역할입니다.</p>
 </blockquote>
+<h2 id="코루틴">코루틴</h2>
+<p><span class="citation" data-cites="todo">@todo</span></p>
 <h2 id="try-catch">try, catch</h2>
 <p><span class="citation" data-cites="todo">@todo</span></p>
-<h2 id="algegraic-effect">Algegraic Effect</h2>
+<h2 id="algebraic-effect">Algebraic Effect</h2>
 <p><span class="citation" data-cites="todo">@todo</span></p>
 <p><a href="https://github.com/ghc-proposals/ghc-proposals/blob/master/proposals/0313-delimited-continuation-primops.rst">Proposal - Delimited Continuation Primops</a>로 올라와 있던 게
 <a href="https://ghc.gitlab.haskell.org/ghc/doc/users_guide/9.6.1-notes.html">GHC 9.6.1</a>에 프리미티브 기능으로 들어 갔다 합니다.</p>
-<p>실제 코드 설계할 때, 이 패턴을 머리에 떠올릴 수 있을 때가 언제 오려나 싶습니다.</p>
 
 <div class="comment">
 <script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
