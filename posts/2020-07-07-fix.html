@@ -134,6 +134,7 @@
 <p><code>\loop -&gt; ...</code> 를 반복하는 코드입니다. 센스있게 람다 함수의 매개 변수 이름을 <code>loop</code>로 지었습니다.</p>
 <h2 id="상상">상상</h2>
 <p>2023.4.9 추가</p>
+<p>차분히 <code>fix</code> 심화를 해보려 하니, 역시 쉬운게 없습니다. 여러 배경 지식을 요구합니다. 그러다 보니, 또 상상으로 빠졌는데, 나름 의미있는 추측 아닐까 해서 올립니다.</p>
 <blockquote>
 <p>생각 스트레칭<br />
 이름이 없는 람다 함수를 다시 부를 방법이 뭐가 있을까요? 이름이 없으면, 부를 방법은 없습니다. 사실 람다 계산법엔 람다 함수에 이름을 붙이는 방법이 존재합니다. 바로 람다 헤드에 있는 변수에 인자로 넘기는 겁니다. 이렇게 매개 변수에 바인딩하면, 현재 람다 함수 내부에서는 이름을 가지게 됩니다.</p>
@@ -155,19 +156,17 @@
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>      <span class="ot">=</span> f (f (fix f))</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>      <span class="ot">=</span> f (f (f (f ( <span class="op">...</span>fix f<span class="op">...</span>))))</span></code></pre></div>
 <p>하지만, <code>f</code>를 반복하다 다음 <code>fix f</code>의 값을 몰라도 되는 때가 생긴다면 멈출 수 있습니다. 아래의 경우 멈출 가능성을 만들어 주는 부분이 <code>n - 1</code>입니다. <code>f</code>를 반복하면서, 계속 똑같은 세상을 대상으로 하는 게 아니라, <code>-1</code>씩 변화가 생긴 세상을 대상으로 반복합니다.</p>
-<pre><code>-- 3을 넣으면,
-fix (\f -&gt; \n -&gt; if n == 0 then 1 else n * f (n - 1)) 3
-  = (\f -&gt; \n -&gt; if n == 0 then 1 else n * f (n - 1)) (fix ...) 3
-  = \n -&gt; 멈출 가능성이 있는 if문 n * ((fix ...) (n - 1)) 3 
-  = \n -&gt; 멈출 가능성이 있는 if문 n * (\n -&gt; 멈출 가성성이 있는 if문 (n - 1) * ((fix ...) (n - 1 - 1))) 3
-  = \n -&gt; 멈출 가능성이 있는 if문 n * (\n -&gt; if문... (n - 1) * (\n -&gt; if문... (n - 2) * ((fix ...) (n - 1 - 1)))) 3
-  -- fix f는 나중에 필요할 때 확장(평가)한다고 보면 됩니다. 여기선 3일 때, 필요한 만큼만 풀어 놨습니다.
-  =               3 * (              (3 - 1) * (              (3 - 2) * 1))</code></pre>
-<p>여기까진 수렴하는 재귀에 대한 설명이고<br />
-아래는 아주 인포멀한 상상입니다.</p>
-<blockquote>
+<div class="sourceCode" id="cb10"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>-- 3을 넣으면,</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>fix (\f -&gt; \n -&gt; if n == 0 then 1 else n * f (n - 1)) 3</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  = (\f -&gt; \n -&gt; if n == 0 then 1 else n * f (n - 1)) (fix ...) 3</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  = \n -&gt; 멈출 가능성이 있는 if문 n * ((fix ...) (n - 1)) 3 </span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  = \n -&gt; 멈출 가능성이 있는 if문 n * (\n -&gt; 멈출 가성성이 있는 if문 (n - 1) * ((fix ...) (n - 1 - 1))) 3</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  = \n -&gt; 멈출 가능성이 있는 if문 n * (\n -&gt; if문... (n - 1) * (\n -&gt; if문... (n - 2) * ((fix ...) (n - 1 - 1)))) 3</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  -- fix f는 나중에 필요할 때 확장(평가)한다고 보면 됩니다. 여기선 3일 때, 필요한 만큼만 풀어 놨습니다.</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  =               3 * (              (3 - 1) * (              (3 - 2) * 1))</span></code></pre></div>
+<p>여기까진 수렴하는 재귀에 대한 설명이고, 지금부터는 아주 인포멀한 상상입니다.</p>
+<p><code>f</code> 반복으로 고정점을 찾을 수 있는 이유는</p>
 <p>원래부터 <code>f</code>를 몇 번씩 반복하게 생겨먹은 함수에 <code>f</code>를 한 번 더 적용한다고 티가 나지 않습니다.</p>
-</blockquote>
 <div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>f (f (f (f ( <span class="op">...</span>fix f<span class="op">...</span>))))</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- 이런 함수에 f른 한 번 더 적용한다고 무슨 차이가 있을까요?</span></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>f (f (f (f (f ( <span class="op">...</span>fix f<span class="op">...</span>)))))</span></code></pre></div>
