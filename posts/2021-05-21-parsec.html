@@ -187,11 +187,11 @@ Parser는 문자열을 받아서 어떤 작업을 한 후 튜플 리스트를 �
 </ol>
 <p>두 가지 경우 모두 클로저를 활용하는 방법으로 해결할 수 있습니다. <em>비수학적으로 모나드를 바라 볼 때, 아주 중요한 특징</em>입니다.</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>파서1 <span class="op">&gt;&gt;=</span> \r1 <span class="ot">-&gt;</span> 파서2 <span class="op">&gt;&gt;=</span> \r2 <span class="ot">-&gt;</span> 파서3 <span class="op">&gt;&gt;=</span> \r3 <span class="ot">-&gt;</span> 최종 작업</span></code></pre></div>
-<p>이 체인의 끝에 있는 최종 작업은 <code>r1</code>, <code>r2</code>, <code>r3</code>를 모두 사용할 수 있습니다. 액션과 액션을 바로 붙이지 않고, 접착제로 쓰이는 바인드<code>&gt;&gt;=</code>함수가 람다 변수에 결과값을 저장하도록 만드는게 모나드 패턴으로 만드는 궁극적 이유입니다.</p>
+<p>이 체인의 끝에 있는 최종 작업은 <code>r1</code>, <code>r2</code>, <code>r3</code>를 모두 사용할 수 있습니다. 액션과 액션을 바로 붙이지 않고, 접착제로 쓰이는 바인드<code>&gt;&gt;=</code>함수가 람다 변수에 결과값을 저장하도록 만드는 게, 모나드 패턴을 쓸 때 아주 유용합니다.</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ot">bind      ::</span> <span class="dt">Parser</span> a <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> <span class="dt">Parser</span> b) <span class="ot">-&gt;</span> <span class="dt">Parser</span> b</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>p ‘bind‘ f <span class="ot">=</span> \inp <span class="ot">-&gt;</span> <span class="fu">concat</span> [f v inp’ <span class="op">|</span> (v,inp’) <span class="ot">&lt;-</span> p inp]</span></code></pre></div>
 <p>두 번째 인자로 받은 <code>f :: a -&gt; Parser b</code> 함수를 첫 번째 파서<code>p</code>의 결과값<code>v</code>에 적용, 결과적으로 <code>p</code>의 리턴값을 람다 변수에 두면서 바인딩하게 됩니다. 이렇게 람다 변수에 둔 값은 현재 액션에서 써먹을 수도 있고, 이 체인에 연결되어 있는 다른 액션(보통은 가장 마지막 액션)에서 써 먹을 수도 있습니다. 다른 함수들의 결과를 매개 변수로 명시적으로 받지 않아도 써먹을 수 있는 중요한 특징입니다.</p>
-<p>클로저를 어떻게 보냐에 따라, “매개 변수 이외에는 절대 정보를 받을 수 없다”는 맞는 말일수도, 틀린 말일수도 있습니다.</p>
+<p>클로저를 어떻게 보냐에 따라, “매개 변수 이외에는 절대 정보를 받을 수 없다”는 맞는 말일수도, 틀린 말일 수도 있습니다.</p>
 <h2 id="monadplus-alternative">MonadPlus, Alternative</h2>
 <p>다음은 파서를 조립할 때 쓸 컴비네이터들입니다.</p>
 <p>※ Combinator - 람다 대수에선 free variable이 없는 함수를 말하지만, 여기선 Parser함수와 Parser함수를 연결해서 또 다른 Parser함수를 만드는 접착제 갈은 역할을 하는 브로커 함수들을 말합니다. 모나드의 바인드같은 함수들을 컴비네이터라 부릅니다. 의미에 맞게 번역한다면 접착 함수쯤일텐데 입에 딱 감기진 않습니다. - <a href="https://wiki.haskell.org/Combinator" class="uri">https://wiki.haskell.org/Combinator</a></p>
