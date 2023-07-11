@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko" lang="ko">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <title>lionhairdino - Cabal 빌드 플래그</title>
+
+        <meta name="description" content="lionhairdino - Cabal 빌드 플래그" />
+        <meta property="og:description" content="하스켈 함수형 프로그래밍" />
+
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <link rel="icon" href="https://lionhairdino.github.io/favicon.svg" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino16px.png" sizes="16x16" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino24px.png" sizes="24x24" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino32px.png" sizes="32x32" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino48px.png" sizes="48x48" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino57px.png" sizes="57x57" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino60px.png" sizes="60x60" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino64px.png" sizes="64x64" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino72px.png" sizes="72x72" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino76px.png" sizes="76x76" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino114px.png" sizes="114x114" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino120px.png" sizes="120x120" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino144px.png" sizes="144x144" />
+        <link rel="shortcut icon" href="../favicon.ico" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino152px.png" sizes="152x152" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino180px.png" sizes="180x180" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino192px.png" sizes="192x192" />
+        <link rel="manifest" href="../site.webmanifest" />
+        <link rel="mask-icon" href="https://lionhairdino.github.io/Lionhairdino_black.svg" color="#ff7500" />
+        <meta name="msapplication-TileImage" content="/images/favicon/Lionhairdino144px.png" />
+        <meta name="msapplication-TileColor" content="#ff7500" />
+        <meta name="theme-color" content="#ffffff" />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="Cabal 빌드 플래그" />
+        <meta property="og:site_name" content="Lionhairdino" />
+        <meta property="og:url" content="https://lionhairdino.github.io/posts/2023-07-12-cabal-flag.html" />
+
+        <meta property="og:image" content="https://lionhairdino.github.io/images/state400px.png" />
+
+      <meta name="keywords" content="build, cabal, flag">
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-E9WZ6VXGHP"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-E9WZ6VXGHP');
+</script>
+<script src="../script/copycode.js"></script>
+<script async src="https://cse.google.com/cse.js?cx=9c53b4915cbb2605c"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.11.1/tocbot.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.11.1/tocbot.css" />
+    </head>
+    <body>
+        <div id="header">
+            <div style="display:inline-block;margin-right:5px;padding-top: 5px;" id="logo">
+                <a href="../"><img style="width:30px;border:none" src="../images/favicon/Lionhairdino48px.png"></a>
+            </div>
+            <div style="display:inline-block;vertical-align: top;padding-top:5px;" id="navigation">
+                <a href="../">lionhairdino</a>
+                <a href="../about.html">about</a>
+                <!--<a href="/archive.html">archive</a>-->
+            </div>
+            <div style="display:inline-block;font-size:0.8em;vertical-align: top;">
+                <div style="display:inline-block;vertical-align: top;padding-top: 5px">사이트내 검색</div>
+                <div style="display:inline-block;width:180px;"> 
+                    <div class="gcse-searchbox-only"></div>
+                </div>
+            </div>
+            <div>
+                여기 글들은 일종의 질문입니다. 용어 선택도 학계, 업계에서 쓰는 걸로 되어 있지 않고, 틀린 내용이 있을 수도 있습니다.
+            </div>
+        </div>
+        <div class="js-toc-content">
+            <h1>Cabal 빌드 플래그</h1>
+            <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+<div class="info">
+    Posted on July 12, 2023
+    
+</div>
+
+<h2 id="요약">요약</h2>
+<ul>
+<li>Cabal 빌드 플래그 <code>default</code> 값의 이상한 동작<br />
+<code>default</code> 값으로 빌드를 시도하고, 실패하면 <em>의외로</em> default값을 뒤집어서 시도합니다.</li>
+<li><code>verbosity=3</code> 으로 리졸빙이 어찌 되가나 확인하기</li>
+</ul>
+<p>아래는 장황하긴 한데, 빌드 오류 이유를 찾는 방법을 일부 볼 수 있어, 시도했던 방법 그대로 기록했습니다.</p>
+<p><span class="citation" data-cites="jhhuh님이">@jhhuh님이</span> Cabal의 기본 개념을 알려주시고, 목적지에 도달할 수 있게, 귀한 시간을 들여 저를 “드리블” 해주셨습니다. ;-) 감사합니다. 혹시 틀린 부분이 있다면, 제가 잘못 정리한 것으로, 아직 따로 리뷰를 통해 검증 받은 글은 아닙니다.</p>
+<h2 id="분명-예시-공개-시점에선-빌드-성공했을-것">분명 예시 공개 시점에선 빌드 성공했을 것</h2>
+<p>2023.6 현재 <a href="https://github.com/DarinM223/jwt-scotty">jose-scotty 예시 파일</a>은 예시에서 시키는대로 하면 빌드가 안됩니다.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>Network/Wai/Handler/Warp/Types.hs:10:1: error:</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    Could not load module ‘Data.X509’</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    It is a member of the hidden package ‘x509-1.7.7’.</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    Perhaps you need to add ‘x509’ to the build-depends in your .cabal file.</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    Use -v to see a list of the files searched for.</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>10 | import Data.X509</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>   |</span></code></pre></div>
+<p>분명 예시는 빌드가 됐을텐데, 어째서 모듈 지정 자체가 안되어 있다는 오류가 날까요?</p>
+<p>보통 <code>hidden</code> 에러가 뜨면, 위 에러 설명에서 제안하는 대로 <code>.cabal</code> 파일에 <code>dependency</code>를 잡아 줍니다.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="at">executable jwt-scotty</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">build-depends</span><span class="kw">:</span><span class="at">       base &gt;=4.12 &amp;&amp; &lt;5</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="at">                     , x509</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="at">                     , ...</span></span></code></pre></div>
+<p>하지만, 이렇게 해도 동일한 에러가 뜨고, 게다가 아래 에러가 추가 됐습니다.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>[1 of 9] Compiling Jose.Jwa         ( Jose/Jwa.hs, dist/build/Jose/Jwa.o )</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>[2 of 9] Compiling Jose.Types       ( Jose/Types.hs, dist/build/Jose/Types.o )</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>Jose/Types.hs:144:18: error:</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    Not in scope: type constructor or class ‘Options’</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>144 | claimsOptions :: Options</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    |                  ^^^^^^^</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>Jose/Types.hs:190:15: error:</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    Not in scope: type constructor or class ‘Options’</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>190 | jwsOptions :: Options</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    |               ^^^^^^^</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>...</span></code></pre></div>
+<p>예시를 만들 당시엔 <code>x509</code>를 별도로 모듈 지정을 안해도 됐다는 건, 다른 라이브러리가 안에 가지고 있던 건 아닐까 추측했는데, 한 가지 경우의 수가 더 있었습니다. 조건부 빌드를 위해 <em>플래그를 써서 모듈을 지정하는 방식</em>이 있습니다.</p>
+<p>추가된 <code>Not in scope...</code> 오류말고, 원 소스 그대로 상태에서 발생한 <code>Could not load module...</code> 오류를 보겠습니다.</p>
+<p>다음과 같은 이유를 추측해 볼 수 있습니다.<br />
+“<code>dependency</code>에 잡아 주었지만, 어떤 절차에선가 강제로 다시 <code>dependency</code>에서 뺀다.”<br />
+왜냐하면 여전히 패키지를 못 찾는다는 같은 오류가 나기 때문입니다. 어째서 이런 일이 생길까요?</p>
+<p>보통 Cabal, Stack을 매뉴얼을 통독하며 익히는 경우는 드문 것 같습니다. 그저 빌드가 되면, 세부 기능은 뒤로 미룹니다. 위 예시의 빌드 오류에는 Cabal 매뉴얼을 따로 보지 않으면 알 수 없는 플래그 관련 동작이 있습니다.</p>
+<h2 id="플래그">플래그</h2>
+<p>참고 - <a href="https://cabal.readthedocs.io/en/stable/cabal-project.html#cfg-flag---flags">GHC 플래그 가이드</a><br />
+조건부로 다르게 빌드할 필요가 있을 때 플래그를 정의할 수 있습니다.(추측: 현재 프로젝트가 A라는 라이브러리를 갖다 쓸 때, A라이브러리를 특정 조건에 따라 빌드를 달리 하려면, 플래그를 통해 제어하는 것으로 보입니다. 플래그가 없다면, A가 어떻게 빌드 될지 현재 프로젝트에서 직접 제어할 방법이 없습니다.)</p>
+<h2 id="warp-플래그">Warp 플래그</h2>
+<p>hackage에서 <code>Warp</code> 패키지 정보를 보면 4개의 플래그를 확인할 수 있습니다.</p>
+<p>network-bytestring (default: Disabled)<br />
+allow-sendfilefd (default: Enabled)<br />
+warp-debug (default: Disabled)<br />
+x509 (default: Enabled)</p>
+<p>직접 <code>Warp</code> 패키지 빌드에 쓰이는 <code>cabal</code>파일을 보고 확인할 수도 있습니다.<br />
+<a href="https://github.com/yesodweb/wai/blob/master/warp/warp.cabal" class="uri">https://github.com/yesodweb/wai/blob/master/warp/warp.cabal</a></p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="at">Flag x509</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">Description</span><span class="kw">:</span><span class="at"> Adds a dependency on the x509 library to enable getting TLS client certificates.</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">Default</span><span class="kw">:</span><span class="at">     </span><span class="ch">True</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="at">  if flag(x509)</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">Build-Depends</span><span class="kw">:</span><span class="at"> crypton-x509</span></span></code></pre></div>
+<p><code>x509</code> 플래그를 <code>True</code>로 지정하면, 의존성에 <code>crypton-x509</code>를 추가하는 게 보입니다. 플래그 값 지정은 <code>+</code>로 <code>True</code>, <code>-</code>로 <code>False</code>를 지정합니다.</p>
+<p><code>cabal.project.local</code>에 <code>+x509</code>를 명시적으로 넣어 주면 빌드에 성공합니다.(현재 2023.6)</p>
+<p>그런데, 위에 보면 <code>x509</code>는 디폴트로 <code>Enabled</code>인데, 아래와 같이 왜 또 <code>constraints</code>에 지정해줘야 할까요?</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">with-compiler</span><span class="kw">:</span><span class="at"> ghc-8.6.5</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">constraints</span><span class="kw">:</span><span class="at"> warp +x509</span></span></code></pre></div>
+<p>이런 이상해 보이는 동작을 알려면 Cabal의 “독특한” 디폴트 동작을 알아야 합니다. (어찌 보면 비상식적으로 보이는 동작입니다.)</p>
+<p>빌드할 때 <code>verbosity=3</code>을 줘서 아래 로그를 얻을 수 있습니다.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>여기 ----&gt; [156] trying: warp:+x509 </span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>[157] trying: crypton-x509-1.7.6 (dependency of warp +x509 *test)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>[158] trying: crypton-x509:!test</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>[159] trying: pem-0.2.4 (dependency of crypton-x509)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>[160] trying: pem:!test</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>[161] next goal: memory (dependency of crypton-x509)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>[161] rejecting: memory-0.18.0 (library is not buildable in the current environment, but it is required by pem)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>[161] trying: memory-0.17.0</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>[162] trying: memory:!test</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>[163] trying: memory:+support_deepseq</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>[164] trying: memory:+support_bytestring</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>[165] trying: hourglass-0.2.12 (dependency of crypton-x509)</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>[166] trying: hourglass:!bench</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>[167] trying: hourglass:!test</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>[168] next goal: crypton (dependency of crypton-x509)</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>[168] rejecting: crypton-0.31 (library is not buildable in the current environment, but it is required by crypton-x509)</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>[168] fail (backjumping, conflict set: crypton, crypton-x509)</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>[157] fail (backjumping, conflict set: crypton, crypton-x509, warp, warp:x509, warp:test)</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>여기 ----&gt; [156] trying: warp:-x509</span></code></pre></div>
+<p>디폴트 옵션 <code>+x509</code>로 빌드 시도하고, <code>crypton-0.31</code> 라이브러리 빌드에 실패하고 <em>플래그를 -x509로 뒤집는negate게 보입니다.</em><br />
+반드시 디폴트 플래그로 빌드해야 하는 게 아니라, “우선” 디폴트로 빌드를 시도합니다.</p>
+<p>그런데, 만일 <code>constraints</code>에 명시적으로 <code>+x509</code>를 추가하면 아래와 같은 로그를 볼 수 있습니다.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>여기 ----&gt; [254] trying: warp:+x509</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>[255] trying: crypton-x509-1.7.6 (dependency of warp +x509)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>[256] trying: crypton-x509:!test</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>[257] trying: pem-0.2.4 (dependency of crypton-x509)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>[258] trying: pem:!test</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>[259] trying: hourglass-0.2.12 (dependency of crypton-x509)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>[260] trying: hourglass:!bench</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>[261] trying: hourglass:!test</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>[262] next goal: crypton (dependency of crypton-x509)</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>[262] rejecting: crypton-0.31 (library is not buildable in the current environment, but it is required by crypton-x509)</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>[262] fail (backjumping, conflict set: crypton, crypton-x509)</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>[255] fail (backjumping, conflict set: crypton, crypton-x509, warp, warp:x509)</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>여기 ----&gt; [254] rejecting: warp:-x509 (constraint from project config /home/jacoo/gitProjects/jisimsim/reference/jwt-scotty/cabal.project.local requires opposite flag selection)</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>[254] fail (backjumping, conflict set: crypton, crypton-x509, warp, warp:x509)</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>[148] trying: warp-3.3.26</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>여기 ----&gt; [149] trying: warp:+x509</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>[150] trying: crypton-x509-1.7.6 (dependency of warp +x509)</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>[151] next goal: crypton (dependency of crypton-x509)</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>[151] rejecting: crypton-0.31 (library is not buildable in the current environment, but it is required by crypton-x509)</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>[151] fail (backjumping, conflict set: crypton, crypton-x509)</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>[150] fail (backjumping, conflict set: crypton, crypton-x509, warp, warp:x509)</span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>여기 ----&gt; [149] rejecting: warp:-x509 (constraint from project config /home/jacoo/gitProjects/jisimsim/reference/jwt-scotty/cabal.project.local requires opposite flag selection)</span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>[149] fail (backjumping, conflict set: crypton, crypton-x509, warp, warp:x509)</span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>[148] trying: warp-3.3.25</span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>여기 ----&gt; [149] trying: warp:+x509</span></code></pre></div>
+<p>디폴트 <code>+x509</code>로 시도하고, 실패하면 <code>-x509</code>로 바꾸려 하지만, <code>constraints: +x509</code> 제약이 그러지 못하도록 막습니다. 그래서, <code>+x509</code> 옵션은 그대로 두고, <code>warp</code> 버전을 낮춰가며 빌드 시도합니다. 바로 이 동작을 알아야, 위와 같은 상황이 왜 벌어지는지 이해할 수 있습니다.</p>
+<p>디폴트로 지정하면, 그 값이 고정이 아니라, 우선 디폴트 값으로 빌드 시도하고, 실패하면 디폴트 값을 뒤집어 다시 시도합니다. 무슨 이유에선가 <code>+x509</code>로 실패해서 <code>-x509</code>로 시도하니, 아예 모듈 자체가 <code>dependency</code>에 잡히지 않았던 겁니다.</p>
+<h1 id="해결책을-찾기까지-시도했던-방법들">해결책을 찾기까지 시도했던 방법들</h1>
+<p>Cabal은 Stack처럼 스냅샷 방식이 아니라서, <code>cabal freeze</code>를 하지 않았다면, 항상 같은 리졸브 결과를 가지는 건 아닌 것으로 보입니다. (제약이 딱히 없다면, 가급적 최신으로 맞춰지는 것 같습니다.) 어찌됐든, 몇 년 전에는 멀쩡히 잘 돌아가서 올려놓은 예시일텐데, 지금 빌드가 되지 않는다면, 환경(<code>cabal</code> 버전, <code>ghc</code> 버전, 기타 의존하는 바이너리나 환경 변수…) 문제이거나, 패키지들 버전 문제입니다.</p>
+<p>우선, 예시를 작성할 때 사용한 ghc, cabal로 버전을 맞춰 줍니다.</p>
+<ul>
+<li><code>ghcup</code>에서 현재 활성화 버전을 <code>set</code>할 수 있습니다.</li>
+</ul>
+<p>이렇게 맞추고 난 뒤에도 에러가 난다면, 패키지 버전 문제일 확률이 높습니다. 위 예시의 경우
+- <code>Warp</code>패키지의 <code>x509</code> 관련 에러니, <code>Warp</code>의 change history를 살펴 <code>x509</code>관련 이슈가 있는지 살펴 봤습니다.<br />
+<a href="https://hackage.haskell.org/package/warp-3.3.28/changelog" class="uri">https://hackage.haskell.org/package/warp-3.3.28/changelog</a><br />
+3.3.20 버전에 <code>x509</code> 플래그가 추가된 것과, 3.3.28 버전에서 ‘-x509’ 플래그 관련 된 걸 고쳤다는 항목이 보입니다.<br />
+패키지 설명의 Dependencies에 보면 crypton-x509가 포함되어 있습니다.</p>
+<ul>
+<li><code>Options</code> 타입 생성자 또는 클래스가 없다고 하니, Hackage에서 어디에 속한 것인지 살펴 봤습니다. 여러 패키지 목록이 나오는데, 이 중 아마도 JSON을 다루는 <code>aeson</code>에 속한 <code>Options</code>로 추측할 수 있습니다. <code>aeson</code>이 <code>import</code>되지 않고 있거나, 현재 리졸브된 버전이 <code>Options</code>이 없는 <code>aeson</code> 버전일 수도 있습니다.<br />
+<a href="https://hackage.haskell.org/package/aeson-2.2.0.0/changelog" class="uri">https://hackage.haskell.org/package/aeson-2.2.0.0/changelog</a><br />
+<code>Options</code>로 문자열 검색을 해 보니,<code>1.2.0.0</code>버전에 <code>Options</code> 생성자를 더 이상 드러내지expose 않는 다는 항목이 보입니다. 이 후 버전으로 리졸브됐기 때문에 <code>Options</code>를 찾지 못한다는 에러가 나온 것으로 추측 할 수 있습니다. <code>.cabal</code> 파일의 <code>build-depends</code>를 보니, 따로 <code>aeson</code> 버전 지정이 없습니다.</li>
+</ul>
+<p>※ cabal이 resolve한 패키지 버전들은 로그를 보거나, <code>cabal build --dry-run</code> 실행, <code>dist-newstyle/cache/plan.json</code>에서 확인할 수 있습니다.</p>
+<p>(<span class="citation" data-cites="jhhuh님이">@jhhuh님이</span> 도움을 주시면서 같이 테스트해 주셨는데, <code>warp-3.3.25</code>, <code>aeson-1.4.7.1</code> 버전으로 리졸브되어 빌드 성공했다고 알려 주셨습니다. 반면 저는 <code>warp-3.3.26</code>, <code>aeson-0.11.3.0</code> 으로 리졸브되고 빌드 실패했습니다. 위에서 이슈가 있던 버전들과 어떤 상관 관계가 보이지 않아 난감했습니다.)</p>
+<p>덕분에 얻은 힌트는 한가지, <code>warp</code>는 <code>3.3.25</code>에서 <code>3.3.26</code>으로 올라가면서 <code>cryptonite</code>를 <code>crypton</code>으로 대체했다는 정보입니다.</p>
+<p>이 후, 위에서 한 것처럼 <code>verbosity=3</code>으로 로그를 쫓아가며 이유를 확인했습니다.</p>
+<p>※ <code>crypton</code>이 빌드가 안되었던 이유는</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="at">  if impl(ghc &lt; 8.8)</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">Buildable</span><span class="kw">:</span><span class="at"> </span><span class="ch">False</span></span></code></pre></div>
+<p><a href="https://github.com/kazu-yamamoto/crypton/blob/e5f315be06b228df657dbd916206be6e50f8f3f5/crypton.cabal#L248-L249" class="uri">https://github.com/kazu-yamamoto/crypton/blob/e5f315be06b228df657dbd916206be6e50f8f3f5/crypton.cabal#L248-L249</a><br />
+위와 같이 되어 있어 GHC-8.6.5에서 빌드가 안됩니다. - <span class="citation" data-cites="jhhuh">@jhhuh</span></p>
+<p>※ <code>warp-3.3.27</code>은 <code>3.3.26</code>까지와는 다르게 <code>x509</code> 플래그와 상관없이, <code>x509</code> 관련 코드가 포함되도록, 하드 코딩 되어 있는데, 저자가 의도한 것이 아니라면, 버그로 보입니다.</p>
+
+<div class="comment">
+<script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
+</script>
+</div>
+<div style="text-align:right">Github 계정이 없는 분은 메일로 보내주세요. lionhairdino at gmail.com </div>
+        </div>
+        <nav class="toc toc-right js-toc relative z-1 transition--300 absolute pa4 pt5 is-position-fixed"></nav>
+        <div id="footer">
+            © 2022 lionhairdino. All rights reserved. Generated by <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+        <script>
+            tocbot.init({
+                tocSelector: '.js-toc',
+                contentSelector: '.js-toc-content',
+                headingSelector: 'h2, h3',
+                hasInnerContainers: true,
+            });
+        </script>
+    </body>
+</html>
