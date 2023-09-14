@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko" lang="ko">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <title>lionhairdino - 확장 Arrows (작성 중)</title>
+
+        <meta name="description" content="Arrows를 편하게 쓰기 위한 Monad의 do 표기 같은 건데, do 보다는 덜 예쁩니다." />
+        <meta property="og:description" content="Arrows를 편하게 쓰기 위한 Monad의 do 표기 같은 건데, do 보다는 덜 예쁩니다." />
+
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <link rel="icon" href="https://lionhairdino.github.io/favicon.svg" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino16px.png" sizes="16x16" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino24px.png" sizes="24x24" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino32px.png" sizes="32x32" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino48px.png" sizes="48x48" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino57px.png" sizes="57x57" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino60px.png" sizes="60x60" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino64px.png" sizes="64x64" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino72px.png" sizes="72x72" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino76px.png" sizes="76x76" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino114px.png" sizes="114x114" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino120px.png" sizes="120x120" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino144px.png" sizes="144x144" />
+        <link rel="shortcut icon" href="../favicon.ico" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino152px.png" sizes="152x152" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino180px.png" sizes="180x180" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino192px.png" sizes="192x192" />
+        <link rel="manifest" href="../site.webmanifest" />
+        <link rel="mask-icon" href="https://lionhairdino.github.io/Lionhairdino_black.svg" color="#ff7500" />
+        <meta name="msapplication-TileImage" content="/images/favicon/Lionhairdino144px.png" />
+        <meta name="msapplication-TileColor" content="#ff7500" />
+        <meta name="theme-color" content="#ffffff" />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="확장 Arrows (작성 중)" />
+        <meta property="og:site_name" content="Lionhairdino" />
+        <meta property="og:url" content="https://lionhairdino.github.io/extensions/2023-09-14-arrow-extension.html" />
+
+        <meta property="og:image" content="https://lionhairdino.github.io/images/state400px.png" />
+
+      <meta name="keywords" content="Arrows, Monad, 합성">
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-E9WZ6VXGHP"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-E9WZ6VXGHP');
+</script>
+<script src="../script/copycode.js"></script>
+<script async src="https://cse.google.com/cse.js?cx=9c53b4915cbb2605c"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.11.1/tocbot.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.11.1/tocbot.css" />
+    </head>
+    <body>
+        <div id="header">
+            <div style="display:inline-block;margin-right:5px;padding-top: 5px;" id="logo">
+                <a href="../"><img style="width:30px;border:none" src="../images/favicon/Lionhairdino48px.png"></a>
+            </div>
+            <div style="display:inline-block;vertical-align: top;padding-top:5px;" id="navigation">
+                <a href="../">lionhairdino</a>
+                <a href="../about.html">about</a>
+                <!--<a href="/archive.html">archive</a>-->
+            </div>
+            <div style="display:inline-block;font-size:0.8em;vertical-align: top;">
+                <div style="display:inline-block;vertical-align: top;padding-top: 5px">사이트내 검색</div>
+                <div style="display:inline-block;width:180px;"> 
+                    <div class="gcse-searchbox-only"></div>
+                </div>
+            </div>
+            <div>
+                여기 글들은 일종의 질문입니다. 용어 선택도 학계, 업계에서 쓰는 걸로 되어 있지 않고, 틀린 내용이 있을 수도 있습니다.
+            </div>
+        </div>
+        <div class="js-toc-content">
+            <h1>확장 Arrows (작성 중)</h1>
+            <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+<div class="info">
+    Posted on September 14, 2023
+    
+</div>
+
+<p><a href="https://ghc.gitlab.haskell.org/ghc/doc/users_guide/exts/arrows.html" class="uri">https://ghc.gitlab.haskell.org/ghc/doc/users_guide/exts/arrows.html</a></p>
+<h1 id="arrow-notation">Arrow Notation</h1>
+<p><code>do</code>표기처럼 단순하고, 읽기 편할 줄 알았는데, 좀 복잡합니다. <a href="../posts/2023-09-14-arrow.html"><code>Arrow</code></a> 자체도 깊게 알고 있는 상태가 아니라서 지금 필요한 정도까지만 봐야 할 것 같습니다. 이 번 글은, 다 이해한 후에 작성하는 게 아니라, 공부 중에 노트한 걸 올려두고, 정리가 될 때마다 조금씩 수정해 가려 합니다. 아마도 오랫동안 미완성 문서일 듯 합니다.</p>
+<p><a href="https://ghc.gitlab.haskell.org/ghc/doc/users_guide/exts/arrows.html" class="uri">https://ghc.gitlab.haskell.org/ghc/doc/users_guide/exts/arrows.html</a><br />
+<a href="https://www.cse.chalmers.se/~rjmh/afp-arrows.pdf" class="uri">https://www.cse.chalmers.se/~rjmh/afp-arrows.pdf</a> 챕터 3.1</p>
+<h2 id="proc">proc</h2>
+<p>arrow 확장을 쓰는 표현에서 <code>proc</code>는 lambda abstraction에서 <code>lambda</code> 같은 역할을 합니다.<br />
+<code>proc</code>는 함수가 아니라, 새로운 키워드입니다.
+proc 전체를 프로시저, 혹은 arrow abstraction이라 부릅니다.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a> \   x <span class="ot">-&gt;</span>      x<span class="op">+</span><span class="dv">1</span>    <span class="co">-- 람다식과 비교</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>proc x <span class="ot">-&gt;</span> f <span class="op">-&lt;</span> x<span class="op">+</span><span class="dv">1</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>          <span class="op">^^^^^^^^</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>          proc의 body부분을 명령어command라 부릅니다<span class="op">.</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>          (<span class="dt">Arrow</span>의 body는 expression이 아닙니다<span class="op">.</span>)</span></code></pre></div>
+<p><code>proc</code>는 <code>\</code> 람다같은 역할입니다.<br />
+<code>\x</code>가 람다식에서 쓸 묶인bound 변수를 나타내듯이,<br />
+<code>proc x</code>에서 <code>x</code>는 arrow 식에서 쓸 묶인 변수입니다.</p>
+<p>Command는 기존에 없던 문법 구성 요소라 하는데, 자세한 설명은 없습니다. 컴비네이터들을 써서 Arrow를 구성하는construct 걸 표현할 때 쓰기 위해 새로 도입했다고 합니다. 가장 단순한 Command인 <code>f -&lt; exp</code>를 보면, “arrow application”이라 생각할 수도 있습니다. 표현식 <code>exp</code>의 값을 <code>arrow f</code>에게 넣어 준다는 뜻입니다.</p>
+<h2 id="section">-&lt;</h2>
+<p><code>-&lt;</code>는 식별자가 아니고, arrow 타입식과 arrow의 입력으로 넘길 식에서 Command를 만들어내는 작업을 나타내는 심볼입니다. analogue of application for arrow라고 읽는다고 하는데, 우리 말로는 뭐라하면 좋은 지 아직 모르겠습니다.</p>
+<p>위에 식은 확장없이 쓰면, 아래식과 같은 식입니다.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>arr (\x <span class="ot">-&gt;</span> x <span class="op">+</span> <span class="dv">1</span>) <span class="op">&gt;&gt;&gt;</span> f</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>proc pat -&gt; a -&lt; e ----&gt; arr (\pat -&gt; e) &gt;&gt;&gt; a</span></code></pre></div>
+<p><code>pat</code>같은 arrow-bound 변수는 <code>-&lt;</code> 왼쪽에서는 유효하지 않습니다.(not in scope)
+이 말은 람다식을 인자로 받는 컴비네이터로는 <code>proc</code>를 구현할 수 없다는 뜻입니다.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>proc (f, x) <span class="ot">-&gt;</span> f <span class="op">-&lt;</span> x</span></code></pre></div>
+<p>이렇게는 못 씁니다. 확장을 안쓰고 표현하면 <code>arr (\(f, x) -&gt; x) &gt;&gt;&gt; f</code> 이렇게 되는데, <code>f</code>가 유효 범위 바깥에서 쓰이고 있습니다. 바깥에서 입력을 받아 오려면 <code>app</code>을 써야 합니다.</p>
+<p>실제 사용할 때는 <code>f</code>라는 arrow에 입력값을 주려면 <code>-&lt;</code>를 쓴다는 걸 기억하면 되겠습니다.</p>
+<h2 id="app">-&lt;&lt;, app</h2>
+<p>아래 둘은 같은 표현입니다.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>proc (f,x) <span class="ot">-&gt;</span> app <span class="op">-&lt;</span> (f,x)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>proc (f,x) <span class="ot">-&gt;</span> f x <span class="op">-&lt;&lt;</span> x<span class="op">+</span><span class="dv">1</span></span></code></pre></div>
+<p>는 다음과 같은 식입니다.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>arr(\x <span class="ot">-&gt;</span> (f x, x<span class="op">+</span><span class="dv">1</span>)) <span class="op">&gt;&gt;&gt;</span> app</span></code></pre></div>
+<p>마치 바운딩된 변수가 오른 쪽에만 나타나면 <code>&lt;</code>를 하나만 써서 <code>-&lt;</code>, 왼쪽 오른쪽 모두에 나타난다면, <code>&lt;</code>를 두 번 써서 <code>-&lt;&lt;</code>로 나타내는 걸로 외워도 되겠습니다. 이 경우에 쓰이는 <code>arrow</code>는 <code>ArrowApply</code> 클래스 인스턴스여야 하며, 이런 arrow들은 모나드와 동일합니다. 보통은 이렇게 쓰는 것보단 모나드가 편하다고 합니다.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>proc x <span class="ot">-&gt;</span> <span class="kw">do</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  y <span class="ot">&lt;-</span> f <span class="op">-&lt;</span> x<span class="op">+</span><span class="dv">1</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  g <span class="op">-&lt;</span> <span class="dv">2</span><span class="op">*</span>y</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> z <span class="ot">=</span> x<span class="op">+</span>y</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  t <span class="ot">&lt;-</span> h <span class="op">-&lt;</span> x<span class="op">*</span>z</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  returnA <span class="op">-&lt;</span> t<span class="op">+</span>z</span></code></pre></div>
+<h2 id="ifthenelse">if…then…else</h2>
+<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>arr (\x <span class="ot">-&gt;</span> <span class="kw">if</span> p x <span class="kw">then</span> <span class="dt">Left</span> x <span class="kw">else</span> <span class="dt">Right</span> x) <span class="op">&gt;&gt;&gt;</span> f <span class="op">|||</span> g</span></code></pre></div>
+<p>확장을 쓰면 다음처럼 표현할 수 있습니다.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>proc x <span class="ot">-&gt;</span> <span class="kw">if</span> p x <span class="kw">then</span> f <span class="op">-&lt;</span> x <span class="kw">else</span> g <span class="op">-&lt;</span> x</span></code></pre></div>
+<p>여기서 쓰인 <code>if...then...else</code> 는 일반 <code>if</code>문이 아니라, <code>proc</code> 안에서 쓰는 conditional command라 부르고, 다음 처럼 번역됩니다.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>proc pat <span class="ot">-&gt;</span> <span class="kw">if</span> e <span class="kw">then</span> c1 <span class="kw">else</span> c2</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="op">-----&gt;</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>arr (\pat <span class="ot">-&gt;</span> <span class="kw">if</span> e <span class="kw">then</span> <span class="dt">Left</span> pat <span class="kw">else</span> <span class="dt">Right</span> pat) <span class="op">&gt;&gt;&gt;</span> (proc pat <span class="ot">-&gt;</span> c1 <span class="op">|||</span> proc pat <span class="ot">-&gt;</span> c2)</span></code></pre></div>
+<h2 id="case">case</h2>
+<div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>mapA f <span class="ot">=</span> arr listcase <span class="op">&gt;&gt;&gt;</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>         arr (<span class="fu">const</span> []) <span class="op">|||</span> (f <span class="op">***</span> mapA f <span class="op">&gt;&gt;&gt;</span> arr (<span class="fu">uncurry</span> (<span class="op">:</span>)))</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span> listcase [] <span class="ot">=</span> <span class="dt">Left</span> ()</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>        listcase (x<span class="op">:</span>xs) <span class="ot">=</span> <span class="dt">Right</span> (x,s)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="co">--확장을 쓰면--&gt;</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>mapA f <span class="ot">=</span> proc xs <span class="ot">-&gt;</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  <span class="kw">case</span> xs <span class="kw">of</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    [] <span class="ot">-&gt;</span> returnA <span class="op">-&lt;</span> []</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    x<span class="op">:</span>xs' <span class="ot">-&gt;</span> (f <span class="op">***</span> mapA f <span class="op">&gt;&gt;&gt;</span> <span class="fu">uncurry</span> (<span class="op">:</span>)) <span class="op">-&lt;</span> (x, xs')</span></code></pre></div>
+<p>…작성 중</p>
+
+<div class="comment">
+<script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
+</script>
+</div>
+<div style="text-align:right">Github 계정이 없는 분은 메일로 보내주세요. lionhairdino at gmail.com </div>
+        </div>
+        <nav class="toc toc-right js-toc relative z-1 transition--300 absolute pa4 pt5 is-position-fixed"></nav>
+        <div id="footer">
+            © 2022 lionhairdino. All rights reserved. Generated by <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+        <script>
+            tocbot.init({
+                tocSelector: '.js-toc',
+                contentSelector: '.js-toc-content',
+                headingSelector: 'h2, h3',
+                hasInnerContainers: true,
+            });
+        </script>
+    </body>
+</html>

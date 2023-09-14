@@ -449,7 +449,7 @@ fmap id mma = fmap m ma</code></pre>
 <p>모나드 공부는 생각의 시작점도 쉽게 추측되지 않고, 얻어지는 장점도 너무 많아 더 혼란스움을 주는 것 같습니다. 이 글의 목적은 모나드의 완벽한 이해가 아닙니다. <strong>합성을 위해서는 <code>a</code>와 <code>m a</code>가 꼭 같아야 하는게 아니라, 합성을 막고 있는 요소를 해결할 수 있으면 됩니다.</strong> <code>a -&gt; m b</code>와 <code>b -&gt; m c</code>는 effect를 빼고 보면 <code>a -&gt; b</code>와 <code>b -&gt; c</code>로 합성이 가능합니다. <code>m</code>때문에 합성을 못하고 있습니다. 두 개의 정보 <code>m</code>을 합쳐 하나로 만들수만 있으면 합성할 수 있습니다. 이를 해결하기 위해</p>
 <div class="sourceCode" id="cb34"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>m · m <span class="ot">-&gt;</span> m</span></code></pre></div>
 <p>이 필요합니다. 이렇게 펑크터 <code>m</code>의 계속된 합성을 위해 모나드 개념을 도입했다를 이해하는 겁니다. 그래야 타입으로 설계할 때, <em>조금 다른 타입</em>이지만 비슷한 속성을 가지고 있는, 즉 펑크터로 변환한 타입과 변환 전 타입이 서로 만나면 모나드를 떠올릴 수 있습니다.</p>
-<p><img align="right" src="../images/before_monad_bindblock.png"></p>
+<p><img align="right" src="../images/before_monad_bindblock.png" alt="모나드 블록"></p>
 <p>하스켈에서 정확히 코드 모양으로 얘기하면 <code>a -&gt; m b</code>와 <code>b -&gt; m c</code>를 연결하는 게 아니라, <code>bind (&gt;&gt;=)</code>끼리 연결합니다. <code>bind (&gt;&gt;=)</code>는 그림의 비어있는 박스 부분에 적당한 <code>(a -&gt; m b)</code>를 채워 넣으면 합성되게 구조를 만들어 둔다고 볼 수 있습니다.</p>
 <h2 id="모나드가-필요함을-눈치-채는-예시">모나드가 필요함을 눈치 채는 예시</h2>
 <p>숫자 두개 알파벳 하나를 받는 Parser 함수를 구현한다면, numParser 두 번, alphabetParser 한 번 연결해서 구현하면 좋겠다는 생각을 할 수 있습니다.</p>
