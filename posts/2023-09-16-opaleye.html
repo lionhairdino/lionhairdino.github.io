@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko" lang="ko">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <title>lionhairdino - 쿼리를 작성 할 때도 타입 체커를 써먹자 - Opaleye (작성 중)</title>
+
+        <meta name="description" content="SQL을 직접적으로 쓰지 않고, SQL을 생성하는 EDSL을 쓰면, 막강한 타입 체커의 도움을 받아 런타임으로 가기 전 쿼리 검증을 받을 수 있습니다." />
+        <meta property="og:description" content="SQL을 직접적으로 쓰지 않고, SQL을 생성하는 EDSL을 쓰면, 막강한 타입 체커의 도움을 받아 런타임으로 가기 전 쿼리 검증을 받을 수 있습니다." />
+
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <link rel="icon" href="https://lionhairdino.github.io/favicon.svg" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino16px.png" sizes="16x16" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino24px.png" sizes="24x24" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino32px.png" sizes="32x32" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino48px.png" sizes="48x48" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino57px.png" sizes="57x57" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino60px.png" sizes="60x60" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino64px.png" sizes="64x64" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino72px.png" sizes="72x72" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino76px.png" sizes="76x76" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino114px.png" sizes="114x114" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino120px.png" sizes="120x120" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino144px.png" sizes="144x144" />
+        <link rel="shortcut icon" href="../favicon.ico" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino152px.png" sizes="152x152" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino180px.png" sizes="180x180" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino192px.png" sizes="192x192" />
+        <link rel="manifest" href="../site.webmanifest" />
+        <link rel="mask-icon" href="https://lionhairdino.github.io/Lionhairdino_black.svg" color="#ff7500" />
+        <meta name="msapplication-TileImage" content="/images/favicon/Lionhairdino144px.png" />
+        <meta name="msapplication-TileColor" content="#ff7500" />
+        <meta name="theme-color" content="#ffffff" />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="쿼리를 작성 할 때도 타입 체커를 써먹자 - Opaleye (작성 중)" />
+        <meta property="og:site_name" content="Lionhairdino" />
+        <meta property="og:url" content="https://lionhairdino.github.io/posts/2023-09-16-opaleye.html" />
+
+        <meta property="og:image" content="https://lionhairdino.github.io/images/state400px.png" />
+
+      <meta name="keywords" content="Database, EDSL, PostgreSQL, SQL, 타입 체커, Type Checker">
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-E9WZ6VXGHP"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-E9WZ6VXGHP');
+</script>
+<script src="../script/copycode.js"></script>
+<script async src="https://cse.google.com/cse.js?cx=9c53b4915cbb2605c"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.11.1/tocbot.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.11.1/tocbot.css" />
+    </head>
+    <body>
+        <div id="header">
+            <div style="display:inline-block;margin-right:5px;padding-top: 5px;" id="logo">
+                <a href="../"><img style="width:30px;border:none" src="../images/favicon/Lionhairdino48px.png"></a>
+            </div>
+            <div style="display:inline-block;vertical-align: top;padding-top:5px;" id="navigation">
+                <a href="../">lionhairdino</a>
+                <a href="../about.html">about</a>
+                <!--<a href="/archive.html">archive</a>-->
+            </div>
+            <div style="display:inline-block;font-size:0.8em;vertical-align: top;">
+                <div style="display:inline-block;vertical-align: top;padding-top: 5px">사이트내 검색</div>
+                <div style="display:inline-block;width:180px;"> 
+                    <div class="gcse-searchbox-only"></div>
+                </div>
+            </div>
+            <div>
+                여기 글들은 일종의 질문입니다. 용어 선택도 학계, 업계에서 쓰는 걸로 되어 있지 않고, 틀린 내용이 있을 수도 있습니다.
+            </div>
+        </div>
+        <div class="js-toc-content">
+            <h1>쿼리를 작성 할 때도 타입 체커를 써먹자 - Opaleye (작성 중)</h1>
+            <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+<div class="info">
+    Posted on September 16, 2023
+    
+</div>
+
+<p>단순 번역 글은 잘 올리지 않으려 하는데, 이 번 글은 아직 단순 번역 글입니다. 프로젝트 중에 참고할 매뉴얼로 먼저 올려 두고, 실제 사용하면서 알게된 내용들로 보완하도록 하겠습니다.</p>
+<p>SQL-생성generating EDSL을 제공하는 라이브러리 (현재2023까지는 PostgreSQL만 지원)<br />
+하스켈 코드로 써 놓으면 SQL을 생성해 주는데, 이렇게 하면 장점이 타입 체커의 도움을 받을 수 있습니다. Opaleye를 쓰면 Postgres DB 쿼리를 쓸 때 타입 체커를 부려 먹고(typesafe), 합성 가능한(composable) 코드를 작성할 수 있습니다. 당장은 현란한 쿼리를 쓰지 않아서, 고작?! 타입 체커의 안정성을 위해서 또 새로운 걸 익혀야 하는가란 생각도 들지만, 다른 예시들에서 쓰는 걸 가끔 만나니, 일단 맛을 보기로 했습니다. Opaleye를 써서 하스켈 코드로 쿼리를 작성하고, 컴파일을 통과하면 런타임에 뻗지 않는다는 신뢰가 생깁니다.</p>
+<p>타입 체커를 적극적으로 쓰는 예시로 봐둘만 합니다.</p>
+<p>다음과 같은 SQL 기능을 제공합니다.<br />
+inner join,<br />
+outer join,<br />
+restriction,<br />
+aggregation,<br />
+distinct,<br />
+sorting and limiting,<br />
+unions,<br />
+differences<br />
+</p>
+<p>DB 생성이나 Table 생성은 아직 안됩니다.</p>
+<p>아래는 오피셜 Repo에서 제공하는 Basic 튜토리얼을 보며 노트한 내용입니다. 그대로, 번역한게 많은데, 번역 오류가 있을 수 있습니다. 직접 프로젝트에 Opaleye를 쓰려 하고 있기 때문에, 사용하면서 얻게 되는 노하우들로 좀 더 채워 넣도록 하겠습니다.</p>
+<p><a href="https://github.com/tomjaguarpaw/haskell-opaleye/blob/master/Doc/Tutorial/TutorialBasic.lhs" class="uri">https://github.com/tomjaguarpaw/haskell-opaleye/blob/master/Doc/Tutorial/TutorialBasic.lhs</a></p>
+<h2 id="스키마">스키마</h2>
+<p>MySQL, Oracle, MSSQL 등에 익숙한 분들에겐 PostgreSQL의 스키마가 혼동을 줄 수 있습니다. 다른 DB들에서도 동일한 용어 스키마가 여기 저기 쓰이니, 그럴 수 밖에 없습니다. Database, 테이블 사이에서 한 번 더 그룹화하는 개념이 있다고 볼 수 있습니다.</p>
+<p>참고) kimDuBiA님의 <a href="https://kimdubi.github.io/postgresql/pg_schema/">PostgreSQL schema 의미 및 권한관리</a><br />
+</p>
+<p><code>table</code> 함수로 테이블을 정의합니다.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Table</span> writeFields viewFields</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="ot">=</span> <span class="dt">Table</span> <span class="dt">String</span> (<span class="dt">TableFields</span> writeFields viewFields)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="op">|</span> tableWithSchema <span class="dt">String</span> <span class="dt">String</span> (<span class="dt">TableFields</span> writeFields viewFields)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="ot">table ::</span> <span class="dt">String</span> <span class="ot">-&gt;</span> <span class="dt">TableFields</span> writeFields viewFields <span class="ot">-&gt;</span> <span class="dt">Table</span> writeFields viewFields</span></code></pre></div>
+<p>쓸 수 있는 필드, 읽을 수 있는 필드 각각 지정하는데 보통은 같으니까, 대부분의 경우 인자가 같은 걸 두 번 반복합니다.</p>
+<p>“필드가 들어 있는 컨테이너의 모양을 설명하는 별도의 컴비네이터”를 써서 간단한 모양으로 테이블을 정의합니다. 여기서는 3튜플을 받는 <code>p3</code> 컴비네이터를 썼습니다.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ot">personTable ::</span> <span class="dt">Table</span> (<span class="dt">Field</span> <span class="dt">SqlText</span>, <span class="dt">Field</span> <span class="dt">SqlInt4</span>, <span class="dt">Field</span> <span class="dt">SqlText</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>                     (<span class="dt">Field</span> <span class="dt">SqlText</span>, <span class="dt">Field</span> <span class="dt">SqlInt4</span>, <span class="dt">Field</span> <span class="dt">SqlText</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>personTable <span class="ot">=</span> table <span class="st">&quot;personTable&quot;</span> (p3 ( tableField <span class="st">&quot;name&quot;</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>                                      , tableField <span class="st">&quot;age&quot;</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>                                      , tableField <span class="st">&quot;address&quot;</span> ))</span></code></pre></div>
+<p>기본값으로, “personTable” 테이블은 PostgreSQL의 디폴트 스키마 “public”을 씁니다. MySQL에서 database에 table이 소속되어 있는 것처럼, 여기선 database에 schema 분류가 있고, 이들 schema에 테이블이 속합니다.<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
+<p>Opaleye 여기 저기서 boilerplate를 피하기 위해 안보이게 타입 클래스가 개입합니다. 사용자는 명시적으로 이들 타입 클래스를 쓸 필요는 없습니다. 타입 클래스가 만들어내는 마법같은 일들은 명시적으로 “typeclass dictionary”를 통해 전달할 수도 있습니다.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ot">personSelect ::</span> <span class="dt">Select</span> (<span class="dt">Field</span> <span class="dt">SqlText</span>, <span class="dt">Field</span> <span class="dt">SqlInt4</span>, <span class="dt">Field</span> <span class="dt">SqlText</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>personSelect <span class="ot">=</span> selectTable personTable</span></code></pre></div>
+<p><code>personSelect</code>는 아래같은 SQL을 생성합니다.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>ghci&gt; printSql personSelect</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>SELECT name0_1 as result1,</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>       age1_1 as result2,</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>       address2_1 as result3</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>FROM (SELECT *</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>      FROM (SELECT name as name0_1,</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>                   age as age1_1,</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>                   address as address2_1</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>            FROM personTable as T1) as T1) as T1</span></code></pre></div>
+<p>왜 저렇게 뎁스가 들어간 모양이 나오는지 아직 이해하지 못했습니다. 튜토리얼에서는 이렇게 실제 생성한 SQL이 아닌, 아래같이 idealized 버전을 같이 보여주며 설명합니다. Opaleye가 최대한 idealized 버전과 같은 쿼리를 뽑아내면 좋은데, 지금처럼 뽑아내도 PostgreSQL이 쿼리 최적화를 하기 때문에 퍼포먼스에서는 그다지 차이가 없다고 합니다.</p>
+<pre><code>SELECT name,
+       age,
+       address
+FROM personTable</code></pre>
+<p>※ <code>printSQL</code>은 여기 예시에서만 쓰는 편의용 유틸리티 함수입니다. 글 끝에 정의 코드가 있습니다.</p>
+<h2 id="record-타입">Record 타입</h2>
+<p>Opaleye는 쿼리에 하스켈 record 타입같은 사용자 정의 타입을 쓸 수 있습니다. 데이터 타입의 모든 필드를 폴리모픽하게 만들면 편리합니다. (오히려 폴리모픽 안하게 만들면 안될 것 같은데, 텍스트에선 안된다는 설명은 따로 없습니다.) 특정 코드에서 구체 타입을 사용하려면 대부분 타입 동의어synonym를 씁니다.</p>
+<p>예시가 좀 특이한데, 주인공은 <code>Birthday</code>가 아니라 <code>Birthday'</code>입니다.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Birthday'</span> a b <span class="ot">=</span> <span class="dt">Birthday</span> {<span class="ot"> bdName ::</span> a,<span class="ot"> bdDay ::</span> b }</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">Birthday</span>      <span class="ot">=</span> <span class="dt">Birthday'</span> <span class="dt">String</span> <span class="dt">Day</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">BirthdayField</span> <span class="ot">=</span> <span class="dt">Birthday'</span> (<span class="dt">Field</span> <span class="dt">SqlText</span>) (<span class="dt">Field</span> <span class="dt">SqlDate</span>)</span></code></pre></div>
+<p><code>Birthday</code>,<code>BirthdayField</code> 둘 모두 <code>Birthday'</code>의 synonym입니다. 이렇게 쓰려면 <strong><em>모든 필드를 폴리모픽</em></strong>하게 써야합니다. 반드시 이렇게 해야만 할 것 같은데, 아니게 하는 방법도 있나 본데, 아직 잘 모르겠습니다.<br />
+사용자 정의 타입이, 뒷단에서 안보이게 돌아가는 “타입 클래스 매직”과 작동하게 하려면 (어떤 타입 클래스?) 인스턴스를 가져야 합니다. 인스턴스는 템플릿 하스켈을 통해 만들 수 있습니다.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="op">$</span>(makeAdaptorAndInstance <span class="st">&quot;pBirthday&quot;</span> '<span class="dt">'Birthday'</span>)</span></code></pre></div>
+<p>이렇게 사용자 정의 타입이 준비되면, 위에서 했던 방식으로 테이블을 만들 수 있습니다. 위 예시에서 <code>p3</code> 컴비네이터가 빠지고, 그 자리에 <code>pBirthday</code>가 들어갔습니다. 그냥 3튜플을 쓸 때는 <code>p3</code>같은 것들의 도움을 받고, 테이블 스키마와 유사한 레코드 타입을 만들면, 그 걸 바로 써도 되는 것 같습니다.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- 위에서 쓸 수 있는 필드, 읽을 수 있는 필드를 지정하는 걸</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- 아래와 같이 쓸 수 있다.</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="ot">birthdayTable ::</span> <span class="dt">Table</span> <span class="dt">BirthdayField</span> <span class="dt">BirthdayField</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>birthdayTable <span class="ot">=</span> table <span class="st">&quot;birthdayTable&quot;</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>                      (pBirthday <span class="dt">Birthday</span> { bdName <span class="ot">=</span> tableField <span class="st">&quot;name&quot;</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>                                          , bdDay <span class="ot">=</span> tableField <span class="st">&quot;birthday&quot;</span> })</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="ot">birthdaySelect ::</span> <span class="dt">Select</span> <span class="dt">BirthdayField</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>birthdaySelect <span class="ot">=</span> selectTable birthdayTable</span></code></pre></div>
+<pre><code>ghci&gt; printSql birthdaySelect
+SELECT name0_1 as result1
+       birthday1_1 as result2
+FROM (SELECT *
+      FROM (SELECT name as name0_1
+                   birthday as birthday1_1
+            FROM birthdayTable as T1) as T1) as T1
+
+idealized SQL:
+
+SELECT name,
+       birthday
+FROM birthdayTable</code></pre>
+<p>아직은 너무 단순한 쿼리들만 보다 보니 이렇게까지 해야만 하나 싶은 생각이 들긴 합니다. 그냥 idealized 쿼리를 손으로 쓰는 게, 직관전이고 더 낫지 않을까 싶은데요. 아마도 복잡한 쿼리를 만나, 타입 체커의 도움을 받는 예시를 봐야 수긍이 갈 것 같습니다.</p>
+<h2 id="projection">Projection</h2>
+<p><code>select</code>에서 일부 필드를 무시하는 걸 Projection이라 합니다. 위 <code>personSelect</code>에서 <code>address</code>를 무시하길 원한다고 칩시다. 아래 첫번째 예시처럼 Opaleye 퀴를 작성하는데, <code>do</code>표기 방식을 쓸 수 있습니다.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ot">nameAge ::</span> <span class="dt">Select</span> (<span class="dt">Field</span> <span class="dt">SqlText</span>, <span class="dt">Field</span> <span class="dt">SqlInt4</span>)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>nameAge <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  (name, age, _) <span class="ot">&lt;-</span> personSelect</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pure</span> (name, age)</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>ghci&gt; printSql nameAge</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>SELECT name0_1 as result1</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>       age1_1 as result2</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>FROM (SELECT *</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>      FROM (SELECT name as name0_1,</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>                   age as age1_1,</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>                   address as address2_1</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>            FROM personTable as T1) as T1) as T1</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>idealized SQL:</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>SELECT name,</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>       age</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>FROM personTable</span></code></pre></div>
+<h2 id="product">Product</h2>
+<p>두 쿼리의 카테시안 프로덕트를 의미합니다. <code>do</code>표기로 간단히 해결할 수 있습니다. <code>personSelect</code>와 <code>birthdaySelect</code> 카테시안 프로덕트를 얻어 보겠습니다.</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="ot">personBirthdayProduct ::</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">Select</span> ((<span class="dt">Field</span> <span class="dt">SqlText</span>, <span class="dt">Field</span> <span class="dt">SqlInt4</span>, <span class="dt">Field</span> <span class="dt">SqlText</span>), <span class="dt">BirthdayField</span>)</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>personBirthdayProduct <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  personRow <span class="ot">&lt;-</span> personSelect</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  birthdayRow <span class="ot">&lt;-</span> birthdaySelect</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pure</span> (personRow, birthdayRow)</span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>ghci&gt; printSql personBirthdayProduct</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>SELECT name0_1 as result1,</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>       age1_1 as result2,</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>       address2_1 as result3,</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>       name0_2 as result4,</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>       birthday1_2 as result5</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>FROM (SELECT *</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>      FROM (SELECT name as name0_1,</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>                   age as age1_1,</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>                   address as address2_1</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>            FROM personTable as T1) as T1,</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>           (SELECT name as name0_2,</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>                   birthday as birthday1_2</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>            FROM birthdayTable as T1) as T2) as T1</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>Idealized SQL:</span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>SELECT name0,</span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>       age0,</span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>       address0,</span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>       name1,</span>
+<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a>       birthday1</span>
+<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>FROM (SELECT name as name0,</span>
+<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a>             age as age0,</span>
+<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a>             address as address0</span>
+<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a>      FROM personTable as T1),</span>
+<span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a>     (SELECT name as name1,</span>
+<span id="cb15-28"><a href="#cb15-28" aria-hidden="true" tabindex="-1"></a>             birthday as birthday1</span>
+<span id="cb15-29"><a href="#cb15-29" aria-hidden="true" tabindex="-1"></a>      FROM birthdayTable as T1)</span></code></pre></div>
+<h2 id="restriction">Restriction</h2>
+<p>특정 조건에 맞는 것들만 추리는 것. <code>personSelect</code> 결과에서 18살까지만으로 필터링 해보겠습니다.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="ot">youngPeople ::</span> <span class="dt">Select</span> (<span class="dt">Field</span> <span class="dt">SqlText</span>, <span class="dt">Field</span> <span class="dt">SqlInt4</span>, <span class="dt">Field</span> <span class="dt">SqlText</span>)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>youngPeople <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  row<span class="op">@</span>(_, age, _) <span class="ot">&lt;-</span> personSelect</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  where_ (age, <span class="op">.&lt;=</span> <span class="dv">18</span>)</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pure</span> row</span></code></pre></div>
+<p>복잡한 조건을 만들 때 쓸 다양한 연산자를 <code>.</code>을 접두어로 정의해 뒀습니다.</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="ot">twentiesAtAddress ::</span> <span class="dt">Select</span> (<span class="dt">Field</span> <span class="dt">SqlText</span>, <span class="dt">Field</span> <span class="dt">SqlInt4</span>, <span class="dt">Field</span> <span class="dt">SqlText</span>)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>twentiesAtAddress <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  row<span class="op">@</span>(_, age, address) <span class="ot">&lt;-</span> personSelect</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  where_ <span class="op">$</span> (<span class="dv">20</span> <span class="op">.&lt;=</span> age) <span class="op">.&amp;&amp;</span> (age <span class="op">.&lt;</span> <span class="dv">30</span>)</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  where_ <span class="op">$</span> address <span class="op">.==</span> sqlString <span class="st">&quot;1 My Street, My Town&quot;</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pure</span> row</span></code></pre></div>
+<h2 id="inner-join">Inner join</h2>
+<p>restriction으로 필터링 된 product를 SQL 용어로는 <code>inner join</code>이라 합니다. 카테시안 곱에서 이름이 같은 <code>row</code>만 가져온다든지 하는 걸 말합니다.</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="ot">personAndBirthday ::</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">Select</span> (<span class="dt">Field</span> <span class="dt">SqlText</span>, <span class="dt">Field</span> <span class="dt">SqlInt4</span>, <span class="dt">Field</span> <span class="dt">SqlText</span>, <span class="dt">Field</span> <span class="dt">SqlData</span>)</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>personAndBirthday <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  (name, age, address) <span class="ot">&lt;-</span> personSelect</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>  birthday             <span class="ot">&lt;-</span> birthdaySelect</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>  where_ <span class="op">$</span> name <span class="op">.==</span> bdName birthday</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pure</span> (name, age, address, bdDay birthday)</span></code></pre></div>
+<h2 id="nullability">Nullability</h2>
+<p><code>Null</code>이 문제를 안 일으키게 하려면, <code>Null</code>을 타입 시스템에 반영하면 됩니다. <code>Nullable</code> 필드는 <code>FieldNullable</code> 타입 생성자를 이용합니다.</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="ot">employeeTable ::</span> <span class="dt">Table</span> (<span class="dt">Field</span> <span class="dt">SqlText</span>, <span class="dt">FieldNullable</span> <span class="dt">SqlText</span>)</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>                       (<span class="dt">Field</span> <span class="dt">SqlText</span>, <span class="dt">FieldNullable</span> <span class="dt">SqlText</span>)</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>employeeTable <span class="ot">=</span> table <span class="st">&quot;employeeTable&quot;</span> (p2 ( tableField <span class="st">&quot;name&quot;</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>                                          , tableField <span class="st">&quot;boss&quot;</span> ))</span></code></pre></div>
+<p>각 고용인들이 <code>Boss</code>가 있는지 보는 예시입니다.</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>hasBoss <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  (name, nullableBoss) <span class="ot">&lt;-</span> selectTable employeeTable</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> aOrNo <span class="ot">=</span> ifThenElse (isNull nullableBoss) (sqlString <span class="st">&quot;no&quot;</span>) (sqlString <span class="st">&quot;a&quot;</span>)</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pure</span> <span class="op">$</span> name <span class="op">.++</span> sqlString <span class="st">&quot; has &quot;</span> <span class="op">.++</span> aOrNo <span class="op">.++</span> sqlString <span class="st">&quot; boss&quot;</span></span></code></pre></div>
+<pre><code>idealized SQL:
+
+SELECT name || ' has '
+            || CASE WHEN boss IS NULL THEN 'no' ELSE 'a' END || ' boss'
+FROM emplyeeTable</code></pre>
+<p><code>null</code>인지 체크하는데 그치지 않고 <code>matchNullable</code>로 좀 더 기능을 추가할 수도 있습니다.</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="ot">bossSelect ::</span> (<span class="dt">Field</span> sqlText, <span class="dt">FieldNullable</span> <span class="dt">SqlText</span>) <span class="ot">-&gt;</span> <span class="dt">Select</span> (<span class="dt">Field</span> <span class="dt">SqlText</span>)</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>bossSelect (name, nullableBoss) <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pure</span> <span class="op">$</span> matchNullable (name <span class="op">.++</span> sqlString <span class="st">&quot; has no boss&quot;</span>)</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>                       (\boss <span class="ot">-&gt;</span> sqlString <span class="st">&quot;The boss of &quot;</span> <span class="op">.++</span> name)</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>                                 <span class="op">.++</span> sqlString <span class="st">&quot; is &quot;</span> <span class="op">.++</span> boss)</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>                       nullableBoss</span></code></pre></div>
+<p><code>matchNullable</code>은 아래 하스켈의 <code>maybe</code> 함수와 같은 역할을 합니다.<br />
+<code>maybe</code>로 바꾸면 아래와 같습니다.</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="ot">bossHaskell ::</span> (<span class="dt">String</span>, <span class="dt">Maybe</span> <span class="dt">String</span>) <span class="ot">-&gt;</span> <span class="dt">String</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>bossHaskell (name, nullableBoss) <span class="ot">=</span> <span class="fu">maybe</span> (name <span class="op">++</span> <span class="st">&quot; has no boss&quot;</span>)</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>                                         (\boss <span class="ot">-&gt;</span> <span class="st">&quot;The boss of &quot;</span> <span class="op">++</span> name </span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>                                                   <span class="op">++</span> <span class="st">&quot; is &quot;</span> <span class="op">++</span> boss)</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>                                         nullableBoss</span></code></pre></div>
+<h2 id="composability">Composability</h2>
+<p><code>twentiesAtAddress</code>를 고치면서 Opaleye가 제공하는 다양한 Composability를 살펴 보겠습니다.</p>
+<p><code>twentiesAtAddress</code> <code>select</code>에서 특정 요소를 뽑아낼 수 있습니다. 나이가 20대면서, 주소가 “1 My Street, My Town”라는 조건을 꺼내 보겠습니다.<br />
+<code>SelectArr a ()</code>은 <code>a</code>타입 필드를 읽고, 어떤 필드도 리턴하지 않습니다.(Noth: <code>Select</code>는 <code>SelectArr ()</code>의 동의어입니다. 어떤 필드도 읽지 않는다는 <code>SelectArr</code>이란 뜻입니다.)</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="ot">restrictIsTwenties ::</span> <span class="dt">Field</span> <span class="dt">SqlInt4</span> <span class="ot">-&gt;</span> <span class="dt">Select</span> () <span class="co">-- 어떤 필드도 읽지 않는다.</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>restrictIsTwenties age <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>  where_ <span class="op">$</span> (<span class="dv">20</span> <span class="op">.&lt;=</span> age) <span class="op">.&amp;&amp;</span> (age <span class="op">.&lt;</span> <span class="dv">30</span>)</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="ot">restrictAddressIs1MyStreet ::</span> <span class="dt">Field</span> <span class="dt">SqlText</span> <span class="ot">-&gt;</span> <span class="dt">Select</span> ()</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>restrictAddressIs1MyStreet address <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>  where_ <span class="op">$</span> address <span class="op">.==</span> sqlString <span class="st">&quot;1 My Street, My Town&quot;</span></span></code></pre></div>
+<p>위 둘은 “필드를 읽어내는” <code>Select</code> 타입이 아니므로, 완성된 SQL을 뽑아내진 못합니다. 이렇게 분리해낸 조건들을 다음과 같이 적용해서 좀 더 보기 좋은 <code>twentiesAtAddress</code>를 만들 수 있습니다.</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="ot">twentiesAtAddress' ::</span> <span class="dt">Select</span> (<span class="dt">Field</span> <span class="dt">SqlText</span>, <span class="dt">Field</span> <span class="dt">SqlInt4</span>, <span class="dt">Field</span> <span class="dt">SqlText</span>)</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>twentiesAtAddress' <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  row<span class="op">@</span>(_, age, address) <span class="ot">&lt;-</span> personSelect</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>  restrictIsTwenties age</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>  restrictAddressIs1MyStreet address</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pure</span> row</span></code></pre></div>
+<h2 id="composability-of-join">Composability of join</h2>
+<p><code>person's name</code>을 <code>birthdaySelect</code>에서 찾은 <code>date of birth</code>와 매핑하는 <code>SelectArr</code>을 뽑아내는 비슷한 작업을 <code>personAndBirthday</code>에 해보겠습니다.</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="ot">birthdayOfPerson ::</span> <span class="dt">Field</span> <span class="dt">SqlText</span> <span class="ot">-&gt;</span> <span class="dt">Select</span> (<span class="dt">Field</span> <span class="dt">SqlDate</span>)</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>birthdayOfPerson name <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  birthday <span class="ot">&lt;-</span> birthdaySelect</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>  where_ <span class="op">$</span> name <span class="op">.==</span> bdName birthday</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pure</span> (bdDay birthday)</span></code></pre></div>
+<p><code>personAndBirthday</code>를 아래와 같이 구현할 수 있습니다.</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="ot">personAndBirthday' ::</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">Select</span> (<span class="dt">Field</span> <span class="dt">SqlText</span>, <span class="dt">Field</span> <span class="dt">SqlInt4</span>, <span class="dt">Field</span> <span class="dt">SqlText</span>, <span class="dt">Field</span> <span class="dt">SqlDate</span>)</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>personAndBirthday' <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>  (name, age, address) <span class="ot">&lt;-</span> personSelect</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>  birthday <span class="ot">&lt;-</span> birthdayOfPerson name</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pure</span> (name, age, address, birthday)</span></code></pre></div>
+<h2 id="aggregation">Aggregation</h2>
+<p>Type safe aggregation이 Opaleye이 가장 자랑하는 기능입니다. 다른 SQL 생성 API들도 이 기능은 어려워 하는 것 같다는데, 써보질 않아 잘 모르겠습니다. Opaleye aggregation은 항상 의미있는 SQL을 생성합니다.</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- 보통의 하스켈 데이터 타입</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Widget</span> a b c d e <span class="ot">=</span> <span class="dt">Widget</span> {<span class="ot"> style    ::</span> a</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>                               ,<span class="ot"> color    ::</span> b</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>                               ,<span class="ot"> location ::</span> c</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>                               ,<span class="ot"> quantity ::</span> d</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>                               ,<span class="ot"> radius   ::</span> e </span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>                               }</span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a><span class="co">-- 위 타입을 Opaleye에서 쓸 때 필요한 코드 생성                               </span></span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a><span class="op">$</span>(makeAdaptorAndInstance <span class="st">&quot;pWidget&quot;</span> '<span class="dt">'Widget</span>)</span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a><span class="ot">widgetTable ::</span> <span class="dt">Table</span> (<span class="dt">Widget</span> (<span class="dt">Field</span> <span class="dt">SqlText</span>) (<span class="dt">Field</span> <span class="dt">SqlText</span>) (<span class="dt">Field</span> <span class="dt">SqlTest</span>)</span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a>                             (<span class="dt">Field</span> <span class="dt">SqlInt4</span>) (<span class="dt">Field</span> <span class="dt">SqlFloat8</span>))</span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a>                     (<span class="dt">Widget</span> (<span class="dt">Field</span> <span class="dt">SqlText</span>) (<span class="dt">Field</span> <span class="dt">SqlText</span>) (<span class="dt">Field</span> <span class="dt">SqlTest</span>)</span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a>                             (<span class="dt">Field</span> <span class="dt">SqlInt4</span>) (<span class="dt">Field</span> <span class="dt">SqlFloat8</span>))</span>
+<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a>widgetTable <span class="ot">=</span> table <span class="st">&quot;widgetTable&quot;</span></span>
+<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a>                    (pWidget <span class="dt">Widget</span> { style <span class="ot">=</span> tableField <span class="st">&quot;style&quot;</span></span>
+<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a>                                    , color <span class="ot">=</span> tableField <span class="st">&quot;color&quot;</span></span>
+<span id="cb28-19"><a href="#cb28-19" aria-hidden="true" tabindex="-1"></a>                                    , location <span class="ot">=</span> tableField <span class="st">&quot;location&quot;</span></span>
+<span id="cb28-20"><a href="#cb28-20" aria-hidden="true" tabindex="-1"></a>                                    , quantity <span class="ot">=</span> tableField <span class="st">&quot;quantity&quot;</span></span>
+<span id="cb28-21"><a href="#cb28-21" aria-hidden="true" tabindex="-1"></a>                                    , radius <span class="ot">=</span> tableField <span class="st">&quot;radius&quot;</span> })</span></code></pre></div>
+<p><code>style</code>과 <code>color</code>로 묶은 <code>widget</code> 그룹을 원한다면, <code>locations</code>가 몇 개나 있는지, <code>widget</code>의 총 갯수는 얼마인지, 평균 <code>radius</code>는 얼마인지 알기 원한다 할 때, <code>aggregateWidgets</code>는 어떻게 이 걸 처리하는지 보여 줍니다.</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="ot">aggregateWidgets ::</span> <span class="dt">Select</span> (<span class="dt">Widget</span> (<span class="dt">Field</span> <span class="dt">SqlText</span>) (<span class="dt">Field</span> <span class="dt">SqlText</span>) (<span class="dt">Field</span> <span class="dt">SqlInt8</span>)</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>                                   (<span class="dt">Field</span> <span class="dt">SqlInt4</span>) (<span class="dt">Field</span> <span class="dt">SqlFloat8</span>))</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>aggregateWidgets <span class="ot">=</span> aggregate (pWidget <span class="dt">Widget</span> { style <span class="ot">=</span> groupBy</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>                                             , color <span class="ot">=</span> groupBy</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>                                             , location <span class="ot">=</span> count</span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>                                             , quantity <span class="ot">=</span> <span class="fu">sum</span></span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>                                             , radius <span class="ot">=</span> avg</span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>                                             })</span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>                             (selectTable widgetTable)</span></code></pre></div>
+<p><code>widgetTable</code>과 <code>aggregateWidgets</code>에서 Template Haskell이 유도한 코드의 쓰임을 좀 더 정확히 볼 수 있습니다. <code>pWidget</code>을 어떻게 필드들이 aggregate되는지 지정하기 위해 “adaptor”로 썼습니다?(<span class="citation" data-cites="todo">@todo</span> 번역이 확실치 안습니다.) <code>count</code> aggregator는 <code>Field String</code>을 <code>Field Int64</code>로 바꾸는데, 데이터 타입을 폴리모픽하게 해서 해결하는 또 다른 예시입니다.</p>
+<h2 id="outer-join">Outer join</h2>
+<p>left join을 지원합니다. Full outer join과 right join은 아직 없습니다. left join은 <code>nullable</code> 필드가 아닌 걸 <code>nullable</code>로 바꿀 수도 있기 때문에, 출력이 <code>Nullability</code>을 지원하는지 잘 봐야 합니다. 이렇게 하기 위해 다음 타입 동의어synonym를 소개합니다.</p>
+<div class="sourceCode" id="cb30"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">FieldNullableBirthday</span> <span class="ot">=</span> <span class="dt">Birthday'</span> (<span class="dt">FieldNullable</span> <span class="dt">SqlText</span>)</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>                                       (<span class="dt">FieldNullable</span> <span class="dt">SqlDate</span>)</span></code></pre></div>
+<p>left join은 <code>join</code>할 두 <code>table</code>과 <code>join</code> 조건으로 표현된다.</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="ot">personBirthdayLeftJoin ::</span> <span class="dt">Select</span> ((<span class="dt">Field</span> <span class="dt">SqlText</span>, <span class="dt">Field</span> <span class="dt">SqlInt4</span>, <span class="dt">Field</span> <span class="dt">SqlText</span>),</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>                                 <span class="dt">FieldNullableBirthday</span>)</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>personBirthdayLeftJoin <span class="ot">=</span> leftJoin perseonSelect birthdaySelect eqName</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span> eqName ((name, _, _), birthdayRow) <span class="ot">=</span> name <span class="op">.==</span> bdName birthdayRow</span></code></pre></div>
+<p>boilerplate를 피하기 위해 Opaleye는 보이지 않게 타입클래스 매직을 씁니다. 이 것 때문에 의외로 컴파일러가 타입 추론을 잘 못하는 경우가 생깁니다. <code>leftJoin</code>이 바로 이런 경우입니다. 이럴 때는 타입 서명을 직접 명시해줘야 합니다. 컴파일러가 <code>Default</code> 인스턴스가 뭔지 모르겠다 하면, 타입 지정을 수동으로 해줘야 합니다.</p>
+<h2 id="newtypes">Newtypes</h2>
+<p>새 타입은, 예를 들어, 창고 ID는 <code>integer</code>지만, <code>WarehouseId</code>란 새로운 타입으로 만들어, 창고를 나타내지 않는 <code>integer</code>들과 섞이는 걸 막는 역할을 합니다. Opaleye에서도 비슷한 일을 할 수 있습니다.</p>
+<div class="sourceCode" id="cb32"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Warehouse'</span> a b c <span class="ot">=</span> <span class="dt">Warehouse</span> {<span class="ot"> wId       ::</span> a</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>                                  ,<span class="ot"> wLocation ::</span> b</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>                                  ,<span class="ot"> wNumGoods ::</span> c }</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a><span class="op">$</span>(makeAdaptorAndInstance <span class="st">&quot;pWarehouse&quot;</span> '<span class="dt">'Warehouse</span>)</span></code></pre></div>
+<p>Opaleye에선 <code>integer</code> ID를 <code>SqlInt4</code>로 쓸 수 있습니다.</p>
+<div class="sourceCode" id="cb33"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">BadWarehouseField</span> <span class="ot">=</span> <span class="dt">Warehouse'</span> (<span class="dt">Field</span> <span class="dt">SqlInt4</span>)</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>                                    (<span class="dt">Field</span> <span class="dt">SqlText</span>)</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>                                    (<span class="dt">Field</span> <span class="dt">SqlInt4</span>)</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a><span class="ot">badWarehouseTable ::</span> <span class="dt">Table</span> <span class="dt">BadWarehouseField</span> <span class="dt">BadWarehouseField</span></span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>badWarehouseTable <span class="ot">=</span> table <span class="st">&quot;warehouse_table&quot;</span></span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>  (pWarehouse <span class="dt">Warehouse</span> { wId <span class="ot">=</span> tableField <span class="st">&quot;id&quot;</span></span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>                        , wLocation <span class="ot">=</span> tableField <span class="st">&quot;location&quot;</span></span>
+<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a>                        , wNumGoods <span class="ot">=</span> tableField <span class="st">&quot;num_goods&quot;</span> })</span></code></pre></div>
+<p>아래와 같이 의미없는 작업을 하는 걸 막을 수 있습니다.</p>
+<div class="sourceCode" id="cb34"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="ot">badComparison ::</span> <span class="dt">BadWarehouseField</span> <span class="ot">-&gt;</span> <span class="dt">Field</span> <span class="dt">SqlBool</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>badComparison w <span class="ot">=</span> wId w <span class="op">.==</span> wNumGoods w</span></code></pre></div>
+<p><code>warehouse ID</code>를 <code>newtype</code>으로 만들어 해결할 수도 있습니다.</p>
+<div class="sourceCode" id="cb35"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">WarehouseId'</span> a <span class="ot">=</span> <span class="dt">WarehouseId</span> a</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="op">$</span>(makeAdaptorAndInstance <span class="st">&quot;pWarehouseId&quot;</span> '<span class="dt">'WarehouseId'</span>)</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">WarehouseIdField</span> <span class="ot">=</span> <span class="dt">WarehouseId'</span> (<span class="dt">Field</span> <span class="dt">SqlInt4</span>)</span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">GoodWarehouseField</span> <span class="ot">=</span> <span class="dt">Warehouse'</span> <span class="dt">WarehouseIdField</span></span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>                                     (<span class="dt">Field</span> <span class="dt">SqlText</span>)</span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>                                     (<span class="dt">Field</span> <span class="dt">SqlInt4</span>)</span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a><span class="ot">goodWarehouseTable ::</span> <span class="dt">Table</span> <span class="dt">GoodWarehouseField</span> <span class="dt">GoodWarehouseField</span></span>
+<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a>goodWarehouseTable <span class="ot">=</span>table <span class="st">&quot;warehosue_table&quot;</span></span>
+<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a>  (pWarehouse <span class="dt">Warehouse</span> { wId <span class="ot">=</span> pWarehouseId (<span class="dt">WarehouseId</span> (tableField <span class="st">&quot;id&quot;</span>))</span>
+<span id="cb35-13"><a href="#cb35-13" aria-hidden="true" tabindex="-1"></a>                        , wLocation <span class="ot">=</span> tableField <span class="st">&quot;location&quot;</span></span>
+<span id="cb35-14"><a href="#cb35-14" aria-hidden="true" tabindex="-1"></a>                        , wNumgoods <span class="ot">=</span> tableField <span class="st">&quot;num_goods&quot;</span> })</span></code></pre></div>
+<p>이제 위의 비교 구문은 타입 체커를 통과하지 못합니다.</p>
+<div class="sourceCode" id="cb36"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>-- forbiddenComparison :: GoodWarehouseField -&gt; Field SqlBool</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>-- forbiddenComparison w = wId w .== wNumGoods w</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>--</span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>-- =&gt; Couldn't match type `WarehouseId' (Field SqlInt4)' with `Field SqlInt4'</span></code></pre></div>
+<p>밑줄친 부분은 같지만, <code>id</code>는 <code>WarehouseId</code>가 붙어 있습니다.</p>
+<h2 id="postgres에로-쿼리-날리기">Postgres에로 쿼리 날리기</h2>
+<p><code>runSelect</code>는 Postgres에 효과적으로 쿼리를 날려주는 <code>typeclass</code> 폴리모픽 함수입니다.</p>
+<div class="sourceCode" id="cb37"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- runSelect :: Database.PostgreSQL.Simple.Connection</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="co">--           -&gt; Select fields -&gt; IO [haskells]</span></span></code></pre></div>
+<p>Opaleye의 레코드를 하스켈 Value의 레코드의 리스트로 변환합니다. <code>leftJoin</code>처럼 이 특별한 동작은 typeclass를 이용합니다. error 메시지를 보기 좋게 하려면, 최대한 모든 것에 타입 서명을 붙여 줘야 합니다.</p>
+<p><code>twentiesAtAddress</code>는 다음 타입을 가진 <code>runSelect</code>를 고릅니다.</p>
+<div class="sourceCode" id="cb38"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="ot">runTwentiesSelect ::</span> <span class="dt">PGS.Connection</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>                  <span class="ot">-&gt;</span> <span class="dt">Select</span> (<span class="dt">Field</span> <span class="dt">SqlText</span>, <span class="dt">Field</span> <span class="dt">SqlInt4</span>, <span class="dt">Field</span> <span class="dt">SqlText</span>)</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>                  <span class="ot">-&gt;</span> <span class="dt">IO</span> [(<span class="dt">String</span>, <span class="dt">Int</span>, <span class="dt">String</span>)]</span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>runTwentiesSelect <span class="ot">=</span> runSelect</span></code></pre></div>
+<p><code>nullable</code> 필드는 <code>FieldNullable</code> 타입 생성자로 표현하며, 실행시에 <code>Maybe</code>로 변환됩니다. 아래같이 <code>selectTable employeeTable</code> select를 실행할 수 있습니다.</p>
+<div class="sourceCode" id="cb39"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="ot">runEmployeesSelect ::</span> <span class="dt">PGS.Connection</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>                   <span class="ot">-&gt;</span> <span class="dt">Select</span> (<span class="dt">Field</span> <span class="dt">SqlText</span>, <span class="dt">FieldNullable</span> <span class="dt">SqlText</span>)</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>                   <span class="ot">-&gt;</span> <span class="dt">IO</span> [(<span class="dt">String</span>, <span class="dt">Maybe</span> <span class="dt">String</span>)]</span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>runEmployeesSelect <span class="ot">=</span> runSelect</span></code></pre></div>
+<p><code>makeAdaptorAndInstance</code>가 생성한 typeclass instance에 의해 Newtype은 자동으로 관리 됩니다. select가 실행되면 <code>WarehoustId' (Field SqlInt4)</code>는 <code>WarehoustId' Int</code>가 됩니다. 아래처럼 <code>selectTable goodWarehoustTable</code> select를 실행합니다.</p>
+<div class="sourceCode" id="cb40"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">WarehouseId</span> <span class="ot">=</span> <span class="dt">WarehouseId'</span> <span class="dt">Int</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">GoodWarehouse</span> <span class="ot">=</span> <span class="dt">Warehouse'</span> warehouseId <span class="dt">Strinng</span> <span class="dt">Int</span></span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a><span class="ot">runwareHouseSelect ::</span> <span class="dt">PSG.Connection</span></span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>                   <span class="ot">-&gt;</span> <span class="dt">Select</span> <span class="dt">GoodWarehouseField</span></span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>                   <span class="ot">-&gt;</span> <span class="dt">IO</span> [<span class="dt">Goodwarehousee</span>]</span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a>runwareHouseSelect <span class="ot">=</span> runSelect</span></code></pre></div>
+<h2 id="위에서-사용한-printsql-함수">위에서 사용한 printSql 함수</h2>
+<div class="sourceCode" id="cb41"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="ot">printSql ::</span> <span class="dt">Default</span> <span class="dt">Unpackspec</span> a a <span class="ot">=&gt;</span> <span class="dt">Select</span> a <span class="ot">-&gt;</span> <span class="dt">IO</span> ()</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>printSql <span class="ot">=</span> <span class="fu">putStrLn</span> <span class="op">.</span> <span class="fu">maybe</span> <span class="st">&quot;Empty select&quot;</span> <span class="fu">id</span> <span class="op">.</span> showSql</span></code></pre></div>
+<p><a href="https://haskell-webapps.readthedocs.io/en/latest/docs/opaleye/instant-gratification.html" class="uri">https://haskell-webapps.readthedocs.io/en/latest/docs/opaleye/instant-gratification.html</a></p>
+<section class="footnotes" role="doc-endnotes">
+<hr />
+<ol>
+<li id="fn1" role="doc-endnote"><p>OS로 따지면 디렉토리와 유사합니다. 스키마는 views, indexes, sequences, data types, operator, functions shcema를 포함할 수 있습니다. 보통 DB에서 스키마라 하면 DB 구조(개체, 속성, 관계)와 제약 조건에 대한 정의를 지칭합니다. PostgreSQL은 스키마 안에 테이블을 만든다고 보면 됩니다. 다음 명령어로 스키마를 생성할 수 있습니다.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">SCHEMA</span> name;</span></code></pre></div>
+<p>Schema안에 테이블 생성하기</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">TABLE</span> myschema.mytable( <span class="op">..</span>. );</span></code></pre></div>
+<p>다른 스키마를 지정하고 싶으면 <code>tableWithSchema</code> 함수를 쓰면 됩니다.<br />
+테이블의 모든 row를 선택하려면 <code>selectTable</code>을 씁니다.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section>
+
+<div class="comment">
+<script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
+</script>
+</div>
+<div style="text-align:right">Github 계정이 없는 분은 메일로 보내주세요. lionhairdino at gmail.com </div>
+        </div>
+        <nav class="toc toc-right js-toc relative z-1 transition--300 absolute pa4 pt5 is-position-fixed"></nav>
+        <div id="footer">
+            © 2022 lionhairdino. All rights reserved. Generated by <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+        <script>
+            tocbot.init({
+                tocSelector: '.js-toc',
+                contentSelector: '.js-toc-content',
+                headingSelector: 'h2, h3',
+                hasInnerContainers: true,
+            });
+        </script>
+    </body>
+</html>
