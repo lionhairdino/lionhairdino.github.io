@@ -360,12 +360,12 @@ differences<br />
 <p>left join을 지원합니다. Full outer join과 right join은 아직 없습니다. left join은 <code>nullable</code> 필드가 아닌 걸 <code>nullable</code>로 바꿀 수도 있기 때문에, 출력이 <code>Nullability</code>을 지원하는지 잘 봐야 합니다. 이렇게 하기 위해 다음 타입 동의어synonym를 소개합니다.</p>
 <div class="sourceCode" id="cb30"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">FieldNullableBirthday</span> <span class="ot">=</span> <span class="dt">Birthday'</span> (<span class="dt">FieldNullable</span> <span class="dt">SqlText</span>)</span>
 <span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>                                       (<span class="dt">FieldNullable</span> <span class="dt">SqlDate</span>)</span></code></pre></div>
-<p>left join은 <code>join</code>할 두 <code>table</code>과 <code>join</code> 조건으로 표현된다.</p>
+<p>left join은 <code>join</code>할 두 <code>table</code>과 <code>join</code> 조건으로 표현됩니다.</p>
 <div class="sourceCode" id="cb31"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="ot">personBirthdayLeftJoin ::</span> <span class="dt">Select</span> ((<span class="dt">Field</span> <span class="dt">SqlText</span>, <span class="dt">Field</span> <span class="dt">SqlInt4</span>, <span class="dt">Field</span> <span class="dt">SqlText</span>),</span>
 <span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>                                 <span class="dt">FieldNullableBirthday</span>)</span>
 <span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>personBirthdayLeftJoin <span class="ot">=</span> leftJoin perseonSelect birthdaySelect eqName</span>
 <span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span> eqName ((name, _, _), birthdayRow) <span class="ot">=</span> name <span class="op">.==</span> bdName birthdayRow</span></code></pre></div>
-<p>boilerplate를 피하기 위해 Opaleye는 보이지 않게 타입클래스 매직을 씁니다. 그런데, 컴파일러가 타입 추론을 잘 못하는 경우가 있다고 합니다. <code>leftJoin</code>이 바로 이런 경우라 합니다. 이럴 때는 타입 서명을 직접 명시해줘야 합니다. 컴파일러가 <code>Default</code> 인스턴스가 뭔지 모르겠다 하면, 타입 지정을 수동으로 해줘야 합니다.</p>
+<p>boilerplate를 피하기 위해 Opaleye는 보이지 않게 타입클래스 매직을 씁니다. 그런데, 컴파일러가 타입 추론을 잘 못하는 경우가 있다고 합니다. <code>leftJoin</code>이 바로 이런 경우인데, 이럴 때는 타입 서명을 직접 써 줘야 합니다. 컴파일러가 <code>Default</code> 인스턴스가 뭔지 모르겠다 하면, 타입 지정을 수동으로 해줘야 합니다.</p>
 <h2 id="newtypes">Newtypes</h2>
 <p><code>newtype</code>은, 예를 들어, 창고 ID는 <code>integer</code>지만, <code>WarehouseId</code>란 새로운 타입으로 만들어, 창고를 나타내지 않는 <code>integer</code>들과 섞이는 걸 막는 역할을 합니다. Opaleye에서도 비슷한 일을 할 수 있습니다.</p>
 <div class="sourceCode" id="cb32"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Warehouse'</span> a b c <span class="ot">=</span> <span class="dt">Warehouse</span> {<span class="ot"> wId       ::</span> a</span>
@@ -407,7 +407,7 @@ differences<br />
 <span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>--</span>
 <span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>-- =&gt; Couldn't match type `WarehouseId' (Field SqlInt4)' with `Field SqlInt4'</span></code></pre></div>
 <p>밑줄친 부분은 같지만, <code>id</code>는 <code>WarehouseId</code>가 붙어 있습니다.</p>
-<h2 id="postgresql에로-쿼리-날리기">PostgreSQL에로 쿼리 날리기</h2>
+<h2 id="postgresql로-쿼리-날리기">PostgreSQL로 쿼리 날리기</h2>
 <p><code>runSelect</code>는 PostgreSQL에 효과적으로 쿼리를 날려주는 타입클래스 폴리모픽 함수입니다.</p>
 <div class="sourceCode" id="cb37"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- runSelect :: Database.PostgreSQL.Simple.Connection</span></span>
 <span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="co">--           -&gt; Select fields -&gt; IO [haskells]</span></span></code></pre></div>

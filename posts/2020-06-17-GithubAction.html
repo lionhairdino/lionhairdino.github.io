@@ -116,7 +116,7 @@ runner 이미지가 이미 갖고 있는 버전을 지정하면 시간을 단축
 </ol>
 <p>처음 workflow 를 실행할 때는 40분 가까이 걸렸고, 캐싱을 사용하면서부터 3분정도의 시간이 걸립니다. workflow 로그를 보면, 아직도 하스켈 설치에 1분, 캐싱에서 파일을 풀어서 설치하는데 1분정도가 걸립니다. todo: 하스켈 설치 폴더도 캐싱 작업을 걸어두면 더 빨라질 것 같다.</p>
 <h2 id="lionhairdino-에-걸어-둔-workflow-소스">lionhairdino 에 걸어 둔 workflow 소스</h2>
-<p>(workflow 문법: <a href="https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions" class="uri">https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions</a>)</p>
+<p>(workflow 문법: <a href="https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions">Workflow syntax for GitHub Actions</a>)</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode yml"><code class="sourceCode yaml"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">name</span><span class="kw">:</span><span class="at"> Haskell CI</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">on</span><span class="kw">:</span></span>
@@ -167,19 +167,19 @@ runner 이미지가 이미 갖고 있는 버전을 지정하면 시간을 단축
 <li>siteSource (private)</li>
 <li>lionhairdino.github.io (public)</li>
 </ul>
-<p>sitSource 저장소에 workflow 를 걸어 두는데, 작업 말미에 결과를 lionhairdino.github.io 저장소에 커밋하려면 보안을 위해 ssh 키 쌍을 등록해 둬야 합니다. (peaceiris/actions-gh-pages 액션을 보면 workflow 를 걸어 둔 저장소와 같은 저장소로 커밋할 때는 github_token 을 쓰고, 다른 저장소에 커밋할 때는 deploy_key 를 씁니다. <a href="https://github.com/peaceiris/actions-gh-pages#%EF%B8%8F-create-ssh-deploy-key" class="uri">https://github.com/peaceiris/actions-gh-pages#%EF%B8%8F-create-ssh-deploy-key</a>)</p>
+<p>sitSource 저장소에 workflow 를 걸어 두는데, 작업 말미에 결과를 lionhairdino.github.io 저장소에 커밋하려면 보안을 위해 ssh 키 쌍을 등록해 둬야 합니다. (peaceiris/actions-gh-pages 액션을 보면 workflow 를 걸어 둔 저장소와 같은 저장소로 커밋할 때는 github_token 을 쓰고, 다른 저장소에 커밋할 때는 deploy_key 를 씁니다. <a href="https://github.com/peaceiris/actions-gh-pages#%EF%B8%8F-create-ssh-deploy-key">peaceiris / actions-gh-pages</a>)</p>
 <p>siteSource 에 public 키를, lionhairdino.github.io 에 private 키를 등록합니다.</p>
 <ul>
 <li><p>ssh 키 생성<br>
-<a href="https://help.github.com/en/github/authenticating-to-github/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent#generating-a-new-ssh-key" class="uri">https://help.github.com/en/github/authenticating-to-github/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent#generating-a-new-ssh-key</a></p></li>
+<a href="https://help.github.com/en/github/authenticating-to-github/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent#generating-a-new-ssh-key">Generating a new SSH key and adding it to the ssh-agent</a></p></li>
 <li><p>키 등록<br>
-<a href="https://developer.github.com/v3/guides/managing-deploy-keys/#deploy-keys" class="uri">https://developer.github.com/v3/guides/managing-deploy-keys/#deploy-keys</a></p></li>
+<a href="https://developer.github.com/v3/guides/managing-deploy-keys/#deploy-keys">Managing deploy keys</a></p></li>
 </ul>
 <h2 id="commit-후-push-도-번거롭다">commit 후 push 도 번거롭다</h2>
 <p>VS Code를 이용한다면 Settings -&gt; Extensions -&gt; Git -&gt; Post Commit Command를 push로 선택하면 됩니다. 아마도 다른 툴들도 비슷한 post 액션 설정이 있을겁니다.</p>
 <p>2021.04.29 추가</p>
 <h2 id="캐시">캐시</h2>
-<p><a href="https://docs.github.com/en/actions/guides/caching-dependencies-to-speed-up-workflows#matching-a-cache-key" class="uri">https://docs.github.com/en/actions/guides/caching-dependencies-to-speed-up-workflows#matching-a-cache-key</a></p>
+<p><a href="https://docs.github.com/en/actions/guides/caching-dependencies-to-speed-up-workflows#matching-a-cache-key">Caching dependencies to speed up workflows</a></p>
 <p><code>cache</code> 액션은 현재 실행되는 <code>workflow</code>를 가진 <code>branch</code>에서 <code>key</code> 또는 <code>restore-keys</code>가 일치하는 캐시를 찾습니다. 현재 <code>branch</code>에서 일치하는 캐시가 없을 때는 부모 <code>branch</code>와 <code>upstream branch</code>에서 찾습니다.<br />
 <code>key</code>로 못찾으면 사용할 <code>restore key</code> 목록을 지정할 수 있습니다. 자세한 이름에서 덜 자세한 이름 순서로 지정해서 매칭을 시도합니다.</p>
 <p>복원키 지정</p>

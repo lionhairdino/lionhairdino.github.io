@@ -116,7 +116,7 @@
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">MonadTrans</span> t <span class="kw">where</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="ot">  lift ::</span> <span class="dt">Monad</span> m <span class="ot">=&gt;</span> m a <span class="ot">-&gt;</span> t m a</span></code></pre></div>
 <p>많이 쓰이는 대부분의 트랜스포머(ListT, MaybeT, ExceptT, ReaderT …)들은 모두 MonadTrans의 인스턴스로 라이브러리에 미리 정의되어 있습니다.<br />
-<a href="https://hackage.haskell.org/package/transformers-0.5.6.2/docs/Control-Monad-Trans-Class.html#t:MonadTrans" class="uri">https://hackage.haskell.org/package/transformers-0.5.6.2/docs/Control-Monad-Trans-Class.html#t:MonadTrans</a></p>
+<a href="https://hackage.haskell.org/package/transformers-0.5.6.2/docs/Control-Monad-Trans-Class.html#t:MonadTrans">Control.Monad.Trans.Class</a></p>
 <p>트랜스포머 안에 들어있는 모나드의 액션을 실행하려면 lift를 써서 트랜스포머층으로 끌어 올립니다.</p>
 <p>mtl에는, Monad Transformer만 있는게 아니라, Monad Transformer와 같이 쓸 라이브러리들(MonadReader, MonadState, MonadIO, …)도 같이 있습니다.</p>
 <p>그 중 MonadReader를 살펴 보겠습니다.</p>
@@ -126,7 +126,7 @@
 <p><code>| m -&gt; r</code> functional dependency 문법은 각주 참고 <a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
 <p>Has클래스에서 봤던 아이디어처럼, 한 가지 타입만 ask를 쓸 수 있는게 아니라, <code>MonadReader r m =&gt; ... constraint</code>를 만족하는 여러 타입들도 ask를 쓸 수 있게 됩니다.</p>
 <h2 id="혹시-monadreader의-ask-정의가-궁금한-적-없나요">혹시 MonadReader의 ask 정의가 궁금한 적 없나요?</h2>
-<p><a href="https://hackage.haskell.org/package/transformers-0.5.6.2/docs/src/Control.Monad.Trans.Reader.html#ask" class="uri">https://hackage.haskell.org/package/transformers-0.5.6.2/docs/src/Control.Monad.Trans.Reader.html#ask</a><br />
+<p><a href="https://hackage.haskell.org/package/transformers-0.5.6.2/docs/src/Control.Monad.Trans.Reader.html#ask">Control.Monad.Trans.Reader #ask</a><br />
 여기 <code>ask</code>는 클래스의 메소드로 정의되어 있는 게 아닙니다.<br />
 Control.Monad.Trans.Reader 모듈의 일반 함수입니다.</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ot">ask ::</span> (<span class="dt">Monad</span> m) <span class="ot">=&gt;</span> <span class="dt">ReaderT</span> r m r <span class="co">----- (1)</span></span>
@@ -163,8 +163,8 @@ Control.Monad.Trans.Reader 모듈의 일반 함수입니다.</p>
 <ol>
 <li id="fn1" role="doc-endnote"><p>functional dependencies<br />
 짧게 동작만 설명하면, 매개 변수가 m, r 두 개지만, m이 정해지면 그에 따라 r도 정해진다는 문법입니다. 타입 추론을 거들기 위한 문법입니다.<br />
-필요한 이유 - <a href="https://stackoverflow.com/questions/58947160/why-is-functionaldependency-needed-for-defining-monadreader" class="uri">https://stackoverflow.com/questions/58947160/why-is-functionaldependency-needed-for-defining-monadreader</a><a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn2" role="doc-endnote"><p><a href="https://hackage.haskell.org/package/mtl-2.2.2/docs/src/Control.Monad.Reader.Class.html#MonadReader" class="uri">https://hackage.haskell.org/package/mtl-2.2.2/docs/src/Control.Monad.Reader.Class.html#MonadReader</a><a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+필요한 이유 - <a href="https://stackoverflow.com/questions/58947160/why-is-functionaldependency-needed-for-defining-monadreader">Why is FunctionalDependency needed for defining MonadReader? - stackoverflow</a><a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2" role="doc-endnote"><p><a href="https://hackage.haskell.org/package/mtl-2.2.2/docs/src/Control.Monad.Reader.Class.html#MonadReader">Control.Monad.Reader.Class #MonadReader</a><a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section>
 

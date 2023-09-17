@@ -389,11 +389,11 @@ A. 혹시 Functor의 <code>fmap</code>과 같아 보인다면, 둘의 받는 함
 <p><code>join</code>과 <code>bind(&gt;&gt;=)</code></p>
 <p><code>join</code>이나, <code>&gt;&gt;=</code>나 Effect Computation을 합치는 건 같은데, 겉 모양을 보면, <code>join</code>은 인자가 하나고, <code>&gt;&gt;=</code>는 인자가 두 개입니다. 어떻게 둘이 같다고 볼 수 있는지 살펴 보겠습니다.</p>
 <p><code>m(m a)</code>는 <code>mma</code>로, <code>m a</code>는 <code>ma</code>로, <code>a -&gt; m b</code>는 <code>m</code>으로 표기하겠습니다.</p>
-<pre><code>join mma = mma &gt;&gt;= id = join (fmap id mma)
-ma &gt;&gt;= m = join (fmap m ma) = (fmap m ma) &gt;&gt;= id </code></pre>
+<div class="sourceCode" id="cb27"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>join mma <span class="ot">=</span> mma <span class="op">&gt;&gt;=</span> <span class="fu">id</span> <span class="ot">=</span> join (<span class="fu">fmap</span> <span class="fu">id</span> mma)</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>ma <span class="op">&gt;&gt;=</span> m <span class="ot">=</span> join (<span class="fu">fmap</span> m ma) <span class="ot">=</span> (<span class="fu">fmap</span> m ma) <span class="op">&gt;&gt;=</span> <span class="fu">id</span> </span></code></pre></div>
 <p><code>join</code>으로 표현된 부분만 비교하면</p>
-<pre><code>join (fmap id mma) = join (fmap m ma)
-fmap id mma = fmap m ma</code></pre>
+<div class="sourceCode" id="cb28"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>join (<span class="fu">fmap</span> <span class="fu">id</span> mma) <span class="ot">=</span> join (<span class="fu">fmap</span> m ma)</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="fu">fmap</span> <span class="fu">id</span> mma <span class="ot">=</span> <span class="fu">fmap</span> m ma</span></code></pre></div>
 <p><code>mma</code>를 다르게 써놨을 뿐 둘이 완전히 동일한 동작을 합니다.</p>
 <p><code>m a</code>에 <code>a -&gt; m b</code>를 적용하는 것과<br />
 <code>m((a -&gt; m b) a)</code> 타입 안에서 적용하고 있을 뿐, 둘 다 <code>mmb</code>의 다른 표현입니다.</p>

@@ -92,7 +92,7 @@ LISP의 quasiquotation을 좀 더 복잡한, 컴파일 하는 언어에 맞춰 �
 <p><a href="https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/meta-haskell.pdf">Template Meta-programming for haskell - Tim Sheard, SPJ</a></p>
 <h2 id="section">$(…)</h2>
 <p>Template Haskell은 <em>하스켈 코드를 생성하는 하스켈 코드 작성</em>이 목표입니다. 라이브러리가 Template Haskell을 쓴다고 하면, 제일 먼저 <code>$(...)</code> 구문을 만납니다. 여기다 “하스켈 코드”를 생성하는 하스켈 코드를 넣어주면, Template Haskell 컴파일을 거쳐 생성된 “하스켈 코드”로 대체됩니다. 여기서 “하스켈 코드”를 생성하는 하스켈 코드는</p>
-<pre><code>InfixE (Just (LitE (IntegerL 1))) (VarE GHC.Num.+) (Just (LitE (IntegerL 2)))</code></pre>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">InfixE</span> (<span class="dt">Just</span> (<span class="dt">LitE</span> (<span class="dt">IntegerL</span> <span class="dv">1</span>))) (<span class="dt">VarE</span> <span class="op">GHC.Num.+</span>) (<span class="dt">Just</span> (<span class="dt">LitE</span> (<span class="dt">IntegerL</span> <span class="dv">2</span>)))</span></code></pre></div>
 <p>이런 모양을 넣어주게 됩니다. 보기 까다롭긴 한데, 일반적으로 작성하는 하스켈 문법과 다를 바 없습니다. 이 코드의 의미는 하스켈 문법의 <a href="http://en.wikipedia.org/wiki/Abstract_syntax_tree">AST(Abstract Syntax Tree)</a>입니다.</p>
 <p>※ 사람이 작성한 보통의 하스켈 코드는 GHC가 컴파일 타임에 AST로 뽑아내는데,이 때 나오는 AST와는 다른 것입니다. TH가 하스켈 코드를 생성하기 위한 룰에만 적합한 AST를 따로 만들어서 씁니다.</p>
 <p>예를 들어, 함수를 호출하는 코드 <code>f x</code>의 AST는 <code>AppE (VarE f) (VarE x)</code>입니다. (당장 <code>VarE</code>가 뭔지, <code>AppE</code>가 뭔지 알 필요는 없습니다.) 이런 AST를 만들어서 <code>$(...)</code> 안에 두면, 나중에 Template Haskell 컴파일을 거치면 <code>f x</code>를 써 준 것과 같은 상태가 됩니다. 이하 Template Haskell은 <code>TH</code>로 표기하겠습니다.</p>
@@ -102,10 +102,10 @@ LISP의 quasiquotation을 좀 더 복잡한, 컴파일 하는 언어에 맞춰 �
 <pre><code>[| 1 + 2 |]</code></pre>
 <p>이렇게 쓰면 위와 동일한 AST, 즉 <code>InfixE (Just (...</code>를 생성해 줍니다.<br />
 그 다음, 이 AST를 <code>$(...)</code>에 넣으면, 하스켈 코드를 생성하는 걸 볼 수 있습니다.</p>
-<pre><code>ghci&gt; [| 1 + 2 |]
-InfixE (Just (LitE (IntegerL 1))) (VarE GHC.Num.+) (Just (LitE (IntegerL 2)))
-ghci&gt; $(pure it)
-3</code></pre>
+<div class="sourceCode" id="cb3"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>ghci&gt; [| 1 + 2 |]</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>InfixE (Just (LitE (IntegerL 1))) (VarE GHC.Num.+) (Just (LitE (IntegerL 2)))</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>ghci&gt; $(pure it)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>3</span></code></pre></div>
 <p><code>$(pure it)</code>는 <code>1 + 2</code> 코드를 생성했습니다.<br />
 ※ 여기서 <code>it</code>을 안쓰고 직접 써주면 예상과 달리 오류가 나옵니다.<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
 <p>※ splice <a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> 는 <code>$x</code> 형태로 씁니다. <code>x</code>에는 표현식이 들어 갑니다. 이미 중위 연산자로 쓰이는 <code>$</code>가 있으므로, 이와 구별하기 위해 <code>$</code>와 <code>x</code> 사이에 공백이 있으면 안됩니다. <code>M.x</code>가 중위 연산자 <code>.</code>와 구별하기 위해 붙여쓰는 것과 마찬가지입니다. <code>$</code>와 <code>.</code>을 중위 연산자로 쓰려면 앞뒤로 공백을 넣어 주면 됩니다.</p>
@@ -122,9 +122,9 @@ ghci&gt; $(pure it)
 <p>이 걸 splice에 집어 넣으면, 아래 코드를 생성합니다.</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>(\x <span class="ot">-&gt;</span> (x, x, x))</span></code></pre></div>
 <p>이 코드에 <code>"x"</code> 인자를 주어 실행하면,</p>
-<pre><code>ghci&gt; :set -XTemplateHaskell
-ghci&gt; $(tupleReplicate 3) &quot;x&quot;
-(&quot;x&quot;,&quot;x&quot;,&quot;x&quot;)</code></pre>
+<div class="sourceCode" id="cb8"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>ghci&gt; :set -XTemplateHaskell</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>ghci&gt; $(tupleReplicate 3) &quot;x&quot;</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>(&quot;x&quot;,&quot;x&quot;,&quot;x&quot;)</span></code></pre></div>
 <h3 id="printf">printf</h3>
 <div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>yell file line <span class="ot">=</span> <span class="fu">fail</span> (<span class="op">$</span>(printf <span class="st">&quot;Error in file %s line %d&quot;</span>) file line)</span></code></pre></div>
 <p><code>TH</code>가 아래 코드를 생성합니다.</p>
@@ -143,20 +143,20 @@ ghci&gt; $(tupleReplicate 3) &quot;x&quot;
 <hr />
 <ol>
 <li id="fn1" role="doc-endnote"><p>Identifier는 <code>mkName</code>이나 <code>dyn</code>으로 정의해야 합니다.</p>
-<pre><code>ghci&gt; $(pure $ InfixE (Just (LitE (IntegerL 1))) (VarE GHC.Num.+) (Just (LitE (IntegerL 2))))
-
-&lt;interactive&gt;:56:45: error:
-    • Couldn't match expected type ‘Exp’
-                  with actual type ‘(Name -&gt; Exp) -&gt; Name -&gt; Exp’
-    • In the second argument of ‘InfixE’, namely ‘(VarE +)’</code></pre>
+<div class="sourceCode" id="cb4"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>ghci&gt; $(pure $ InfixE (Just (LitE (IntegerL 1))) (VarE GHC.Num.+) (Just (LitE (IntegerL 2))))</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>&lt;interactive&gt;:56:45: error:</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    • Couldn't match expected type ‘Exp’</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>                  with actual type ‘(Name -&gt; Exp) -&gt; Name -&gt; Exp’</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    • In the second argument of ‘InfixE’, namely ‘(VarE +)’</span></code></pre></div>
 <p>“Variable identifier가 show로 그냥 나온 거예요” - <span class="citation" data-cites="Ailrun">@Ailrun</span></p>
 <p>위와 같이 <code>GHC.Num.+</code>가 코드에 쓰이면 바로 함수로 인식합니다. splice에서 쓰려면 <code>mkName</code>으로 <code>captureable name</code>을 만들어 써야 합니다.</p>
-<pre><code>ghci&gt; :{
-ghci| $(pure $ InfixE (Just (LitE (IntegerL 1)))
-ghci| (VarE $ mkName &quot;GHC.Num.+&quot;)
-ghci| (Just (LitE (IntegerL 2))))
-ghci| :}
-3</code></pre>
+<div class="sourceCode" id="cb5"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>ghci&gt; :{</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>ghci| $(pure $ InfixE (Just (LitE (IntegerL 1)))</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>ghci| (VarE $ mkName &quot;GHC.Num.+&quot;)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>ghci| (Just (LitE (IntegerL 2))))</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>ghci| :}</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>3</span></code></pre></div>
 <p><code>+</code>라는 식별자identifier는 AST에서 쓰려면 mkName으로 정의되어야 합니다.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 <li id="fn2" role="doc-endnote"><p>Splice: 메타 프로그래밍에서 쓰는 용어로, 나중에 대체될 대상들을 의미합니다. <code>TH</code>에서는 <code>$(...)</code>를 의미합니다. 영단어 뜻은 필름과 필름을 이어 붙인 부분을 의미합니다.</p>
 <p>add a splice plate</p>
