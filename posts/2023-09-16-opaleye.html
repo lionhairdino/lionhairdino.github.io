@@ -83,8 +83,8 @@
 
 <p>단순 번역 글은 잘 올리지 않으려 하는데, 이 번 글은 아직 단순 번역 글입니다. 프로젝트 중에 참고할 매뉴얼로 먼저 올려 두고, 실제 사용하면서 알게된 내용들로 보완하도록 하겠습니다.</p>
 <p>SQL-생성generating EDSL을 제공하는 라이브러리 (현재2023까지는 PostgreSQL만 지원)<br />
-하스켈 코드로 써 놓으면 SQL을 생성해 주는데, 이렇게 하면 장점이 타입 체커의 도움을 받을 수 있습니다. Opaleye를 쓰면 Postgres DB 쿼리를 쓸 때 타입 체커를 부려 먹고(typesafe), 합성 가능한(composable) 코드를 작성할 수 있습니다. 당장은 현란한 쿼리를 쓰지 않아서, 고작?! 타입 체커의 안정성을 위해서 또 새로운 걸 익혀야 하는가란 생각도 들지만, 다른 예시들에서 쓰는 걸 가끔 만나니, 일단 맛을 보기로 했습니다. Opaleye를 써서 하스켈 코드로 쿼리를 작성하고, 컴파일을 통과하면 런타임에 뻗지 않는다는 신뢰가 생깁니다.</p>
-<p>타입 체커를 적극적으로 쓰는 예시로 봐둘만 합니다.</p>
+하스켈 코드로 써 놓으면 SQL을 생성해 주는데, 이렇게 하면 장점이 타입 체커의 도움을 받을 수 있습니다. Opaleye를 쓰면 PostgreSQL DB 쿼리를 쓸 때 타입 체커를 부려 먹고(typesafe), 합성 가능한(composable) 코드를 작성할 수 있습니다. 당장은 현란한 쿼리를 쓰지 않아서, 고작?! 타입 체커의 안정성을 위해서 또 새로운 걸 익혀야 하는가란 생각도 들지만, 다른 예시들에서 쓰는 걸 가끔 만나니, 일단 맛을 보기로 했습니다. Opaleye를 써서 하스켈 코드로 쿼리를 작성하고, 컴파일을 통과하면 런타임에 뻗지 않는다는 신뢰가 생깁니다.</p>
+<p>타입 체커를 적극적으로 쓰는 예시로 봐 둘만 합니다.</p>
 <p>다음과 같은 SQL 기능을 제공합니다.<br />
 inner join,<br />
 outer join,<br />
@@ -96,20 +96,19 @@ unions,<br />
 differences<br />
 </p>
 <p>DB 생성이나 Table 생성은 아직 안됩니다.</p>
-<p>아래는 오피셜 Repo에서 제공하는 Basic 튜토리얼을 보며 노트한 내용입니다. 그대로, 번역한게 많은데, 번역 오류가 있을 수 있습니다. 직접 프로젝트에 Opaleye를 쓰려 하고 있기 때문에, 사용하면서 얻게 되는 노하우들로 좀 더 채워 넣도록 하겠습니다.</p>
+<p>아래는 오피셜 Repo에서 제공하는 Basic 튜토리얼을 보며 노트한 내용입니다. 그대로, 번역한 게 많은데, 번역 오류가 있을 수 있습니다. 직접 프로젝트에 Opaleye를 쓰려 하고 있습니다. 사용하면서 얻게 되는 노하우들로 좀 더 채워 넣도록 하겠습니다.</p>
 <p><a href="https://github.com/tomjaguarpaw/haskell-opaleye/blob/master/Doc/Tutorial/TutorialBasic.lhs" class="uri">https://github.com/tomjaguarpaw/haskell-opaleye/blob/master/Doc/Tutorial/TutorialBasic.lhs</a></p>
 <h2 id="스키마">스키마</h2>
 <p>MySQL, Oracle, MSSQL 등에 익숙한 분들에겐 PostgreSQL의 스키마가 혼동을 줄 수 있습니다. 단어 뜻에 어긋나게 쓰는 건 아니지만 조금 다른 걸 지칭하고 있습니다. 다른 DB들에서도 동일한 용어 “스키마”가 여기 저기 쓰이니, 그럴 수 밖에 없습니다. Database, 테이블 사이에서 한 번 더 그룹화하는 개념 혹은 절차가 있다고 볼 수 있습니다.</p>
-<p>저처럼 PostgreSQL의 스키마가 낯선 분은 아래 글을 보시면 도움이 됩니다.<br />
-참고) kimDuBiA님의 <a href="https://kimdubi.github.io/postgresql/pg_schema/">PostgreSQL schema 의미 및 권한관리</a><br />
-</p>
+<p>저처럼 “PostgreSQL의 스키마”가 낯선 분은 아래 글을 보시면 도움이 됩니다.<br />
+참고) kimDuBiA님의 <a href="https://kimdubi.github.io/postgresql/pg_schema/">PostgreSQL schema 의미 및 권한관리</a></p>
 <p><code>table</code> 함수로 테이블을 정의합니다.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Table</span> writeFields viewFields</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="ot">=</span> <span class="dt">Table</span> <span class="dt">String</span> (<span class="dt">TableFields</span> writeFields viewFields)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="op">|</span> tableWithSchema <span class="dt">String</span> <span class="dt">String</span> (<span class="dt">TableFields</span> writeFields viewFields)</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="ot">table ::</span> <span class="dt">String</span> <span class="ot">-&gt;</span> <span class="dt">TableFields</span> writeFields viewFields <span class="ot">-&gt;</span> <span class="dt">Table</span> writeFields viewFields</span></code></pre></div>
-<p>쓸 수 있는 필드, 읽을 수 있는 필드 각각 지정하는데 보통은 같으니까, 대부분의 경우 인자가 같은 걸 두 번 반복합니다.</p>
+<p>쓸 수 있는 필드, 읽을 수 있는 필드 각각 지정하는데 보통은 같으니까, 대부분의 경우 같은 인자를 두 번 반복합니다.</p>
 <p>“필드가 들어 있는 컨테이너의 모양을 설명하는 별도의 컴비네이터”를 써서 간단한 모양으로 테이블을 정의합니다. 여기서는 3튜플을 받는 <code>p3</code> 컴비네이터를 썼습니다.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ot">personTable ::</span> <span class="dt">Table</span> (<span class="dt">Field</span> <span class="dt">SqlText</span>, <span class="dt">Field</span> <span class="dt">SqlInt4</span>, <span class="dt">Field</span> <span class="dt">SqlText</span>)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>                     (<span class="dt">Field</span> <span class="dt">SqlText</span>, <span class="dt">Field</span> <span class="dt">SqlInt4</span>, <span class="dt">Field</span> <span class="dt">SqlText</span>)</span>
@@ -117,7 +116,7 @@ differences<br />
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>                                      , tableField <span class="st">&quot;age&quot;</span></span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>                                      , tableField <span class="st">&quot;address&quot;</span> ))</span></code></pre></div>
 <p>기본값으로, “personTable” 테이블은 PostgreSQL의 디폴트 스키마 “public”을 씁니다. MySQL에서 database에 table이 소속되어 있는 것처럼, 여기선 database에 schema 분류가 있고, 이들 schema에 테이블이 속합니다.<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
-<p>Opaleye 여기 저기서 boilerplate를 피하기 위해 안보이게 타입 클래스가 개입합니다. 사용자는 명시적으로 이들 타입 클래스를 쓸 필요는 없습니다. 타입 클래스가 만들어내는 마법같은 일들은 명시적으로 “typeclass dictionary”를 통해 전달할 수도 있습니다.</p>
+<p>Opaleye 여기 저기서 boilerplate를 피하기 위해 안보이게 타입클래스가 개입합니다. 사용자는 명시적으로 이들 타입클래스를 쓸 필요는 없습니다. 타입클래스가 만들어내는 마법같은 일들은 명시적으로 “typeclass dictionary”를 통해 전달할 수도 있습니다.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ot">personSelect ::</span> <span class="dt">Select</span> (<span class="dt">Field</span> <span class="dt">SqlText</span>, <span class="dt">Field</span> <span class="dt">SqlInt4</span>, <span class="dt">Field</span> <span class="dt">SqlText</span>)</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>personSelect <span class="ot">=</span> selectTable personTable</span></code></pre></div>
 <p><code>personSelect</code>는 아래같은 SQL을 생성합니다.</p>
@@ -131,19 +130,19 @@ differences<br />
 <span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>                   address as address2_1</span>
 <span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>            FROM personTable as T1) as T1) as T1</span></code></pre></div>
 <p>왜 저렇게 뎁스가 들어간 모양이 나오는지 아직 이해하지 못했습니다. 튜토리얼에서는 이렇게 실제 생성한 SQL이 아닌, 아래같이 idealized 버전을 같이 보여주며 설명합니다. Opaleye가 최대한 idealized 버전과 같은 쿼리를 뽑아내면 좋은데, 지금처럼 뽑아내도 PostgreSQL이 쿼리 최적화를 하기 때문에 퍼포먼스에서는 그다지 차이가 없다고 합니다.</p>
-<pre><code>SELECT name,
-       age,
-       address
-FROM personTable</code></pre>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> name,</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>       age,</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>       address</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> personTable</span></code></pre></div>
 <p>※ <code>printSQL</code>은 여기 예시에서만 쓰는 편의용 유틸리티 함수입니다. 글 끝에 정의 코드가 있습니다.</p>
 <h2 id="record-타입">Record 타입</h2>
-<p>Opaleye는 쿼리에 하스켈 record 타입같은 사용자 정의 타입을 쓸 수 있습니다. 데이터 타입의 모든 필드를 폴리모픽하게 만들면 편리합니다. (오히려 폴리모픽 안하게 만들면 안될 것 같은데, 텍스트에선 안된다는 설명은 따로 없습니다.) 특정 코드에서 구체 타입을 사용하려면 대부분 타입 동의어synonym를 씁니다.</p>
+<p>Opaleye는 쿼리에 하스켈 record 타입같은 사용자 정의 타입을 쓸 수 있습니다. 데이터 타입의 모든 필드를 폴리모픽하게 만들면 편리합니다. (아래 예시들을 보면 오히려 폴리모픽 안하게 만들면 안될 것 같은데, 텍스트에선 아예 안된다는 말은 또 따로 없습니다.) 특정 코드에서 구체 타입을 사용하려면 대부분 타입 동의어synonym를 씁니다.</p>
 <p>예시가 좀 특이한데, 주인공은 <code>Birthday</code>가 아니라 <code>Birthday'</code>입니다.</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Birthday'</span> a b <span class="ot">=</span> <span class="dt">Birthday</span> {<span class="ot"> bdName ::</span> a,<span class="ot"> bdDay ::</span> b }</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">Birthday</span>      <span class="ot">=</span> <span class="dt">Birthday'</span> <span class="dt">String</span> <span class="dt">Day</span></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">BirthdayField</span> <span class="ot">=</span> <span class="dt">Birthday'</span> (<span class="dt">Field</span> <span class="dt">SqlText</span>) (<span class="dt">Field</span> <span class="dt">SqlDate</span>)</span></code></pre></div>
-<p><code>Birthday</code>,<code>BirthdayField</code> 둘 모두 <code>Birthday'</code>의 synonym입니다. 이렇게 쓰려면 <strong><em>모든 필드를 폴리모픽</em></strong>하게 써야합니다. 반드시 이렇게 해야만 할 것 같은데, 아니게 하는 방법도 있나 본데, 아직 잘 모르겠습니다.<br />
-사용자 정의 타입이, 뒷단에서 안보이게 돌아가는 “타입 클래스 매직”과 작동하게 하려면 (어떤 타입 클래스?) 인스턴스를 가져야 합니다. 인스턴스는 템플릿 하스켈을 통해 만들 수 있습니다.</p>
+<p><code>Birthday</code>, <code>BirthdayField</code> 둘 모두 <code>Birthday'</code>의 synonym입니다. 이렇게 쓰려면 <strong><em>모든 필드를 폴리모픽</em></strong>하게 써야합니다. 반드시 이렇게 해야만 할 것 같은데, 아니게 하는 방법이 있는지 없는지 아직 잘 모르겠습니다.<br />
+사용자 정의 타입이, 뒷단에서 안보이게 돌아가는 “타입클래스 매직”과 작동하게 하려면 (어떤 타입클래스?) 인스턴스를 가져야 합니다. 인스턴스는 템플릿 하스켈을 통해 만들 수 있습니다.</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="op">$</span>(makeAdaptorAndInstance <span class="st">&quot;pBirthday&quot;</span> '<span class="dt">'Birthday'</span>)</span></code></pre></div>
 <p>이렇게 사용자 정의 타입이 준비되면, 위에서 했던 방식으로 테이블을 만들 수 있습니다. 위 예시에서 <code>p3</code> 컴비네이터가 빠지고, 그 자리에 <code>pBirthday</code>가 들어갔습니다. 그냥 3튜플을 쓸 때는 <code>p3</code>같은 것들의 도움을 받고, 테이블 스키마와 유사한 레코드 타입을 만들면, 그 걸 바로 써도 되는 것 같습니다.</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- 위에서 쓸 수 있는 필드, 읽을 수 있는 필드를 지정하는 걸</span></span>
@@ -155,22 +154,22 @@ FROM personTable</code></pre>
 <span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="ot">birthdaySelect ::</span> <span class="dt">Select</span> <span class="dt">BirthdayField</span></span>
 <span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>birthdaySelect <span class="ot">=</span> selectTable birthdayTable</span></code></pre></div>
-<pre><code>ghci&gt; printSql birthdaySelect
-SELECT name0_1 as result1
-       birthday1_1 as result2
-FROM (SELECT *
-      FROM (SELECT name as name0_1
-                   birthday as birthday1_1
-            FROM birthdayTable as T1) as T1) as T1
-
-idealized SQL:
-
-SELECT name,
-       birthday
-FROM birthdayTable</code></pre>
+<div class="sourceCode" id="cb11"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>ghci&gt; printSql birthdaySelect</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>SELECT name0_1 as result1</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>       birthday1_1 as result2</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>FROM (SELECT *</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>      FROM (SELECT name as name0_1</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>                   birthday as birthday1_1</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>            FROM birthdayTable as T1) as T1) as T1</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>idealized SQL:</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>SELECT name,</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>       birthday</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>FROM birthdayTable</span></code></pre></div>
 <p>아직은 너무 단순한 쿼리들만 보다 보니 이렇게까지 해야만 하나 싶은 생각이 들긴 합니다. 그냥 idealized 쿼리를 손으로 쓰는 게, 직관전이고 더 낫지 않을까 싶은데요. 아마도 복잡한 쿼리를 만나, 타입 체커의 도움을 받는 예시를 봐야 수긍이 갈 것 같습니다.</p>
 <h2 id="projection">Projection</h2>
-<p><code>select</code>에서 일부 필드를 무시하는 걸 Projection이라 합니다. 위 <code>personSelect</code>에서 <code>address</code>를 무시하길 원한다고 칩시다. 아래 첫번째 예시처럼 Opaleye 퀴를 작성하는데, <code>do</code>표기 방식을 쓸 수 있습니다.</p>
+<p><code>select</code>에서 일부 필드를 무시하는 걸 Projection이라 합니다. 위 <code>personSelect</code>에서 <code>address</code>를 무시하길 원한다고 칩시다. 아래 첫 번째 예시처럼 Opaleye 쿼리를 생성하는데 <code>do</code>표기 방식을 쓸 수 있습니다.</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ot">nameAge ::</span> <span class="dt">Select</span> (<span class="dt">Field</span> <span class="dt">SqlText</span>, <span class="dt">Field</span> <span class="dt">SqlInt4</span>)</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>nameAge <span class="ot">=</span> <span class="kw">do</span></span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  (name, age, _) <span class="ot">&lt;-</span> personSelect</span>
@@ -266,11 +265,11 @@ FROM birthdayTable</code></pre>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> aOrNo <span class="ot">=</span> ifThenElse (isNull nullableBoss) (sqlString <span class="st">&quot;no&quot;</span>) (sqlString <span class="st">&quot;a&quot;</span>)</span>
 <span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pure</span> <span class="op">$</span> name <span class="op">.++</span> sqlString <span class="st">&quot; has &quot;</span> <span class="op">.++</span> aOrNo <span class="op">.++</span> sqlString <span class="st">&quot; boss&quot;</span></span></code></pre></div>
-<pre><code>idealized SQL:
-
-SELECT name || ' has '
-            || CASE WHEN boss IS NULL THEN 'no' ELSE 'a' END || ' boss'
-FROM emplyeeTable</code></pre>
+<div class="sourceCode" id="cb21"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>idealized SQL:</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>SELECT name || ' has '</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>            || CASE WHEN boss IS NULL THEN 'no' ELSE 'a' END || ' boss'</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>FROM emplyeeTable</span></code></pre></div>
 <p><code>null</code>인지 체크하는데 그치지 않고 <code>matchNullable</code>로 좀 더 기능을 추가할 수도 있습니다.</p>
 <div class="sourceCode" id="cb22"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="ot">bossSelect ::</span> (<span class="dt">Field</span> sqlText, <span class="dt">FieldNullable</span> <span class="dt">SqlText</span>) <span class="ot">-&gt;</span> <span class="dt">Select</span> (<span class="dt">Field</span> <span class="dt">SqlText</span>)</span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>bossSelect (name, nullableBoss) <span class="ot">=</span> <span class="kw">do</span></span>
@@ -288,7 +287,7 @@ FROM emplyeeTable</code></pre>
 <h2 id="composability">Composability</h2>
 <p><code>twentiesAtAddress</code>를 고치면서 Opaleye가 제공하는 다양한 Composability를 살펴 보겠습니다.</p>
 <p><code>twentiesAtAddress</code> <code>select</code>에서 특정 요소를 뽑아낼 수 있습니다. 나이가 20대면서, 주소가 “1 My Street, My Town”라는 조건을 꺼내 보겠습니다.<br />
-<code>SelectArr a ()</code>은 <code>a</code>타입 필드를 읽고, 어떤 필드도 리턴하지 않습니다.(Noth: <code>Select</code>는 <code>SelectArr ()</code>의 동의어입니다. 어떤 필드도 읽지 않는다는 <code>SelectArr</code>이란 뜻입니다.)</p>
+<code>SelectArr a ()</code>은 <code>a</code>타입 필드를 읽고, 어떤 필드도 리턴하지 않습니다.(Note: <code>Select</code>는 <code>SelectArr ()</code>의 동의어입니다. 어떤 필드도 읽지 않는 <code>SelectArr</code>이란 뜻입니다.)</p>
 <div class="sourceCode" id="cb24"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="ot">restrictIsTwenties ::</span> <span class="dt">Field</span> <span class="dt">SqlInt4</span> <span class="ot">-&gt;</span> <span class="dt">Select</span> () <span class="co">-- 어떤 필드도 읽지 않는다.</span></span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>restrictIsTwenties age <span class="ot">=</span> <span class="kw">do</span></span>
 <span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>  where_ <span class="op">$</span> (<span class="dv">20</span> <span class="op">.&lt;=</span> age) <span class="op">.&amp;&amp;</span> (age <span class="op">.&lt;</span> <span class="dv">30</span>)</span>
@@ -356,7 +355,7 @@ FROM emplyeeTable</code></pre>
 <span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>                                             , radius <span class="ot">=</span> avg</span>
 <span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>                                             })</span>
 <span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>                             (selectTable widgetTable)</span></code></pre></div>
-<p><code>widgetTable</code>과 <code>aggregateWidgets</code>에서 Template Haskell이 유도한 코드의 쓰임을 좀 더 정확히 볼 수 있습니다. <code>pWidget</code>을 어떻게 필드들이 aggregate되는지 지정하기 위해 “adaptor”로 썼습니다?(<span class="citation" data-cites="todo">@todo</span> 번역이 확실치 안습니다.) <code>count</code> aggregator는 <code>Field String</code>을 <code>Field Int64</code>로 바꾸는데, 데이터 타입을 폴리모픽하게 해서 해결하는 또 다른 예시입니다.</p>
+<p><code>widgetTable</code>과 <code>aggregateWidgets</code>에서 Template Haskell이 유도한 코드의 쓰임을 좀 더 정확히 볼 수 있습니다. <code>pWidget</code>을 어떻게 필드들이 aggregate되는지 지정하기 위해 “adaptor”로 썼습니다?(<span class="citation" data-cites="todo">@todo</span> 번역이 확실치 않습니다.) <code>count</code> aggregator는 <code>Field String</code>을 <code>Field Int64</code>로 바꾸는데, 데이터 타입을 폴리모픽하게 해서 해결하는 또 다른 예시입니다.</p>
 <h2 id="outer-join">Outer join</h2>
 <p>left join을 지원합니다. Full outer join과 right join은 아직 없습니다. left join은 <code>nullable</code> 필드가 아닌 걸 <code>nullable</code>로 바꿀 수도 있기 때문에, 출력이 <code>Nullability</code>을 지원하는지 잘 봐야 합니다. 이렇게 하기 위해 다음 타입 동의어synonym를 소개합니다.</p>
 <div class="sourceCode" id="cb30"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">FieldNullableBirthday</span> <span class="ot">=</span> <span class="dt">Birthday'</span> (<span class="dt">FieldNullable</span> <span class="dt">SqlText</span>)</span>
@@ -366,9 +365,9 @@ FROM emplyeeTable</code></pre>
 <span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>                                 <span class="dt">FieldNullableBirthday</span>)</span>
 <span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>personBirthdayLeftJoin <span class="ot">=</span> leftJoin perseonSelect birthdaySelect eqName</span>
 <span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span> eqName ((name, _, _), birthdayRow) <span class="ot">=</span> name <span class="op">.==</span> bdName birthdayRow</span></code></pre></div>
-<p>boilerplate를 피하기 위해 Opaleye는 보이지 않게 타입클래스 매직을 씁니다. 이 것 때문에 의외로 컴파일러가 타입 추론을 잘 못하는 경우가 생깁니다. <code>leftJoin</code>이 바로 이런 경우입니다. 이럴 때는 타입 서명을 직접 명시해줘야 합니다. 컴파일러가 <code>Default</code> 인스턴스가 뭔지 모르겠다 하면, 타입 지정을 수동으로 해줘야 합니다.</p>
+<p>boilerplate를 피하기 위해 Opaleye는 보이지 않게 타입클래스 매직을 씁니다. 그런데, 컴파일러가 타입 추론을 잘 못하는 경우가 있다고 합니다. <code>leftJoin</code>이 바로 이런 경우라 합니다. 이럴 때는 타입 서명을 직접 명시해줘야 합니다. 컴파일러가 <code>Default</code> 인스턴스가 뭔지 모르겠다 하면, 타입 지정을 수동으로 해줘야 합니다.</p>
 <h2 id="newtypes">Newtypes</h2>
-<p>새 타입은, 예를 들어, 창고 ID는 <code>integer</code>지만, <code>WarehouseId</code>란 새로운 타입으로 만들어, 창고를 나타내지 않는 <code>integer</code>들과 섞이는 걸 막는 역할을 합니다. Opaleye에서도 비슷한 일을 할 수 있습니다.</p>
+<p><code>newtype</code>은, 예를 들어, 창고 ID는 <code>integer</code>지만, <code>WarehouseId</code>란 새로운 타입으로 만들어, 창고를 나타내지 않는 <code>integer</code>들과 섞이는 걸 막는 역할을 합니다. Opaleye에서도 비슷한 일을 할 수 있습니다.</p>
 <div class="sourceCode" id="cb32"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Warehouse'</span> a b c <span class="ot">=</span> <span class="dt">Warehouse</span> {<span class="ot"> wId       ::</span> a</span>
 <span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>                                  ,<span class="ot"> wLocation ::</span> b</span>
 <span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>                                  ,<span class="ot"> wNumGoods ::</span> c }</span>
@@ -408,11 +407,11 @@ FROM emplyeeTable</code></pre>
 <span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>--</span>
 <span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>-- =&gt; Couldn't match type `WarehouseId' (Field SqlInt4)' with `Field SqlInt4'</span></code></pre></div>
 <p>밑줄친 부분은 같지만, <code>id</code>는 <code>WarehouseId</code>가 붙어 있습니다.</p>
-<h2 id="postgres에로-쿼리-날리기">Postgres에로 쿼리 날리기</h2>
-<p><code>runSelect</code>는 Postgres에 효과적으로 쿼리를 날려주는 <code>typeclass</code> 폴리모픽 함수입니다.</p>
+<h2 id="postgresql에로-쿼리-날리기">PostgreSQL에로 쿼리 날리기</h2>
+<p><code>runSelect</code>는 PostgreSQL에 효과적으로 쿼리를 날려주는 타입클래스 폴리모픽 함수입니다.</p>
 <div class="sourceCode" id="cb37"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- runSelect :: Database.PostgreSQL.Simple.Connection</span></span>
 <span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="co">--           -&gt; Select fields -&gt; IO [haskells]</span></span></code></pre></div>
-<p>Opaleye의 레코드를 하스켈 Value의 레코드의 리스트로 변환합니다. <code>leftJoin</code>처럼 이 특별한 동작은 typeclass를 이용합니다. error 메시지를 보기 좋게 하려면, 최대한 모든 것에 타입 서명을 붙여 줘야 합니다.</p>
+<p>Opaleye의 레코드를 하스켈 Value의 레코드의 리스트로 변환합니다. <code>leftJoin</code>처럼 이 특별한 동작은 타입클래스를 이용합니다. error 메시지를 보기 좋게 하려면, 최대한 모든 것에 타입 서명을 붙여 줘야 합니다.</p>
 <p><code>twentiesAtAddress</code>는 다음 타입을 가진 <code>runSelect</code>를 고릅니다.</p>
 <div class="sourceCode" id="cb38"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="ot">runTwentiesSelect ::</span> <span class="dt">PGS.Connection</span></span>
 <span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>                  <span class="ot">-&gt;</span> <span class="dt">Select</span> (<span class="dt">Field</span> <span class="dt">SqlText</span>, <span class="dt">Field</span> <span class="dt">SqlInt4</span>, <span class="dt">Field</span> <span class="dt">SqlText</span>)</span>
@@ -423,7 +422,7 @@ FROM emplyeeTable</code></pre>
 <span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>                   <span class="ot">-&gt;</span> <span class="dt">Select</span> (<span class="dt">Field</span> <span class="dt">SqlText</span>, <span class="dt">FieldNullable</span> <span class="dt">SqlText</span>)</span>
 <span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>                   <span class="ot">-&gt;</span> <span class="dt">IO</span> [(<span class="dt">String</span>, <span class="dt">Maybe</span> <span class="dt">String</span>)]</span>
 <span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>runEmployeesSelect <span class="ot">=</span> runSelect</span></code></pre></div>
-<p><code>makeAdaptorAndInstance</code>가 생성한 typeclass instance에 의해 Newtype은 자동으로 관리 됩니다. select가 실행되면 <code>WarehoustId' (Field SqlInt4)</code>는 <code>WarehoustId' Int</code>가 됩니다. 아래처럼 <code>selectTable goodWarehoustTable</code> select를 실행합니다.</p>
+<p><code>makeAdaptorAndInstance</code>가 생성한 타입클래스 인스턴스에 의해 <code>newtype</code>은 자동으로 관리 됩니다. select가 실행되면 <code>WarehoustId' (Field SqlInt4)</code>는 <code>WarehoustId' Int</code>가 됩니다. 아래처럼 <code>selectTable goodWarehoustTable</code> select를 실행합니다.</p>
 <div class="sourceCode" id="cb40"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">WarehouseId</span> <span class="ot">=</span> <span class="dt">WarehouseId'</span> <span class="dt">Int</span></span>
 <span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">GoodWarehouse</span> <span class="ot">=</span> <span class="dt">Warehouse'</span> warehouseId <span class="dt">Strinng</span> <span class="dt">Int</span></span>
 <span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -438,7 +437,7 @@ FROM emplyeeTable</code></pre>
 <section class="footnotes" role="doc-endnotes">
 <hr />
 <ol>
-<li id="fn1" role="doc-endnote"><p>OS로 따지면 디렉토리와 유사합니다. 스키마는 views, indexes, sequences, data types, operator, functions shcema를 포함할 수 있습니다. 보통 DB에서 스키마라 하면 DB 구조(개체, 속성, 관계)와 제약 조건에 대한 정의를 지칭합니다. PostgreSQL은 스키마 안에 테이블을 만든다고 보면 됩니다. 다음 명령어로 스키마를 생성할 수 있습니다.</p>
+<li id="fn1" role="doc-endnote"><p>OS로 따지면 디렉토리와 유사합니다. 스키마는 views, indexes, sequences, data types, operator, functions shcema를 포함할 수 있습니다. 보통 DB에서 스키마라 하면 DB 구조(개체, 속성, 관계)와 제약 조건에 대한 정의를 지칭합니다. PostgreSQL에서도 뜻을 달리 쓰는 건 아닙니다. PostgreSQL은 스키마 안에 테이블을 만든다고 보면 됩니다. 다음 명령어로 스키마를 생성할 수 있습니다.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">SCHEMA</span> name;</span></code></pre></div>
 <p>Schema안에 테이블 생성하기</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">TABLE</span> myschema.mytable( <span class="op">..</span>. );</span></code></pre></div>
