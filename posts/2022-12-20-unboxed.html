@@ -88,12 +88,12 @@
 ※ 무한 루프처럼 값을 돌려주지 않을 때의 반환값을 <code>bottom</code>이라 하니, “<code>bottom</code>이 들어 있다는 잘못된 표현”입니다. 여기서는 결과 형태가 “한 가지”가 아니라는 의미로 썼습니다.</p>
 <p>무언가 타입으로 감싼다wrap는 것도, 위와 같은 목표를 포함하고 있습니다. 여러 요소를 묶어 하나로 부를 수 있게, 같은 타입으로 취급할 수 있게 해주는, 즉 <em>추상화</em>를 하는 방법입니다. <code>Just n</code>도 <code>Nothing</code>도 <code>Maybe</code>로 취급할 수 있습니다. 이런 의미를 알면, Boxed이면 뭔가 추상화 할 것으로 금방 추측 할 수 있습니다.</p>
 <h2 id="boxed">Boxed</h2>
-<pre><code>포인터 -----&gt; 힙: Value1 | &lt;thunk&gt;</code></pre>
+<div class="sourceCode" id="cb1"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>포인터 -----&gt; 힙: Value1 | &lt;thunk&gt;</span></code></pre></div>
 <p>힙에 있는 객체를 가리키는 포인터입니다. 하스켈은 Lazy 때문에 <code>&lt;thunk&gt;</code>로 머물러 있다가, 평가되면 값으로 바뀌어야 합니다. 적어도 두 가지 형태를 하나로 볼 수 있어야 합니다. 포인터로 두면 <code>&lt;thunk&gt;</code>를 가리키거나 <code>평가된 값</code>을 가리킬 수 있게 됩니다. (<code>&lt;thunk&gt;</code>가 있어야 boxed라고 하는 게 아니라, 힙에 넣어두고 포인팅하기만 하면 boxed입니다.)</p>
 <p>예) <code>Int</code>는 2Word 크기의 힙 객체를 가리키는 포인터입니다.</p>
 <p>※ unboxed 값 보다는 한 단계 과정을 거쳐야 하니, 당연히 unboxed보다는 퍼포먼스가 좋지 않고, 컴파일러 unboxed 타입으로 바꿀 수 있으면, 컴파일 과정에서 unboxed로 바꿉니다.</p>
 <h2 id="unboxed">Unboxed</h2>
-<pre><code>Int#</code></pre>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Int</span><span class="op">#</span></span></code></pre></div>
 <p>포인터가 아니라, 값 자체로 raw machine 타입입니다.<br />
 예) <code>Int#</code>은 C의 <code>long int</code><br />
 <code>Double#</code>은 C의 <code>double</code><br />
@@ -106,7 +106,7 @@ primitive가 붙은 것들은 하스켈로 코드로 구현되어 있지 않다�
 <h3 id="unboxed-tuple-unboxed-sums">Unboxed tuple, Unboxed sums</h3>
 <h2 id="lifted">Lifted</h2>
 <p>※ Bottom은 값을 반환하지 않는 걸 의미하니, <code>0 | 1 | Bottom</code>을 쓴다고 <code>Bottom</code>이 어떤 값을 의미하는 건 아닙니다. 그저 선택지 중 하나임을 표시합니다.</p>
-<pre><code>포인터 -----&gt; 힙: Value1 | &lt;thunk&gt; | Bottom</code></pre>
+<div class="sourceCode" id="cb3"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>포인터 -----&gt; 힙: Value1 | &lt;thunk&gt; | Bottom</span></code></pre></div>
 <p><code>Bottom</code>이 될 수 있는 타입을 lifted 타입이라 부르고,
 예) 가능한 값<code>0 | 1 | 2 | 3...</code>이 있는 <code>Int#</code> 타입에 <code>Bottom</code>을 추가해서 <code>0 | 1 | 2 | 3...| Bottom</code>이 되는 걸 lifted 되었다고 표현합니다. 포인터로 가리키지 않는, primitive 타입들로는 <code>Bottom</code>을 표현할 수가 없습니다. <code>Int</code>는 <code>Int# | Bottom</code>를 가리키는 것으로 볼 수 있습니다.</p>
 <p>※ 기존 것에 무언가 추가된 요소, 즉 다시 말해, 기존 세계와 비슷하지만 어떤 요소가 추가된 세계로 바뀌었을 때 쓰는 표현입니다. 펑터로 변형되어 추가적인 어떤 요소가 있는 타입으로 바뀌는 걸 lifted 되었다고 말하기도 합니다. 여기 4가지 형태를 거론할 때는 특히 <code>Bottom</code>이 가능하냐 안하냐로 읽으면 무리가 없습니다.</p>
