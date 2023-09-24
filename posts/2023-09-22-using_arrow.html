@@ -81,6 +81,8 @@
     
 </div>
 
+<p>Sun Sep 24 03:19:40 AM KST 2023 아직 이해하지 못한 부분이 있어 계속 정리 중인 글입니다. 대부분 아직 상상입니다. 모나드보다 표현력이 좋다하지만, 모나드로 표현할 수 있는 건 굳이 Arrow로 표현하진 않는 것 같습니다. 어떤 문제, 대상을 보면 Arrow를 떠올려야 할지 찾고 있습니다.</p>
+<p>Arrow가 무엇인지는 <a href="../posts/2023-09-14-arrow.html">Arrow는 모나드의 일반화</a>에 정리해 두었습니다. 여기선 언제 Arrow를 쓸 생각을 하면 되는지 찾는 게 목표입니다.</p>
 <h2 id="생각-스트레칭">생각 스트레칭</h2>
 <p><code>a -&gt; m b</code>를 받는 함수와 <code>m a</code>를 받는 함수 중 어느 게 더 표현력이 좋을까요? 혹은 더 추상적일까요?<br />
 말을 바꾸면, 함수와 타입 중 어느 게 더 표현력이 좋을까요?
@@ -128,8 +130,8 @@ Arrow 설명부터 활용까지 잘 나와 있는 위키북스에 있는 글인�
 <li>이들 중 하나가 있다면, 해당 글자에 따라 다음 파서를 고른다.</li>
 </ul>
 <p>제안한 방법은, 각 파서들이 <code>첫글자파서 + 나머지파서</code>를 가지고 있게 만듭니다. 텍스트에서는 나오지 않지만, 헛갈리지 않게 둘을 합친 파서를 <code>전체파서</code>라고 부르겠습니다. <code>전체파서</code> 둘을 받아 묶어 놓으려면, <code>첫글자파서</code>끼리 묶고, <code>나머지파서</code>끼리 묶어 놓아야 합니다. 그래야 <code>첫글자파서</code>만 먼저 돌리는게 가능할테니까요.</p>
-<p><code>전체파서 = 첫글자파서 + 나마저파서</code></p>
-<p>이렇게 생긴 것 세 개를 합성하면</p>
+<p><code>전체파서 = 첫글자파서 + 나머지파서</code></p>
+<p>이렇게 생긴 것 세 개를 합성한다면</p>
 <p><code>(첫글자파서1 | 첫글자파서2 | 첫글자파서3)</code> 를 먼저 돌리고,<br />
 다음 돌리는 <code>나머지파서</code>는, 모두 돌릴 필요없이 <em>이전 결과에 따라 돌릴 파서를 선택</em>해야 합니다. 최종 합성한 <code>전체파서</code> 모양을 추측해보면,</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>전체파서 =</span>
@@ -166,13 +168,13 @@ Arrow 설명부터 활용까지 잘 나와 있는 위키북스에 있는 글인�
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="ot">spCharA ::</span> <span class="dt">Char</span> <span class="ot">-&gt;</span> <span class="dt">StaticParser</span> <span class="dt">Char</span></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>spCharA c <span class="ot">=</span> <span class="dt">SP</span> <span class="dt">False</span> [c]</span>
 <span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co">--             ^^^^^ ^^^</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>                 <span class="op">|</span>   시작 글자</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>                 <span class="op">|</span>   첫 글자 목록</span>
 <span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>                 <span class="op">|</span></span>
 <span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>               빈 문자열 못받음</span></code></pre></div>
 <p>위 정적 파서 <code>spCharA</code>는 첫 글자 <code>c</code>를 위한 파서이며, 빈 문자열은 받지 못합니다.</p>
 <blockquote>
 <p>Q. 빈 문자열을 받을 수 있는지 여부를 왜 갖고 있어야 할까요?<br />
-빈 문자열은 보통 에지 케이스로 쓰이는 경우가 많습니다. 재귀를 돌다가 빈 문자열이 되면 멈춘다든지 할 때 쓰입니다. 뒤에 나오는 <code>runParser</code>의 동작을 보면, 빈 문자열 플래그가 <code>True</code>이고, 빈 문자열 <code>[]</code>이 들어오면, 바로 동적 파서에 <code>(초기값, [])</code>을 넘겨 실행시킵니다.</p>
+빈 문자열은 보통 에지 케이스로 쓰이는 경우가 많습니다. 문자열을 받아 조금씩 먹으며 재귀를 돌다가 빈 문자열이 되면 멈춘다든지 할 때 쓰입니다. 뒤에 나오는 <code>runParser</code>의 동작을 보면, 빈 문자열 플래그가 <code>True</code>이고, 빈 문자열 <code>[]</code>이 들어오면, 바로 동적 파서에 <code>(초기값, [])</code>을 넘겨 실행시킵니다.</p>
 <p>추측1) 동적 파서가 빈 문자열이 들어와서 오류가 났다는 결과를 내뱉을 수 있다면, 빈 문자열이 의미 있을 수도 있겠습니다.</p>
 <p>추측2) 만일 동적 파서가 빈 문자열 처리를 할 수 없다면, 이 옵션을 <code>False</code>로 만들어 정적 파서에서 걸러낼 수 있습니다. 아래에 나오는 <code>dpCharA</code> 같은 동적 파서는 <code>_:xs</code>로 패턴 매칭하므로, 빈 입력 문자열은 동적 파서까지는 오지 말아야 합니다.
 아래 Arrow 인스턴스를 만들 대 <code>arr</code>이 옵션을 <code>True</code>로 쓰고 있습니다.<br />
@@ -227,9 +229,10 @@ Arrow 설명부터 활용까지 잘 나와 있는 위키북스에 있는 글인�
 <p>지금까지는 <code>전체파서</code>가 “한 글자”를 파싱하는 작업이었습니다. <code>runParser</code><a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> 서명을 보면, <code>전체파서</code>와 초기값 <code>a</code>를 받아 <code>[s] -&gt; Maybe (b, [s])</code> 함수를 반환합니다. 모나드 액션과 같은 타입입니다.</p>
 <p><code>Arrow</code>로 넘어가기 숨 차네요. 왜 필요한지 보이기 위한 “상황” 자체를 이해하는 것도 쉽지 않습니다.</p>
 <h3 id="arrow-컴비네이터-활용">Arrow 컴비네이터 활용</h3>
+<p><code>전체파서</code>에서 <code>동적파서</code>는 2튜플을 넣어 주며 “<em>실행</em>”하게 되지만, <code>정적파서</code>는 별다른 “실행” 없어도 어떻게 생겼는지 볼 수 있습니다. <code>전체파서</code> 3개를 합성했다면, <code>P (SP (True &amp;&amp; False &amp;&amp; True) ['a','b','c']) (...동적 파서 합성...)</code> 모양이 되고, 언제든 패턴 매칭만으로 <code>SP</code>를 꺼낼 수 있습니다. 외부 입력 값에 따라 <code>SP</code> 값은 변하지 않지만, <code>DP</code>는 값이 변합니다. 만일, 타입과 타입을 연결하는 게 아니라, 함수와 함수를 연결한다면, “정적”인 정보를 둘 데가 없습니다. 정적인 정보가 병행하는 게 보이면 <code>Arrow</code>를 떠올려야 할 때입니다.</p>
 <div class="sourceCode" id="cb17"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Eq</span> s <span class="ot">=&gt;</span> <span class="dt">Arrow</span> (<span class="dt">Parser</span> s) <span class="kw">where</span></span></code></pre></div>
 <div class="sourceCode" id="cb18"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>  arr f <span class="ot">=</span> <span class="dt">P</span> (<span class="dt">SP</span> <span class="dt">True</span> []) (<span class="dt">DP</span> (\(b,s) <span class="ot">-&gt;</span> (f b, s)))</span></code></pre></div>
-<p><code>arr</code>은 보통의 함수를 Arrow로 바꿔 줍니다. <code>arr</code> 적용해 얻은 Arrow는 빈 문자열만 받을 수 있고, 나중에 <code>runParser</code>를 돌릴 때, 동작할 수 있도록 동적 파서에 <code>f</code>를 끼워 놓습니다. 별다른 작업은 안하고 arrow 흐름 안에 <code>f</code>를 적용하는 인터페이스 입니다. 파싱 결과에만 <code>f</code>를 적용할 뿐, 입력 문자열을 먹는다거나 하지 않습니다.</p>
+<p><code>arr</code>은 보통의 함수를 Arrow로 바꿔 줍니다. <code>arr</code> 적용해 얻은 Arrow는 파싱할 첫 글자가 없고, 동적 파서에서도 문자열을 먹거나 하지 않습니다. 나중에 <code>runParser</code>를 돌릴 때, 동작할 수 있도록 동적 파서에 <code>f</code>를 끼워 놓기만 합니다. 별다른 작업은 안하고 Arrow 흐름 안에 <code>f</code>를 적용하는 인터페이스 입니다.</p>
 <div class="sourceCode" id="cb19"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>  first (<span class="dt">P</span> sp (<span class="dt">DP</span> p)) <span class="ot">=</span> (<span class="dt">P</span> sp (<span class="dt">DP</span> (\((b,d),s) <span class="ot">-&gt;</span> </span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> (c, s') <span class="ot">=</span> p (b, s) <span class="co">-- (b,d)에서 앞에 b에만 동적 파서p 적용</span></span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">in</span>  ((c, d), s')))) <span class="co">-- b는 c로 바뀌었지만, d는 손대지 않고 그대로 내보낸다.</span></span></code></pre></div>
@@ -267,6 +270,7 @@ Arrow 설명부터 활용까지 잘 나와 있는 위키북스에 있는 글인�
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>              (-&gt;) a mb  &gt;=&gt;                (-&gt;) b mc</span>
 <span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>ArrowInstance (-&gt;) a  b  &gt;&gt;&gt;  ArrowInstnace (-&gt;) b  c</span></code></pre></div>
 <p>함수를 합성할 때마다, 반복되는 어떤 작업 (Effect를 잃어버리지 않기 위한 작업)이 있다면, 모나드 인터페이스가 딱이었습니다.</p>
+<p>Sun Sep 24 03:20:50 AM KST 2023 작성 중…</p>
 <section class="footnotes" role="doc-endnotes">
 <hr />
 <ol>
