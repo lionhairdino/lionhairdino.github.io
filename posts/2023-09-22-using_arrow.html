@@ -257,24 +257,26 @@ Arrow 설명부터 활용까지 잘 나와 있는 위키북스에 있는 글인�
 <p><code>charA</code>가 가진 동적 파서가 하는 일을 봐서는, 이렇게 합성하면 안될 게 뻔히 보입니다. 앞의 한 글자 파싱 예시가 어떻게 다음으로 연결되는지 아직 모르겠습니다.</p>
 <p>Sun Sep 24 03:07:26 AM KST 2023 작성 중…</p>
 <h2 id="모나딕으로-조합한-파서와-차이">모나딕으로 조합한 파서와 차이</h2>
-<p>첫 글자 파서를 두는 건 모나드로 표현 못한다고 하는데, 왜 그럴까요? <code>Do</code>를 파싱 중이면,
-- 첫 글자 파서 없으면, <code>D</code>에서 실패하나, <code>o</code>에서 실패하나 다음으로 가는 길이 같고,
-- 첫 글자 파서를 두면, <code>D</code>에서 실패와 <code>o</code>에서 실패가 다음 가는 길이 다릅니다.</p>
+<p>첫 글자 파서를 두는 건 모나드로 표현 못한다고 하는데, 왜 그럴까요? “<code>Do</code>”를 파싱 중이면,</p>
 <blockquote>
 <p>Q. 왜 첫 글자 파서를 운용할 때는 static infomation이 필요할까?</p>
 </blockquote>
-<p>Arrow 인터페이스는 두 개의 파서(정적, 동적)를 transparently compose and manipulate할 수 있게 해준다.</p>
+<p>Arrow 인터페이스는 두 개의 파서(정적, 동적)를 transparently compose and manipulate할 수 있게 해줍니다.
+Sun Sep 24 11:54:42 AM KST 2023 작성 중 …</p>
 <h2 id="정리">정리</h2>
 <p>그냥 <code>a -&gt; b</code>, <code>b -&gt; c</code> 함수를 정의하고, <code>(.)</code>를 이용해서 <code>a --...--&gt; c</code>를 만든 것과, Arrow 인터페이스를 이용하는 것의 차이는 뭘까요?</p>
-<div class="sourceCode" id="cb25"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>              (-&gt;) a  b   .                 (-&gt;) b  c</span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>              (-&gt;) a mb  &gt;=&gt;                (-&gt;) b mc</span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>ArrowInstance (-&gt;) a  b  &gt;&gt;&gt;  ArrowInstnace (-&gt;) b  c</span></code></pre></div>
-<p>함수를 합성할 때마다, 반복되는 어떤 작업 (Effect를 잃어버리지 않기 위한 작업)이 있다면, 모나드 인터페이스가 딱이었습니다.</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>              (-&gt;) a    b    .                 (-&gt;) b    c</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>              (-&gt;) a (m b)  &gt;=&gt;                (-&gt;) b (m c)</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>ArrowInstance (-&gt;) a    b   &gt;&gt;&gt;  ArrowInstnace (-&gt;) b    c</span></code></pre></div>
+<p>함수를 합성할 때마다, 반복되는 어떤 작업 (Effect를 잃어버리지 않기 위한 작업)이 있다면, 모나드 인터페이스가 딱이었습니다.
+<code>a -&gt; b</code>의 합성과 <code>m (m a) -&gt; m a</code> 작업을 “병행”해 주는 작업이 필요하면 모나드를 떠올리며 됐습니다.
+추측) <code>a -&gt; b</code>든 <code>a -&gt; m b</code>든, 합성과 정적인 정보 유통<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>을 병행해야 한다면 Arrow를 떠올리면 됩니다.</p>
 <p>Sun Sep 24 03:20:50 AM KST 2023 작성 중…</p>
 <section class="footnotes" role="doc-endnotes">
 <hr />
 <ol>
 <li id="fn1" role="doc-endnote"><p>이런 패턴이 선언형 프로그래밍의 좋은 예시 아닐까요? 딱, 양분할 순 없지만, 컴비네이터로 조합 할 때는, 할 일을 조합해서 목록(설계도)만 만들고, 실제 작업은 바로이런 <code>run~</code>이 붙은 것들이 “컴비네이터로 조합해서 만들어 둔 설계도”를 보고 합니다. 꼭 DSL처럼 완전 선언과 구현이 나뉘는 느낌은 아니더라도, 좀 감이 오는데 도움이 되는 것 같아 언급해 봤습니다.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2" role="doc-endnote"><p>아직 유통이란 말을 다른데서 본적이 없지만, 함수 합성으로 필요한 정보를 끌고 다니는 게 마치 “정보 유통” 체계를 잡는 느낌이 들어 써봤습니다.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section>
 
