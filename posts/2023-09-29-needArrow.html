@@ -290,7 +290,7 @@ A. <code>acc</code>, <code>f</code>만 줘서 <code>accum</code>을 실행하면
 <span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a><span class="ot">livesLeft ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">String</span></span>
 <span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>livesLeft hung <span class="ot">=</span> <span class="st">&quot;Lives: [&quot;</span></span>
-<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>                <span class="op">++</span> <span class="fu">replicate</span> (attempts <span class="op">-</span> hung) <span class="ot">`#`</span></span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>                <span class="op">++</span> <span class="fu">replicate</span> (attempts <span class="op">-</span> hung) <span class="ch">'#'</span></span>
 <span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>                <span class="op">++</span> <span class="fu">replicate</span> hung <span class="ch">' '</span></span>
 <span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>                <span class="op">++</span> <span class="st">&quot;]&quot;</span></span>
 <span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a></span>
@@ -300,16 +300,16 @@ A. <code>acc</code>, <code>f</code>만 줘서 <code>accum</code>을 실행하면
 <span id="cb33-13"><a href="#cb33-13" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> letter <span class="ot">=</span> listToMaybe userInput <span class="co">-- 나중에 runCircuit이 넣어 준다.</span></span>
 <span id="cb33-14"><a href="#cb33-14" aria-hidden="true" tabindex="-1"></a>  guessed <span class="ot">&lt;-</span> updateGuess <span class="op">-&lt;</span> (word, letter)</span>
 <span id="cb33-15"><a href="#cb33-15" aria-hidden="true" tabindex="-1"></a>  hung <span class="ot">&lt;-</span> updateHung <span class="op">-&lt;</span> (word, letter)</span>
-<span id="cb33-16"><a href="#cb33-16" aria-hidden="true" tabindex="-1"></a>  end <span class="ot">&lt;-</span> delayedEcho <span class="dt">True</span> <span class="op">-&lt;</span> <span class="fu">not</span> (word <span class="op">==</span> guessed <span class="op">||</span> hung) <span class="op">&gt;=</span> attempts)</span>
+<span id="cb33-16"><a href="#cb33-16" aria-hidden="true" tabindex="-1"></a>  end <span class="ot">&lt;-</span> delayedEcho <span class="dt">True</span> <span class="op">-&lt;</span> <span class="fu">not</span> (word <span class="op">==</span> guessed <span class="op">||</span> hung <span class="op">&gt;=</span> attempts)</span>
 <span id="cb33-17"><a href="#cb33-17" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> result <span class="ot">=</span> <span class="kw">if</span> word <span class="op">==</span> guessed</span>
 <span id="cb33-18"><a href="#cb33-18" aria-hidden="true" tabindex="-1"></a>                  <span class="kw">then</span> [guessed, <span class="st">&quot;You won!&quot;</span>]</span>
-<span id="cb33-19"><a href="#cb33-19" aria-hidden="true" tabindex="-1"></a>                  <span class="kw">else</span> <span class="kw">if</span> hung <span class="op">&gt;=</span> attemps</span>
+<span id="cb33-19"><a href="#cb33-19" aria-hidden="true" tabindex="-1"></a>                  <span class="kw">else</span> <span class="kw">if</span> hung <span class="op">&gt;=</span> attempts</span>
 <span id="cb33-20"><a href="#cb33-20" aria-hidden="true" tabindex="-1"></a>                       <span class="kw">then</span> [guessed, livesLeft hung, <span class="st">&quot;You died!&quot;</span>]</span>
 <span id="cb33-21"><a href="#cb33-21" aria-hidden="true" tabindex="-1"></a>                       <span class="kw">else</span> [guessed, livesLeft hung]</span>
 <span id="cb33-22"><a href="#cb33-22" aria-hidden="true" tabindex="-1"></a>  returnA <span class="op">-&lt;</span> (end, result)</span>
 <span id="cb33-23"><a href="#cb33-23" aria-hidden="true" tabindex="-1"></a> <span class="kw">where</span></span>
 <span id="cb33-24"><a href="#cb33-24" aria-hidden="true" tabindex="-1"></a><span class="ot">  updateGuess ::</span> <span class="dt">Circuit</span> (<span class="dt">String</span>, <span class="dt">Maybe</span> <span class="dt">Char</span>) <span class="dt">String</span> <span class="co">------- Circuit 타입!</span></span>
-<span id="cb33-25"><a href="#cb33-25" aria-hidden="true" tabindex="-1"></a>  updateGuess <span class="ot">=</span> accum' (<span class="fu">repeat</span> <span class="ch">'_'</span>) <span class="op">$</span> (\(word, letter) guess <span class="ot">-&gt;</span></span>
+<span id="cb33-25"><a href="#cb33-25" aria-hidden="true" tabindex="-1"></a>  updateGuess <span class="ot">=</span> accum' (<span class="fu">repeat</span> <span class="ch">'_'</span>) <span class="op">$</span> \(word, letter) guess <span class="ot">-&gt;</span></span>
 <span id="cb33-26"><a href="#cb33-26" aria-hidden="true" tabindex="-1"></a>    <span class="kw">case</span> letter <span class="kw">of</span></span>
 <span id="cb33-27"><a href="#cb33-27" aria-hidden="true" tabindex="-1"></a>      <span class="dt">Just</span> l <span class="ot">-&gt;</span> <span class="fu">map</span> (\(w, g) <span class="ot">-&gt;</span> <span class="kw">if</span> w <span class="op">==</span> l <span class="kw">then</span> w <span class="kw">else</span> g) (<span class="fu">zip</span> word guess)</span>
 <span id="cb33-28"><a href="#cb33-28" aria-hidden="true" tabindex="-1"></a>      <span class="dt">Nothing</span> <span class="ot">-&gt;</span> <span class="fu">take</span> (<span class="fu">length</span> word) guess</span>
@@ -351,24 +351,26 @@ A. <code>acc</code>, <code>f</code>만 줘서 <code>accum</code>을 실행하면
 <span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>  returnA <span class="op">-&lt;</span> t <span class="op">/</span> n</span></code></pre></div>
 <p>바나나 브라켓 안의 첫 번째 아이템은 임의의 개수의 arrow를 입력으로 받아 arrow를 돌려주는 함수입니다. 중위 연산자는 이 안에서는 쓸 수 없습니다. 그래서 <code>(&amp;&amp;&amp;)</code>가 앞으로 나왔습니다.</p>
 <p>Sat Sep 30 12:38:18 AM KST 2023 작성 중…</p>
+<h3 id="왜-hangman-게임-흐름을-arrow-인스턴스인-circuit로-모델링했을까요">왜 hangman 게임 흐름을 Arrow 인스턴스인 Circuit로 모델링했을까요?</h3>
+<p>Sat Sep 30 01:29:48 AM KST 2023 작성 중…</p>
 <h3 id="circuit-타입은-뭘-의미할까요"><code>Circuit</code> 타입은 뭘 의미할까요?</h3>
 <div class="sourceCode" id="cb36"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>eachTimeAddOne <span class="ot">=</span> <span class="dt">Circuit</span> (\a <span class="ot">-&gt;</span> ( eachTimeAddOne, (<span class="op">+</span><span class="dv">1</span>) a))</span>
 <span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- 원래 작업은            \a -&gt;                   (+1) a  </span></span></code></pre></div>
-<p><code>\a -&gt; a + 1</code>을 <code>Circuit</code> 타입에 넣으면 무슨 일을 할 수 있을까요? 함수형은 모든 필요한 값은 인자로 받아야만 하니, 전역 변수같이 메모리를 따로 둘 수 없어 체이닝동안 생기는 기억해야 할 값들을 편리하게 다루기 위한 테크닉들이 필요합니다.</p>
-<p>(지금 부터는 아주 개인적인 의견으로 검증받지 않은 생각입니다.)<br />
-보통 함수 체이닝을 할 때 <code>(.)</code>을 써서 체이닝을 합니다. 하스켈에서 이루어지는 체이닝(컴비네이션)들은 자세히 보면, 타입이 가지고 있는 함수를 체이닝 하거나, 혹은 함수 자체를 체이닝 하는 것처럼 말하지만, 사실은 컴비네이터를 체이닝하는 것입니다. 예를 들어 <code>a -&gt; b</code>,<code>b -&gt; c</code>,<code>c -&gt; d</code>를 체이닝한다면, <code>(.) (b -&gt; c) (a -&gt; b)</code>와 <code>(c -&gt; d)</code>를 다시 <code>(.)</code>으로 묶습니다. <code>(.)</code>의 체인입니다. 체이닝할때마다 반복되는 작업이 있다면 <code>(.)</code>에 넣어두면 됩니다. 모나드 같은 경우는 Effect 관련 작업은 바인드가 맡아서 하도록 해 뒀습니다. 모나드 경우도 <code>a -&gt; m b</code>의 체인이 아니라, 바인드의 체인입니다.</p>
+<p><code>\a -&gt; a + 1</code>을 <code>Circuit</code> 타입에 넣으면 무슨 일을 할 수 있을까요? 함수형은 모든 필요한 값은 인자로 받아야만 하고, 전역 변수같이 메모리를 따로 둘 수 없어 체이닝동안 생기는 기억해야 할 값들을 편리하게 다루기 위한 테크닉들이 필요합니다.</p>
+<p>(지금 부터는 아주 상상입니다.)<br />
+보통 함수 체이닝을 할 때 <code>(.)</code>을 써서 체이닝을 합니다. 하스켈에서 이루어지는 체이닝(컴비네이션)들은 자세히 보면, 타입이 가지고 있는 함수를 체이닝 하거나, 혹은 함수 자체를 체이닝 하는 것처럼 말하지만, 사실은 컴비네이터를 체이닝하는 것입니다. 예를 들어 <code>a -&gt; b</code>, <code>b -&gt; c</code>, <code>c -&gt; d</code>를 체이닝한다면, <code>(.) (b -&gt; c) (a -&gt; b)</code>와 <code>(c -&gt; d)</code>를 다시 <code>(.)</code>으로 묶습니다. <code>(.)</code>의 체인입니다. 체이닝할때마다 반복되는 작업이 있다면 <code>(.)</code>을 새롭게 정의하면 됩니다. 모나드 같은 경우는 Effect 관련 작업은 바인드가 맡아서 하도록 해 뒀습니다. 모나드 경우도 <code>a -&gt; m b</code>의 체인이 아니라, 바인드의 체인입니다.</p>
 <p><code>\a -&gt; a + 1</code>을 <code>Circuit</code>으로 래핑해 두면, 반드시 <code>Circuit</code>을 패턴 매칭해서 안을 봐야 <code>a + 1</code>을 꺼내 올 수 있으니, 반드시 일어나야 하는 절차를 둘 곳이 생깁니다. 타입으로 래핑하니, 같이 따라 다녀야 할 정보를 둘 자리도 튜플같은 Product 타입으로 마련할 수 있습니다.</p>
 <p>여러 정보를 한 곳에 묶어두는 방법으로 함수 안에다 두는 방법이 있습니다. 체이닝동안 필요한 정보를 product 타입으로 둘 수도 있지만, 함수가 가지고 있게 할 수도 있습니다.</p>
-<p>타입, 컴비네이터 공조만으로 끝난 게 아니라, 한 가지가 더 있습니다. 바로 트리거를 당기는 역할을 하는 <code>run~</code>류의 함수들입니다. 우리말로는 “실행기”라 번역하기도 합니다. <code>Circuit</code>타입을 정의하고, 합성하거나 흐름을 제어하는 컴비네이터들을 정의해서 커다란 <code>Circuit</code> 덩어리를 만들았다면, 마지막 <code>runCircuit</code>을 거치게 됩니다.</p>
-<div class="sourceCode" id="cb37"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>입력 a를 받아서 b를 얻기까지의 차이</span>
+<p>타입, 컴비네이터 공조만으로 끝난 게 아니라, 한 가지가 더 있습니다. 바로 트리거를 당기는 역할을 하는 <code>run~</code>류의 함수들입니다. 우리말로는 “실행기”라 번역하기도 합니다. <code>Circuit</code>타입을 정의하고, 합성하거나 흐름을 제어하는 컴비네이터들을 정의해서 커다란 <code>Circuit</code> 덩어리를 만들었다면, 마지막 <code>runCircuit</code>을 거치게 됩니다.</p>
+<div class="sourceCode" id="cb37"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>입력 a를 받아서 b를 얻기까지 보통 함수와 Circuit의 차이</span>
 <span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>a -&gt; b    vs    Circuit 타입</span>
 <span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>                각 종 컴비네이터</span>
 <span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>                runCircuit</span></code></pre></div>
-<p>절차를 이리 많이 추가해 뒀으니, 훨씬 많은 걸 표현할 수 있는 건 당연한데, 명령향에 머리가 고정되어 있어, 가끔 퍼포먼스가 염려되긴 합니다.</p>
+<p>절차를 이리 많이 추가해 뒀으니, 훨씬 많은 걸 표현할 수 있는 건 당연한데, 명령형에 머리가 고정되어 있어, 가끔 퍼포먼스가 염려되긴 합니다.</p>
 <p>이제 위 시각으로 <code>Circuit</code>을 읽어 보겠습니다.<br />
 언젠가 <code>a</code>를 받으면 <code>b</code>를 돌려주는 게 아니라,<br />
-언젠가 <code>a</code>를 받으면, <code>(다음 이어지는 작업에 할 일, 결과 b)</code> 2튜플을 결과로 돌려줄 “준비”를 한 함수를 돌려줍니다. 그럼, <code>runCircuit</code>이 처음 입력값 <code>a</code>를 가지고 리스트 원소를 하나씩 따라가며 이어지는 작업을 튜플에서 꺼내 적용합니다. <code>Arrow</code> 클래스의 인스턴스로 만들었으니, <code>Arrow</code>를 쓸 수 있는곳, 즉 <code>Arrow</code>의 <code>do</code> 노테이션으로 보기 좋게 흐름을 표현할 수 있습니다.</p>
+언젠가 <code>a</code>를 받으면, <code>(다음 이어지는 작업에 할 일, 결과 b)</code> 2튜플을 결과로 돌려줄 “준비”를 한 함수를 돌려줍니다. 그럼, <code>runCircuit</code>이 처음 입력값 <code>a</code>를 가지고 리스트 원소를 하나씩 따라가며, <code>Circuit</code>안의 함수를 적용하고, 다음 원소에는 이전 <code>Circuit</code>의 결과 튜플에 들어 있는 <code>Circuit</code>을 가져와 사용합니다. <code>Arrow</code> 클래스의 인스턴스로 만들었으니, <code>Arrow</code>를 쓸 수 있는곳, 즉 <code>Arrow</code>의 <code>do</code> 노테이션으로 보기 좋게 흐름을 표현할 수도 있습니다.</p>
 <p>합성 <code>(.)</code>을 일반화 하기 위해 타입으로 래핑한다는 생각은 어렵지 않지만, 이렇게 래핑한 것들의 흐름을 제어할 수 있는 체계들을 정돈되게 만들어 둔 건 쉽게 생각할 수 있는 건 아니겠습니다.</p>
 <p>참고<br />
 <a href="https://www.youtube.com/watch?v=hrNfkP8iKAs">Bartosz Milewski - Arrows are strong profunctor</a></p>
