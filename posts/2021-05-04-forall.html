@@ -176,7 +176,8 @@
 <p>2022.2.25 추가</p>
 <blockquote>
 <p>함수 서명에 아무런 제약 없이 <code>a</code>만 써주면, GHC는 <code>a</code>를 무엇으로 결정할지 모릅니다. 반드시, <code>타입 정보</code>를 줘야 합니다.
-함수 안에서 폴리모픽 <code>a</code>를 다룰 때, 특정 클래스의 인스턴스만 다룰지, 아니면 어떤 타입이든 들어와도 처리할 수 있는지 <em>함수 서명</em>에서 알려줘야, 코드 조립할 때, 함수 내용을 보지않고 서명으로만 체크할 수 있게 됩니다. 그래서, 컴파일할 때는 함수 몸체(구현)에 있는 타입의 쓰임과 함수 서명이 일치하는지 체크하고, 나중에 다른 코드와 만날 때는 서명만 가지고 일치하는 타입이 들어오는지 체크하리라 예상합니다. ※ 2022.10.17 추가 - 이게 non-dependent type checking이 동작하는 방식이라 합니다. <span class="citation" data-cites="Ailrun님">@Ailrun님</span> 감사합니다.
+함수 안에서 폴리모픽 <code>a</code>를 다룰 때, 특정 클래스의 인스턴스만 다룰지, 아니면 어떤 타입이든 들어와도 처리할 수 있는지 <em>함수 서명</em>에서 알려줘야, 코드 조립할 때, 함수 내용을 보지않고 서명으로만 체크할 수 있게 됩니다. 그래서, 컴파일할 때는 함수 몸체(구현)에 있는 타입의 쓰임과 함수 서명이 일치하는지 체크하고, 나중에 다른 코드와 만날 때는 서명만 가지고 일치하는 타입이 들어오는지 체크하리라 예상합니다.<br />
+※ 2022.10.17 추가 - 이게 non-dependent type checking이 동작하는 방식이라 합니다. <span class="citation" data-cites="Ailrun님">@Ailrun님</span> 감사합니다.<br />
 <code>forall a.</code> 를 앞에 붙여 주면, <code>아무 타입</code>이나 들어와도 처리할 수 있다는 <em>타입 정보</em>를 준 것으로 받아들입니다. <code>아무 타입</code>이나 받으려면, 구현은 <code>모든 타입</code> 대응할 수 있어야 합니다. 보통 폴리모픽하게 쓸 때 <code>forall a.</code>를 명시적으로 써주지 않지만, GHC가 안보이게 붙인다고 보면 됩니다.</p>
 </blockquote>
 <p>2022.9.17 추가</p>
@@ -220,7 +221,7 @@ forall a. (Num a) =&gt; a 타입 : { 리터럴 0, 리터럴 1, 리터럴 2, … 
 </blockquote>
 <p>※ 괄호를 쓰지 않았을 때 forall의 스코프
 <a href="https://downloads.haskell.org/ghc/latest/docs/html/users_guide/exts/scoped_type_variables.html">GHC 매뉴얼</a>을 보면 <code>func1</code>은 함수 선언 전체가, 즉 <code>a -&gt; Int</code>가 <code>forall a</code>의 유효 스코프라고 합니다.</p>
-<p><em>어디에도 서명, 조립 단계 이렇게 설명된 곳은 없습니다. forall a를 Bottom값으로 설명한 자료, 또는 타입을 매개 변수로 받는 함수 등으로 설명한 자료들을 찾았지만, 서명에 있는 괄호 (…)에 대해 명쾌하게 설명한 곳은 아직 찾지 못했습니다.</em></p>
+<p><em>어디에도 서명, 조립 단계 이렇게 설명된 곳은 없습니다. <code>forall a</code>를 <code>Bottom</code>값으로 설명한 자료, 또는 타입을 매개 변수로 받는 함수 등으로 설명한 자료들을 찾았지만, 서명에 있는 괄호 <code>(...)</code>에 대해 명쾌하게 설명한 곳은 아직 찾지 못했습니다.</em></p>
 <p>GHC가 폴리모픽 타입을 만나면 구체 타입으로 추론한다는 것에서 혼동이 올 수 있습니다. <code>forall</code>은 타입 추론을 해서 <code>Bool</code>을 주면 <code>Bool</code>에 맞는 동작을 하고, <code>Int</code>를 주면 <code>Int</code>에 맞는 동작을 하겠다는 게 아닙니다.
 <code>Bool</code>을 주든, <code>Int</code>를 주든 같은 동작으로 문제 없이 처리 하겠다는 겁니다.</p>
 <p>2022.10.13 추가</p>
@@ -297,8 +298,10 @@ forall a. (Num a) =&gt; a 타입 : { 리터럴 0, 리터럴 1, 리터럴 2, … 
 <p>이론적인 것보다 실제 동작으로 얘기하면,
 (가)는 외부에서 <code>Bool -&gt; Bool</code> 타입으로 결정된 함수가 들어오면 문제가 생기고,
 (나)는 외부에서는 모든 것이 가능한 함수가 들어오고, 내부에서 구체 타입이 결정됩니다.</p>
-<p>그래서 “내부에서 함수가 결정되도록 하려면 <code>RankNType</code>을 쓰면 된다고 얘기합니다. <span class="citation" data-cites="재원">@재원</span></p>
+<p>그래서 “내부에서 함수가 결정되도록 하려면 <code>RankNType</code>을 쓰면 된다”고 얘기합니다. <span class="citation" data-cites="재원">@재원</span></p>
 <p>※ 위에 날짜별로 추가된 글은, 하스켈 학교에서 여러분들과 대화하며 올렸던 글들을 그대로 가져온 것입니다.</p>
+<p>2023.9.28
+<code>forall a =&gt; [a]</code>라 하면, “<code>a</code>는 무엇인지 보지 않겠어”, 혹은 “구조 안에 들어 있는 건 뭔지 관심없고, 난 구조에 관한 내용만 가지고 있어” 라고 간단히 읽을 수 있습니다.</p>
 
 <div class="comment">
 <script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
