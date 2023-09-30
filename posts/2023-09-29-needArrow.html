@@ -83,11 +83,12 @@
 
 <p>Sat Sep 30 12:37:49 AM KST 2023 작성 중… 아직 완전히 이해하지 못하고, 일부는 추측하며 정리하고 있습니다.</p>
 <p><a href="https://en.wikibooks.org/wiki/Haskell/Arrow_tutorial#Stephen's_Arrow_Tutorial">Haskell/Arrow tutorial - wikibooks</a><br />
-Arrow 실 사용 예시를, 자세한 설명과 함께 볼 수 있는 글 입니다. 처음엔 언제 Arrow를 사용하면 좋을 지 알기 위해 봤는데, 재귀 패턴, 모양을 더 공부하게 만든 예시입니다. 여기 글은 위 링크에 있는 튜토리얼을 그대로 가져와 읽으며, 메모를 추가한 정도의 글입니다. 아래에 나오는 코드는 모두 위 링크에서 발췌했습니다.</p>
+Arrow 실 사용 예시를, 자세한 설명과 함께 볼 수 있는 글 입니다. 처음엔 언제 Arrow를 사용하면 좋을 지 알기 위해 봤는데, 재귀 패턴, 모양을 더 공부하게 만든 예시입니다. Arrow가 어떻게 쓰이는 지만 보기엔 적당한 글이 아닐 수도 있습니다. 우아한 Arrow로 넘어가기 전에 일단 Circuit에서 막히니까요. 여기 글은 위 링크에 있는 튜토리얼을 그대로 가져와 읽으며, 메모를 추가한 정도의 글입니다. 아래에 나오는 코드는 모두 위 링크에서 발췌했습니다.</p>
+<p>어느 정도 쓰고 돌아보니, 길게도 썼습니다. 오류가 있을지도 모르는 긴 글을 누가 읽을까 싶은데요. 위 텍스트로 Arrow를 공부하며 벽에 부딪히는 분들을 위한 아이디어가 몇 개 있긴 합니다. 정답을 알려주는 텍스트가 아니라, 같이 공부하는 옆 친구의 노트입니다.</p>
 <h2 id="생각-스트레칭">생각 스트레칭</h2>
 <p>반복을 표현하는 방법</p>
 <p>A.<br />
-<code>(+10)</code>을 <code>for</code>, <code>재귀</code> 등으로 10`번 반복해</p>
+<code>(+10)</code>을 <code>for</code>, <code>재귀</code> 등으로 <code>10</code>번 반복해</p>
 <p>B.<br />
 <code>AddTen (AddTen (AddTen ...))</code> 무한 타입을 만든다.<br />
 패턴 매칭으로 <code>AddTen</code>을 벗겨 낼 때마다 <code>(+10)</code>을 하도록 정의한다.<br />
@@ -96,10 +97,10 @@ Arrow 실 사용 예시를, 자세한 설명과 함께 볼 수 있는 글 입니
 B 경우엔 한 번 더 패턴 매칭하면 됩니다.</p>
 <p>A보다 B가 훨씬 더 복잡하고, 머리를 괴롭히는데 B로 하면 A로 하는 것 보다 어떤 장점이 있을까요?</p>
 <h2 id="circuit">Circuit</h2>
-<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">Circuit</span> a b <span class="ot">=</span> <span class="dt">Circuit</span> {<span class="ot"> unCircuit ::</span> a <span class="ot">-&gt;</span> (<span class="dt">Circuit</span> a b, b)}</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">Circuit</span> a b <span class="ot">=</span> <span class="dt">Circuit</span> {<span class="ot">unCircuit ::</span> a <span class="ot">-&gt;</span> (<span class="dt">Circuit</span> a b, b)}</span></code></pre></div>
 <h3 id="circuit안에-또-circuit">Circuit안에 또 Circuit</h3>
 <p>순환하는 타입 읽기가 불편하지 않나요? 저는 아직도 편하지 않습니다.</p>
-<p><code>Circuit</code> 타입을 생성하려면 생성자 <code>Circuit</code>에 <code>(\a -&gt; ???)</code> 같은 함수를 넣어야 하는데, <code>???</code> 부분에는 뭐가 들어가면 될까요? <code>Circuit</code> 타입을 넣어 줘야 하는데, 그러려면 안 쪽에 또 <code>Circuit</code> 타입이 있고, 그냥 대체하면서 따라가면 무한으로 가버립니다. 타입에서는 이렇게 써 준다고 무한 재귀하는 모양이 아닙니다. 안에 있는 <code>Circuit</code>타입 값이, 꼭 현재 정의하고 있는 <code>Circuit</code>과 같은 값일 필요는 없으니, 재귀가 아닌 경우도 있을 수 있습니다. 물론, 값을 만들 때 재귀하는 모양의 값을 만들 순 있습니다.</p>
+<p><code>Circuit</code> 타입을 생성하려면 생성자 <code>Circuit</code>에 <code>(\a -&gt; ???)</code> 같은 함수를 넣어야 하는데, <code>???</code> 부분에는 뭐가 들어가면 될까요? <code>Circuit</code> 타입을 넣어 줘야 하는데, 그러려면 안 쪽에 또 <code>Circuit</code> 타입이 있고, 그냥 대체하면서 따라가면 무한으로 가버립니다. 타입에서는 이렇게 써 준다고 무한 재귀하는 모양이 아닙니다. 안에 있는 <code>Circuit</code>타입 값이, 꼭 현재 정의하고 있는 <code>Circuit</code>과 같은 값일 필요는 없으니, 재귀가 아닌 경우도 있을 수 있습니다. 물론, 값을 만들 때 재귀하는 모양의 값을 만들 순 있습니다. 하지만, <strong><em>혼자서</em></strong> 무한히 도는 일은 일어나지 않습니다.</p>
 <p><code>data List a = a : List a | []</code></p>
 <p><code>[]</code>, <code>1:[]</code>, <code>1:2:[]</code> … 등이 모두 <code>List</code> 타입의 값이 될 수 있다는 얘기지, 재귀 함수를 읽듯 <code>List</code>가 무한히 호출되지는 않습니다. 그런데, <code>List</code>의 경우는 에지 케이스, 즉 <code>[]</code>라는 표현이 있어, 더 이상 이어지는 값이 없을 경우 <code>[]</code>으로 마감하면 됩니다. 하지만 <code>Circuit</code>의 경우는 Sum타입으로 에지 케이스를 가지고 있지 않습니다. <code>Circuit</code>은 종료를 표현할 수 없으니 무한 반복으로 갈 것만 같습니다.</p>
 <p>하스켈은 Lazy합니다. 타입 생성자로 쌓여 있는 건 패턴 매칭으로 벗겨내거나, <code>unCircuit</code>같은 함수를 실행하기 전에는 안에 들어있는 값을 볼 수 없습니다. <code>Circuit</code> 안에 들어 있는 <code>Circuit</code>은 또 풀려고 하지 말고, 그냥 안을 보지 않은 채로 <code>Circuit</code>으로만 봐야 합니다. 안을 들여다 볼 필요가 있기 전 까지, 안은 안보면 됩니다.</p>
@@ -109,7 +110,7 @@ B 경우엔 한 번 더 패턴 매칭하면 됩니다.</p>
 아닙니다. 적어도 하나가 있습니다. 바로 정의되고 있는 자기 자신입니다.<br />
 (아래 쪽에 보면, <code>id</code>도 있긴 합니다. 다른 <code>Circuit</code>값을 못 쓰진 않지만, 텍스트에선 “처음 생성”에는 모두 순환하는 예시만 보입니다. )</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> cir <span class="ot">=</span></span></code></pre></div>
-<p>이라고만 해도, 쓸 수 있는 <code>cir</code>이 하나 생겼습니다. <code>???</code> 자리엔 <code>Circuit</code>을 넣어줘야 하니, <code>cir</code>을 넣어줘도 됩니다. Lazy하니 <code>cir</code>이 무슨 값인지는 필요할 때, 또 보면 됩니다. ※ 컴파일러가 바인딩하는 과정을 보면, 이런 재귀적인 표현들이 “약간” 더 편해지긴 합니다.</p>
+<p>이라고만 해도, 쓸 수 있는 <code>cir</code>이 하나 생겼습니다. <code>???</code> 자리엔 <code>Circuit</code>을 넣어줘야 하니, <code>cir</code>을 넣어줘도 됩니다. Lazy하니 <code>cir</code>이 무슨 값인지는 필요할 때, 또 보면 됩니다. ※ 컴파일러가 바인딩하는 과정(WHNF 개념 포함)을 보면, 이런 재귀적인 표현들이 “약간” 더 편해지긴 합니다.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> cir <span class="ot">=</span> <span class="dt">Circuit</span> (\a <span class="ot">-&gt;</span> (cir, b))</span></code></pre></div>
 <p>타입 정의 자체가 순환 정의는 아니지만, 위와 같이 값을 선언하면 순환하는 값을 가지게 됩니다.<br />
 ※ <code>cir</code>값을 위와 같이 만들어 뒀다면, <code>let cir2 = Circuit (\a -&gt; (cir, b))</code>로 <code>cir2</code> 정의할 때 <code>cir</code>을 가져다 쓸 수 있습니다. 텍스트를 보면, 시작부터 다른 <code>Circuit</code>을 가지게 하진 않고, 컴비네이션을 하는 동안, 두 <code>Circuit</code>을 합친다든지 하며 다른 <code>Circuit</code>이 들어갑니다.</p>
@@ -126,10 +127,22 @@ B 경우엔 한 번 더 패턴 매칭하면 됩니다.</p>
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>        <span class="kw">let</span> (cir1', b) <span class="ot">=</span> cir1 a</span>
 <span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>            (cir2', c) <span class="ot">=</span> cir2 b</span>
 <span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>        <span class="kw">in</span>  (cir2' <span class="ot">`dot`</span> cir1', c)</span></code></pre></div>
-<p><code>Circuit</code> 두 개를 모두 거쳐 결과값<code>c</code>를 만들고, 또 언제든 두 개를 모두 거칠 수 있도록 <code>dot</code>으로 합성한 걸 가지고 있습니다. <code>dot</code>을 구현하는데, 안에 또 <code>dot</code>이 나옵니다. <code>Circuit</code>안에 <code>Circuit</code>이 또 들어 있으니, 당연히 또 나오겠거니 예측할 수 있습니다.</p>
-<p><code>Circuit</code>은 <code>a</code>를 받고, 결과값을 갖고 있는 2튜플을 돌려주는 함수입니다. 안 쪽 <code>Circuit</code>을 잠시 가리고 보면,</p>
+<p><code>Circuit</code> 두 개를 모두 거쳐 결과값<code>c</code>를 만들고, 또 언제든 두 개를 모두 거칠 수 있도록 <code>dot</code>으로 합성한 걸 가지고 있습니다. <code>dot</code>을 구현하는데, 안에 또 <code>dot</code>이 나옵니다. <code>Circuit</code>안에 <code>Circuit</code>이 또 들어 있으니, 당연히 또 나오겠거니 예측할 수 있긴 합니다.</p>
+<p><code>Circuit</code>은 <code>a</code>를 받고, 결과값을 갖고 있는 2튜플을 돌려주는 함수입니다. <code>Circuit</code>을 잠시 가리고 보면,</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>a <span class="ot">-&gt;</span> (           , b)</span></code></pre></div>
-<p>텍스트에선 <code>b</code>를 내부 상태값internal state이라 표현하고 있습니다. <code>a</code>를 받아 <code>b</code>상태가 되고, <code>b</code>를 받아 <code>c</code>상태가 되게 하고, 여전히 <code>Circuit</code>안에 들어 있게 하면 2튜플의 두 번째 자리에 상태를 유지할 수 있습니다. 저는 정보량으로 추상화 시켜서 보곤 합니다. <code>a -&gt; b</code>와 달리 <code>a -&gt; (??, b)</code>는 분명히 추가 정보를 가지고 있습니다. 이 함수 자체만으로는 추가 정보가 어떤 역할을 하지 못하지만, <code>??</code>을 꺼내가는 다른 절차가 끼어들어 다른 역할을 할 수 있을 거라 추측해 볼 수 있습니다.</p>
+<p>텍스트에선 <code>b</code>를 내부 상태값internal state이라 표현하고 있습니다. <code>a</code>를 받아 <code>b</code>상태가 되고, <code>b</code>를 받아 <code>c</code>상태가 되게 하고, 여전히 <code>Circuit</code>안에 들어 있게 하면 2튜플의 두 번째 자리에 상태를 유지할 수 있습니다. 저는 정보량으로 추상화 시켜서 보곤 합니다. <code>a -&gt; b</code>와 달리 <code>a -&gt; (??, b)</code>는 분명히 추가 정보를 가지고 있습니다. 이 <strong><em>함수 자체만으로는 추가 정보가 어떤 역할을 하지 못하지만</em></strong>, <code>??</code>을 꺼내가는 다른 절차가 끼어들어 다른 역할을 할 수 있을 거라 추측해 볼 수 있습니다.</p>
+<h5 id="무한히-반복될-것만-같아-불편하다.">무한히 반복될 것만 같아 불편하다.</h5>
+<p>마지막 <code>(cir2'</code> <code>dot</code> <code>cir1')</code> 해석이 어렵습니다.</p>
+<p>실제 코드가 아니라 눈에 잘 보이게, <code>c1</code>과 <code>c2</code>의 합성을 <code>c1-c2</code>로 쓰고, 합성 결과에 있는 <code>...(c2' dot c1',...)</code>를 <code>c1'-c2'</code>라고 쓰겠습니다. 한 번돌고나서 새로 만들어지는 <code>Circuit</code>은 프라임<code>'</code>을 붙이겠습니다.</p>
+<p>이 무한히 쌓여갈 것만 같은 <code>dot</code>의 반복은 어떻게 해석할까요?</p>
+<p><code>in</code>을 빼고 <code>let</code>부분만 보면, 첫 번째 <code>Circuit</code>를 돌리고 나온 결과를, 두 번째 <code>Circuit</code>에 입력으로 넣어주고 있습니다. 텍스트에서 보면 <code>c1</code>이 안에 가지고 있는 <code>c1'</code>은 둘이 같거나, <code>c1</code>과 인자를 달리해서 만들어냅니다.(텍스트에선 결과에 의존해서 새 <code>Circuit</code>을 만듭니다.) <code>c1-c2</code>를 돌린 다음에, <strong><em>또</em></strong> 돌린다면 <code>c1'-c2'</code>을 돌립니다. 그 다음에 돌린다면 <code>c1''-c2''</code>을 돌릴 겁니다. <code>Circuit</code>들은 입출력으로 서로 이어지고 있지만, 다음 돌릴 자신의 “후임” <code>Circuit</code>은 각자 알아서 독립적으로 만들어 냅니다.</p>
+<p>만일 5개의 <code>Circuit</code>을 합성했다면, 순서대로 입출력을 넘겨 받으며 <code>c1-c2-c3-c4-c5</code>를 실행하고, 다음 번에도 <code>c1'-c2'-c3'-c4'-c5'</code>를 돌릴거란 뜻으로 <code>Circuit $ \a -&gt; (c1'-c2'-c3'-c4'-c5', 다섯 개 Circuit을 연이어 돈 결과)</code>를 반환합니다. <code>runCircuit</code>이 “리스트에 남은 원소가 있다면”, 준비한 <code>c1'-c2'-c3'-c4'-c5'</code>를 돌리고, 다음 돌릴 <code>Circuit</code>은 <code>c1''-c2''-c3''-c4''-c5''</code>으로 준비 할 겁니다. 만일, <code>runCircuit</code>하기 전에 <code>c6</code>을 합성한다면 <code>(c1-c2-c3-c4-c5-c6, 여섯 개 Circuit을 연이어 돈 결과)</code>를 준비합니다.</p>
+<p>제 생각을 쓰는 것도 어려우니, 읽는 분들에게 전달이 잘 될리가 없겠습니만, 그래도, 최선을 다해 불편함을 주는 부분을 짚어보면,</p>
+<ul>
+<li><code>Circuit</code>은 독립적으로 다음 <code>Circuit</code>을 준비합니다. 처음 <code>Circuit</code>에서 변하지 않을 수도 있고, 변했을 수도 있습니다.</li>
+<li>합성하면, 입출력 값으로 이어져 돌긴 하지만, 자신들의 후임 <code>Circuit</code>은 각자 독립적으로 준비한 다음, 이 들을 모아서 다음 돌릴 준비를 합니다.</li>
+</ul>
+<p>전체적으로 불편함을 주는 이유는, <strong><em>여기선 무한 반복으로 갈 것만 같은 코드 모양이지만, runCircuit이 리스트에 원소가 남아 있는 동안만 반복 시킵니다.</em></strong> 무한 리스트를 정의하고, 필요한 만큼만 <code>take</code>하는 것과 비슷합니다. 하스켈에서 만나는 모든 무한한 것들은 필요한 만큼만 꺼내올 줄 아는 파트너가 항상 존재합니다. 언제 멈출 수 있는지, <strong><em>언제 다음 반복을 시작하는지</em></strong>를 알게 되면 조금 덜 불편합니다.</p>
 <h4 id="id">id</h4>
 <p>이제 위 <code>(.)</code>을 만나 아무 일도 일어나지 않는 <code>id</code>를 정의합니다.</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Cat.Category</span> <span class="dt">Circuit</span> <span class="kw">where</span></span>
@@ -163,21 +176,22 @@ A. 추측) <code>Cat.id</code>를 <code>Circuit a a</code>로 추론할텐데, �
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  first (<span class="dt">Circuit</span> cir) <span class="ot">=</span> <span class="dt">Circuit</span> <span class="op">$</span> (\(b, d) <span class="ot">-&gt;</span></span>
 <span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> (cir', c) <span class="ot">=</span> cir b</span>
 <span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">in</span>  (first cir', (c, d)) <span class="co">-- d는 손 대지 않는다.</span></span></code></pre></div>
+<p>Arrow는 합성할 함수를 래핑합니다. 여기선 <code>입력 -&gt; ( 다음에 쓸 Circuit , 현재 결과 )</code>를 래핑합니다.</p>
 <p><code>arr</code>은 보통의 하스켈 함수를 Arrow로 리프팅할 때 씁니다.</p>
-<p>타입으로 래핑해서 컴비네이션을 하는 것들은, 보통 <code>run~</code>과정을 거쳐 결과값을 얻습니다. 패턴 매칭이나 <code>unCircuit</code>같은 과정을 통해 래핑된 타입의 바깥 세계와 만나게 됩니다.</p>
 <h3 id="runcircuit">runCircuit</h3>
+<p>타입으로 래핑해서 컴비네이션을 하는 것들은, 보통 <code>run~</code>과정을 거쳐 결과값을 얻습니다. 패턴 매칭이나 <code>unCircuit</code>같은 과정을 통해 래핑된 타입의 바깥 세계와 만나게 됩니다.</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ot">runCircuit ::</span> <span class="dt">Circuit</span> a b <span class="ot">-&gt;</span> [a] <span class="ot">-&gt;</span> [b]</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>runCircuit _   []     <span class="ot">=</span> []</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>runCircuit cir (x<span class="op">:</span>xs) <span class="ot">=</span></span>
 <span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> (cir', x') <span class="ot">=</span> unCircuit cir x</span>
 <span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="kw">in</span>  x' <span class="op">:</span> runCircuit cir' xs</span></code></pre></div>
-<p>자기 자신을 정적인 정보와 같이 가지고 있는 <code>Circuit</code>의 경우는 <code>cir'</code>과 <code>cir</code>이 같아져서 이런 패턴의 코드가 필요 없어도 될 것만 같은데, 다른 <code>Circuit</code>을 가지고 있을 수도 있기 때문에, <code>runCircuit</code>은 위와 같이 <code>cir</code>이 돈 후에, <code>cir'</code>이 돌도록 정의해햐 합니다.</p>
+<p>자기 자신을 가지고 있는 <code>Circuit</code>의 경우는 <code>cir'</code>과 <code>cir</code>이 같아져서 이런 패턴의 코드가 필요 없어도 될 것만 같지만, 다른 <code>Circuit</code>을 가지고 있을 수도 있기 때문에, <code>runCircuit</code>은 위와 같이 <code>cir</code>이 돈 후에, <code>cir'</code>이 돌도록 정의해햐 합니다. 무한 <code>Circuit</code>을 끊어주는 작업은 <code>[]</code> 패턴매칭이 담당합니다.</p>
 <h3 id="accum">accum</h3>
 <div class="sourceCode" id="cb13"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="ot">accum ::</span> acc <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> acc <span class="ot">-&gt;</span> (b, acc)) <span class="ot">-&gt;</span> <span class="dt">Circuit</span> a b</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>accum acc f <span class="ot">=</span> <span class="dt">Circuit</span> <span class="op">$</span> \input <span class="ot">-&gt;</span></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> (output, acc') <span class="ot">=</span> input <span class="ot">`f`</span> acc</span>
 <span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">in</span>  (accum acc' f, output)</span></code></pre></div>
-<p><code>f input acc</code> 작업을 <code>Circuit</code>으로 한 번 래핑한 덕분에, <code>acc</code>를 가지고 있을 수 있습니다.</p>
+<p><code>f input acc</code> 작업을 <code>Circuit</code>으로 한 번 래핑한 덕분에, <code>acc</code>를 유지 및 유통할 수 있습니다.</p>
 <blockquote>
 <p>Q. <code>Circuit</code>이 들어갈 자리에 <code>accum acc' f</code>가 들어갔다?<br />
 A. <code>accum</code>의 반환 타입은 <code>Circuit a b</code>입니다.</p>
@@ -186,7 +200,9 @@ A. <code>accum</code>의 반환 타입은 <code>Circuit a b</code>입니다.</p>
 <p>Q. <code>accum</code>이 무한 반복되는 건가?<br />
 A. <code>acc</code>, <code>f</code>만 줘서 <code>accum</code>을 실행하면, 안에 있는 <code>accum</code>이 바로 불리지 않습니다. 안에 있는 <code>accum</code>이 불리려면 추가 절차가 있어야 합니다. <code>Circuit</code>으로 패턴 매칭을 해서 <code>\input -&gt; ... (accum ...)</code> 함수를 꺼내고, <code>input</code>값을 줘서 실행해야 합니다. 그렇게 실행하면 또 다시 <code>Circuit</code>값에 머물러 있고, 또 언젠가 패턴 매칭하면 그 때 다음 동작이 일어날 겁니다. 정리하면, 그냥은 반복되지 않고, 반복 절차로 들어가기 위한 추가 조건이 있는 셈입니다.</p>
 </blockquote>
-<h3 id="circuit-primitives">Circuit primitives</h3>
+<p><code>accum</code>같은 함수를 읽을 때, 다음처럼 읽으면 도움이 됩니다.<br />
+<code>accum</code>은 <code>acc</code>와 <code>f</code>를 받아서 <code>Circuit</code>을 <strong><em>만들어 내는 함수</em></strong>입니다. 현재는 <code>acc</code>, <code>f</code>를 가지고 작업했지만, 다음 작업은 <code>acc'</code>, <code>f</code>를 가지고 작업할 겁니다. <code>acc</code>가 <code>acc'</code>으로 바뀌었습니다.
+### Circuit primitives</p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="ot">accum' ::</span> b <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> <span class="dt">Circuit</span> a b</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>accum' acc f <span class="ot">=</span> accum acc (\a b <span class="ot">-&gt;</span> <span class="kw">let</span> b' <span class="ot">=</span> a <span class="ot">`f`</span> b <span class="kw">in</span> (b', b'))</span></code></pre></div>
 <p><code>accum</code>이 두 번째 인자로 받는 함수는 <code>a -&gt; acc -&gt; (b, acc)</code> 2튜플을 반환하는 함수를 받습니다. <code>accum'</code>는 반환값이 2튜플이 아닌 <code>a -&gt; b -&gt; b</code> 함수를 받아, 결과를 복사해서 2튜플로 만드는 과정을 붙이는 작업을 한 후 <code>accum</code>에게 넘기는 보조 함수입니다.</p>
@@ -194,12 +210,14 @@ A. <code>acc</code>, <code>f</code>만 줘서 <code>accum</code>을 실행하면
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>total <span class="ot">=</span> accum' <span class="dv">0</span> (<span class="op">+</span>)</span></code></pre></div>
 <p>위 작업은 다음과 같습니다.</p>
 <div class="sourceCode" id="cb16"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>total <span class="ot">=</span> accum <span class="dv">0</span> (결과값 복사해서 2튜플 만들기 <span class="op">.</span> (<span class="op">+</span>))</span></code></pre></div>
-<p>이제 위에 그냥 무한 반복이 아니라, 반복하려면 절차가 필요하다고 말했던, 그 절차를 아래와 같이 실행할 수 있습니다.</p>
+<p>이제 위에 그냥 무한 반복이 아니라, 반복하려면 절차가 필요하다고 말했던, 그 절차를 <code>runCircuit</code>으로 아래와 같이 실행할 수 있습니다.</p>
 <div class="sourceCode" id="cb17"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>GHCi&gt; runCircuit total [1,0,1,0,0,2]</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>[1,1,2,2,2,4]</span></code></pre></div>
-<p><code>runCircuit</code>은 <code>Circuit</code>타입과 리스트를 넘겨주면, 리스트 맨 앞 원소에 <code>Circuit</code>이 갖고 있는 작업을 진행해서 바꿔 놓고, 이어서 그 다음 원소에는 <code>Circuit</code>이 안에 갖고 있는 <code>Circuit</code>을 적용합니다. 보통, 자기 자신과 같은 <code>Circuit</code>을 안에 가지고 있다면(예시는 예외없이 모두 그렇습니다), 결국 받은 리스트 원소에 모두 <code>Circuit</code>이 가진 작업을 진행합니다.
-&gt; Q. 자신과 같은 <code>Circuit</code>을 계속 부르는데, 어떻게 값이 누적되고 있을까?<br />
-&gt; A. <code>accum</code>의 반환 값 안에 있는 <code>...(accum acc' f, ...)</code>에서 <code>accum</code>은 함수고, <code>acc</code>와 <code>f</code>를 줘야만 <code>Circuit</code>이 됩니다. 현재 <code>Circuit</code>에 있는 함수를 적용해서 <code>acc'</code>을 만들고, 이 값으로 <code>accum</code>을 호출해서 다음 적용할 <code>Circuit</code>을 만듭니다.</p>
+<p><code>runCircuit</code>은 <code>Circuit</code>타입과 리스트를 넘겨주면, 리스트 맨 앞 원소에 <code>Circuit</code>이 갖고 있는 작업을 진행해서 바꿔 놓고, 이어서 그 다음 원소에는 <code>Circuit</code>이 안에 갖고 있는 후임 <code>Circuit</code>을 적용합니다. 보통, 자기 자신과 같은 <code>Circuit</code>을 적용하거나, 조금 다른 인자로 만들어진 <code>Circuit</code>를 적용합니다.</p>
+<blockquote>
+<p>Q. 자신과 같은 <code>Circuit</code>을 계속 부르는데, 어떻게 값이 누적되고 있을까?<br />
+A. <code>accum</code>의 반환 값 안에 있는 <code>...(accum acc' f, ...)</code>에서 <code>accum</code>은 함수고, <code>acc</code>와 <code>f</code>를 줘야만 <code>Circuit</code>이 됩니다. 현재 <code>Circuit</code>에 있는 함수를 적용해서 <code>acc'</code>을 만들고, 이 값으로 <code>accum</code>을 호출해서 다음 적용할 <code>Circuit</code>을 만듭니다. 완전 동일한 <code>Circuit</code>을 매 번 적용하고 있는 건 아닙니다.</p>
+</blockquote>
 <h3 id="arrow-proc-notation">Arrow <code>proc</code> notation</h3>
 <div class="sourceCode" id="cb18"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="ot">mean1 ::</span> <span class="dt">Fractional</span> a <span class="ot">=&gt;</span> <span class="dt">Circuit</span> a a</span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>mean1 <span class="ot">=</span> (total <span class="op">&amp;&amp;&amp;</span> (<span class="fu">const</span> <span class="dv">1</span> <span class="op">^&gt;&gt;</span> total)) <span class="op">&gt;&gt;&gt;</span> arr (<span class="fu">uncurry</span> (<span class="op">/</span>))</span></code></pre></div>
@@ -209,9 +227,9 @@ A. <code>acc</code>, <code>f</code>만 줘서 <code>accum</code>을 실행하면
 <code>(&gt;&gt;&gt;)</code>는 Arrow 두 개를 합성합니다.<br />
 <code>(^&gt;&gt;)</code>는 <code>const 1 ^&gt;&gt; total</code> = <code>arr (const 1) &gt;&gt;&gt; total</code> 입니다.<br />
 ※ 참고 - <a href="../posts/2023-09-14-arrow.html">Arrow는 모나드의 일반화</a></p>
-<p><code>mean1</code>을 해석하면, 나중에 <code>runCircuit</code>으로 리스트가 들어오면,<br />
-<code>total</code> Circuit을 돌려 누적값이 들어있는 리스트로 바꾸고,
-<code>const 1 ^&gt;&gt; total</code> Circuit을 돌려 모든 원소를 <code>1</code>로 바꾸면서 <code>total</code>을 돌립니다. 결국 리스트의 가장 마지막 누적값이 원소 개수가 됩니다. <code>uncurry</code>가 없다면 <code>[(모든 원소를 더한 값, 원소 개수)]</code>이 됩니다.</p>
+<p><code>mean1</code>을 해석해 보면, 나중에 <code>runCircuit</code>으로 리스트가 들어오면,<br />
+<code>total</code> <code>Circuit</code>을 돌려 누적값으로 바꾸고,
+<code>const 1 ^&gt;&gt; total</code> <code>Circuit</code>을 돌려 받은 값을 <code>1</code>로 바꾸면서 <code>total</code>을 돌려 누적값으로 바뀝니다. 결국 리스트의 가장 마지막 누적값이 원소 개수가 됩니다. <code>uncurry</code>가 없다면 <code>[(모든 원소를 더한 값, 원소 개수)]</code>이 됩니다. <code>C1 &amp;&amp;&amp; C2</code>에서 <code>C1</code>은 <code>C1</code>대로 후임 <code>Circuit</code>을 만들고, <code>C2</code>는 <code>C2</code>대로 후임 <code>Circuit</code>을 만듭니다.</p>
 <div class="sourceCode" id="cb19"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>GHCi&gt; runCircuit (total &amp;&amp;&amp; (const 1 ^&gt;&gt; total)) $ [0,10,7,8]</span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>[(0,1),(10,2),(17,3),(25,4)]</span></code></pre></div>
 <div class="sourceCode" id="cb20"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="ot">mean2 ::</span> <span class="dt">Fractional</span> a <span class="ot">=&gt;</span> <span class="dt">Circuit</span> a a</span>
@@ -351,17 +369,22 @@ A. <code>acc</code>, <code>f</code>만 줘서 <code>accum</code>을 실행하면
 <span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>  returnA <span class="op">-&lt;</span> t <span class="op">/</span> n</span></code></pre></div>
 <p>바나나 브라켓 안의 첫 번째 아이템은 임의의 개수의 arrow를 입력으로 받아 arrow를 돌려주는 함수입니다. 중위 연산자는 이 안에서는 쓸 수 없습니다. 그래서 <code>(&amp;&amp;&amp;)</code>가 앞으로 나왔습니다.</p>
 <p>Sat Sep 30 12:38:18 AM KST 2023 작성 중…</p>
-<h3 id="왜-hangman-게임-흐름을-arrow-인스턴스인-circuit로-모델링했을까요">왜 hangman 게임 흐름을 Arrow 인스턴스인 Circuit로 모델링했을까요?</h3>
+<h3 id="왜-hangman-게임-흐름을-arrow-인스턴스인-circuit으로-모델링했을까요">왜 hangman 게임 흐름을 Arrow 인스턴스인 Circuit으로 모델링했을까요?</h3>
+<p>이 글은, 어떤 요소가 Arrow로 해결하면 좋은가를 찾는 게 목표입니다.</p>
+<p>먼저 <code>Circuit</code>을 왜 Arrow 인스턴스로 만들었을까요?</p>
 <p>Sat Sep 30 01:29:48 AM KST 2023 작성 중…</p>
-<h3 id="circuit-타입은-뭘-의미할까요"><code>Circuit</code> 타입은 뭘 의미할까요?</h3>
+<h4 id="circuit-타입은-뭘-의미할까요"><code>Circuit</code> 타입은 뭘 의미할까요?</h4>
 <div class="sourceCode" id="cb36"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>eachTimeAddOne <span class="ot">=</span> <span class="dt">Circuit</span> (\a <span class="ot">-&gt;</span> ( eachTimeAddOne, (<span class="op">+</span><span class="dv">1</span>) a))</span>
 <span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- 원래 작업은            \a -&gt;                   (+1) a  </span></span></code></pre></div>
 <p><code>\a -&gt; a + 1</code>을 <code>Circuit</code> 타입에 넣으면 무슨 일을 할 수 있을까요? 함수형은 모든 필요한 값은 인자로 받아야만 하고, 전역 변수같이 메모리를 따로 둘 수 없어 체이닝동안 생기는 기억해야 할 값들을 편리하게 다루기 위한 테크닉들이 필요합니다.</p>
 <p>(지금 부터는 아주 상상입니다.)<br />
+##### 사실은 컴비네이터 체이닝
 보통 함수 체이닝을 할 때 <code>(.)</code>을 써서 체이닝을 합니다. 하스켈에서 이루어지는 체이닝(컴비네이션)들은 자세히 보면, 타입이 가지고 있는 함수를 체이닝 하거나, 혹은 함수 자체를 체이닝 하는 것처럼 말하지만, 사실은 컴비네이터를 체이닝하는 것입니다. 예를 들어 <code>a -&gt; b</code>, <code>b -&gt; c</code>, <code>c -&gt; d</code>를 체이닝한다면, <code>(.) (b -&gt; c) (a -&gt; b)</code>와 <code>(c -&gt; d)</code>를 다시 <code>(.)</code>으로 묶습니다. <code>(.)</code>의 체인입니다. 체이닝할때마다 반복되는 작업이 있다면 <code>(.)</code>을 새롭게 정의하면 됩니다. 모나드 같은 경우는 Effect 관련 작업은 바인드가 맡아서 하도록 해 뒀습니다. 모나드 경우도 <code>a -&gt; m b</code>의 체인이 아니라, 바인드의 체인입니다.</p>
+<h5 id="함수로-있을-때-보다-타입으로-만들면-강력해진다">함수로 있을 때 보다, 타입으로 만들면 강력해진다</h5>
 <p><code>\a -&gt; a + 1</code>을 <code>Circuit</code>으로 래핑해 두면, 반드시 <code>Circuit</code>을 패턴 매칭해서 안을 봐야 <code>a + 1</code>을 꺼내 올 수 있으니, 반드시 일어나야 하는 절차를 둘 곳이 생깁니다. 타입으로 래핑하니, 같이 따라 다녀야 할 정보를 둘 자리도 튜플같은 Product 타입으로 마련할 수 있습니다.</p>
 <p>여러 정보를 한 곳에 묶어두는 방법으로 함수 안에다 두는 방법이 있습니다. 체이닝동안 필요한 정보를 product 타입으로 둘 수도 있지만, 함수가 가지고 있게 할 수도 있습니다.</p>
-<p>타입, 컴비네이터 공조만으로 끝난 게 아니라, 한 가지가 더 있습니다. 바로 트리거를 당기는 역할을 하는 <code>run~</code>류의 함수들입니다. 우리말로는 “실행기”라 번역하기도 합니다. <code>Circuit</code>타입을 정의하고, 합성하거나 흐름을 제어하는 컴비네이터들을 정의해서 커다란 <code>Circuit</code> 덩어리를 만들었다면, 마지막 <code>runCircuit</code>을 거치게 됩니다.</p>
+<h5 id="run">RUN!</h5>
+<p>타입, 컴비네이터 공조만으로 끝난 게 아니라, 한 가지가 더 있습니다. 바로 트리거를 당기는 역할을 하는 <code>run~</code>류의 함수들입니다. 우리말로는 “실행기runner”라 번역하기도 합니다. <code>Circuit</code>타입을 정의하고, 합성하거나 흐름을 제어하는 컴비네이터들을 정의해서 커다란 <code>Circuit</code> 덩어리를 만들었다면, 마지막 <code>runCircuit</code>을 거치게 됩니다.</p>
 <div class="sourceCode" id="cb37"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>입력 a를 받아서 b를 얻기까지 보통 함수와 Circuit의 차이</span>
 <span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>a -&gt; b    vs    Circuit 타입</span>
@@ -370,10 +393,13 @@ A. <code>acc</code>, <code>f</code>만 줘서 <code>accum</code>을 실행하면
 <p>절차를 이리 많이 추가해 뒀으니, 훨씬 많은 걸 표현할 수 있는 건 당연한데, 명령형에 머리가 고정되어 있어, 가끔 퍼포먼스가 염려되긴 합니다.</p>
 <p>이제 위 시각으로 <code>Circuit</code>을 읽어 보겠습니다.<br />
 언젠가 <code>a</code>를 받으면 <code>b</code>를 돌려주는 게 아니라,<br />
-언젠가 <code>a</code>를 받으면, <code>(다음 이어지는 작업에 할 일, 결과 b)</code> 2튜플을 결과로 돌려줄 “준비”를 한 함수를 돌려줍니다. 그럼, <code>runCircuit</code>이 처음 입력값 <code>a</code>를 가지고 리스트 원소를 하나씩 따라가며, <code>Circuit</code>안의 함수를 적용하고, 다음 원소에는 이전 <code>Circuit</code>의 결과 튜플에 들어 있는 <code>Circuit</code>을 가져와 사용합니다. <code>Arrow</code> 클래스의 인스턴스로 만들었으니, <code>Arrow</code>를 쓸 수 있는곳, 즉 <code>Arrow</code>의 <code>do</code> 노테이션으로 보기 좋게 흐름을 표현할 수도 있습니다.</p>
+언젠가 <code>a</code>를 받으면, <code>(다음 이어지는 작업에 할 일, 결과 b)</code> 2튜플을 결과로 돌려줄 “준비”를 한 함수를 돌려줍니다. <strong><em>다음 이어지는 작업은 결과<code>b</code>에 의존해서 만듭니다.</em></strong> 그럼, <code>runCircuit</code>이 처음 입력값 <code>a</code>를 가지고 리스트 원소를 하나씩 따라가며, <code>Circuit</code>안의 함수를 적용하고, 다음 원소에는 이전 <code>Circuit</code>의 결과 튜플에 들어 있는 <code>Circuit</code>을 가져와 사용합니다.</p>
+<p><code>Arrow</code> 클래스의 인스턴스로 만들었으니, <code>Arrow</code>를 쓸 수 있는곳, 즉 <code>Arrow</code>의 <code>do</code> 노테이션으로 보기 좋게 흐름을 표현할 수도 있습니다.</p>
+<p><span class="citation" data-cites="todo">@todo</span> Arrow가 되어 얻는 장점 더 추가</p>
 <p>합성 <code>(.)</code>을 일반화 하기 위해 타입으로 래핑한다는 생각은 어렵지 않지만, 이렇게 래핑한 것들의 흐름을 제어할 수 있는 체계들을 정돈되게 만들어 둔 건 쉽게 생각할 수 있는 건 아니겠습니다.</p>
 <p>참고<br />
-<a href="https://www.youtube.com/watch?v=hrNfkP8iKAs">Bartosz Milewski - Arrows are strong profunctor</a></p>
+Arrow를 이론적으로 접근하면 Freyd Category로 접근해야 하는데, 그나마 실용에 좀 가까운 “이론”으로 접근하려면
+<a href="https://www.youtube.com/watch?v=hrNfkP8iKAs">Bartosz Milewski - Arrows are strong profunctor</a> 이 출발점이 될 수 있겠습니다.</p>
 
 <div class="comment">
 <script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
