@@ -406,13 +406,14 @@ A. <code>accum</code>의 반환 값 안에 있는 <code>...(accum acc' f, ...)</
 <h3 id="circuit-타입은-뭘-의미할까요"><code>Circuit</code> 타입은 뭘 의미할까요?</h3>
 <div class="sourceCode" id="cb39"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>eachTimeAddOne <span class="ot">=</span> <span class="dt">Circuit</span> (\a <span class="ot">-&gt;</span> ( eachTimeAddOne, (<span class="op">+</span><span class="dv">1</span>) a))</span>
 <span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- 원래 작업은            \a -&gt;                   (+1) a  </span></span></code></pre></div>
-<p><code>\a -&gt; a + 1</code>을 <code>Circuit</code> 타입에 넣으면 무슨 일을 할 수 있을까요? 함수형은 모든 필요한 값은 인자로 받아야만 하고, 전역 변수같이 메모리를 따로 둘 수 없어 체이닝동안 생기는 기억해야 할 값들을 편리하게 다루기 위한 테크닉들이 필요합니다.</p>
+<p><code>\a -&gt; a + 1</code>을 <code>Circuit</code> 타입에 넣으면 무슨 일을 할 수 있을까요?</p>
+<p>함수형은 모든 필요한 값은 인자로 받아야만 하고, 전역 변수같이 메모리를 따로 둘 수 없어 체이닝동안 생기는 기억해야 할 값들을 편리하게 다루기 위한 테크닉들이 필요합니다.</p>
 <p>(지금 부터는 아주 상상입니다.)</p>
+<h4 id="함수-추가-정보">함수 + 추가 정보</h4>
+<p><code>\a -&gt; a + 1</code>을 <code>Circuit</code>으로 래핑해 두면, 반드시 <code>Circuit</code>을 패턴 매칭해서 안을 봐야 <code>a + 1</code>을 꺼내 올 수 있으니, 반드시 일어나야 하는 절차를 둘 곳이 생깁니다. 타입으로 래핑하니, 같이 따라 다녀야 할 정보를 둘 자리도 튜플같은 Product 타입으로 마련할 수 있습니다.</p>
+<p>여러 정보를 한 곳에 묶어두는 방법으로 함수 안에다 두는 방법이 있습니다. 체이닝동안 필요한 정보를 product 타입으로 둘 수도 있지만, 함수가 가지고 있게 할 수도 있습니다. 동적인 정보라면 이렇게 하는 쪽이 더 적합할 수 있습니다.</p>
 <h4 id="사실은-컴비네이터-체이닝">사실은 컴비네이터 체이닝</h4>
 <p>보통 함수 체이닝을 할 때 <code>(.)</code>을 써서 체이닝을 합니다. 하스켈에서 이루어지는 체이닝(컴비네이션)들은 자세히 보면, 타입이 가지고 있는 함수를 체이닝 하거나, 혹은 함수 자체를 체이닝 하는 것처럼 말하지만, 사실은 컴비네이터를 체이닝하는 것입니다. 예를 들어 <code>a -&gt; b</code>, <code>b -&gt; c</code>, <code>c -&gt; d</code>를 체이닝한다면, <code>(.) (b -&gt; c) (a -&gt; b)</code>와 <code>(c -&gt; d)</code>를 다시 <code>(.)</code>으로 묶습니다. <code>(.)</code>의 체인입니다. 체이닝할때마다 반복되는 작업이 있다면 <code>(.)</code>을 새롭게 정의하면 됩니다. 모나드 같은 경우는 Effect 관련 작업은 바인드가 맡아서 하도록 해 뒀습니다. 모나드 경우도 <code>a -&gt; m b</code>의 체인이 아니라, 바인드의 체인입니다.</p>
-<h4 id="함수로-있을-때-보다-타입으로-만들면-강력해진다">함수로 있을 때 보다, 타입으로 만들면 강력해진다</h4>
-<p><code>\a -&gt; a + 1</code>을 <code>Circuit</code>으로 래핑해 두면, 반드시 <code>Circuit</code>을 패턴 매칭해서 안을 봐야 <code>a + 1</code>을 꺼내 올 수 있으니, 반드시 일어나야 하는 절차를 둘 곳이 생깁니다. 타입으로 래핑하니, 같이 따라 다녀야 할 정보를 둘 자리도 튜플같은 Product 타입으로 마련할 수 있습니다.</p>
-<p>여러 정보를 한 곳에 묶어두는 방법으로 함수 안에다 두는 방법이 있습니다. 체이닝동안 필요한 정보를 product 타입으로 둘 수도 있지만, 함수가 가지고 있게 할 수도 있습니다.</p>
 <h4 id="run">RUN!</h4>
 <p>코드 구석 구석을 읽다보면, 이 부분을 간과하는 경우가 많은 것 같습니다. 타입, 컴비네이터 공조만으로 끝난 게 아니라, 한 가지가 더 있습니다. 바로 트리거를 당기는 역할을 하는 <code>run~</code>류의 함수들입니다. 우리말로는 “실행기runner”라 번역하기도 합니다. <code>Circuit</code>타입을 정의하고, 합성하거나 흐름을 제어하는 컴비네이터들을 정의해서 커다란 <code>Circuit</code> 뭉치를 만들었다면, 마지막 <code>runCircuit</code>을 거치게 됩니다.</p>
 <div class="sourceCode" id="cb40"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>입력 a를 받아서 b를 얻기까지 보통 함수와 Circuit의 차이</span>
