@@ -280,6 +280,7 @@ A. <code>accum</code>의 반환 값 안에 있는 <code>...(accum acc' f, ...)</
 <span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>[False,True,False,False,False]</span></code></pre></div>
 <h4 id="arrowchoice">ArrowChoice</h4>
 <p>게임의 메인 Arrow는 계속 반복해서 실행되고, 낱말은 처음 한 번만 뽑고, 게임 진행동안 계속 기억하고 있어야 합니다. Rather than just mask its output on subsequent loops (이 말은 아마도, 실제 뽑는 작업은 하면서, 쓰지 않는 걸 얘기하는 것 같습니다.) 실제 한 번만 돌아가는게 퍼포먼스에서 유리합니다. 하지만, Circuit에선 “Arrow 뭉치”에 포함된 Arrow 컴포넌트의 모든 경로로 데이터가 흘러갑니다. (골드 버그 장치 혹은 도미노 등이 연상됩니다.) 하나의 경로로만 흘러가게 하려면, <code>ArrowChoice</code>클래스의 인스턴스로 만들어야 합니다.</p>
+<p>※ 뭉치란 말이 투박하긴 하지만, 컴비네이션 결과물을 지칭하기에 적당한 의미를 가진 듯 합니다. 다른 곳에서도 쓰이는 “용어”는 아닙니다. 순수 한글 말을 쓰려고 고른 게 아니라, 대상을 가장 잘 표현하는 적당한 말같아 골랐습니다.</p>
 <div class="sourceCode" id="cb29"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">ArrowChoice</span> <span class="dt">Circuit</span> <span class="kw">where</span></span>
 <span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  left orig<span class="op">@</span>(<span class="dt">Circuit</span> cir) <span class="ot">=</span> <span class="dt">Circuit</span> <span class="op">$</span> \ebd <span class="ot">-&gt;</span> <span class="kw">case</span> ebd <span class="kw">of</span></span>
 <span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Left</span> b  <span class="ot">-&gt;</span> <span class="kw">let</span> (cir', c) <span class="ot">=</span> cir b</span>
@@ -399,7 +400,7 @@ A. <code>accum</code>의 반환 값 안에 있는 <code>...(accum acc' f, ...)</
 <span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>  (t, n) <span class="ot">&lt;-</span> (total <span class="op">-&lt;</span> value) <span class="op">&amp;&amp;&amp;</span> (total <span class="op">-&lt;</span> <span class="dv">1</span>)</span>
 <span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span> <span class="op">-&lt;</span> t <span class="op">/</span> n</span></code></pre></div>
 <p>이렇게, 바나나 브라켓을 떼어내도 GHC가 알아서 잘 해석한다니, 가볍게 보고 지나가도 될 것 같습니다.</p>
-<h2 id="왜-hangman-게임-흐름을-arrow-인스턴스인-circuit으로-모델링했까">왜 hangman 게임 흐름을 Arrow 인스턴스인 Circuit으로 모델링했까?</h2>
+<h2 id="왜-hangman-게임-흐름을-arrow-인스턴스인-circuit으로-모델링했을까">왜 Hangman 게임 흐름을 Arrow 인스턴스인 Circuit으로 모델링했을까?</h2>
 <p>이 글은, 어떤 요소가 Arrow로 해결하면 좋은가를 찾는 게 목표입니다.</p>
 <p>먼저 <code>Circuit</code>을 왜 Arrow 인스턴스로 만들었을까요?</p>
 <h3 id="circuit-타입은-뭘-의미할까요"><code>Circuit</code> 타입은 뭘 의미할까요?</h3>
