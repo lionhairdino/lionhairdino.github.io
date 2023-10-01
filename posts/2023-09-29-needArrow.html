@@ -227,7 +227,8 @@ A. <code>accum</code>의 반환 값 안에 있는 <code>...(accum acc' f, ...)</
 <code>(&amp;&amp;&amp;)</code>는 Arrow 두 개를 받아, 각각의 계산computation을 실행하고, 결과를 2튜플로 만듭니다.<br />
 <code>(&gt;&gt;&gt;)</code>는 Arrow 두 개를 합성합니다.<br />
 <code>(^&gt;&gt;)</code>는 <code>const 1 ^&gt;&gt; total</code> = <code>arr (const 1) &gt;&gt;&gt; total</code> 입니다.<br />
-※ 참고 - <a href="../posts/2023-09-14-arrow.html">Arrow는 모나드의 일반화</a></p>
+</p>
+<p>※ 참고 - <a href="../posts/2023-09-14-arrow.html">Arrow는 모나드의 일반화</a></p>
 <p><code>mean1</code>을 해석해 보면, 나중에 <code>runCircuit</code>으로 리스트가 들어오면,<br />
 <code>total</code>을 돌려 누적값으로 바꾸고,<br />
 <code>const 1 ^&gt;&gt; total</code>을 돌려, 들어온 값을 <code>1</code>로 바꾸고 <code>total</code>을 돌려 누적값으로 바꿉니다.<br />
@@ -398,35 +399,35 @@ A. <code>accum</code>의 반환 값 안에 있는 <code>...(accum acc' f, ...)</
 <span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>  (t, n) <span class="ot">&lt;-</span> (total <span class="op">-&lt;</span> value) <span class="op">&amp;&amp;&amp;</span> (total <span class="op">-&lt;</span> <span class="dv">1</span>)</span>
 <span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span> <span class="op">-&lt;</span> t <span class="op">/</span> n</span></code></pre></div>
 <p>이렇게, 바나나 브라켓을 떼어내도 GHC가 알아서 잘 해석한다니, 가볍게 보고 지나가도 될 것 같습니다.</p>
-<h3 id="왜-hangman-게임-흐름을-arrow-인스턴스인-circuit으로-모델링했을까요">왜 hangman 게임 흐름을 Arrow 인스턴스인 Circuit으로 모델링했을까요?</h3>
+<h2 id="왜-hangman-게임-흐름을-arrow-인스턴스인-circuit으로-모델링했을까요">왜 hangman 게임 흐름을 Arrow 인스턴스인 Circuit으로 모델링했을까요?</h2>
 <p>이 글은, 어떤 요소가 Arrow로 해결하면 좋은가를 찾는 게 목표입니다.</p>
 <p>먼저 <code>Circuit</code>을 왜 Arrow 인스턴스로 만들었을까요?</p>
-<h4 id="circuit-타입은-뭘-의미할까요"><code>Circuit</code> 타입은 뭘 의미할까요?</h4>
+<h3 id="circuit-타입은-뭘-의미할까요"><code>Circuit</code> 타입은 뭘 의미할까요?</h3>
 <div class="sourceCode" id="cb39"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>eachTimeAddOne <span class="ot">=</span> <span class="dt">Circuit</span> (\a <span class="ot">-&gt;</span> ( eachTimeAddOne, (<span class="op">+</span><span class="dv">1</span>) a))</span>
 <span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- 원래 작업은            \a -&gt;                   (+1) a  </span></span></code></pre></div>
 <p><code>\a -&gt; a + 1</code>을 <code>Circuit</code> 타입에 넣으면 무슨 일을 할 수 있을까요? 함수형은 모든 필요한 값은 인자로 받아야만 하고, 전역 변수같이 메모리를 따로 둘 수 없어 체이닝동안 생기는 기억해야 할 값들을 편리하게 다루기 위한 테크닉들이 필요합니다.</p>
-<p>(지금 부터는 아주 상상입니다.)<br />
-##### 사실은 컴비네이터 체이닝
-보통 함수 체이닝을 할 때 <code>(.)</code>을 써서 체이닝을 합니다. 하스켈에서 이루어지는 체이닝(컴비네이션)들은 자세히 보면, 타입이 가지고 있는 함수를 체이닝 하거나, 혹은 함수 자체를 체이닝 하는 것처럼 말하지만, 사실은 컴비네이터를 체이닝하는 것입니다. 예를 들어 <code>a -&gt; b</code>, <code>b -&gt; c</code>, <code>c -&gt; d</code>를 체이닝한다면, <code>(.) (b -&gt; c) (a -&gt; b)</code>와 <code>(c -&gt; d)</code>를 다시 <code>(.)</code>으로 묶습니다. <code>(.)</code>의 체인입니다. 체이닝할때마다 반복되는 작업이 있다면 <code>(.)</code>을 새롭게 정의하면 됩니다. 모나드 같은 경우는 Effect 관련 작업은 바인드가 맡아서 하도록 해 뒀습니다. 모나드 경우도 <code>a -&gt; m b</code>의 체인이 아니라, 바인드의 체인입니다.</p>
-<h5 id="함수로-있을-때-보다-타입으로-만들면-강력해진다">함수로 있을 때 보다, 타입으로 만들면 강력해진다</h5>
+<p>(지금 부터는 아주 상상입니다.)</p>
+<h4 id="사실은-컴비네이터-체이닝">사실은 컴비네이터 체이닝</h4>
+<p>보통 함수 체이닝을 할 때 <code>(.)</code>을 써서 체이닝을 합니다. 하스켈에서 이루어지는 체이닝(컴비네이션)들은 자세히 보면, 타입이 가지고 있는 함수를 체이닝 하거나, 혹은 함수 자체를 체이닝 하는 것처럼 말하지만, 사실은 컴비네이터를 체이닝하는 것입니다. 예를 들어 <code>a -&gt; b</code>, <code>b -&gt; c</code>, <code>c -&gt; d</code>를 체이닝한다면, <code>(.) (b -&gt; c) (a -&gt; b)</code>와 <code>(c -&gt; d)</code>를 다시 <code>(.)</code>으로 묶습니다. <code>(.)</code>의 체인입니다. 체이닝할때마다 반복되는 작업이 있다면 <code>(.)</code>을 새롭게 정의하면 됩니다. 모나드 같은 경우는 Effect 관련 작업은 바인드가 맡아서 하도록 해 뒀습니다. 모나드 경우도 <code>a -&gt; m b</code>의 체인이 아니라, 바인드의 체인입니다.</p>
+<h4 id="함수로-있을-때-보다-타입으로-만들면-강력해진다">함수로 있을 때 보다, 타입으로 만들면 강력해진다</h4>
 <p><code>\a -&gt; a + 1</code>을 <code>Circuit</code>으로 래핑해 두면, 반드시 <code>Circuit</code>을 패턴 매칭해서 안을 봐야 <code>a + 1</code>을 꺼내 올 수 있으니, 반드시 일어나야 하는 절차를 둘 곳이 생깁니다. 타입으로 래핑하니, 같이 따라 다녀야 할 정보를 둘 자리도 튜플같은 Product 타입으로 마련할 수 있습니다.</p>
 <p>여러 정보를 한 곳에 묶어두는 방법으로 함수 안에다 두는 방법이 있습니다. 체이닝동안 필요한 정보를 product 타입으로 둘 수도 있지만, 함수가 가지고 있게 할 수도 있습니다.</p>
-<h5 id="run">RUN!</h5>
-<p>타입, 컴비네이터 공조만으로 끝난 게 아니라, 한 가지가 더 있습니다. 바로 트리거를 당기는 역할을 하는 <code>run~</code>류의 함수들입니다. 우리말로는 “실행기runner”라 번역하기도 합니다. <code>Circuit</code>타입을 정의하고, 합성하거나 흐름을 제어하는 컴비네이터들을 정의해서 커다란 <code>Circuit</code> 뭉치를 만들었다면, 마지막 <code>runCircuit</code>을 거치게 됩니다.</p>
+<h4 id="run">RUN!</h4>
+<p>코드 구석 구석을 읽다보면, 이 부분을 간과하는 경우가 많은 것 같습니다. 타입, 컴비네이터 공조만으로 끝난 게 아니라, 한 가지가 더 있습니다. 바로 트리거를 당기는 역할을 하는 <code>run~</code>류의 함수들입니다. 우리말로는 “실행기runner”라 번역하기도 합니다. <code>Circuit</code>타입을 정의하고, 합성하거나 흐름을 제어하는 컴비네이터들을 정의해서 커다란 <code>Circuit</code> 뭉치를 만들었다면, 마지막 <code>runCircuit</code>을 거치게 됩니다.</p>
 <div class="sourceCode" id="cb40"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>입력 a를 받아서 b를 얻기까지 보통 함수와 Circuit의 차이</span>
 <span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>a -&gt; b    vs    Circuit 타입</span>
 <span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>                각 종 컴비네이터</span>
 <span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>                runCircuit</span></code></pre></div>
 <p>절차를 이리 많이 추가해 뒀으니, 훨씬 많은 걸 표현할 수 있는 건 당연한데, 명령형에 머리가 고정되어 있어, 가끔 퍼포먼스가 염려되긴 합니다.</p>
-<h5 id="반복해서-돈다.-그래서-이름이-circuit이다.">반복해서 돈다. 그래서 이름이 Circuit이다.</h5>
+<h4 id="반복해서-돈다.-그래서-이름이-circuit이다.">반복해서 돈다. 그래서 이름이 Circuit이다.</h4>
 <p>이제 위 시각으로 <code>Circuit</code>을 읽어 보겠습니다.<br />
 언젠가 <code>a</code>를 받으면 <code>b</code>를 돌려주는 게 아니라,<br />
 언젠가 <code>a</code>를 받으면, <code>(후임 Circuit - 다음 이어지는 작업에 할 일, 결과 b)</code> 2튜플을 결과로 돌려줄 “준비”를 한 함수를 돌려줍니다. <strong><em>후임 Circuit은 결과 b에 의존해서 만들거나 현재 Circuit과 같을 수 있습니다.</em></strong> 그럼, <code>runCircuit</code>이 처음 입력값 <code>a</code>를 가지고, 리스트의 첫 번째 원소에 작업을 하고, 그 다음 원소를 꺼내 후임 <code>Circuit</code>을 꺼내와 사용합니다. 이 후임 <code>Circuit</code> 안에는 또 이어서 쓸 후임 <code>Circuit</code>이 들어 있습니다.</p>
-<h4 id="반복되는-작업을-circuit으로-모델링">반복되는 작업을 Circuit으로 모델링</h4>
+<h3 id="반복되는-작업을-circuit으로-모델링">반복되는 작업을 Circuit으로 모델링</h3>
 <p>계속 반복되는 메인 루프가 있고, 루프가 도는 동안 기억해야 할 정보들이 있습니다. 아주 일반적인 상황 아닌가 싶은데요. 행맨 정도의 게임에서는 <code>Circuit</code>으로 모델링하는 게 우아해 보이기는 한데, 루프가 복잡해져도 우아할 수 있을까 싶습니다.</p>
-<h4 id="왜-circuit을-arrow-인스턴스로-만들까">왜 Circuit을 Arrow 인스턴스로 만들까?</h4>
-<p>루프 안을 뜯어보면, 데이터 흐름을 요리 조리 바꿔야 합니다. 병행 작업을 하는 것도 있고, 상황에 따라 분기(<code>if</code>)해야 하는 것도 있고요. 이럴 때 <code>Arrow</code> 인터페이스를 도입하면, 병행, <code>if</code>를 다루는 인터페이스도 있고, 무엇보다 <code>do</code> 노테이션으로 보기 좋게 표현할 수 있는데 눈이갑니다.</p>
+<h3 id="왜-circuit을-arrow-인스턴스로-만들까">왜 Circuit을 Arrow 인스턴스로 만들까?</h3>
+<p>루프 안을 뜯어보면, 데이터 흐름을 요리 조리 바꿔야 합니다. 병행 작업을 하는 것도 있고, 상황에 따라 분기(<code>if</code>)해야 하는 것도 있고요. 이럴 때 <code>Arrow</code> 인터페이스를 도입하면, 병행, <code>if</code>를 다루는 인터페이스도 있고, 무엇보다 <code>do</code> 노테이션으로 보기 좋게 표현할 수 있다는데 눈이 갑니다.</p>
 <p>위 정리는 너무 일반적인 상황이라, 이 게 Arrow가 쓰이는 이유라면, 엄청나게 많은 경우에 Arrow를 쓸텐데, 그러지 않는 걸 보면 모델링 대상이 복잡해지면 우아하지 않기 때문 아닐까요?</p>
 <p>합성 <code>(.)</code>을 일반화 하기 위해 타입으로 래핑한다는 생각은 어렵지 않지만, 이렇게 래핑한 것들의 흐름을 제어할 수 있는 체계들을 정돈되게 만들어 둔 건 쉽게 생각할 수 있는 건 아니겠습니다.</p>
 <p>참고<br />
