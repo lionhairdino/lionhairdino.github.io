@@ -4,9 +4,9 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-        <title>lionhairdino - FRP와 Arrow (작성 예정)</title>
+        <title>lionhairdino - 선언형 프로그래밍</title>
 
-        <meta name="description" content="lionhairdino - FRP와 Arrow (작성 예정)" />
+        <meta name="description" content="lionhairdino - 선언형 프로그래밍" />
         <meta property="og:description" content="하스켈 함수형 프로그래밍" />
 
         <link rel="stylesheet" type="text/css" href="../css/default.css" />
@@ -33,13 +33,13 @@
         <meta name="msapplication-TileColor" content="#ff7500" />
         <meta name="theme-color" content="#ffffff" />
         <meta property="og:type" content="website" />
-        <meta property="og:title" content="FRP와 Arrow (작성 예정)" />
+        <meta property="og:title" content="선언형 프로그래밍" />
         <meta property="og:site_name" content="Lionhairdino" />
-        <meta property="og:url" content="https://lionhairdino.github.io/posts/2023-10-01-frp.html" />
+        <meta property="og:url" content="https://lionhairdino.github.io/posts/2023-10-07-DeclarativeProgramming.html" />
 
         <meta property="og:image" content="https://lionhairdino.github.io/images/state400px.png" />
 
-      <meta name="keywords" content="Reactive, Functional, Arrow">
+      <meta name="keywords" content="Declarative Programming, Combinator, Combination">
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-E9WZ6VXGHP"></script>
 <script>
@@ -74,18 +74,35 @@
             </div>
         </div>
         <div class="js-toc-content">
-            <h1>FRP와 Arrow (작성 예정)</h1>
+            <h1>선언형 프로그래밍</h1>
             <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
 <div class="info">
-    Posted on October  1, 2023
+    Posted on October  7, 2023
     
 </div>
 
-<p>참고<br />
-지속적으로 함수형 텍스트들을 번역하고 계신 오현석님이 한빛출판사를 통해 출판한 번역서 <a href="https://m.hanbit.co.kr/store/books/book_view.html?p_code=B3673113778">함수형 반응형 프로그래밍</a>이 있습니다.</p>
-<p>FRP는 이벤트 전달을 “잘”하기 위한 프로그래밍 기법입니다. 관찰자Observer (Listener 혹은 Callback) 패턴을 대체할 수 있는 기법입니다.</p>
-<p>크게 함수형 프로그래밍과 반응형 프로그래밍의 교집합이라 볼 수 있습니다.
-Sun Oct 1 04:15:28 PM KST 2023 작성 중…</p>
+<p>선언형 프로그래밍이 무슨 말일까요?</p>
+<p>보통 이 용어를 설명하는 글들은, 반복 작업으로 <code>for</code> 구문을 쓰는 명령형 프로그래밍 모양과, 리스트에 <code>filter</code> 등을 적용하는 모양을 비교하는 예시를 듭니다. 하지만, 처음 이런 설명을 들으면, 반복하는 작업 구현의 위치를 옮겼을 뿐 그리 달라 보이지 않기도 합니다.</p>
+<p><code>How</code> 보다는 <code>What</code>에 집중하는 스타일이라는 추상적인 설명도 많이 접합니다. 그냥 DSL(Domain Specific Language)을 만드는 방식으로 모델링하는 걸 말하는가 싶기도 합니다. 저는 이런 설명들로는 명확한 느낌이 오진 않았습니다. 하스켈을 잠시동안 물고 늘어진 저에게, 선언형 프로그래밍을 설명하라면 다음을 예시로 들겠습니다.</p>
+<ol type="1">
+<li>문제에서 <strong><em>기본 블럭</em></strong>으로 쓰일 타입이나 함수를 정의합니다.</li>
+<li>이들 기본 블럭을 이리 저리 조합할 수 있는 <strong><em>도구</em></strong>들을 준비합니다.</li>
+<li>이제, 문제를 이들 블럭과 도구들을 이용한 <strong><em>조합</em></strong>으로 모델링합니다.</li>
+</ol>
+<p><code>조합</code>을 통해 로직을 표현합니다. 문제들을 잘 쪼개서, 부분 문제들을 어떻게<code>How</code> 동작해서 실제 해결하는지는 <code>도구</code>들에 구현되어 있어, 최종 <code>조합</code>에는 무엇을<code>What</code>을 하는지만 남아 있는 명세서처럼 보이게 됩니다.</p>
+<p>문제를 해결하기 위해<br />
+a를 먼저 이렇게<code>how</code> 해결하고, 그 다음 b를 이렇게<code>how</code> 해결하고… 이렇게 시퀀스로 떠올릴 수도 있고,<br />
+문제를 이루는 기본 요소들을 먼저 정의하고, 이들이 어떤 동작들을 필요로 하는지 정의하고, 최종 로직은 이들 정의들을 잘 <strong><em>조합</em></strong>해서 해결하면, 여기엔 <code>How</code>보다는 <code>What</code>만 들어 있게 됩니다. 이 걸 “선언Declaration”이라 부릅니다.</p>
+<p>눈에 금방 들어오는 예시로, 기본 Parser들을 정의하고, 이들의 실행 흐름을 제어할 수 있는 도구Combinator들을 만들어, 복잡한 파싱을 이들 조합으로 해결하는 것을 들 수 있습니다.</p>
+<p>리스트와 필터를 예시로 삼는 이유는, 리스트가 하나의 스트림으로 여러 필터의 조합을 통과해 원하는 결과에 도달하는 모양을, 실제 어떻게<code>How</code> 동작하는 가는 필터 구현에 들어있게 되고, 최종 문제를 기술하는 문장에는 이 필터들을 조합해서, 이런<code>What</code> 문제를 해결한다는 말만 보이게 됩니다.</p>
+<p>도구들에는 최대한 범용적인 기능만 남겨 놓고, 지금 접근 중인 문제에만 특별히 필요한 기능들은 <code>조합</code>에서만 드러나게 하면, 모나드니, Arrow니 하는 이름을 붙인 패턴들이 됩니다. 보통 이런 패턴들은 <code>Int</code>나 <code>Char</code>같은 Primitive 타입보다는 이런 Primitive 타입들을 담을 수 있는 <code>구조</code>를 대상으로 <code>조합</code> 도구를 준비해 놓습니다.</p>
+<p>제가 기존 설명들에 추가하고 싶은 핵심 키워드는 <code>조합</code>입니다.</p>
+<ol type="1">
+<li>기본 블럭은 Type 또는 Function</li>
+<li>도구는 Combinator</li>
+<li>조합은 Combination (함수형에서는 주로 함수 합성Composition으로 나타납니다.)</li>
+</ol>
+<p>쯤 되겠습니다.</p>
 
 <div class="comment">
 <script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
