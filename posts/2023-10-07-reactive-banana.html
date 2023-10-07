@@ -4,7 +4,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-        <title>lionhairdino - reactive-banana 예시로 FRP 동작 방식 이해해 보기</title>
+        <title>lionhairdino - reactive-banana 예시로 FRP 동작 방식 이해해 보기 (작성 중)</title>
 
         <meta name="description" content="reactive-banana의 예시 소스를 해석해서, 어떻게 돌아가는 걸 FRP라 부르는지 살펴봤습니다." />
         <meta property="og:description" content="reactive-banana의 예시 소스를 해석해서, 어떻게 돌아가는 걸 FRP라 부르는지 살펴봤습니다." />
@@ -33,7 +33,7 @@
         <meta name="msapplication-TileColor" content="#ff7500" />
         <meta name="theme-color" content="#ffffff" />
         <meta property="og:type" content="website" />
-        <meta property="og:title" content="reactive-banana 예시로 FRP 동작 방식 이해해 보기" />
+        <meta property="og:title" content="reactive-banana 예시로 FRP 동작 방식 이해해 보기 (작성 중)" />
         <meta property="og:site_name" content="Lionhairdino" />
         <meta property="og:url" content="https://lionhairdino.github.io/posts/2023-10-07-reactive-banana.html" />
 
@@ -74,7 +74,7 @@
             </div>
         </div>
         <div class="js-toc-content">
-            <h1>reactive-banana 예시로 FRP 동작 방식 이해해 보기</h1>
+            <h1>reactive-banana 예시로 FRP 동작 방식 이해해 보기 (작성 중)</h1>
             <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
 <div class="info">
     Posted on October  7, 2023
@@ -183,13 +183,16 @@ A. <span class="citation" data-cites="todo">@todo</span> <code>MomentIO</code>�
 <p><code>ecoin &lt;- fromAddHandler (addHandler escoin)</code>를 말로 읽어 보면, <code>escoin</code> 이벤트 소스에서, 이벤트 등록/통지를 담당하는 <code>AddHandler</code>를 꺼내 와서 <code>MomentIO</code>로 감싼 값을 만듭니다. 이름대로, 특정 순간에 일어날 <code>MomentIO</code> Computation을 뜻합니다. Computation이라 했으니, <code>IO</code> 모나드처럼 어떤 조건이 만족되면 값을 만들거라 예상할 수 있습니다. <code>ecoin</code> 값은 언제 생길까요? 언젠가, 어디선가 <code>fire</code> 시키면 그 때 만들어질 값입니다.</p>
 <p><code>data MomentIO a = MIO { unMIO :: Prim.Moment a}</code><br />
 이벤트 네트워크에 입출력을 할 때 쓰입니다.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>  (<span class="ot">ecredits ::</span> <span class="dt">Event</span> <span class="dt">Money</span>,<span class="ot"> bcredits ::</span> <span class="dt">Behavior</span> <span class="dt">Money</span>) <span class="ot">&lt;-</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    mapAccum <span class="dv">0</span> <span class="op">.</span> <span class="fu">fmap</span> (\f x <span class="ot">-&gt;</span> (f x, f x)) <span class="op">$</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>      unions</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>        [ addCredit <span class="op">&lt;$</span> ecoin, <span class="co">-- 언젠가 알게 될 coin값</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>          removeCredit <span class="op">&lt;$</span> edoesplay,</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>          addWin <span class="op">&lt;$&gt;</span> ewin</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>        ]</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">--                     x                          acc</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  (<span class="ot">ecredits ::</span> <span class="dt">Event</span> <span class="dt">Money</span>,<span class="ot"> bcredits ::</span> <span class="dt">Behavior</span> <span class="dt">Money</span>) <span class="ot">&lt;-</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    mapAccum <span class="dv">0</span> <span class="op">.</span> <span class="fu">fmap</span> (\f x <span class="ot">-&gt;</span> (f x, f x)) <span class="op">$</span> </span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>      unions</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>        [ addCredit <span class="op">&lt;$</span> ecoin, <span class="co">-- 언젠가 알게 될 coin값</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>          removeCredit <span class="op">&lt;$</span> edoesplay,</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>          addWin <span class="op">&lt;$&gt;</span> ewin</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>        ]</span></code></pre></div>
+<p><code>unions</code>의 결과는 <code>[ (+1)을 가진 이벤트, (+5)를 가진 이벤트, ...]</code> 모양의 함수 스트림입니다. 게임 진행은 사용자 인터랙션에 따라 <code>(+1)</code>,<code>(+5)</code>,<code>(-1)</code> … 등이 쌓여나갈 겁니다. 함수 스트림 값을 하나씩 <code>credits</code>에 적용하며 <code>0</code>이 되면 게임을 끝내야 합니다. <code>mapAccum</code>이 받는 이벤트는 <code>Event (acc -&gt; (x, acc))</code>로, 결과 튜플의 두 번째 자리에 계속 값을 누적하며 기억할 수 있습니다. 이 값은 <code>Behavior</code>로 기억합니다.</p>
+<p><span class="citation" data-cites="todo">@todo</span> 아직 제대로 <code>mapAccum</code>을 해석하지 못했습니다. <code>Event</code>, <code>Behavior</code> 개념을 더 자세히 추가하는 중입니다. - Sat Oct 7 03:29:47 PM KST 2023</p>
 <blockquote>
 <p>Q. 이벤트 구조로 만들어 둔, 즉 <code>Event</code> 타입의 <code>ecoin</code>은 <code>()</code>를 담고 있다고 했는데, <code>addCredit = (+1)</code>을 보면 <code>Number</code>여야 할 것럼 보인다?<br />
 A. <code>(&lt;$) :: a -&gt; Event b -&gt; Event a</code><br />
@@ -199,15 +202,22 @@ A. <code>(&lt;$) :: a -&gt; Event b -&gt; Event a</code><br />
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>ghci&gt; (+1) &lt;$ [(),()] &lt;*&gt; [1,2]</span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>[2,3,2,3]</span></code></pre></div>
 </blockquote>
+<p><code>ecoin</code>이 가진 <code>()</code>를 <code>(+ 1)</code> 함수로 바꿔 놓고,<br />
+<code>edoesplay</code>가 가진 <code>()</code>를 <code>(- 1)</code>함수로 바꿔 놓고<br />
+<code>ewin</code>이 가진 <code>Double | Triple</code>에 따라 <code>(+ 5)</code>, <code>(+ 20)</code>로 바꿔 놓습니다.<br />
+의미만 보면(실제는 다름), <code>[(발생시각,(+ 1)), (발생시각, (+ 5)), (발생시각, (- 1)) ...]</code> 무한 리스트입니다. </p>
 <p><code>data Event a</code><br />
 <code>newtype Event a = E { unE :: Prim.Event a }</code><br />
-<code>Prim.Event</code>는 <code>type Event a = Cached Moment (Pulse a)</code>로 정의되어 있는데, 해석이 어렵습니다. 뜻은 <code>type Event a = [(Time, a)]</code> 쯤으로 보면 된다하니, 라이브러리 소스 자체를 더 뜯어보기 전엔 이렇게만 알고 넘어 가야겠습니다. 발생 시간을 같이 가지고 있는 이벤트 튜플의 스트림(무한 리스트)입니다. 이벤트 발생 시간순 시퀀스로 볼 수 있습니다.</p>
+<code>Prim.Event</code>는 <code>type Event a = Cached Moment (Pulse a)</code>로 정의되어 있는데, <code>Moment</code>가 <code>ReaderT EventNetwork</code>란 것까지만 집어 내고, 전체 해석은 시간이 걸리겠습니다. 뜻은 <code>type Event a = [(Time, a)]</code> 쯤으로 보면 된다하니, 라이브러리 소스 자체를 더 뜯어보기 전엔 이렇게만 알고 넘어 가야겠습니다. 발생 시간을 같이 가지고 있는 이벤트 튜플 스트림(무한 리스트)입니다. 이벤트 발생 시간순 시퀀스로 볼 수 있습니다.</p>
 <p><code>data Behavior a</code><br />
 <code>type Behavior a = Cached Moment (Latch a, Pulse ())</code> 로 정의되어 있고, 시간에 따라 변하는 값을 나타냅니다. 뜻은 <code>type Behavior a = Time -&gt; a</code> 쯤으로 보면 됩니다. 가장 기본이 되는 시간에 따라 변하는 값은 <code>time :: Behavior Time</code> 입니다. FRAN 논문의 주요 아이디어는 <code>Behavior Picture</code>라고 합니다.</p>
 <p><code>Event</code>, <code>Behavior</code> 두 타입과 <code>MonadMoment</code> 클래스로 여러 컴비네이터를 구현해 놨습니다.</p>
 <p><code>mapAccum :: MonadMoment m =&gt; acc -&gt; Event (acc -&gt; (x, acc)) -&gt; m (Event x, Behavior acc)</code> <code>AccumE</code>와 <code>AccumB</code>를 합친 컴비네이션입니다.</p>
 <p><code>accumE :: MonadMoment m =&gt; a -&gt; Event (a -&gt; a) -&gt; m (Event a)</code><br />
-이벤트값 스트림을 누적합니다. strict로 left scan하는 <code>scanl'</code>와 비슷합니다. 초기값으로 시작해서, 언제든 이벤트가 발생하면 새로운 값을 emit합니다. 새 값은 이벤트에 들어있는 함수를 이전 값에 적용해서 계산합니다.</p>
+이벤트값 스트림을 누적합니다. strict로 left scan하는 <code>scanl'</code>와 비슷합니다. 초기값으로 시작해서, 언제든 이벤트가 발생하면 새로운 값을 emit합니다. 새 값은 이벤트에 들어있는 함수를 이전 값에 적용해서 계산합니다.<br />
+예를 들면,<br />
+초기값 <code>0</code>일 때 <code>(+1)::Int -&gt; Int</code> 이벤트가 들어오면 결과, <code>Event Int</code>는 <code>1</code>을 가지고 있고,<br />
+이 상태에서 <code>(+5)::Int -&gt; Int</code> 이벤트가 들어오면, 결과 <code>Event Int</code>는 <code>6</code>을 가지고 있게 됩니다.</p>
 <p><code>accumB :: MonadMoment m =&gt; a -&gt; Event (a -&gt; a) -&gt; m (Behavior a)</code><br />
 이벤트 발생을 <code>Behavior</code>에 누적합니다. 값은 <code>accumE</code>로 누적하고, <code>stepper</code>를 써서 시간 의존time-varying값으로 변환됩니다.</p>
 <p><code>stepper :: MonadMoment m =&gt; a -&gt; Event a -&gt; m (Behavior a)</code><br />
