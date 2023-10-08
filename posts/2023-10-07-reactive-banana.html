@@ -81,37 +81,48 @@
     
 </div>
 
-<p>reactive-banana 사용법을 따라가며, FRP가 뭔가만 보겠습니다. FRP를 <strong><em>어떻게 구현했는지는 보지 않습니다.</em></strong><br />
-※ Hackage에서 FRP로 검색하면 많은 수가 나옵니다. 이 중 예시 코드가 잘되어 있어, 읽기 편할 것 같은 라이브러리를 골랐을 뿐, 현재(2023.10) 가장 권장되는 라이브러리는 아닌 걸로 보입니다. Original FRP 방식은 가베지 컬렉션에 문제가 있어 Yampa가 해결했다는데, 다른 라이브러리는 잘 모르겠습니다. (퍼포먼스 문제를 가지고 있어, 프로덕트에는 reflex-frp가 더 많이 쓰는 추세라 합니다. - <span class="citation" data-cites="jhhuh님">@jhhuh님</span>)</p>
-<p>이 프레임워크의 가장 기본적인 사용법은 아래와 같습니다.</p>
+<p>reactive-banana가 FRP를 <strong><em>어떻게 구현했는지는 보지 않습니다.</em></strong><br />
+reactive-banana 사용법을 따라가며, FRP가 무엇인가만 보려합니다.</p>
+<p>※ Hackage에서 FRP로 검색하면 많은 수가 나옵니다. 이 중 예시 코드가 잘 되어 있어, 읽기 편할 것 같은 라이브러리를 골랐을 뿐, 현재(2023.10) 가장 권장되는 라이브러리는 아닌 걸로 보입니다. Original FRP 방식은 가베지 컬렉션에 문제가 있어 <a href="https://github.com/ivanperez-keera/Yampa/">Yampa</a>가 해결했다는데, 다른 라이브러리는 잘 모르겠습니다. (퍼포먼스 문제를 가지고 있어, 프로덕트에는 <a href="https://reflex-frp.org/">reflex</a>가 더 많이 쓰는 추세라 합니다. - <span class="citation" data-cites="jhhuh님">@jhhuh님</span>)</p>
+<h2 id="생각-스트레칭">생각 스트레칭</h2>
+<p>(<strong><em>검증 필요</em></strong>)</p>
+<p>나무를 썰지 않고 있다가, 필요할 때 톱을 주면서 “나무를 썰어”라고 시퀀셜하게 할 수도 있고,<br />
+톱을 주지 않고 “나무를 썰어”라고 먼저 말해 놓고, 필요할 때 톱을 넘겨도<code>fire</code> 동일한 효과가 납니다. 어차피 톱이 없으면, 나무를 써는 일은 일어나지 않으니, 신경쓰지 않고, “나무를 썰어”라고 말해도 됩니다. 그리고, 중요한 비유가 빠졌는데, “<strong><em>언제든지</em></strong>, 톱이 들어오면 나무를 썬다”까지 얘기해야 됩니다. - <code>Lazy한 스트림</code></p>
+<p>또 다시, 톱으로 썰어 목재가 준비되면, 망치를 넘겨 “가구를 만들어”라고 할 수도 있지만, 역시나 목재나 망치를 주지 않고 “가구를 만들어”라고 먼저 해 놓아도 됩니다. 어차피 목재, 망치가 준비되지 않으면 “가구를 만들어”는 일어나지 않습니다. - <code>Reactive Style</code></p>
+<p>프로그래밍의 흐름이 어떤 이벤트 스트림에 의존하는 다른 이벤트 스트림을 만드는 식의 모양이 됩니다. 이렇게 이벤트에 (연쇄적으로) 반응react하는 흐름을 함수형으로 작성하는 걸 Functional Reactive Programming이라 합니다. Lazy한 특징들과 잘 맞아 떨어질 것 같은데, 아직 라이브러리 코드를 깊게 보지 못해 추측일 뿐입니다.</p>
+<p>(아래 핵심 타입으로 <code>Event</code>와 <code>Behavior</code>가 나오는데 먼저 비유에 붙여 얘기하면, 스트림에 톱이나 망치가 들어 온 횟수를 센다거나 하는 사람을 있다면, 이 사람은 <code>Behavior</code>로 볼 수 있습니다. <code>Event</code> 스트림이 좀 raw한 값이라면, <code>Behavior</code>는 이 raw한 값들을 한 번 가공해서 기억하고 있는 값처럼 보입니다. )</p>
+<h2 id="register-fire">register, fire!</h2>
+<p>reactive-banana 프레임워크의 가장 기본적인 사용법은 아래와 같습니다.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">do</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  (addHandler, fire) <span class="ot">&lt;-</span> newAddHandler</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  register addHandler <span class="fu">putStrLn</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  fire <span class="st">&quot;Hello!&quot;</span></span></code></pre></div>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  (addHandler, fire) <span class="ot">&lt;-</span> newAddHandler <span class="co">-- 말만 먼저 할 수 있는 구조를 만들고,</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  register addHandler <span class="fu">putStrLn</span> <span class="co">-- 나무를 썰어라고 말 해놓고</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  fire <span class="st">&quot;Hello!&quot;</span> <span class="co">-- 톱을 나중에 넘깁니다.</span></span></code></pre></div>
 <p>프레임워크에 있는 구조 안에 함수를 넣어(<code>register</code>) 두면, 이 함수에 필요한 인자를 구조의 인터페이스(<code>fire</code>)로 전달해 비동기로 실행하고 있습니다.</p>
 <p>실제 사용 예시를 보겠습니다.<br />
-<a href="https://github.com/HeinrichApfelmus/reactive-banana/blob/master/reactive-banana/doc/examples/SlotMachine.hs">HeinrichApfelmus/reactive-banana - SlotMachine.hs</a> 소스를 가져와서 뜯어봤습니다.</p>
+<a href="https://github.com/HeinrichApfelmus/reactive-banana/blob/master/reactive-banana/doc/examples/SlotMachine.hs">HeinrichApfelmus/reactive-banana - SlotMachine.hs</a> 소스를 가져와서 뜯어봤습니다.<br />
+그림 세 개가 일치하면, 돈이 쏟아지는 그 슬롯 머신 게임입니다.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="kw">do</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  displayHelpMessage</span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  sources <span class="ot">&lt;-</span> makeSources</span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  network <span class="ot">&lt;-</span> compile <span class="op">$</span> networkDescription sources</span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  actuate network</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  eventLoop sources</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="ot">displayHelpMessage ::</span> <span class="dt">IO</span> ()</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>displayHelpMessage <span class="ot">=</span></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mapM_</span> <span class="fu">putStrLn</span> <span class="op">$</span></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;-----------------------------&quot;</span></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>      <span class="op">:</span> <span class="st">&quot;- THE REACTIVE SLOT MACHINE -&quot;</span></span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>      <span class="op">:</span> <span class="st">&quot;------ WIN A BANANA ---------&quot;</span></span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>      <span class="op">:</span> <span class="st">&quot;&quot;</span></span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>      <span class="op">:</span> <span class="st">&quot;Commands are:&quot;</span></span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>      <span class="op">:</span> <span class="st">&quot;  coin - inser a coin&quot;</span></span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>      <span class="op">:</span> <span class="st">&quot;  play - play one game&quot;</span></span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>      <span class="op">:</span> <span class="st">&quot;  quit - quit the program&quot;</span></span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>      <span class="op">:</span> <span class="st">&quot;&quot;</span></span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>      <span class="op">:</span> []</span></code></pre></div>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  eventLoop sources</span></code></pre></div>
+<p>reactive-banana는 이벤트 네트워크란 이름을 붙인 이벤트 그래프를 만들고<code>networkDescription</code>, 컴파일<code>compile</code>이라는 작업을 통해 리액티브로 돌아갈 구조를 준비합니다. 그리고 나서, 이 네트워크를 시작<code>actuate</code>시키면 이벤트 관련 동작들이 시작됩니다. <code>eventLoop</code>는 특별히 프레임워크 내부에 준비된 절차는 아니고, 외부의 일반적인 루프로 <code>fire</code> 핸들러를 통해 프레임워크와 소통합니다. 여기선, 이 정도까지만 보고 넘어가겠습니다. 핵심적인 아이디어 구현 코드를 보려고 라이브러리 코드 자체를 조금 뜯어 봤는데, 역시나 금방 눈에 들어오진 않습니다. 여기서는 우선 FRP가 뭔지를 알아내는 게 목표입니다.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ot">displayHelpMessage ::</span> <span class="dt">IO</span> ()</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>displayHelpMessage <span class="ot">=</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mapM_</span> <span class="fu">putStrLn</span> <span class="op">$</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;-----------------------------&quot;</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>      <span class="op">:</span> <span class="st">&quot;- THE REACTIVE SLOT MACHINE -&quot;</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>      <span class="op">:</span> <span class="st">&quot;------ WIN A BANANA ---------&quot;</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>      <span class="op">:</span> <span class="st">&quot;&quot;</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>      <span class="op">:</span> <span class="st">&quot;Commands are:&quot;</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>      <span class="op">:</span> <span class="st">&quot;  coin - inser a coin&quot;</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>      <span class="op">:</span> <span class="st">&quot;  play - play one game&quot;</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>      <span class="op">:</span> <span class="st">&quot;  quit - quit the program&quot;</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>      <span class="op">:</span> <span class="st">&quot;&quot;</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>      <span class="op">:</span> []</span></code></pre></div>
 <h2 id="비동기로-실행될-구조---addhandler-타입">비동기로 실행될 구조 - AddHandler 타입</h2>
 <p><code>makeSources = (,) &lt;$&gt; newAddHandler &lt;*&gt; newAddHandler</code></p>
 <p><code>newAddHandler</code>는 나중에 함수(작업)를 받아, 이벤트 형태로 동작시키기 위한 틀을 만듭니다.<br />
@@ -126,19 +137,21 @@
 <p>Q. 안에 있는 함수는 핸들러를 받아 <code>IO (IO ())</code>를 반환한다. <code>IO ()</code>가 아니라 <code>IO (IO ())</code>다. 왜 그럴까? .<br />
 A. <span class="citation" data-cites="todo">@todo</span> <code>MomentIO</code>와 연관 있는 듯 한데, 라이브러리 코드를 더 뜯어봐야 알겠습니다.</p>
 </blockquote>
-<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ot">eventLoop ::</span> (<span class="dt">EventSource</span> (), <span class="dt">EventSource</span> ()) <span class="ot">-&gt;</span> <span class="dt">IO</span> ()</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>eventLoop (escoin, esplay) <span class="ot">=</span> loop</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    loop <span class="ot">=</span> <span class="kw">do</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>      <span class="fu">putStr</span> <span class="st">&quot;&gt; &quot;</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>      hFlush stdout</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>      s <span class="ot">&lt;-</span> <span class="fu">getLine</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>      <span class="kw">case</span> s <span class="kw">of</span></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;coin&quot;</span> <span class="ot">-&gt;</span> fire escoin () <span class="co">-- coin 이벤트 소스를 fire한다.</span></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;play&quot;</span> <span class="ot">-&gt;</span> fire esplay ()</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;quit&quot;</span> <span class="ot">-&gt;</span> <span class="fu">return</span> ()</span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>        _ <span class="ot">-&gt;</span> <span class="fu">putStrLn</span> <span class="op">$</span> s <span class="op">++</span> <span class="st">&quot; - unknown command&quot;</span></span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>      when (s <span class="op">/=</span> <span class="st">&quot;quit&quot;</span>) loop</span></code></pre></div>
+<p>이제 서명의 뜻을 알았으니, 그대로 읽으면 <code>newAddHandler</code>는 <code>(AddHandler a, fire함수)</code> 두 개의 정보를 반환합니다.</p>
+<p>아래는 프레임워크의 일부가 아닌, 보통의 하스켈 루프입니다.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ot">eventLoop ::</span> (<span class="dt">EventSource</span> (), <span class="dt">EventSource</span> ()) <span class="ot">-&gt;</span> <span class="dt">IO</span> ()</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>eventLoop (escoin, esplay) <span class="ot">=</span> loop</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    loop <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>      <span class="fu">putStr</span> <span class="st">&quot;&gt; &quot;</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>      hFlush stdout</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>      s <span class="ot">&lt;-</span> <span class="fu">getLine</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>      <span class="kw">case</span> s <span class="kw">of</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;coin&quot;</span> <span class="ot">-&gt;</span> fire escoin () <span class="co">-- coin 이벤트 소스를 fire한다.</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;play&quot;</span> <span class="ot">-&gt;</span> fire esplay ()</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;quit&quot;</span> <span class="ot">-&gt;</span> <span class="fu">return</span> ()</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>        _ <span class="ot">-&gt;</span> <span class="fu">putStrLn</span> <span class="op">$</span> s <span class="op">++</span> <span class="st">&quot; - unknown command&quot;</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>      when (s <span class="op">/=</span> <span class="st">&quot;quit&quot;</span>) loop</span></code></pre></div>
 <h2 id="이벤트-소스">이벤트 소스</h2>
 <p>Event 소스라면 뭘 할 줄 알아야 할까요?</p>
 <ul>
@@ -146,114 +159,116 @@ A. <span class="citation" data-cites="todo">@todo</span> <code>MomentIO</code>�
 <li>(통지를 보낼) 핸들러들을 기억 할 수 있으면 됩니다.</li>
 </ul>
 <p><code>EventSource</code>는 핸들러 등록/통지 작업을 하는 <code>AddHandler</code>와 <code>fire</code> 역할을 하는 함수를 가지고 있습니다.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">EventSource</span> a <span class="ot">=</span> (<span class="dt">AddHandler</span> a, <span class="dt">Handler</span> a) <span class="co">-- 원 코드는 a -&gt; IO () 로 되어 있다.</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- 두 번째 Handler는 이벤트를 `fire`를 하는 함수로, newAddHandler로 만들어진다.</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- fire도 핸들러로 볼 수 있긴 한데, Fire라는 synonym을 만들어 써도 좋겠다.</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="ot">addHandler ::</span> <span class="dt">EventSource</span> a <span class="ot">-&gt;</span> <span class="dt">AddHandler</span> a</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>addHandler <span class="ot">=</span> <span class="fu">fst</span> </span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co">-- 2튜플의 첫 번째에 있는 &quot;핸들러를 등록하는 함수&quot;를 가진 AddHandler 가져오기</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="co">-- 정의만 보면, 마치 getHandler 작명이 어울릴 것 같은데,</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="co">-- 남은 코드를 더 읽어보면 add가 맞는 작명으로 보인다.</span></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="ot">fire ::</span> <span class="dt">EventSource</span> a <span class="ot">-&gt;</span> <span class="dt">Handler</span> a <span class="co">-- 원 코드는 a -&gt; IO () 로 되어 있다.</span></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>fire <span class="ot">=</span> <span class="fu">snd</span></span></code></pre></div>
-<p><code>addHandler</code>, <code>fire</code> 함수는 각 각 2튜플의 첫 번째, 두 번째 걸 꺼내오는 역할만 합니다.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">Money</span> <span class="ot">=</span> <span class="dt">Int</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">Reels</span> <span class="ot">=</span> (<span class="dt">Int</span>, <span class="dt">Int</span>, <span class="dt">Int</span>) <span class="co">-- 릴테입할 때 릴</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Win</span> <span class="ot">=</span> <span class="dt">Double</span> <span class="op">|</span> <span class="dt">Triple</span></span>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">EventSource</span> a <span class="ot">=</span> (<span class="dt">AddHandler</span> a, <span class="dt">Handler</span> a) <span class="co">-- 원 코드는 a -&gt; IO () 로 되어 있다.</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- 두 번째 Handler는 이벤트를 `fire`를 하는 함수로, newAddHandler로 만들어진다.</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- fire도 핸들러로 볼 수 있긴 한데, Fire라는 synonym을 만들어 써도 좋겠다.</span></span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="ot">networkDescription ::</span> (<span class="dt">EventSource</span> (), <span class="dt">EventSource</span> ()) <span class="ot">-&gt;</span> <span class="dt">MomentIO</span> ()</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>networkDescription (escoin, esplay) <span class="ot">=</span> mdo <span class="co">-- MomentIO의 mdo (RecursiveDo)</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  initialStdGen <span class="ot">&lt;-</span> liftIO newStdGen</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  ecoin <span class="ot">&lt;-</span> fromAddHandler (addHandler escoin)</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>           <span class="co">----------------------------------</span></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="co">--                 MomentIO (Event a)</span></span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  eplay <span class="ot">&lt;-</span> fromAddHandler (addHandler esplay)</span></code></pre></div>
-<p>핸들러 등록 함수를 보고 이벤트를 만듭니다. 마치 거꾸로 절차가 된 것 같습니다. 생각의 흐름은 이벤트를 만들고, 이벤트 <code>fire</code>를 기다리는 핸들러를 만들 것 같은데, <code>AddHandler</code> 타입에서 이벤트를 가져 옵니다. 용어가 혼동을 줘서 그런 듯 합니다.</p>
-<ul>
-<li>이벤트가 동작해서 결과로 얻을 값은 <code>a</code>고,</li>
-<li>이벤트를 시작 시키는 함수는 <code>fire</code>고,</li>
-<li>핸들러 등록/통지는 <code>AddHandler</code>가 합니다.</li>
-</ul>
-<p>“이벤트”는 뭘까요? 부드럽게 이해가진 않을 수 있는데, 일어난 사건 자체를 뜻하기도 하고, 위 속성을 가지도록 만든 <strong><em>구조</em></strong>를 뜻하기도 하고, <code>AddHandler</code> 타입에서 쓰는 <strong><em>스트림</em></strong>을 뜻하기도 합니다.</p>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="ot">addHandler ::</span> <span class="dt">EventSource</span> a <span class="ot">-&gt;</span> <span class="dt">AddHandler</span> a</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>addHandler <span class="ot">=</span> <span class="fu">fst</span> </span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co">-- 2튜플의 첫 번째에 있는 &quot;핸들러를 등록하는 함수&quot;를 가진 AddHandler 가져오기</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="co">-- 정의만 보면, 마치 getHandler 작명이 어울릴 것 같은데,</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="co">-- 남은 코드를 더 읽어보면 add가 맞는 작명으로 보인다.</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="ot">fire ::</span> <span class="dt">EventSource</span> a <span class="ot">-&gt;</span> <span class="dt">Handler</span> a <span class="co">-- 원 코드는 a -&gt; IO () 로 되어 있다.</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>fire <span class="ot">=</span> <span class="fu">snd</span></span></code></pre></div>
+<p><code>newAddHandler</code>가 반환한 값을 쓰기 편하게 이름 붙여 놓는 역할정도 하는 함수들입니다.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">Money</span> <span class="ot">=</span> <span class="dt">Int</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">Reels</span> <span class="ot">=</span> (<span class="dt">Int</span>, <span class="dt">Int</span>, <span class="dt">Int</span>) <span class="co">-- 릴테입할 때 릴</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Win</span> <span class="ot">=</span> <span class="dt">Double</span> <span class="op">|</span> <span class="dt">Triple</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="ot">networkDescription ::</span> (<span class="dt">EventSource</span> (), <span class="dt">EventSource</span> ()) <span class="ot">-&gt;</span> <span class="dt">MomentIO</span> ()</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>networkDescription (escoin, esplay) <span class="ot">=</span> mdo <span class="co">-- MomentIO의 mdo (RecursiveDo)</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  initialStdGen <span class="ot">&lt;-</span> liftIO newStdGen</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  ecoin <span class="ot">&lt;-</span> fromAddHandler (addHandler escoin)</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>           <span class="co">----------------------------------</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="co">--                 MomentIO (Event a)</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  eplay <span class="ot">&lt;-</span> fromAddHandler (addHandler esplay)</span></code></pre></div>
+<p>핸들러 등록 구조를 가진 <code>AddHandler</code> 타입에서 준비해 둔 이벤트 스트림을 가져 옵니다.</p>
 <p><code>escoin</code>, <code>esplay</code>는 이벤트 구조를 만들어 둔 것들로, 인자 타입 서명을 보면 <code>EventSource ()</code>이므로 <code>()</code>를 담을 구조입니다. 이 구조 안의 스트림인 <code>Event</code> 타입을 <code>fromAddHandler</code>로 가져옵니다.</p>
 <p><code>fromAddHandler :: AddHandler a -&gt; MomentIO (Event a)</code><br />
-이벤트 네트워크가 시작actuate되면, 호출될 때마다 이벤트를 발생시킬 콜백 함수를 등록합니다.</p>
-<p><code>ecoin &lt;- fromAddHandler (addHandler escoin)</code>를 말로 읽어 보면, <code>escoin</code> 이벤트 소스에서, 이벤트 등록/통지를 담당하는 <code>AddHandler</code>를 꺼내 와서 <code>MomentIO</code>로 감싼 값을 만듭니다. 이름대로, 특정 순간에 일어날 <code>MomentIO</code> Computation을 뜻합니다. Computation이라 했으니, <code>IO</code> 모나드처럼 어떤 조건이 만족되면 값을 만들거라 예상할 수 있습니다. <code>ecoin</code> 값은 언제 생길까요? 언젠가, 어디선가 <code>fire</code> 시키면 그 때 만들어질 값입니다.</p>
+이벤트 네트워크가 시작actuate되면, 호출될 때마다 이벤트를 발생시킬 콜백 함수를 이 함수가 등록합니다.</p>
+<p><code>ecoin &lt;- fromAddHandler (addHandler escoin)</code>를 말로 읽어 보면, <code>escoin</code> 이벤트 소스에서, 이벤트 등록/통지를 담당하는 <code>AddHandler</code>를 꺼내 와서 <code>MomentIO</code>로 감싼 값을 만듭니다. 이름대로, 특정 순간에 일어날 <code>MomentIO</code> Computation을 뜻합니다. Computation이라 했으니, <code>IO</code> 모나드처럼 어떤 조건이 만족되면 값을 만들거라 예상할 수 있습니다. <code>ecoin</code>의 실제 값은 언제 생길까요? 언젠가, 어디선가 <code>fire</code> 시키면 그 때 만들어질 값입니다.</p>
 <p><code>data MomentIO a = MIO { unMIO :: Prim.Moment a}</code><br />
-이벤트 네트워크에 입출력을 할 때 쓰입니다.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">--                     x                          acc</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  (<span class="ot">ecredits ::</span> <span class="dt">Event</span> <span class="dt">Money</span>,<span class="ot"> bcredits ::</span> <span class="dt">Behavior</span> <span class="dt">Money</span>) <span class="ot">&lt;-</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    mapAccum <span class="dv">0</span> <span class="op">.</span> <span class="fu">fmap</span> (\f x <span class="ot">-&gt;</span> (f x, f x)) <span class="op">$</span> </span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>      unions</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>        [ addCredit <span class="op">&lt;$</span> ecoin, <span class="co">-- 언젠가 알게 될 coin값</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>          removeCredit <span class="op">&lt;$</span> edoesplay,</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>          addWin <span class="op">&lt;$&gt;</span> ewin</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>        ]</span></code></pre></div>
+이벤트 네트워크에 입,출력할 때 쓰입니다.</p>
+<h2 id="mapaccum">mapAccum</h2>
+<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>  (<span class="ot">ecredits ::</span> <span class="dt">Event</span> <span class="dt">Money</span>,<span class="ot"> bcredits ::</span> <span class="dt">Behavior</span> <span class="dt">Money</span>) <span class="ot">&lt;-</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    mapAccum <span class="dv">0</span> <span class="op">.</span> <span class="fu">fmap</span> (\f x <span class="ot">-&gt;</span> (f x, f x)) <span class="op">$</span> </span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>      unions</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>        [ addCredit <span class="op">&lt;$</span> ecoin, <span class="co">-- 언젠가 알게 될 coin값</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>          removeCredit <span class="op">&lt;$</span> edoesplay,</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>          addWin <span class="op">&lt;$&gt;</span> ewin</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>        ]</span></code></pre></div>
 <p><code>unions</code>의 결과는 <code>[ (+1)을 가진 이벤트, (+5)를 가진 이벤트, ...]</code> 모양의 함수 스트림입니다. 게임 진행은 사용자 인터랙션에 따라 <code>(+1)</code>,<code>(+5)</code>,<code>(-1)</code> … 등이 쌓여나갈 겁니다. 함수 스트림 값을 하나씩 <code>credits</code>에 적용하며 <code>0</code>이 되면 게임을 끝내야 합니다. <code>mapAccum</code>이 받는 이벤트는 <code>Event (acc -&gt; (x, acc))</code>로, 결과 튜플의 두 번째 자리에 계속 값을 누적하며 기억할 수 있습니다. 이 값은 <code>Behavior</code>로 기억합니다.</p>
 <p><span class="citation" data-cites="todo">@todo</span> 아직 제대로 <code>mapAccum</code>을 해석하지 못했습니다. <code>Event</code>, <code>Behavior</code> 개념을 더 자세히 추가하는 중입니다. - Sat Oct 7 03:29:47 PM KST 2023</p>
 <blockquote>
 <p>Q. 이벤트 구조로 만들어 둔, 즉 <code>Event</code> 타입의 <code>ecoin</code>은 <code>()</code>를 담고 있다고 했는데, <code>addCredit = (+1)</code>을 보면 <code>Number</code>여야 할 것럼 보인다?<br />
 A. <code>(&lt;$) :: a -&gt; Event b -&gt; Event a</code><br />
 안에 들어 있는 걸 바꾸는 컴비네이터입니다.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>'a' &lt;$ Just 2</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>Just 'a'</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>ghci&gt; (+1) &lt;$ [(),()] &lt;*&gt; [1,2]</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>[2,3,2,3]</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>'a' &lt;$ Just 2</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>Just 'a'</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>ghci&gt; (+1) &lt;$ [(),()] &lt;*&gt; [1,2]</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>[2,3,2,3]</span></code></pre></div>
 </blockquote>
+<h3 id="이벤트-트랜스폼">이벤트 트랜스폼</h3>
 <p><code>ecoin</code>이 가진 <code>()</code>를 <code>(+ 1)</code> 함수로 바꿔 놓고,<br />
 <code>edoesplay</code>가 가진 <code>()</code>를 <code>(- 1)</code>함수로 바꿔 놓고<br />
 <code>ewin</code>이 가진 <code>Double | Triple</code>에 따라 <code>(+ 5)</code>, <code>(+ 20)</code>로 바꿔 놓습니다.<br />
 의미만 보면(실제는 다름), <code>[(발생시각,(+ 1)), (발생시각, (+ 5)), (발생시각, (- 1)) ...]</code> 무한 리스트입니다. </p>
+<h3 id="event-behavior">Event, Behavior</h3>
+<p>예시 소스를 따라가며 기록하다 보니, 제일 먼저 나와야 하는 기본 개념이 지금 나왔습니다.</p>
 <p><code>data Event a</code><br />
 <code>newtype Event a = E { unE :: Prim.Event a }</code><br />
-<code>Prim.Event</code>는 <code>type Event a = Cached Moment (Pulse a)</code>로 정의되어 있는데, <code>Moment</code>가 <code>ReaderT EventNetwork</code>란 것까지만 집어 내고, 전체 해석은 시간이 걸리겠습니다. 뜻은 <code>type Event a = [(Time, a)]</code> 쯤으로 보면 된다하니, 라이브러리 소스 자체를 더 뜯어보기 전엔 이렇게만 알고 넘어 가야겠습니다. 발생 시간을 같이 가지고 있는 이벤트 튜플 스트림(무한 리스트)입니다. 이벤트 발생 시간순 시퀀스로 볼 수 있습니다.</p>
+<code>Prim.Event</code>는 <code>type Event a = Cached Moment (Pulse a)</code>로 정의되어 있는데, <code>Moment</code>구현에 보면 <code>ReaderT EventNetwork</code>가 보입니다. 뜻은 <code>type Event a = [(Time, a)]</code> 쯤으로 보면 된다하니, 라이브러리 소스 자체를 더 뜯어보기 전엔 이렇게만 알고 넘어 가야겠습니다. 발생 시간을 같이 가지고 있는 이벤트 튜플 스트림(무한 리스트)입니다. 이벤트 발생 시간순 시퀀스로 볼 수 있습니다.</p>
+<blockquote>
+<p><span class="citation" data-cites="todo">@todo</span> 단일 이벤트가 아닌, 이벤트 <strong><em>스트림</em></strong>이라 하여, 무한 리스트같은 재귀 모양이 나오고, 핸들러를 등록/해제 하는 함수가 불어 있을 거라 예상하며 코드를 뒤졌는데, 딱히 재귀 모양이 잘 드러나지 않습니다. <code>IORef</code> 들을 여기 저기 쓴 게 보이는데, <code>MVar</code>는 안보입니다. 결국 블로킹을 통해 비동기 동작을 하려면 <code>MVar</code>가 보일 것만 같은데요. 코드를 이해하게 되면, 내용을 추가하도록 하겠습니다.</p>
+</blockquote>
 <p><code>data Behavior a</code><br />
-<code>type Behavior a = Cached Moment (Latch a, Pulse ())</code> 로 정의되어 있고, 시간에 따라 변하는 값을 나타냅니다. 뜻은 <code>type Behavior a = Time -&gt; a</code> 쯤으로 보면 됩니다. 가장 기본이 되는 시간에 따라 변하는 값은 <code>time :: Behavior Time</code> 입니다. FRAN 논문의 주요 아이디어는 <code>Behavior Picture</code>라고 합니다.</p>
+<code>type Behavior a = Cached Moment (Latch a, Pulse ())</code> 로 정의되어 있고, 시간에 따라 변하는 값을 나타냅니다. 뜻은 <code>type Behavior a = Time -&gt; a</code> 쯤으로 보면 됩니다. 가장 기본이 되는 시간에 따라 변하는 값은 <code>time :: Behavior Time</code> 입니다. (<a href="http://conal.net/fran/">FRAN</a> 논문의 주요 아이디어는, 시간에 따라 그림이 변하는, 즉 애니메이션을 <code>Behavior Picture</code>라고 표현하고 있습니다.)</p>
+<h3 id="컴비네이터">컴비네이터</h3>
 <p><code>Event</code>, <code>Behavior</code> 두 타입과 <code>MonadMoment</code> 클래스로 여러 컴비네이터를 구현해 놨습니다.</p>
-<p><code>mapAccum :: MonadMoment m =&gt; acc -&gt; Event (acc -&gt; (x, acc)) -&gt; m (Event x, Behavior acc)</code> <code>AccumE</code>와 <code>AccumB</code>를 합친 컴비네이션입니다.</p>
-<p><code>accumE :: MonadMoment m =&gt; a -&gt; Event (a -&gt; a) -&gt; m (Event a)</code><br />
-이벤트값 스트림을 누적합니다. strict로 left scan하는 <code>scanl'</code>와 비슷합니다. 초기값으로 시작해서, 언제든 이벤트가 발생하면 새로운 값을 emit합니다. 새 값은 이벤트에 들어있는 함수를 이전 값에 적용해서 계산합니다.<br />
-예를 들면,<br />
-초기값 <code>0</code>일 때 <code>(+1)::Int -&gt; Int</code> 이벤트가 들어오면 결과, <code>Event Int</code>는 <code>1</code>을 가지고 있고,<br />
-이 상태에서 <code>(+5)::Int -&gt; Int</code> 이벤트가 들어오면, 결과 <code>Event Int</code>는 <code>6</code>을 가지고 있게 됩니다.</p>
-<p><code>accumB :: MonadMoment m =&gt; a -&gt; Event (a -&gt; a) -&gt; m (Behavior a)</code><br />
-이벤트 발생을 <code>Behavior</code>에 누적합니다. 값은 <code>accumE</code>로 누적하고, <code>stepper</code>를 써서 시간 의존time-varying값으로 변환됩니다.</p>
-<p><code>stepper :: MonadMoment m =&gt; a -&gt; Event a -&gt; m (Behavior a)</code><br />
-초기값과 새 값 스트림으로부터 시간 의존 함수를 만듭니다.</p>
-<p><code>unions :: [Event (a -&gt; a)] -&gt; Event (a -&gt; a)</code><br />
+<p>※ 원래 안에 가지고 있는 값에 적용(의존)하면서 값을 바꾸면, 누적Accumulate이란 용어를 선택한 것 같습니다.</p>
+<p><strong><em>mapAccum</em></strong><code>:: MonadMoment m =&gt; acc -&gt; Event (acc -&gt; (x, acc)) -&gt; m (Event x, Behavior acc)</code> <code>AccumE</code>와 <code>AccumB</code>를 합친 컴비네이션입니다.</p>
+<p><strong><em>accumE</em></strong><code>:: MonadMoment m =&gt; a -&gt; Event (a -&gt; a) -&gt; m (Event a)</code><br />
+이벤트가 가진 값을 누적합니다. strict로 left scan하는 <code>scanl'</code>와 비슷합니다. 초기값으로 시작해서, 언제든 이벤트가 발생하면 새로운 값을 emit합니다. 새 값은 이벤트에 들어있는 함수를 이전 값에 적용해서 계산합니다.</p>
+<p><strong><em>accumB</em></strong><code>:: MonadMoment m =&gt; a -&gt; Event (a -&gt; a) -&gt; m (Behavior a)</code><br />
+<code>Event</code>에 들어 있는 함수를 이벤트 발생하면 <code>Behavior</code>가 가진 값에 적용합니다.<br />
+</p>
+<p><strong><em>stepper</em></strong><code>:: MonadMoment m =&gt; a -&gt; Event a -&gt; m (Behavior a)</code><br />
+초기값 <code>a</code>를 가지고 있고, <code>Event a</code> 스트림에 의존하는 <code>Behavior</code>를 만듭니다. <code>Event</code>가 <code>fire</code>되면 <code>Behavior</code>에 들어 있는 값은 <code>Event</code>에 들어 있는 값으로 바뀝니다.<br />
+※ 값은 <code>accumE</code>로 누적하고, <code>stepper</code>를 써서 시간 의존time-varying값으로 변환할 수 있습니다.</p>
+<p><strong><em>unions</em></strong><code>:: [Event (a -&gt; a)] -&gt; Event (a -&gt; a)</code><br />
 값이 함수인 이벤트 스트림 리스트를 받아 모두 붙여 하나의 스트림으로 만듭니다.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> addCredit <span class="ot">=</span> (<span class="op">+</span> <span class="dv">1</span>) </span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>      removeCredit <span class="ot">=</span> <span class="fu">subtract</span> <span class="dv">1</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>      addWin <span class="dt">Double</span> <span class="ot">=</span> (<span class="op">+</span> <span class="dv">5</span>)</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>      addWin <span class="dt">Triple</span> <span class="ot">=</span> (<span class="op">+</span> <span class="dv">20</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ot">      emayplay ::</span> <span class="dt">Event</span> <span class="dt">Bool</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>      emayplay <span class="ot">=</span> (\credits _ <span class="ot">-&gt;</span> credits <span class="op">&gt;</span> <span class="dv">0</span>) <span class="op">&lt;$&gt;</span> bcredits <span class="op">&lt;@&gt;</span> eplay</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="ot">      edoesplay ::</span> <span class="dt">Event</span> ()</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>      edoesplay <span class="ot">=</span> () <span class="op">&lt;$</span> filterE <span class="fu">id</span> emayplay</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="ot">      edenied ::</span> <span class="dt">Event</span> ()</span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>      edenied <span class="ot">=</span> () <span class="op">&lt;$</span> filterE <span class="fu">not</span> emayplay</span></code></pre></div>
-<div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>  (<span class="ot">eroll ::</span> <span class="dt">Event</span> <span class="dt">Reels</span>,<span class="ot"> bstdgen ::</span> <span class="dt">Behavior</span> <span class="dt">StdGen</span>) <span class="ot">&lt;-</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    mapAccum initialStdGen <span class="op">$</span> roll <span class="op">&lt;$&gt;</span> edoesplay</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span><span class="ot"> roll ::</span> () <span class="ot">-&gt;</span> <span class="dt">StdGen</span> <span class="ot">-&gt;</span> (<span class="dt">Reels</span>, <span class="dt">StdGen</span>)</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>      roll () gen0 <span class="ot">=</span> ((z1, z2, z3), gen3)</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>        <span class="kw">where</span></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>          random <span class="ot">=</span> randomR (<span class="dv">1</span>, <span class="dv">4</span>)</span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>          (z1, gen1) <span class="ot">=</span> random gen0</span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>          (z2, gen2) <span class="ot">=</span> random gen1</span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>          (z3, gen3) <span class="ot">=</span> random gen2</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> addCredit <span class="ot">=</span> (<span class="op">+</span> <span class="dv">1</span>) </span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>      removeCredit <span class="ot">=</span> <span class="fu">subtract</span> <span class="dv">1</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>      addWin <span class="dt">Double</span> <span class="ot">=</span> (<span class="op">+</span> <span class="dv">5</span>)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>      addWin <span class="dt">Triple</span> <span class="ot">=</span> (<span class="op">+</span> <span class="dv">20</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ot">      emayplay ::</span> <span class="dt">Event</span> <span class="dt">Bool</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>      emayplay <span class="ot">=</span> (\credits _ <span class="ot">-&gt;</span> credits <span class="op">&gt;</span> <span class="dv">0</span>) <span class="op">&lt;$&gt;</span> bcredits <span class="op">&lt;@&gt;</span> eplay</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="ot">      edoesplay ::</span> <span class="dt">Event</span> ()</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>      edoesplay <span class="ot">=</span> () <span class="op">&lt;$</span> filterE <span class="fu">id</span> emayplay</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="ot">      edenied ::</span> <span class="dt">Event</span> ()</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>      edenied <span class="ot">=</span> () <span class="op">&lt;$</span> filterE <span class="fu">not</span> emayplay</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>  (<span class="ot">eroll ::</span> <span class="dt">Event</span> <span class="dt">Reels</span>,<span class="ot"> bstdgen ::</span> <span class="dt">Behavior</span> <span class="dt">StdGen</span>) <span class="ot">&lt;-</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    mapAccum initialStdGen <span class="op">$</span> roll <span class="op">&lt;$&gt;</span> edoesplay</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span><span class="ot"> roll ::</span> () <span class="ot">-&gt;</span> <span class="dt">StdGen</span> <span class="ot">-&gt;</span> (<span class="dt">Reels</span>, <span class="dt">StdGen</span>)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>      roll () gen0 <span class="ot">=</span> ((z1, z2, z3), gen3)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>        <span class="kw">where</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>          random <span class="ot">=</span> randomR (<span class="dv">1</span>, <span class="dv">4</span>)</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>          (z1, gen1) <span class="ot">=</span> random gen0</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>          (z2, gen2) <span class="ot">=</span> random gen1</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>          (z3, gen3) <span class="ot">=</span> random gen2</span></code></pre></div>
 <p>랜덤값 3개를 만들어 3튜플 <code>Reels</code>에 넣고, <code>gen</code>값을 나중에 써야하니 결과로 같이 내보냅니다.</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ot">      ewin ::</span> <span class="dt">Event</span> <span class="dt">Win</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>      ewin <span class="ot">=</span> <span class="fu">fmap</span> fromJust <span class="op">$</span> filterE isJust <span class="op">$</span> <span class="fu">fmap</span> checkWin eroll</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ot">      ewin ::</span> <span class="dt">Event</span> <span class="dt">Win</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>      ewin <span class="ot">=</span> <span class="fu">fmap</span> fromJust <span class="op">$</span> filterE isJust <span class="op">$</span> <span class="fu">fmap</span> checkWin eroll</span></code></pre></div>
 <p><code>ewin</code>은 <code>eroll</code>값이 정해지면 그 때 알 수 있습니다.</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>      checkWin (z1, z2, z3)</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>        <span class="op">|</span> <span class="fu">length</span> (nub [z1, z2, z3]) <span class="op">==</span> <span class="dv">1</span> <span class="ot">=</span> <span class="dt">Just</span> <span class="dt">Triple</span></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>        <span class="op">|</span> <span class="fu">length</span> (nub [z1, z2, z3]) <span class="op">==</span> <span class="dv">2</span> <span class="ot">=</span> <span class="dt">Just</span> <span class="dt">Double</span></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>        <span class="op">|</span> <span class="fu">otherwise</span> <span class="ot">=</span> <span class="dt">Nothing</span></span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>      checkWin (z1, z2, z3)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>        <span class="op">|</span> <span class="fu">length</span> (nub [z1, z2, z3]) <span class="op">==</span> <span class="dv">1</span> <span class="ot">=</span> <span class="dt">Just</span> <span class="dt">Triple</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>        <span class="op">|</span> <span class="fu">length</span> (nub [z1, z2, z3]) <span class="op">==</span> <span class="dv">2</span> <span class="ot">=</span> <span class="dt">Just</span> <span class="dt">Double</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>        <span class="op">|</span> <span class="fu">otherwise</span> <span class="ot">=</span> <span class="dt">Nothing</span></span></code></pre></div>
 <p><code>nub</code>은 중복 원소를 제거합니다. 세 개가 모두 같으면 <code>Triple</code>, 두 개가 같으면 <code>Double</code>입니다.</p>
+<h3 id="연쇄적인-이벤트-reactive">연쇄적인 이벤트 Reactive!</h3>
 <p>전체 동작을 요약해 보면,</p>
 <ol type="1">
 <li><code>coin</code> 입력을 하면 <code>ecoin</code> <code>Event</code>가 <code>fire</code>되고 스트림에는 <code>(+1)</code>이 담기고,</li>
@@ -263,14 +278,14 @@ A. <code>(&lt;$) :: a -&gt; Event b -&gt; Event a</code><br />
 <li><code>edoesplay</code>가 <code>fire</code>되면 <code>(랜덤, 랜덤, 랜덤)</code> 값을 가질 <code>eroll</code> <code>Event</code>가 <code>fire</code>되고,</li>
 <li><code>eroll</code>이 <code>fire</code>되면 <code>Just Triple | Just Double | Nothing</code>을 가진 <code>ewin</code>이 <code>fire</code>됩니다.</li>
 </ol>
-<div class="sourceCode" id="cb13"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>  reactimate <span class="op">$</span> <span class="fu">putStrLn</span> <span class="op">.</span> showCredit <span class="op">&lt;$&gt;</span> ecredits</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="co">--             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co">--                        Event (IO ())</span></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="co">-- ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</span></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="co">--                   MomentIO ()</span></span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  reactimate <span class="op">$</span> <span class="fu">putStrLn</span> <span class="op">.</span> showRoll <span class="op">&lt;$&gt;</span> eroll</span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  reactimate <span class="op">$</span> <span class="fu">putStrLn</span> <span class="op">.</span> showWin <span class="op">&lt;$&gt;</span> ewin</span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  reactimate <span class="op">$</span> <span class="fu">putStrLn</span> <span class="st">&quot;Not enough credits!&quot;</span> <span class="op">&lt;$</span> edenied</span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>  reactimate <span class="op">$</span> <span class="fu">putStrLn</span> <span class="op">.</span> showCredit <span class="op">&lt;$&gt;</span> ecredits</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="co">--             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="co">--                        Event (IO ())</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co">-- ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="co">--                   MomentIO ()</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  reactimate <span class="op">$</span> <span class="fu">putStrLn</span> <span class="op">.</span> showRoll <span class="op">&lt;$&gt;</span> eroll</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>  reactimate <span class="op">$</span> <span class="fu">putStrLn</span> <span class="op">.</span> showWin <span class="op">&lt;$&gt;</span> ewin</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>  reactimate <span class="op">$</span> <span class="fu">putStrLn</span> <span class="st">&quot;Not enough credits!&quot;</span> <span class="op">&lt;$</span> edenied</span></code></pre></div>
 <p><code>reactimate :: Event (IO ()) -&gt; MomentIO ()</code><br />
 <code>Event</code>가 <code>fire</code>되면, 언제든 <code>Event</code>가 가진 <code>IO</code> 액션을 실행합니다.</p>
 <ul>
@@ -280,23 +295,28 @@ A. <code>(&lt;$) :: a -&gt; Event b -&gt; Event a</code><br />
 </ul>
 <p><code>eroll</code>, <code>ewin</code>, <code>edenied</code>들이 모두 평범한 값을 쓰는 모양과 다르지 않게 나오는게, 우아해 보이지 않나요?</p>
 <p>아래 나머지는 그저 출력에 관한 문자열을 만드는 함수들입니다.</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>showCredit money <span class="ot">=</span> <span class="st">&quot;Credits: &quot;</span> <span class="op">++</span> <span class="fu">show</span> money</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>showRoll (z1, z2, z3) <span class="ot">=</span> <span class="st">&quot;You rolled &quot;</span> <span class="op">++</span> <span class="fu">show</span> z1 <span class="op">++</span> <span class="fu">show</span> z2 <span class="op">++</span> <span class="fu">show</span> z3</span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>showWin <span class="dt">Double</span> <span class="ot">=</span> <span class="st">&quot;Wow, a double!&quot;</span></span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>showWin <span class="dt">Triple</span> <span class="ot">=</span> <span class="st">&quot;Wowwowwow! A Triple! So awesome!&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>showCredit money <span class="ot">=</span> <span class="st">&quot;Credits: &quot;</span> <span class="op">++</span> <span class="fu">show</span> money</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>showRoll (z1, z2, z3) <span class="ot">=</span> <span class="st">&quot;You rolled &quot;</span> <span class="op">++</span> <span class="fu">show</span> z1 <span class="op">++</span> <span class="fu">show</span> z2 <span class="op">++</span> <span class="fu">show</span> z3</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>showWin <span class="dt">Double</span> <span class="ot">=</span> <span class="st">&quot;Wow, a double!&quot;</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>showWin <span class="dt">Triple</span> <span class="ot">=</span> <span class="st">&quot;Wowwowwow! A Triple! So awesome!&quot;</span></span></code></pre></div>
 <h2 id="rp-reactive-programming">RP (Reactive Programming)</h2>
 <p>비동기 함수를 다루는 모양이 옵저버 패턴과 그다지 달라 보이지 않습니다. 옵저버 패턴과 다른 점이 뭘까요?<br />
 단일 이벤트가 아닌, 이벤트 스트림을 다루는 게 가장 큰 차이점으로 보입니다. 이런 저런 절차에서 조건이 맞으면 스트림에 있는 이벤트 자체를 바꾸어 놓고, 이렇게 바뀐 이벤트들에 연계되어 있는 작업들이 비동기로 돌아가는 모양입니다.</p>
 <p>리액티브 프로그래밍은, 이벤트를 스트림으로 만들고, <code>async</code>한 신호를 잡는데는 옵저버 패턴을 씁니다.</p>
 <blockquote>
 <p>Q. 리액티브에서 이벤트 스트림을 조작하는 작업들은, 옵저버 패턴에선 옵저버단에서 해결할 수도 있지 않나?<br />
-A. <span class="citation" data-cites="todo">@todo</span></p>
+A. <span class="citation" data-cites="todo">@todo</span> 할 수는 있지만, 복잡하기 때문에 RP가 나왔습니다.</p>
+</blockquote>
+<blockquote>
+<p>Q. 스트림으로 만드는 이유는?<br />
+A. <span class="citation" data-cites="todo">@todo</span> 하스켈 구현에선 Lazy하게 (무한 리스트 처럼) 동작 시키기에 스트림이 좋을 것 같긴 한데, 아직 정확히 언급하는 자료는 못 찾았습니다.<br />
+금방 눈에 보이는 장점 하나는, 브로커 역할의 스트림이 생겼으니, 옵저버블과 옵저버가 서로 몰라도 됩니다. 옵저버블은 스트림에 이벤트를 실어 보내면 되고, 옵저버는 스트림만 보고 있으면 되니, 각자에게 등록한다거나 하지 않아도 됩니다.</p>
 </blockquote>
 <h2 id="frp-functional-react-programming">FRP (Functional React Programming)</h2>
-<p>Reactive도 하스켈(함수형?)으로 작성하면 토 나올 만큼 우아합니다.</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>makeSources <span class="ot">=</span> (,) <span class="op">&lt;$&gt;</span> newAddHandler <span class="op">&lt;*&gt;</span> newAddHandler</span></code></pre></div>
-<p>딱 2개의 이벤트로 비동기로 돌아갈 구조를 만들고, 사용자 인터랙션을 통해 이벤트가 시작되면, 이벤트가 가진 값 자체를 바꾸거나, 새로운 이벤트로 연계합니다. Lazy함도 적절히 쓰이는 것 같기도 하고, 모나드 패턴도 딱 들어 맞는 걸로 보이는데, 라이브러리 코드를 더 자세히 뜯어 보고싶은 욕구가 생기긴 합니다. 여기 코드만 봐서는 Functional과 찰떡처럼 보이긴 한데, 다른 비 함수형 구현은 보지 않아 얼마나 찰떡인지는 모르겠습니다.</p>
-<p><strong><em>Computation이란 언젠가 계산될 값이란 걸 염두하고 보면 도움이 되지 않을까 합니다.</em></strong> Computation들을 엮어서combine 표현하는 스타일에 익숙해져야 합니다. 여기선, 언젠가 값이 될 Computation인 <code>MomentIO</code> 뭉치를 만들고 있습니다. <code>IO</code>모나드가 <code>Realworld</code>를 흘리면 돌아가기 시작해서 결과가 나온다고 이해하고 있다면, <code>MomentIO</code>는 언젠가 <code>fire</code>가 실행되면 돌아가게 될 Computation입니다.</p>
+<p>Reactive도 하스켈(함수형?)으로 작성하면 (익숙하지 않은 것 투성이라) 토 나올 만큼 우아합니다.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>makeSources <span class="ot">=</span> (,) <span class="op">&lt;$&gt;</span> newAddHandler <span class="op">&lt;*&gt;</span> newAddHandler</span></code></pre></div>
+<p>딱 2개의 이벤트로 시작해서 비동기로 돌아갈 구조를 만들고, 사용자 인터랙션을 통해 이벤트가 시작되면, 이벤트가 가진 값 자체를 바꾸거나, 새로운 이벤트로 연계합니다. Lazy함도 적절히 쓰이는 것 같기도 하고, 모나드 패턴도 딱 들어 맞는 걸로 보여서, 라이브러리 코드를 더 자세히 뜯어 보고싶은 욕구가 생기긴 합니다. 여기 코드만 봐서는 Functional과 찰떡처럼 보이긴 한데, 다른 비 함수형 구현은 보지 않아 얼마나 찰떡인지는 모르겠습니다.</p>
+<p>구현 아이디어를 볼 때, <strong><em>Computation이란 언젠가 계산될 값이란 걸 염두하고 보면 도움이 되지 않을까 합니다.</em></strong> Computation들을 엮어서combine 표현하는 스타일에 익숙해져야 합니다. 여기선, 언젠가 값이 될 Computation인 <code>MomentIO</code> 뭉치를 만들고 있습니다. <code>IO</code>모나드가 <code>Realworld</code>를 흘리면 돌아가기 시작해서 결과가 나온다고 이해하고 있다면, <code>MomentIO</code>는 언젠가 <code>fire</code>가 실행되면 돌아가게 될 Computation입니다.</p>
 
 <div class="comment">
 <script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
