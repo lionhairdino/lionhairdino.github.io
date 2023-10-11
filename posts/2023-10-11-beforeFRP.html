@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko" lang="ko">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <title>lionhairdino - FRP의 Event와 Behavior</title>
+
+        <meta name="description" content="FRP 문서를 볼 때, 가장 처음 이해해야 되는 Event와 Behavior 중 Behavior가 까다롭습니다. 일부 텍스트들의 서두를 읽은 것을 정리해봤습니다." />
+        <meta property="og:description" content="FRP 문서를 볼 때, 가장 처음 이해해야 되는 Event와 Behavior 중 Behavior가 까다롭습니다. 일부 텍스트들의 서두를 읽은 것을 정리해봤습니다." />
+
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <link rel="icon" href="https://lionhairdino.github.io/favicon.svg" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino16px.png" sizes="16x16" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino24px.png" sizes="24x24" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino32px.png" sizes="32x32" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino48px.png" sizes="48x48" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino57px.png" sizes="57x57" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino60px.png" sizes="60x60" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino64px.png" sizes="64x64" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino72px.png" sizes="72x72" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino76px.png" sizes="76x76" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino114px.png" sizes="114x114" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino120px.png" sizes="120x120" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino144px.png" sizes="144x144" />
+        <link rel="shortcut icon" href="../favicon.ico" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino152px.png" sizes="152x152" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino180px.png" sizes="180x180" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino192px.png" sizes="192x192" />
+        <link rel="manifest" href="../site.webmanifest" />
+        <link rel="mask-icon" href="https://lionhairdino.github.io/Lionhairdino_black.svg" color="#ff7500" />
+        <meta name="msapplication-TileImage" content="/images/favicon/Lionhairdino144px.png" />
+        <meta name="msapplication-TileColor" content="#ff7500" />
+        <meta name="theme-color" content="#ffffff" />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="FRP의 Event와 Behavior" />
+        <meta property="og:site_name" content="Lionhairdino" />
+        <meta property="og:url" content="https://lionhairdino.github.io/posts/2023-10-11-beforeFRP.html" />
+
+        <meta property="og:image" content="https://lionhairdino.github.io/images/state400px.png" />
+
+      <meta name="keywords" content="FRP, Functional React Programming, Event, Behavior">
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-E9WZ6VXGHP"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-E9WZ6VXGHP');
+</script>
+<script src="../script/copycode.js"></script>
+<script async src="https://cse.google.com/cse.js?cx=9c53b4915cbb2605c"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.11.1/tocbot.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.11.1/tocbot.css" />
+    </head>
+    <body>
+        <div id="header">
+            <div style="display:inline-block;margin-right:5px;padding-top: 5px;" id="logo">
+                <a href="../"><img style="width:30px;border:none" src="../images/favicon/Lionhairdino48px.png"></a>
+            </div>
+            <div style="display:inline-block;vertical-align: top;padding-top:5px;" id="navigation">
+                <a href="../">lionhairdino</a>
+                <a href="../about.html">about</a>
+                <!--<a href="/archive.html">archive</a>-->
+            </div>
+            <div style="display:inline-block;font-size:0.8em;vertical-align: top;">
+                <div style="display:inline-block;vertical-align: top;padding-top: 5px">사이트내 검색</div>
+                <div style="display:inline-block;width:180px;"> 
+                    <div class="gcse-searchbox-only"></div>
+                </div>
+            </div>
+            <div>
+                여기 글들은 일종의 질문입니다. 용어 선택도 학계, 업계에서 쓰는 걸로 되어 있지 않고, 틀린 내용이 있을 수도 있습니다.
+            </div>
+        </div>
+        <div class="js-toc-content">
+            <h1>FRP의 Event와 Behavior</h1>
+            <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+<div class="info">
+    Posted on October 11, 2023
+    
+</div>
+
+<p>하스켈 관련 얘기는 아니고, FRP 이해의 출발점인 <code>Event</code>와 <code>Behavior</code>를 이해가 목표입니다.</p>
+<p>새로운 프로그래밍 대상을 공부할 때, 먼저 상상해 보곤 합니다. 해결해야 하는 문제를 정리해 보고, 문제들을 어떻게 풀어나갈지 생각해 봅니다.</p>
+<p>사실, 그리 깊게 알고 싶진 않고 구현 아이디어와 사용법 정도 알고싶을 때가 많은데, 하스켈의 자료들은 여차하면 논문으로, 여차하면 소스 코드로 끌어 갑니다. 그런 곳으로 잘 못 끌려가면 카테고리 이론 용어들이 떡하니 버틴 경우도 많고, 처음 보는 문법으로 풀어 나가는 코드도 보게 되곤 합니다.</p>
+<p>저런 곳으로 끌려가지 않기 위해, 서두의 내용만 갖고, 상상 했던 내용과 아귀를 맞추려고 시도합니다. 그러다 그럴싸하게 맞아 떨어지면 맞는 내용이겠거니 하고 넘어갑니다. 블로그에 글도 올려 놓고요. 그러니, 틀리는 경우가 종종 있을 수 밖에 없습니다. 틀리거나 의심스런 내용이 보이면 댓글, 혹은 메일 꼭 부탁드립니다.</p>
+<h2 id="생각-스트레칭">생각 스트레칭</h2>
+<p>텍스트들의 도입부를 읽고, 내가 구현한다면, 어떻게 할까 생각해 봤습니다. 변하는 시스템을 <strong><em>모두 반응Reaction</em></strong>으로 표현한다면</p>
+<pre><code>E1   -&gt;   E2   -&gt;   E3 </code></pre>
+<p>이벤트들이 연쇄적으로 반응Reactive하며 바뀌는 정보가 있겠고,<br />
+(※ 값이 유지되지 않는다는 뜻으로 화살표를 짧게 했습니다.)</p>
+<pre><code>E1 (혹은 특정 시각)            E2나 시간등의 변경 요인                -- Discrete하게 변경
+                |                         |
+                B1 -----------^-----------------^----...-----&gt; ...    -- Continuous하게 유지
+                              ^                 ^
+                              값이 필요해서 들여다 보는 순간          -- Discrete하게 읽기 </code></pre>
+<p>(“시작”같은 “특정 시각”도 시간 이벤트라 볼 수 있으니) 이벤트로 시스템에 변경을 가하면, 시간이 흘러가면서 지속적으로 바뀌는 정보를 생각해 볼 수 있습니다. 물론 꼭 계속 바뀌지 않고, 한 번 바뀐 값으로 계속 가는 “유지”도 포함입니다. 이런 것들은 시간에 따라 계속 바뀌고 있지만, 바뀌는 값을 실제로 꼭 계속 업데이트 할 필요는 없습니다. 필요한 순간에 <code>t -&gt; a</code>에 <code>t</code>값을 넘겨 함수를 실행해서 값을 받아오면 됩니다.</p>
+<p>여기에선 <code>Event</code>와 <code>Behavior</code>의 실제 구현을 보는 게 아니라, FRP 프레임워크를 설계하면서 이들이 어떤 걸 모델링 했는지, 의미를 보려 합니다.</p>
+<h2 id="event">Event</h2>
+<p>FRP 입장에선 입력input으로 볼 수 있습니다. 외부로부터 들어 올 수도 있고, 특정 시각에 발생할 수도 있습니다. <code>fire</code>란 동작으로 자신에게 등록된 모든 핸들러에게 변경을 통지할 수 있습니다. 의미로만 보면 <code>Event</code>는 <code>[Maybe a]</code>고, <code>Behavior</code>는 <code>[a]</code>입니다. 둘 모두 FRP에선 스트림으로 처리하니 <code>[]</code>입니다. <code>Event</code>는 특정 순간에 값이 있을 수도 있고, 없을 수도 있으니 <code>Maybe</code>이고, <code>Behavior</code>는 모든 시간에 값을 얻을 수 있습니다. 의미상으로 그렇다는 얘깁니다. 참고 - <a href="https://github.com/HeinrichApfelmus/reactive-banana/blob/master/reactive-banana/src/Reactive/Banana/Model.hs">Reactive-banana의 학습용 소스 - Model.hs</a></p>
+<h2 id="behavior">Behavior</h2>
+<p>시간에 따라 변하는 값입니다. (실제 구현은 아니고)의미로는 <code>t -&gt; a</code>로 볼 수 있다고 합니다.</p>
+<p><strong>Q1. 어떻게 <code>t -&gt; a</code>로 현실을 모델링 할 수 있을까요?</strong><br />
+함수는 이미 벌어질 일을 다 알고 있는, 즉 매핑이 정해져 있는데, 이 걸로 어떻게 변할지 모를 현실을 어떻게 표현할까요?</p>
+<p><strong>ex1)</strong> 정말로 시간에 따라 벌어질 일을 이미 알고 있을 수 있습니다.
+빨간불을 시작으로 60초 주기로 바뀌는 신호등을 위한 함수는</p>
+<pre><code>신호등함수 = \t -&gt; if t를120으로 나눈 나머지가 &lt; 60 이면 녹색, 아니면 빨강</code></pre>
+<p>신호등 시작 스위치를 켜는 이벤트에 반응으로 위 함수를 가진 <code>Behavior</code>를 만듭니다. 언제든 어떤 순간에 신호등 상태를 알고 싶다면, 신호등함수에 현재 시각을 넣고 결과값을 받아 오면 됩니다.</p>
+<blockquote>
+<p>그런데 문제가 있습니다. <code>Behavior</code>는 <code>Event</code>와 달리 자신의 변화를 다른 곳에 알릴 수가 없습니다. 화면에 신호등을 표시해 주는 그림이 있다면, <code>Behavior</code> 자체가 외부에 알려주는 기능이 없으니 계속 물어 보는(폴링하는) 수밖에 없습니다.</p>
+<p>원하는 순간에만 값을 알면 되는 경우와, 값의 변화가 있으면 눈치 채야 하는 경우가 있습니다. 신호등의 경우는 시간에 따라 변하는 값이기도 하고, 외부에 변화를 알려줘야 되기도 합니다. 이럴 때는 <code>Behavior</code>만으로 해결할 수 없습니다.</p>
+</blockquote>
+<p><strong>ex2)</strong> <code>\_ -&gt; constant</code> 이벤트에 대한 리액트로 한 번 바뀐값이 그대로 유지되고 있을 수도 있습니다.</p>
+<p><strong>ex3)</strong> <code>t -&gt; a</code>에서 반환값 <code>a</code>가 함수인 <code>t -&gt; (b -&gt; c)</code> 이런식이면 어떨까요? 순간마다 함수를 돌려주는데, 함수들이 가지고 있는 정보들은 불특정 시기에 바뀔 수 있는 값들을 참조할 수도 있습니다.</p>
+<p>저는 <code>t -&gt; a</code>란 걸, <strong>불특정 시기에 항상 값을 얻을 수 있다는 표현</strong>으로 이해했습니다.</p>
+<p><strong>Q2. <code>Event</code>와 다르게 연속Continuous적인 시간에 벌어지는 일이라고 합니다. 결국 컴퓨터로 표현하려면 모두 discrete하게(불연속, 이산) 바꿔야 하는 것 아닌가요?</strong></p>
+<p>실제 구현이 연속Continuous적인 동작을 한다는 게 아니라, 시간에 연속인 대상을 모델링을 했다는 뜻일 뿐, <code>Behavior</code>가 연속으로 계속 업데이트 하고 있는 모양은 아닙니다. <code>Behavior</code>의 값을 가져다는 쓰는 쪽에서 연속이란 의미는, 바꿔 말하면, 언제든 “값을 원하는 순간”에 값을 얻을 수 있다는 말입니다.</p>
+<p><strong>Q3. <code>Behavior</code>는 시간의 흐름을 강조합니다. FRP가 내부적으로 흘러가는 타이머를 두는 건가요?</strong><br />
+폴링 작업이 들어가면 타이머가 돈다고 볼 수 있겠습니다. 항상 변경되는 걸 결과로 바로 보여야 하는 건 아니니, 그럴 수도 아닐 수도 있습니다. 만일 실시간으로 계속 값을 가져와야 한다면 타이머가 돌아야 합니다. 참고 - <a href="http://conal.net/papers/push-pull-frp/push-pull-frp.pdf">Push-Pull FRP - Conal Elliot 섹션5.1</a></p>
+<p>전 <code>Behavior</code>가 FRP에서 일종의 <strong>기억 장소</strong> 역할을 하는 것으로 이해했습니다.</p>
+
+<div class="comment">
+<script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
+</script>
+</div>
+<div style="text-align:right">Github 계정이 없는 분은 메일로 보내주세요. lionhairdino at gmail.com </div>
+        </div>
+        <nav class="toc toc-right js-toc relative z-1 transition--300 absolute pa4 pt5 is-position-fixed"></nav>
+        <div id="footer">
+            © 2022 lionhairdino. All rights reserved. Generated by <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+        <script>
+            tocbot.init({
+                tocSelector: '.js-toc',
+                contentSelector: '.js-toc-content',
+                headingSelector: 'h2, h3',
+                hasInnerContainers: true,
+            });
+        </script>
+    </body>
+</html>
