@@ -6,8 +6,8 @@
 
         <title>lionhairdino - 선언형 프로그래밍</title>
 
-        <meta name="description" content="lionhairdino - 선언형 프로그래밍" />
-        <meta property="og:description" content="하스켈 함수형 프로그래밍" />
+        <meta name="description" content="컴비네이터 라이브러리들의 형태를 보면, 선언형 프로그래밍이라는 말이 조금 더 구체적으로 보이는 것 같아 정리해 봤습니다." />
+        <meta property="og:description" content="컴비네이터 라이브러리들의 형태를 보면, 선언형 프로그래밍이라는 말이 조금 더 구체적으로 보이는 것 같아 정리해 봤습니다." />
 
         <link rel="stylesheet" type="text/css" href="../css/default.css" />
         <link rel="icon" href="https://lionhairdino.github.io/favicon.svg" />
@@ -39,7 +39,7 @@
 
         <meta property="og:image" content="https://lionhairdino.github.io/images/state400px.png" />
 
-      <meta name="keywords" content="Declarative Programming, Combinator, Combination">
+      <meta name="keywords" content="Declarative Programming, Combinator, Combination, 선언형, 컴비네이터, 조합">
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-E9WZ6VXGHP"></script>
 <script>
@@ -83,7 +83,7 @@
 
 <p>선언형 프로그래밍이 무슨 말일까요?</p>
 <p>보통 이 용어를 설명하는 글들은, 반복 작업으로 <code>for</code> 구문을 쓰는 명령형 프로그래밍 모양과, 리스트에 <code>filter</code> 등을 적용하는 모양을 비교하는 예시를 듭니다. 하지만, 처음 이런 설명을 들으면, 반복하는 작업 구현의 위치를 옮겼을 뿐 그리 달라 보이지 않기도 합니다.</p>
-<p><code>How</code> 보다는 <code>What</code>에 집중하는 스타일이라는 추상적인 설명도 많이 접합니다. 그냥 DSL(Domain Specific Language)을 만드는 방식으로 모델링하는 걸 말하는가 싶기도 합니다. 저는 이런 설명들로는 명확한 느낌이 오진 않았습니다. 하스켈을 잠시동안 물고 늘어진 저에게, 선언형 프로그래밍을 설명하라면 다음을 예시로 들겠습니다.</p>
+<p><code>How</code> 보다는 <code>What</code>에 집중하는 스타일이라는 추상적인 설명도 많이 접합니다. 그냥 DSL(Domain Specific Language)을 만드는 방식으로 모델링하는 걸 말하는가 싶기도 합니다. 저는 이런 설명들로는 명확한 느낌이 오진 않았습니다. 하스켈을 잠시동안 물고 늘어진 저에게, 선언형 프로그래밍을 설명하라면 다음을 (컴비네이터 스타일)예시로 들겠습니다.</p>
 <ol type="1">
 <li>문제에서 <strong><em>기본 블럭</em></strong>으로 쓰일 타입이나 함수를 정의합니다.</li>
 <li>이들 기본 블럭을 이리 저리 조합할 수 있는 <strong><em>도구</em></strong>들을 준비합니다.</li>
@@ -93,10 +93,10 @@
 <p>단순히 일부 기능을 모듈화(프로시져화)해서 빼내고, 이름만 남겨두는 걸 의미한다기 보다, 모듈화 한 것들을, 한 가지 방식이 아닌, 여러가지 방식으로 유연하게 조합할 수 있게 “설계”하는 걸 의미합니다. 마치 자연수 같은 대상들을 정하고, 그 것들을 연산하는 더하기, 빼기들을 준비해서, 최종식은 이 것들을 조합해서 그 때 그 때 필요한 걸 표현하는 것처럼 말입니다.</p>
 <p>문제를 해결하기 위해<br />
 a를 먼저 이렇게<code>how</code> 해결하고, 그 다음 b를 이렇게<code>how</code> 해결하고… 이렇게 시퀀스로 떠올릴 수도 있고,<br />
-문제를 이루는 기본 요소들을 먼저 정의하고, 이들이 어떤 동작들을 필요로 하는지 정의하고, 최종 로직은 이들 정의들을 잘 <strong><em>조합</em></strong>해서 해결하면, 여기엔 <code>How</code>보다는 <code>What</code>만 들어 있게 됩니다. 이 걸 “선언Declaration”이라 부릅니다.</p>
-<p>눈에 금방 들어오는 예시로, <code>기본 블럭</code>이 되는 Parser들을 정의하고, 이들의 실행 흐름을 제어할 수 있는 <code>도구</code>Combinator들을 만들어, 복잡한 파싱을 이들 <code>조합</code>으로 해결하는 것을 들 수 있습니다.</p>
-<p>리스트와 필터를 예시로 삼는 이유는, 리스트가 하나의 스트림으로 여러 필터의 조합을 통과해 원하는 결과에 도달하는 모양을, 실제 어떻게<code>How</code> 동작하는 가는 필터 구현에 들어있게 되고, 최종 문제를 기술하는 문장에는 이 필터들을 조합해서, 이런<code>What</code> 문제를 해결한다는 말만 보이게 됩니다.</p>
-<p><code>도구</code>들에는 최대한 범용적인 기능만 남겨 놓고, 지금 접근 중인 문제에만 특별히 필요한 기능들은 <code>기본 블럭</code>과 <code>조합</code>에서만 드러나게 하면, 모나드니, Arrow니 하는 이름을 붙인 패턴들이 됩니다. 보통 이런 패턴들은 <code>Int</code>나 <code>Char</code>같은 Primitive 타입보다는 이런 Primitive 타입들을 담을 수 있는 <code>구조</code>를 대상으로 <code>조합</code>, <code>도구</code>를 준비해 놓습니다.</p>
+문제를 이루는 기본 요소들을 먼저 정의하고, 이들이 어떤 동작들을 필요로 하는지 정의하고, 최종 로직은 이들 정의들을 잘 <strong><em>조합</em></strong>해서 해결하면, 여기엔 <code>How</code>보다는 <code>What</code>만 들어 있게 됩니다. 이 걸 “선언Declaration형”이라 부릅니다.</p>
+<p>눈에 금방 들어오는 예시로, <code>기본 블럭</code>이 되는 Parser들을 정의하고, 이들의 실행 흐름을 제어할 수 있는(변형, 결합하며 접착할 수 있는 다양한) <code>도구</code>Combinator들을 만들어, 복잡한 파싱을 이들 <code>조합</code>으로 해결하는 것을 들 수 있습니다.</p>
+<p>리스트와 필터를 예시로 삼는 이유는, 리스트가 하나의 스트림으로 여러 필터의 조합을 통과해 원하는 결과에 도달하는 모양을, 실제 어떻게<code>How</code> 동작하는 가는 필터 구현에 들어있게 되고, 최종 문제를 기술하는 문장에는 이 <strong>필터들을 조합</strong>해서, 이런<code>What</code> 문제를 해결한다는 말만 보이게 됩니다.</p>
+<p><code>도구</code>들에는 최대한 범용적인 기능만 남겨 놓고, 지금 접근 중인 문제에만 특별히 필요한 기능들은 <code>기본 블럭</code>과 <code>조합</code>에서만 드러나게 하면, 모나드니, Arrow니 하는 이름을 붙인 패턴들이 됩니다. (다른 말로 구조안에 뭐가 들어 있든 상관하지 않고, 구조만을 위한 컴비네이션을 만드는 걸 말합니다. )보통 이런 패턴들은 <code>Int</code>나 <code>Char</code>같은 Primitive 타입보다는 이런 Primitive 타입들을 담을 수 있는 <code>구조</code>를 대상으로 <code>조합</code>, <code>도구</code>를 준비해 놓습니다. 아주 인포멀하게 얘기하면, <code>SomeWrapper a</code>에서 <code>a</code>에는 무관하고, <code>SomeWrapper</code>만으로 컴비네이션을 만듭니다.</p>
 <p>제가 기존 설명들에 추가하고 싶은 핵심 키워드는 <code>조합</code>입니다.</p>
 <ol type="1">
 <li>기본 블럭은 Type 또는 Function</li>
@@ -104,7 +104,7 @@ a를 먼저 이렇게<code>how</code> 해결하고, 그 다음 b를 이렇게<co
 <li>조합은 Combination (함수형에서는 주로 함수 합성Composition으로 나타납니다.)</li>
 </ol>
 <p>쯤 되겠습니다.</p>
-<p>역시나 금방 와닿는 설명도 아니고, 포멀한 설명도 아닙니다. FRP 프레임워크를 보다, 또 한 번 컴비네이션 스타일의 우아함을 느껴, 이게 바로 선언형이구나란 생각이 들어 글을 남깁니다.</p>
+<p>선언형의 한 예시인 컴비네이터 스타일에 대한 얘기지만, 선언형이란 용어에 접근하기에 괜찮아 보입니다. 역시나 금방 와닿는 설명도 아니고, 포멀한 설명도 아니긴 합니다만, FRP 프레임워크를 보다, 또 한 번 컴비네이션 스타일의 우아함을 느껴, 이게 바로 선언형이구나란 생각이 들어 글을 남깁니다.</p>
 
 <div class="comment">
 <script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>

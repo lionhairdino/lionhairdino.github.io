@@ -92,9 +92,9 @@
 (※ 값이 유지되지 않는다는 뜻으로 화살표를 짧게 했습니다.)</p>
 <pre><code>E1 (혹은 특정 시각)            E2나 시간등의 변경 요인                -- Discrete하게 변경
                 |                         |
-                B1 -----------^-----------------^----...-----&gt; ...    -- Continuous하게 유지
-                              ^                 ^
-                              값이 필요해서 들여다 보는 순간          -- Discrete하게 읽기 </code></pre>
+       Behavior B1 -----------^-----------------^----...-----&gt;  ...    -- Continuous하게 유지
+                             ^                 ^
+                          값이 필요해서 들여다 보는 순간              -- Discrete하게 읽기 </code></pre>
 <p>(“시작”같은 “특정 시각”도 시간 이벤트라 볼 수 있으니) 이벤트로 시스템에 변경을 가하면, 시간이 흘러가면서 지속적으로 바뀌는 정보를 생각해 볼 수 있습니다. 물론 꼭 계속 바뀌지 않고, 한 번 바뀐 값으로 계속 가는 “유지”도 포함입니다. 이런 것들은 시간에 따라 계속 바뀌고 있지만, 바뀌는 값을 실제로 꼭 계속 업데이트 할 필요는 없습니다. 필요한 순간에 <code>t -&gt; a</code>에 <code>t</code>값을 넘겨 함수를 실행해서 값을 받아오면 됩니다.</p>
 <p>여기에선 <code>Event</code>와 <code>Behavior</code>의 실제 구현을 보는 게 아니라, FRP 프레임워크를 설계하면서 이들이 어떤 걸 모델링 했는지, 의미를 보려 합니다.</p>
 <h2 id="event">Event</h2>
@@ -119,6 +119,15 @@
 <p><strong>Q3. <code>Behavior</code>는 시간의 흐름을 강조합니다. FRP가 내부적으로 흘러가는 타이머를 두는 건가요?</strong><br />
 폴링 작업이 들어가면 타이머가 돈다고 볼 수 있겠습니다. 항상 변경되는 걸 결과로 바로 보여야 하는 건 아니니, 그럴 수도 아닐 수도 있습니다. 만일 실시간으로 계속 값을 가져와야 한다면 타이머가 돌아야 합니다. 참고 - <a href="http://conal.net/papers/push-pull-frp/push-pull-frp.pdf">Push-Pull FRP - Conal Elliot 섹션5.1</a></p>
 <p>전 <code>Behavior</code>가 FRP에서 일종의 <strong>기억 장소</strong> 역할을 하는 것으로 이해했습니다.</p>
+<h2 id="예시">예시</h2>
+<p>마우스는 움직일 때마다 <code>Event</code>가 발생하고, 이 <code>Event</code>가 <code>Behavior</code>에 마우스 위치를 저장합니다.<br />
+어떤 상황에서 마우스 위치값이 필요하면 <code>Behavior</code>를 읽어 오면 됩니다.<br />
+값이 필요할 때 직접 <code>Event</code>에서 값을 받아 오지 않는 이유는, 마우스가 멈춰 있다면 <code>Event</code>는 발생하지 않습니다.<br />
+</p>
+<p><code>Behavior</code>의 시간은 Continuous하게 흐르지만, <code>Behavior</code>의 값이 변경되는 시점과, 값을 필요로 하는 시점은 Discrete합니다.<br />
+반면, <code>Event</code>의 시간은 Discrete하고, Event의 값을 받아가는 시점은, <code>Event</code>가 발생한 순간입니다.</p>
+<p>※ Reflex에는 위 두개에 더해 <code>Dynamic</code>이란 타입이 있습니다.
+<code>Behavior</code>처럼 모든 시간에 값을 가지는데, 가지고 있는 값이 바뀌면 외부로 알릴 수 있습니다. 기본적인 구현은 <code>Event</code>와 <code>Behavior</code>를 튜플로 가지고 있습니다. 참고 - <a href="http://docs.reflex-frp.org/en/latest/overview.html#reflex-basics">Rflex Basics</a></p>
 
 <div class="comment">
 <script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
