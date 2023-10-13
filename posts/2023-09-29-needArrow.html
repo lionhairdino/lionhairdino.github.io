@@ -91,11 +91,13 @@ Arrow 실 사용 예시를, 자세한 설명과 함께 볼 수 있는 글 입니
 <p>A.<br />
 <code>(+10)</code>을 <code>for</code>, <code>재귀</code> 등으로 <code>10</code>번 반복해</p>
 <p>B.<br />
-<code>AddTen (AddTen (AddTen ...))</code> 무한 타입을 만든다.<br />
+<code>data AddTen a = MkAddTen (AddTen a)</code></p>
+<p>즉 <code>AddTen (AddTen (AddTen ...))</code> 무한이 가능한 재귀 타입을 만든다.<br />
 패턴 매칭으로 <code>AddTen</code>을 벗겨 낼 때마다 <code>(+10)</code>을 하도록 정의한다.<br />
 패턴 매칭을 <code>10</code>번 한다.</p>
-<p><code>(+10)</code>을 한 번 더하고 싶으면, A 경우엔 그냥 <code>(+10)</code>을 한 번 더하면 되고,
-B 경우엔 한 번 더 패턴 매칭하면 됩니다.</p>
+<p><code>(+10)</code>을 한 번 더하고 싶으면, A 경우엔 그냥 <code>(+10)</code>을 한 번 더하면 되고,<br />
+B 경우엔 한 번 패턴 매칭하면 됩니다.</p>
+<p>그런데, <code>AddTen</code>타입은 리스트 정의처럼 종료(<code>[] 혹은 Empty</code>)를 표시하는 엣지 케이스가 없습니다. <code>AddTen</code>은 <code>AddTen</code>값이 있어야 되는데, 처음 <code>AddTen</code>값은 어떻게 정의할까요? 그리고 정의가 되었다 해도, 무한하게 가버리는 걸 실용에서 어찌 써먹을까요?</p>
 <p>A보다 B가 훨씬 더 복잡하고, 머리를 괴롭히는데 B로 하면 A로 하는 것 보다 어떤 장점이 있을까요?</p>
 <h2 id="circuit">Circuit</h2>
 <div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">Circuit</span> a b <span class="ot">=</span> <span class="dt">Circuit</span> {<span class="ot">unCircuit ::</span> a <span class="ot">-&gt;</span> (<span class="dt">Circuit</span> a b, b)}</span>
