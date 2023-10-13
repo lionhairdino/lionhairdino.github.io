@@ -98,7 +98,9 @@ Arrow 실 사용 예시를, 자세한 설명과 함께 볼 수 있는 글 입니
 B 경우엔 한 번 더 패턴 매칭하면 됩니다.</p>
 <p>A보다 B가 훨씬 더 복잡하고, 머리를 괴롭히는데 B로 하면 A로 하는 것 보다 어떤 장점이 있을까요?</p>
 <h2 id="circuit">Circuit</h2>
-<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">Circuit</span> a b <span class="ot">=</span> <span class="dt">Circuit</span> {<span class="ot">unCircuit ::</span> a <span class="ot">-&gt;</span> (<span class="dt">Circuit</span> a b, b)}</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">Circuit</span> a b <span class="ot">=</span> <span class="dt">Circuit</span> {<span class="ot">unCircuit ::</span> a <span class="ot">-&gt;</span> (<span class="dt">Circuit</span> a b, b)}</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>                                                  <span class="op">^^^^^^^^^^^</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>                                                  continuation</span></code></pre></div>
 <h3 id="circuit안에-또-circuit">Circuit안에 또 Circuit</h3>
 <p>순환하는 타입 읽기가 불편하지 않나요? 저는 아직도 편하지 않습니다.</p>
 <p><code>Circuit</code> 타입을 생성하려면 생성자 <code>Circuit</code>에 <code>(\a -&gt; ???)</code> 같은 함수를 넣어야 하는데, <code>???</code> 부분에는 뭐가 들어가면 될까요? <code>Circuit</code> 타입을 넣어 줘야 하는데, 그러려면 안 쪽에 또 <code>Circuit</code> 타입이 있고, 그냥 대체하면서 따라가면 무한으로 가버립니다. 타입에서는 이렇게 써 준다고 무한 재귀하는 모양이 아닙니다. 안에 있는 <code>Circuit</code>타입 값이, 꼭 현재 정의하고 있는 <code>Circuit</code>과 같은 값일 필요는 없으니, 재귀가 아닌 경우도 있을 수 있습니다. 물론, 값을 만들 때 재귀하는 모양의 값을 만들 순 있습니다. 하지만, <strong><em>혼자서</em></strong> 무한히 도는 일은 일어나지 않습니다.</p>
@@ -143,7 +145,7 @@ B 경우엔 한 번 더 패턴 매칭하면 됩니다.</p>
 <li><code>Circuit</code>은 독립적으로 다음 <code>Circuit</code>을 준비합니다. 처음 <code>Circuit</code>에서 변하지 않을 수도 있고, 변했을 수도 있습니다.</li>
 <li>합성하면, 입출력 값으로 이어져 돌긴 하지만, 자신들의 후임 <code>Circuit</code>은 각자 독립적으로 준비한 다음, 이 들을 모아서 다음 돌릴 준비를 합니다.</li>
 </ul>
-<p>전체적으로 불편함을 주는 이유는, <strong><em>여기선 무한 반복으로 갈 것만 같은 코드 모양이지만, runCircuit이 리스트에 원소가 남아 있는 동안만 반복 시킵니다.</em></strong> 무한 리스트를 정의하고, 필요한 만큼만 <code>take</code>하는 것과 비슷합니다. 하스켈에서 만나는 모든 무한한 것들은 필요한 만큼만 꺼내올 줄 아는 파트너가 항상 존재합니다. 언제 멈출 수 있는지, <strong><em>언제 다음 반복을 시작하는지</em></strong>를 알게 되면 조금 덜 불편합니다.</p>
+<p>전체적으로 불편함을 주는 이유는, <strong><em>여기선 무한 반복으로 갈 것만 같은 코드 모양이지만, runCircuit이 리스트에 원소가 남아 있는 동안만 반복 시킵니다.</em></strong> 무한 리스트를 정의하고, 필요한 만큼만 <code>take</code>하는 것과 비슷합니다. 하스켈에서 만나는 (실용적인) 무한한 것들은 대부분 필요한 만큼만 꺼내올 줄 아는 파트너가 존재합니다. 언제 멈출 수 있는지, <strong><em>언제 다음 반복을 시작하는지</em></strong>를 알게 되면 조금 덜 불편합니다.</p>
 <h4 id="id">id</h4>
 <p>이제 위 <code>(.)</code>을 만나 아무 일도 일어나지 않는 <code>id</code>를 정의합니다.</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Cat.Category</span> <span class="dt">Circuit</span> <span class="kw">where</span></span>
@@ -206,7 +208,7 @@ A. <code>acc</code>, <code>f</code>만 줘서 <code>accum</code>을 실행하면
 <h3 id="circuit-primitives">Circuit primitives</h3>
 <div class="sourceCode" id="cb14"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="ot">accum' ::</span> b <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> <span class="dt">Circuit</span> a b</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>accum' acc f <span class="ot">=</span> accum acc (\a b <span class="ot">-&gt;</span> <span class="kw">let</span> b' <span class="ot">=</span> a <span class="ot">`f`</span> b <span class="kw">in</span> (b', b'))</span></code></pre></div>
-<p><code>accum</code>이 두 번째 인자로 받는 함수는 <code>a -&gt; acc -&gt; (b, acc)</code> 2튜플을 반환하는 함수를 받습니다. <code>accum'</code>는 반환값이 2튜플이 아닌 <code>a -&gt; b -&gt; b</code> 함수를 받아, 결과를 복사해서 2튜플로 만드는 과정을 붙이는 작업을 한 후 <code>accum</code>에게 넘기는 보조 함수입니다.</p>
+<p><code>accum</code>이 두 번째 인자로 받는 함수는 <code>a -&gt; acc -&gt; (b, acc)</code> 2튜플을 반환하는 함수를 받습니다. <code>accum'</code>는 반환값이 2튜플이 아닌 <code>a -&gt; b -&gt; b</code> 함수를 받아, 결과를 복사해서 2튜플로 만드는 과정을 붙여 <code>accum</code>에게 넘기는 보조 함수입니다.</p>
 <div class="sourceCode" id="cb15"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="ot">total ::</span> <span class="dt">Num</span> a <span class="ot">=&gt;</span> <span class="dt">Circuit</span> a a</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>total <span class="ot">=</span> accum' <span class="dv">0</span> (<span class="op">+</span>)</span></code></pre></div>
 <p>위 작업은 다음과 같습니다.</p>
@@ -262,7 +264,8 @@ A. <code>accum</code>의 반환 값 안에 있는 <code>...(accum acc' f, ...)</
 <span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>  idx <span class="ot">&lt;-</span> generator (<span class="dv">0</span>, <span class="fu">length</span> dictionary <span class="op">-</span> <span class="dv">1</span>) rng <span class="op">-&lt;</span> ()</span>
 <span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  returnA <span class="op">-&lt;</span> dictionary <span class="op">!!</span> idx</span></code></pre></div>
 <p>여기선 특별한 외부 입력값을 받는 건 아니고, <code>runCircuit</code>으로 더미로 <code>()</code> 유닛을 받을 겁니다. 유닛으로 채워진 리스트를 받으면, <code>gen</code>값이 바뀌는 걸 잃어버리지 않고 다음으로 넘겨가며 유닛 개수만큼 랜덤값을 뽑아냅니다.<br />
-<code>Circuit</code>으로 래핑되어 있기 때문에, 안 쪽에 있는 함수에게 값을 주어 실행한다든지, 결과를 바깥으로 내보내려면, 매 번 패턴 매칭을 해서 풀어야 합니다. 하지만, Arrow 인스턴스로 만들었기 때문에, <code>&lt;-</code>,<code>-&lt;</code> 등을 이용해 쉽게 할 수 있습니다.</p>
+※ Reactive로 가면 이런 모양을 자주 만납니다. 시간의 흐름을 <code>()</code> 무한 리스트로 두고, 한 스텝(샘플링) 나아갈 때마다 <code>()</code>를 가져오는 것으로 모델링합니다.<br />
+<code>Circuit</code>으로 래핑되어 있기 때문에, 안 쪽에 있는 함수에게 값을 주어 실행한다든지, 결과를 바깥으로 내보내려면, 매 번 패턴 매칭을 해서 풀어야 합니다. 하지만, Arrow 인스턴스로 만들었기 때문에, <code>&lt;-</code>,<code>-&lt;</code> 등을 이용해 쉽게 표현할 수 있습니다.</p>
 <div class="sourceCode" id="cb24"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>GHCi&gt; rng &lt;- getStdGen</span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>GHCi&gt; runCircuit (pickWord rng) [(), (), ()]</span>
 <span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>[&quot;dog&quot;,&quot;bird&quot;,&quot;dog&quot;]</span></code></pre></div>
@@ -279,7 +282,7 @@ A. <code>accum</code>의 반환 값 안에 있는 <code>...(accum acc' f, ...)</
 <div class="sourceCode" id="cb28"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>GHCi&gt; runCircuit (delayedEcho False) [True, False, False, False, True]</span>
 <span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>[False,True,False,False,False]</span></code></pre></div>
 <h4 id="arrowchoice">ArrowChoice</h4>
-<p>게임의 메인 Arrow는 계속 반복해서 실행되고, 낱말은 처음 한 번만 뽑고, 게임 진행동안 계속 기억하고 있어야 합니다. Rather than just mask its output on subsequent loops (이 말은 아마도, 실제 뽑는 작업은 하면서, 쓰지 않는 걸 얘기하는 것 같습니다.) 실제 한 번만 돌아가는게 퍼포먼스에서 유리합니다. 하지만, Circuit에선 “Arrow 뭉치”에 포함된 Arrow 컴포넌트의 모든 경로로 데이터가 흘러갑니다. (골드 버그 장치 혹은 도미노 등이 연상됩니다.) 하나의 경로로만 흘러가게 하려면, <code>ArrowChoice</code>클래스의 인스턴스로 만들어야 합니다.</p>
+<p>게임의 메인 Arrow는 계속 반복해서 실행되고, 낱말은 처음 한 번만 뽑고, 게임 진행동안 계속 기억하고 있어야 합니다. Rather than just mask its output on subsequent loops (이 말은 아마도, 실제 뽑는 작업은 하면서, 쓰지 않는 걸 얘기하는 것 같습니다.) 실제 한 번만 돌아가는게 퍼포먼스에서 유리합니다. 하지만, Circuit에선 “Arrow 뭉치combination”에 포함된 Arrow 컴포넌트의 모든 경로로 데이터가 흘러갑니다. (골드 버그 장치 혹은 도미노 등이 연상됩니다.) 하나의 경로로만 흘러가게 하려면, <code>ArrowChoice</code>클래스의 인스턴스로 만들어야 합니다.</p>
 <p>※ 뭉치란 말이 투박하긴 하지만, 컴비네이션 결과물을 지칭하기에 적당한 의미를 가진 듯 합니다. 다른 곳에서도 쓰이는 “용어”는 아닙니다. 순수 한글 말을 쓰려고 고른 게 아니라, 대상을 가장 잘 표현하는 적당한 말같아 골랐습니다.</p>
 <div class="sourceCode" id="cb29"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">ArrowChoice</span> <span class="dt">Circuit</span> <span class="kw">where</span></span>
 <span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  left orig<span class="op">@</span>(<span class="dt">Circuit</span> cir) <span class="ot">=</span> <span class="dt">Circuit</span> <span class="op">$</span> \ebd <span class="ot">-&gt;</span> <span class="kw">case</span> ebd <span class="kw">of</span></span>
@@ -315,6 +318,7 @@ A. <code>accum</code>의 반환 값 안에 있는 <code>...(accum acc' f, ...)</
 <span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>GHCi&gt; runCircuit (getWord rng) [(), (), (), (), (), ()]</span>
 <span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>[&quot;dog&quot;,&quot;dog&quot;,&quot;dog&quot;,&quot;dog&quot;,&quot;dog&quot;,&quot;dog&quot;]</span></code></pre></div>
 <p>여러 개의 <code>Circuit</code>들을 붙여 <code>Circuit</code> 뭉치를 만들고, 이 뭉치를 <code>runCircuit</code>으로 반복해서 돌릴텐데, 이렇게 도는 동안 <code>getWord</code>는 몇 번을 돌려도 처음 선택한 값만 가지고 있습니다.</p>
+<h4 id="circuit-뭉치-실행">Circuit 뭉치 실행</h4>
 <p>게임중에 반복되어 실행될 코드를 보면</p>
 <div class="sourceCode" id="cb33"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="ot">attempts ::</span> <span class="dt">Int</span></span>
 <span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>attempts <span class="ot">=</span> <span class="dv">5</span></span>
@@ -360,6 +364,9 @@ A. <code>accum</code>의 반환 값 안에 있는 <code>...(accum acc' f, ...)</
 <span id="cb33-42"><a href="#cb33-42" aria-hidden="true" tabindex="-1"></a>    <span class="op">.</span> runCircuit (hangman rng)</span>
 <span id="cb33-43"><a href="#cb33-43" aria-hidden="true" tabindex="-1"></a>    <span class="op">.</span> (<span class="st">&quot;&quot;</span><span class="op">:</span>)</span>
 <span id="cb33-44"><a href="#cb33-44" aria-hidden="true" tabindex="-1"></a>    <span class="op">.</span> <span class="fu">lines</span></span></code></pre></div>
+<p><code>hangman</code>이란 커다란 <code>Circuit</code> 뭉치를 만들고, <code>runCircuit</code>이 입력이 “한 번” 들어올 때마다 돌립니다. (합성 설명할 때처럼 바뀌었다는 의미에서 프라임을 붙이겠습니다.) 처음엔 <code>Circuit</code>을 돌리고, 그 다음 번엔 <code>Circuit'</code>을 돌리고, 그 다음엔 <code>Circuit''</code>… 이런 식입니다. <code>Circuit</code>이 돌고 나서 (continuation으로) 후임 <code>Circuit'</code>을 준비하는데, 기억해야 하는 정보를 모두 집어 넣어 준비합니다.</p>
+<p>전역 변수 같은 바깥 스코프의 mutable한 변수-기억 장소-를 둘 수 없기 때문에 필요한 테크닉입니다. 지금 동작하는 함수 뭉치가, 결과값과 함께 다음 번 돌릴 함수continuation를 준비하면서 <strong><em>기억해야 될 것들을 새로 만드는 함수에 실어 놓습니다.</em></strong> 그리고는 <code>run</code>Circuit 같은 것들이 <code>run</code>하면서 준비된 함수를 실행합니다.</p>
+<p>※ Reactive(Reactive-banana, Yampa, Reflex)를 볼 때 비슷한 모양들을 만나게 되니, 이런 continuation을 가진 모양에 충분히 익숙해지면 도움이 됩니다. 쓰고 보니, 함수형 전반에 걸쳐서 계속 만나는 모양입니다.</p>
 <div class="sourceCode" id="cb34"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>Welcome to Arrow Hangman</span>
 <span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>___</span>
 <span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>Lives: [#####]</span>
@@ -375,12 +382,19 @@ A. <code>accum</code>의 반환 값 안에 있는 <code>...(accum acc' f, ...)</
 <span id="cb34-13"><a href="#cb34-13" aria-hidden="true" tabindex="-1"></a>o</span>
 <span id="cb34-14"><a href="#cb34-14" aria-hidden="true" tabindex="-1"></a>dog</span>
 <span id="cb34-15"><a href="#cb34-15" aria-hidden="true" tabindex="-1"></a>You won!</span></code></pre></div>
+<h4 id="lazy-와-stream">Lazy 와 Stream</h4>
+<p><code>interact</code>함수는 전체 stdin 입력을 받아 <code>String -&gt; String</code> 함수에 넘깁니다.<br />
+<code>lines</code>는 <code>String</code>을 받아 <code>[String]</code> 리스트로 만듭니다.<br />
+<code>runCircuit</code>은 <code>Circuit</code>과 리스트를 받으면 리스트를 출력합니다.<br />
+</p>
+<p><code>interact</code>가 받은 함수는, 한 번 돌아서 작업을 마친 후에, 또 반복하며 도는게 아닙니다. <code>String</code>을 받아 한 번만 돌고 <code>String</code>을 출력할 뿐입니다. 중간에, 원소 하나에 대한 작업이 끝나면 볼 수 있게 해놨을 뿐, <code>interact</code>가 <code>String -&gt; String</code>함수를 loop 돌리는 게 아닙니다. 실행시킨 후 특별히 Ctrl-c 등으로 stdin을 끌내지 않으면, 입력으로 들어가는 <code>String</code>이 무한히 들어갑니다. <code>Enter</code>키를 누를 때마다 <code>lines</code>가 출력할 리스트의 원소 하나가 준비됩니다. 그럼 리스트를 받는 <code>runCircuit</code>이 전체는 아직이라도, 원소 하나가 준비되는대로 가져옵니다. 원소 하나를 받아 <code>Circuit</code>을 돌리고, 후임 <code>Circuit</code>을 준비한 후 다음 원소를 Lazy하게 기다립니다.</p>
+<p><strong>스트림</strong>(여기선 무한 리스트지만, 어떤 것이든 재귀로 정의된 타입)을 다루는 Lazy 표현은 우아하지만, Strict 나라에서 살던 사람이, Lazy 나라로 넘어와서, 읽는 것을 넘어 원어민처럼 생각 자체를 Lazy하게 하려면 벽이 심하게 높은 것 같습니다.</p>
+<h3 id="바나나-브라켓---함수와-arrow-명령어-묶기combine">바나나 브라켓 - 함수와 arrow 명령어 묶기combine</h3>
 <p>GHC에는 <code>arrow</code> 구문과, <code>arrow</code>에 적용하는 함수를 컴바인하는 바나나 브라켓 <code>(|   |)</code>가 있습니다. 이를 이용하면 다음처럼 쓸 수 있습니다.</p>
 <div class="sourceCode" id="cb35"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="ot">mean3 ::</span> <span class="dt">Fractional</span> a <span class="ot">=&gt;</span> <span class="dt">Circuit</span> a a</span>
 <span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>mean3 <span class="ot">=</span> proc value <span class="ot">-&gt;</span> <span class="kw">do</span></span>
 <span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>  (t, n) <span class="ot">&lt;-</span> (<span class="op">|</span> (<span class="op">&amp;&amp;&amp;</span>) (total <span class="op">-&lt;</span> value) (total <span class="op">-&lt;</span> <span class="dv">1</span>) <span class="op">|</span>)</span>
 <span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>  returnA <span class="op">-&lt;</span> t <span class="op">/</span> n</span></code></pre></div>
-<h3 id="바나나-브라켓---함수와-arrow-명령어-묶기combine">바나나 브라켓 - 함수와 arrow 명령어 묶기combine</h3>
 <div class="sourceCode" id="cb36"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="ot">mean2 ::</span> <span class="dt">Fractional</span> a <span class="ot">=&gt;</span> <span class="dt">Circuit</span> a a</span>
 <span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>mean2 <span class="ot">=</span> proc value <span class="ot">-&gt;</span> <span class="kw">do</span></span>
 <span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>  t <span class="ot">&lt;-</span> total <span class="op">-&lt;</span> value</span>
