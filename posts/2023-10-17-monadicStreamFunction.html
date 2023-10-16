@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko" lang="ko">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <title>lionhairdino - Monadic Stream Function (작성 중)</title>
+
+        <meta name="description" content="lionhairdino - Monadic Stream Function (작성 중)" />
+        <meta property="og:description" content="하스켈 함수형 프로그래밍" />
+
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <link rel="icon" href="https://lionhairdino.github.io/favicon.svg" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino16px.png" sizes="16x16" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino24px.png" sizes="24x24" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino32px.png" sizes="32x32" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino48px.png" sizes="48x48" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino57px.png" sizes="57x57" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino60px.png" sizes="60x60" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino64px.png" sizes="64x64" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino72px.png" sizes="72x72" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino76px.png" sizes="76x76" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino114px.png" sizes="114x114" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino120px.png" sizes="120x120" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino144px.png" sizes="144x144" />
+        <link rel="shortcut icon" href="../favicon.ico" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino152px.png" sizes="152x152" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino180px.png" sizes="180x180" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino192px.png" sizes="192x192" />
+        <link rel="manifest" href="../site.webmanifest" />
+        <link rel="mask-icon" href="https://lionhairdino.github.io/Lionhairdino_black.svg" color="#ff7500" />
+        <meta name="msapplication-TileImage" content="/images/favicon/Lionhairdino144px.png" />
+        <meta name="msapplication-TileColor" content="#ff7500" />
+        <meta name="theme-color" content="#ffffff" />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="Monadic Stream Function (작성 중)" />
+        <meta property="og:site_name" content="Lionhairdino" />
+        <meta property="og:url" content="https://lionhairdino.github.io/posts/2023-10-17-monadicStreamFunction.html" />
+
+        <meta property="og:image" content="https://lionhairdino.github.io/images/state400px.png" />
+
+      <meta name="keywords" content="Arrow, MSF, Effect, Stream">
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-E9WZ6VXGHP"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-E9WZ6VXGHP');
+</script>
+<script src="../script/copycode.js"></script>
+<script async src="https://cse.google.com/cse.js?cx=9c53b4915cbb2605c"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.11.1/tocbot.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.11.1/tocbot.css" />
+    </head>
+    <body>
+        <div id="header">
+            <div style="display:inline-block;margin-right:5px;padding-top: 5px;" id="logo">
+                <a href="../"><img style="width:30px;border:none" src="../images/favicon/Lionhairdino48px.png"></a>
+            </div>
+            <div style="display:inline-block;vertical-align: top;padding-top:5px;" id="navigation">
+                <a href="../">lionhairdino</a>
+                <a href="../about.html">about</a>
+                <!--<a href="/archive.html">archive</a>-->
+            </div>
+            <div style="display:inline-block;font-size:0.8em;vertical-align: top;">
+                <div style="display:inline-block;vertical-align: top;padding-top: 5px">사이트내 검색</div>
+                <div style="display:inline-block;width:180px;"> 
+                    <div class="gcse-searchbox-only"></div>
+                </div>
+            </div>
+            <div>
+                여기 글들은 일종의 질문입니다. 용어 선택도 학계, 업계에서 쓰는 걸로 되어 있지 않고, 틀린 내용이 있을 수도 있습니다.
+            </div>
+        </div>
+        <div class="js-toc-content">
+            <h1>Monadic Stream Function (작성 중)</h1>
+            <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+<div class="info">
+    Posted on October 17, 2023
+    
+</div>
+
+<p>아마도 띄어 쓰기가 Monadic Stream<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>, Function 이 아니라 Monadic, Stream Function 처럼 보입니다.</p>
+<h2 id="생각-스트레칭">생각 스트레칭</h2>
+<p>언제든 꺼내 올 수 있는, 무한 함수 제공 상자가 있습니다. 함수를 하나 꺼내서 써먹으면, 그 결과를 반영해서 다음 번에 꺼내 올 함수를 준비 합니다. 예를 들면, 누적값등을 계속 다음 준비되는 함수에 넘기는 겁니다. 이 상자에서 꺼내 쓰는 함수들만의 컨텍스트가 생길거라 예측할 수 있습니다.</p>
+<p>하나의 함수를, 하나의 값에 적용하는 보통의 상황과 달리 스트림 함수라 부를 때는,<br />
+하나의 함수를, 스트림 원소 마다 계속 적용이 아니라<br />
+하나의 함수를, <strong><em>스트림에서 꺼내온 한 원소에 적용하고 나면, 함수를 변형해서 그 다음 원소에 적용할 준비</em></strong>를 합니다.</p>
+<p><span class="citation" data-cites="todo">@todo</span> - 지금 지식으론 스트림에 적용하는 용도로 쓰는 “스트림 함수”도 맞지만, 위에 얘기한 함수 상자를 “함수 스트림”이라 부를 수도 있지 않나 싶은데요. 잘 못 생각하는 뭔가가 있을지도 모르겠습니다.
+## 모나딕 스트림 함수 - MSF 타입
+자기 자신과 같은 타입을 가지고 있는 재귀 타입입니다.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">MSF</span> m a b <span class="ot">=</span> <span class="dt">MSF</span> {<span class="ot"> unMSF ::</span> a <span class="ot">-&gt;</span> m (b, <span class="dt">MSF</span> m a b) }</span></code></pre></div>
+<p>MSF(Monadic Stream Function)는
+- 폴리모픽 타입
+- 입력값에 MSF를 적용하고,<br />
+모나딕 컨텍스트 안에 결과값과 <strong>Continuation</strong>을 넣어 반환하는 함수</p>
+<p>두 가지로 이루어져 있습니다.</p>
+<p>순환 타입이 불편한 분은 <a href="../posts/2023-09-29-needArrow.html#circuit">Arrow 예시 - Circuit</a>의 <code>Circuit</code> 타입을 참고해 보세요. 거의 같은 아이디어입니다.
+## step
+예를 들면, 시간을 Discrete하게 모델링(샘플링)해서 단위 시간마다 잘라서 바라 볼때, 다음 단위 시간으로 넘어가는 함수를 <code>step</code>이라고 부릅니다.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ot">step ::</span> <span class="dt">Monad</span> m <span class="ot">=&gt;</span> <span class="dt">MSF</span> m a b <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> m (b, <span class="dt">MSF</span> m a b)</span></code></pre></div>
+<p>스트림용이 아닌 보통의 함수라면 <code>a -&gt;   b</code> 또는 <code>a -&gt; m b</code> 등의 함수를 <code>a</code>에 적용해서 결과값 <code>b</code> 혹은 <code>m b</code>가 나옵니다. 그런데, <strong>스트림</strong> 함수라면 어떤 동작이 추가될까요?</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>a <span class="ot">-&gt;</span> m (  b  ,  <span class="dt">MSF</span> <span class="op">...</span> )</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co">--              ^^^^^^^</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co">--            continuation</span></span></code></pre></div>
+<p>스트림에서 한 원소를 가져와 함수를 적용하고 나면, 결과와 <strong>다음 원소에 적용할 함수</strong>를 준비합니다. 잊어버리지 말아야 할 정보들은 이 함수에 넣어 준비하면 됩니다. 그럼 <strong>누군가</strong> 가져다 쓸 겁니다. (항상 이 조건이 맞아야 범용적인 용어로서의 스트림 함수라 부르는지는 잘 모르겠습니다. 일단, 여기선 스트림 함수라 하는 것은, 모두 다음에 쓸 함수를 준비합니다.)</p>
+<h2 id="embed">embed</h2>
+<p>타입과 <code>step</code>만으론 스트림 causal(인과관계)을 표현하지 못 합니다. 스트림 입력에 함수를 연이어 적용하고, 매 번 나오는 effect도 잘 join해서 끌고 가는 함수가 필요합니다.</p>
+<p><a href="https://hackage.haskell.org/package/dunai-0.11.2/docs/src/Data.MonadicStreamFunction.InternalCore.html#feedback">Data.MonadicStreamFunction</a>에서 발췌</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ot">embed ::</span> <span class="dt">Monad</span> m <span class="ot">=&gt;</span> <span class="dt">MSF</span> m a b <span class="ot">-&gt;</span> [a] <span class="ot">-&gt;</span> m [b]</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>embed _  []     <span class="ot">=</span> <span class="fu">return</span> []</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>embed sf (a<span class="op">:</span>as) <span class="ot">=</span> <span class="kw">do</span> <span class="co">-- 스트림의 모나드를 위해</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  (b, sf') <span class="ot">&lt;-</span> unMSF sf a</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  bs       <span class="ot">&lt;-</span> embed sf' as <span class="co">-- 다음 원소에 접근 할 땐 sf가 아니라 변형된 sf'입니다.</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span> (b<span class="op">:</span>bs)</span></code></pre></div>
+<p>당연히 스트림에 다음 원소가 아직 안들어 오면, <code>bs</code>는 준비되지 않습니다. 하지만 <code>b</code>는 준비 됐으니, Lazy한 스트림을 다루는 함수들은 <code>b</code>만 먼저 가져가게 될 겁니다.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  embed (arr (\n <span class="ot">-&gt;</span> <span class="dv">1</span> <span class="op">+</span> n)) [<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>]</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>λ&gt; [2,3,4]</span></code></pre></div>
+<p><a href="../posts/2023-09-29-needArrow.html#runcircuit">Arrow 예시 - runCircuit</a> 참고</p>
+<h2 id="feedback">feedback</h2>
+<p>위에서 <code>bs</code>를 구하는 과정 <code>embed sf' as</code>를 보면, 이전 작업 결과 <code>b</code>를 참조하거나 하지 않습니다. 이 전 작업의 결과를 참조하려면 어떻게 할까요? (텍스트에선 과거에 의존하기라 부르고 있습니다.)<code>embed</code>는 후임<code>MSF</code>를 받아 그냥 적용할 뿐입니다. 한 가지 방법은 <code>embed</code>에 넘기기 전에 후임 <code>MSF</code>에 이전 결과를 심어 놓으면 됩니다. (추측-<code>MSF</code>로 만들어 낸 결과를 다시 <code>MSF</code>에 넣는다 해서 feed-back 아닐까요?)</p>
+<p>※ 이전 작업의 결과를 다음 작업에 넣어주는, <code>embed</code> 비슷한 별도의 <code>runner</code>를 만들어도 될 것 같은데, 여기선 스트림 함수 자체에 필요한 정보를 실어 놓는 컴비네이터를 소개하고 있습니다. 모로 가도 서울로만 가면 되니, 일단 따라가 보겠습니다. 텍스트의 과거 의존이란 설명보다 <a href="https://hackage.haskell.org/package/dunai-0.11.2/docs/src/Data.MonadicStreamFunction.InternalCore.html#feedback">소스</a> 동작을 보는 게 더 이해하기 편합니다.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ot">feedback ::</span> <span class="dt">Monad</span> m <span class="ot">=&gt;</span> past <span class="ot">-&gt;</span> <span class="dt">MSF</span> m (future_a, past) (result, past) <span class="ot">-&gt;</span> <span class="dt">MSF</span> m future_a result </span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>feedback past sf <span class="ot">=</span> <span class="dt">MSF</span> <span class="op">$</span> \future <span class="ot">-&gt;</span> </span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>        <span class="co">-- m 모나드의 do</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>        <span class="kw">do</span> </span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>          ((result', past'), sf') <span class="ot">&lt;-</span> unMSF sf (future_a, past)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="co">--        m의 바인드가 돌며 effect에 필요한 동작을 합니다.    </span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>          <span class="fu">return</span> (result', feedback past' sf') </span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="co">--                           후임 MSF를 바로 써먹지 않고, 또 다시 feedback을 먹입니다.</span></span></code></pre></div>
+<p>※ 누적된 값은 과거의 값이어서 <code>past</code>, 나중에 <code>embed</code>가 넣어 주게 될 값은 <code>futuer_a</code>라 이름 붙였습니다.</p>
+<p>세세한 걸 보기전에 윤곽만 먼저 짚으면, <code>초기값</code>과 <code>MSF</code>를 넣어주면, <code>MSF</code>를 돌려주는 컴비네이터입니다. 누적의 <code>초기값</code>으로 쓰일 값을 넘겨서 <code>MSF</code>를 변형한다고 볼 수 있습니다. <code>MSF</code>에 들어 있는 함수 타입이 아무거나 되는 건 아니고, <code>( , ) -&gt; m ( , )</code>이어야 합니다. 2튜플을 입력으로 받는데, 2튜플 중 하나는 지금 넣어주는 초기값이고, 나머지 하나는 나중에 받을 값입니다.</p>
+<p><code>embed</code>가 <code>feedback</code>을 먹인 <code>MSF</code>를 받는다면, 첫 번째 원소에 적용한 다음에 쓸 <code>MSF</code>는 <code>feedback past' sf'</code> 즉, <code>sf'</code>만 알고 있는 게 아니라, 누적값 <code>past'</code>을 같이 가지고 있는 작업입니다. 다음 작업으로 <code>sf'</code>을 쓰는데, <code>State</code>모나드처럼 추가적인 정보 <code>past'</code>를 쓸 수 있습니다.</p>
+<p>※ 처음 <code>feedback</code>만 봐서는 딱히, 무슨 일을 하는지, 왜 이름이 <code>feedback</code>인지 눈에 잘 안들어 왔는데, <code>embed</code>와 붙여 읽으니 조금 눈에 들어옵니다.</p>
+<p>아래 코드를 말로 읽어 보겠습니다.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ot">sumFrom ::</span> (<span class="dt">Num</span> n, <span class="dt">Monad</span> m) <span class="ot">=&gt;</span> n <span class="ot">-&gt;</span> <span class="dt">MSF</span> m n n</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>sumFrom n0 <span class="ot">=</span> feedback n0 (arr add2)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    add2 (n, acc) <span class="ot">=</span> <span class="kw">let</span> n' <span class="ot">=</span> n <span class="op">+</span> acc <span class="kw">in</span> (n', n') </span></code></pre></div>
+<p>해석하면, 처음 <code>embed</code>가 <code>sumFrom</code>을 한 번 실행하면, 초기값 <code>n0</code>와 리스트에서 뽑은 원소 하나를 더하고, 두 개를 더한 값을 튜플에 넣어서 다음 번 <code>sumFrom</code>을 실행할 준비를 합니다.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ot">count ::</span> (<span class="dt">Num</span> n, <span class="dt">Monad</span> m) <span class="ot">=&gt;</span> <span class="dt">MSF</span> m () n</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>count <span class="ot">=</span> arr (<span class="fu">const</span> <span class="dv">1</span>) <span class="op">&gt;&gt;&gt;</span> sumFrom <span class="dv">0</span></span></code></pre></div>
+<p>여기서부터 살짝 <code>MSF</code> Arrow의 장점이 보이기 시작합니다. <code>const 1</code>은 <code>embed</code>가 무슨 값을 넣어 주든 <code>1</code>로 바꿉니다. 그리고 이 <code>sumFrom</code>에 초기값 <code>0</code>을 넣어 돌리니, <code>1</code>을 원소 수만큼 더하게 되어 최종 값은 전체 개수를 뜻하는 값이 됩니다.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  embed count [<span class="st">&quot;foo&quot;</span>, <span class="st">&quot;bar&quot;</span>, <span class="st">&quot;baz&quot;</span>]</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>λ&gt; [1,2,3]</span></code></pre></div>
+<h2 id="arrow-인스턴스">Arrow 인스턴스</h2>
+<p>Arrow는 함수를 래핑해 둔 것인데, Monadic Stream “Function”을 MSF로 래핑해뒀으니 Arrow가 생각나는게 자연스럽습니다.</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="ot">arrM ::</span> <span class="dt">Monad</span> m <span class="ot">=&gt;</span> (a <span class="ot">-&gt;</span> m b) <span class="ot">-&gt;</span> <span class="dt">MSF</span> m a b</span></code></pre></div>
+<p><a href="https://dl.acm.org/doi/pdf/10.1145/3236791">Fault Tolerant Functional Reactive Programming (Functional Peral) - Ivan Perez</a></p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Env</span> <span class="ot">=</span> <span class="dt">Env</span> {<span class="ot"> windowWidth ::</span> <span class="dt">Int</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>               ,<span class="ot"> windowHeight ::</span> <span class="dt">Int</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>               }</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="ot">rotateMousePos180 ::</span> <span class="dt">MSF</span> (<span class="dt">Reader</span> <span class="dt">Env</span>) (<span class="dt">Int</span>, <span class="dt">Int</span>) (<span class="dt">Int</span>, <span class="dt">Int</span>)</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="ot">rotateMousePos180 ::</span> proc (x, y) <span class="ot">-&gt;</span> <span class="kw">do</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  winW <span class="ot">&lt;-</span> arrM (ask windowWidth) <span class="op">-&lt;</span> ()</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>  winH <span class="ot">&lt;-</span> arrM (ask windowHeight) <span class="op">-&lt;</span> ()</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>  returnA <span class="op">-&lt;</span> (winW <span class="op">-</span> x, winH <span class="op">-</span> y)</span></code></pre></div>
+<p>모나딕 효과를 날리고 “flatten”할 수 있다. MSF running 함수를 통해서.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="ot">runReaderS ::</span> <span class="dt">MSF</span> (<span class="dt">ReaderT</span> r m) a b <span class="ot">-&gt;</span> r <span class="ot">-&gt;</span> <span class="dt">MSF</span> m a b</span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>ghci&gt; embed (runReaderS (rotateMousePos180) (Env 1024 768) [(10,10),(100,100)])</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>[(1014,758),(924,668)]</span></code></pre></div>
+<p>…작성 중</p>
+<section class="footnotes" role="doc-endnotes">
+<hr />
+<ol>
+<li id="fn1" role="doc-endnote"><p><strong>모나딕 스트림</strong><br />
+<a href="https://types22.inria.fr/files/2022/06/TYPES_2022_slides_32.pdf">Monsters:programming and reasoning - A study and implrementation of monadic streams</a> 참고<br />
+스트림은 원소들이 순차적으로 (보통은 무한하게) 들어옵니다.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>0, 1, 2, 3, 4, 5, ...</span></code></pre></div>
+<p>그냥 순차적으로 들어오는 정보로만 생각했는데, 모나딕 스트림에서 얘기하는 스트림에는 다음 뜻이 들어가 있습니다.</p>
+<p>“<code>n</code>번 째 원소(값)를 얻기 위해선, 이전 값들을 모두 <code>traverse</code>해야 합니다.”</p>
+<p>모나딕 스트림은 원소를 보려면, Effect를 평가해야 하는 스트림입니다.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>+--------+    +--------+</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>| Effect | 0, | Effect | 1, ...</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>+--------+    +--------+</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>           0,            1, ... pure 스트림</span></code></pre></div>
+<p>모나딕 스트림에서 n번 째 원소를 얻으려면, 모든 이전 원소와 Effect를 거쳐 와야합니다. pure 스트림은 Effect가 없는, 혹은 Effect가 아무 일도 안하는 모나딕 스트림으로 볼 수 있습니다.<br />
+<code>Just 1 -- Just 2 -- Nothing -- Just 3 -- ..</code> 이런 걸 모나딕 스트림이라 하는가 싶었는데, 이건 그냥 <code>[Maybe a]</code> 입니다. 모나딕 스트림은 다음을 의미합니다.
+<code>Just (1, Just (2, Just (3, Just (4, Nothing))))</code> -검증 필요-</p>
+<p><span class="citation" data-cites="todo">@todo</span> - Monadic Stream Function 은 여기서 말하는 모나딕 스트림과는 상관 없는 듯 보입니다. 특정 논문에서만 붙인 이름들인지, 통용되는 이름인지 조차 모르겠습니다. 아직 단편적인 지식만 있어, 실제 프로젝트에 사용해 보면서 보완해야 할 것 같습니다.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section>
+
+<div class="comment">
+<script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
+</script>
+</div>
+<div style="text-align:right">Github 계정이 없는 분은 메일로 보내주세요. lionhairdino at gmail.com </div>
+        </div>
+        <nav class="toc toc-right js-toc relative z-1 transition--300 absolute pa4 pt5 is-position-fixed"></nav>
+        <div id="footer">
+            © 2022 lionhairdino. All rights reserved. Generated by <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+        <script>
+            tocbot.init({
+                tocSelector: '.js-toc',
+                contentSelector: '.js-toc-content',
+                headingSelector: 'h2, h3',
+                hasInnerContainers: true,
+            });
+        </script>
+    </body>
+</html>
