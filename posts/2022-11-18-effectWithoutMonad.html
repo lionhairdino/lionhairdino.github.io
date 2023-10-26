@@ -157,10 +157,10 @@
 <h2 id="결론">결론</h2>
 <p>아직, 위의 예시 둘 다 모나드는 아닙니다. (두 번째 예시는 모나드 법칙을 만족 못해 모나드 클래스의 인스턴스로 만들지는 못합니다.) 여기서는 모나드 없이 Effect를 개별적으로 어떻게 해결하는지를 보는 게 목적입니다. 모나드를 도입 전에도 Effect 개념은 있었으며, Effect 훈련이 충분히 된 상태에서 모나드를 만났을 것이다란 상상입니다. 그냥, 천재여서 훈련이 필요 없었을 가능성도 물론 존재하지만요.</p>
 <p>※ 나중 마지막 글에 넣을 최종 결론을 일부 먼저 살펴보면, 위 얘기에 하스켈의 모나드 “클래스”를 쓰지는 않았지만, 모나드 “개념”은 이미 존재합니다. Effect가 모나드고, 모나드가 Effect입니다. 같은 개념, 대상, 상황을 서로 다른 학문에서 기술했다고 볼 수 있습니다. 프로그래밍에서는 Effect란 말을 쓰고, 수학에서는 Monad란 말을 썼을 뿐, 두 개가 지칭하는 개념은 서로 같습니다.</p>
-<section class="footnotes" role="doc-endnotes">
+<aside id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes">
 <hr />
 <ol>
-<li id="fn1" role="doc-endnote"><p>이전 함수의 계산 결과가<br />
+<li id="fn1"><p>이전 함수의 계산 결과가<br />
 성공하면 <code>Just 200.0</code> 같은 값일테니, 다음 함수에 <code>Just</code> 없이 <code>200.0</code>을 넘겨 주면 되고<br />
 실패하면 <code>Nothing</code>이어서 다음 함수 <code>f2</code>는 받을 수 없으니, <code>f2</code>를 거치지 않고, 그냥 <code>Nothing</code>을 돌려주면 됩니다.</p>
 <p>Maybe <code>combinator</code> 구현</p>
@@ -168,7 +168,7 @@
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>                    <span class="dt">Just</span> v <span class="ot">-&gt;</span> f v</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>                    <span class="dt">Nothing</span> <span class="ot">-&gt;</span> <span class="dt">Nothing</span></span></code></pre></div>
 <a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></li>
-<li id="fn2" role="doc-endnote"><p><code>Compensation</code>을 분리해서 잠시 보관하고, <code>f2</code>에 넘겨 계산한 후, 분리해놨던 <code>Compensation</code>을 적용합니다. 그 뒤, <code>f2</code>가 계산하며 새로 만들어 낸 <code>Compensation</code>값과 함께 <code>State 계산값 Compensation</code> 형태로 돌려주면 됩니다.(아직 아래 예시는 문제가 있습니다. 모나드 Associative law를 만족하지 못합니다.)</p>
+<li id="fn2"><p><code>Compensation</code>을 분리해서 잠시 보관하고, <code>f2</code>에 넘겨 계산한 후, 분리해놨던 <code>Compensation</code>을 적용합니다. 그 뒤, <code>f2</code>가 계산하며 새로 만들어 낸 <code>Compensation</code>값과 함께 <code>State 계산값 Compensation</code> 형태로 돌려주면 됩니다.(아직 아래 예시는 문제가 있습니다. 모나드 Associative law를 만족하지 못합니다.)</p>
 <p>State <code>combinator</code> 구현</p>
 <div class="sourceCode" id="cb20"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>combinator (<span class="dt">State</span> (a,c)) f <span class="ot">=</span> </span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> <span class="dt">State</span> (res1, newc) <span class="ot">=</span> f a </span>
@@ -176,7 +176,7 @@
 <span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>                               <span class="kw">else</span> <span class="dt">State</span> (res1 <span class="op">*</span> c, newc <span class="op">*</span> <span class="dv">2</span>)</span></code></pre></div>
 <a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></li>
 </ol>
-</section>
+</aside>
 
 <div class="comment">
 <script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>

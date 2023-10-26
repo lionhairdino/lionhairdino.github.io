@@ -144,10 +144,10 @@
 <p>일단 재귀가 등장하면 생각이 복잡해집니다. 재귀가 무한대로 가면 더욱 따라가기가 불편해집니다. 재귀를 보면 딱 한 단계만 진행하거나, 어떤 조건하에서 끝난다는 걸 알고 읽으면 도움이 됩니다. 여기서는 <code>Pure</code>를 만나면 끝납니다.</p>
 <p>위 바인드를 정리해 보면 <em>(Free타입 A)와 (Free타입 B를 돌려주는 함수)가 만나면, 컨텍스트는 계속 발현(fmap)될 수 있는 모양을 유지하며 A의 가장 안쪽에 B를 붙이는 작업</em>을 합니다.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- 실제 코드는 모두 Free지만, 설명하기 위해 편의상 Free에 번호를 붙이겠습니다.</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="dt">Free1</span><span class="op">..</span>(<span class="dt">Free2</span><span class="op">..</span>(<span class="op">Pure..</span>)) <span class="op">&gt;&gt;=</span> (\_<span class="ot">-&gt;</span><span class="dt">Free3</span><span class="op">..</span>(<span class="dt">Free4</span><span class="op">..</span>(<span class="op">Pure..</span>)))</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="op">Free1..</span>(<span class="op">Free2..</span>(<span class="op">Pure..</span>)) <span class="op">&gt;&gt;=</span> (\_<span class="ot">-&gt;</span><span class="op">Free3..</span>(<span class="op">Free4..</span>(<span class="op">Pure..</span>)))</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co">-- 결과는</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="dt">Free1</span><span class="op">..</span>(<span class="dt">Free2</span><span class="op">..</span>(<span class="dt">Free3</span><span class="op">..</span>(<span class="dt">Free4</span><span class="op">..</span>(<span class="op">Pure..</span>))))</span></code></pre></div>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="op">Free1..</span>(<span class="op">Free2..</span>(<span class="op">Free3..</span>(<span class="op">Free4..</span>(<span class="op">Pure..</span>))))</span></code></pre></div>
 <p>대부분 <code>Free(..(Free..))</code>와 같은 값을 만나고, 여기에 바인드로 <code>(\_ -&gt; Free ...)</code> 함수를 적용하면 <code>Free</code>가 몇 번 감싸져 있든 안쪽까지 들어가 <code>Pure r</code>에 도달해서 <code>r</code>에 함수를 적용하므로 가장 안쪽에 이어 붙이는 효과가 납니다. 적용하는 함수는 리턴 타입이 <code>Free</code> 타입이니, <em>결과는 Free 속에 Free를 넣은 형태</em>가 됩니다.</p>
 <p>어떤 펑크터가 됐든 <code>Free</code>로 감싸서 <code>Free</code>타입으로 만들면 <code>..</code> 이라 표시된 자리에 펑크터 값이 들어갑니다.</p>
 <h2 id="free-모나드-join">Free 모나드 join</h2>
@@ -169,7 +169,8 @@
 <span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>join (<span class="dt">Free</span> (f (<span class="dt">Pure</span>      (<span class="dt">Free</span>(f (<span class="dt">Pure</span> x)))      ))) <span class="ot">=</span> <span class="dt">Free</span> (f (<span class="dt">Free</span> (f (<span class="dt">Pure</span> x))))</span>
 <span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>join (<span class="dt">Free</span> (f (<span class="dt">Pure</span>      (<span class="dt">Pure</span> x)                ))) <span class="ot">=</span> <span class="dt">Free</span> (f (<span class="dt">Pure</span> x))</span></code></pre></div>
 <figure>
-<img src="../images/free_monad_join.png" alt="Free 모나드 join" /><figcaption aria-hidden="true">Free 모나드 join</figcaption>
+<img src="../images/free_monad_join.png" alt="Free 모나드 join" />
+<figcaption aria-hidden="true">Free 모나드 join</figcaption>
 </figure>
 <p>이해하기 좋게 그리기가 쉽지 않습니다. 목표는 펑크터 <code>f</code>가 모두 살아 남게 합성해야 합니다.</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>join (   <span class="dt">Free</span> (f (<span class="dt">Pure</span> (<span class="dt">Free</span> (f (<span class="dt">Pure</span> r)))))   ) <span class="co">-- :: m (m a)</span></span>
@@ -279,7 +280,8 @@
 <p>펑크터를 받으면 공짜로<code>Free</code> 모나드를 만들어 준다기에, 그럼 기존 모나드들도 <code>Free</code>로 구현할 수 있는 한 번 시도해 봤습니다.<br />
 결론부터 말하면, <code>Reader</code>를 정의하기 위해 펑크터(<code>fmap</code>)를 잘 정의하고, <code>Free</code>에 넣는다고 <code>Reader</code> 모나드가 되지 않습니다. 다른 형태의 바인딩이 가능한 모나드가 될 뿐입니다. <code>Free</code> 모노이드<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>와 비슷하게, 바인딩이 되는 <code>구조</code>(틀)를 만들어 놓고, 그 안에 밀어 넣으면서 “바인딩이 되니 모나드가 된거야”라고 말할 뿐, 원하는 모나드가 되진 않습니다. 공짜를 뜻하는 <code>Free</code>가 아니라, 모나드 이름이 <code>Free</code>인 모나드라고 해야 할 것 같습니다.</p>
 <figure>
-<img src="../images/freeMonad.png" alt="공짜로? 모나드 되기. 단 Free 모나드만 될 수 있습니다." /><figcaption aria-hidden="true">공짜로? 모나드 되기. 단 Free 모나드만 될 수 있습니다.</figcaption>
+<img src="../images/freeMonad.png" alt="공짜로? 모나드 되기. 단 Free 모나드만 될 수 있습니다." />
+<figcaption aria-hidden="true">공짜로? 모나드 되기. 단 Free 모나드만 될 수 있습니다.</figcaption>
 </figure>
 <h3 id="mymaybe">MyMaybe</h3>
 <p><code>Maybe</code>와 같은 <code>MyMaybe</code>를 정의하는데, 펑크터까지만 만들어 두고, <code>Free</code>를 씌워서 모나드 동작을 하는지 살펴봤습니다.</p>
@@ -478,10 +480,10 @@
 <code>freer</code>: 작업을 엮으면서, 무슨 이펙트를 발생하게 할지도 나중에 인터프리터가 알아서 하고, 합치는 것도 인터프리터가 알아서 해</p>
 <p>어차피 나중에 이펙트를 합치는 “추가 작업”을 한다면, 이펙트 생성조차도 나중에 맡기는 게 더 일반적일 수 있겠다는 생각이 듭니다. <code>Freer</code>은 공부를 좀 더 한 후에 따로 글을 올려야 할 것 같습니다.</p>
 <p><span class="citation" data-cites="todo">@todo</span>: F-algebra를 이용한 설명 추가</p>
-<section class="footnotes" role="doc-endnotes">
+<aside id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes">
 <hr />
 <ol>
-<li id="fn1" role="doc-endnote"><p><strong>함수의 재귀와 데이터의 재귀</strong>
+<li id="fn1"><p><strong>함수의 재귀와 데이터의 재귀</strong>
 함수의 재귀는 함수안에서 함수를 부르고, 부른 함수에서 또 함수를 부르는데, 데이터 재귀는 그런 뜻이 아닙니다. 함수 재귀는 한 번 실행되기 시작하면 끝나는 조건을 만나기 전에는 계속 반복 실행하는데, 데이터 재귀는 실행의 개념이 아닙니다.</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="dt">List</span> a <span class="ot">=</span> <span class="dt">Empty</span> <span class="op">|</span> <span class="dt">Con</span> a (<span class="dt">List</span> a)</span></code></pre></div>
 <p>는 다음과 같은 형태가 될 수 있다는 뜻이지, 데이터 생성자 Con안에서 타입 생성자 List를 만났다고 또 “실행”을 하는게 아닙니다.</p>
@@ -491,7 +493,7 @@
 <span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="op">...</span></span></code></pre></div>
 <p>이런 모양 모두 리스트 타입이 될 수 있다는 뜻입니다. 데이터 선언 자체에는 반드시 Empty 값으로 끝난다는 제약은 없지만, 실제 코드에서 의미있는 값들은 대부분 마감되는 형태로 나타납니다. (Lazy를 이용해서 무한 반복되는 모양이 나올 때는 마감 여부를 알 필요가 없고, 앞에 몇 개만 쓴다든지 하는 경우가 있긴 있습니다.)</p>
 <p>데이터 재귀를 만나면 머릿속에서 무한 “호출”을 하지 마시고, 그런 “모양이 올 수도 있다”라고 해석하면 됩니다.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn2" role="doc-endnote"><p><strong>Free의 속 뜻</strong><br />
+<li id="fn2"><p><strong>Free의 속 뜻</strong><br />
 같은 뜻으로 쓰인 <code>Free</code> 모노이드를 보면 이해하는데 도움이 됩니다.<br />
 리스트를 <code>Free</code> 모노이드라 부릅니다. 영어 번역으론 타입을 받으면 <code>Free</code> 모노이드를 돌려주는 구조라 되어 있는데, 이런 설명식 문장으로 의사 소통이 귀찮은지 그냥 리스트를 <code>Free</code> 모노이드라 부르기도 합니다. 엄밀히 말하면 타입을 모노이드로 만드는 툴이 리스트이고, 이렇게 별 노력없이 만들어진 모노이드를 <code>Free</code> 모노이드라 부릅니다.</p>
 <p>This structure gives you a “free” monoid for a given type.</p>
@@ -504,7 +506,7 @@
 <code>Free</code> 모나드는 공짜로 모나드로 만들어 준다고 아니라, 그 자체로 하나의 모나드 종류입니다. <code>IO</code> 모나드, <code>Reader</code> 모나드, …<code>Free</code> 모나드입니다. <code>Free</code> 모나드가 <code>Reader</code> 모나드를 자동으로 만들어 주거나 하지 않습니다. 적절한 인터프리터를 만들어 <code>Reader</code>로 동작하게 할 수는 있습니다.</p>
 <p><code>Free</code> 모나드는 이펙트를 합치는 작업을 하지 않는 모나드입니다.</p>
 <p>2022-7-27 추가 - 공을 연결하는게 아니라, 연결된 상자들을 준비하고, 상자에 공을 넣으면 “<strong><em>Free하게 </em></strong> 공을 연결했다”고 합니다.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn3" role="doc-endnote"><p><strong>타입 생성자와 값 생성자 혼동</strong></p>
+<li id="fn3"><p><strong>타입 생성자와 값 생성자 혼동</strong></p>
 <p>이젠 안 할 때도 됐는데, 지금도 이런 실수를 자주 합니다.</p>
 <div class="sourceCode" id="cb27"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Free</span> x <span class="ot">=</span> <span class="dt">Free</span> ( <span class="dt">MyReader</span> (\r <span class="ot">-&gt;</span> (<span class="op">&gt;&gt;=</span> f) (runMyReader mr r)) ) <span class="co">---- (x)</span></span></code></pre></div>
 <p><code>Free x</code>의 모양이 <code>Free (MyReader e a)</code> 모양일 거라 오해할 수 있습니다. <code>Free (MyReader e a)</code>는 값이 아니라 타입입니다. 값은 <code>Free</code> 정의에 따라 <code>Free (Free ...(Pure r))</code> 모양이지, <code>Free (MyReader e a)</code> 가 아닙니다.</p>
@@ -530,7 +532,7 @@
 <span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="dt">Free</span> (<span class="dt">Just</span> (<span class="dt">Free</span> (<span class="dt">Just</span> (<span class="dt">Pure</span> ()) )))<span class="ot"> ::</span> <span class="dt">Free</span> <span class="dt">Maybe</span> ()</span></code></pre></div>
 <a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></li>
 </ol>
-</section>
+</aside>
 
 <div class="comment">
 <script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>

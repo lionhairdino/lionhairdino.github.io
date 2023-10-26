@@ -123,7 +123,8 @@
 <p>2021.5.9 추가</p>
 <h2 id="값-생성자를-벗길-때-발현되는-컨텍스트">값 생성자를 벗길 때 발현되는 컨텍스트</h2>
 <figure>
-<img src="../images/wrappingType.png" alt="얼굴을 봐야 대화를 하지" /><figcaption aria-hidden="true">얼굴을 봐야 대화를 하지</figcaption>
+<img src="../images/wrappingType.png" alt="얼굴을 봐야 대화를 하지" />
+<figcaption aria-hidden="true">얼굴을 봐야 대화를 하지</figcaption>
 </figure>
 <p><code>a -&gt; f b</code> 해석</p>
 <p><code>a</code>를 받아 작업을 한 후 <code>f b</code>의 결과를 만드는데, <code>b</code>가 아니라 <code>f b</code>인건 반드시 어떤 값 생성자로 감싸져 있다는 뜻입니다.(카인드로 얘기하면 <code>* -&gt; *</code>) 값 생성자로 감싸져 있으면 무슨일이 생길까요? 값 생성자로 감싸는 이유는 값 생성자를 벗겨낼 때 어떤 작업을 반드시 하게끔 하기 위해서 입니다. 벗겨낼(inverse) 때 반드시 하는 작업을 effect라 부릅니다. 유심히 볼 동작은 값 생성자로 감쌀때가 아닙니다. 값 생성자와 패턴 매칭으로 풀어낼 때 비로소 effect가 발현됩니다. 그리고 또 한가지, 값 생성자를 벗겨 낼 때는 옆에 있는 함수와 뭔가를 하기 위해서 벗겨냅니다. 혼자만 effect를 확인하는 건 의미가 없습니다. effect를 확인 후 다른 함수와의 동작을 결정지을 필요가 있을 때 값 생성자를 벗겨 냅니다. effect가 있는 작업들을 연이어 합성했을 때, 함수가 연결될 때마다 고정적으로 작동하는 effect작업을 context라 부릅니다.</p>
@@ -147,10 +148,10 @@
 <p><code>Maybe Int</code>는 <code>Just Int</code>값 아니면 <code>Nothing</code>값이 될 수 있습니다. <code>Int</code>값을 <code>Just Int</code>로 만들려면, 그냥 <code>Just</code>로 감싸면 됩니다. 마치 <code>Just</code>가 인자로 <code>Int</code>를 받아 <code>Just Int</code>가 되는 함수 같습니다. 하지만, 일반 함수와 다르게 값 생성자는 <em>패턴 매칭</em>에 쓰일 수 있습니다. 이게 헛갈릴까 싶지만 처음 공부할때 혼동하는 경우가 있습니다.</p>
 <h2 id="maybe-int는-당분간은-maybe">Maybe Int는 당분간은 Maybe</h2>
 <p>필요로 하는 값의 타입은 <code>Int</code>이고, <code>Maybe</code>는 어떤 절차를 나타내는 구조라 부르기도 합니다. [Int]의 구조는 리스트, <code>Reader env Int</code>의 구조는 <code>Reader env</code>라고 보면 됩니다. 항상 구조를 파고 들어 값을 가져오는 건 아닙니다. 구조가 뭔지만 궁금할 때도 있습니다. 하스켈은 Lazy하니 <code>Maybe Int</code>는 <code>Int</code>를 필요로 하는 순간이 오기 전까진, 그냥 <code>Maybe</code> 구조의 뭔가입니다. 보통 패턴 매칭으로 구조를 벗겨 냅니다. <code>Maybe Int</code>를 <code>Just</code>와 <code>Nothing</code>으로 패턴 매칭하는 순간 <code>Int</code>인 걸 알게 됩니다.</p>
-<section class="footnotes" role="doc-endnotes">
+<aside id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes">
 <hr />
 <ol>
-<li id="fn1" role="doc-endnote"><p>타입에 따라 인스턴스를 고르니, 타입과 함수를 연관 짓는 함수로 볼 수 있습니다. 어떤 것과 어떤 것을 연관 지어 놓는 걸 함수라고 하는데, 어떤 것을 연관 짓냐에 따라 이름을 달리 붙여 놨습니다.</p>
+<li id="fn1"><p>타입에 따라 인스턴스를 고르니, 타입과 함수를 연관 짓는 함수로 볼 수 있습니다. 어떤 것과 어떤 것을 연관 지어 놓는 걸 함수라고 하는데, 어떤 것을 연관 짓냐에 따라 이름을 달리 붙여 놨습니다.</p>
 <ol type="1">
 <li>타입과 타입을 매핑 = 함수<br />
 </li>
@@ -162,9 +163,9 @@
 </ol>
 <p>펑크터는 함수만 매핑하는 것이 아니라, 타입도 같이 매핑합니다.<br />
 <code>a, b</code>타입이 있고, 이 타입들을 다루는 <code>a -&gt; b</code> 함수가 있다면, 펑크터 <code>F</code>는 <code>F a</code>, <code>F b</code>, <code>F a -&gt; F b</code>로 매핑합니다.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn2" role="doc-endnote"><p><code>main</code> 함수에서 흐름이 시작되는데, <code>main</code> 함수 자체가 <code>&gt;&gt;=</code> 로 엮어 놓은 거대한 함수 composition입니다.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p><code>main</code> 함수에서 흐름이 시작되는데, <code>main</code> 함수 자체가 <code>&gt;&gt;=</code> 로 엮어 놓은 거대한 함수 composition입니다.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
-</section>
+</aside>
 
 <div class="comment">
 <script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>

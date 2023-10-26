@@ -138,10 +138,10 @@ A. <code>ReaderT</code> 정의에 <code>m</code>이 모나드여야 한다는 �
 <p>Q. MonadReader가 ReaderT인가요?<br />
 A. 둘은 다른 겁니다. <code>ReaderT</code>는 타입이고, <code>MonadReader</code>는 클래스입니다. <code>ReaderT</code>는 <code>asks</code>를 가지고<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> 있고, <code>MonadReader</code>는 <code>asks</code>를 가지고 있어야 한다는 제약을 나타낼 때 쓰입니다. <code>MonadReader</code>는 없어도, <code>ReaderT</code>만으로 모나드 스택은 만들 수 있습니다. 이 경우 각 층에 참여한 모나드들이 모두 <code>asks</code>를 알고 있지 않기 때문에 <code>asks</code>를 가진 <code>Reader</code>모나드 층에 도달할 수 있게끔 명시적으로 <code>lift</code>를 써주면 됩니다. <code>lift . lift . lift . ask</code> 이런 식으로 몇 번째 층에서 <code>asks</code>를 처리할 수 있는지 정확한 횟수의 <code>lift</code>를 써서 알려주면 됩니다. 하지만 모든 층이 <code>MonadReader</code>의 인스턴스여서 <code>asks</code> 메소드가 모두 구현되어 있다면 어떻게 될까요? 모든 층에 있는 <code>asks</code>가 모두 <code>asks</code> 자체 동작을 하는 게 아니라, “<em>나는 모르지만, 다음 층으로 떠 넘겨 줄게(mtl라이브러리 핵심 아이디어)</em>” 라는 동작을 하는 <code>asks</code>가 있다면, <code>lift</code>를 굳이 써주지 않고 그냥 <code>asks</code>만 써도, 알아서 <code>ReaderT</code>층까지 찾아가는 동작을 하게 됩니다. <code>MonadReader</code>(mtl은)는 <code>ReaderT</code>(모나드 트랜스포머 스택)를 편하게 쓰기 위한 보조helper 라이브러리입니다.</p>
 </blockquote>
-<section class="footnotes" role="doc-endnotes">
+<aside id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes">
 <hr />
 <ol>
-<li id="fn1" role="doc-endnote"><p>다른 트랜스포머들은 liftIO를 어떻게 정의해 놨는지 볼까요?</p>
+<li id="fn1"><p>다른 트랜스포머들은 liftIO를 어떻게 정의해 놨는지 볼까요?</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> (<span class="dt">MonadIO</span> m) <span class="ot">=&gt;</span> <span class="dt">MonadIO</span> (<span class="dt">MaybeT</span> m) <span class="kw">where</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    liftIO <span class="ot">=</span> lift <span class="op">.</span> liftIO</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -152,9 +152,9 @@ A. 둘은 다른 겁니다. <code>ReaderT</code>는 타입이고, <code>MonadRea
 <span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    liftIO <span class="ot">=</span> lift <span class="op">.</span> liftIO</span>
 <span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="op">...</span></span></code></pre></div>
 <p>예상대로 별 다른 모양은 없습니다. 그저 아래층으로 떠넘기기만 하면 되니 인스턴스들이 다를 게 없습니다.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn2" role="doc-endnote"><p><code>Reader</code> 타입이 <code>asks</code>를 “가지고 있다”라 표현하는게 적합하지 않을 수 있습니다. OOP에서 오브젝트가 메소드를 가지고 있는 것과는 달리 <code>asks</code>는 그냥 보통의 함수입니다. 인자로 받는 타입이 <code>Reader</code>일 뿐입니다. OOP처럼 함수들을 강제로 묶어서 하나의 개체로 처리하는 방법은 없습니다. 레코드 문법Record Syntax이 마치 함수를 묶어 하나로 처리하는 것처럼 보이나, 레코드 문법에서도 각 필드에 접근하기 위한 접근자들은 그냥 함수일 뿐입니다. 그러고 보면, 함수형에서 함수는 다른 패러다임의 함수보다는 stand alone 성격이 강합니다.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p><code>Reader</code> 타입이 <code>asks</code>를 “가지고 있다”라 표현하는게 적합하지 않을 수 있습니다. OOP에서 오브젝트가 메소드를 가지고 있는 것과는 달리 <code>asks</code>는 그냥 보통의 함수입니다. 인자로 받는 타입이 <code>Reader</code>일 뿐입니다. OOP처럼 함수들을 강제로 묶어서 하나의 개체로 처리하는 방법은 없습니다. 레코드 문법Record Syntax이 마치 함수를 묶어 하나로 처리하는 것처럼 보이나, 레코드 문법에서도 각 필드에 접근하기 위한 접근자들은 그냥 함수일 뿐입니다. 그러고 보면, 함수형에서 함수는 다른 패러다임의 함수보다는 stand alone 성격이 강합니다.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
-</section>
+</aside>
 
 <div class="comment">
 <script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
