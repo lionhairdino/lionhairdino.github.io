@@ -81,18 +81,18 @@
     
 </div>
 
-<p>하스켈 관련 얘기는 아니고, FRP 이해의 출발점인 <code>Event</code>와 <code>Behavior</code>를 이해가 목표입니다.</p>
-<p>새로운 프로그래밍 대상을 공부할 때, 먼저 상상해 보곤 합니다. 해결해야 하는 문제를 정리해 보고, 문제들을 어떻게 풀어나갈지 생각해 봅니다.</p>
-<p>사실, 그리 깊게 알고 싶진 않고 구현 아이디어와 사용법 정도 알고싶을 때가 많은데, 하스켈의 자료들은 여차하면 논문으로, 여차하면 소스 코드로 끌어 갑니다. 그런 곳으로 잘 못 끌려가면 카테고리 이론 용어들이 떡하니 버틴 경우도 많고, 처음 보는 문법으로 풀어 나가는 코드도 보게 되곤 합니다.</p>
+<p>FRP 전체에 대한 얘기는 아니고, FRP 이해의 출발점인 <code>Event</code>와 <code>Behavior</code>를 이해가 목표입니다. <code>Event</code> 개념보다는 주로 <code>Behavior</code>에 대한 상상, 해석입니다.</p>
+<p>사실, 그리 깊게 알고 싶진 않고 구현 아이디어와 사용법 정도 알고싶을 때가 많은데, 하스켈의 자료들은 여차하면 논문으로, 여차하면 소스 코드로 끌고 들어갑니다. 그런 곳으로 잘 못 끌려가면 카테고리 이론 용어들이 떡하니 버틴 경우도 많고, 처음 보는 문법으로 풀어 나가는 코드도 보게 되곤 합니다.</p>
 <p>저런 곳으로 끌려가지 않기 위해, 서두의 내용만 갖고, 상상 했던 내용과 아귀를 맞추려고 시도합니다. 그러다 그럴싸하게 맞아 떨어지면 맞는 내용이겠거니 하고 넘어갑니다. 혹시나 의논을 할 수 있는 분을 만날까 해서 블로그에 글도 올려 놓고요. 그러니, 틀리는 경우가 종종 있을 수 밖에 없습니다. 틀리거나 의심스런 내용이 보이면 댓글, 혹은 메일 꼭 부탁드립니다.</p>
+<p>새로운 프로그래밍 대상을 공부할 때, 먼저 상상해 보곤 합니다. 해결해야 하는 문제를 정리해 보고, 문제들을 어떻게 풀어나갈지 생각해 봅니다. 이러고 개념을 보기 시작하면 단점이 하나 생깁니다. 제 상상이 일종의 기준이 되어 계속 맞춰보게 됩니다. 기준이 크게 무리가 없는 상상이면 굉장히 도움이 많이 되지만, 반대의 경우도 생깁니다.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">Event</span> a    <span class="ot">=</span> <span class="dt">Event</span>    {<span class="ot"> occ ::</span> (<span class="dt">Time</span>, a) }</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">Behavior</span> a <span class="ot">=</span> <span class="dt">Behavior</span> {<span class="ot"> at  ::</span> <span class="dt">Time</span> <span class="ot">-&gt;</span> a }</span></code></pre></div>
 <p>텍스트에선 실제가 아닌 이론적인 두 가지 형태를 먼저 설명하고 있습니다.
-<code>Event</code>는 “특정 시간에 일어난 일”이고, <code>Behavior</code>는 시간마다 바뀔 수 있는 값인데, 언제고 알고 싶은 시간을 주면 값을 알려주는 함수입니다.</p>
-<p>다음도 역시 실구현이 아닌 개념을 더 직관적으로 보면 아래처럼 되는데, <code>Behavior</code>와 <code>Event</code>를 굳이 나누게 된 동기?가 궁금해서 계속 뒤저 보는 중입니다. <span class="citation" data-cites="todo">@todo</span> Thu Oct 26 10:16:19 AM KST 2023</p>
+<code>Event</code>는 “특정 시간에 일어난 일”이고, <code>Behavior</code>는 시간마다 바뀔 수 있는 (mutation) 값인데, 언제고 알고 싶은 시간을 주면 값을 알려주는 함수입니다.</p>
+<p>다음도 역시 실구현이 아닌, 개념을 더 직관적으로 보면 아래처럼 되는데, <code>Behavior</code>와 <code>Event</code>를 굳이 나누게 된 동기?가 궁금해서 계속 뒤저 보는 중입니다. <span class="citation" data-cites="todo">@todo</span> Fri Nov 3 10:43:12 AM KST 2023</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>Event는    [_,_,_,_,e,_,_,e,_,...]</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>Behavior는 [b,b,b,b,b,b,b,b,b,...]</span></code></pre></div>
-<p>세상에 존재하는 걸 두가지로만 봅니다. 어떤 순간에도 값이 존재하는 것과, 특정 순간에만 값이 존재하는 것. 위 <code>occ</code>, <code>at</code>보다 더 의미가 직관적으로 보이지 않나 싶은데요. 원소를 <code>Maybe</code>로 모델링하면, <code>Behavior</code>는 <code>Just</code> 값으로만 이루어진 걸로 보면되니, 위 둘을 하나로 추상화할 수 있지 않을까 싶은데요. (어떤 라이브러리는 이렇게 하나로 만든 걸 <code>Signal</code>이라 부른다고 합니다.) FRP는 왜 두 가지로 나누어서 모델링 했을까요?</p>
+<p>세상에 존재하는 걸 두가지로만 봅니다. 어떤 순간에도 값이 존재하는 것과, 특정 순간에만 값이 존재하는 것. 위 <code>occ</code>, <code>at</code>보다 더 의미가 직관적으로 보이지 않나 싶은데요. 원소를 <code>Maybe</code>로 모델링하면, <code>Behavior</code>는 <code>Just</code> 값으로만 이루어진 걸로 보면되니, 위 둘을 하나로 추상화할 수 있지 않을까 싶은데요. (어떤 라이브러리는 둘이 합쳐 하나의 <code>Signal</code>로 모델링한 것도 있습니다.) FRP는 왜 두 가지로 나누어서 모델링 했을까요?</p>
 <p>다음 원소로 진행하는 걸 단위 시간 한 스텝을 나아가는 걸로 해석하고 있습니다.</p>
 <h2 id="생각-스트레칭">생각 스트레칭</h2>
 <p>텍스트들의 도입부를 읽고, 내가 구현한다면, 어떻게 할까 생각해 봤습니다. 변하는 시스템을 <strong><em>모두 반응Reaction</em></strong>으로 표현한다면</p>
@@ -112,7 +112,7 @@
 <p>구현을 생각하면, (발생 시각, 값) 두 가지 정보만 가지고 있습니다. 시간을 인자로 주거나 하는 게 아닙니다. 여러 시간이 아니라, 특정 시각에 변화를 주는 일이 일어났을 뿐입니다.</p>
 <h2 id="behavior">Behavior</h2>
 <p><code>Event</code>는 그리 어렵지 않게 넘어 갔는데 <code>Behavior</code>는 설명들이 혼란을 줍니다. 어떤 라이브러리 구현은 이 둘을 구분하지 않고 <code>Signal</code>이란 하나의 타입을 두고 구현한 것도 있다고 합니다. 둘은 성격이 달라 보이는데, 하나로 본다니 금방 수긍이 가지 않습니다. 이벤트 발생과 지속을 구분하는 게 무슨 철학적인 접근인가 싶기도 합니다.</p>
-<p>시간에 따라 변하는 값입니다. (실제 구현은 아니고)의미로는 <code>t -&gt; a</code>로 볼 수 있다고 합니다. (semantic function)</p>
+<p>시간에 따라 변하는 값입니다. (실제 구현은 아니고) <strong>의미</strong>로는 <code>t -&gt; a</code>로 볼 수 있다고 합니다. (<strong>semantic</strong> function)</p>
 <blockquote>
 <p><strong>생각 스트레칭</strong><br />
 아직 정답은 모르고 추측입니다.<br />
@@ -133,31 +133,45 @@
 <p><strong>Q2. <code>Event</code>와 다르게 연속Continuous적인 시간에 벌어지는 일이라고 합니다. 결국 컴퓨터로 표현하려면 모두 discrete하게(불연속, 이산) 바꿔야 하는 것 아닌가요?</strong></p>
 <p>실제 구현이 연속Continuous적인 동작을 한다는 게 아니라, 시간에 연속인 대상을 모델링을 했다는 뜻일 뿐, <code>Behavior</code>가 연속으로 계속 업데이트 하고 있는 모양은 아닙니다. <code>Behavior</code>의 값을 가져다는 쓰는 쪽에서 연속이란 의미는, 바꿔 말하면, 언제든 “값을 원하는 순간”에 값을 얻을 수 있다는 말입니다. 무엇이 일정 시간동안 “존재”한다는 뜻에는 Continuous란 의미가 들어가 있다는 생각이 듭니다.</p>
 <p><strong>Q3. <code>Behavior</code>는 시간의 흐름을 강조합니다. FRP가 내부적으로 흘러가는 타이머를 두는 건가요?</strong><br />
-폴링 작업이 들어가면 타이머가 돈다고 볼 수 있겠습니다. 항상 변경되는 걸 결과로 바로 보여야 하는 건 아니니, 그럴 수도 아닐 수도 있습니다. 만일 실시간으로 계속 값을 가져와야 한다면 타이머가 돌아야 합니다. 참고 - <a href="http://conal.net/papers/push-pull-frp/push-pull-frp.pdf">Push-Pull FRP - Conal Elliot 섹션5.1</a><br />
+추측 - 폴링 작업이 들어가면 타이머가 돈다고 볼 수 있겠습니다. 항상 변경되는 걸 결과로 바로 보여야 하는 건 아니니, 그럴 수도 아닐 수도 있습니다. 만일 실시간으로 계속 값을 가져와야 한다면 타이머가 돌아야 합니다. 참고 - <a href="http://conal.net/papers/push-pull-frp/push-pull-frp.pdf">Push-Pull FRP - Conal Elliot 섹션5.1</a><br />
 보통 예시들을 보면 입력을 스트림으로 주는데, <code>[_, _, _, ...]</code>에서 원소 하나를 가져와 작업하고, 다음 원소를 가져오는 걸 시간이 흘러간 것으로 표현하는 곳도 있습니다.</p>
 </blockquote>
 <p>전 <code>Behavior</code>가 FRP에서 일종의 <strong>기억 장소</strong> 역할을 하는 것으로 이해했습니다. 시간에 연속적으로 변할 수 있는 값이긴 하나, 실 구현에선 (매 단위시간마다 업데이트를 하고 있는 게 아니라) 적절한 동작이 필요하겠습니다. 마치, FRP의 원조처럼 여기 저기 거론되는 <a href="http://conal.net/papers/icfp97/icfp97.pdf">FRAN</a>에선, 이론대로</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Behavior</span> a <span class="ot">=</span> <span class="dt">Behavior</span> (<span class="dt">Time</span> <span class="ot">-&gt;</span> a)</span></code></pre></div>
 <p>로 표현하는데, 이렇게 하면 공간 시간 낭비가 너무 심하니, 적절한 트레이드 오프가 필요하다고 합니다.</p>
-<p><a href="https://wiki.haskell.org/Functional_Reactive_Programming">Functional Reactive Programming - Haskell Wiki</a>에 보면 위젯을 1급first class 값으로 다루는 것에 대한 얘기가 나옵니다. <del>Lazy 평가를 기본으로 하는 하스켈에서 <code>Behavior</code>를 시간에 대한 <strong>함수</strong>로 모델링하면, 다음과 같은 코드 모양이 가능합니다.</del> 잘 못 생각한 것 같습니다. WHNF까지만 reduc하는 Lazy가 영향이 있을 것 같긴 한데, 아직 정리가 안됩니다.</p>
+<p><a href="https://wiki.haskell.org/Functional_Reactive_Programming">Functional Reactive Programming - Haskell Wiki</a>에 보면 위젯을 1급first class 값으로 다루는 것에 대한 얘기가 나옵니다. Lazy 평가를 기본으로 하는 하스켈에서 <code>Behavior</code>를 시간에 대한 <strong>함수</strong>로 모델링하면, 다음과 같은 코드 모양이 가능합니다. WHNF까지만 reduce하는 Lazy가 영향이 있을 것 같긴 한데, 아직 정리가 안됩니다.</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>myEditWidget <span class="op">:</span>; <span class="dt">Behavior</span> <span class="dt">Text</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="kw">do</span> edit1 <span class="ot">&lt;-</span> editWidget</span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>   edit2 <span class="ot">&lt;-</span> editWidget</span>
 <span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>   label <span class="ot">&lt;-</span> label (liftA2 (<span class="op">&lt;&gt;</span>) edit1 edit2)</span></code></pre></div>
-<p><span class="citation" data-cites="todo">@todo</span> 아직 아하 모먼트가 오지 않은 채 작성 중입니다. Thu Oct 26 10:15:54 AM KST 2023</p>
-<p>어찌 됐건 <code>Behavior</code>는 시간을 주면 값을 돌려줘야 합니다. 실제 함수든 아니든 말입니다.</p>
+<p><span class="citation" data-cites="todo">@todo</span> 아직 아하 모먼트가 오지 않은 채 작성 중입니다. Fri Nov 3 10:32:18 AM KST 2023</p>
+<p>어찌 됐건 <code>Behavior</code>는 시간을 주면 값을 돌려줘야 합니다. 실제 단순 함수로 구현됐든, 복잡하게 구현 됐든, 뭐가 됐든 말입니다.</p>
 <h2 id="예시">예시</h2>
-<p>마우스는 움직일 때마다 <code>Event</code>가 발생하고, 이 <code>Event</code>가 <code>Behavior</code>에 마우스 위치를 저장합니다.<br />
-어떤 상황에서 마우스 위치값이 필요하면 <code>Behavior</code>를 읽어 오면 됩니다.<br />
-값이 필요할 때 직접 <code>Event</code>에서 값을 받아 오지 않는 이유는, 마우스가 멈춰 있다면 <code>Event</code>는 발생하지 않지만, 위치값은 존재해야 합니다.<br />
-</p>
+<p>마우스는 움직일 때마다 <code>Event</code>가 발생하고, 이 <code>Event</code>가 <code>Behavior</code>에 마우스 위치를 저장합니다. 마우스 위치값이 필요하면 이 <code>Behavior</code>를 읽어 오면 됩니다. 값이 필요할 때 직접 <code>Event</code>에서 값을 받아 오지 않는 이유가 뭘까요? 마우스가 멈춰 있다면 <code>Event</code>는 발생하지 않지만, 위치값은 존재해야 합니다.</p>
 <p><code>Behavior</code>의 시간은 Continuous하게 흐르지만, <code>Behavior</code>의 값이 변경되는 시점과, 값을 필요로 하는 시점은 Discrete합니다.<br />
 반면, <code>Event</code>의 시간은 Discrete하고, Event의 값을 받아가는 시점은, <code>Event</code>가 발생한 순간입니다.</p>
 <p>※ Reflex에는 위 두개에 더해 <code>Dynamic</code>이란 타입이 있습니다.
 <code>Behavior</code>처럼 모든 시간에 값을 가지는데, 가지고 있는 값이 바뀌면 외부로 알릴 수 있습니다. 기본적인 구현은 <code>Event</code>와 <code>Behavior</code>를 튜플로 가지고 있습니다.</p>
 <p>참고 - <a href="http://docs.reflex-frp.org/en/latest/overview.html#reflex-basics">Reflex Basics</a></p>
 <p><span class="citation" data-cites="todo">@todo</span> 작성 중 …</p>
+<h2 id="연속된-시간">연속된 시간</h2>
+<p>연속된 시간을 어떻게 표현할 수 있을까요?</p>
+<p>연속된 시간을 다른 말로 풀면, <strong>어떤 시간에도 값이 존재</strong>한다고 말할 수 있습니다. 이 풀이는, 어떤 시간과도 매핑되는 값이 있는 함수로 볼 수 있다로 연결됩니다. 그럴만하다고 끄덕하게 되는 Representation입니다.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>t <span class="ot">-&gt;</span> a</span></code></pre></div>
+<p><a href="http://conal.net/">Conal Elliot</a> 교수는 연속된 시간을 비트맵과 벡터 그래픽에 비유하기도 합니다. 비트맵은 정해진 해상도가 아닌 곳에서 보면 일그러지지만, 벡터 그래픽은 어떠한 해상도에도 대응할 수 있습니다. 여기에 제 생각을 더하자면, 비트맵이란 벡터 그래픽을 특정 해상도에 맞춰 해석한 값입니다. <code>벡터 그래픽 :: 해상도 -&gt; 비트맵 그래픽</code> 쯤으로 볼 수 있습니다. 결국 눈으로 보는 건 해상도에 맞춰진 비트맵을 보는 걸로 생각할 수 있습니다. 반대 방향에서 들어가며 보면, 만일 <code>t -&gt; a</code>로 문제가 생기지 않는 모델링을 할 수만 있다면, 연속된 시간을 모델링했다고 말할 수 있겠습니다.</p>
+<p>stackoverflow에 있는 Conal 교수 답변<br />
+<a href="https://stackoverflow.com/questions/1028250/what-is-functional-reactive-programming">What is (functional) reactive programming?</a><br />
+evolving value<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
+<p>first class value<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a></p>
+<p><a href="https://stackoverflow.com/questions/5875929/specification-for-a-functional-reactive-programming-language">Specification for a Functional Reactive Programming language</a></p>
+<aside id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes">
+<hr />
+<ol>
+<li id="fn1"><p><strong>evolving value</strong>: 시간에 따라 변하는 값을 evolving value라고 말하고 있습니다. 진화evolve하는 값인데, 진화에는 뭔가 더 나아지고, 복잡해지는 뉘앙스가 있는데, 영어는 시간이 지나면서 변화한다는 뜻만 있는 걸까요? 단순 변화를 evolving이라 하면 안 어울리긴 합니다만, 어쨌든 시간 의존 변화를 뜻합니다.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p><strong>1급 값(first class value)</strong>: 정의할 수 있고, 연결combine할 수 있고, 함수의 입, 출력으로 쓰일 수 있는 대상에 1급이란 말을 붙입니다. 종종 first class citizen이란 말을 쓰는데, 추측으론 영어권에선 차별하지 않는 다는 뜻으로 <strong>1급 시민</strong>이란 말을 종종 쓰는 것 같습니다. 차별이 되는 대상을 2급이라 표현하기도 합니다. 하스켈에선 보통의 타입과 다를바 없다는 뜻과 같습니다.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</aside>
 
 <div class="comment">
 <script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
