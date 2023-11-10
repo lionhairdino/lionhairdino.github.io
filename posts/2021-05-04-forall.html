@@ -6,8 +6,8 @@
 
         <title>lionhairdino - forall - 아무거나 (하나)와 모든 것의 차이</title>
 
-        <meta name="description" content="forall을 수학적으로 풀이하지 않고, 프로그래머 입장에서 풀어본 글입니다. 아직 밑에 깔려있는 원리를 모릅니다." />
-        <meta property="og:description" content="forall을 수학적으로 풀이하지 않고, 프로그래머 입장에서 풀어본 글입니다. 아직 밑에 깔려있는 원리를 모릅니다." />
+        <meta name="description" content="forall을 수학적으로 풀이하지 않고, 프로그래머 입장에서 풀어본 글입니다. 아직 밑에 깔려있는 원리는 모릅니다." />
+        <meta property="og:description" content="forall을 수학적으로 풀이하지 않고, 프로그래머 입장에서 풀어본 글입니다. 아직 밑에 깔려있는 원리는 모릅니다." />
 
         <link rel="stylesheet" type="text/css" href="../css/default.css" />
         <link rel="icon" href="https://lionhairdino.github.io/favicon.svg" />
@@ -39,7 +39,7 @@
 
         <meta property="og:image" content="https://lionhairdino.github.io/images/state400px.png" />
 
-      <meta name="keywords" content="forall, RankNTypes">
+      <meta name="keywords" content="forall, RankNTypes, rank, Rank2Types">
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-E9WZ6VXGHP"></script>
 <script>
@@ -81,6 +81,10 @@
     
 </div>
 
+<p>오늘 점심 뭘 먹을까?<br />
+난 이 것도, 저 것도 <strong>모든</strong>걸 먹을 수 있는 입맛이야. For All<br />
+<strong>아무거나</strong> (하나) 먹자<br />
+</p>
 <p>에러 관련 포스트들에서 몇 번 강조했는데 <code>forall</code>은 말 그대로 모든 타입입니다. 어떤 타입으로든 카멜레온처럼 변할 수 있다가 아니라, 어떤 타입도 처리할 수 있어야 한다는 뜻입니다. ( 참고 - <a href="../errors/2020-07-15-rigidTypeVariable.html">컴파일 에러 읽기 - rigid type variable</a> ) 그런데, 이 걸 명시적으로 써야 하는 경우가 있습니다. 바로 Rank 개념이 필요한 경우입니다.</p>
 <h2 id="생각-스트레칭">생각 스트레칭</h2>
 <p>2022.12.31 추가</p>
@@ -88,8 +92,9 @@
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>foo _ <span class="ot">=</span> <span class="dt">True</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- 괄호를 써서 유효 범위를 명시적으로 표시하면 foo는 다음과 같습니다.</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co">-- foo :: forall a. (a -&gt; Bool)</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="ot">bar ::</span> (<span class="kw">forall</span> a<span class="op">.</span> a) <span class="ot">-&gt;</span> <span class="dt">Bool</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>bar _ <span class="ot">=</span> <span class="dt">False</span></span></code></pre></div>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="ot">bar ::</span> (<span class="kw">forall</span> a<span class="op">.</span> a) <span class="ot">-&gt;</span> <span class="dt">Bool</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>bar _ <span class="ot">=</span> <span class="dt">False</span></span></code></pre></div>
 <p><code>forall</code>이 걸리는 범위에 대한 이야기입니다.<br />
 “<code>foo</code>는 <code>a -&gt; Bool</code> 구현이 모든 타입에 문제 없이 동작한다”고<br />
 “<code>bar</code>는 <code>a</code> 구현이 모든 타입에 문제 없이 동작한다”입니다.</p>
@@ -301,7 +306,7 @@ forall a. (Num a) =&gt; a 타입 : { 리터럴 0, 리터럴 1, 리터럴 2, … 
 <p>그래서 “내부에서 함수가 결정되도록 하려면 <code>RankNType</code>을 쓰면 된다”고 얘기합니다. <span class="citation" data-cites="재원">@재원</span></p>
 <p>※ 위에 날짜별로 추가된 글은, 하스켈 학교에서 여러분들과 대화하며 올렸던 글들을 그대로 가져온 것입니다.</p>
 <p>2023.9.28
-<code>forall a =&gt; [a]</code>라 하면, “<code>a</code>는 무엇인지 보지 않겠어”, 혹은 “구조 안에 들어 있는 건 뭔지 관심없고, 난 구조에 관한 내용만 가지고 있어” 라고 간단히 읽을 수 있습니다.</p>
+<code>forall a =&gt; [a]</code>라 하면, “<code>a</code>는 무엇인지 보지 않겠어”, 혹은 “구조 안에 들어 있는 건 뭔지 관심없고, 난 구조에 관한 내용만 가지고 있어” 라고 간단히 읽을 수 있습니다. <code>a</code>가 무언가로 특정되면 안된다는 걸 컴파일러에게 알려 주는 가이드입니다.</p>
 
 <div class="comment">
 <script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>

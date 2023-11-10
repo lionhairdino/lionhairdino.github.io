@@ -84,7 +84,7 @@
 <p>pull 기반 모나딕 FRP<br />
 reactive-banana가 FRP를 <strong><em>어떻게 구현했는지는 보지 않습니다.</em></strong><br />
 reactive-banana 사용법을 따라가며, FRP가 무엇인가만 보려합니다.</p>
-<p>※ Hackage에서 FRP로 검색하면 많은 수가 나옵니다. 이 중 예시 코드가 잘 되어 있어, 읽기 편할 것 같은 라이브러리를 골랐을 뿐, 현재(2023.10) 가장 권장되는 라이브러리는 아닌 걸로 보입니다. Original FRP 방식은 가베지 컬렉션에 문제가 있어 <a href="https://github.com/ivanperez-keera/Yampa/">Yampa</a>가 해결했다는데, 다른 라이브러리는 잘 모르겠습니다. (퍼포먼스 문제를 가지고 있어, 프로덕트에는 <a href="https://reflex-frp.org/">reflex</a>가 더 많이 쓰는 추세라 합니다. - <span class="citation" data-cites="jhhuh님">@jhhuh님</span>)</p>
+<p>※ Hackage에서 FRP로 검색하면 많은 수가 나옵니다. 이 중 예시 코드가 잘 되어 있어, 읽기 편할 것 같은 라이브러리를 골랐을 뿐, 현재(2023.10) 가장 권장되는 라이브러리는 아닌 걸로 보입니다. Original FRP 방식은 가베지 컬렉션에 문제가 있어 <a href="https://github.com/ivanperez-keera/Yampa/">Yampa</a>가 해결했다는데, 다른 라이브러리는 잘 모르겠습니다. (퍼포먼스 문제를 가지고 있어, 프로덕트에는 <a href="https://reflex-frp.org/">reflex</a>를 더 많이 쓰는 추세라 합니다. - <span class="citation" data-cites="jhhuh님">@jhhuh님</span>)</p>
 <h2 id="생각-스트레칭">생각 스트레칭</h2>
 <p>(<strong><em>검증 필요</em></strong>)</p>
 <p>나무를 썰지 않고 있다가, 필요할 때 톱을 주면서 “나무를 썰어”라고 시퀀셜하게 할 수도 있고,<br />
@@ -211,13 +211,14 @@ A. <code>(&lt;$) :: a -&gt; Event b -&gt; Event a</code><br />
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>ghci&gt; (+1) &lt;$ [(),()] &lt;*&gt; [1,2]</span>
 <span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>[2,3,2,3]</span></code></pre></div>
 </blockquote>
-<h3 id="이벤트-트랜스폼">이벤트 트랜스폼</h3>
+<h2 id="이벤트-트랜스폼">이벤트 트랜스폼</h2>
 <p><code>ecoin</code>이 가진 <code>()</code>를 <code>(+ 1)</code> 함수로 바꿔 놓고,<br />
 <code>edoesplay</code>가 가진 <code>()</code>를 <code>(- 1)</code>함수로 바꿔 놓고<br />
 <code>ewin</code>이 가진 <code>Double | Triple</code>에 따라 <code>(+ 5)</code>, <code>(+ 20)</code>로 바꿔 놓습니다.<br />
 의미만 보면(실제는 다름), <code>[(발생시각,(+ 1)), (발생시각, (+ 5)), (발생시각, (- 1)) ...]</code> 무한 리스트입니다. </p>
-<h3 id="event-behavior">Event, Behavior</h3>
-<p>예시 소스를 따라가며 기록하다 보니, 제일 먼저 나와야 하는 기본 개념이 지금 나왔습니다.</p>
+<h2 id="event-behavior">Event, Behavior</h2>
+<p>예시 소스를 따라가며 기록하다 보니, 제일 먼저 나와야 하는 기본 개념이 지금 나왔습니다.<br />
+※ <a href="../posts/2023-10-11-beforeFRP.html">FRP의 Event와 Behavior</a> 글에서 좀더 자세하게 정리 중입니다.</p>
 <p><strong>data Event a</strong><br />
 <code>newtype Event a = E { unE :: Prim.Event a }</code><br />
 <code>Prim.Event</code>는 <code>type Event a = Cached Moment (Pulse a)</code>로 정의되어 있는데, <code>Moment</code>구현에 보면 <code>ReaderT EventNetwork</code>가 보입니다. 뜻은 <code>type Event a = [(Time, a)]</code> 쯤으로 보면 된다하니, 라이브러리 소스 자체를 더 뜯어보기 전엔 이렇게만 알고 넘어 가야겠습니다. 발생 시간을 같이 가지고 있는 이벤트 튜플 스트림(무한 리스트)입니다. 이벤트 발생 시간순 시퀀스로 볼 수 있습니다.</p>
@@ -232,11 +233,10 @@ A. <code>(&lt;$) :: a -&gt; Event b -&gt; Event a</code><br />
 <p><code>reactive-banana</code>에선 <code>stepper</code> 함수를 써서, <code>Event</code>로 바뀐 값을 <code>Behavior</code>가 의존해서, 가진 값을 바꿀 수 있지만, 그 반대로는 할 수 없습니다.</p>
 <p><a href="https://stackoverflow.com/questions/22989253/frp-event-streams-and-signals-what-is-lost-in-using-just-signals">stackoverflow - FRP Event streams and Signals…</a>에 흥미로운 설명이 있습니다. (아래는 답변 글에서 발췌)</p>
 <div class="sourceCode" id="cb21"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>(<span class="dt">Behavior</span> a, <span class="dt">Behavior</span> b) <span class="op">~</span> <span class="dt">Behavior</span> (a, b)</span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>(<span class="dt">Event</span>    a, <span class="dt">Event</span>    b) <span class="op">~</span> <span class="dt">Event</span>    (<span class="dt">EitherOrBoth</span> a b)</span></code></pre></div>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>(<span class="dt">Event</span>    a, <span class="dt">Event</span>    b) <span class="op">~</span> <span class="dt">Event</span>    (<span class="dt">EitherOrBoth</span> a b)</span></code></pre></div>
 <p>만일 <code>Event</code>와 <code>Behavior</code>를 하나로 합친다면, 위 상황이 깨진다는 설명입니다. <code>Behavior</code>는 둘 다 모두 기억해야 하지만, <code>Event</code>는 둘 모두를 살릴 수도 있지만, 둘 중 하나만 살려야 할 수도 있다는 말입니다. 무슨 말일까요?</p>
 <p><code>Behavior</code>에는 <code>change</code> 개념이 없습니다. 그러니, 적어도 FRP 안에서는 <code>Behavior</code>에는 반응react할 수 없습니다.</p>
-<h3 id="컴비네이터">컴비네이터</h3>
+<h2 id="컴비네이터">컴비네이터</h2>
 <p><code>Event</code>, <code>Behavior</code> 두 타입과 <code>MonadMoment</code> 클래스로 여러 컴비네이터를 구현해 놨습니다.</p>
 <p>※ 원래 안에 가지고 있는 값에 적용(의존)하면서 값을 바꾸면, 계속 바꿔 나갈테니 누적Accumulate이란 용어를 선택한 것 같습니다.</p>
 <p><strong>mapAccum</strong><code>:: MonadMoment m =&gt; acc -&gt; Event (acc -&gt; (x, acc)) -&gt; m (Event x, Behavior acc)</code> <code>AccumE</code>와 <code>AccumB</code>를 합친 컴비네이션입니다.</p>
