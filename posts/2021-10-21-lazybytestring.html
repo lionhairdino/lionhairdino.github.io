@@ -150,12 +150,12 @@ ex. <a href="https://hackage.haskell.org/package/bytestring-0.11.3.1/docs/Data-B
 <p>둘이 대부분 같은 인터페이스가 구현되어 있어 사용할 때는 신경쓰지 않아도 되겠지 했는데, 그렇지 않습니다. 함수가 <code>BL.ByteString</code>을 받도록 설계하면, 이 함수는 <code>BS.ByteString</code>을 받을 수 없습니다. 이유가 대부분 안에서 다른 라이브러리에 있는 <code>ByteString</code> 관련 함수들을 가져다 쓰는데, 해당 라이브리리들의 버전을 모두 바꿔줘야 합니다. 때로는 <code>Strict</code>, <code>Lazy</code> 둘 중 하나만 지원하는 라이브러리들도 있습니다.</p>
 <p>둘 중 어떤 걸 어떤 때 써야하는지 정리가 필요해 보이는데, 지금 당장은 딱 필요한 순간에 전체 바이트열이 필요한 경우가 많다면 <code>Strict</code>로, 그렇지 않으면 <code>Lazy</code>를 쓴다정도만 떠오릅니다.</p>
 <p>둘 모두 꼭 필요한 때가 아니면 포인터로 머물러 있는데, 꼭 필요한 때를 상상해 보면 출력을 한다든지, 파싱을 한다든지 내용이 필요할 때입니다. 파싱을 가정해 보면 <code>Strict ByteString</code>은 안에 있는 포인터가 가리키는 메모리에서 내용을 <em>한 번에 모두 읽어 옵니다.</em> Lazy는 일단 첫 번째 <code>Chunk</code>가 가리키는 것만 읽어오고, <em>더 필요하면 또 읽어올</em> 겁니다.</p>
-<aside id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes">
+<section class="footnotes" role="doc-endnotes">
 <hr />
 <ol>
-<li id="fn1"><p>ForeignPtr는 외부에 유지되는 객체에 대한 참조를 말합니다. 외부란, 하스켈 코드를 돌리는 런타임 시스템(더 구체적으론 스토리지 관리자)의 관리를 받지 않는 오브젝트란 뜻입니다. 하스켈의 힙이나 스택에서 더 이상 이 포인터를 보는 참조가 없으면 외부에 있는 릴리즈 담당 루틴을 부르게 됩니다. 더 깊이 보기 전에 추측해보면, C 등으로 alloc하고 해당 메모리를 가리키는 포인터를 하스켈이 받아서 작업할 때 쓸 것 같습니다.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn1" role="doc-endnote"><p>ForeignPtr는 외부에 유지되는 객체에 대한 참조를 말합니다. 외부란, 하스켈 코드를 돌리는 런타임 시스템(더 구체적으론 스토리지 관리자)의 관리를 받지 않는 오브젝트란 뜻입니다. 하스켈의 힙이나 스택에서 더 이상 이 포인터를 보는 참조가 없으면 외부에 있는 릴리즈 담당 루틴을 부르게 됩니다. 더 깊이 보기 전에 추측해보면, C 등으로 alloc하고 해당 메모리를 가리키는 포인터를 하스켈이 받아서 작업할 때 쓸 것 같습니다.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
-</aside>
+</section>
 
 <div class="comment">
 <script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>

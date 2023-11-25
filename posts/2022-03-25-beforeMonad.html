@@ -151,15 +151,13 @@
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>a <span class="ot">-&gt;</span> m b</span></code></pre></div>
 <p>우선 첫 번째는 입력과 출력 모두 같은 펑크터 적용이 되어 있으니 <code>a -&gt; b</code> , <code>b -&gt; c</code> 함수를 합성하듯 간단히 함수 컴포지션 <code>(.)</code>으로 연결할 수 있습니다.</p>
 <figure>
-<img src="../images/before_monad_mbmb.png" alt="mb와 mb가 만난다" />
-<figcaption aria-hidden="true">mb와 mb가 만난다</figcaption>
+<img src="../images/before_monad_mbmb.png" alt="mb와 mb가 만난다" /><figcaption aria-hidden="true">mb와 mb가 만난다</figcaption>
 </figure>
 <div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>(m a <span class="ot">-&gt;</span> m b) <span class="op">.</span> (m b <span class="ot">-&gt;</span> m c)</span></code></pre></div>
 <p>두 번째는 입 출력이 다른 펑크터 타입이라 함수 컴포지션으로 해결할 수 없습니다. 이건 모나드가 익숙해진 후 <a href="../posts/2021-05-06-comonad.html">코모나드</a> 글에서 보도록 하겠습니다.</p>
 <p>마지막 세 번째도 입력과 출력이 다른데 어떻게 연결하면 좋을까요?</p>
 <figure>
-<img src="../images/before_monad_mbb.png" alt="mb와 b가 만난다" />
-<figcaption aria-hidden="true">mb와 b가 만난다</figcaption>
+<img src="../images/before_monad_mbb.png" alt="mb와 b가 만난다" /><figcaption aria-hidden="true">mb와 b가 만난다</figcaption>
 </figure>
 <div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>(a <span class="ot">-&gt;</span> m b) <span class="op">???</span> (b <span class="ot">-&gt;</span> m c)</span></code></pre></div>
 <p><code>m b</code>와 <code>b</code> 둘이 <em>같은 걸</em>로 볼 수만 있다면, 아무 문제 없을텐데요.</p>
@@ -178,8 +176,7 @@ A. 여기서 같다 다르다의 관심사는 한 함수 내에서가 아니라,
 <p>둘 중 하나를 기준으로 잡을 수도 있습니다.
 기준을 만들고 특정 연산(함수)을 이용해서 대상들을 비교하면, 같은지 다른지 좀 더 모호하지 않게 얘기할 수 있게 됩니다.</p>
 <figure>
-<img src="../images/1mm.png" alt="정확하게 얘기하기" />
-<figcaption aria-hidden="true">정확하게 얘기하기</figcaption>
+<img src="../images/1mm.png" alt="정확하게 얘기하기" /><figcaption aria-hidden="true">정확하게 얘기하기</figcaption>
 </figure>
 <p><code>a</code> 와 <code>m a</code>는 다릅니다. “얼마나” 다를까요?<br />
 <code>m a</code>를 기준으로 잡고, <code>a</code>가 얼마나 다른지 나타내는 함수가 있으면, <em>함수만큼 다르다</em>고 말할 수 있습니다. (기준을 <code>a</code>가 아닌 <code>m a</code>로 잡은 이유는, 우리가 필요로 하는 정보를 모두 갖고 있는 타입은 <code>m a</code>인데, 함수들이 <code>a</code> 타입을 받아 문제가 생겨서 그렇습니다. <code>a -&gt; m b</code> 함수를 거치고 나서 원하는 결과는 <code>b</code>가 아니라 <code>m b</code>입니다.)</p>
@@ -187,16 +184,14 @@ A. 여기서 같다 다르다의 관심사는 한 함수 내에서가 아니라,
 <p>어설픈 지식으로 수학 얘기를 하려는 게 아니라, 둘이 다른 걸 “어떻게 같은 타입으로 볼 수 있느냐”에 대한 직관에 관한 얘기입니다.<br />
 아래와 같이 동작하는 함수가 있습니다.</p>
 <figure>
-<img src="../images/before_monad_iso.png" alt="전단사bijective" />
-<figcaption aria-hidden="true">전단사bijective</figcaption>
+<img src="../images/before_monad_iso.png" alt="전단사bijective" /><figcaption aria-hidden="true">전단사bijective</figcaption>
 </figure>
 <p><code>A</code>와 <code>B</code>는 서로 전사Surjective이며, 단사injective로 연결된 전단사bijective 관계입니다.
 <code>f: A -&gt; B</code> 함수가 있고, 돌아 오는 <code>g: B -&gt; A</code> 함수(<code>f</code>의 역함수)도 있습니다.
 <code>A</code>를 넣어줘야 할 곳에 <code>g(B의 원소)</code>를 해서 넣어 줄수도 있고, <code>B</code>를 넣어줘야 할 곳에 <code>f(A의 원소)</code>를 해서 넣어줘도 됩니다. ※ 이런 관계를 Isomorphic 관계(이름만 다를 뿐 같은 구조)라 합니다.
 서로 다른 정도를 표현하는 함수를 적용하면 바로 같은 것으로 바뀌고 있습니다.</p>
 <figure>
-<img src="../images/before_monad_noniso.png" alt="A에서 B로 가며 정보를 잃어버렸습니다." />
-<figcaption aria-hidden="true">A에서 B로 가며 정보를 잃어버렸습니다.</figcaption>
+<img src="../images/before_monad_noniso.png" alt="A에서 B로 가며 정보를 잃어버렸습니다." /><figcaption aria-hidden="true">A에서 B로 가며 정보를 잃어버렸습니다.</figcaption>
 </figure>
 <p>A의 1과 2는 B의 a로 연결되고,<br />
 A의 3은 B의 b로 연결되었습니다.</p>
@@ -326,8 +321,7 @@ A. 결과 <code>a</code>는 더이상 <code>List</code> 모나드 타입이 아�
 <p><strong><code>a -&gt; m b</code> 타입을 합성하는 자체를 모나드라 부르는게 아니라</strong>, <code>m a, m (m a), m (m (m a)), m (m (m (m a)))...</code> 처럼 합성해도 effect를 모두 하나로 합쳐 <code>m a</code>로 표현할 수 있게 <code>return</code>, <code>join</code>이 있는 구조를 모나드라 합니다. 처음 공부를 할 때, 모나드의 목표를 합성으로 설명하며 <code>a -&gt; m b</code> 타입의 합성이 같이 나와 혼란스러웠던 부분입니다.</p>
 <p>하스켈에선 <code>a -&gt; m b</code> 타입 함수를 합성하는데 <code>join</code>을 좀 더 편리하게 쓰기 위해(모나드를 편리하게 쓰기 위해) 아래와 같은 컴비네이터 함수를 정의합니다.</p>
 <figure>
-<img src="../images/before_monad_bind.png" alt="Bind = join(fmap…)" />
-<figcaption aria-hidden="true">Bind = join(fmap…)</figcaption>
+<img src="../images/before_monad_bind.png" alt="Bind = join(fmap…)" /><figcaption aria-hidden="true">Bind = join(fmap…)</figcaption>
 </figure>
 <div class="sourceCode" id="cb20"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- a -&gt; m b 모양의 함수를 특별히 모나드(모나딕) action이라 지칭하기도 합니다.</span></span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="ot">(&gt;&gt;=) ::</span> <span class="dt">Monad</span> m <span class="ot">=&gt;</span> m a <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> m b) <span class="ot">-&gt;</span> m b</span>
@@ -344,12 +338,10 @@ A. 모나드 바탕에 들어간 생각을 <code>(.)</code>과 비슷한 모양�
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>f <span class="op">&gt;=&gt;</span> g     <span class="ot">=</span> \x <span class="ot">-&gt;</span> f x <span class="op">&gt;&gt;=</span> g</span></code></pre></div>
 </blockquote>
 <figure>
-<img src="../images/join_v2.png" alt="effect 합성 - 흐릿한 부분이 있으면 &gt;=&gt;, 없으면 &gt;&gt;=" />
-<figcaption aria-hidden="true">effect 합성 - 흐릿한 부분이 있으면 &gt;=&gt;, 없으면 &gt;&gt;=</figcaption>
+<img src="../images/join_v2.png" alt="effect 합성 - 흐릿한 부분이 있으면 &gt;=&gt;, 없으면 &gt;&gt;=" /><figcaption aria-hidden="true">effect 합성 - 흐릿한 부분이 있으면 &gt;=&gt;, 없으면 &gt;&gt;=</figcaption>
 </figure>
 <figure>
-<img src="../images/joinjoin_v2.png" alt="effect 합성한 것에 합성 - 흐릿한 부분이 있으면 &gt;=&gt;, 없으면 &gt;&gt;=" />
-<figcaption aria-hidden="true">effect 합성한 것에 합성 - 흐릿한 부분이 있으면 &gt;=&gt;, 없으면 &gt;&gt;=</figcaption>
+<img src="../images/joinjoin_v2.png" alt="effect 합성한 것에 합성 - 흐릿한 부분이 있으면 &gt;=&gt;, 없으면 &gt;&gt;=" /><figcaption aria-hidden="true">effect 합성한 것에 합성 - 흐릿한 부분이 있으면 &gt;=&gt;, 없으면 &gt;&gt;=</figcaption>
 </figure>
 <blockquote>
 <p>Q. <code>(&gt;=&gt;)</code>보다 <code>(&gt;&gt;=)</code>가 왜 더 편리한가요?<br />
@@ -387,8 +379,7 @@ A. 혹시 Functor의 <code>fmap</code>과 같아 보인다면, 둘의 받는 함
 <span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>m a <span class="op">&gt;&gt;=</span> act1 <span class="op">&gt;&gt;=</span> act2 <span class="op">&gt;&gt;=</span> act3</span></code></pre></div>
 <p>위와 같이 간단히 쓸 수 있는 이유가 궁금하면? - 연산자 우선 순위<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a></p>
 <figure>
-<img src="../images/before_monad_bindGraph.png" alt="목표는 m a -&gt; … -&gt; m c 입니다" />
-<figcaption aria-hidden="true">목표는 m a -&gt; … -&gt; m c 입니다</figcaption>
+<img src="../images/before_monad_bindGraph.png" alt="목표는 m a -&gt; … -&gt; m c 입니다" /><figcaption aria-hidden="true">목표는 m a -&gt; … -&gt; m c 입니다</figcaption>
 </figure>
 <p><code>m a</code>를 받아 <code>a</code>를 꺼내고, <code>a -&gt; m b</code>에 넘길수 없는 <strong>진한 파랑 m</strong>은 따로 떼어 내서, 나중에 새로 생성된 <strong>옅은 파랑 m</strong>과 하나의 <strong>진한 파랑 m</strong>으로 합쳐 다시 <code>m b</code>로 만듭니다. 이 값을 다음 <code>bind</code>에 넘깁니다.</p>
 <p>※ <code>(&gt;&gt;=)</code>나 <code>(&gt;=&gt;)</code>는 모나드의 <code>join</code>을 편하게 쓰기 위한 컴비네이터입니다.</p>
@@ -417,24 +408,20 @@ A. 혹시 Functor의 <code>fmap</code>과 같아 보인다면, 둘의 받는 함
 <span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>join (<span class="dt">Just</span> x) <span class="ot">=</span> x</span></code></pre></div>
 <p>※ 참고 - 어떤 타입의 <code>id</code>가 들어가는지 보는 방법<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a></p>
 <figure>
-<img src="../images/maybe_join2.png" alt="Maybe (Maybe a) -&gt; Maybe a" />
-<figcaption aria-hidden="true">Maybe (Maybe a) -&gt; Maybe a</figcaption>
+<img src="../images/maybe_join2.png" alt="Maybe (Maybe a) -&gt; Maybe a" /><figcaption aria-hidden="true">Maybe (Maybe a) -&gt; Maybe a</figcaption>
 </figure>
 <figure>
-<img src="../images/writer_v2.png" alt="Writer (Writer a) -&gt; Writer a" />
-<figcaption aria-hidden="true">Writer (Writer a) -&gt; Writer a</figcaption>
+<img src="../images/writer_v2.png" alt="Writer (Writer a) -&gt; Writer a" /><figcaption aria-hidden="true">Writer (Writer a) -&gt; Writer a</figcaption>
 </figure>
 <figure>
-<img src="../images/list_join.png" alt="List(List a) -&gt; List a" />
-<figcaption aria-hidden="true">List(List a) -&gt; List a</figcaption>
+<img src="../images/list_join.png" alt="List(List a) -&gt; List a" /><figcaption aria-hidden="true">List(List a) -&gt; List a</figcaption>
 </figure>
 <h2 id="결론">결론</h2>
 <p><code>a -&gt; m b</code>와 <code>b -&gt; m c</code> 합성 방법을 고민하면, <code>m b</code>에서 <code>b</code>로 돌아올 방법이 필요합니다. 하지만, 펑크터 <code>m</code>은 거의 isomorphism이 아닙니다. 구조만 보존하면(homomorphism) 어떻게 변형할지 알 수 없습니다. 거꾸로 돌아오는 길은, effect를 모두 잃어버리니 애시당초 없을 확률이 높습니다. (isomorphic하여 돌아 올 때 잃어버릴 게 없다면 effect가 없다는 말입니다. effect가 없는 모나드로는 Identity 모나드가 있습니다.) 그럼 합성을 포기 했을 것도 같은데, effect만 따로 합칠 수만 있다면 합성할 수 있다는 생각을 어떻게 했을까요? 펑크터에 대한 통찰이 있어 effect가 따로 보였을까요?</p>
 <p>카테고리 이론은 현재 카테고리에서 해결책을 찾지 못할 때 펑크터로 변환한 곳에서 해결책을 찾기도 합니다.
 <code>a -&gt; m b</code>를 펑크터<code>m</code>으로 한 번 더 변환하면 <code>m a -&gt; m (m b)</code>가 됩니다. 둘이 같게 만드는데서 해결책을 찾기 시작한 건 아닐까요?</p>
 <figure>
-<img src="../images/join_commute.png" alt="join (fmap f (return a)) = f a" />
-<figcaption aria-hidden="true">join (fmap f (return a)) = f a</figcaption>
+<img src="../images/join_commute.png" alt="join (fmap f (return a)) = f a" /><figcaption aria-hidden="true">join (fmap f (return a)) = f a</figcaption>
 </figure>
 <p>(<code>a -&gt; m b</code> 모피즘을 펑크터 <code>id</code>로 변환한 것과, 펑크터 <code>m</code>으로 변환한 것의 Naturality condition에서 아래 빨간색 부분만 방향을 바꾼 것)</p>
 <p>어떻게 떠올렸을지 모를 천재적 센스에 따라,<br />
@@ -488,8 +475,7 @@ Functor 하나를 이용해 구조는 유지한 채 다른 모양으로 매핑�
 <p>위와 같은 방법을 포함해서 여러가지 방법으로 다른 것과 관계를 찾아, 기존 수학에 있던 개념들을 오로지 이들 관계로만 표현해서 체계를 만들어 갑니다. 이렇게 하면, 대상의 속성들에 의존하지 않게 되어 다른 곳에서도 카테고리로 정의만 되면 기존 개념들을 그대로 적용할 수 있게 됩니다. 그 과정 속에서 위에서 보았던, 모나드 <code>join</code>의 <code>m (m a)</code>를 <code>m a</code>로 바꾸는 동작과 동일하게, <code>m · m</code>과 <code>m</code>의 다름을 처리해서 모노이드로 만드는 경우가 나옵니다. 카테고리에서 이런 동작이 포함되어 있는 구조를 모나드라합니다. 하스켈에 있는 펑크터와 모나드가 나온 곳이라 하여, 딱 모나드까지만 가보려고 하는데 그리 순탄하지는 않습니다.</p>
 <p>※ 추측: Monad의 어원은 하나를 뜻하는 Monas에서 왔다고 합니다. 아마도 서로 다른 대상을 “같게” 본다는 의미가 있어 이렇게 이름 붙인게 아닐까요? 카테고리 이론에선 Monad를 Triple, Triad라 부르기도 합니다. 이 때는 3가지(펑크터, return, join)가 있으면 하나로 볼 수 있어서 그런 건 아닐까요?</p>
 <figure>
-<img src="../images/isomorphic.png" alt="같음" />
-<figcaption aria-hidden="true">같음</figcaption>
+<img src="../images/isomorphic.png" alt="같음" /><figcaption aria-hidden="true">같음</figcaption>
 </figure>
 <h2 id="도움을-주신-분들">도움을 주신 분들</h2>
 <p>모나드의 카테고리 이론쪽 개념과 그동안 엉켜있던 모나드 조각들을 푸는데 도움을 주신 Ailrun님 감사드립니다. 덕분에 혼자서 넘어가기 어려운 산들을 넘어간 것 같습니다.<br />
@@ -539,10 +525,10 @@ Functor 하나를 이용해 구조는 유지한 채 다른 모양으로 매핑�
 <h3 id="그럼-join의-동작은-마음대로-만들어도-되나">그럼 join의 동작은 마음대로 만들어도 되나?</h3>
 <p><span class="citation" data-cites="todo">@todo</span>: Monad law 3가지를 지키면서 만들어야 하고, 또한 Theorem for Free에 따라 유일성unicity이 있다는 내용 추가<br />
 <span class="citation" data-cites="todo">@todo</span>: Nothing :: Maybe (Maybe a)를 Just 1 :: Maybe a와 연결했을 때 monad law가 틀어지는 예시 추가</p>
-<aside id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes">
+<section class="footnotes" role="doc-endnotes">
 <hr />
 <ol>
-<li id="fn1"><p><strong>역함수가 존재해서 isomorphic이 된다.</strong><br />
+<li id="fn1" role="doc-endnote"><p><strong>역함수가 존재해서 isomorphic이 된다.</strong><br />
 그냥 같게 볼 수 있는 함수가 아니라 <code>inverseM :: m a -&gt; a</code> 가 존재한다면?</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ot">inverseMaybe ::</span> <span class="dt">Maybe</span> a <span class="ot">-&gt;</span> a</span></code></pre></div>
 <p>이렇게 거꾸로 변환할 수 있는 방법이 있다면</p>
@@ -558,7 +544,7 @@ Functor 하나를 이용해 구조는 유지한 채 다른 모양으로 매핑�
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>ma <span class="op">&gt;&gt;=</span> action <span class="ot">=</span> action (inverseM ma)</span></code></pre></div>
 <p>이렇게 간단히 끝날 수 있습니다. <em>문제는 입력으로 들어오는 값에 Maybe가 추가했던 구조는 모두 무시되었습니다.</em><br />
 아마도, 대부분의 경우 이런 결과를 원하지 않을 겁니다.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn2"><p><strong>서로 다른 타입 합성</strong><br />
+<li id="fn2" role="doc-endnote"><p><strong>서로 다른 타입 합성</strong><br />
 서로 다른 타입을 합성하고 있지만, 이 자체를 모나드라 하지 않습니다. 모나드는 컴비네이터로 합성하는 동안 펑크터가 만들어낸 “effect를 모두 합성해서 잃어버리지 않을 수 있는 구조”를 모나드라 합니다. “모나드를 이용해” effect를 잃어버리지 않고 합성한다라고 얘기할 수 있습니다.</p>
 <div class="sourceCode" id="cb19"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- 컴비네이터로 합성하는 예시</span></span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="ot">act1 ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Bool</span>    </span>
@@ -581,11 +567,11 @@ Functor 하나를 이용해 구조는 유지한 채 다른 모양으로 매핑�
 <span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="fu">print</span> <span class="op">$</span> act1 <span class="op">&gt;&gt;&gt;&gt;</span> act2 <span class="op">&gt;&gt;&gt;&gt;</span> act3 <span class="op">$</span> <span class="dv">100</span></span></code></pre></div>
 <a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></li>
-<li id="fn3"><p><strong>중위 연산자 우선 순위</strong><br />
+<li id="fn3" role="doc-endnote"><p><strong>중위 연산자 우선 순위</strong><br />
 중위infix 연산자 <code>(&gt;&gt;=)</code>의 우선 순위 지정 덕분에 간단하게 쓸 수 있습니다.</p>
 <div class="sourceCode" id="cb26"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="kw">infixl</span> <span class="dv">1</span>  <span class="op">&gt;&gt;</span>, <span class="op">&gt;&gt;=</span></span></code></pre></div>
 <p>바인드의 우선 순위는 위와 같이 정의되어 있습니다. <code>infix</code>에 붙어 있는 <code>l</code>이 왼쪽 우선이란 뜻입니다.<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn4"><p><strong>GHC 추론 타입 확인하기</strong><br />
+<li id="fn4" role="doc-endnote"><p><strong>GHC 추론 타입 확인하기</strong><br />
 Q. id는 어떤 타입이 들어가는지 어떻게 알까요?<br />
 A. _ (hole)을 넣어주면 GHC가 어떤 값으로 추론했는지 알 수 있습니다.</p>
 <div class="sourceCode" id="cb30"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Prelude</span> <span class="dt">Data.Functor</span><span class="op">&gt;</span> join (<span class="dt">Just</span> <span class="dv">1</span>) <span class="op">&gt;&gt;=</span> _</span>
@@ -593,7 +579,7 @@ A. _ (hole)을 넣어주면 GHC가 어떤 값으로 추론했는지 알 수 있�
 <span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>• <span class="dt">Found</span> hole<span class="op">:</span><span class="ot"> _ ::</span> a0 <span class="ot">-&gt;</span> m b</span></code></pre></div>
 <a href="#fnref4" class="footnote-back" role="doc-backlink">↩︎</a></li>
 </ol>
-</aside>
+</section>
 
 <div class="comment">
 <script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
