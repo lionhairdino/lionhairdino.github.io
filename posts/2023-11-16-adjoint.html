@@ -87,6 +87,8 @@
 <p>카테고리 이론에 대한 글을 남기는 건, 어설퍼서 잘 안하는데, 재미난 상상이 떠올라 남깁니다. 아래가 궁금하지 않은 분들은 읽을만한 글이 아닙니다. 항등, 동형, 펑터, 자연 변환에 대해 간단히 짚고 가긴 하지만, 부족한 설명들이니, 다른 정식 텍스트들을 통해 제대로 알아두시면 좋습니다.</p>
 <ul>
 <li>왜 두 개의 펑터로, 얼마나 같은지를 표현할까?</li>
+<li>두 개가 얼마나 같은지를 따지는데 왜 자연 동형 얘기가 나올까?</li>
+<li>왜 <code>ϵ</code>과 <code>η</code>의 화살표 방향이 반대일까?</li>
 <li>모나드와 어떤 연관성이 있을까?</li>
 </ul>
 <p><code>=</code>을 쓸만큼 같지 않으면 <code>~</code>도 쓰고, <code>≃</code>, <code>⋍</code> …(<code>=</code>과 여러 기호의 조합)을 써서 그래도 어찌 보면, 어느 정도는 같게 볼 수 있다고 말하는 개념들이 많습니다. Adjunction도 그들 중 하나입니다.</p>
@@ -103,12 +105,17 @@
 <h2 id="펑터functor">펑터Functor</h2>
 <p>카테고리에선 대상을 매핑하는 동작은 모피즘, 카테고리를 매핑하는 동작은 펑터라 부릅니다. 함수가 한 가지만 매핑한다면, 펑터는 오브젝트도, 모피즘도, 모피즘 합성도 모두 매핑(카테고리를 매핑)해야 합니다. 참고 - <a href="../posts/2023-03-09-functor.html">한 번쯤 나올 법 했는데, 아직 없었던 펑터 이야기</a></p>
 <h2 id="동형isomorphic">동형isomorphic</h2>
-<p>텍스트들의 설명으론, 구조가 같은 두 대상 사이에서 구조를 보존하는 사상을 isomorphism이라 합니다. 둘은 다르지만, isomorphism이 있으면(<strong>up to isomorphism</strong>), isomorphic하다고 말합니다.</p>
+<p>텍스트들의 설명으론, 구조가 같은 두 대상 사이에서 구조를 보존하는 사상을 isomorphism이라 합니다. 둘은 다르지만, isomorphism이 있으면(<strong>up to isomorphism</strong>), isomorphic하다고 말합니다.<br />
+한 시스템에서 어떤 상태가 어디에서 출발해서 어떤, 어떤 값을 거쳐 어디에 도달하는 상황을 생각하면, 이를 모델링한 곳에서도 항상 동일한 경로로 변경이 되어, 모델링 한 것으로 현실을 완벽히 추적할 수도 있고, 거꾸로 현실에서 모델링한 것이 어떻게 값이 변해갈지 완벽히 추적할 수 있는 걸 말합니다. 두 시스템의 상태가 완전히 <strong>일대일 대응</strong>으로 어느 한 쪽을 알면, 다른 한 쪽도 알 수 있는 iso(같은)morphic(모양)이라 합니다.</p>
+<p><code>homo-</code> 는 <code>same</code>을 의미하고, <code>iso-</code>는 <code>equal</code>을 의미한다고 합니다.<br />
+<code>same</code>은 <code>identity</code>를 보는 것이고, <code>equal</code>은 <code>equality</code>를 본다고 합니다.<br />
+“today’s exchange rate 1 dollar is <strong>equal</strong> to 0.91 euros. but they are not the <strong>same</strong> thing”
+구글링으로 여러 설명을 찾아 봐도 딱히 명쾌하단 느낌을 주는 설명이 없습니다. 제 경험적으로 느끼는 건, 내가 주목하는, 필요로하는 성질은 같고, 그 외는 같은지 다른지 신경안쓰는 (거의 비슷한) 것에는 <code>homo-</code>(ex. homomorphic)를 붙이고, 모든 성질이 같은 것에는 <code>iso-</code>를 붙입니다.</p>
 <h2 id="항등원identity">항등원Identity</h2>
 <p>어떤 연산에 항등원Identity이라면, 항등원과 연산하면 원래 값이 바뀌지 않는, 다른 말로 하면 해당 연산과 만났을 때 <strong>아무 일도 일어나지 않는</strong> 걸 항등원이라 합니다. 대수학 정의를 보면<br />
 <code>e_L * a = a</code> 이 성립하면 좌항등원<br />
 <code>a * e_R = a</code> 이 성립하면 우항등원<br />
-이 둘이 모두 성립하면 그제서야 항등원이라 합니다.<br />
+이 둘이 모두 성립하면 그제서야 항등원이라 합니다. (추가적으로 따라야 하는 법칙들이 몇 개 있습니다.)<br />
 참고 - <a href="../posts/2022-12-12-CommutativeAssociativeIdentity.html#%ED%95%AD%EB%93%B1%EC%9B%90">결합 법칙, 교환 법칙, 항등원, 합성</a>
 ## 항등 함수Identity Function
 <code>id_X: X -&gt; X</code><br />
@@ -116,11 +123,11 @@
 좌항등원, 우항등원처럼 임의의 함수 <code>f: X -&gt; Y</code>와 합성<code>(⋅)</code>이라는 연산에 대해<br />
 <code>f ⋅ id_X = f</code><br />
 <code>id_Y ⋅ f = f</code><br />
-성질을 만족해야 합니다. 잘 보면 <strong>id_X와 id_Y 두 가지</strong>를 만족해야 합니다. 단일 값인 <code>1</code>같은 값의 더하기 연산에 대한 항등원은 <code>1 + 0 = 0</code>, <code>0 + 1 = 0</code> 으로 하나의 값인 <code>0</code>이 항등원이었지만, 항등 함수는 <strong>한 가지 정보</strong>를 가지고 있는 값이 아닙니다. <strong>두 가지 정보 X, Y</strong>를 갖고 있는 <code>X -&gt; Y</code>란 함수의, 함수 합성에 대한 항등원 역할을 하는 건, <strong>두 가지</strong>를 봐야 한다고 예측할 수 있습니다.</p>
+성질을 만족해야 합니다. 잘 보면 <strong>id_X와 id_Y 두 가지</strong>가 나옵니다. 단일 값인 <code>1</code>같은 값의 더하기 연산에 대한 항등원은 <code>1 + 0 = 0</code>, <code>0 + 1 = 0</code> 으로 하나의 값인 <code>0</code>이 항등원이었지만, 함수는 <strong>한 가지 정보</strong>를 가지고 있는 값이 아닙니다. <strong>두 가지 정보 X, Y</strong>를 갖고 있는 <code>X -&gt; Y</code>란 함수의, <strong>함수 합성(연산)</strong>에 대한 항등원 역할을 하는 건, <strong>두 가지</strong>를 봐야 한다고 예측할 수 있습니다.</p>
 <p>만일 <code>f: X -&gt; Y</code> 함수라면,<br />
 <code>f ⋅ id_X</code>를 하려면 <code>id_X: X -&gt; X</code> 타입일테고,<br />
 <code>id_Y ⋅ f</code>를 하려면 <code>id_Y: Y -&gt; Y</code> 타입이 되어야 합성 할 수 있습니다.<br />
-타입 일치를 보면서, 그냥 당연하다고 넘어가면 되겠지만, 전 두 가지 정보가 있는 것의 연산에서 항등원은 두 가지를 봐야 한다는 것에 눈이 갔습니다. 하스켈에서는 폴리모픽으로 정의해서 <code>id :: a -&gt; a</code> 하나로 표현할 수 있지만, 항등 함수 성질을 만족하려면 <code>id_X</code>, <code>id_Y</code> 두 개의 항등 함수가 있어야 합니다.</p>
+타입 일치를 보면서, 그냥 당연하다고 넘어가면 되겠지만, 전 두 가지 정보가 있는 것의 연산에서 항등원은 두 가지를 봐야 한다는 것에 눈이 갔습니다. 하스켈에서는 폴리모픽으로 정의해서 <code>id :: a -&gt; a</code> 하나로 표현만 할 수 있지, 항등 함수 성질을 만족하려면 <code>id_X</code>, <code>id_Y</code> 두 개의 항등 함수가 있어야 합니다.</p>
 <h2 id="항등-펑터identity-functor">항등 펑터Identity Functor</h2>
 <p>Identity 펑터는 뭘 의미할까요? (Identity 모피즘과 구별) 어떤 연산에 Identity라는 걸까요?<br />
 함수가 함수 합성이란 연산에 대해 항등원을 찾았듯이, 펑터 합성 <code>(∘)</code>에 대한 항등원입니다. 함수 합성 <code>(⋅)</code>과 구별하기 위해 속이 빈 동그라미로 표기하겠습니다.<br />
@@ -129,12 +136,12 @@
 펑터 <code>F</code>와 합성해서 다음을 만족하면<br />
 <code>id_D ∘ F = F = F ∘ id_C</code><br />
 <code>id_C</code>, <code>id_D</code> 들을 항등 펑터라 합니다.</p>
-<p>어설프게 펑터, 항등원, 항등 함수를 차례로 짚으면서 온 이유가, 어떤식으로든 <strong>같음</strong>(항등)을 말하려면 <strong>두 가지</strong> 정보가 필요하다는 걸 보기 위해서입니다.</p>
-<p>어떤 타입의 대상이 작업을 거친 후에도 같은 타입으로 돌아 오는 모노이드로 만들려면 원래부터 두 가지 정보가 필요하고, 펑터 두 개로 표현할 수 있는 게 당연하다로 이어지는 상상입니다. 다 작성한 후에, 아 잘 못 생각했구나 라고 할 수도 있는, 아직까지는 그저 상상입니다.</p>
+<p>어설프게 펑터, 항등원, 항등 함수를 차례로 짚으면서 온 이유가, 어떤식으로든 펑터로 <strong>항상 같음</strong>(항등)을 말하려면 <strong>두 가지</strong> 정보가 필요하다는 걸 보기 위해서입니다.</p>
+<p>어떤 타입의 대상이 작업(펑터)을 거친 후에도 같은 타입으로 돌아 오는 모노이드로 만들려면 원래부터 두 가지 정보가 필요하고, 펑터 두 개로 표현할 수 있는 게 당연하다로 이어지는 상상입니다. 다 작성한 후에, 아 잘 못 생각했구나 라고 할 수도 있는, 아직까지는 그저 상상입니다.</p>
 <h2 id="항등-자연-변환identity-natural-transformation">항등 자연 변환Identity Natural Transformation</h2>
 <p>카테고리 <code>C</code>, <code>D</code><br />
 펑터 <code>F: C -&gt; D</code><br />
-<code>id_F(F) = F</code><br />
+항등 자연 변환 <code>id_F(F) = F</code><br />
 펑터 <code>F</code>를 변환해도 <code>F</code>가 나오는 자연 변환입니다. 항등 자연 변환도 역시 왼 쪽, 오른 쪽을 봐야 합니다.
 카테고리에 <code>X</code>, <code>Y</code> 대상이 있고, <code>f: X -&gt; Y</code> 모피즘이 있을 때</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>(id_F)_Y ∘ F(f) </span>
@@ -143,41 +150,42 @@
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  = F(f) ∘ id_F(X) </span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  = F(f) ∘ (id_F)_X</span></code></pre></div>
 <p>역시나 항등 성질을 만족하려면 <code>id_F</code>를 <code>X</code>,<code>Y</code> 두 군데서 봐야 합니다.<br />
-※ 아래 첨자 표기가 어려워 <code>_</code>로 썼습니다.<br />
-※ 텍스트들이 <code>id_F</code>가 자연 변환인지, 펑터인지 딱 짚어서 말해주지 않는 경우가 많습니다. 알아서 잘 보는 수밖에 없다고 합니다.</p>
+</p>
+<p>지금부턴 제 상상입니다. 한 시스템에서 다른 시스템으로 가도록 변환하는데, **항상 고정적인 변형이 일어난다”면, 이 고정적인 변형을 보정할 수 있는 매핑(모피즘)을 정의할 수 있습니다. 이 고정적인 변형을 덜어내는 작업Natural isomorphism을 하면 다시 원래의 것과 같아지는 걸 Natural isomorphic이라 합니다. 둘이 같진 않지만, 항상 고정적인 변형이 일어난다면? 이란 상상에서 풀어간 생각입니다.</p>
+<p>※ 아래 첨자 표기가 어려워 <code>_</code>로 썼습니다.<br />
+※ 텍스트들이 <code>id_F</code>가 자연 변환인지, 펑터인지 딱 짚어서 말해주지 않는 경우가 많습니다. 심지어 그냥 <code>F</code>로 쓰고 자연 변환을 뜻할 때도 있고, 항등 자연 변환을 뜻할 때도 있습니다. 알아서 잘 보는 수밖에 없다고 합니다.</p>
 <h2 id="adjoint-펑터">Adjoint 펑터</h2>
-<p>여기서는 일반적인 Adjunction이 아니라, Adjunction 관계의 두 Adjoint 펑터가 만나서 모나드가 되는 것만 보려고 합니다. 결론부터 말하면, Adjunction도 결국 얼마나 같게 볼 수 있는가에 관한 얘기입니다.</p>
+<p>※ 여기서는 일반적인 Adjunction이 아니라, Adjunction 관계의 두 Adjoint 펑터가 만나서 모나드가 되는 것만 보려고 합니다. 결론부터 말하면, Adjunction도 결국 얼마나 같게 볼 수 있는가에 관한 얘기입니다.</p>
 <p>우리말 번역으론 “수반 함자”라고 합니다. 隨伴 따를 수, 짝 반 : 어떤 사물 현상에 따라서 함께 생기는 것. 안타깝게도 번역이 딱히 더 익숙하지도, 더 구체적인 감을 주지도 않습니다.</p>
-<p><code>C</code>,<code>D</code>는 카테고리<br />
-<code>F</code>,<code>G</code>는 펑터</p>
+<p><code>C</code>,<code>D</code>는 카테고리, <code>F</code>,<code>G</code>는 펑터</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="dt">F</span><span class="op">:</span> <span class="dt">C</span> <span class="ot">-&gt;</span> <span class="dt">D</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="dt">G</span><span class="op">:</span> <span class="dt">D</span> <span class="ot">-&gt;</span> <span class="dt">C</span></span></code></pre></div>
-<p><code>F⋅G = id_D</code>이고, <code>GF = id_C</code>이면 카테고리<code>C</code>와 카테고리<code>D</code>는 동형isomorphic입니다. 그런데, 이렇게 딱 동형이 아닐 때도 의미가 있는 경우가 있습니다. Adjunction은 딱 동형이지 않지만 어찌 어찌하면 동형처럼 보일 때에 관한 얘기입니다.</p>
+<p><code>F∘G = id_D</code>이고, <code>G∘F = id_C</code>이면 카테고리<code>C</code>와 카테고리<code>D</code>는 동형isomorphic입니다. 조금 풀어서 얘기하면, 펑터 합성에 <code>id_D</code>가 등장하면, 아무런 추가 작업 없이 그냥 <code>F∘G</code>를 쓸 수 있습니다. 그런데, 현실에선 이렇게 딱 동형이 아닐 때도 의미가 있는 경우가 있습니다. Adjunction은 딱 동형은 아니지만 어찌 어찌하면 동형처럼 보일 때에 관한 얘기입니다.</p>
 <p><code>F</code>와 <code>G</code> 사이의 Adjunction <code>(ϵ, η)</code>는 다음과 같은 두 개의 자연 변환Natural Transformation으로 이루어진 순서쌍이라고 합니다.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>ϵ<span class="op">:</span> <span class="dt">F</span>⋅<span class="dt">G</span> <span class="ot">=&gt;</span> id_D</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>η<span class="op">:</span> id_C <span class="ot">=&gt;</span> <span class="dt">G</span>⋅<span class="dt">F</span></span></code></pre></div>
 <p>여기까지가 보통 텍스트들 서두에서 볼 수 있는 내용입니다. <a href="https://ko.wikipedia.org/wiki/%EC%88%98%EB%B0%98_%ED%95%A8%EC%9E%90">Wiki - Adjoint Functor</a>. 당연하게도 비수학인이 봐서 이해할만한 자료는 거의 없습니다. 이제부터는 대부분 제 상상입니다.</p>
-<p>상상해보면, <code>ϵ</code>, <code>η</code>가 없으면 <code>F⋅G</code>를 <code>id_D</code>처럼, <code>id_C</code>를 <code>G⋅F</code>처럼 볼 수 없지만, <code>ϵ</code>, <code>η</code>의 도움을 받으면, 혹은 보정한다면 <code>F</code>와 <code>G</code>의 합성으로 <code>id_D</code>, <code>id_C</code>와 같은 일을 할 수 있습니다.<br />
-<code>F⋅G</code>가 <code>id_D</code>가 아닌데, <code>ϵ</code>으로 살짝 보정하면 <code>id_D</code> 동작을 하고,<br />
-<code>G⋅F</code>가 <code>id_C</code>가 아닌데, <code>η</code>로 살짝 보정하면 <code>id_C</code> 동작을 한다고<br />
+<p>상상해보면, <code>ϵ</code>, <code>η</code>가 없으면 <code>F∘G</code>를 <code>id_D</code>처럼, <code>id_C</code>를 <code>G∘F</code>처럼 볼 수 없지만, <code>ϵ</code>, <code>η</code>의 도움을 받으면, 혹은 보정한다면 <code>F</code>와 <code>G</code>의 합성으로 <code>id_D</code>, <code>id_C</code>와 같은 일을 할 수 있습니다.<br />
+<code>F∘G</code>가 <code>id_D</code>가 아닌데, <code>ϵ</code>으로 살짝 보정하면 <code>id_D</code> 동작을 하고,<br />
+<code>G∘F</code>가 <code>id_C</code>가 아닌데, <code>η</code>로 살짝 보정하면 <code>id_C</code> 동작을 한다고<br />
 보면 순조롭게 넘어 갈 수 있을 것만 같습니다.</p>
-<p>하지만, <code>η</code>가 <strong><em>화살표 방향이 반대</em></strong>입니다. <code>G⋅F</code>를 주면 <code>id_C</code>를 돌려주는 게 아니라, <code>id_C</code>를 주면 <code>G⋅F</code>를 돌려줍니다. 텍스트를 읽는 동안 펑터와 자연 변환이 섞여 있어 혼란스럽습니다.</p>
+<p>하지만, <code>η</code>가 <strong><em>화살표 방향이 반대</em></strong>입니다. <code>G∘F</code>를 주면 <code>id_C</code>를 돌려주는 게 아니라, <code>id_C</code>를 주면 <code>G∘F</code>를 돌려줍니다. 그리고, 텍스트를 읽는 동안 펑터와 자연 변환이 섞여 있어 혼란스럽습니다.</p>
 <p>만일<br />
-<code>F⋅G</code>가 아무 조치 없이 <code>id_D</code>가 되고,<br />
-<code>G⋅F</code>가 아무 조치 없이 <code>id_C</code>가 되면<br />
+<code>F∘G</code>가 아무 조치 없이 <code>id_D</code>가 되고,<br />
+<code>G∘F</code>가 아무 조치 없이 <code>id_C</code>가 되면<br />
 카테고리 <code>C</code>와 <code>D</code>는 isomorphic합니다.</p>
 <p><code>C</code>와 <code>D</code>가 딱 isomorphic하진 않지만,
-<code>F⋅G</code>가 <code>id_D</code>와 같지 않은데, <code>ϵ: F⋅G =&gt; id_D</code>가 있고,<br />
-<code>G⋅F</code>가 <code>id_C</code>와 같지 않은데, <code>η: id_C =&gt; G⋅F</code>가 있으면<br />
+<code>F∘G</code>가 <code>id_D</code>와 같지 않은데, <code>ϵ: F∘G =&gt; id_D</code>가 있고,<br />
+<code>G∘F</code>가 <code>id_C</code>와 같지 않은데, <code>η: id_C =&gt; G∘F</code>가 있으면<br />
 <code>C</code>와 <code>D</code>를 isomorphic처럼 볼 수 있게 됩니다.</p>
-<p>상상 - 카테고리에선 대상이 뭔지 관심 없습니다. isomorphic스러운 동작을 하는지 보기 위해 한 대상에서 출발해서 돌아온 대상이 같은 걸 보는 게 아니라, 펑터<code>F</code>가 변하지 않는 걸 봅니다. <code>F</code>로 갔다가, <code>G</code>로 <strong>돌아온 대상이 같은 가 보는 게 아니라</strong>, <code>F</code>라는 동작이 변하지 않는 걸 보는 겁니다. 이 걸 식으로 표현하려면 <code>F⋅G⋅F</code>에서 <code>F</code>로 돌아 올 수 있고, <code>G⋅F⋅G</code>에서 <code>G</code>로 돌아올 수 있나 보는 테크닉을, 카테고리 이론에선 자주 만납니다. 그럼, 대상을 전혀 고려하지 않아도 됩니다.</p>
-<p>※ 대부분의 텍스트에선 따로 설명없이 <code>F⋅G⋅F</code>, <code>G⋅F⋅G</code>가 등장하는데, 왜 이들이 조건에 등장하는지 말해주고 시작하는 자료는 못찾았습니다. 다들 그 정도는 척하고 알아 들을만한 사람들만 봐서 그럴까요?</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>F⋅G⋅F = F</span></code></pre></div>
-<p>아무 절차 없이 이렇게 되면 isomorphic이고, 추가 절차 <code>ϵ</code>으로 <code>ϵ(F⋅G)</code>로 변환하면 <code>id_D</code>가 되어 <code>ϵ(F⋅G)⋅F = id_D⋅F = F</code>가 되고,</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>G = G⋅F⋅G</span></code></pre></div>
-<p><code>G⋅F⋅G = id_C⋅G</code>로 보면, <code>η(id_C)</code>로 변환하면 <code>G = η(id_C)⋅G = G⋅F⋅G</code>가 되면 <code>F</code>와 <code>G</code>는 Adjunction이라 합니다.</p>
-<p>항등 펑터와 항등 자연 변환이 섞여 있어 혼란스럽긴 한데, 왼 쪽을 보정해서 오른 쪽과 같게 만들든, 오른 쪽을 보정해서 왼 쪽과 같게 만들든, 여하튼 <code>ϵ</code>,<code>η</code>만 있으면 <code>=</code>가 성립하게 만들 수 있다는 것까지는 이해했습니다. 그런데, 왜 언제는 왼 쪽, 언제는 오른 쪽을 보정하게 했을까요? 어느 한 쪽을 뒤집으면 일단 합성 가능성이 생깁니다. 그냥은 합성할 수 없지만, 약간의 작업만 해주면 합성 가능해집니다.</p>
-<p>“함수가 합성이 된다”는 것에는 추가적인 정보가 들어가 있습니다. <code>f⋅g = id</code>, <code>g⋅f = id</code>가 가능하다고 하면, <code>g</code>의 정의역domain 치역codomain이 <strong>같은 수준의 정보를 가지고 있다</strong>는 걸 알 수 있습니다. (<span class="citation" data-cites="Ailrun님이">@Ailrun님이</span> 숨은 뜻을 알려 주셨습니다. 감사합니다.)</p>
+<p>상상 - 카테고리에선 대상이 뭔지 관심 없습니다. isomorphic스러운 성질을 가지고 있는지 보기 위해 한 대상에서 출발해서 돌아온 대상이 같은 걸 보는 게 아니라, 펑터<code>F</code>가 변하지 않는 걸 봅니다. <code>F</code>로 갔다가, <code>G</code>로 <strong>돌아온 대상이 같은 가 보는 게 아니라</strong>, <code>F</code>라는 동작이 변하지 않는 걸 보는 겁니다. 이 걸 식으로 표현하려면 <code>F∘G∘F</code>에서 <code>F</code>로 돌아 올 수 있고, <code>G∘F∘G</code>에서 <code>G</code>로 돌아올 수 있나 보는 테크닉을, 카테고리 이론에선 자주 만납니다. 그럼, 대상을 전혀 고려하지 않아도 됩니다.</p>
+<p>※ 대부분의 텍스트에선 따로 설명없이 <code>F∘G∘F</code>, <code>G∘F∘G</code>가 등장하는데, 왜 이들이 조건에 등장하는지 말해주고 시작하는 자료는 못찾았습니다. 다들 그 정도는 척하고 알아 들을만한 사람들만 봐서 그럴까요?</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>F∘G∘F = F</span></code></pre></div>
+<p>아무 절차 없이 이렇게 되면 isomorphic이고, 추가 절차 <code>ϵ</code>으로 <code>ϵ(F∘G)</code>로 변환하면 <code>id_D</code>가 되어 <code>ϵ(F∘G)∘F = id_D∘F = F</code>가 되고,</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>G = G∘F∘G</span></code></pre></div>
+<p><code>G∘F∘G = id_C∘G</code>로 보면, <code>η(id_C)</code>로 변환하면 <code>G = η(id_C)∘G = G∘F∘G</code>가 되면 <code>F</code>와 <code>G</code>는 Adjunction이라 합니다.</p>
+<p>항등 펑터와 항등 자연 변환이 섞여 있어 혼란스럽긴 한데, 왼 쪽을 보정해서 오른 쪽과 같게 만들든, 오른 쪽을 보정해서 왼 쪽과 같게 만들든, 여하튼 <code>ϵ</code>,<code>η</code>만 있으면 <code>=</code>가 성립하게 만들 수 있다는 것까지는 보입니다. 그런데, 왜 언제는 왼 쪽, 언제는 오른 쪽을 보정하게 했을까요?</p>
+<p><code>f∘g = id</code>, <code>g∘f = id</code>가 가능하다고 하면, <code>g</code>의 정의역domain과 치역codomain이 <strong>같은 수준의 정보를 가지고 있다</strong>는 걸 알 수 있습니다. (<span class="citation" data-cites="Ailrun님이">@Ailrun님이</span> 숨은 뜻을 알려 주셨습니다. 감사합니다.)</p>
 <p><code>ϵ: F⋅G =&gt; id_D</code><br />
 <code>η: G⋅F =&gt; id_C</code><br />
 이렇게 되어 있거나,<br />
@@ -212,7 +220,7 @@
 </ul>
 <p>※ 변형이 일어났다는 말은, 곧 <code>F</code>가 <code>x1</code>이란 정보를 잃어버리면서 온다는 얘기로 보입니다.</p>
 <p>아마도 이런 인포멀한 접근이, 전공 선수분들한테는 의미가 없을지도 모르겠습니다. 전 현실 문제를 보고, 펑터로 이리 저리 변환을 하는데, 어떤 경우가 보이면 Adjunction을 이용해 모델링해야겠다란 생각이 들 수 있도록 하는 게 목표입니다.</p>
-<p>참고<br />
+<p>참고. 다음 사이트는 찾은 자료 중, 직관에 대한 설명이 가장 많이 등장하는, 제 입맛에 딱 맞는 글이 많습니다.<br />
 <a href="https://www.math3ma.com/blog/what-is-an-adjunction-part-1">What is an Adjunction? Part 1 (Motivation) - math3ma</a><br />
 <a href="https://www.math3ma.com/blog/what-is-an-adjunction-part-2">What is an Adjunction? Part 2 (Definition) - math3ma</a></p>
 
