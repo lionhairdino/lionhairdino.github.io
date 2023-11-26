@@ -93,6 +93,18 @@
 </ul>
 <p><code>=</code>을 쓸만큼 같지 않으면 <code>~</code>도 쓰고, <code>≃</code>, <code>⋍</code> …(<code>=</code>과 여러 기호의 조합)을 써서 그래도 어찌 보면, 어느 정도는 같게 볼 수 있다고 말하는 개념들이 많습니다. Adjunction도 그들 중 하나입니다.</p>
 <p>다시 한 번 말하지만, 수학 카테고리 이론의 Adjunction을 정교하게 공부하려는 분에게 어울리는 글이 아닙니다.</p>
+<h2 id="얼마나-같은-걸까">얼마나 같은 걸까</h2>
+<p>모나드를 해석하면서, 이펙트가 섞여 있는 것들 타입을 맞춰 나가는 훈련을 했으니, “같다”는 개념에 약간의 지식이 생겼겠지 하고 붙었습니다. 하지만, 동형, 자연 변환 등의 기본 용어 조차, 어렵사리 어떤 동작을 하는지만 알지, 의미를 충분히 알지 못하고 있구나를 느꼈습니다. 역시, “같다”는 개념은 어려운 주제 같습니다.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>F∘G   = , ~=, -&gt;  id_D   </span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>G∘F   = , ~=, -&gt;  id_C   </span></code></pre></div>
+<p>위에 식 중 어떤 걸 만족하냐에 따라 <code>C</code>와 <code>D</code>의 조금씩 다른 관계를 표현할 수 있습니다. 여기에 숨은 뜻을 보기 위해 아래 질문들을 먼저 고민해 봤습니다.</p>
+<p>isomorphic인 것과 homomorphic 중 isomorphic이 아닌 것들의 차이는 뭘까요? 구조는 유지하며 변환해 갔지만, 다시 처음으로 돌아오지 못한다입니다.(역연산이 존재하지 않음) 어떤 경우에 처음으로 돌아오지 못할까요? collapse 됐다거나 해서 처음 정보를 잃어버려야만 돌아 갈 수 없지 않을까 추측하고 있습니다. 처음을 잃어버려도 필요한 정보는 살아 있는 가장 간단한 경우를 예를 들면, <code>0</code>포함 자연수들에서 <code>1+2</code>의 결과로 <code>3</code>을 받았을 때, <code>3</code>만 보고선 <code>1+2</code>의 결과인지 <code>1+1+1</code>, <code>3+0</code>, …인지 알 수 없습니다. 하지만, 필요한 정보는 <code>3</code>이기 때문에 처음 출발지를 잃어버려도 상관없습니다. Writer 모나드의 로그 누적을 보면 <code>"this is log"</code>에서 <code>"this is"</code>가 먼저 쌓였는지 <code>"this"</code>가 먼저 쌓였는지 알 수 없습니다. 하지만 필요한 건 최종 전체 로그이니, 어떻게 쌓였는지 몰라도 상관없습니다. Reader 모나드의 경우 외부 스코프의 상수값을 두 번 읽어오나, 한 번 읽어오나 차이가 없으니, 몇 번을 읽었는지 알 필요가 없습니다. 세상엔 이 정도로만 같으면, 이 정도의 관계만 있으면 되는 경우가 무수히 많습니다.</p>
+<p><code>id</code>와 자연 동형인 것과, <code>id</code>로 변환해주는 자연 변환이 있는 것의 차이가 뭘까요?<br />
+카테고리가 동형인가를 알아보려면, 둘 사이에 id펑터 역할을 할 수 있는 펑터 조합이 있는가를 봅니다.<br />
+펑터 조합이 id펑터와 동형인지 보려면, 자연 동형인가를 알아보고, 없다면 자연 동형이 되는 자연 변환이 있는가를 봅니다.<br />
+그럼, 자연 변환이 동형인가를 보려면?
+카테고리에선 대상 언급 없이 모든 걸 풀어나가니, 같음도 마찬가지입니다. 모피즘이 되는 것들이 id 모피즘과 같아지는지, 동형이 되는지등을 찾아 봅니다.</p>
+<p>모르는 것 투성이라 글로 정리하는 게 의미있을까 싶어 계속 미루고 있었는데, 약간 기록할만한 상상이 생겨 정리했습니다.</p>
 <h2 id="adjoint-adjunction-단어-뜻">Adjoint, Adjunction 단어 뜻</h2>
 <p><code>Ad</code>(무엇과 가까이, 어디를 향해, 무엇과 관련하여) - <code>Joint</code>(jungere 결합하다)<br />
 <code>Ad</code> - <code>Junction</code> “closely connected, joined, united”를 뜻하는 라틴어 Adjunction</p>
@@ -144,26 +156,25 @@
 항등 자연 변환 <code>id_F(F) = F</code><br />
 펑터 <code>F</code>를 변환해도 <code>F</code>가 나오는 자연 변환입니다. 항등 자연 변환도 역시 왼 쪽, 오른 쪽을 봐야 합니다.
 카테고리에 <code>X</code>, <code>Y</code> 대상이 있고, <code>f: X -&gt; Y</code> 모피즘이 있을 때</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>(id_F)_Y ∘ F(f) </span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  = id_F(Y) ∘ F(f) </span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  = F(f) </span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  = F(f) ∘ id_F(X) </span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  = F(f) ∘ (id_F)_X</span></code></pre></div>
-<p>역시나 항등 성질을 만족하려면 <code>id_F</code>를 <code>X</code>,<code>Y</code> 두 군데서 봐야 합니다.<br />
-</p>
-<p>지금부턴 제 상상입니다. 한 시스템에서 다른 시스템으로 가도록 변환하는데, <strong>항상 고정적인(예측이 가능한) 변형이 일어난다</strong>면, 이 고정적인 변형을 보정할 수 있는 매핑(모피즘)을 정의할 수 있습니다. 이 고정적인 변형을 덜어내는 작업Natural isomorphism을 하면 다시 원래의 것과 같아지는 걸 Natural isomorphic이라 합니다. 둘이 같진 않지만, <code>F</code>와 <code>G</code>의 합성이 항상 고정적인 변형이 일어난다면? 이란 상상에서 풀어간 생각입니다.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>(id_F)_Y ∘ F(f) </span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  = id_F(Y) ∘ F(f) </span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  = F(f) </span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  = F(f) ∘ id_F(X) </span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  = F(f) ∘ (id_F)_X</span></code></pre></div>
+<p>역시나 항등 성질을 만족하려면 <code>id_F</code>를 <code>X</code>,<code>Y</code> 두 군데서 봐야 합니다.</p>
+<p>지금부턴 제 상상입니다. 한 시스템에서 다른 시스템으로 가도록 변환하는데, <strong>항상 고정적인(예측이 가능한) 변형이 일어나고, 원래의 히스토리를 기억한다</strong>면, 이 고정적인 변형을 보정할 수 있는 매핑(isomorphism)을 정의할 수 있습니다. 이 고정적인 변형을 지우는 작업(Natural isomorphism)을 하면 다시 원래의 것과 같아지는 걸 Natural isomorphic이라 합니다. 둘이 같진 않지만, <code>F</code>와 <code>G</code>의 합성이 항상 고정적인 변형이 일어나고, 처음을 알수 있다면? 이란 상상에서 풀어간 생각입니다.</p>
 <p>※ 아래 첨자 표기가 어려워 <code>_</code>로 썼습니다.<br />
 ※ 텍스트들이 <code>id_F</code>가 자연 변환인지, 펑터인지 딱 짚어서 말해주지 않는 경우가 많습니다. 심지어 그냥 <code>F</code>로 쓰고 자연 변환을 뜻할 때도 있고, 항등 자연 변환을 뜻할 때도 있습니다. 알아서 잘 보는 수밖에 없다고 합니다.</p>
 <h2 id="adjoint-펑터">Adjoint 펑터</h2>
 <p>※ 여기서는 일반적인 Adjunction이 아니라, Adjunction 관계의 두 Adjoint 펑터가 만나서 모나드가 되는 것만 보려고 합니다. 결론부터 말하면, Adjunction도 결국 얼마나 같게 볼 수 있는가에 관한 얘기입니다.</p>
 <p>우리말 번역으론 “수반 함자”라고 합니다. 隨伴 따를 수, 짝 반 : 어떤 사물 현상에 따라서 함께 생기는 것. 안타깝게도 번역이 딱히 더 익숙하지도, 더 구체적인 감을 주지도 않습니다.</p>
 <p><code>C</code>,<code>D</code>는 카테고리, <code>F</code>,<code>G</code>는 펑터</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="dt">F</span><span class="op">:</span> <span class="dt">C</span> <span class="ot">-&gt;</span> <span class="dt">D</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="dt">G</span><span class="op">:</span> <span class="dt">D</span> <span class="ot">-&gt;</span> <span class="dt">C</span></span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="dt">F</span><span class="op">:</span> <span class="dt">C</span> <span class="ot">-&gt;</span> <span class="dt">D</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="dt">G</span><span class="op">:</span> <span class="dt">D</span> <span class="ot">-&gt;</span> <span class="dt">C</span></span></code></pre></div>
 <p><code>F∘G = id_D</code>이고, <code>G∘F = id_C</code>이면 카테고리<code>C</code>와 카테고리<code>D</code>는 동형isomorphic입니다. 조금 풀어서 얘기하면, 어딘가의 펑터 합성식에 <code>id_D</code>가 등장한다면, 아무런 추가 작업 없이 그냥 <code>F∘G</code>를 쓸 수 있습니다. 그런데, 현실에선 이렇게 딱 동형이 아닐 때도 의미가 있는 경우가 많습니다. Adjunction은 딱 동형은 아니지만 어찌 어찌하면 동형처럼 보일 때에 관한 얘기입니다.</p>
 <p><code>F</code>와 <code>G</code> 사이의 Adjunction <code>(ϵ, η)</code>는 다음과 같은 두 개의 자연 변환Natural Transformation으로 이루어진 순서쌍이라고 합니다.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>ϵ<span class="op">:</span> <span class="dt">F</span>⋅<span class="dt">G</span> <span class="ot">=&gt;</span> id_D</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>η<span class="op">:</span> id_C <span class="ot">=&gt;</span> <span class="dt">G</span>⋅<span class="dt">F</span></span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>epsilon ϵ<span class="op">:</span> <span class="dt">F</span>⋅<span class="dt">G</span> <span class="ot">=&gt;</span> id_D</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>eta η<span class="op">:</span> id_C <span class="ot">=&gt;</span> <span class="dt">G</span>⋅<span class="dt">F</span></span></code></pre></div>
 <p>여기까지가 보통 텍스트들 서두에서 볼 수 있는 내용입니다. <a href="https://ko.wikipedia.org/wiki/%EC%88%98%EB%B0%98_%ED%95%A8%EC%9E%90">Wiki - Adjoint Functor</a>. 당연하게도 비수학인이 봐서 이해할만한 자료는 거의 없습니다. 이제부터는 대부분 제 상상입니다.</p>
 <p>상상해보면, <code>ϵ</code>, <code>η</code>가 없으면 <code>F∘G</code>를 <code>id_D</code>처럼, <code>id_C</code>를 <code>G∘F</code>처럼 볼 수 없지만, <code>ϵ</code>, <code>η</code>의 도움을 받으면(보정한다면) <code>F</code>와 <code>G</code>의 합성으로 <code>id_D</code>, <code>id_C</code>와 같은 일을 할 수 있습니다.<br />
 <code>F∘G</code>가 <code>id_D</code>가 아닌데, <code>ϵ</code>으로 살짝 보정하면 <code>id_D</code> 동작을 하고,<br />
@@ -179,27 +190,28 @@
 <code>G∘F</code>가 <code>id_C</code>와 같지 않은데, <code>η: id_C =&gt; G∘F</code>가 있으면<br />
 <code>C</code>와 <code>D</code>를 isomorphic처럼 볼 수 있게 됩니다.</p>
 <p>※ 대부분의 텍스트에선 따로 설명없이 <code>F∘G∘F</code>, <code>G∘F∘G</code>가 등장하는데, 왜 이들이 조건에 등장하는지 말해주고 시작하는 자료는 못찾았습니다. 다들 그 정도는 척하고 알아 들을만한 사람들만 봐서 그럴까요?<br />
-상상 - 카테고리에선 대상이 뭔지 관심 없습니다. isomorphic스러운 성질을 가지고 있는지 보기 위해 한 대상에서 출발해서 돌아온 대상이 같은 걸 보는 게 아니라, 펑터<code>F</code>가 변하지 않는 걸 봅니다. <code>F</code>로 갔다가, <code>G</code>로 <strong>돌아온 대상이 같은 가 보는 게 아니라, 돌아온 대상에서 F 동작이 변하지 않는 걸</strong> 보는 겁니다. 이 걸 식으로 표현하려면 <code>F∘G∘F</code>에서 <code>F</code>로 돌아 올 수 있고, <code>G∘F∘G</code>에서 <code>G</code>로 돌아올 수 있나 보는 테크닉을, 카테고리 이론에선 자주 만납니다. 그럼, 대상을 전혀 보지 않아도 같은 대상임을 알 수 있습니다.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>F∘G∘F = F</span></code></pre></div>
+상상 - 카테고리에선 대상이 뭔지 관심 없습니다. 두 카테고리가 isomorphic인지 본다면, 한 대상에서 출발해서 돌아온 대상이 같은 걸 보는 게 아니라, 펑터<code>F</code>가 변하지 않는 걸 봅니다. <code>F</code>로 갔다가, <code>G</code>로 <strong>돌아온 대상이 같은 가 보는 게 아니라, 돌아온 대상에 또 F를 적용했을 때, 동작이 변하지 않는 걸</strong> 보는 겁니다. 이 걸 식으로 표현하려면 <code>F∘G∘F</code>에서 <code>F</code>로 돌아 올 수 있고, <code>G∘F∘G</code>에서 <code>G</code>로 돌아올 수 있나 보는 테크닉을, 카테고리 이론에선 자주 만납니다. 그럼, 대상을 전혀 보지 않아도 같은 대상임을 알 수 있습니다.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>F∘G∘F = F</span></code></pre></div>
 <p>아무 절차 없이 이렇게 되면 isomorphic이고, 추가 절차 <code>ϵ</code>으로 <code>ϵ(F∘G)</code>로 변환하면 <code>id_D</code>가 되어 <code>ϵ(F∘G)∘F = id_D∘F = F</code>가 되고,</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>G = G∘F∘G</span></code></pre></div>
-<p><code>G∘F∘G = id_C∘G</code>로 보면, <code>η(id_C)</code>로 변환하면 <code>G = η(id_C)∘G = G∘F∘G</code>가 되면 <code>F</code>와 <code>G</code>는 Adjunction이라 합니다.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>G = G∘F∘G</span></code></pre></div>
+<p><code>G∘F∘G = id_C∘G</code>로 보면, <code>η(id_C)</code>로 변환하면 <code>G = η(id_C)∘G = G∘F∘G</code>가 되면 <code>F</code>, <code>G</code>, <code>ϵ</code>, <code>η</code>를 묶어 Adjunction이라 합니다.</p>
 <p>항등 펑터와 항등 자연 변환이 섞여 있어 혼란스럽긴 한데, 왼 쪽을 보정해서 오른 쪽과 같게 만들든, 오른 쪽을 보정해서 왼 쪽과 같게 만들든, 여하튼 <code>ϵ</code>,<code>η</code>만 있으면 <code>=</code>가 성립하게 만들 수 있다는 것까지는 보입니다. 그런데, 왜 언제는 왼 쪽, 언제는 오른 쪽을 보정하게 했을까요?</p>
 <p>제 첫 해석은, 대체commute 경로가 되기 위해선 하나가 뒤집어져야 한다라고 생각했습니다. 하지만, 이대로 넘어가기에는 찜찜했습니다. 아마도 여기에 번뜩이는 아이디어가 숨어 있는 듯 한데 쉽게 찾아지지 않습니다.</p>
 <p><code>f∘g = id</code>, <code>g∘f = id</code>가 가능하면, <code>g</code>의 정의역domain과 치역codomain이 <strong>같은 수준의 정보를 가지고 있습니다</strong> - <span class="citation" data-cites="Ailrun">@Ailrun</span></p>
 <blockquote>
 <p><span class="citation" data-cites="Ailrun">@Ailrun</span>:<br />
 만약에 둘 다를 아래와 같이 정의하면</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>ϵ: F∘G =&gt; id_D</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>η: G∘F =&gt; id_C -- 원래 정의는 id_C =&gt; G∘F</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>ϵ: F∘G =&gt; id_D</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>η: G∘F =&gt; id_C -- 원래 정의는 id_C =&gt; G∘F</span></code></pre></div>
 <p><code>F∘G</code>나 <code>G∘F</code>가 <code>id</code>에 비해서 훨씬 “약한” 녀석이어도 (함수로 따지자면 <code>id_C</code>나 <code>id_D</code>라는 치역보다 훨씬 적은 정보만을 가지고 있어도) 얼마든지 두 자연 변환을 줄 수 있기에 <code>C</code>와 <code>D</code>의 강한 관계를 나타내는 대표자로서 <code>F</code>와 <code>G</code>를 쓰기 힘듭니다.<br />
 마찬가지로 반대로만 정의하면</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>ϵ: id_D =&gt; F⋅G -- 원래 정의는 F∘G =&gt; id_D</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>η: id_C =&gt; G⋅F</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>ϵ: id_D =&gt; F⋅G -- 원래 정의는 F∘G =&gt; id_D</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>η: id_C =&gt; G⋅F</span></code></pre></div>
 <p><code>id_C</code>에는 포함되지 않는 아무 온갖 쓸데없는 추가 정보를 포함하고 있어도, 문제가 없기 때문에 또 제약이 너무 약하다고 할 수 있습니다.</p>
 </blockquote>
 <p>둘 중 하나 방향을 뒤집게 되면, 추가적인 제약이 들어있는 것과 같습니다. 위의 경우는 <code>id_C</code>, <code>id_D</code> 만큼의 정보(혹은 같은 양의 정보?)를 <code>F</code>와<code>G</code>의 합성도 가지고 있다는 얘기가 숨어 있습니다. 왜 그런지 좀 더 상상해 봤습니다.<br />
 <code>ϵ</code>과 <code>η</code>는 (co)domain이 달라 바로는 합성할 수 없습니다.</p>
+<p>… 작성 중</p>
 <p>자연 변환은 한 카테고리에서 다른 카테고리로 가는 펑터를 변환하는데, 이 때 변환한 값도 원래의 카테고리를 벗어나지 않습니다. <code>F∘G</code> 합성의 도메인, 코도메인을 보면 <code>id_D</code>와 같은 <code>D -&gt; D</code>로 원래 것과 같습니다. 사실은 <code>D -&gt; C -&gt; D</code>로 무려 현재 카테고리를 벗어났다가 돌아 오고 있지만, <code>id_D</code>와 같은 동작을 하게끔 하려는 게 목적입니다. 이 걸 척학적이라고 해야 할지, 인문적이라 해야 할지 모르지만, 그동안 “같다” 라고 생각한 것들이, 시작과 끝을 제외하면 무슨 복잡한 일을 하고 있을 수 있다는 생각이 듭니다. 시간이란 양이 존재하지 안는 수학에서는 얼마나 오래 걸리는 작업을 하든, 시작과 끝만 같다면 같은 것이니까요. 과정은 중요하지 않고, 결과만 같으면 같은 것입니다.</p>
 <p>최종 결론은, 카테고리 <code>C</code>,<code>D</code>는 펑터<code>F</code>, <code>G</code>, 자연 변환<code>ϵ</code>, <code>η</code>가 있으면(Adjunction이 있으면) 같은 것처럼 볼 수 있을 정도로 같다(다르다)입니다.</p>
 <p>※ <code>ϵ</code>은 <code>counit</code>이라 부르고, <code>η</code>는 <code>unit</code>이라 부르기도 합니다.</p>
@@ -221,7 +233,7 @@
 <p>동형, 자연동형, Adjunction은 그림에서 빨간 변형에 따라 구분이 되는 것으로 생각하고 있습니다. (동일한 일이 <code>F∘G</code>에도 일어난다고 가정해 주세요.)</p>
 <ul>
 <li>빨간 변형이 없다면 <strong>C와 D는 동형</strong></li>
-<li>빨간 변형을 <strong><em>항상 예측할 수 있다면, 혹은 항상 알 수 있다면, C와 D사이에는 ID_C와 자연 동형인 펑터 G∘F 합성이 존재</em></strong>. 자연 동형이라면 <code>ID_C</code>나 <code>ID_D</code>에서 역으로 <code>F∘G</code>나 <code>G∘F</code>를 찾을 수도 있어야 하니 얼마나 변형됐는지 정보를 잃어버리면 안됩니다.</li>
+<li>빨간 변형을 <strong><em>항상 정확히 알 수고,되돌릴 수 있다면, C와 D사이에는 ID_C와 자연 동형인 펑터 G∘F 합성이 존재</em></strong>. 자연 동형이라면 <code>ID_C</code>나 <code>ID_D</code>에서 역으로 <code>F∘G</code>나 <code>G∘F</code>를 찾을 수도 있어야 하니 얼마나 변형됐는지 정보를 잃어버리면 안됩니다.</li>
 <li>빨간 변형을 버리거나 참조해서, 어떻게든 수긍할만한 새로운 변형 생성을 허락한다면 <strong>C와 D는 Adjunction관계인 펑터F, G 합성이 존재</strong></li>
 </ul>
 <p>※ 변형이 일어났다는 말은, 곧 <code>F</code>가 <code>x1</code>이란 정보를 잃어버리면서 온다는 얘기로 보입니다.</p>
