@@ -114,6 +114,7 @@
 <p>혼자서는 아니지만, 둘이 뭉쳐(결합) 지구를 지킬 수 있으면 Adjunction 관계라 부릅니다.</p>
 <p>※ 명사냐 형용사냐로 갈릴 뿐, Adjoint와 Adjunction은 뜻 자체는 거의 같은 뜻으로 쓰입니다.</p>
 <p>아래 용어들은 몇 번을 봤던 개념들인데, 다 알고 있다 생각했는데, 의외로 혼란스러운 부분이 많았습니다. 항등원은 어떤 연산에 대해서 정의되는데, 항등 함수와 항등 펑터, 항등 자연 변환들은 어떤 “연산”에 대해 정의된 것인가부터, 텍스트마다 <code>F</code>, <code>id_F</code>를 펑터, 항등 펑터, 항등 자연 변환 표현으로 혼용해서 쓰는 바람에 더 혼란스러웠습니다. 항등X들은 정의와 성질을 혼동하기도 했습니다. 정식 정의들 보다는 Adjunction을 이해하는데 필요한 아이디어만 정리했습니다.</p>
+<p>정의 방법이, universal morphisms을 쓰는 것, Hom-set을 쓰는 것, counit-unit을 쓰는 것 세 가지가 있는데, 여기서는 세 번째 counit-unit 으로 정의하는 걸 뜯어 봅니다.</p>
 <h2 id="펑터functor">펑터Functor</h2>
 <p>카테고리에선 대상을 매핑하는 동작은 모피즘, 카테고리를 매핑하는 동작은 펑터라 부릅니다. 함수가 한 가지만 매핑한다면, 펑터는 오브젝트도, 모피즘도, 모피즘 합성도 모두 매핑(카테고리를 매핑)해야 합니다. 참고 - <a href="../posts/2023-03-09-functor.html">한 번쯤 나올 법 했는데, 아직 없었던 펑터 이야기</a></p>
 <h2 id="동형isomorphic">동형isomorphic</h2>
@@ -206,8 +207,10 @@
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>G∘F∘G = G</span></code></pre></div>
 <p>아무 작업 없이 위 식이 성립하면 isomorphic입니다. 특정 작업으로 위 관계를 <code>=</code>과 비슷하게 만들면, isomorphic<strong>처럼</strong> 볼 수 있습니다. 과연 위에 두 자연 변환 <code>ϵ'</code>,<code>η'</code>으로 가능한지 따라 가 보겠습니다.</p>
 <h3 id="화살표가-반대-방향인-이유">화살표가 반대 방향인 이유</h3>
-<p><img src="../images/adjunction_triangle.jpg" alt="F∘G∘F, G∘F∘G" />
-카테고리 이론은 다이아그램 체이싱을 하며 대체commute 경로를 찾는 작업이 기본이라 합니다. 대수에서 <code>왼 쪽 = 오른 쪽</code> 식과 같은 의미입니다. 빨간색 화살표들이 서로 commute하도록 만드는 게 목표입니다.</p>
+<figure>
+<img src="../images/adjunction_triangle.jpg" alt="F∘G∘F, G∘F∘G" /><figcaption aria-hidden="true">F∘G∘F, G∘F∘G</figcaption>
+</figure>
+<p>카테고리 이론은 다이아그램 체이싱을 하며 대체commute 경로를 찾는 작업이 기본이라 합니다. 대수에서 <code>왼 쪽 = 오른 쪽</code> 식과 같은 의미입니다. 빨간색 화살표들이 서로 commute하도록 만드는 게 목표입니다.</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>나∘가 = id_F 자연 변환</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>라∘다 = id_G 자연 변환</span></code></pre></div>
 <ul>
@@ -216,18 +219,20 @@
 <li>(다)자연 변환에는 <code>G -&gt; G∘F∘G</code> 변환이 들어가야 하고,</li>
 <li>(라)자연 변환에는 <code>G∘F∘G -&gt; G</code> 변환이 들어가야 합니다.</li>
 </ul>
-<p>위 식이 성립하게 만들기 위해, 현재 가지고 있는 유일한 변환 <code>ϵ'</code>, <code>η'</code>을 활용해 보겠습니다. <code>*</code>은 자연 변환 수평 합성을 뜻합니다.</p>
+<p>위 식이 성립하게 만들기 위해, 현재 가지고 있는 유일한 변환 <code>ϵ'</code>, <code>η'</code>을 활용해 보겠습니다. <code>*</code>은 자연 변환 수평 합성, <code>1F</code>는 <code>F</code>에서 항등 자연 변환을 뜻합니다.</p>
 <ul>
-<li>(가)에는 <code>F항등자연변환 * (id_C -&gt; G∘F)</code> 자연 변환이 들어가야 하는데, 우리 손엔 반대 모양 <code>η': G∘F -&gt; id_C</code>만 있습니다. <strong>실패</strong>
-&gt; Q. <code>(F∘G -&gt; id_D) * F항등자연변환</code> 자연 변환이 있어도 되지 않나?<br />
-&gt; A. 물론 가능합니다. 하지만, <code>ϵ: F∘G =&gt; id_D</code> 가 있는데 <code>F∘G -&gt; id_D</code>까지 있으면 그냥 자연 동형이 돼 버립니다.</li>
-<li>(나)에는 <code>(F∘G -&gt; id_D) * F항등자연변환</code> 자연 변환이 들어가야 하는데, 마침 <code>ϵ': F∘G -&gt; id_D</code>가 딱 이 모양입니다. <strong>성공</strong></li>
-<li>(다)에는 <code>(id_C -&gt; G∘F) * F항등자연변환</code> 자연 변환이 들어가야 하는데, 마찬가지로 우리 손엔 없습니다. <strong>실패</strong></li>
-<li>(라)에는 <code>F항등자연변환 * (F∘G -&gt; id_D)</code> 자연 변환이 들어가야 하는데, 마침 <code>ϵ': F∘G -&gt; id_D</code>가 딱 이 모양입니다. <strong>성공</strong></li>
+<li>(가)에는 <code>1F* (id_C -&gt; G∘F)</code> 자연 변환이 들어가야 하는데, 우리 손엔 반대 모양 <code>η': G∘F -&gt; id_C</code>만 있습니다. <strong>실패</strong>
+&gt; Q. <code>(F∘G -&gt; id_D) * 1F</code> 자연 변환이 있어도 되지 않나?<br />
+&gt; A. 물론 가능합니다. 하지만, <code>ϵ: F∘G =&gt; id_D</code> 가 있는데 <code>F∘G &lt;= id_D</code>까지 있으면 그냥 자연 동형이 돼 버립니다.</li>
+<li>(나)에는 <code>(F∘G -&gt; id_D) * 1F</code> 자연 변환이 들어가야 하는데, 마침 <code>ϵ': F∘G -&gt; id_D</code>가 딱 이 모양입니다. <strong>성공</strong></li>
+<li>(다)에는 <code>(id_C -&gt; G∘F) * 1F</code> 자연 변환이 들어가야 하는데, 마찬가지로 우리 손엔 없습니다. <strong>실패</strong></li>
+<li>(라)에는 <code>1F* (F∘G -&gt; id_D)</code> 자연 변환이 들어가야 하는데, 마침 <code>ϵ': F∘G -&gt; id_D</code>가 딱 이 모양입니다. <strong>성공</strong></li>
 </ul>
 <p>※ 자연 변환 수평 합성Natural Transformation Horizontal Composition<br />
-<code>F</code>에서 항등 자연 변환 <code>1_F</code>를 그냥 <code>F</code>로 표기한 곳도 있습니다. 자연 변환 수평 합성의 결과는 자연 변환입니다. 아래 그림의 결과 자연 변환 <code>F =&gt; F∘G∘F</code>를 펑터 <code>F</code>에 적용하면 <code>F∘G∘F</code>를 얻습니다.
-<img src="../images/nt_hComposition.JPG" alt="자연 변환 수평 합성 Natural Transformation Horizontal Composition" /></p>
+<code>F</code>에서 항등 자연 변환 <code>1_F</code>를 그냥 <code>F</code>로 표기한 곳도 있습니다. 자연 변환 수평 합성의 결과는 자연 변환입니다. 아래 그림의 결과 자연 변환 <code>F =&gt; F∘G∘F</code>를 펑터 <code>F</code>에 적용하면 <code>F∘G∘F</code>를 얻습니다.</p>
+<figure>
+<img src="../images/nt_hComposition.JPG" alt="자연 변환 수평 합성 Natural Transformation Horizontal Composition" /><figcaption aria-hidden="true">자연 변환 수평 합성 Natural Transformation Horizontal Composition</figcaption>
+</figure>
 <p><code>왼 쪽 = 오른 쪽</code> 둘을 같게 만들 때, 꼭 한 쪽만 변형할 필요는 없습니다. 아래처럼 놓고 다시 한 번 체이싱을 해보겠습니다.</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>ϵ''<span class="op">:</span> id_D <span class="ot">=&gt;</span> <span class="dt">F</span>∘<span class="dt">G</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>η''<span class="op">:</span> id_C <span class="ot">=&gt;</span> <span class="dt">G</span>∘<span class="dt">F</span></span></code></pre></div>
@@ -240,9 +245,9 @@
 <p>결국 Adjunction 텍스트에 나오는 서로 반대 방향의 자연 변환 <code>ϵ'</code>과 <code>η''</code>을 다음처럼 준비하면 다이아그램 체이싱에 성공할 수 있습니다.</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>ϵ<span class="op">:</span> <span class="dt">F</span>∘<span class="dt">G</span> <span class="ot">=&gt;</span> id_D</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>η<span class="op">:</span> id_C <span class="ot">=&gt;</span> <span class="dt">G</span>∘<span class="dt">F</span></span></code></pre></div>
-<p>위 그림을 보면 <code>F∘G∘F</code>에서 앞에 <code>F</code>와 뒤에 <code>F</code>의 색을 달리 했습니다. 제 눈엔 독특한 특징으로 보이는데 아직 속 뜻은 잘 못 찾고 있습니다. <code>F</code>와 같아지려면, 앞에 <code>F</code>가 살아남아도 되고(<code>G∘F</code>를 <code>id_C</code>로), 뒤에 <code>F</code>가 살아 남아도(<code>F∘G</code>를 <code>id_D</code>로) 되는 상황입니다. Adjunction이 가능한 이유가 여기에 있다고 생각됩니다.</p>
+<p>위 그림을 보면 <code>F∘G∘F</code>에서 앞에 <code>F</code>와 뒤에 <code>F</code>의 색을 달리 했습니다. 제 눈엔 독특한 특징으로 보이는데 아직 속 뜻은 잘 못 찾고 있습니다. <code>F</code>와 같아지려면, 앞에 <code>F</code>가 살아남아도 되고(<code>G∘F</code>를 <code>id_C</code>로), 뒤에 <code>F</code>가 살아 남아도(<code>F∘G</code>를 <code>id_D</code>로) 되는 상황입니다. Adjunction이 가능한 이유가 여기에 있다고 생각합니다.</p>
 <p>다른 글에서, 모든 값을 <code>id</code>가 적용된 Computation으로 보자는 생각을 얘기했었는데, Adjunction도 비슷한 느낌으로 본다면, <code>F</code> 펑터는 <code>id_D∘F∘id_C</code>로 볼 수 있고, <code>G</code>펑터는 <code>id_C∘G∘id_D</code>로 볼 수 있습니다.</p>
-<p>모나드에서는 <code>return</code>이 번뜩이는 센스라 생각했는데, Adjunction에선 화살표 반대가 번뜩이는 센스로 생각됩니다.</p>
+<p>모나드에서는 <code>return</code>이 번뜩이는 센스라 생각했는데, Adjunction에선 화살표 그런 듯 합니다.</p>
 <p>과연, 화살표 반대 방향은 위처럼 쫓아가다 나온 것인지, 아니면 내포된 속 뜻이 있어, 단 번에 서로 반대 방향의 자연 변환을 준비해야 되는 걸 알았는지 지금은 모르겠습니다. 속 뜻에 대한 질문에 <span class="citation" data-cites="Ailrun님으로부터">@Ailrun님으로부터</span> 아래 같은 답을 받았습니다.</p>
 <blockquote>
 <p><span class="citation" data-cites="Ailrun">@Ailrun</span>:<br />
@@ -288,10 +293,12 @@
 <p>아마도 이런 인포멀한 접근이, 전공 선수분들한테는 의미가 없을지도 모르겠습니다. 전 현실 문제를 보고, 펑터로 이리 저리 변환을 하는데, 어떤 경우가 보이면 Adjunction을 이용해 모델링해야겠다란 생각이 들 수 있도록 하는 게 목표입니다.</p>
 <p>참고. 다음 글은 찾은 자료 중, 직관에 대한 설명이 가장 많이 등장하는, 제 입맛에 딱 맞는 글입니다. 예시를 벡터 스페이스로 들고 있어 그리 쉽지는 않지만, 딱딱한 정규 텍스트들보다는 좋았습니다.<br />
 <a href="https://www.math3ma.com/blog/what-is-an-adjunction-part-1">What is an Adjunction? Part 1 (Motivation) - math3ma</a><br />
-<a href="https://www.math3ma.com/blog/what-is-an-adjunction-part-2">What is an Adjunction? Part 2 (Definition) - math3ma</a><br />
-</p>
+<a href="https://www.math3ma.com/blog/what-is-an-adjunction-part-2">What is an Adjunction? Part 2 (Definition) - math3ma</a></p>
 <p>참고. 하스켈 코드로 Adjunction 보기<br />
-<a href="https://www.stephendiehl.com/posts/adjunctions.html">From Adjunctions to Monads - Stephen Diehl</a></p>
+<a href="https://www.stephendiehl.com/posts/adjunctions.html">From Adjunctions to Monads - Stephen Diehl</a><br />
+<a href="https://chrispenner.ca/posts/adjunction-battleship">Adjunctions And Battleship</a></p>
+<p>참고. 프로그래머가 카테고리 이론 맛을 보려면, 바르토즈 밀레프스키 박사님을 피해갈 수 없습니다.<br />
+<a href="https://bartoszmilewski.com/2016/04/18/adjunctions/">Adjunction - Bartoz Milewski</a></p>
 <p>Mon Nov 27 03:45:47 PM KST 2023 작성 중</p>
 
 <div class="comment">
