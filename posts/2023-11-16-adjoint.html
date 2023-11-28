@@ -185,6 +185,7 @@
 <p>지금부터는 거의 모두 상상입니다. <strong>틀린 걸로 확인되면 모두 지울 예정입니다.</strong></p>
 <h3 id="시작점으로-다시-돌아오면-동형">시작점으로 다시 돌아오면 동형</h3>
 <p>자연 변환은 한 카테고리에서 다른 카테고리로 가는 펑터를 변환하는데, 이 때 변환한 값도 원래의 도메인을 벗어나지 않습니다. <code>F∘G</code> 합성의 도메인, 코도메인을 보면 <code>id_D</code>와 같은 <code>D -&gt; D</code>로 원래 것과 같습니다. 사실은 <code>D -&gt; C -&gt; D</code>로 무려 현재 카테고리를 벗어났다가 돌아 오고 있지만, <code>id_D</code>와 같은 동작을 하게끔 하려는 게 목적입니다. 이 걸 척학적이라고 해야 할지, 인문적이라 해야 할지 모르지만, 그동안 “isomorphic하다” 라고 생각한 것들이, 시작과 끝을 제외하면 무슨 복잡한 일을 하고 있을 수 있다는 생각이 듭니다. 컴퓨터의 computation과 달리 시간이란 양이 존재하지 않는 수학 세계에서는 얼마나 오래 걸리는 작업을 하든, 시작과 끝만 같다면 같은 것이니까요. 과정은 중요하지 않고, 결과만 같으면 같은 것입니다.</p>
+<p>처음 Adjunction을 보고 떠올린 상상이, “달나라를 다녀와도 돌아 올 수만 있다면, 아무일도 일어나지 않은 걸로 해 줄게.” 입니다.</p>
 <p>지금까지는 “같음”의 정도는 완전히 같음(이 건 수학적 정의를 모릅니다.) &gt; 동형Isomorphic &gt; 준동형Homomorphic 정도의 구분을 하고 있었는데, Homomorphic 중에 Adjunction 관계인 걸 특징지을 수 있습니다.</p>
 <h3 id="id와-동형isomorphic은-아니지만-준동형homomorphic">id와 동형isomorphic은 아니지만 준동형homomorphic</h3>
 <p>우선, 여기선 같음의 기준을 Isomorphic으로 잡고 얘기를 이어가겠습니다.<br />
@@ -236,6 +237,7 @@
 <div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>ϵ<span class="op">:</span> <span class="dt">F</span>∘<span class="dt">G</span> <span class="ot">=&gt;</span> id_D</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>η<span class="op">:</span> id_C <span class="ot">=&gt;</span> <span class="dt">G</span>∘<span class="dt">F</span></span></code></pre></div>
 <p>위 그림을 보면 <code>F∘G∘F</code>에서 앞에 <code>F</code>와 뒤에 <code>F</code>의 색을 달리 했습니다. 제 눈엔 독특한 특징으로 보이는데 아직 속 뜻은 잘 못 찾고 있습니다. <code>F</code>와 같아지려면, 앞에 <code>F</code>가 살아남아도 되고(<code>G∘F</code>를 <code>id_C</code>로), 뒤에 <code>F</code>가 살아 남아도(<code>F∘G</code>를 <code>id_D</code>로) 되는 상황입니다. Adjunction이 가능한 이유가 여기에 있다고 생각합니다.</p>
+<p><span class="citation" data-cites="todo">@todo</span> 혹은 <code>F∘G∘F</code>에서 앞에 <code>F</code>와 뒤에 <code>F</code>를 반드시 처음의 <code>F</code>, 마지막 <code>F</code>와 연관지을 필요 없다고 본다면, 색깔은 무의미합니다. 아직 고민 중입니다.</p>
 <blockquote>
 <p>이 번 글을 정리한 목적은 바로 이 특징 때문입니다. 속 뜻, 직관이 뭘까에 대한 고민입니다.</p>
 <p>독특한 특징1<br />
@@ -266,9 +268,23 @@
 </blockquote>
 <p>둘 중 하나 방향을 뒤집게 되면, 추가적인 제약이 들어있는 것과 같습니다. 위의 경우는 <code>id_C</code>, <code>id_D</code> 만큼의 정보(혹은 같은 양의 정보?)를 <code>F</code>와<code>G</code>의 합성도 가지고 있다는 얘기가 숨어 있다고 볼 수 있습니다.</p>
 <p>결론은, 카테고리 <code>C</code>,<code>D</code>는 펑터<code>F</code>, <code>G</code>, 자연 변환<code>ϵ</code>, <code>η</code>가 있으면(Adjunction이 있으면) 같은 것처럼 볼 수 있을 정도로 같다(다르다)입니다.</p>
-<p>※ <code>ϵ</code>은 <code>counit</code>이라 부르고, <code>η</code>는 <code>unit</code>이라 부르기도 합니다.</p>
+<p>※ <code>ϵ</code>은 <code>counit</code>이라 부르고, <code>η</code>는 <code>unit</code>이라 부릅니다.</p>
 <h2 id="모나드와-연관성">모나드와 연관성</h2>
-<p>정의만 읽어서 알 수 있는 공통점은, Adjunction, 모나드 둘 다 정보를 잃어버리면서도 같은 것이라 우기는 개념입니다. -<span class="citation" data-cites="todo">@todo</span></p>
+<p>정의만 읽어서 알 수 있는 공통점은, Adjunction, 모나드 둘 다 정보를 잃어버리면서도 같은 것이라 우기는 개념입니다. <code>ϵ</code> 과 <code>η</code>만 있다면, <code>F</code>와 <code>F∘G∘F</code>와 <code>F∘G∘F∘G∘F</code>,… 들을 모두 같은 척하고 볼 수 있습니다. 어딘가에서 모노이드와의 연관성이 나올 것으로 추측할 수 있습니다. (모나드는 <code>M</code>, <code>M∘M</code>, <code>M∘M∘M</code>,…들을 모두 같은 척하고 볼 수 있었습니다.)</p>
+<p>참고. 프로그래머가 카테고리 이론 맛을 보려면, 바르토즈 밀레프스키 박사님을 피해갈 수 없습니다.<br />
+<a href="https://bartoszmilewski.com/2016/04/18/adjunctions/">Adjunction - Bartoz Milewski</a><br />
+위 링크를 보면, 하스켈 의사 코드로 표현하고 있는데,</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>η<span class="ot">_d ::</span> d <span class="ot">-&gt;</span> (<span class="dt">R</span> ∘ <span class="dt">L</span>) d</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>ϵ<span class="ot">_c ::</span> (<span class="dt">L</span> ∘ <span class="dt">R</span>) c <span class="ot">-&gt;</span> c</span></code></pre></div>
+<p>를 Commute가 잘 보이게 아래처럼 보고 읽었습니다.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>η<span class="ot">_d ::</span> <span class="dt">Id_D</span> d <span class="ot">-&gt;</span> (<span class="dt">R</span> ∘ <span class="dt">L</span>) d</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>ϵ<span class="ot">_c ::</span> (<span class="dt">L</span> ∘ <span class="dt">R</span>) c <span class="ot">-&gt;</span> <span class="dt">Id_C</span> c</span></code></pre></div>
+<p><code>unit</code>은 모나드의 <code>return</code><br />
+<code>counit</code>은 코모나드의 <code>extract</code><br />
+</p>
+<p>모든 adjoint 펑터 쌍은 모나드와 코모나드를 정의합니다. 모든 모나드와 코모나드는 adjoint 쌍으로 분해factorize할 수 있는데, 반드시 유니크한 하나로 나오지 않을 수 있다고 합니다.</p>
+<p>늘상 모나드를 쓰지만, Adjunction은 거의 쓰지 않는 이유가, adjoint 펑터 쌍으로 분해하면, Hask 카테고리를 벗어나는 무언가를 표현해야 해서 안 쓰이고, 엔도펑터만 등장하는 Adjunction만 표현할 수 있습니다.</p>
+<p>Wed Nov 29 04:35:32 AM KST 2023 작성 중…</p>
 <h2 id="요약">요약</h2>
 <p><code>C</code>, <code>D</code> 둘이 얼마나 같은데?</p>
 <ul>
@@ -302,8 +318,6 @@
 <p>참고. 하스켈 코드로 Adjunction 보기<br />
 <a href="https://www.stephendiehl.com/posts/adjunctions.html">From Adjunctions to Monads - Stephen Diehl</a><br />
 <a href="https://chrispenner.ca/posts/adjunction-battleship">Adjunctions And Battleship</a></p>
-<p>참고. 프로그래머가 카테고리 이론 맛을 보려면, 바르토즈 밀레프스키 박사님을 피해갈 수 없습니다.<br />
-<a href="https://bartoszmilewski.com/2016/04/18/adjunctions/">Adjunction - Bartoz Milewski</a></p>
 <p>Mon Nov 27 03:45:47 PM KST 2023 작성 중</p>
 
 <div class="comment">
