@@ -103,7 +103,7 @@
 <p>왜 특별히 <code>ϵ</code>, <code>η</code>를 고르고 <code>F</code>, <code>G</code>와 합쳐 멋지게 Adjunction이란 이름도 붙여줬을까 궁금해졌습니다. 어떤 텍스트에선 서로 inverse하게 만들어 중간에 <code>F</code>나 <code>G</code>를 끼워 넣어 합성하기 위한 것이다로 설명하고 넘어가기도 합니다. 하지만, 이 설명만으론 찜찜했습니다.</p>
 <p><strong><em>결론부터 말하면 반드시 ϵ, η 조합만 가능합니다.</em></strong></p>
 <figure>
-<img src="../images/adjunction_arrow_meaning7.jpg" alt="입력에 있는 도형은 출력에 들어갈 크기여야 한다." /><figcaption aria-hidden="true">입력에 있는 도형은 출력에 들어갈 크기여야 한다.</figcaption>
+<img src="../images/adjunction_arrow_meaning7.jpg" alt="입력 도형은 출력 도형에 들어 갈 크기여야 한다." /><figcaption aria-hidden="true">입력 도형은 출력 도형에 들어 갈 크기여야 한다.</figcaption>
 </figure>
 <p>지금부터 쫓아가 보겠습니다.</p>
 <h2 id="동형isomorphic">동형Isomorphic</h2>
@@ -124,6 +124,7 @@
 </figure>
 <p><code>Int</code>와 <code>Maybe Int</code>가 아닌, <code>Maybe Int</code>와 <code>Maybe (Maybe Int)</code>를 대상으로 두면 <code>Just (Nothing)</code>을 <code>Nothing</code>으로 우겨 넣으며 동형 비슷하다고 우길 수 있습니다. 참고 - <a href="../posts/2022-03-25-beforeMonad.html">모나드, 같음 - m (m a)와 m a는 얼마나 다를까?</a></p>
 <p><code>G∘F</code>는 <code>Id_C</code>와 동일한 동작을 합니다. 자연 동형입니다. <code>Just 1</code>에서 출발해서 <code>Just 1</code>로, …, <code>Nothing</code>에서 출발해서 <code>Nothing</code>으로 돌아올 수 있습니다. <code>C</code>와 <code>D</code>는 동형Isomorphic은 아니지만, 둘 사이를 오가는 펑터 <code>F</code>, <code>G</code> 합성 중 <code>G∘F</code>는 <code>Id_C</code>와 자연 동형Natural Isomorphic입니다. 그냥 동형일 때보단, 뭔 짓을 해야하긴 하지만, 그래도 이정도면 많이 닮았으니 같은 걸로 볼 수 있을 것만 같습니다. <code>G∘F</code>를 봤으니, <code>F∘G</code>도 살펴 봐야 합니다.</p>
+<p>※ 사실 자연 동형이 안되는 걸 찾으려 했는데, <code>Maybe</code>는 <code>G∘F</code>와 <code>Id_C</code>가 자연 동형입니다.</p>
 <h2 id="자연-변환natural-transformation">자연 변환Natural Transformation</h2>
 <figure>
 <img src="../images/adjunction_arrow_meaning5.jpg" alt="Natural Transformation" /><figcaption aria-hidden="true">Natural Transformation</figcaption>
@@ -131,29 +132,28 @@
 <p><code>Nothing</code>으로 출발해서 <code>Nothing</code>으로 돌아온다는 보장이 없습니다. <code>C</code>로 가면서 <strong>구조의 일부를 잃어버렸기 때문</strong>입니다. <code>Id_D</code>와 다른 동작을 하니 자연 동형이 아닙니다.</p>
 <p>이제, 이 상황에서 <code>Id_D</code>와 동형은 아니지만, <code>G∘F &lt;- Id_D</code> 또는 <code>G∘F -&gt; Id_D</code> 자연<strong>변환</strong>을 정의하려 합니다.</p>
 <p>펑터는 준동형사상homomorphism입니다. 적어도 자연 변환으로 변경한 펑터가 <code>Id</code>스런 동작을 하려면, <code>Id</code>들의 도메인을 벗어날 수 없습니다.</p>
-<p><code>Maybe (Maybe Int)</code> 세상은 <code>Maybe Int</code>만 있는 세상과 <strong>동일한 구조는 그대로 보존</strong>하고 있고, 추가로 <code>Nothing</code>이란 구조를 가진 더 큰 도메인을 가지고 있습니다. 이 걸 도형의 크기로 구분해서 그렸습니다. 아래 그림에서 <code>C</code>를 <code>Maybe Int</code>로, <code>D</code>를 <code>Maybe(Maybe Int)</code>로 보면 됩니다.</p>
-<p>펑터를 표현하는 상자는 왼 쪽면이 입력, 오른 쪽 면이 출력으로 두겠습니다.<br />
-<code>F: C -&gt; D</code>는 작은 구조 <code>Maybe Int</code>에서 큰 구조 <code>Maybe(Maybe Int)</code>로 가고 있습니다.<br />
+<p><code>Maybe (Maybe Int)</code> 구조는 <code>Maybe Int</code>만 있는 구조와 <strong>동일한 구조는 그대로 보존</strong>하고 있고, 추가로 <code>Nothing</code>이란 구조를 가진 더 큰 도메인을 가지고 있습니다. 이 걸 도형의 크기로 구분해서 그렸습니다. 아래 그림에서 <code>C</code>를 <code>Maybe Int</code>로, <code>D</code>를 <code>Maybe(Maybe Int)</code>로 보면 됩니다.</p>
+<p><code>F: C -&gt; D</code>는 작은 구조 <code>Maybe Int</code>에서 큰 구조 <code>Maybe(Maybe Int)</code>로 가고 있습니다.<br />
 <code>G: D -&gt; C</code>는 큰 구조에서 작은 구조로 가고 있습니다.<br />
 <code>Id_C: C -&gt; C</code>는 작은 구조에서 작은 구조로 가고 있습니다.<br />
 <code>Id_D: D -&gt; D</code>는 큰 구조에서 큰 구조로 가고 있습니다.</p>
-<p>이 걸 한번에 표현할 그럴싸한 그림이 떠올랐습니다.</p>
-<p>상자의 왼 쪽 면을 입력 크기로, 오른 쪽 면을 출력 크기로 표현하겠습니다.</p>
+<p>이 걸 한번에 표현할 그럴싸한 그림이 떠올랐습니다.<br />
+펑터를 표현하는 상자는 왼 쪽면이 입력, 오른 쪽 면이 출력으로 두겠습니다.</p>
 <figure>
 <img src="../images/adjunction_arrow_meaning6.jpg" alt="아무 방향이나 안되는 이유" /><figcaption aria-hidden="true">아무 방향이나 안되는 이유</figcaption>
 </figure>
 <p>※ <code>Id</code> 상자들을 둘로 나눠서 본 이유는 수평 합성을 따져 보려고 한 건데, <code>F</code>, <code>G</code> 각 각 독립적으론 <code>Id_D</code>, <code>Id_C</code>와 정의역, 치역이 달라 의미가 없습니다. 아래 그림처럼 그냥 하나로 보는게 더 잘 들어 맞습니다.</p>
-<p><strong><em>화살표 입력에 있는 도형은 출력에 있는 도형에 들어 갈 수 있어야 합니다.</em></strong> 위에 X표를 해둔 빨간색 화살표로 바꾼다면 도형들을 그대로 넣을 수 없는 상황입니다. 자연 동형이 아니라서 <code>Id_C</code>, <code>Id_D</code>로 만들 적당한 자연 변환을 준비한다 해도, 아무 조합이 되는 게 아니라, 지켜야 하는 제약이 있습니다. 적어도 <code>G∘F</code>합성은 <code>Id_D</code>를 넘지 않는 정보를 가져야 하며, <code>F∘G</code> 합성은 <code>Id_C</code>보다는 큰 정보를 가지고 있어야 합니다.</p>
+<p><strong><em>화살표 입력에 있는 도형은 출력에 있는 도형에 반드시 들어 갈 수 있어야 합니다.</em></strong> 위에 X표를 해둔 빨간색 화살표로 바꾼다면 도형들을 그대로 넣을 수 없는 상황입니다. 자연 동형이 아니라서 <code>Id_C</code>, <code>Id_D</code>로 만들 적당한 자연 변환을 준비한다 해도, 아무 조합이 되는 게 아니라, 지켜야 하는 제약이 있습니다. 적어도 <code>G∘F</code>합성은 <code>Id_D</code>를 넘지 않는 정보를 가져야 하며, <code>F∘G</code> 합성은 <code>Id_C</code>보다는 큰 정보를 가지고 있어야 합니다.</p>
 <p>만일, Isomorphic한 상태라면, 아래 <code>C</code>,<code>D</code>,<code>F∘G</code>, <code>Id_D</code>, <code>G∘F</code>, <code>Id_C</code>는 모두 같은 크기의 도형이 됩니다.</p>
 <p>(최종 입출력 메타포가 잘 보이도록 <span class="citation" data-cites="Ailrun님이">@Ailrun님이</span> 아래와 같이 <code>F</code>, <code>G</code>의 도형 모양을 바로 잡아 주셨습니다. 감사합니다.)</p>
 <figure>
 <img src="../images/adjunction_arrow_meaning7.jpg" alt="아무 방향이나 안되는 이유 - 최종" /><figcaption aria-hidden="true">아무 방향이나 안되는 이유 - 최종</figcaption>
 </figure>
 <h2 id="결론">결론</h2>
-<p>두 카테고리 중 하나가 가진 구조를 다른 쪽이 완전히 보존하며 추가적인 구조를 가진 상황이라면, 정보가 불균형하여 Isomorphism이 있을 수 없어 Isomorphic으로 볼 수 없는 상황입니다. 하지만 큰 구조에서 작은 구조로 올 때 틀어짐을 감수할만 상황이라면, 위 타입의 자연변환 두 개만 정의할 수 있다면, 적당히 같다고 우겨 볼 수 있습니다.</p>
-<p>(마치, “같다”는 하나의 조건을 여러 개로 쪼개어factorize, 둘이 스페셜한 관계라고 할 수 있는 최소한의 제약을 추린게 <code>ϵ</code>, <code>η</code>란 느낌입니다. 혹 더 깊이 들어가서 조건을 더 여러 개로 쪼개면, 또 덜 닮았지만 의미 있는 경우가 나오는 게 아닐까요? )</p>
+<p>두 카테고리 중 하나가 가진 구조를 다른 쪽이 완전히 보존하며 추가적인 구조를 가진 상황이라면, 정보가 불균형하여 Isomorphism이 있을 수 없어 Isomorphic으로 볼 수 없는 상황입니다. 하지만 큰 구조에서 작은 구조로 올 때 틀어짐을 감수할만한 상황이라서, 위 타입의 자연변환 두 개만 정의할 수 있다면, 적당히 같다고 우겨 볼 수 있습니다.</p>
+<p>(마치, “같다”는 하나의 조건을 여러 개로 쪼개어factorize, 둘이 스페셜한 관계라고 할 수 있는 최소한의 제약을 추린게 <code>ϵ</code>, <code>η</code>까지는 남겨 둔다 느낌입니다. 혹 더 깊이 들어가서 조건을 더 여러 개로 쪼개면, 덜 닮았지만 의미 있는 경우가 또 나오는 게 아닐까요? )</p>
 <p>어디선가 글을 읽다가 두 구조에 <strong>“Adjunction을 줄 수 있다”</strong>, <strong>“Adjunction을 정의할 수 있다”</strong>라고 한다면, “두 구조간의 불균형 정보를 수긍이 가는선에서 무시한다면 같게 볼 수 있는 방법이 존재한다”라고 받아들이면 됩니다.</p>
-<p>둘은 <strong>Adjunction 관계</strong>야가 아니라, <strong>Adjunction을 가질 수 있는 관계</strong>야 라고 말하는 게 맞는 것 같습니다.</p>
+<p>둘은 <strong>Adjunction 관계</strong>야가 아니라, <strong>Adjunction (관계의 펑터를)을 가질 수 있는 관계</strong>야 라고 말하는 게 맞는 것 같습니다.</p>
 <p>프로그래밍에서 틀어짐이 꼭 중요하지 않은 예시로는, 지금 생각나는 건 모나드 밖에 없습니다.</p>
 <ul>
 <li><code>Writer</code>모나드: <code>"log1"</code>,<code>"log2"</code>를 차례로 생겼지만, 최종 <code>"log1log2"</code>만 필요하다면, <code>"log1"+"log2"</code>해서 <code>"log1log2"</code>인지, 한 번에 <code>"log1log2"</code>인지 알 필요가 없다.<br />
