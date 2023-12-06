@@ -4,7 +4,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-        <title>lionhairdino - Adjunction 관계를 표현하는 두 Adjoint 펑터로 모나드 표현하기 (작성 중)</title>
+        <title>lionhairdino - Adjunction을 만드는 두 Adjoint 펑터로 모나드 표현하기 (작성 중)</title>
 
         <meta name="description" content="카테고리 이론에서 모나드를 설명하는 방법 중 하나인 Adjoint Functor를 비수학적으로 해석합니다." />
         <meta property="og:description" content="카테고리 이론에서 모나드를 설명하는 방법 중 하나인 Adjoint Functor를 비수학적으로 해석합니다." />
@@ -33,7 +33,7 @@
         <meta name="msapplication-TileColor" content="#ff7500" />
         <meta name="theme-color" content="#ffffff" />
         <meta property="og:type" content="website" />
-        <meta property="og:title" content="Adjunction 관계를 표현하는 두 Adjoint 펑터로 모나드 표현하기 (작성 중)" />
+        <meta property="og:title" content="Adjunction을 만드는 두 Adjoint 펑터로 모나드 표현하기 (작성 중)" />
         <meta property="og:site_name" content="Lionhairdino" />
         <meta property="og:url" content="https://lionhairdino.github.io/posts/2023-11-16-adjoint.html" />
 
@@ -74,7 +74,7 @@
             </div>
         </div>
         <div class="js-toc-content">
-            <h1>Adjunction 관계를 표현하는 두 Adjoint 펑터로 모나드 표현하기 (작성 중)</h1>
+            <h1>Adjunction을 만드는 두 Adjoint 펑터로 모나드 표현하기 (작성 중)</h1>
             <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
 <div class="info">
     Posted on November 16, 2023
@@ -119,9 +119,9 @@
 <p>※ 명사냐 형용사냐로 갈릴 뿐, Adjoint와 Adjunction은 뜻 자체는 거의 같은 뜻으로 쓰입니다.</p>
 <p>아래 용어들은 몇 번을 봤던 개념들인데, 다 알고 있다 생각했는데, 의외로 혼란스러운 부분이 많았습니다. 항등원은 어떤 연산에 대해서 정의되는데, 항등 함수와 항등 펑터, 항등 자연 변환들은 어떤 “연산”에 대해 정의된 것인가부터, 텍스트마다 <code>F</code>, <code>id_F</code>를 펑터, 항등 펑터, 항등 자연 변환 표현으로 혼용해서 쓰는 바람에 더 혼란스러웠습니다. 항등X들은 정의와 성질을 혼동하기도 했습니다. 정식 정의들이 아니라 Adjunction을 이해하는데 필요한 아이디어만 정리했습니다.</p>
 <p>Adjunction 정의 방법이, universal morphisms을 쓰는 것, Hom-set을 쓰는 것, counit-unit을 쓰는 것 세 가지가 있는데, 여기서는 세 번째 counit-unit 으로 정의하는 걸 뜯어 봅니다.</p>
-<p>추측 - 둘이 같다, 둘이 isomorphic하다, 둘이 Adjunction이다.. 식으로 쓰나 했는데, Adjunction은 두 카테고리가 아니라, 두 펑터의 관계를 나타내는 말입니다.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>두 카테고리는 | Adjunction 관계의 두 펑터가 있는 | 관계</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>두 카테고리는 | Isomorphism이 있는               | Isomorphic 관계</span></code></pre></div>
+<p>추측 - 둘이 같다, 둘이 isomorphic하다, 둘이 Adjunction이다.. 식으로 쓰나 했는데, Adjunction은 두 카테고리가 사이에 두어, 두 카테고리를 연결할 때 도와주는 도구 같은 겁니다.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>두 카테고리는 Adjunction이 있는 OO관계 - 따로 여기에 들어가는 용어는 없나 봅니다.</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>두 카테고리는 Isomorphism이 있는 Isomorphic 관계</span></code></pre></div>
 <p>식으로 말하면 되는 듯 합니다.</p>
 <h2 id="펑터functor">펑터Functor</h2>
 <p>카테고리에선 대상을 매핑하는 동작은 모피즘, 카테고리를 매핑하는 동작은 펑터라 부릅니다. 함수가 한 가지만 매핑한다면, 펑터는 오브젝트도, 모피즘도, 모피즘 합성도 모두 매핑(카테고리를 매핑)해야 합니다. 참고 - <a href="../posts/2023-03-09-functor.html">한 번쯤 나올 법 했는데, 아직 없었던 펑터 이야기</a></p>
@@ -196,7 +196,7 @@
 <code>F∘G = id_D</code>가 아니고, <code>G∘F = id_C</code>가 아니라서, <code>F</code>와 <code>G</code>의 합성이 isomorphism 역할을 못 한다면,<br />
 <code>ϵ(F∘G) = id_D</code>와 <code>η(G∘F) = id_C</code> 있으면 될 것 같은데, 왜 <code>G∘F = η(id_C)</code>가 있는지 보기 위한 사전 생각 스트레칭들입니다.</p>
 <h2 id="adjoint-펑터">Adjoint 펑터</h2>
-<p>※ 여기서는 일반적인 Adjunction이 아니라, Adjunction 관계를 이루는 두 Adjoint 펑터가 만나서 모나드가 되는 것만 보려고 합니다. 결론부터 말하면, Adjunction도 결국 얼마나 같게 볼 수 있는가에 관한 얘기입니다.</p>
+<p>※ 여기서는 Adjunction을 만드는 두 Adjoint 펑터가 만나서 모나드가 되는 것만 보려고 합니다. 결론부터 말하면, Adjunction도 결국 얼마나 같게 볼 수 있는가에 관한 얘기입니다.</p>
 <p>우리말 번역으론 “수반 함자”라고 합니다. 隨伴 따를 수, 짝 반 : 어떤 사물 현상에 따라서 함께 생기는 것. 안타깝게도 번역이 딱히 더 익숙하지도, 더 구체적인 감을 주지도 않습니다.</p>
 <p><code>C</code>,<code>D</code>는 카테고리, <code>F</code>,<code>G</code>는 펑터</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="dt">F</span><span class="op">:</span> <span class="dt">C</span> <span class="ot">-&gt;</span> <span class="dt">D</span></span>
@@ -225,7 +225,7 @@
 <h3 id="시작점으로-다시-돌아오면-동형">시작점으로 다시 돌아오면 동형</h3>
 <p>자연 변환은 한 카테고리에서 다른 카테고리로 가는 펑터를 변환하는데, 이 때 변환한 값도 원래의 도메인을 벗어나지 않습니다. <code>F∘G</code> 합성의 도메인, 코도메인을 보면 <code>id_D</code>와 같은 <code>D -&gt; D</code>로 원래 것과 같습니다. 사실은 <code>D -&gt; C -&gt; D</code>로 무려 현재 카테고리를 벗어났다가 돌아 오고 있지만, <code>id_D</code>와 같은 동작을 하게끔 하려는 게 목적입니다. 이 걸 척학적이라고 해야 할지, 인문적이라 해야 할지 모르지만, 그동안 “isomorphic하다” 라고 생각한 것들이, 시작과 끝을 제외하면 무슨 복잡한 일을 하고 있을 수 있다는 생각이 듭니다. 컴퓨터의 computation과 달리 시간이란 양이 존재하지 않는 수학 세계에서는 얼마나 오래 걸리는 작업을 하든, 시작과 끝만 같다면 같은 것이니까요. 과정은 중요하지 않고, 결과만 같으면 같은 것입니다.</p>
 <p>처음 Adjunction을 보고 떠올린 상상이, “달나라를 다녀와도 돌아 올 수만 있다면, 아무일도 일어나지 않은 걸로 해 줄게.” 입니다.</p>
-<p>지금까지는 “같음”의 정도는 완전히 같음(이 건 수학적 정의를 모릅니다.) &gt; 동형Isomorphic &gt; 준동형Homomorphic 정도의 구분을 하고 있었는데, Homomorphic 중에 Adjunction 관계의 펑터가 있는 걸 특징지을 수 있습니다.</p>
+<p>지금까지는 “같음”의 정도는 완전히 같음(이 건 수학적 정의를 모릅니다.) &gt; 동형Isomorphic &gt; 준동형Homomorphic 정도의 구분을 하고 있었는데, Homomorphic 중에 Adjunction이 있는 관계를 특징지을 수 있습니다.</p>
 <h3 id="id와-동형isomorphic은-아니지만-준동형homomorphic">id와 동형isomorphic은 아니지만 준동형homomorphic</h3>
 <p>우선, 여기선 같음의 기준을 Isomorphic으로 잡고 얘기를 이어가겠습니다.<br />
 <code>F∘G</code> 펑터 합성에서 <code>id_D</code>펑터로는 갈 수 있지만 돌아오지 못하는 자연 변환이 있고, <code>G∘F</code> 펑터 합성에서 <code>id_C</code>펑터로 갈 수 있는데, 돌아오지 못하는 자연 변환이 있는 경우를 생각해 보겠습니다. 돌아오지 못한다는 건, 무언가 처음의 정보를 잃어버렸다는 얘기입니다. 하지만, 잃어버린 정보가 그다지 필요한 정보가 아니었다면, 무시하고 같게 볼 수 있을 정도의 관계일 경우도 있습니다. 조금씩 틀어진 걸 보정하려면 언뜻 생각하기에 아래 자연 변환이 있으면 될 것처럼 보입니다.</p>
@@ -341,19 +341,19 @@
 ※ “그 시스템에서 <code>F</code>는 upto isomorphism으로 유니크해” 이렇게 한글인 척 하는 영어 문장들을 가끔 만납니다. 시스템에 조금씩 다른 <code>F</code>, <code>F'</code>, <code>F''</code>,… 들이 존재하지만, 이들을 isomorphic하게 볼 수 있는 isomorphism이 있으면, 결국 이들은 다 같은isomorphic 걸로 보고, 하나만unique 있는 것처럼 볼 수 있다는 말입니다.</li>
 <li>Natural isomorphism이 있는 관계야.<br />
 <code>C</code>, <code>D</code> 둘은 다르고, isomorphism도 없지만, 둘 간의 펑터 합성을 <code>id</code>와 같게 볼 수 있게 하는 Natural isomorphism이 있는 관계야</li>
-<li><code>C</code>, <code>D</code> 둘은 다르고, isomorphism도 없고, Natural isomorphism인 펑터 합성도 없지만, 펑터 합성을 Natural isomorphism과 비슷하게 볼 방법(변환 방법)이 존재하는 Adjunction 관계야.</li>
+<li><code>C</code>, <code>D</code> 둘은 다르고, isomorphism도 없고, Natural isomorphism인 펑터 합성도 없지만, 펑터 합성을 Natural isomorphism과 비슷하게 볼 방법(변환 방법)이 존재하는 Adjunction이 있는 관계야.</li>
 </ul>
 <p>둘이 얼마나 같은지, 얼마나 밀접한 관계인지를 표현할 수 있는 Adjunction이란 툴이 하나 더 생겼습니다.</p>
 <p>※ 아래는 과연 현실에서 동형과 달리 <strong>자연 동형</strong>이 어떤 직관으로 나타날까 고민하다 나온 상상입니다. 아래는 우선 <code>G∘F</code>만 보겠습니다.</p>
 <figure>
-<img src="../images/adjunction.jpg" alt="동형, 자연동형이 있는 관계, Adjunction 관계가 있는 관계" /><figcaption aria-hidden="true">동형, 자연동형이 있는 관계, Adjunction 관계가 있는 관계</figcaption>
+<img src="../images/adjunction.jpg" alt="동형, 자연동형이 있는 관계, Adjunction 있는 관계" /><figcaption aria-hidden="true">동형, 자연동형이 있는 관계, Adjunction 있는 관계</figcaption>
 </figure>
 <p>동형, 자연동형, Adjunctio이 있는 관계는 그림에서 빨간 변형에 따라 구분이 되는 것으로 상상하고 있습니다. (동일한 일이 <code>F∘G</code>에도 일어난다고 가정해 주세요.)</p>
 <ul>
 <li>빨간 변형이 없다면 <strong>C와 D는 동형</strong></li>
 <li>빨간 변형을 <strong><em>항상 정확히 알 수 있고, 되돌릴 수 있다면, C와 D사이에는 ID_C와 자연 동형인 펑터 G∘F 합성이 존재</em></strong>.<br />
 자연 동형이라면 <code>ID_C</code>나 <code>ID_D</code>에서 역으로 <code>F∘G</code>나 <code>G∘F</code>를 찾을 수도 있어야 하니 얼마나 변형됐는지 정보를 잃어버리면 안됩니다.</li>
-<li>빨간 변형을 버리거나 참조해서, <strong><em>어떻게든 수긍할만한 새로운 변형 생성을 허락</em></strong>한다면 <strong>C와 D는 Adjoint관계인 펑터F, G 합성이 존재</strong>하는, 혹은 Adjunction 관계의 두 펑터가 존재하는 관계.</li>
+<li>빨간 변형을 버리거나 참조해서, <strong><em>어떻게든 수긍할만한 새로운 변형 생성을 허락</em></strong>한다면 <strong>C와 D는 Adjoint관계인 펑터F, G 합성이 존재</strong>하는, 혹은 Adjunction이 존재하는 관계.</li>
 </ul>
 <p>※ 변형이 일어났다는 말은, 곧 <code>F</code>가 <code>x1</code>이란 정보를 잃어버리면서 온다는 얘기로 보입니다.</p>
 <p><code>ϵ</code>과 <code>η</code>는 <code>id</code>들과 일대일 대응이 아닙니다. 무언가 정보를 잃어버리면서 <code>id</code>와 비슷한 일을 합니다. 모나드와 마찬가지로 쓸모 없는 정보를 잃어버리거나 합치면서 같은 모양이 가능한 것들이 있다면, Adjunction으로 모델링을 시도해 볼 수 있겠습니다.</p>
