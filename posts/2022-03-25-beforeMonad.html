@@ -298,8 +298,9 @@ A. 컴비네이터 안에서 <code>m a</code>에 있던 <strong>effect1</strong>
 <span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>m <span class="op">.</span> m <span class="ot">-&gt;</span> m</span></code></pre></div>
 <p><strong>함수 타입만 봐서는 <code>a -&gt; m b</code>의 출력 <code>m b</code>와 <code>b -&gt; m c</code>의 입력 <code>b</code>를 맞춰야만 될 것 같지만, 함수의 작업 내용으로 보면 <code>m . m</code> 을 <code>m</code> 하나와 같게 보는 문제입니다. 접점에서 <code>m b</code>와 <code>b</code>가 만나는 건 어차피 컴비네이터가 일시적으로 해결하고, 진짜 문제는 작업 내용을 잃어버리지 않는 겁니다.</strong> (<code>b</code>로 가면 effect를 모두 잃어버립니다.)</p>
-<p>애초에 이 문제는 <code>m a</code>와 <code>a</code>의 문제가 아니라, effect가 두 번 겹쳐지기 때문에 <code>m (m a)</code>와 <code>m a</code>의 문제입니다.</p>
+<p>애초에 이 문제는 <code>m a</code>와 <code>a</code>의 문제가 아니라, effect가 두 번 겹쳐지기 때문에 <code>m (m a)</code>와 <code>m a</code>의 문제, 즉 <code>m . m</code>과 <code>m</code>의 문제입니다.</p>
 <p>함수 합성을 바라 보는 조금은 다른 눈이 생긴 것 같지 않나요? <em>만나는 타입이 반드시 같지 않아도 필요한 정보만 유지할 방법만 보인다면 컴비네이터를 이용해 합성<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a></em>이 가능 할 수 있습니다.</p>
+<p>(카테고리 이론에선, 아예 <code>m a</code>에서 <code>a</code>란 아무 속성도 가지지 않은 그냥 점입니다. 어떤 모피즘과 만나도 모피즘에게 영향을 미치지 않습니다. 애초에 카테고리 이론의 모나드는 <code>a</code>가 등장하지 않는,<code>m</code>에 관한 얘기입니다. <code>a</code>스럽다고 오해할 항등 펑크터 <code>id</code>가 등장하지만, 결국 <code>a</code>를 보는 것은 아닙니다. 값들이 베이스, 아래 동네고 이 값들을 주무르는 펑크터 동네가 위에 있다면, 아래 동네랑 전혀 상관 없는 윗 동네 얘기입니다. 왜 위 아래 메타포로 썼는가 하면, 나중에 lift란 말과 이어지게 하기 위함입니다.)</p>
 <blockquote>
 <p>Q. <code>m a -&gt; a</code>는 불가능한데, <code>m (m a)  -&gt; m a</code>는 왜 가능한가요?<br />
 A. 최종 결과값이 <code>a</code>가 되면 effect를 담아 둘 곳이 아예 없습니다. 하지만 <code>m a</code>라면 담아 둘 곳은 있는 상태입니다. <code>fmap</code> 내부에는 입력으로 들어온 <code>m a</code>의 effect와 <code>a -&gt; m b</code>에서 새로 만들어낸 effect, 이렇게 두 effect가 같이 있게 됩니다. 두 번의 effect를 어떻게 하나로 만들 방법만 있다면(effect algebra를 정의할 수 있다면) 하나로 만들어진 <code>effect</code>는 다시 <code>m a</code>에 담을 수 있습니다. 다시 말하지만 결과값이 <code>a</code>이면 effect를 담아둘 곳이 없습니다.<br />

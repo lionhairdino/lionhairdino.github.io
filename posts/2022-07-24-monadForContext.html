@@ -144,7 +144,7 @@ OOP에서는 outer에 해당하는 것이 오브젝트가 되어 지역적인 �
 <span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co">-- 타입이 달라 위에처럼 계속 적용할 수는 없습니다.</span></span></code></pre></div>
 <p><code>context</code>가 계속 추가되고, 타입은 <code>IntWithContext</code>로 같게 유지하면서 <code>context</code>들을 모두 잃어버리지 않아야 합니다.</p>
 <h2 id="컴비네이터">컴비네이터</h2>
-<p>서로 타입이 다르지만, 특수한 경우에는 컴비네이터(접착 함수)를 써서 합성하는 모양을 만들 수 있습니다.</p>
+<p>서로 타입이 다르지만, 컴비네이터(접착 함수)를 써서 합성하는 모양을 만들 수 있습니다. (함수 합성 <code>(.)</code>도 컴비네이터 중 하나일 뿐입니다.)</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ot">combinator ::</span> <span class="dt">IntWithContext</span> context <span class="ot">-&gt;</span> (context <span class="ot">-&gt;</span> <span class="dt">IntWithContext</span>) <span class="ot">-&gt;</span> <span class="dt">IntWithContext</span> context</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>combinator (<span class="dt">IntWithContext</span> intval context) func <span class="ot">=</span> {</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- 첫 번째 인자로 받은 IntWithContext에서 int와 context를 꺼내서</span></span>
@@ -165,7 +165,7 @@ OOP에서는 outer에 해당하는 것이 오브젝트가 되어 지역적인 �
 <p>모나드로 여러가지 <code>effect</code>를 해결할 수 있는데, 여기서는 그 중 참조 투명성, 불변성으로 인해 상태를 유지할 수 없는 문제를 모나드로 해결하는 방법을 다뤘습니다.</p>
 <h2 id="정리">정리</h2>
 <p>모나드로 상태 처리 하기<br />
-상태를 상위 스코프의 변수로 두어 유지할 방법이 없는 함수형에선, 상태를 끌고 다닐 방법이 필요합니다. 타입 자체에 <code>context</code>를 위한 공간을 만들고, 컴비네이터가 합성을 하면서 <code>context</code>를 계속 합성해주는데, 이 때 <code>context</code> 합성이 가능한 구조를 모나드라 합니다. 이렇게 하면, 프로그래머는 컴비네이터에게 상태를 끌고 다니는 것을 맡기고, 크게 신경쓰지 않아도 됩니다.</p>
+상태를 상위 스코프의 변수로 두어 유지할 방법이 없는 함수형에선, 상태를 끌고 다닐 방법이 필요합니다. 타입 자체에 <code>context</code>를 위한 공간을 만들고, 컴비네이터가 합성을 하면서 <code>context</code>를 계속 합성해 주는데, 이 때 <code>context</code> 합성이 가능한 구조를 모나드라 합니다. 이렇게 하면, 프로그래머는 컴비네이터에게 상태를 끌고 다니는 것을 맡기고, 크게 신경쓰지 않아도 됩니다.</p>
 <p>이 글에선, 모나드의 모든 걸 설명한 게 아니라, 모나드로 상태를 다루는 방법만을 설명했습니다. 모나드는 이해하기도 어렵고, 설명하기도 어렵습니다. 블로그에 몇 개의 모나드 글을 올렸는데, 모나드 이해가 어려워서 반복적으로 공부하듯이 모나드 설명도 반복적으로 하다 보면 늘지 않을까 하는 생각을 합니다. 카테고리 이론과 물려 공부하다보면 시원스럽게 이해하지 못한 것들이 쌓입니다. “내가 알고 있는 것이 과연 모나드의 본질인가?”라는 의심도 계속 들고요. 모나드를 통찰하는 글이 아니라, 이 방향에서 보는 사람도 있구나 정도의 글로 봐주시기 바랍니다.</p>
 <p>※ 위 설명에서 나오는 <code>context</code>를 모두 <code>effect</code>로 바꾸어 읽어도 됩니다만, 여기서는 <code>effect</code>중 상태<code>side effect</code>를 유지할 수 있는 패턴이란 것에 집중하도록 <code>effect</code> 대신 <code>context</code>란 용어를 사용했습니다.</p>
 

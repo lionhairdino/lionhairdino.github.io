@@ -125,10 +125,18 @@
 <p>반군semigroup에서 항등원이 추가되어 모노이드가 되면서 얻는 가장 큰 특징이, 가지고 있는 연산으로 모든 원소들을 표현할 수 있다고 생각했습니다. 예를 들어 자연수, 더하기 모노이드에서는 <code>0</code>이 있어, <code>0</code>도 <code>0 + 0</code>으로 <code>1</code>도 <code>1 + 0</code>으로 표현할 수 있습니다. 만일, 항등원 <code>0</code>이 없다면 모두 더하기 연산으로 표현할 수 없습니다. 다시 말해 <em>하나의 모양으로 추상화</em> 할 수 없습니다. 그래서, 함수형에서는 모나드란 구조까지 가져오며, 기를 쓰고 모노이드 구조로 만드는구나로 추측하고 있습니다.</p>
 <p>대화를 나눴던 여러 분들이 “오해”를 하고 있다고 하니, 분명 문제가 있는 의견일 겁니다. 정확한 이론으로 받아 들이진 마시기 바랍니다. 저의 상상일 뿐입니다. 그럼에도 글을 올리는 이유는, 틀리면 틀린대로 남아 있는 이야기를 더 이어 나갔으면 해서 입니다.</p>
 <p>2023-11-29 추가<br />
-둘이 isomorphic(혹은 같다?)는 걸 수학적으로 표현represent할 때 쓰입니다. Adjunction에선 둘이 isomorphic하다는 걸 식으로 표현하기 위해, 둘 사이에 존재하는 펑터 합성이 항등 펑터 <code>id</code>와 같다는 걸 보입니다.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- C, D 카테고리. F, G 펑터</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- id_C C에서 항등 펑터, id_D D에서 항등 펑터</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="dt">F</span>∘<span class="dt">G</span> <span class="ot">=</span> id_D, <span class="dt">G</span>∘<span class="dt">F</span> <span class="ot">=</span> id_C</span></code></pre></div>
+둘이 동형isomorphic이란(혹은 같다?) 걸 수학적으로 표현represent할 때 쓰입니다. Adjunction에선 둘이 isomorphic하다는 걸 식으로 표현하기 위해, 둘 사이에 존재하는 펑터 합성이 항등 펑터 <code>Id</code>와 같다는 걸 보이는 것으로 표현합니다.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- C, D 카테고리. F: C -&gt; D, G: D -&gt; C 펑터</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- Id_C C에서 항등 펑터, Id_D D에서 항등 펑터</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="dt">F</span>∘<span class="dt">G</span> <span class="ot">=</span> <span class="dt">Id_D</span>, <span class="dt">G</span>∘<span class="dt">F</span> <span class="ot">=</span> <span class="dt">Id_C</span></span></code></pre></div>
+<p>2023-12-05 추가<br />
+Q. 모나드에서 <code>join</code>이 연산이고, <code>return</code>이 항등원 역할을 하는 모노이드인데, <code>return</code>은 <code>a -&gt; m a</code>로 아무 것도 안하는게 아니지 않나?<br />
+A. 항등원이 아무 것도 안하는 역할을 하는 건, 스스로, 혹은 혼자만이 아니라, “연산과 만났을 때” 아무 일도 안한다는 뜻입니다. 누군가가 가지고 있는 속성은 결국 어떤 오퍼레이션(연산), 함수를 만나서 그 성질이 드러납니다. 위 생각 스트레칭에 있는 절차에 아무것도 안함이라 넣어 놓은 항등원은 결국 만나게 될 어떤 오퍼레이션에 대한 항등원이란 뜻입니다. <code>return</code>도 마찬가지로 <code>join</code>을 만나는 걸 염두에 둔 동작을 해야 합니다. 타입 모양만 봐도 바로 보입니다. <code>join</code>은 <code>m</code>을 줄이고 있으니, <code>join</code>이 아무 일도 못하게 하려면, (아무 일도 못한 것으로 만들어 버리려면) <code>return</code>은 <code>m</code>을 늘려야 합니다. <code>(+)</code>가 항상 두 개의 정보를 필요로 하는데, <code>1</code>은 하나의 정보니 여기에 <code>0</code>을 추가해 <code>1+0</code>으로 만드는 것처럼요.<br />
+항등원은 혼자서는 아무 의미도 없고, 꼭 파트너(오퍼레이션)가 누군지 알아야 의미가 생깁니다.</p>
+<p>Q. 그냥 가만히 있는 속성도 있지 않나?<br />
+A. 화면에 Display되는(우리가 알게 되는) 속성은, 속성을 화면에 내보내 누군가가 보는 것이 오퍼레이션입니다. 웃긴 영화의 속성은, 우리에게 그 속성이 닿아 느끼기 전엔 아무 의미도 없습니다.<br />
+</p>
+<p>“속성은 반드시 누군가(함수)와 만나야 의미가 있습니다.”</p>
 <h2 id="합성">합성</h2>
 <p>함수형 프로그래밍은 함수를 계속 합성해 가며 프로그램을 완성합니다. 단순히 작업의 연속성을 뜻하는 것 말고 다른 정보를 줄 때도 있습니다.</p>
 <p><code>a -&gt; b</code>와 <code>b -&gt; d</code>가 있고, 이 둘을 합성한 <code>a -&gt; d</code>가 있고,
