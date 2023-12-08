@@ -150,8 +150,8 @@ proc 전체를 프로시저, 혹은 arrow abstraction이라 부릅니다.</p>
 <p><code>rec</code> 키워드를 써서 상호 재귀 바인딩을 구현하는 것도 가능합니다.</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ot">counter ::</span> <span class="dt">ArrowCircuit</span> a <span class="ot">=&gt;</span> a <span class="dt">Bool</span> <span class="dt">Int</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>counter <span class="ot">=</span> proc reset <span class="ot">-&gt;</span> <span class="kw">do</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>        rec     output <span class="ot">&lt;-</span> returnA <span class="op">-&lt;</span> <span class="kw">if</span> reset <span class="kw">then</span> <span class="dv">0</span> <span class="kw">else</span> next</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>                next <span class="ot">&lt;-</span> delay <span class="dv">0</span> <span class="op">-&lt;</span> output<span class="op">+</span><span class="dv">1</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>        rec     output <span class="ot">&lt;-</span> returnA <span class="op">-&lt;</span> <span class="kw">if</span> reset <span class="kw">then</span> <span class="dv">0</span> <span class="kw">else</span> next <span class="co">-- output은 next에 의존</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>                next <span class="ot">&lt;-</span> delay <span class="dv">0</span> <span class="op">-&lt;</span> output<span class="op">+</span><span class="dv">1</span>                    <span class="co">-- next는 output에 의존</span></span>
 <span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>        returnA <span class="op">-&lt;</span> output</span></code></pre></div>
 <p><code>output</code>과 <code>next</code>가 서로 물고 물려 있는 상호 재귀가 딱 봐도 불편합니다.</p>
 <p><code>rec</code>는 <code>ArrowLoop</code>의 <code>loop</code> 함수로 구현되어 있습니다.</p>
