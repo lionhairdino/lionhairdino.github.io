@@ -163,17 +163,19 @@
 <p><em>여기서부턴 추측입니다.</em>
 괄호로 감싸져 있을 땐, 현재 함수 서명에서 영향이 있는 게 아니라, 나중에 들어오는 값이 진짜 <code>forall a. [a]</code> 가 들어와야 합니다. 모든 타입 중에 어느 한 타입이 아니라, 진짜로 <code>모든 타입</code>을 받을 수 있는 무언가가 들어와야 합니다.</p>
 <ol type="1">
-<li><code>No instance</code> : 클래스는 추론됐는데, 해당 타입을 키로 하는 인스턴스는 없다.</li>
+<li><code>No instance ...</code>: 클래스는 추론됐는데, 해당 타입을 키로 하는 인스턴스는 없다.</li>
 </ol>
 <ul>
+<li>서명의 다른 부분은 볼 필요 없습니다. <code>(forall a.[a])</code>만 보면 됩니다. 생각 스트레칭에서 봤듯이 <code>모든 타입</code>을 받아 리스트<code>[]</code>로 만들 수 있는 구현만 가능합니다.</li>
 <li>서명과 구현의 모순 여부 체크를 지나, 나중에 코드 조립 중 들어온 타입을 보니 <code>1</code>이 들어왔습니다.</li>
 <li><code>1</code>이란 리터럴로 추론한 타입은 <code>Num</code> 클래스의 인스턴스입니다.</li>
-<li>지금 정해지지 않은 타입, <code>모든 타입 a</code>가 <code>Num</code>의 인스턴스여야 한다는 말입니다. <code>a</code>는 <code>모든 타입</code>인데, <code>Num</code> 인스턴스 중 <em>모든 타입용 인스턴스</em>는 당연히 없습니다.</li>
+<li><code>모든 타입 a</code>가 <code>Num</code>의 인스턴스여야 한다는 말입니다. <code>a</code>는 <code>모든 타입</code>인데, <code>Num</code> 인스턴스 중 <em>모든 타입용 인스턴스</em>는 당연히 없습니다.</li>
 </ul>
 <ol start="2" type="1">
-<li><code>Couldn't match</code> : 특정 타입까지 추론됐는데, 다른 조건에서 추론된 타입과 일치하지 않는다.</li>
+<li><code>Couldn't match ...</code>: 특정 타입까지 추론됐는데, 다른 조건에서 추론된 타입과 일치하지 않는다.</li>
 </ol>
 <ul>
+<li>서명의 다른 부분은 볼 필요 없습니다. <code>(forall a.[a])</code>만 보면 됩니다. 이 것도 역시 <code>모든 타입</code>을 받아 리스트<code>[]</code>로 만들 수 있는 구현만 가능합니다.</li>
 <li>서명과 구현의 모순 여부 체크를 지나 , 나중에 코드 조립 중 들어온 타입을 보니 <code>'a'</code>가 들어왔습니다.</li>
 <li><code>'a'</code>를 보고 추론할 수 있는 타입은 <code>Char</code> 하나입니다. 구체 타입 <code>Char</code>로 추론되었습니다.</li>
 <li>지금 정해지지 않은 타입, <code>모든 a</code>는 <code>모든 타입</code>이지 하나의 구체 타입이 아닙니다. <code>모든 타입</code>과 <code>Char</code>는 매치되지 않습니다.</li>
@@ -183,7 +185,7 @@
 <p>함수 서명에 아무런 제약 없이 <code>a</code>만 써주면, GHC는 <code>a</code>를 무엇으로 결정할지 모릅니다. 반드시, <code>타입 정보</code>를 줘야 합니다.
 함수 안에서 폴리모픽 <code>a</code>를 다룰 때, 특정 클래스의 인스턴스만 다룰지, 아니면 어떤 타입이든 들어와도 처리할 수 있는지 <em>함수 서명</em>에서 알려줘야, 코드 조립할 때, 함수 내용을 보지않고 서명으로만 체크할 수 있게 됩니다. 그래서, 컴파일할 때는 함수 몸체(구현)에 있는 타입의 쓰임과 함수 서명이 일치하는지 체크하고, 나중에 다른 코드와 만날 때는 서명만 가지고 일치하는 타입이 들어오는지 체크하리라 예상합니다.<br />
 ※ 2022.10.17 추가 - 이게 non-dependent type checking이 동작하는 방식이라 합니다. <span class="citation" data-cites="Ailrun님">@Ailrun님</span> 감사합니다.<br />
-<code>forall a.</code> 를 앞에 붙여 주면, <code>아무 타입</code>이나 들어와도 처리할 수 있다는 <em>타입 정보</em>를 준 것으로 받아들입니다. <code>아무 타입</code>이나 받으려면, 구현은 <code>모든 타입</code> 대응할 수 있어야 합니다. 보통 폴리모픽하게 쓸 때 <code>forall a.</code>를 명시적으로 써주지 않지만, GHC가 안보이게 붙인다고 보면 됩니다.</p>
+<code>forall a. a</code>로 함수가 아닌 단독 <code>a</code>만을 위한 <code>foall a.</code>붙여 주면, <code>a</code>가 <code>아무 타입</code>이 될 수 있다는 말이 아니라, <em>아무 타입을 받아도 문제가 없는 구현, 즉 모든 타입에 대응하는 구현</em>이라는 타입 정보를 준 것으로 받아들입니다. <code>아무 타입</code>이나 들어와도 문제 없으려면, 구현은 <code>모든 타입</code> 대응할 수 있어야 합니다. <code>forall a.a -&gt; Bool</code>은 <code>a</code>의 구현이 아니라, <code>a -&gt; Bool</code>의 구현이 모든 타입에 대응할 수 있다는 말입니다. <code>a</code>를 아예 보지 않는 구현을 만들면 되겠지요. 보통 폴리모픽하게 쓸 때 <code>forall a.</code>를 명시적으로 써주지 않지만, GHC가 안보이게 붙인다고 보면 됩니다.</p>
 </blockquote>
 <p>2022.9.17 추가</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ot">{-# LANGUAGE RankNTypes #-}</span></span>
@@ -226,7 +228,7 @@ forall a. (Num a) =&gt; a 타입 : { 리터럴 0, 리터럴 1, 리터럴 2, … 
 </blockquote>
 <p>※ 괄호를 쓰지 않았을 때 forall의 스코프
 <a href="https://downloads.haskell.org/ghc/latest/docs/html/users_guide/exts/scoped_type_variables.html">GHC 매뉴얼</a>을 보면 <code>func1</code>은 함수 선언 전체가, 즉 <code>a -&gt; Int</code>가 <code>forall a</code>의 유효 스코프라고 합니다.</p>
-<p><em>어디에도 서명, 조립 단계 이렇게 설명된 곳은 없습니다. <code>forall a</code>를 <code>Bottom</code>값으로 설명한 자료, 또는 타입을 매개 변수로 받는 함수 등으로 설명한 자료들을 찾았지만, 서명에 있는 괄호 <code>(...)</code>에 대해 명쾌하게 설명한 곳은 아직 찾지 못했습니다.</em></p>
+<p><em>제가 본 자료들에 서명, 조립 단계 이렇게 설명한 곳은 없습니다. <code>forall a</code>를 <code>Bottom</code>값으로 설명한 자료, 또는 타입을 매개 변수로 받는 함수 등으로 설명한 자료들을 찾았지만, 서명에 있는 괄호 <code>(...)</code>에 대해 명쾌하게 설명한 곳은 아직 찾지 못했습니다.</em></p>
 <p>GHC가 폴리모픽 타입을 만나면 구체 타입으로 추론한다는 것에서 혼동이 올 수 있습니다. <code>forall</code>은 타입 추론을 해서 <code>Bool</code>을 주면 <code>Bool</code>에 맞는 동작을 하고, <code>Int</code>를 주면 <code>Int</code>에 맞는 동작을 하겠다는 게 아닙니다.
 <code>Bool</code>을 주든, <code>Int</code>를 주든 같은 동작으로 문제 없이 처리 하겠다는 겁니다.</p>
 <p>2022.10.13 추가</p>
@@ -267,8 +269,8 @@ forall a. (Num a) =&gt; a 타입 : { 리터럴 0, 리터럴 1, 리터럴 2, … 
 <span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>&lt;interactive&gt;:6:14: error:</span>
 <span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>    • Couldn't match expected type ‘Int’ with actual type ‘a’</span>
 <span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>      ‘a’ is a rigid type variable bound by</span></code></pre></div>
-<p><code>func1</code>은 어떤 타입이 들어와도 <code>Int</code>를 내뱉을 수 있습니다. =&gt; 모든 타입에 대응해서 <code>Int</code>를 뱉을 수 있습니다.
-<code>func2</code>는 반드시 “어떤 타입이 들어와도 <code>Int</code>를 내뱉을 수 있는 함수”만 들어와야 합니다.
+<p><code>func1</code>은 아무(어떤) 타입이 들어와도 <code>Int</code>를 내뱉을 수 있습니다. =&gt; 모든 타입에 대응해서 <code>Int</code>를 뱉을 수 있습니다.
+<code>func2</code>는 반드시 “아무(어떤) 타입이 들어와도 <code>Int</code>를 내뱉을 수 있는 함수”만 들어와야 합니다.
 <code>\n -&gt; 2</code>는 어떤 타입이 들어와도 <code>2</code>를 내뱉을 수 있습니다.
 <code>\n -&gt; n</code>는 <code>True</code>를 주면 <code>True</code>를 내뱉는 함수라 안됩니다.</p>
 <p><code>func1</code>은 <code>forall a. a</code> 자리에 <code>"a"</code>, <code>1</code>, <code>True</code> 등 아무 타입이나 들어오는데
@@ -278,7 +280,7 @@ forall a. (Num a) =&gt; a 타입 : { 리터럴 0, 리터럴 1, 리터럴 2, … 
 <code>func2</code>는 “모든 타입을 받을 수 있는 함수”만 받을 수 있습니다.</p>
 <p>이렇게 타입으로만 설명하면 말장난처럼 들릴 수도 있습니다.</p>
 <p>동작을 따라가며 예상하면 조금 나을 수 있습니다.<br />
-넣어 준 함수의 인자는 아직 정해지지 않았습니다. <code>func2</code> 안에서 어떤 인자가 들어 갈지(혹은 안 들어갈지) 모릅니다. 예를 들어, 나중에 <code>True</code>가 들어 갈 수도 있는데, 여기다 <code>Int -&gt; Int</code> 함수를 넣어 놓으면 문제가 생길거라 예상할 수 있습니다.</p>
+넣어 준 함수의 인자는 아직 정해지지 않았습니다. <code>func2</code> 안에서 어떤 인자를 넣어 줄지(혹은 아무 것도 안 넣어 줄지) 모릅니다. 예를 들어, 나중에 <code>func2</code>가 <code>True</code>를 넣어 줄 수도 있는데, 여기다 <code>Int -&gt; Int</code> 함수를 넣어 놓으면 문제가 생길거라 예상할 수 있습니다.</p>
 <p>다음 함수를 해석해 보면,</p>
 <div class="sourceCode" id="cb18"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="ot">func ::</span> <span class="kw">forall</span> a<span class="op">.</span> (a <span class="ot">-&gt;</span> <span class="dt">Bool</span>) <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>func f <span class="ot">=</span> <span class="kw">if</span> f <span class="dv">1</span> <span class="kw">then</span> <span class="dv">1</span> <span class="kw">else</span> <span class="dv">0</span></span></code></pre></div>
@@ -292,21 +294,22 @@ forall a. (Num a) =&gt; a 타입 : { 리터럴 0, 리터럴 1, 리터럴 2, … 
 <span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>  In the expression: if f 1 then 1 else 0</span></code></pre></div>
 <p>모든 <code>a</code>를 다룰 수 있는 함수가 들어 왔으니 <code>1</code>을 넘겨줘도 되야 할 것 같은데, 그렇게 해석되지 않습니다.</p>
 <div class="sourceCode" id="cb20"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="ot">func ::</span> <span class="kw">forall</span> a<span class="op">.</span> (a <span class="ot">-&gt;</span> <span class="dt">Bool</span>) <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="co">------(가)</span></span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>func f <span class="ot">=</span> <span class="kw">if</span> f <span class="dv">1</span> <span class="kw">then</span> <span class="dv">1</span> <span class="kw">else</span> <span class="dv">0</span></span></code></pre></div>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>func f <span class="ot">=</span> <span class="kw">if</span> f <span class="dv">1</span> <span class="kw">then</span> <span class="dv">1</span> <span class="kw">else</span> <span class="dv">0</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>            <span class="op">^^^</span> <span class="co">-- f가 1을 받고 있다!</span></span></code></pre></div>
 <p>세상에 <code>Int</code>타입과 <code>Bool</code> 타입만 있다 가정하면,
 <code>func</code>는 <code>(Int -&gt; Bool) -&gt; Int</code>도 <code>(Bool -&gt; Bool) -&gt; Int</code>도 가능한 구현이어야 합니다.
-구현에서 <code>1</code>을 넣어주고 있기 때문에 <code>(Bool -&gt; Bool)</code>인 경우에는 문제가 됩니다.</p>
+하지만, 구현에서 <code>1</code>을 넣어주고 있기 때문에 <code>(Bool -&gt; Bool)</code>인 경우에는 문제가 됩니다.</p>
 <div class="sourceCode" id="cb21"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="ot">func ::</span> (<span class="kw">forall</span> a<span class="op">.</span> a <span class="ot">-&gt;</span> <span class="dt">Bool</span>) <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="co">------(나)</span></span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>func f <span class="ot">=</span> <span class="kw">if</span> f <span class="dv">1</span> <span class="kw">then</span> <span class="dv">1</span> <span class="kw">else</span> <span class="dv">0</span></span></code></pre></div>
 <p><code>func</code>는 <code>(Int -&gt; Bool)</code>도 <code>(Bool -&gt; Bool)</code>도 가능한 함수를 받아 <code>Int</code>를 돌려줍니다.
 <code>Int</code>도, <code>Bool</code>도 받을 수 있는 함수를 받았기 때문에, 여기에 <code>1</code>을 넣는 건 문제가 되지 않습니다.</p>
 <p>이론적인 것보다 실제 동작으로 얘기하면,
 (가)는 외부에서 <code>Bool -&gt; Bool</code> 타입으로 결정된 함수가 들어오면 문제가 생기고,
-(나)는 외부에서는 모든 것이 가능한 함수가 들어오고, 내부에서 구체 타입이 결정됩니다.</p>
+(나)는 외부에서는 모든 것이 가능한 함수가 들어오고, 이 함수가 <code>Int -&gt; Bool</code>일지, <code>Bool -&gt; Bool</code>일지는 즉, 구체 타입은 내부에서 결정됩니다.</p>
 <p>그래서 “내부에서 함수가 결정되도록 하려면 <code>RankNType</code>을 쓰면 된다”고 얘기합니다. <span class="citation" data-cites="재원">@재원</span></p>
 <p>※ 위에 날짜별로 추가된 글은, 하스켈 학교에서 여러분들과 대화하며 올렸던 글들을 그대로 가져온 것입니다.</p>
 <p>2023.9.28
-<code>forall a =&gt; [a]</code>라 하면, “<code>a</code>는 무엇인지 보지 않겠어”, 혹은 “구조 안에 들어 있는 건 뭔지 관심없고, 난 구조에 관한 내용만 가지고 있어” 라고 간단히 읽을 수 있습니다. <code>a</code>가 무언가로 특정되면 안된다는 걸 컴파일러에게 알려 주는 가이드입니다.</p>
+<code>forall a.a =&gt; [a]</code>라 하면, “<code>a</code>는 무엇인지 보지 않겠어”, 혹은 “구조 안에 들어 있는 건 뭔지 관심없고, 난 구조에 관한 내용만 가지고 있어” 라고 간단히 읽을 수 있습니다. <code>a</code>가 무언가로 특정되면 안된다는 걸 컴파일러에게 알려 주는 가이드입니다.</p>
 
 <div class="comment">
 <script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
