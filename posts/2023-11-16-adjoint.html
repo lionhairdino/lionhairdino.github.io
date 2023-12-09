@@ -334,13 +334,21 @@
 <div class="sourceCode" id="cb14"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>η<span class="ot">_d ::</span> d <span class="ot">-&gt;</span> (<span class="dt">R</span> ∘ <span class="dt">L</span>) d</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>ϵ<span class="ot">_c ::</span> (<span class="dt">L</span> ∘ <span class="dt">R</span>) c <span class="ot">-&gt;</span> c</span></code></pre></div>
 <p>를 Commute가 잘 보이게 아래처럼 보고 읽었습니다.</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>η<span class="ot">_d ::</span> <span class="dt">Id_D</span> d <span class="ot">-&gt;</span> (<span class="dt">R</span> ∘ <span class="dt">L</span>) d</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>ϵ<span class="ot">_c ::</span> (<span class="dt">L</span> ∘ <span class="dt">R</span>) c <span class="ot">-&gt;</span> <span class="dt">Id_C</span> c</span></code></pre></div>
-<p><code>unit</code>은 모나드의 <code>return</code><br />
-<code>counit</code>은 코모나드의 <code>extract</code><br />
-</p>
-<p>모든 adjoint 펑터 쌍은 모나드와 코모나드를 정의합니다. 모든 모나드와 코모나드는 adjoint 쌍으로 분해factorize할 수 있는데, 반드시 유니크한 하나의 쌍으로 나오지 않을 수 있다고 합니다.</p>
-<p>늘상 모나드를 쓰지만, Adjunction은 거의 쓰지 않는 이유가, adjoint 펑터 쌍으로 분해하면, Hask 카테고리를 벗어나는 무언가를 표현해야 해서 안 쓰이고, 엔도펑터만 등장하는 Adjunction만 표현할 수 있습니다.</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>η<span class="ot">_d ::</span> <span class="dt">Id_D</span> d <span class="ot">-&gt;</span> (<span class="dt">R</span> ∘ <span class="dt">L</span>) d <span class="co">-- Id_D -&gt; R∘L</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>ϵ<span class="ot">_c ::</span> (<span class="dt">L</span> ∘ <span class="dt">R</span>) c <span class="ot">-&gt;</span> <span class="dt">Id_C</span> c <span class="co">-- L∘R -&gt; Id_C</span></span></code></pre></div>
+<p><code>R∘L</code>을 <code>m</code>으로, <code>L∘R</code>을 <code>w</code>(<code>m</code>을 뒤집은)로 놓으면,<br />
+<code>unit</code>은 모나드의 <code>return : a -&gt; m a</code><br />
+<code>counit</code>은 코모나드의 <code>extract : w a -&gt; a</code><br />
+가 됩니다.</p>
+<p>모든 adjoint 펑터 쌍은 모나드와 코모나드를 정의합니다. 모든 모나드와 코모나드는 adjoint 쌍으로 분해factorize할 수 있는데, 반드시 유니크한 하나의 쌍으로 나오지 않을 수 있습니다.</p>
+<p>늘상 모나드를 쓰지만, Adjunction은 거의 쓰지 않는 이유가, adjoint 펑터 쌍으로 분해하면, Hask 카테고리를 벗어나는 무언가를 표현해야 해서 안 쓰이고, 하스켈에선 엔도펑터만 등장하는 Adjunction만 표현할 수 있습니다.</p>
+<h3 id="예시">예시</h3>
+<div class="sourceCode" id="cb16"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">State</span> s a <span class="ot">=</span> <span class="dt">State</span>{<span class="ot">runState ::</span> s <span class="ot">-&gt;</span> (a, s)}</span></code></pre></div>
+<p>adjoint 펑터 두개를 찾아야 하는데, 굉장한 이론을 갖다 대기 전에 직관을 보겠습니다. <code>State</code>모나드가 하는 일은,</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>(가)상태 s를 받아서</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>-- 결과값 a와 같이 끌고 다니기 위해</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>(나)a와 s를 2튜플로 만듭니다.</span></code></pre></div>
+<p>이렇게 직관적으로 두 단계로 나눌 수 있습니다. 코드로 쓰면 (가)<code>s -&gt;</code>, (나) <code>(, s)</code>입니다. 더 변환이나 수정없이 바로 (가)가 Left adjoint 펑터고, (나)가 Right adjoint 입니다. (웬일로 직관하고 조금도 빗나감 없이 딱 맞아 떨어집니다.) 모나드에서 모노이드의 이항연산을 두 단계로 쪼개 보던 거랑 연관성이 있지 않을까요? <span class="citation" data-cites="todo">@todo</span></p>
 <h2 id="요약">요약</h2>
 <p><code>C</code>, <code>D</code> 둘이 얼마나 같은데?</p>
 <ul>
@@ -384,50 +392,28 @@
 <p>hom-sets의 자연 동형으로 Adjunctions을 정의할 수 있습니다. universal construction과 밀접하게 연결 됩니다. 여러 구성 절차construction로 <strong>분해factorize</strong>될 수 있는 고유한 사상이 있다는 말을 들으면, 어떤 집합과 hom-set간의 매핑이 있구나라고 생각하면 됩니다.?</p>
 <p>자연 변환은 모피즘과 가환 다이어그램을 매핑합니다.</p>
 <p>분명한 목적을 알려 주면 상상하는데 도움이 됩니다. 목표는 <code>C</code>와 <code>D</code>가 동형인가를 보기 위한 게 목표지만, 최종 목표 전에 중간 목표를 이렇게 잡을 수 있습니다. <code>C</code>에 있는 <code>L d -&gt; c</code> 모피즘과 <code>D</code>에 있는 <code>d -&gt; R c</code> 모피즘을 동형으로 볼 수 있는가 입니다.</p>
-<p><code>C</code>에서 <code>L d</code>와 임의의 <code>c</code>를 잡으면, 그 둘 사이에 모피즘이 반드시 하나만 있는 게 아닙니다. 하나도 없을 수도, 여러 개일 수도 있습니다. 이 걸 hom-set <code>C(L d, c)</code>로 표현합니다. 이 hom-set의 도착지인 <code>c</code>를 <code>R c</code>로 <code>D</code>의 대상 중 하나와 매핑하면 아래같은 가환 다이아그램이 나옵니다. <code>L, L d -&gt; c, R</code>로 가는 길과, <code>d -&gt; R c</code>로 가는 길이 commute함이 보입니다. 이렇게, <code>C(L d, c)</code>와 <code>D(d, R c)</code> 사이에 isomorphism이 있으면 <code>L</code>, <code>R</code>로 Adjunction을 만들 수 있습니다.</p>
+<p><code>C</code>에서 <code>L d</code>와 임의의 <code>c</code>를 잡으면, 그 둘 사이에 모피즘이 반드시 하나만 있는 게 아닙니다. 하나도 없을 수도, 여러 개일 수도 있습니다. 이 걸 hom-set <code>C(L d, c)</code>로 표현합니다. 이 hom-set의 도착지인 <code>c</code>를 <code>R c</code>로 <code>D</code>의 대상 중 하나와 매핑하면 아래같은 가환 다이아그램이 나옵니다.</p>
+<p><span class="citation" data-cites="todo">@todo</span> Hom-set으로 Adjucntion 정의하는 그림 추가</p>
+<p><code>L, L d -&gt; c, R</code>로 가는 길과, <code>d -&gt; R c</code>로 가는 길이 commute함이 보입니다. 이렇게, <code>C(L d, c)</code>와 <code>D(d, R c)</code> 사이에 isomorphism이 있으면 <code>L</code>, <code>R</code>로 Adjunction을 만들 수 있습니다.</p>
 <p>카테고리 <code>C</code>에서 카테고리 <code>Set</code>으로 가는 펑터 <code>(가)</code>, <code>(나)</code> 사이의 <strong>자연 변환</strong>과 (각 <code>c</code>마다 hom-set을 대상으로 갖고 있는 <code>Set</code> 카테고리의 hom-set 하나와 매핑한다고 볼 수 있으니, <code>C -&gt; Set</code> 평터입니다.)</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>c -&gt; C(L d, c) 펑터(가) -------- φ 자연변환 --------&gt; c -&gt; D(d, R c) 펑터(나)</span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>c -&gt; C(L d, c) 펑터(가) -------- φ 자연변환 --------&gt; c -&gt; D(d, R c) 펑터(나)</span></code></pre></div>
 <p>카테고리 <code>D</code>에서 카테고리 Set으로 가는 펑터 <code>(다)</code>, <code>(라)</code> 사이의 <strong>자연 변환</strong></p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>d -&gt; C(L d, c) 펑터(다) -------- Ψ 자연변환 --------&gt; d -&gt; D(d, R c) 펑터(라)</span></code></pre></div>
-<p><code>φ</code>와 <code>Ψ</code>가 서로의 역invertible이 된다고 합니다.(자연 변환은 정의역과 치역이 같아야 하는데, <code>φ</code>와 <code>Ψ</code>는 도메인이 다르지 않나? <span class="citation" data-cites="todo">@todo</span> 작성 중…)</p>
-<p>※ <code>c</code>가 모두 출력 쪽에 있으니 이럴 땐 covariant 펑터라 하고, <code>d</code>는 모두 입력 쪽에 있으니 contravariant 펑터라 합니다. 모른다면, 여기선 일단 넘어가도 될 것 같습니다. 참고 - <a href="../posts/2022-11-10-coContraVarint.html">Covariant, Contravariant, Positive, Negative</a></p>
-<p>hom-set을 이용한 정의를 쫓아가면 <code>η: G∘F &lt;- Id_C</code>가 화살표가 당연하게 뒤집혀져 있어야 하는 게 보이긴 하나, 아직도 찜찜합니다. 처음, Adjunction 개념을 세운 학자는 왜 이런 생각을 했을까요? 첫 번째 방식의 정의를 쫓아가 보면, 화살표가 뒤집힌 것만 나오는 게 아닙니다. 여러가지 조합이 가능한데, 왜 하필 그 중 Adjunction 관계인 것에만 이름을 붙였을까요?</p>
-<h2 id="속-뜻삭제-예정">속 뜻(삭제 예정)</h2>
-<p>펑터 카테고리에선 자연 변환 모피즘입니다. 항등 자연 변환이 무려 옆동네를 갔다 오고 있을 수도 있다는 말입니다. 아무 일도 안하는 항등이 어딜 갔다 오는 것일 수도 있다니… 밑에 깔린 속 뜻이 뭘까요?</p>
-<ol type="1">
-<li>일단, 아래서 생각을 시작해 보겠습니다.</li>
-</ol>
-<div class="sourceCode" id="cb18"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>   C                D</span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>   X ----- F ----&gt; F(X)</span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>   |                |</span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>   f               F(f)   </span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>   |                |</span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>   V                V</span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>   Y ----- F ----&gt; F(Y)</span></code></pre></div>
-<p><code>G</code>가 <code>F</code>의 역inverse매핑 동작을 한다면,</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a> GF(X) &lt;--- G ---- F(X)</span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>   |                |</span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a> GF(f)             F(f)   </span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>   |                |</span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>   V                V</span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a> GF(Y) &lt;--- G ---- F(Y)</span></code></pre></div>
-<p><code>GF = Id_C</code>가 됩니다. 역도 마찬가지로 <code>FG = Id_D</code>가 됩니다.<br />
-<code>C</code>와 <code>D</code>는 동형입니다.</p>
-<ol start="2" type="1">
-<li><code>F:C -&gt; D</code>, <code>G:D -&gt; C</code> 라는 서로 반대 뱡향의 펑터가 있기는 하지만, <code>C</code>와 <code>D</code>가 동형이 아니라면, 이들의 조합이 <code>Id</code>스런 일을 못합니다. 모피즘 <code>f: X -&gt; Y</code>와 모피즘 <code>F(f): F(X) -&gt; F(Y)</code>는 동형이 아닙니다. 그런데, 여기서 <strong>반짝이는 기술</strong>이 들어 갑니다.</li>
-</ol>
-<div class="sourceCode" id="cb20"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>   X' &lt;---- G ----- F(X)   F(X)</span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>   |                         |</span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>   X                         |</span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>   |                       F(f)</span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>   f                         |     </span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>   |                         |</span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>   V                         V</span>
-<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>   Y ------ F ----&gt; F(Y)   F(Y)</span></code></pre></div>
-<p>동형은 아니지만, <code>G</code>펑터가 있으니 되돌아 갈 방법이 아예 없는 건 아닙니다. <code>G</code>로 한 번에 <code>X</code>에 도착하지 못하지만, <code>X'-&gt;X</code>만 있다면, 왼쪽 디귿자 모피즘과, 오른쪽 일자 모피즘이 <del>같은</del> 비슷한 결과를 가져옵니다. 동형만큼 같은 결과를 내진 않지만, 그렇다고 아무 관계가 없다고 하기엔 너무 밀접한 관계가 있습니다. 적어도 <code>X</code>, <code>Y</code>는 같은 결과를 낼 수는 있으니까요. (눈으로 보기엔 같아 보여도 <code>F</code>펑터의 효과를 <code>G</code>로 지웠다, 다시 <code>F</code>로 만들어 냅니다. 원래 있든 <code>F</code>와 동일한 정보를 가지고 있을 거란 보장이 없으니, 가환은 아닙니다.)</p>
-<p>※ <code>G</code>가 정보를 잃어버리면서 <code>F(X) -&gt; X</code>일 수도 있으니, 완전히 가환하지는 않습니다. 화살표가 가환할 것 같은 경로를 만든다고 다 가환인 건 아닌가 봅니다. 펑터는 homomorphic이란 제약만 있습니다. 펑터 합성들을 쫓아 갈 때, 계속 정보를 잃어버리면서 합성되고 있을 수도 있습니다. 다이어그램에서 가환하다를 항상 대수의 <code>=</code>equal처럼 볼 순 없나 봅니다. 참고 - <a href="https://www.math3ma.com/blog/commutative-diagrams-explained">Commutative Diagrams Explained - math3ma</a><br />
-<code>ϵ*η = id</code> 가 안됩니다.(왜 둘을 합성하려 하려고 할까?) <code>ϵ :: L∘R -&gt; I_C</code> 고, <code>η :: I_D -&gt; R∘L</code> 이라 타입이 안맞아 합성할 수 없습니다. 여기에 <code>L</code>과 <code>R</code>을 적절히 끌어다 쓰면, 합성 모양을 얻을 수 있습니다.</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>d -&gt; C(L d, c) 펑터(다) -------- Ψ 자연변환 --------&gt; d -&gt; D(d, R c) 펑터(라)</span></code></pre></div>
+<p><code>φ</code>와 <code>Ψ</code>가 서로의 역invertible이 된다고 합니다.</p>
+<p><code>L</code>, <code>R</code> 두 펑터 조합이 <code>C</code>, <code>D</code>에 있는 모피즘(여기선 hom-set)에 대해서 <code>Id</code>스런 일을 할 수 있게, 두 모피즘의 차이를 자연 변환으로 나타내려는 게 목적입니다.</p>
+<blockquote>
+<p>Q. 자연 변환은 정의역과 치역이 같아야 하는데, <code>φ</code>와 <code>Ψ</code>는 도메인이 다르지 않나?<br />
+A. 도착지 hom-set <code>C(L d, c)</code>, <code>D(d, R c)</code>는 카테고리 <code>Set</code>의 대상이라 보고, <code>C</code>카테고리의 대상<code>c</code>와 <code>Set</code>카테고리의의 대상을 매핑한 펑터 사이의 자연 변환은 결국 <code>Set</code>카테고리의 모피즘입니다. 마찬가지로 <code>d</code>와 <code>Set</code>을 매핑하는 펑터 사이의 모피즘도 <code>Set</code>카테고리의 모피즘입니다. 이 둘 모피즘 모두 <code>Set</code>에 있으니 합성할 수 있습니다. 합성한 것이 isomorphism이 되면, 돌고 돌아왔지만 <code>C</code>와 <code>D</code>를 isomorphic처럼 볼 수 있게 됩니다.<br />
+<strong>카테고리</strong>가 같은가(얼마나 닮았나)를 보려면, 둘 사이를 오가는<br />
+<strong>펑터 조합</strong>이 Id_C, Id_D와 같은 게 있는지를 보고,<br />
+없다면, 같게 만들 수 있는<br />
+<strong>펑터 조합</strong>과 Id_C, Id_D 사이의<br />
+<strong>자연 변환</strong>을 봅니다.</p>
+<p>지금 수준으로 보기엔, 카테고리 이론은 결국 자연 변환 놀음 같습니다.</p>
+</blockquote>
+<p>※ <code>c</code>가 모두 출력 쪽에 있을 땐 covariant 펑터라 하고, <code>d</code>는 모두 입력 쪽에 있으니 contravariant 펑터라 합니다. 여기서 급하게 알아야 될 건 아닐 겁니다. 참고 - <a href="../posts/2022-11-10-coContraVarint.html">Covariant, Contravariant, Positive, Negative</a></p>
+<p>hom-set을 이용한 정의를 쫓아가면 <code>η: G∘F &lt;- Id_C</code>가 화살표가 당연하게 뒤집혀져 있어야 하는 게 보이긴 하나, 아직도 찜찜합니다. 처음, Adjunction 개념을 세운 학자는 왜 이런 생각을 했을까요? 첫 번째 방식의 정의를 쫓아가 보면, 화살표가 뒤집힌 것만 나오는 게 아닙니다. 여러가지 조합이 가능한데, 왜 하필 그 중 Adjunction 인 것에만 이름을 붙였을까요?</p>
+<p>글이 길어져 별도의 글로 올렸습니다. <a href="../posts/2023-12-05-adjunction_arrow_meaning.html">Adjunction에서 η와 ϵ의 화살표 방향이 반대인 이유</a></p>
 
 <div class="comment">
 <script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
