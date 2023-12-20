@@ -4,10 +4,10 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-        <title>lionhairdino - Hom Functor (스케치 중)</title>
+        <title>lionhairdino - 홈펑터Hom Functor와 요네다 보조 정리Yoneda lemma(작성 중)</title>
 
-        <meta name="description" content="lionhairdino - Hom Functor (스케치 중)" />
-        <meta property="og:description" content="하스켈 함수형 프로그래밍" />
+        <meta name="description" content="다른 수학 배경 지식 없이, 오로지 카테고리 이론으로만 풀어 나갔습니다. 최종 목표는 Lens에 Yoneda lemma 아이디어를 적용했는지를 보는 것입니다." />
+        <meta property="og:description" content="다른 수학 배경 지식 없이, 오로지 카테고리 이론으로만 풀어 나갔습니다. 최종 목표는 Lens에 Yoneda lemma 아이디어를 적용했는지를 보는 것입니다." />
 
         <link rel="stylesheet" type="text/css" href="../css/default.css" />
         <link rel="icon" href="https://lionhairdino.github.io/favicon.svg" />
@@ -33,13 +33,13 @@
         <meta name="msapplication-TileColor" content="#ff7500" />
         <meta name="theme-color" content="#ffffff" />
         <meta property="og:type" content="website" />
-        <meta property="og:title" content="Hom Functor (스케치 중)" />
+        <meta property="og:title" content="홈펑터Hom Functor와 요네다 보조 정리Yoneda lemma(작성 중)" />
         <meta property="og:site_name" content="Lionhairdino" />
         <meta property="og:url" content="https://lionhairdino.github.io/posts/2023-12-16-homFunctor.html" />
 
         <meta property="og:image" content="https://lionhairdino.github.io/images/state400px.png" />
 
-      <meta name="keywords" content="hom-set, functor">
+      <meta name="keywords" content="hom-set, functor, hom-functor, 홈펑터, 요네다 렘마, 요네다 보조 정리, Covariant, Contravariant">
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-E9WZ6VXGHP"></script>
 <script>
@@ -74,7 +74,7 @@
             </div>
         </div>
         <div class="js-toc-content">
-            <h1>Hom Functor (스케치 중)</h1>
+            <h1>홈펑터Hom Functor와 요네다 보조 정리Yoneda lemma(작성 중)</h1>
             <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
 <div class="info">
     Posted on December 16, 2023
@@ -122,15 +122,15 @@
 <li>새로운 구조 안에 있는 대상에 <code>f</code>를 적용한다고 해석하기도 합니다. <code>(a -&gt; b) -&gt; f a -&gt; f b</code></li>
 </ul>
 <blockquote>
-<p>주의: 함수 안에 들어 있는 걸 바꾸는 건 다른 문제입니다. 한참 헤맸는데, <code>Maybe x</code>일 때 <code>fmap</code>으로 <code>x</code>에 함수를 적용할 순 있어도, <code>Maybe (x -&gt; y)</code>에선 함수를 깨버리고 들어갈 수가 없습니다. <code>x</code>와 <code>y</code>는 보이지 않습니다. <code>(x -&gt; y)</code> 자체가 대상object입니다. 대상을 변형할 수는 없고, 전에 합성을 하든, 후에 합성을 하는 수 밖에 없습니다.</p>
+<p>주의: 함수 안에 들어 있는 걸 바꾸는 건 다른 문제입니다. 한참 헤맸는데, <code>Maybe x</code>일 때 <code>fmap</code>으로 <code>x</code>에 함수를 적용할 순 있어도, <code>Maybe (x -&gt; y)</code>에선 함수를 깨버리고 들어갈 수가 없습니다. <code>x</code>와 <code>y</code>는 보이지 않습니다. <code>(x -&gt; y)</code> 자체가 대상object입니다. 대상을 변형할 수는 없고, 전에 합성을 하든, 후에 합성을 하는 수 밖에 없습니다. 안에 있는 <code>x</code>에 <code>f</code>를 적용한다는 메타포로 보면, <code>Maybe</code> 안에 있는 <code>(x -&gt; y)</code>에 <code>f</code>를 적용할 순 있어도, 더 들어가 <code>x</code>에 적용할 순 없습니다.</p>
 </blockquote>
-<p><code>A-&gt;</code><strong>X</strong>를 변환해서 <code>A-&gt;</code><strong>Y</strong>가 되게 하려면, <code>A-&gt;</code><strong>X</strong> 다음에 <code>f:</code> <strong>X</strong><code>-&gt;</code><strong>Y</strong>를 합성(<strong>X - &gt;Y ∘ A - &gt;X</strong>)하면 됩니다. 또는 새로운 구조 <code>A-&gt;</code><strong>X</strong> 안 쪽에 있는 <strong>X</strong>에 <code>f</code>를 적용하는 것이 아니라, <code>A-&gt;X</code>의 결과로 함수를 빠져나올 <code>X</code>에 <code>f</code>를 적용합니다.</p>
-<p>하나의 <strong>hom-Set</strong> <code>Hom(A,X)</code>에 들어 있는 모피즘(:<strong>A -&gt; X</strong>)을 <code>g1</code>, <code>g2</code>, <code>...</code> 라 하면, <strong>Hom-Functor</strong> <code>Hom(A,-)</code>는 이 모피즘들을 각 각 <code>f:</code><strong>(X -&gt; Y) ∘</strong>와 합성합니다. 결국 <strong>hom-set</strong> <code>Hom(A,Y)</code>에 있는 모피즘(:<strong>A -&gt; Y</strong>) <code>f∘g1</code>, <code>f∘g2</code>, <code>...</code>로 매핑하는 모양이 됩니다.</p>
+<p><code>A-&gt;</code><strong>X</strong>를 변환해서 <code>A-&gt;</code><strong>Y</strong>가 되게 하려면, <code>A-&gt;</code><strong>X</strong> 다음에 <code>f:</code> <strong>X</strong><code>-&gt;</code><strong>Y</strong>를 합성(<strong>(X-&gt;Y) ∘ (A-&gt;X)</strong>)하면 됩니다. 또는 새로운 구조 <code>A-&gt;</code><strong>X</strong> 안 쪽에 있는 <strong>X</strong>에 <code>f</code>를 적용하는 것이 아니라, <code>A-&gt;X</code>의 결과로 함수를 빠져나올 <code>X</code>에 <code>f</code>를 적용합니다.</p>
+<p>하나의 <strong>hom-Set</strong> <code>Hom(A,X)</code>에 들어 있는 모피즘(:<strong>A-&gt;X</strong>)을 <code>g1</code>, <code>g2</code>, <code>...</code> 라 하면, <strong>Hom-Functor</strong> <code>Hom(A,-)</code>는 이 모피즘들을 각 각 <code>f:</code><strong>(X-&gt;Y) ∘</strong>와 합성합니다. 결국 <strong>hom-set</strong> <code>Hom(A,Y)</code>에 있는 모피즘(:<strong>A-&gt;Y</strong>) <code>f∘g1</code>, <code>f∘g2</code>, <code>...</code>로 매핑하는 모양이 됩니다.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>g1 ----&gt; f∘g1</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>g2 ----&gt; f∘g2</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>...</span></code></pre></div>
 <p>※ 모피즘 매핑을 보면 <code>X</code> <strong>-&gt;</strong> <code>Y</code>에 펑터를 적용한 결과가 <code>...X...</code> <strong>-&gt;</strong> <code>...Y...</code> 그대로여서 Covariant 펑터라 합니다.</p>
-<p>(※ 보통 카테고리 이론에서는 대상을 구조가 없는, 아무 성질도 없는 점 쯤으로 생각합니다. 그런데, 만일 <code>Hom(A,-)</code> 펑터를 적용하니, 위에 같은 합성 성질이 나왔다면, 대상이 <code>A -&gt; X</code>를 가지고 있다고 유추할 수 있을 것 같습니다. 이렇게 생각하는 게 맞는지 모르겠습니다.)</p>
+<p>(※ 보통 카테고리 이론에서는 대상을 구조가 없는, 아무 성질도 없는 점 쯤으로 생각합니다. 그런데, 만일 <code>Hom(A,-)</code> 펑터를 적용하니, 위에 같은 합성 성질이 나왔다면, 대상이 <code>A-&gt;X</code>를 가지고 있다고 유추할 수 있을 것 같습니다. (검증 필요))</p>
 <h2 id="hom---b-c---set">Hom (-, B) : C -&gt; Set</h2>
 <p><code>B</code>는 일단 고정한 채로<br />
 <code>Hom(-,B)</code>는 아래와 같이 매핑하는 펑터입니다.<br />
@@ -140,11 +140,11 @@
 <p>모피즘 매핑을 보겠습니다.<br />
 (1) <code>h:X -&gt; Y</code> —&gt; <code>Hom(</code><strong>h</strong><code>,B): Hom(</code><strong>X</strong><code>,B) -&gt; Hom(</code><strong>Y</strong><code>,B) -- ???</code><br />
 (2) <code>h:X -&gt; Y</code> —&gt; <code>Hom(</code><strong>h</strong><code>,B): Hom(</code><strong>Y</strong><code>,B) -&gt; Hom(</code><strong>X</strong><code>,B)</code><br />
-(1)처럼 Covariant하게 정의하면 될 것 같은데, (2)로 Contravariant하게 정의하고 있습니다. <strong><em>왜 이렇게 정의했을까요?</em></strong> (1)이 뭐가 문제인지 보기 위해, (1)로 정의해 보겠습니다. <code>X-&gt;B</code> 모피즘을 <code>Y-&gt;B</code>로 바꾸려 합니다. 어떤 변환 과정을 거치든 시작이 <code>Y</code>이고 끝이 <code>B</code>입니다. <code>X-&gt;Y</code>와 <code>X-&gt;B</code>만 가지고선 <strong>시작에 Y</strong>를 둘 방법이 없습니다. <strong>끝에 B</strong>를 둘 수 있는 <code>X-&gt;B</code>는 있으니, <code>∘ (Y-&gt;X)</code>가 있으면 딱입니다. <code>h^op:Y-&gt;X</code>가 필요합니다. <code>X-&gt;B</code>모피즘을 <code>g1</code>, <code>g2</code>, …라 하면, <code>g1∘h^op</code>, <code>g2∘h^op</code>, …와 매핑합니다. 결국, 함수의 입력 쪽에 <code>X</code>가 있다면 Contravariant한 정의만 가능합니다.</p>
+(1)처럼 Covariant하게 정의하면 될 것 같은데, (2)로 Contravariant하게 정의하고 있습니다. <strong><em>왜 이렇게 정의했을까요?</em></strong> (1)이 뭐가 문제인지 보기 위해, (1)로 정의해 보겠습니다. <code>X-&gt;B</code> 모피즘을 <code>Y-&gt;B</code>로 변환하려 합니다. 어떤 변환 과정을 거치든 시작이 <code>Y</code>이고 끝이 <code>B</code>입니다. <code>X-&gt;Y</code>와 <code>X-&gt;B</code>만 가지고선 <strong>시작에 Y</strong>를 둘 방법이 없습니다. <strong>끝에 B</strong>를 둘 수 있는 <code>X-&gt;B</code>는 있으니, <code>∘ (Y-&gt;X)</code>가 있으면 딱입니다. <code>h^op:Y-&gt;X</code>가 필요합니다. <code>X-&gt;B</code>모피즘을 <code>g1</code>, <code>g2</code>, …라 하면, <code>g1∘h^op</code>, <code>g2∘h^op</code>, …와 매핑합니다. 결국, 함수의 입력 쪽에 <code>X</code>가 있다면 Contravariant한 정의만 가능합니다.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>g1 ----&gt; g1∘h^op</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>g2 ----&gt; g2∘h^op</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>...</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>-- 텍스트에선 아예 h: Y -&gt; X로 두고 설명을 시작합니다. 그러면</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>-- 텍스트에선 아예 h: Y -&gt; X로 뒤집어서 두고 설명을 시작합니다. 그러면</span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>g1 ----&gt; g1∘h</span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>g2 ----&gt; g2∘h</span>
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>...</span></code></pre></div>
@@ -160,21 +160,25 @@
 <p>로 볼 수 있습니다.<br />
 <code>X-&gt;X</code>를 변환해서 <code>X-&gt;Y</code>로 만든다면, Contravariant를 없애고,<br />
 <code>X-&gt;X</code>를 변환해서 <code>Y-&gt;X</code>로 만든다면, Covariant를 없앱니다.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>          X-&gt;X ---&gt; X-&gt;Y ----------&gt; X-&gt;Y </span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>Y-&gt;X ---&gt; X-&gt;X           ----------&gt; Y-&gt;X </span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>Contra               Co</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>          X-&gt;X ---&gt; X-&gt;Y ----------&gt; X-&gt;Y </span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>Y-&gt;X ---&gt; X-&gt;X           ----------&gt; Y-&gt;X </span></code></pre></div>
 <p>대상 속에 <code>-&gt;</code>가 있다면, “Contravariant는 항상 따라다니고 있던 것이었다”라고 상상해 봤습니다.</p>
 </blockquote>
 <p>※ 모피즘 매핑을 보면 <code>X</code> <strong>-&gt;</strong> <code>Y</code>에 펑터를 적용한 결과가 방향이 뒤집어진 <code>...Y...</code> <strong>-&gt;</strong> <code>...X...</code>여서 Contravariant 펑터입니다. 입력이었던 것이 출력이 되고, 출력이었던 것이 입력이 되었습니다.</p>
 <p>참고 - <a href="../posts/2022-11-10-coContraVarint.html">Covariant, Contravariant, Positive, Negative</a></p>
 <h3 id="natural-manner">Natural Manner</h3>
 <p>첫 번째 인자를 고정하면 Covariant 펑터를 주고, 두 번째 인자를 고정하면 Contravariant 펑터를 줍니다. (위 설명하고 헛갈리지 말아야 합니다. variant한 값이 어디 있는지를 봐야 합니다.)</p>
-<p><code>Hom(A, -)</code>, <code>Hom(-, B)</code>는 다음과 같은 가환 다이어그램이 성립합니다. <code>f: B -&gt; B'</code>, <code>h:A' -&gt; A</code>에서 아무거나 짝지으면</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>Hom(A,B) -----Hom(h,B)-----&gt; Hom(A',B)</span>
+<p><code>Hom(A, -)</code>, <code>Hom(-, B)</code>는 다음과 같은 가환 다이어그램이 성립합니다. <code>f: B -&gt; B'</code>, <code>h:A' -&gt; A</code>에서 아무거나 짝지으면 ※ <a href="https://en.wikipedia.org/wiki/Hom_functor">위키 Hom functor</a>에서 발췌</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>Hom(A,B) -----Hom(h,B)-----&gt; Hom(A',B)     -&gt; Hom(-,B) 변환</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>   |                            |</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>   | Hom(A,f)                   | Hom(A',f)</span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>   |                            |</span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>   V                            V</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>Hom(A,B') ----Hom(h,B')----&gt; Hom(A',B')</span></code></pre></div>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>Hom(A,B') ----Hom(h,B')----&gt; Hom(A',B')    -&gt; Hom(-,B')로 변환</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>   |                            |</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>   V                            V</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>Hom(A,-)로 변환              Hom(A',-)로 변환</span></code></pre></div>
 <p>양 쪽 경로 모두 <code>g:A -&gt; B</code>를 <code>f∘g∘h:A' -&gt; B'</code>로 보냅니다. (※ 하나는 covarint, 하나는 Contravariant로 정의한 덕에 <code>f∘g∘h</code> 모양으로 합성할 수 있게 됐습니다.) 이 가환이 갖는 의미가 뭘까요? Covariant 펑터 <code>Hom(A,-)</code>를 적용한 후에 Contravariant 펑터 <code>Hom(-,B)</code>를 적용하나, Contravariant 펑터를 적용 후 Covariant 펑터를 적용하나 결과가 같습니다. 이 걸 Natural Manner라고 부릅니다.</p>
 <p>두 펑터를 합친 <code>Hom(-,-)</code>는 바이펑터bifunctor입니다. <code>C</code>카테고리에서 한 번만 뽑는게 아니라, 두 번 뽑아아야 하니 <code>C × C</code>에서 <code>Set</code>으로 가는 바이펑터인데, 첫 번째 인자를 고정하면 Covariant하고, 두 번째 인자를 고정하면 Contravariant합니다.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>Hom(-,-): C^op × C -&gt; Set</span></code></pre></div>
@@ -193,20 +197,20 @@
 <code>C-&gt;D</code>인 <code>F</code>펑터와 <code>G</code>펑터가 Naturality Condition(Square)을 만족한다고 하면, 이 걸로 뭘 알 수 있을까요? <code>F</code>와 <code>G</code> 모두 <code>C</code>의 구조를 보존한채로 <code>D</code>에 상image을 만듭니다. 이 두 상은 <strong><em>구조가 같습니다.</em></strong><br />
 </p>
 </blockquote>
-<h2 id="요네다-보조-정리yoneda-lemma">요네다 보조 정리Yoneda Lemma</h2>
-<p>이제 요네다 보조 정리를 볼 준비가 끝났습니다. 짧은 지식에 꾸역 꾸역 이해하려고 하는 이유는, Lens 때문입니다. Lens에서 get, set 인터페이스를 하나의 형태로 통일하기 위해 쓴 “테크닉”이 바로 요네다 보조 정리라 하니, 궁금해서 붙들고 있습니다. 참고 - <a href="../posts/2021-05-13-lens.html">Lens - 펑크터의 독특한 활용</a></p>
+<h2 id="요네다-보조-정리yoneda-lemma">요네다 보조 정리Yoneda lemma</h2>
+<p>이제 요네다 보조 정리를 볼 준비가 끝났습니다. 짧은 지식에 카테고리 이론의 정수라는 요네다 보조 정리를 꾸역 꾸역 이해하려고 하는 이유는, Lens 때문입니다. Lens에서 get, set 인터페이스를 하나의 형태로 통일하기 위해 쓴 “테크닉”이 바로 요네다 보조 정리라 하니, 궁금해서 붙들고 있습니다. (참고 - 요네다 보조 정리에 대해 전혀 모를 때 쓴 글입니다. <a href="../posts/2021-05-13-lens.html">Lens - 펑크터의 독특한 활용</a>)</p>
 <p>참고 - <a href="https://www.johndcook.com/blog/2019/08/06/hom-functors/%3E">Hom functors and a glimpse of Yoneda</a> : 혼란스럽게 쓰이는 기호들을 짚어주고, 다른 배경 지식을 최소한 요구하며 “짧게” 설명합니다.</p>
 <p>또 다른 표기:<br />
 <code>H^A = Hom(A, -)</code> Covariant 펑터<br />
 <code>H_A = Hom(-, A)</code> Contravariant 펑터<br />
 ※ <code>^A</code>는 윗 첨자, <code>_A</code>는 아래 첨자</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>Hom(H^A, H^B) ~= Hom(B, A)</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>Hom(H_A, H_B) ~= Hom(A, B)</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>(가) Hom(H^A, H^B) ~= Hom(B, A)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>(나) Hom(H_A, H_B) ~= Hom(A, B)</span></code></pre></div>
 <p>왼 쪽, 오른 쪽 <code>Hom</code>의 의미가 다릅니다. 오른 쪽은 <strong>모피즘 집합</strong>을 의미하고, 왼 쪽은 펑터에서 펑터로 가는, 즉 <strong>자연 변환Natural Transformation 집합</strong>(펑터 사이의 모피즘이 자연 변환이니, 모피즘 집합이라 불러도 됩니다.)입니다.</p>
 <p>위 식이 성립한다가 요네다 렘마입니다.</p>
-<p>텍스트들 중에는 Covariant는 빼고, Contravariant만 얘기하는 것들도 있습니다.</p>
-<p>“<code>A-&gt;B</code>는 <code>Hom(-,A) -&gt; Hom(-,B)</code> 자연 변환과 동형isomorphic이다.”</p>
-<p>홈펑터 정의를 그대로 넣어 따라가 보겠습니다.</p>
+<h3 id="가">(가)</h3>
+<p>“<code>A-&gt;B</code>모피즘은 <code>Hom(-,A) -&gt; Hom(-,B)</code> 자연 변환과 동형isomorphic이다.”<br />
+홈펑터 정의를 그대로 넣어 따라가 보겠습니다.</p>
 <p><code>Hom(-,A)</code>홈펑터는<br />
 <code>X1 ---&gt; Hom(X1,A)</code><br />
 <code>X2 ---&gt; Hom(X2,A)</code><br />
@@ -221,13 +225,38 @@
 <div class="sourceCode" id="cb8"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>(X-&gt;A)∘(Y-&gt;X)</span></code></pre></div>
 <p>같은 작업을 <code>Hom(-,B)</code>에도 하면</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>(X-&gt;B)∘(Y-&gt;X)</span></code></pre></div>
-<p>이제 <code>X-&gt;Y</code>를 원래의 <code>A-&gt;B</code>표기로 바꾸면</p>
+<p>이제 <code>X-&gt;Y</code>를 원래의 <code>A-&gt;B</code>로 바꾸면</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>(A-&gt;A)∘(B-&gt;A) -----&gt; B-&gt;A</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>(A-&gt;B)∘(B-&gt;A) -----&gt; B-&gt;B</span></code></pre></div>
-<p>둘 간의 차이, 즉 <code>Hom(-,A)</code>홈펑터에서 <code>Hom(-,B)</code>홈펑터로 가는 자연 변환은 <code>B-&gt;A</code> 후에 <strong>A-&gt;B</strong>를 하면 <code>B-&gt;B</code>가 됩니다. 두 홈펑터의 자연 변환도 <strong>A-&gt;B</strong>가 나왔습니다.</p>
-<p>이제, 이런 결과를 Lens에 어떻게 적용하는지 볼 차례입니다. 많은 내용을 그대로 가져와야 하니 <a href="https://lionhairdino.github.io/posts/2021-05-13-lens.html#%EC%99%9C-%ED%8E%91%ED%81%AC%ED%84%B0%EA%B0%80-%EB%93%A4%EC%96%B4%EA%B0%80-%EC%9E%88%EC%9D%84%EA%B9%8C%EC%9A%94">Lens 정의에 왜 펑터가 들어가 있을까요?</a>를 열어 놓고 같이 봐주세요.</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">Identity</span> a <span class="ot">=</span> <span class="dt">Identity</span> {<span class="ot"> runIdentity ::</span> a } <span class="kw">deriving</span> <span class="dt">Functor</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">Const</span> a b <span class="ot">=</span> <span class="dt">Const</span> {<span class="ot"> getConst ::</span> a } <span class="kw">deriving</span> <span class="dt">Functor</span></span></code></pre></div>
+<p>둘 간의 차이, 즉 <code>Hom(-,A)</code>홈펑터에서 <code>Hom(-,B)</code>홈펑터로 가는 자연 변환은, <code>B-&gt;A</code> 후에 <strong>A-&gt;B</strong>를 하면 <code>B-&gt;B</code>가 되니 <strong>A-&gt;B</strong>가 바로 자연 변환입니다. 두 홈펑터의 자연 변환도 <strong>A-&gt;B</strong>가 나왔습니다.</p>
+<p>※ <code>1</code>과 <code>2</code>의 차이는 <code>+1</code>이라고 말하듯, <code>B-&gt;A</code>와 <code>B-&gt;B</code>의 차이(자연변환)는 <strong>A-&gt;B</strong>입니다. 이런 결과가 나오는 게 당연해 보이기도 하고, 신기하기도 합니다.</p>
+<h3 id="나">(나)</h3>
+<p><code>Hom(A,-)</code>홈펑터는<br />
+<code>X1 ---&gt; Hom(A,X1)</code><br />
+<code>X2 ---&gt; Hom(A,X2)</code><br />
+…<br />
+<code>Hom(B,-)</code>홈펑터는<br />
+<code>X1 ---&gt; Hom(B,X1)</code><br />
+<code>X2 ---&gt; Hom(B,X2)</code><br />
+…<br />
+역시, 원래의 모피즘 <code>A-&gt;B</code>를 잠시 <code>X-&gt;Y</code>로 두겠습니다.<br />
+<code>Hom(A,-)</code>홈펑터가 <code>X-&gt;Y</code>를 매핑한 모피즘은 <code>Hom(A,X) -&gt; Hom(A,Y)</code>입니다.<br />
+<code>A-&gt;X</code>를 <code>A-&gt;Y</code>로 변환하려면, Covariant하게 <code>(X-&gt;Y)∘</code>를 쓰면 됩니다.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>(X-&gt;Y)∘(A-&gt;X)</span></code></pre></div>
+<p>같은 작업을 <code>Hom(B,-)</code>에도 하면</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>(X-&gt;Y)∘(B-&gt;X)</span></code></pre></div>
+<p>이제 <code>X-&gt;Y</code>를 <code>A-&gt;B</code>로 바꾸면</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>(A-&gt;B)∘(A-&gt;A) -----&gt; A-&gt;B</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>(A-&gt;B)∘(B-&gt;A) -----&gt; A-&gt;A</span></code></pre></div>
+<p><code>A-&gt;B</code>와 <code>A-&gt;A</code>의 차이는 <code>B-&gt;A</code>입니다.</p>
+<h2 id="lens">Lens</h2>
+<p>이제, 이런 결과를 Lens에 어떻게 적용하는지 볼 차례입니다. 많은 내용을 그대로 얘기해야 하니 <a href="https://lionhairdino.github.io/posts/2021-05-13-lens.html#%EC%99%9C-%ED%8E%91%ED%81%AC%ED%84%B0%EA%B0%80-%EB%93%A4%EC%96%B4%EA%B0%80-%EC%9E%88%EC%9D%84%EA%B9%8C%EC%9A%94">Lens 정의에 왜 펑터가 들어가 있을까요?</a>를 같이 봐주세요.</p>
+<p>Lens 구현에 보면 <code>(a-&gt;a) -&gt; (s-&gt;s)</code>를 <code>s-&gt;a</code>로 바꾸는 작업을 합니다.<br />
+위 요네다 렘마 (나)에선 <code>B-&gt;A</code>는 <code>(A-&gt;B) -&gt; (A-&gt;A)</code>와 동형이었습니다.<br />
+<code>B</code>를 <code>s</code>로, <code>A</code>를 <code>a</code>로 두면,<br />
+</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>(a-&gt;s) -&gt; (a-&gt;a) ~= s-&gt;a</span></code></pre></div>
+<p>동일한 모양이 나왔습니다.</p>
 <p>Wed Dec 20 03:41:39 AM KST 2023 작성 중 …</p>
 <h2 id="하스켈-코드로-보는-요네다-보조-정리">하스켈 코드로 보는 요네다 보조 정리</h2>
 <p><a href="https://gist.github.com/Icelandjack/02069708bc75f4284ac625cd0e2ec81f" class="uri">https://gist.github.com/Icelandjack/02069708bc75f4284ac625cd0e2ec81f</a></p>
