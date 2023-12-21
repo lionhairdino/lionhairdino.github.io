@@ -83,10 +83,23 @@
 
 <p><a href="https://en.wikipedia.org/wiki/Hom_functor" class="uri">https://en.wikipedia.org/wiki/Hom_functor</a></p>
 <h2 id="생각-스트레칭">생각 스트레칭</h2>
-<p>삼형제 <code>A</code>,<code>B</code>,<code>C</code>가 있을 때,<br />
+<ol type="1">
+<li>삼형제 <code>A</code>,<code>B</code>,<code>C</code>(순서는 형부터)가 있을 때,<br />
 “(가) <code>A</code>보다는 작고”, “(나) <code>C</code>보다는 크다”<br />
-는 두 조건을 모두 만족하려면 <code>B</code>뿐이 없습니다. (가), (나) 모피즘을 이용해 <code>B</code>를 정의했습니다. (<code>B</code>를 특정지을 수 있습니다.)</p>
-<p>다른 모든 것들과 어떤 관계를 맺고 있는지 알면, 범인을 단정지을 수 있습니다.!</p>
+는 두 조건을 모두 만족하려면 <code>B</code>뿐이 없습니다. (가), (나) 모피즘을 이용해 <code>B</code>를 정의했습니다. (<code>B</code>를 특정지을 수 있습니다.)</li>
+</ol>
+<figure>
+<img src="../images/usingMorphism.jpg" alt="삼각형을 모피즘으로 가리키는 방법" /><figcaption aria-hidden="true">삼각형을 모피즘으로 가리키는 방법</figcaption>
+</figure>
+<p>위 그림의 사각형을 완성시킬 무엇 = 삼각형. 삼각형 모양을 잘라 낸 어떤 도형으로도 삼각형을 가리킬 수 있습니다.</p>
+<ol start="2" type="1">
+<li><code>(A-&gt;B) -&gt; (C-&gt;B)</code><br />
+<code>(A-&gt;B)</code>를 <code>(C-&gt;B)</code>로 매핑한다.<br />
+<code>(A-&gt;B)</code>를 <code>(C-&gt;B)</code>로 변환한다.<br />
+<code>(A-&gt;B)</code>와 <code>(C-&gt;B)</code>의 차이를 나타낸다.<br />
+…<br />
+그다지 거부감 없이 다 받아들일만한 설명입니다. 위의 해석들을 직관으로 보면 <code>A</code>를 <code>C</code>로 바꾸는 <code>A-&gt;C</code>만 있으면 구현할 수 있을 것만 같습니다. <code>((A-&gt;C)-&gt;B)</code> 이렇게요. 하지만 <strong>A-&gt;B</strong>는 <strong>블랙 박스</strong>입니다. 안에서 무슨 일이 일어나고 있을지 알 수 없습니다. <code>A-&gt;Z-&gt;Y-&gt;X....C-&gt;B</code> 이러고 있을지도 모르는데, 어디를 어떻게 손 댈지 알 수 없습니다. <code>A-&gt;블랙 박스-&gt;B</code>가 고차 함수가 아니고선, 블랙 박스에 들어가는 인터페이스 A와 붙이든지, 나오는 인터페이스 B와 붙이든지 해야 합니다.</li>
+</ol>
 <h2 id="a---b-와-homab">a -&gt; b 와 Hom(a,b)</h2>
 <p>일단, hom-set부터 보고 가겠습니다. <code>hom(a,b)</code>는 <code>a</code>에서 <code>b</code>로 가는 모든 모피즘의 집합이라고 합니다.</p>
 <blockquote>
@@ -184,7 +197,7 @@
 <span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>   |                            |</span>
 <span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>   V                            V</span>
 <span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>Hom(A,-)로 변환              Hom(A',-)로 변환</span></code></pre></div>
-<p>양 쪽 경로 모두 <code>g:A -&gt; B</code>를 <code>f∘g∘h:A' -&gt; B'</code>로 보냅니다. (※ 하나는 covarint, 하나는 Contravariant로 정의한 덕에 <code>f∘g∘h</code> 모양으로 합성할 수 있게 됐습니다.) 이 가환이 갖는 의미가 뭘까요? Covariant 펑터 <code>Hom(A,-)</code>를 적용한 후에 Contravariant 펑터 <code>Hom(-,B)</code>를 적용하나, Contravariant 펑터를 적용 후 Covariant 펑터를 적용하나 결과가 같습니다. 이 걸 Natural Manner라고 부릅니다.</p>
+<p>양 쪽 경로 모두 <code>g:A -&gt; B</code>를 <code>f∘g∘h:A' -&gt; B'</code>로 보냅니다. (※ 하나는 Covariant, 하나는 Contravariant로 정의한 덕에 <code>f∘g∘h</code> 모양으로 합성할 수 있게 됐습니다.) 이 가환이 갖는 의미가 뭘까요? Covariant 펑터 <code>Hom(A,-)</code>를 적용한 후에 Contravariant 펑터 <code>Hom(-,B)</code>를 적용하나, Contravariant 펑터를 적용 후 Covariant 펑터를 적용하나 결과가 같습니다. 이 걸 Natural Manner라고 부릅니다.</p>
 <p>두 펑터를 합친 <code>Hom(-,-)</code>는 바이펑터bifunctor입니다. <code>C</code>카테고리에서 한 번만 뽑는게 아니라, 두 번 뽑아아야 하니 <code>C × C</code>에서 <code>Set</code>으로 가는 바이펑터인데, 첫 번째 인자를 고정하면 Covariant하고, 두 번째 인자를 고정하면 Contravariant합니다.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>Hom(-,-): C^op × C -&gt; Set</span></code></pre></div>
 <p><code>C^op</code>는 <code>C</code>의 화살표를 모두 뒤집어 놓은 반대opposite 카테고리입니다.</p>
@@ -236,7 +249,7 @@
 <p>둘 간의 차이, 즉 <code>Hom(-,A)</code>홈펑터에서 <code>Hom(-,B)</code>홈펑터로 가는 자연 변환은, <code>B-&gt;A</code> 후에 <strong>A-&gt;B</strong>를 하면 <code>B-&gt;B</code>가 되니 <strong>A-&gt;B</strong>가 바로 자연 변환입니다. 두 홈펑터의 자연 변환도 <strong>A-&gt;B</strong>가 나왔습니다.</p>
 <p><code>B-&gt;</code><strong>A-&gt;B</strong><br />
 <code>B----&gt;B</code></p>
-<p>※ <code>1</code>과 <code>2</code>의 차이는 <code>+1</code>이라고 말하듯, <code>B-&gt;A</code>와 <code>B-&gt;B</code>의 차이(자연변환)는 <strong>A-&gt;B</strong>입니다. 이런 결과가 나오는 게 당연해 보이기도 하고, 신기하기도 합니다.</p>
+<p>※ <code>1</code>과 <code>2</code>의 차이는 <code>+1</code>이라고 말하듯, <code>B-&gt;A</code>와 <code>B-&gt;B</code>의 차이(자연변환)는 <strong>A-&gt;B</strong>(<code>(A-&gt;B)∘</code>)입니다. 이런 결과가 나오는 게 당연해 보이기도 하고, 신기하기도 합니다.</p>
 <h3 id="나">(나)</h3>
 <p>“<code>B-&gt;A</code>모피즘은 <code>Hom(A,-) -&gt; Hom(B,-)</code> 자연 변환과 동형isomorphic이다.”<br />
 </p>
@@ -257,13 +270,13 @@
 <p>이제 <code>X-&gt;Y</code>를 <code>A-&gt;B</code>로 바꾸면</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>(A-&gt;B)∘(A-&gt;A) -----&gt; A-&gt;B</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>(A-&gt;B)∘(B-&gt;A) -----&gt; B-&gt;B</span></code></pre></div>
-<p><code>A-&gt;B</code>와 <code>B-&gt;B</code>의 차이는, 즉 자연 변환은 <code>B-&gt;A</code>가 있으면 됩니다.</p>
+<p><code>A-&gt;B</code>와 <code>B-&gt;B</code>의 차이는, 즉 자연 변환은 <strong>B-&gt;A</strong>(<code>∘(B-&gt;A)</code>)가 있으면 됩니다.</p>
 <p><strong>B-&gt;A</strong><code>-&gt;B</code><br />
 <code>B----&gt;B</code></p>
 <figure>
 <img src="../images/yoneda.jpg" alt="요네다 보조 정리" /><figcaption aria-hidden="true">요네다 보조 정리</figcaption>
 </figure>
-<p>위에서는 <code>Hom(-,A) -&gt; Hom(-,B)</code>만 봤지만, <code>Hom(-,B)</code>자리에 <code>C^op -&gt; Set</code> 모양의 어떤 펑터든 성립한다고 합니다. 이를 식으로 쓰면,</p>
+<p>위에서는 <code>Hom(-,A) -&gt; Hom(-,B)</code>만 봤지만, <code>Hom(-,B)</code>자리에 <code>C^op -&gt; Set</code> 모양의 어떤 펑터든 성립한다고 합니다. 이를 식으로 쓰면, ※ 상상 - 카테고리니 어떤 Set의 대상이 어떤 set인지는 보지 않고, Contravariant하기만 하면 동작이 성립할테니, 당연히 그럴 것 같긴 합니다.</p>
 <p><code>F펑터: C^op -&gt; Set</code>일 때,<br />
 <code>Hom(-,X)홈펑터 -&gt; F펑터</code>자연 변환이 <code>F(X)</code>와 bijection
 <strong>Nat(Hom(-,X),F) ~= F(X)</strong></p>
@@ -277,10 +290,6 @@
 </p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>(a-&gt;s) -&gt; (s-&gt;s) ~= s-&gt;a -- 요네다 보조 정리</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>(a-&gt;a) -&gt; (s-&gt;s) ~= s-&gt;a -- Lens에서 필요한 것</span></code></pre></div>
-<p><code>a-&gt;s</code>를 <code>a-&gt;a</code>로 만들려면 <code>s-&gt;a</code>만 있으면 되겠습니다.<br />
-</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>(s-&gt;a)∘(a-&gt;s) -&gt; (s-&gt;s) ~= s-&gt;a </span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>(a-&gt;a)        -&gt; (s-&gt;s) ~= s-&gt;a </span></code></pre></div>
 <p>Wed Dec 20 03:41:39 AM KST 2023 작성 중 …</p>
 <h2 id="하스켈-코드로-보는-요네다-보조-정리">하스켈 코드로 보는 요네다 보조 정리</h2>
 <p><a href="https://gist.github.com/Icelandjack/02069708bc75f4284ac625cd0e2ec81f">Icelandjack/Yoneda_II.markdown</a></p>
