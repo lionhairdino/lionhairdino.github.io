@@ -335,59 +335,60 @@
 <span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">LensGetter</span> s a <span class="ot">=</span> s <span class="ot">-&gt;</span> <span class="dt">Const</span> a s</span></code></pre></div>
 <p>비슷한 모양을 가지도록 <code>LensGetter</code>를 다시 정의하면,<br />
 (이런 아이디어가 어디서 왔을까요? 가설처럼 일단 서명을 세우고 고민한 건 아닐까요?)</p>
-<p>2022.8.11 추가 - Yoneda lemma를 보면, 이런 아이디어가 나온 이유를 알 수 있다고 합니다. 카테고리 이론을 알고 싶긴 한데, 수학 베이스가 없어 들었다 놨다 합니다.</p>
-<div class="sourceCode" id="cb42"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">LensGetter</span> p a <span class="ot">=</span> (a <span class="ot">-&gt;</span> <span class="dt">Const</span> a p) <span class="ot">-&gt;</span> (s <span class="ot">-&gt;</span> <span class="dt">Const</span> a p)</span>
-<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a><span class="ot">view ::</span> <span class="dt">LensGetter</span> p a <span class="ot">-&gt;</span> p <span class="ot">-&gt;</span> a</span>
-<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>view lens p <span class="ot">=</span> getConst (lens <span class="dt">Const</span> p)</span>
-<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a><span class="co">--                           ^^^^^</span></span>
-<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a><span class="ot">personAddressL ::</span> <span class="dt">LensGetter</span> <span class="dt">Person</span> <span class="dt">Address</span></span>
-<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>personAddressL f person <span class="ot">=</span> <span class="dt">Const</span> <span class="op">$</span> getConst <span class="op">$</span> f (personAddress person)</span></code></pre></div>
-<p>lens 타입 함수에 <code>Const p</code>를 넣는게 아니라, <em>Const 값 생성자</em>, p를 넣으면 어찌되나 보겠습니다.</p>
-<div class="sourceCode" id="cb43"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>view lens p <span class="ot">=</span> getConst (personalAddressL <span class="dt">Const</span> p) </span>
-<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>            <span class="ot">=</span> getConst (<span class="dt">Const</span> <span class="op">$</span> getConst <span class="op">$</span> <span class="dt">Const</span> (personAddress p))</span>
-<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>            <span class="ot">=</span> personAddress p</span></code></pre></div>
-<p><em>Const 값 생성자</em>를 넣는 방법으로 view 함수를 구현했습니다.<br />
+<p>2022.8.11 추가 - Yoneda lemma를 보면, 이런 아이디어가 나온 이유를 알 수 있다고 합니다.
+~~~ haskell
+type LensGetter s a = (a -&gt; Const a s) -&gt; (s -&gt; Const a s)</p>
+<p>view :: LensGetter s a -&gt; s -&gt; a
+view lens s = getConst (lens Const s)
+– ^^^^^
+personAddressL :: LensGetter Person Address
+personAddressL f person = Const $ getConst $ f (personAddress person)
+~~~</p>
+<p>lens 타입 함수에 <code>Const p</code>를 넣는게 아니라, <em>Const 값 생성자</em>, <code>p</code>를 넣으면 어찌되나 보겠습니다.</p>
+<div class="sourceCode" id="cb42"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>view lens p <span class="ot">=</span> getConst (personalAddressL <span class="dt">Const</span> p) </span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>            <span class="ot">=</span> getConst (<span class="dt">Const</span> <span class="op">$</span> getConst <span class="op">$</span> <span class="dt">Const</span> (personAddress p))</span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>            <span class="ot">=</span> personAddress p</span></code></pre></div>
+<p><em>Const 값 생성자</em>를 넣는 방법으로 <code>view</code> 함수를 구현했습니다.<br />
 이 것도 <code>Functor</code> 스타일로 구현하면</p>
-<div class="sourceCode" id="cb44"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="ot">personAddressL ::</span> <span class="dt">LensGetter</span> <span class="dt">Person</span> <span class="dt">Address</span></span>
-<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>personAddressL f person <span class="ot">=</span> (\address <span class="ot">-&gt;</span> person { personAddress <span class="ot">=</span> address}) <span class="op">&lt;$&gt;</span> f (personAddress person)</span></code></pre></div>
+<div class="sourceCode" id="cb43"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="ot">personAddressL ::</span> <span class="dt">LensGetter</span> <span class="dt">Person</span> <span class="dt">Address</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>personAddressL f person <span class="ot">=</span> (\address <span class="ot">-&gt;</span> person { personAddress <span class="ot">=</span> address}) <span class="op">&lt;$&gt;</span> f (personAddress person)</span></code></pre></div>
 <p><em>명시적인 Const는 사라지고</em>, <code>LensModify</code> 때 정의한 함수와 같아 보이지 않나요?<br />
 타입만 <code>LensGetter</code>냐, <code>LensModify</code>냐지 함수 본체body는 완전히 동일한 모양이 됐습니다.</p>
-<div class="sourceCode" id="cb45"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="ot">personAddressL ::</span> <span class="dt">LensGetter</span> <span class="dt">Person</span> <span class="dt">Address</span></span>
-<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>personAddressL f person <span class="ot">=</span> (\address <span class="ot">-&gt;</span> person { personAddress <span class="ot">=</span> address}) <span class="op">&lt;$&gt;</span> f (personAddress person)</span>
-<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a><span class="ot">personAddressL ::</span> <span class="dt">LensModify</span> <span class="dt">Person</span> <span class="dt">Address</span></span>
-<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>personAddressL f person <span class="ot">=</span> (\address <span class="ot">-&gt;</span> person { personAddress <span class="ot">=</span> address}) <span class="op">&lt;$&gt;</span> f (personAddress person)</span></code></pre></div>
+<div class="sourceCode" id="cb44"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="ot">personAddressL ::</span> <span class="dt">LensGetter</span> <span class="dt">Person</span> <span class="dt">Address</span></span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>personAddressL f person <span class="ot">=</span> (\address <span class="ot">-&gt;</span> person { personAddress <span class="ot">=</span> address}) <span class="op">&lt;$&gt;</span> f (personAddress person)</span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a><span class="ot">personAddressL ::</span> <span class="dt">LensModify</span> <span class="dt">Person</span> <span class="dt">Address</span></span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>personAddressL f person <span class="ot">=</span> (\address <span class="ot">-&gt;</span> person { personAddress <span class="ot">=</span> address}) <span class="op">&lt;$&gt;</span> f (personAddress person)</span></code></pre></div>
 <p>이 정도면 두 타입을 하나의 모양으로 표시하고, 조립할 때 쓸 실제 코드는 GHC가 골라 오도록 떠맡길 수 있습니다.</p>
-<div class="sourceCode" id="cb46"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">Lens</span> s a <span class="ot">=</span> <span class="kw">forall</span> f<span class="op">.</span> <span class="dt">Functor</span> f <span class="ot">=&gt;</span> (a <span class="ot">-&gt;</span> f a) <span class="ot">-&gt;</span> (s <span class="ot">-&gt;</span> f s)</span>
-<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">Identity</span> a <span class="ot">=</span> <span class="dt">Identity</span> {<span class="ot"> runIdentity ::</span> a }</span>
-<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">deriving</span> <span class="dt">Functor</span></span>
-<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">Const</span> a b <span class="ot">=</span> <span class="dt">Const</span> {<span class="ot"> getConst ::</span> a }</span>
-<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a>  <span class="kw">deriving</span> <span class="dt">Functor</span></span>
-<span id="cb46-8"><a href="#cb46-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb46-9"><a href="#cb46-9" aria-hidden="true" tabindex="-1"></a><span class="ot">over ::</span> <span class="dt">Lens</span> s a <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> a) <span class="ot">-&gt;</span> s <span class="ot">-&gt;</span> s</span>
-<span id="cb46-10"><a href="#cb46-10" aria-hidden="true" tabindex="-1"></a>over lens f s <span class="ot">=</span> runIdentity (lens (<span class="dt">Identity</span> <span class="op">.</span> f) s) </span>
-<span id="cb46-11"><a href="#cb46-11" aria-hidden="true" tabindex="-1"></a><span class="co">-- 위의 기나긴 여정 없이 Identity가 왜 들어갔는지 알 수 있을까요?</span></span>
-<span id="cb46-12"><a href="#cb46-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb46-13"><a href="#cb46-13" aria-hidden="true" tabindex="-1"></a><span class="ot">view ::</span> <span class="dt">Lens</span> s a <span class="ot">-&gt;</span> s <span class="ot">-&gt;</span> a</span>
-<span id="cb46-14"><a href="#cb46-14" aria-hidden="true" tabindex="-1"></a>view lens s <span class="ot">=</span> getConst (lens <span class="dt">Const</span> s) </span>
-<span id="cb46-15"><a href="#cb46-15" aria-hidden="true" tabindex="-1"></a><span class="co">-- 위의 기나긴 여정 없이 Const가 왜 들어갔는지 알 수 있을까요? </span></span>
-<span id="cb46-16"><a href="#cb46-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb46-17"><a href="#cb46-17" aria-hidden="true" tabindex="-1"></a><span class="ot">personAddressL ::</span> <span class="dt">Lens</span> <span class="dt">Person</span> <span class="dt">Address</span></span>
-<span id="cb46-18"><a href="#cb46-18" aria-hidden="true" tabindex="-1"></a>personAddressL f person <span class="ot">=</span></span>
-<span id="cb46-19"><a href="#cb46-19" aria-hidden="true" tabindex="-1"></a>      (\address <span class="ot">-&gt;</span> person { personAddress <span class="ot">=</span> address })</span>
-<span id="cb46-20"><a href="#cb46-20" aria-hidden="true" tabindex="-1"></a>  <span class="op">&lt;$&gt;</span> f (personAddress person)</span>
-<span id="cb46-21"><a href="#cb46-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb46-22"><a href="#cb46-22" aria-hidden="true" tabindex="-1"></a><span class="ot">getPersonAddress ::</span> <span class="dt">Person</span> <span class="ot">-&gt;</span> <span class="dt">Address</span></span>
-<span id="cb46-23"><a href="#cb46-23" aria-hidden="true" tabindex="-1"></a>getPersonAddress <span class="ot">=</span> view personAddressL</span>
-<span id="cb46-24"><a href="#cb46-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb46-25"><a href="#cb46-25" aria-hidden="true" tabindex="-1"></a><span class="ot">modifyPersonAddress ::</span> (<span class="dt">Address</span> <span class="ot">-&gt;</span> <span class="dt">Address</span>) <span class="ot">-&gt;</span> <span class="dt">Person</span> <span class="ot">-&gt;</span> <span class="dt">Person</span></span>
-<span id="cb46-26"><a href="#cb46-26" aria-hidden="true" tabindex="-1"></a>modifyPersonAddress <span class="ot">=</span> over personAddressL</span>
-<span id="cb46-27"><a href="#cb46-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb46-28"><a href="#cb46-28" aria-hidden="true" tabindex="-1"></a><span class="ot">setPersonAddress ::</span> <span class="dt">Address</span> <span class="ot">-&gt;</span> <span class="dt">Person</span> <span class="ot">-&gt;</span> <span class="dt">Person</span></span>
-<span id="cb46-29"><a href="#cb46-29" aria-hidden="true" tabindex="-1"></a>setPersonAddress address <span class="ot">=</span> modifyPersonAddress (<span class="fu">const</span> address)</span></code></pre></div>
+<div class="sourceCode" id="cb45"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">Lens</span> s a <span class="ot">=</span> <span class="kw">forall</span> f<span class="op">.</span> <span class="dt">Functor</span> f <span class="ot">=&gt;</span> (a <span class="ot">-&gt;</span> f a) <span class="ot">-&gt;</span> (s <span class="ot">-&gt;</span> f s)</span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">Identity</span> a <span class="ot">=</span> <span class="dt">Identity</span> {<span class="ot"> runIdentity ::</span> a }</span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">deriving</span> <span class="dt">Functor</span></span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">Const</span> a b <span class="ot">=</span> <span class="dt">Const</span> {<span class="ot"> getConst ::</span> a }</span>
+<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a>  <span class="kw">deriving</span> <span class="dt">Functor</span></span>
+<span id="cb45-8"><a href="#cb45-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-9"><a href="#cb45-9" aria-hidden="true" tabindex="-1"></a><span class="ot">over ::</span> <span class="dt">Lens</span> s a <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> a) <span class="ot">-&gt;</span> s <span class="ot">-&gt;</span> s</span>
+<span id="cb45-10"><a href="#cb45-10" aria-hidden="true" tabindex="-1"></a>over lens f s <span class="ot">=</span> runIdentity (lens (<span class="dt">Identity</span> <span class="op">.</span> f) s) </span>
+<span id="cb45-11"><a href="#cb45-11" aria-hidden="true" tabindex="-1"></a><span class="co">-- 위의 기나긴 여정 없이 Identity가 왜 들어갔는지 알 수 있을까요?</span></span>
+<span id="cb45-12"><a href="#cb45-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-13"><a href="#cb45-13" aria-hidden="true" tabindex="-1"></a><span class="ot">view ::</span> <span class="dt">Lens</span> s a <span class="ot">-&gt;</span> s <span class="ot">-&gt;</span> a</span>
+<span id="cb45-14"><a href="#cb45-14" aria-hidden="true" tabindex="-1"></a>view lens s <span class="ot">=</span> getConst (lens <span class="dt">Const</span> s) </span>
+<span id="cb45-15"><a href="#cb45-15" aria-hidden="true" tabindex="-1"></a><span class="co">-- 위의 기나긴 여정 없이 Const가 왜 들어갔는지 알 수 있을까요? </span></span>
+<span id="cb45-16"><a href="#cb45-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-17"><a href="#cb45-17" aria-hidden="true" tabindex="-1"></a><span class="ot">personAddressL ::</span> <span class="dt">Lens</span> <span class="dt">Person</span> <span class="dt">Address</span></span>
+<span id="cb45-18"><a href="#cb45-18" aria-hidden="true" tabindex="-1"></a>personAddressL f person <span class="ot">=</span></span>
+<span id="cb45-19"><a href="#cb45-19" aria-hidden="true" tabindex="-1"></a>      (\address <span class="ot">-&gt;</span> person { personAddress <span class="ot">=</span> address })</span>
+<span id="cb45-20"><a href="#cb45-20" aria-hidden="true" tabindex="-1"></a>  <span class="op">&lt;$&gt;</span> f (personAddress person)</span>
+<span id="cb45-21"><a href="#cb45-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-22"><a href="#cb45-22" aria-hidden="true" tabindex="-1"></a><span class="ot">getPersonAddress ::</span> <span class="dt">Person</span> <span class="ot">-&gt;</span> <span class="dt">Address</span></span>
+<span id="cb45-23"><a href="#cb45-23" aria-hidden="true" tabindex="-1"></a>getPersonAddress <span class="ot">=</span> view personAddressL</span>
+<span id="cb45-24"><a href="#cb45-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-25"><a href="#cb45-25" aria-hidden="true" tabindex="-1"></a><span class="ot">modifyPersonAddress ::</span> (<span class="dt">Address</span> <span class="ot">-&gt;</span> <span class="dt">Address</span>) <span class="ot">-&gt;</span> <span class="dt">Person</span> <span class="ot">-&gt;</span> <span class="dt">Person</span></span>
+<span id="cb45-26"><a href="#cb45-26" aria-hidden="true" tabindex="-1"></a>modifyPersonAddress <span class="ot">=</span> over personAddressL</span>
+<span id="cb45-27"><a href="#cb45-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-28"><a href="#cb45-28" aria-hidden="true" tabindex="-1"></a><span class="ot">setPersonAddress ::</span> <span class="dt">Address</span> <span class="ot">-&gt;</span> <span class="dt">Person</span> <span class="ot">-&gt;</span> <span class="dt">Person</span></span>
+<span id="cb45-29"><a href="#cb45-29" aria-hidden="true" tabindex="-1"></a>setPersonAddress address <span class="ot">=</span> modifyPersonAddress (<span class="fu">const</span> address)</span></code></pre></div>
 <p><code>Lens</code> 타입 안에 들어 있는 <code>Functor f</code>는<br />
 <code>over</code> 안에서 인자 <code>lens</code>에 <code>runIdentity</code>를 쓰는 걸 보고 GHC가 알아서 <code>Identity</code>로 추론하고,<br />
 <code>view</code> 안에서 인자 <code>lens</code>에 <code>getConst</code>를 쓰는 걸 보고 GHC가 알아서 <code>Const</code>로 추론합니다.</p>
@@ -400,11 +401,11 @@
 <hr />
 <ol>
 <li id="fn1" role="doc-endnote"><p>실제 <code>over</code> 정의</p>
-<div class="sourceCode" id="cb47"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="ot">over ::</span> <span class="dt">ASetter</span> s t a b <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> s <span class="ot">-&gt;</span> t</span>
-<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>over l f <span class="ot">=</span> runIdentity <span class="op">#.</span> l (<span class="dt">Identity</span> <span class="op">#.</span> f)</span>
-<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- 매개 변수가 3개여야 하는데 두 개면 하나만 포인트 프리로 보면 됩니다.</span></span>
-<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>( <span class="op">#.</span> )<span class="ot"> ::</span> <span class="dt">Coercible</span> c b <span class="ot">=&gt;</span> (b <span class="ot">-&gt;</span> c) <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> c)</span>
-<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a>( <span class="op">#.</span> ) _ <span class="ot">=</span> coerce (\x <span class="ot">-&gt; x ::</span> b)<span class="ot"> ::</span> <span class="kw">forall</span> a b<span class="op">.</span> <span class="dt">Coercible</span> b a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> b</span></code></pre></div>
+<div class="sourceCode" id="cb46"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="ot">over ::</span> <span class="dt">ASetter</span> s t a b <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> s <span class="ot">-&gt;</span> t</span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>over l f <span class="ot">=</span> runIdentity <span class="op">#.</span> l (<span class="dt">Identity</span> <span class="op">#.</span> f)</span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- 매개 변수가 3개여야 하는데 두 개면 하나만 포인트 프리로 보면 됩니다.</span></span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>( <span class="op">#.</span> )<span class="ot"> ::</span> <span class="dt">Coercible</span> c b <span class="ot">=&gt;</span> (b <span class="ot">-&gt;</span> c) <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> c)</span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>( <span class="op">#.</span> ) _ <span class="ot">=</span> coerce (\x <span class="ot">-&gt; x ::</span> b)<span class="ot"> ::</span> <span class="kw">forall</span> a b<span class="op">.</span> <span class="dt">Coercible</span> b a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> b</span></code></pre></div>
 <p>Coercible - 단어 뜻: 강제할 수 있는
 <code>coerce</code> : 같은 표현representation을 가진 타입의 값들을 런타임 오버헤드 없이 서로 안전하게 변환할 때 씁니다. 가장 간단한 경우가, <code>newtype</code>의 구체 타입에서 추상 타입으로 갈 때 <code>newtype</code> 생성자를 대신해서 쓸 수 있을 뿐 아니라, <code>newtype</code>의 리스트를 구체 타입들의 리스트로 바꿀 때 쓸 수 있다고 합니다.</p>
 <p>깊이가 점점 깊어져, <code>coerce</code>는 <code>a</code>를 받아 <code>b</code>로 변환하는 함수정도로만 알고 지나 가겠습니다.</p>
