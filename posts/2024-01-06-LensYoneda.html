@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko" lang="ko">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <title>lionhairdino - Lens와 요네다 보조 정리</title>
+
+        <meta name="description" content="lionhairdino - Lens와 요네다 보조 정리" />
+        <meta property="og:description" content="하스켈 함수형 프로그래밍" />
+
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <link rel="icon" href="https://lionhairdino.github.io/favicon.svg" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino16px.png" sizes="16x16" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino24px.png" sizes="24x24" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino32px.png" sizes="32x32" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino48px.png" sizes="48x48" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino57px.png" sizes="57x57" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino60px.png" sizes="60x60" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino64px.png" sizes="64x64" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino72px.png" sizes="72x72" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino76px.png" sizes="76x76" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino114px.png" sizes="114x114" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino120px.png" sizes="120x120" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino144px.png" sizes="144x144" />
+        <link rel="shortcut icon" href="../favicon.ico" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino152px.png" sizes="152x152" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino180px.png" sizes="180x180" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino192px.png" sizes="192x192" />
+        <link rel="manifest" href="../site.webmanifest" />
+        <link rel="mask-icon" href="https://lionhairdino.github.io/Lionhairdino_black.svg" color="#ff7500" />
+        <meta name="msapplication-TileImage" content="/images/favicon/Lionhairdino144px.png" />
+        <meta name="msapplication-TileColor" content="#ff7500" />
+        <meta name="theme-color" content="#ffffff" />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="Lens와 요네다 보조 정리" />
+        <meta property="og:site_name" content="Lionhairdino" />
+        <meta property="og:url" content="https://lionhairdino.github.io/posts/2024-01-06-LensYoneda.html" />
+
+        <meta property="og:image" content="https://lionhairdino.github.io/images/state400px.png" />
+
+      <meta name="keywords" content="yoneda lemma, Twan van Laarhoven, Bartosz Milewski, lens">
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-E9WZ6VXGHP"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-E9WZ6VXGHP');
+</script>
+<script src="../script/copycode.js"></script>
+<script async src="https://cse.google.com/cse.js?cx=9c53b4915cbb2605c"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.11.1/tocbot.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.11.1/tocbot.css" />
+    </head>
+    <body>
+        <div id="header">
+            <div style="display:inline-block;margin-right:5px;padding-top: 5px;" id="logo">
+                <a href="../"><img style="width:30px;border:none" src="../images/favicon/Lionhairdino48px.png"></a>
+            </div>
+            <div style="display:inline-block;vertical-align: top;padding-top:5px;" id="navigation">
+                <a href="../">lionhairdino</a>
+                <a href="../about.html">about</a>
+                <!--<a href="/archive.html">archive</a>-->
+            </div>
+            <div style="display:inline-block;font-size:0.8em;vertical-align: top;">
+                <div style="display:inline-block;vertical-align: top;padding-top: 5px">사이트내 검색</div>
+                <div style="display:inline-block;width:180px;"> 
+                    <div class="gcse-searchbox-only"></div>
+                </div>
+            </div>
+            <div>
+                여기 글들은 일종의 질문입니다. 용어 선택도 학계, 업계에서 쓰는 걸로 되어 있지 않고, 틀린 내용이 있을 수도 있습니다.
+            </div>
+        </div>
+        <div class="js-toc-content">
+            <h1>Lens와 요네다 보조 정리</h1>
+            <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+<div class="info">
+    Posted on January  6, 2024
+    
+</div>
+
+<p><a href="https://bartoszmilewski.com/2013/10/08/lenses-stores-and-yoneda/">Lenses, Stores 그리도 요네다 - 바르토즈 밀레프스키</a><br />
+<a href="https://www.twanvl.nl/blog/news/2011-05-19-lenses-talk">Twan van Laarhoven - Talk on Lenses</a></p>
+<p>렌즈의 목적을 간단히 얘기하면,<br />
+<code>b</code> 아래 서브 구조에 있는 <code>a</code>를 가져오는 것과<br />
+<code>b</code> 아래 서브 구조에 <code>a</code>를 지정하는 것으로 볼 수 있습니다.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ot">get ::</span> b <span class="ot">-&gt;</span> a</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ot">set ::</span> b <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> b</span></code></pre></div>
+<p>이 걸 <code>Stroe</code> 구조를 반환하는 하나의 함수로 표현 할 수도 있습니다.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Store</span> a b <span class="ot">=</span> <span class="dt">Store</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  {<span class="ot"> pos ::</span> a</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  ,<span class="ot"> peek ::</span> a <span class="ot">-&gt;</span> b</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  }</span></code></pre></div>
+<p>둘의 관계가 잘 드러나게 정렬해 보면</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ot">get  ::</span> b <span class="ot">-&gt;</span> a</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ot">pos  ::</span>      a</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="ot">set  ::</span> b <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> b</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="ot">peek ::</span>      a <span class="ot">-&gt;</span> b</span></code></pre></div>
+<p><code>get</code>,<code>set</code>과 같은데, <code>b-&gt;</code>만 빠진 상태로 볼 수 있습니다.</p>
+<p>여기에 Twan van Laarhoven은 완전히 다른 표현을 생각해 냈습니다.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">forall</span> g<span class="op">.</span> <span class="dt">Functor</span> g <span class="ot">=&gt;</span> (a <span class="ot">-&gt;</span> g a) <span class="ot">-&gt;</span> g b</span></code></pre></div>
+<p><code>Store</code>의 <code>pos</code>와 <code>peek</code>는 둘 모두 위 폴리모픽 함수로 볼 수 있습니다. <code>Functor g =&gt;</code>라 했으니, 구현 어디선가 <code>fmap</code>을 쓴다를 선언했습니다. <code>fmap</code>의 서명은</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fmap</span><span class="ot"> ::</span> (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> g a <span class="ot">-&gt;</span> g b</span></code></pre></div>
+<p>입니다. Laarhoven 식 안에서 <code>g</code>의 <code>fmap</code>을 써서 <code>g b</code>를 만들려면, 함수 <code>(a-&gt;b)</code>와 <code>a</code>가 있어야 합니다. <code>a</code>에 <code>a -&gt; g a</code>를 적용해서 <code>g a</code>를 만들고, 여기에 <code>fmap</code>으로 <code>a-&gt;b</code>를 적용해 <code>g b</code>를 만들 수 있습니다. Laarhoven 식의 서명만으로 <code>(a-&gt;b)</code>,<code>a</code>를 가지고 있다는 걸 알 수 있습니다. (텍스트에선 이 후 복잡한 식을 쫓아가며 설명하는데, 미리 결과를 말하자면, <code>(a -&gt; g a) -&gt; g b</code>는 <code>(a, a-&gt;b)</code>와 Laarhoven equivalence입니다.)</p>
+<p>어디서 본 듯한 이 패턴은 바로 요네다 보조 정리에 나오는 패턴입니다.<br />
+<code>forall t. (a -&gt; t) -&gt; g t ~= g a</code><br />
+</p>
+<p>요네다 보조 정리를 말로 풀면 다음과 같습니다.<br />
+“어떤 폴리모픽 함수(<code>a-&gt;t</code>까지가 아니라 자연 변환 <code>forall t.(a-&gt;t)-&gt;g t</code>)는 어떤 펑터 <code>g</code>의 상image에 있는 값들의 집합이다.”<br />
+서명만 봐도 <code>a-&gt;t</code>만 줬는데, <code>g t</code>가 나오려면 안에 <code>a</code>를 가지고 있다는 말입니다.</p>
+
+<div class="comment">
+<script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
+</script>
+</div>
+<div style="text-align:right">Github 계정이 없는 분은 메일로 보내주세요. lionhairdino at gmail.com </div>
+        </div>
+        <nav class="toc toc-right js-toc relative z-1 transition--300 absolute pa4 pt5 is-position-fixed"></nav>
+        <div id="footer">
+            © 2022 lionhairdino. All rights reserved. Generated by <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+        <script>
+            tocbot.init({
+                tocSelector: '.js-toc',
+                contentSelector: '.js-toc-content',
+                headingSelector: 'h2, h3',
+                hasInnerContainers: true,
+            });
+        </script>
+    </body>
+</html>
