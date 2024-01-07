@@ -343,12 +343,23 @@
 <span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a><span class="ot">view ::</span> <span class="dt">LensGetter</span> s a <span class="ot">-&gt;</span> s <span class="ot">-&gt;</span> a</span>
 <span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>view lens s <span class="ot">=</span> getConst (lens <span class="dt">Const</span> s)</span>
 <span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a><span class="co">--                           ^^^^^</span></span>
-<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a><span class="ot">personAddressL ::</span> <span class="dt">LensGetter</span> <span class="dt">Person</span> <span class="dt">Address</span></span>
-<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>personAddressL f person <span class="ot">=</span> <span class="dt">Const</span> <span class="op">$</span> getConst <span class="op">$</span> f (personAddress person)</span></code></pre></div>
-<p>lens 타입 함수에 <code>Const p</code>를 넣는게 아니라, <em>Const 값 생성자</em>, <code>p</code>를 넣으면 어찌되나 보겠습니다.</p>
-<div class="sourceCode" id="cb43"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>view lens p <span class="ot">=</span> getConst (personalAddressL <span class="dt">Const</span> p) </span>
-<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>            <span class="ot">=</span> getConst (<span class="dt">Const</span> <span class="op">$</span> getConst <span class="op">$</span> <span class="dt">Const</span> (personAddress p))</span>
-<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>            <span class="ot">=</span> personAddress p</span></code></pre></div>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a><span class="co">--                         값 생성자</span></span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a><span class="ot">personAddressL ::</span> <span class="dt">LensGetter</span> <span class="dt">Person</span> <span class="dt">Address</span></span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a>personAddressL f person <span class="ot">=</span> <span class="dt">Const</span> <span class="op">$</span> getConst <span class="op">$</span> f (personAddress person)</span>
+<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a><span class="co">--             ^                             ^</span></span>
+<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a><span class="co">--           Const                           |</span></span>
+<span id="cb42-11"><a href="#cb42-11" aria-hidden="true" tabindex="-1"></a><span class="co">--                               어차피 나머지가 하드 코딩인데, </span></span>
+<span id="cb42-12"><a href="#cb42-12" aria-hidden="true" tabindex="-1"></a><span class="co">--                               그냥 Const라 써도 되겠습니다.</span></span></code></pre></div>
+<p><code>LensGetter</code>타입 <code>lens</code>에 <code>Const p</code>를 넣는게 아니라, <strong>Const 값 생성자</strong>, <code>p</code>를 넣으면 어찌되나 보겠습니다.<br />
+<code>(Address -&gt; Const Address Person) -&gt; Person -&gt; Const Address Person</code>에서<br />
+처 번째 인자로 <code>Const</code> 값 생성자, 두 번째 인자로 <code>p</code>를 넣는다는 말입니다.</p>
+<div class="sourceCode" id="cb43"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>view personalAddressL p </span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>    <span class="ot">=</span> getConst (personalAddressL <span class="dt">Const</span> p) </span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a><span class="co">--              ^^^^^^^^^^^^^^^^^^^^^^</span></span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>    <span class="ot">=</span> getConst (<span class="dt">Const</span> <span class="op">$</span> getConst <span class="op">$</span> <span class="dt">Const</span> (personAddress p))</span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a><span class="co">--    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</span></span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a><span class="co">--             지워진다고 보면</span></span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a>    <span class="ot">=</span> personAddress p</span></code></pre></div>
 <p><em>Const 값 생성자</em>를 넣는 방법으로 <code>view</code> 함수를 구현했습니다.<br />
 이 것도 <code>Functor</code> 스타일로 구현하면</p>
 <div class="sourceCode" id="cb44"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="ot">personAddressL ::</span> <span class="dt">LensGetter</span> <span class="dt">Person</span> <span class="dt">Address</span></span>
