@@ -372,11 +372,7 @@
 <span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a><span class="ot">personAddressL ::</span> <span class="dt">LensModify</span> <span class="dt">Person</span> <span class="dt">Address</span></span>
 <span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>personAddressL f person <span class="ot">=</span> (\address <span class="ot">-&gt;</span> person { personAddress <span class="ot">=</span> address}) <span class="op">&lt;$&gt;</span> f (personAddress person)</span></code></pre></div>
-<p>이 정도면 두 타입을 하나의 모양으로 표시하고, 조립할 때 쓸 실제 코드는 GHC가 골라 오도록 떠맡길 수 있습니다.</p>
-<blockquote>
-<p><strong>Q.</strong> 나중에 GHC가 타입 추론한다 해도 <code>&lt;$&gt;</code> 인스턴스만 다른 걸 가져오는 걸 텐데, 그래 봤자 <code>Const</code>의 <code>fmap</code>이나 <code>Identity</code>의 <code>fmap</code>이나 별로 다른 동작을 하지 않을텐데, 이 걸로 어떻게 <code>getter</code>, <code>setter</code> 동작을 다 표현하지?<br />
-<strong>A.</strong></p>
-</blockquote>
+<p>이 정도면 두 함수를 하나의 모양으로 표시하고, 조립할 때 쓸 실제 코드는 GHC가 골라 오도록 떠맡길 수 있습니다.</p>
 <div class="sourceCode" id="cb46"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- type LensModify s a = (a -&gt; Identity a) -&gt; (s -&gt; Identity s)</span></span>
 <span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- type LensGetter s a = (a -&gt; Const a s) -&gt; (s -&gt; Const a s)</span></span>
 <span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">Lens</span> s a <span class="ot">=</span> <span class="kw">forall</span> f<span class="op">.</span> <span class="dt">Functor</span> f <span class="ot">=&gt;</span> (a <span class="ot">-&gt;</span> f a) <span class="ot">-&gt;</span> (s <span class="ot">-&gt;</span> f s)</span>
@@ -408,6 +404,10 @@
 <span id="cb46-29"><a href="#cb46-29" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb46-30"><a href="#cb46-30" aria-hidden="true" tabindex="-1"></a><span class="ot">setPersonAddress ::</span> <span class="dt">Address</span> <span class="ot">-&gt;</span> <span class="dt">Person</span> <span class="ot">-&gt;</span> <span class="dt">Person</span></span>
 <span id="cb46-31"><a href="#cb46-31" aria-hidden="true" tabindex="-1"></a>setPersonAddress address <span class="ot">=</span> modifyPersonAddress (<span class="fu">const</span> address)</span></code></pre></div>
+<blockquote>
+<p><strong>Q.</strong> 나중에 GHC가 타입 추론한다 해도 <code>&lt;$&gt;</code> 인스턴스만 다른 걸 가져오는 걸 텐데, 그래 봤자 <code>Const</code>의 <code>fmap</code>이나 <code>Identity</code>의 <code>fmap</code>이나 별로 다른 동작을 하지 않을텐데, 이 걸로 어떻게 <code>getter</code>, <code>setter</code> 동작을 다 표현하지?<br />
+<strong>A.</strong> 추상화한 <code>personAddressL</code> 렌즈는 함수 하나를 받고, 이 함수를 <code>fmap</code>으로 안쪽에 적용하는 역할만 정해놨습니다. 어떤 일을 할지는 이 함수로 뭘 받냐에 따라 달라집니다. 동일 구조의 렌즈지만, <code>getPersonAddress</code>와 <code>modifyPersonAddress</code>는 포인트 프리로 정의되어 있습니다. <code>view</code>가 동작하면 <code>Person</code>만 받을테고, <code>over</code>가 동작하면 함수와 <code>Person</code>을 받습니다.</p>
+</blockquote>
 <p><code>Lens</code> 타입 안에 들어 있는 <code>Functor f</code>는<br />
 <code>over</code> 안에서 인자 <code>lens</code>에 <code>runIdentity</code>를 쓰는 걸 보고 GHC가 알아서 <code>Identity</code>로 추론하고,<br />
 <code>view</code> 안에서 인자 <code>lens</code>에 <code>getConst</code>를 쓰는 걸 보고 GHC가 알아서 <code>Const</code>로 추론합니다.</p>
