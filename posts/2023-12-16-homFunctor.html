@@ -513,18 +513,25 @@ B -&gt; Hom(-,B)
 <span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a><span class="co">--                    (a-&gt;s)와 (s-&gt;s)의 차이는 (s-&gt;a)입니다.      </span></span></code></pre></div>
 <p>이제 GHC한테 맡길 방법을 찾아야 합니다. <code>f</code>를 폴리모픽하게 두고, GHC가 채워넣게 해서 어쩔 땐 <code>a</code>를, 어쩔 땐 <code>s</code>를 고르게 한다면, 하나의 모양으로 표기할 수 있습니다.</p>
 <div class="sourceCode" id="cb31"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">LensModify</span> s a <span class="ot">=</span> (a <span class="ot">-&gt;</span> f a) <span class="ot">-&gt;</span> (s <span class="ot">-&gt;</span> f s) </span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">LensGetter</span> s a <span class="ot">=</span> (a <span class="ot">-&gt;</span> f a) <span class="ot">-&gt;</span> (s <span class="ot">-&gt;</span> f a)</span></code></pre></div>
-<p>아래 부분은 아무리 요네다를 알고 있었다해도 어떻게 이런 걸 떠올렸지 싶은 트릭입니다. 아마도 <code>Identity</code>와 같이 가장 단순한 <code>Runner</code>를 가진 <code>Const</code>를 고른 게 아닐까 추측합니다.</p>
-<div class="sourceCode" id="cb32"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">Identity</span> a <span class="ot">=</span> <span class="dt">Identity</span> {<span class="ot"> runIdentity ::</span> a } <span class="kw">deriving</span> <span class="dt">Functor</span></span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">Const</span>  a b <span class="ot">=</span> <span class="dt">Const</span>    {<span class="ot"> getConst    ::</span> a } <span class="kw">deriving</span> <span class="dt">Functor</span></span>
-<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">LensModify</span> s a <span class="ot">=</span> (a <span class="ot">-&gt;</span> <span class="dt">Identity</span> a) <span class="ot">-&gt;</span> (s <span class="ot">-&gt;</span> <span class="dt">Identity</span> s) </span>
-<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">LensGetter</span> s a <span class="ot">=</span> (a <span class="ot">-&gt;</span> <span class="dt">Const</span> a s) <span class="ot">-&gt;</span> (s <span class="ot">-&gt;</span> <span class="dt">Const</span> a s)</span></code></pre></div>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">LensGetter</span> s a <span class="ot">=</span> (a <span class="ot">-&gt;</span> f a) <span class="ot">-&gt;</span> (s <span class="ot">-&gt;</span> f a) <span class="co">-- _ 자리에 f a를 넣었습니다.</span></span></code></pre></div>
 <p>이제 GHC가 컨텍스트에 따라서 <code>Identity</code> 또는 <code>Const a</code>를 선택하게 하는 일만 남았습니다.<br />
 펑터 타입을 열어 둔</p>
-<div class="sourceCode" id="cb33"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">Lens</span> s a <span class="ot">=</span> <span class="kw">forall</span> f <span class="op">.</span> <span class="dt">Functor</span> f <span class="ot">=&gt;</span> (a <span class="ot">-&gt;</span> f a) <span class="ot">-&gt;</span> (s <span class="ot">-&gt;</span> f s)</span></code></pre></div>
-<p>를 만듭니다.</p>
-<p>직관적으로 보면, 이렇게 간단히 해석되기도 하는데, <a href="https://www.twanvl.nl/blog/news/2011-05-19-lenses-talk">Twan van Laarhoven equivalence</a>를 따져서 Lens 분석을 하는 글이 있습니다.<br />
+<div class="sourceCode" id="cb32"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">Lens</span> s a <span class="ot">=</span> <span class="kw">forall</span> f <span class="op">.</span> <span class="dt">Functor</span> f <span class="ot">=&gt;</span> (a <span class="ot">-&gt;</span> f a) <span class="ot">-&gt;</span> (s <span class="ot">-&gt;</span> f s)</span></code></pre></div>
+<p>를 만듭니다. 하지만 타입을 잘 보면 문제가 한가지 있습니다.<br />
+<code>LensGetter</code>의 끝 부분을 보면 <code>f a</code>인데, 추상화한 타입 <code>Lens</code>의 끝 부분을 보면 <code>f s</code>입니다. 이대로는 추상화가 되지 않습니다. 이 부분을 해결하는 트릭이 번뜩입니다.<br />
+아래는 아무리 요네다를 알고 있었다해도 어떻게 이런 걸 떠올렸지 싶은 트릭입니다.</p>
+<div class="sourceCode" id="cb33"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">Identity</span> a <span class="ot">=</span> <span class="dt">Identity</span> {<span class="ot"> runIdentity ::</span> a } <span class="kw">deriving</span> <span class="dt">Functor</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">Const</span>  a b <span class="ot">=</span> <span class="dt">Const</span>    {<span class="ot"> getConst    ::</span> a } <span class="kw">deriving</span> <span class="dt">Functor</span></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">LensModify</span> s a <span class="ot">=</span> (a <span class="ot">-&gt;</span> <span class="dt">Identity</span> a) <span class="ot">-&gt;</span> (s <span class="ot">-&gt;</span> <span class="dt">Identity</span> s) </span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">LensGetter</span> s a <span class="ot">=</span> (a <span class="ot">-&gt;</span> <span class="dt">Const</span> a  a) <span class="ot">-&gt;</span> (s <span class="ot">-&gt;</span> <span class="dt">Const</span> a  s)</span></code></pre></div>
+<p>요네다 임베딩으로 보면 <code>(a -&gt; _) -&gt; (s -&gt; _)</code>에서 <code>_</code>부분에는 뭐가 들어가도, 같은 게 양쪽에 들어가면 상관없습니다. <code>Lens</code>에 <code>f</code>로 <code>Const a</code>를 넣고, 나중에 <code>runConst</code>를 거치면, 원하는대로 <code>(a -&gt; a) -&gt; (s -&gt; a)</code>가 나옵니다. 그럼 <code>Const</code>만 가능한 건지 <code>Maybe</code>를 한번 넣어 보겠습니다.<br />
+</p>
+<div class="sourceCode" id="cb34"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">LensGetter</span> s a <span class="ot">=</span> (a <span class="ot">-&gt;</span> <span class="dt">Maybe</span> s) <span class="ot">-&gt;</span> (s <span class="ot">-&gt;</span> <span class="dt">Maybe</span> s)</span></code></pre></div>
+<p><code>runMaybe</code>가 없긴 하지만, 어찌해서 <code>Maybe</code>를 떼어냈다 해도 <code>(a -&gt; s) -&gt; (s -&gt; s)</code>입니다.<br />
+<strong><em>Const a는 a를 가지고 들어가는 트릭이 있습니다.</em></strong><br />
+</p>
+<p>직관적으로 보면, 이렇게 간단히 해석되기도 하는데, <a href="https://www.twanvl.nl/blog/news/2011-05-19-lenses-talk">Twan van Laarhoven equivalence</a>를 따져서 Lens 분석을 하는 글이 있습니다. 혹시 이 글에서 위 트릭에 관한 글이 있을지 찾아봐야겠습니다. <span class="citation" data-cites="todo">@todo</span><br />
 <span class="citation" data-cites="todo">@todo</span> <a href="https://bartoszmilewski.com/2013/10/08/lenses-stores-and-yoneda/">Lenses, Stores, and Yoneda - 바르토즈 밀레프스키</a> 글을 해석 중입니다. - <a href="../posts/2024-01-06-LensYoneda.html">Lens와 요네다 보조 정리</a></p>
 <p><a href="https://lens.github.io/">The Lens Library</a></p>
 <hr />
@@ -565,20 +572,20 @@ A. 같은 내용을 코드로 표현한 것입니다. 저 코드 모양이 만�
 자연 변환의 각 성분들을 살펴 봅니다. 혹은 펑터 자체를 대상으로 하는 펑터 카테고리로 보면, 다시 1단계로 돌아갑니다. 그럼 자연 변환은, 대상 사이의 모피즘이 됩니다.</p>
 <p><strong>↦ 세로바가 앞에 붙은 화살표</strong><br />
 <a href="https://en.wikipedia.org/wiki/Maplet">Maplet</a>이라 부르고, 예상하듯 <a href="https://en.wikipedia.org/wiki/Function_(mathematics)#Arrow_notation">함수</a>를 뜻한다고 합니다. 매핑을 뜻하긴 하나, <code>x ↦ f (x)</code> 이렇게 쓰면, 람다 함수 <code>\x -&gt; f x</code>와 같은 의미입니다. 그래서 홈펑터를 다음처럼 표기하기도 합니다.</p>
-<div class="sourceCode" id="cb34"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>hom(A,-): C -&gt; Set</span>
-<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>hom(A,-): B ↦ hom(A,B)</span></code></pre></div>
+<div class="sourceCode" id="cb35"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>hom(A,-): C -&gt; Set</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>hom(A,-): B ↦ hom(A,B)</span></code></pre></div>
 <p>모피즘 <code>f: B-&gt;C</code> 매핑은</p>
-<div class="sourceCode" id="cb35"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>hom(A,f): hom(A,B) -&gt; hom(A,C)</span>
-<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>hom(A,f): g ↦ f∘g</span></code></pre></div>
+<div class="sourceCode" id="cb36"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>hom(A,f): hom(A,B) -&gt; hom(A,C)</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>hom(A,f): g ↦ f∘g</span></code></pre></div>
 <p><strong>locally small category</strong><br />
 임의의 두 대상 사이의 모피즘 모음이 집합인 카테고리를 말합니다. 모음이 집합이 아닌 예로, 모든 집합 모음이 있습니다. 이 모음은 집합이 될 수 없습니다. 모든 집합의 모음이라 했으니까요. (러셀 역설) 그럼 locally small이 아닌 경우는 어떤 특징이 있는지 궁금하긴 한데, 일단 가던 길부터 잘 가고 생각해 봐야겠습니다. 텍스트들을 읽다 locally small을 만나면, 일단 “두 대상 사이에 모피즘 집합이 있군” 정도로 넘어 가려 합니다.</p>
 <p><strong>자연 변환 Natrual Transformation 표기</strong><br />
 카테고리 <code>C</code>, <code>D</code>, 펑터 <code>F: C -&gt; D</code>, <code>G: C-&gt; D</code> 일 때, 자연 변환 <code>η: F -&gt; G</code> …<br />
 이렇게 얘기하는 걸 다음과 같이 표기합니다.</p>
-<div class="sourceCode" id="cb36"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>[C,D](F,G)</span></code></pre></div>
+<div class="sourceCode" id="cb37"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>[C,D](F,G)</span></code></pre></div>
 <p>어떤 카테고리를 도메인, 코도메인으로 하고 있는지를 먼저 표시해 줍니다.</p>
 <p>※ 아래는 <code>C-&gt;Set</code> 펑터를 나타냅니다. (역시나 펑터들이 대상이 되면, 모피즘과 혼동되지 않는 표기가 필요했을 거라 추측합니다.)</p>
-<div class="sourceCode" id="cb37"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>[C,Set] 또는 Set^C</span></code></pre></div>
+<div class="sourceCode" id="cb38"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>[C,Set] 또는 Set^C</span></code></pre></div>
 <p>텍스트마다 다 다르긴 한데, 대체적으로<br />
 영문 소문자는 대상<code>a</code>, 혹은 모피즘<code>f</code>들을 표시하고,<br />
 영문 대문자는 카테고리<code>C</code>, 혹은 펑터<code>F</code>들을 표시하고,<br />
