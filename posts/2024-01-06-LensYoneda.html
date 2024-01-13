@@ -105,12 +105,12 @@
 <p><code>Store</code>의 <code>pos</code>와 <code>peek</code>는 둘 모두 위 폴리모픽 함수로 볼 수 있습니다. <code>Functor g =&gt;</code>라 했으니, 구현 어디선가 <code>fmap</code>을 쓴다를 선언했습니다. <code>fmap</code>의 서명은</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fmap</span><span class="ot"> ::</span> (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> g a <span class="ot">-&gt;</span> g b</span></code></pre></div>
 <p>입니다. Laarhoven 식 안에서 <code>g</code>의 <code>fmap</code>을 써서 <code>g b</code>를 만들려면, 함수 <code>(a-&gt;b)</code>와 <code>a</code>가 있어야 합니다. <code>a</code>에 <code>a -&gt; g a</code>를 적용해서 <code>g a</code>를 만들고, 여기에 <code>fmap</code>으로 <code>a-&gt;b</code>를 적용해 <code>g b</code>를 만들 수 있습니다. Laarhoven 식의 서명만으로 <code>(a-&gt;b)</code>,<code>a</code>를 가지고 있다는 걸 알 수 있습니다. (텍스트에선 이 후 복잡한 식을 쫓아가며 설명하는데, 미리 결과를 말하자면, <code>(a -&gt; g a) -&gt; g b</code>는 <code>(a, a-&gt;b)</code>와 Laarhoven equivalence입니다.)</p>
-<p>어디서 본 듯한 이 패턴은 바로 요네다 보조 정리에 나오는 패턴입니다.<br />
+<p>어디서 본 듯한 이 패턴은 바로 <a href="../posts/2023-12-16-homFunctor.html">요네다 보조 정리</a>에 나오는 패턴입니다.<br />
 <code>forall t. (a -&gt; t) -&gt; g t ~= g a</code><br />
 </p>
 <p>요네다 보조 정리를 말로 풀면 다음과 같습니다.<br />
-“어떤 폴리모픽 함수(<code>a-&gt;t</code>까지가 아니라 자연 변환 <code>forall t.(a-&gt;t)-&gt;g t</code>)는 어떤 펑터 <code>g</code>의 상image에 있는 값들의 집합이다.”<br />
-서명만 봐도 <code>a-&gt;t</code>만 줬는데, <code>g t</code>가 나오려면 안에 <code>a</code>를 가지고 있다는 말입니다.</p>
+“어떤 폴리모픽 함수(<code>a-&gt;t</code>까지가 아니라 자연 변환 <code>forall t. (a-&gt;t) -&gt; g t</code>)는 어떤 펑터 <code>g</code>의 상image에 있는 값들의 집합과 대응한다.”<br />
+서명만 봐도 <code>a-&gt;t</code>만 줬는데, <code>g a</code>가 나오려면 안에 <code>a</code>를 가지고 있다는 말입니다.</p>
 
 <div class="comment">
 <script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
