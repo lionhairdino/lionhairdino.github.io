@@ -424,7 +424,7 @@ B -&gt; Hom(-,B)
 <img src="../images/yoneda_proof.jpg" alt="요네다 보조 정리 증명" /><figcaption aria-hidden="true">요네다 보조 정리 증명</figcaption>
 </figure>
 <p><code>(F,a) -&gt; (G,b)</code>와 <code>F a -&gt; G b</code>를 보겠습니다. <code>(F,a)</code>란 프로덕트 카테고리이니, <code>μ: F-&gt;G</code>, <code>u: a-&gt;b</code>를 각각 봐서 <code>(μ,u)</code>가 됩니다. <code>F</code>와 <code>G</code>는 펑터이니, 각 성분별로 보면 <code>μ_x: F x -&gt; G x</code>로 표현하고 있습니다. 그럼 <code>F a -&gt; G b</code>는 <code>F a</code>에 <code>μ</code>를 적용해서 <code>G a</code>로 바꾼 후 <code>G</code>의 <code>fmap</code>으로 <code>a</code>를 <code>b</code>로 바꿉니다. <strong>G u ∘ μ_x</strong><br />
-※ 혹 <strong>G u</strong>가 어색하다면, 보통 <code>f</code>에 <code>F</code>를 적용해서 <code>F f</code>가 되는걸, 코드로 생각하면 <code>F f</code>란 <code>F</code>의 <code>fmap</code>으로 <code>f</code>를 변환한 것입니다.</p>
+※ 혹 <strong>G u</strong>가 어색하다면, 보통 <code>f</code>에 <code>F</code>를 적용해서 <code>F f</code>가 되는 걸, 코드로 생각하면 <code>F f</code>란 <code>F</code>의 <code>fmap</code>으로 <code>f</code>를 변환한 것입니다.</p>
 <p><code>(F,a) - &gt; (G,b)</code>와 <code>[C,Set](C(a,-),F)</code> -&gt; <code>[C,Set](C(b,-),G)</code>를 보겠습니다.<br />
 <code>C(a,-)</code>, <code>F</code>, <code>G</code>는 펑터니 자연 변환은 성분을 봐야합니다.<br />
 <code>α_x = C(a,x) -&gt; F x ---&gt; (a-&gt;x) -&gt; F x</code><br />
@@ -438,6 +438,26 @@ B -&gt; Hom(-,B)
 (나)는 <code>G u ∘ μ_x</code><br />
 (다)는 <code>μ_x∘α_x∘u</code></p>
 <p>정리하면 <code>F a</code>도 <code>F</code>와 <code>a</code>에만 의존해서 결정되고, <code>Φ: [C,Set](C(a,-),F)</code>도 <code>F</code>와 <code>a</code>만 의존해서 결정되므로 둘은 동형이란 얘깁니다. 수식으로 딱 떨어지는 걸 보고 싶었는데, 영상에선 이렇게 끝을 맺고 있습니다.</p>
+<h2 id="결론">결론</h2>
+<p>더 추상적으로 얘기하면, 함수 두 개 <code>f</code>, <code>g</code>가 <code>f(a,b)</code>로 <code>a</code>, <code>b</code>에만 의존하고, <code>g(a,b)</code>도 역시 <code>a</code>, <code>b</code>에만 의존한다면 둘 사이의 일정한 대응 관계를 만들 수 있습니다. 값이 고정되어 있지 않은 폴리모픽, 즉 <code>forall a</code>, <code>forall b</code>와의 관계에만 의존해서 결과가 결정되는, 둘에게서 (어떤 절차를 거치면) 같은 정보를 뽑아낼 수 있습니다.<br />
+<code>a</code>를 <code>b</code>에 적용할 함수(펑터)로 보면, 가장 간단하게 <code>a</code>, <code>b</code> 정보를 가지고 있는 식은 <code>a</code> <code>b</code> 입니다.</p>
+<p>도메인, 코도메인이 같은 어떤 두 펑터 <code>F</code> (<code>a -&gt; Fa</code>,<code>f -&gt; Ff</code>)와 <code>G</code> (<code>a -&gt; Ga</code>,<code>f -&gt; Gf</code>)의 자연 변환 성분을 보면<br />
+<code>Fa</code>와 <code>Ga</code>의 차이<br />
+<code>Ff</code>와 <code>Gf</code>의 차이<br />
+입니다. 자연 변환 자체는 <code>a</code>, <code>f</code>에만 의존하고 있습니다.<br />
+</p>
+<p>이 자연 변환이 바로 둘의 <strong>일정한 관계</strong>를 뜻합니다. 아주 확실한 건 아닙니다만, 아주 아주 축약해서 얘기하면, <strong><em>요네다는 자연 변환 성질을 얘기한 것</em></strong>인가라는 생각이 듭니다.</p>
+<p><code>C</code> 카테고리 자체가 어떤 복잡한 구성, 구조를 가지고 있든 간에,<br />
+[모든 구성원이 <code>a</code>에 의존하게 만드는 펑터(<code>:C-&gt;Set</code>)]와,<br />
+[임의의 펑터 <code>F:C-&gt;Set</code>] 사이의<br />
+자연 변환 자체는 <code>F</code>, <code>a</code>에만 의존할 거라 추측할 수 있습니다.</p>
+<p>조금 더 복잡하게 얘기하면, 위 자연 변환 자체를 또 펑터로 보고(뎁스가 이렇게 깊어지는 건 저도 별로 안 좋아합니다만, 위 증명을 그대로 쓰면)<br />
+[[모든 구성원이 a에 의존하게 만드는 펑터] -&gt; [임의의 펑터 F]] 펑터(여기선 자연 변환이 아닌 <code>[C,Set] × C -&gt; Set</code>펑터)와<br />
+[(a,F) -&gt; F a] 펑터<br />
+사이에 존재하는 자연 변환을 정의할 수 있으니, [모든 구성원이 a에 의존하게 만드는 펑터]는 <code>a</code>와 동등한 의미를 가지고 있다는 결론에 도달합니다.<br />
+</p>
+<p>너무 결론으로 훅 점프한 것 같긴한데, 조금 더 힌트가 될만한 말을 덧붙이자면, 펑터는 <code>C</code>를 변형하는 동작이지, <code>C</code>가 아닙니다. <code>F</code>를 <code>x</code>에 적용해서 나오는 “값”은 <code>x</code>에 의존하지만, <code>F</code>자체가 어떤 동작을 할지는 <code>x</code>에 의존하는 것이 아닙니다. <code>F i = +i</code> 함수를 <code>x</code>에 적용한다면, <code>x+i</code>가 됩니다. <code>F</code>는 <code>i</code>에 의존해서 동작이 결정되고, 이를 <code>x</code>에 적용합니다. 이 동작만 떼 내어 보는 겁니다. 홈펑터는 <code>홈펑터 a = a -&gt;</code>라는 함수로 보고, 이 홈펑터의 동작은 <code>a</code>에만 의존한다 말하고 있습니다.</p>
+<p>요네다 벽을 넘고 나면, 카테고리 이론을 이해하는데 도움이 된다고 하는데, 자연 변환에 대한 인사이트(한 눈에 보이진 않지만, 본질적인 의미)가 생겨서 그렇다는 뜻 아닐까 합니다.</p>
 <h2 id="하스켈에서-요네다-보조-정리의-의미">하스켈에서 요네다 보조 정리의 의미</h2>
 <p>카테고리 이론의 지상 최대 과제는, “모든 것들을 관계로 설명하자”입니다. 요네다는 이 말을 그대로 이론으로 보여주고 있습니다. <code>A</code>에 <code>F</code>를 적용하는 것은 <code>A</code>를 나타내는 <code>Hom(A,-)</code>와 <code>F</code>의 자연 변환으로 대체할 수 있다는 말입니다. 안 그래도 추상화에 추상화로 머리가 터지는데, 애초에 홈펑터로 시작하면 얼마나 복잡할까 싶습니다. 함부로 건드릴 대상은 아니지만, 거의 모든 걸 함수, Computation으로 보려는 하스켈에서 무언가를 같게(동형) 보는 작업은 매우 중요합니다. 현재까지는, 동형으로 보기 위한 3대장 테크닉이 모나드, Adjunction, 요네다 정리로 생각됩니다. 모나드를 제외하면 직접적으로 쓸 일이 많지 않겠지만, 현실을 모델링할 때 영감을 주는 역할을 할 수 있을거라 믿습니다.<br />
 ※ 지금은 설명할 정도로 잘 알지 못하지만, 어렴풋이 셋의 연결 고리가 보입니다.</p>
@@ -529,11 +549,13 @@ B -&gt; Hom(-,B)
 </p>
 <div class="sourceCode" id="cb34"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">LensGetter</span> s a <span class="ot">=</span> (a <span class="ot">-&gt;</span> <span class="dt">Maybe</span> s) <span class="ot">-&gt;</span> (s <span class="ot">-&gt;</span> <span class="dt">Maybe</span> s)</span></code></pre></div>
 <p><code>runMaybe</code>가 없긴 하지만, 어찌해서 <code>Maybe</code>를 떼어냈다 해도 <code>(a -&gt; s) -&gt; (s -&gt; s)</code>입니다.<br />
-<strong><em>Const a는 a를 가지고 들어가는 트릭이 있습니다.</em></strong><br />
 </p>
-<p>직관적으로 보면, 이렇게 간단히 해석되기도 하는데, <a href="https://www.twanvl.nl/blog/news/2011-05-19-lenses-talk">Twan van Laarhoven equivalence</a>를 따져서 Lens 분석을 하는 글이 있습니다. 혹시 이 글에서 위 트릭에 관한 글이 있을지 찾아봐야겠습니다. <span class="citation" data-cites="todo">@todo</span><br />
-<span class="citation" data-cites="todo">@todo</span> <a href="https://bartoszmilewski.com/2013/10/08/lenses-stores-and-yoneda/">Lenses, Stores, and Yoneda - 바르토즈 밀레프스키</a> 글을 해석 중입니다. - <a href="../posts/2024-01-06-LensYoneda.html">Lens와 요네다 보조 정리</a></p>
-<p><a href="https://lens.github.io/">The Lens Library</a></p>
+<p><strong><em>Const a는 a를 가지고 들어가는 트릭이 있습니다.</em></strong><br />
+</p>
+<p>직관적으로 보면, 이렇게 간단히 해석되기도 하는데, <a href="https://www.twanvl.nl/blog/news/2011-05-19-lenses-talk">Twan van Laarhoven equivalence</a>를 따져서 Lens 분석을 하는 글이 있습니다. 혹시 이 글에서 위 트릭에 관한 이론이 있을지 찾아봐야겠습니다. <span class="citation" data-cites="todo">@todo</span><br />
+<span class="citation" data-cites="todo">@todo</span> <a href="https://bartoszmilewski.com/2013/10/08/lenses-stores-and-yoneda/">Lenses, Stores, and Yoneda - 바르토즈 밀레프스키</a> 글을 해석 중입니다. - <a href="../posts/2024-01-06-LensYoneda.html">Lens와 요네다 보조 정리</a><br />
+<a href="https://lens.github.io/">The Lens Library</a><br />
+</p>
 <hr />
 <h3 id="참고">참고</h3>
 <p><a href="https://en.wikipedia.org/wiki/Hom_functor">홈펑터 - 위키백과</a><br />
