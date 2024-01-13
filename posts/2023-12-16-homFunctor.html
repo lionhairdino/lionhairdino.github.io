@@ -130,8 +130,8 @@
 <p><code>Hom(A, -)</code>는 마치 하스켈 타입 생성자 같기도 하고, 함수를 인자로 받아, 가지고 있는 함수를 변형하는 고차 함수 같기도 합니다. 쓰고나서 보니, 펑터 인스턴스가 있는 타입 생성자와 <code>fmap</code>, 즉 펑터입니다.</p>
 <p><code>Hom(A, -)</code>에서, 설명을 위해 <code>A</code>는 일단 고정한 채로<br />
 아래와 같이 카테고리<code>C</code>에 있는 <code>X</code>,<code>Y</code>,<code>...</code> 대상을 <code>Set</code>카테고리의 대상 hom-Set에 매핑합니다.<br />
-<code>X</code> —&gt; <code>Hom(A,X)</code><br />
-<code>Y</code> —&gt; <code>Hom(A,Y)</code><br />
+<code>X</code> —&gt; <code>Hom(A,X)</code> : <code>A</code>를 주면 <code>X</code>가 되는 함수<br />
+<code>Y</code> —&gt; <code>Hom(A,Y)</code> : <code>A</code>를 주면 <code>Y</code>가 되는 함수<br />
 …</p>
 <p><code>Hom</code>펑터는 <strong>펑터</strong>니까 모피즘도 매핑해야 합니다.<br />
 <code>f:X -&gt; Y</code> —&gt; <code>Hom(A,</code><strong>f</strong><code>): Hom(A,</code><strong>X</strong><code>) -&gt; Hom(A,</code><strong>Y</strong><code>)</code><br />
@@ -141,7 +141,8 @@
 <li>새로운 구조 안에 있는 대상에 <code>f</code>를 적용한다고 해석하기도 합니다. <code>(a -&gt; b) -&gt; f a -&gt; f b</code></li>
 </ul>
 <blockquote>
-<p>주의: 함수 안에 들어 있는 걸 바꾸는 건 다른 문제입니다. 한참 헤맸는데, <code>Maybe x</code>일 때 <code>fmap</code>으로 <code>x</code>에 함수를 적용할 순 있어도, 생각 스트레칭에서 말했듯이, <code>Maybe (x -&gt; y)</code>에선 함수를 깨버리고 들어갈 수가 없습니다. <code>x</code>와 <code>y</code>는 보이지 않습니다. <code>(x -&gt; y)</code> 자체가 대상object입니다. 대상을 변형할 수는 없고, 전에 합성을 하든, 후에 합성을 하는 수 밖에 없습니다. 안에 있는 <code>x</code>에 <code>f</code>를 적용한다는 메타포로 보면, <code>Maybe</code> 안에 있는 <code>(x -&gt; y)</code>에 <code>f</code>를 적용할 순 있어도, 더 들어가 <code>x</code>에 적용할 순 없습니다.</p>
+<p>주의: 함수 안에 들어 있는 걸 바꾸는 건 다른 문제입니다. 한참 헤맸는데, <code>Maybe x</code>일 때 <code>fmap</code>으로 <code>x</code>에 함수를 적용할 순 있어도, 생각 스트레칭에서 말했듯이, <code>Maybe (x -&gt; y)</code>에선 함수를 깨버리고 들어갈 수가 없습니다. <code>x</code>와 <code>y</code>는 보이지 않습니다. <code>(x -&gt; y)</code> 자체가 대상object입니다. 대상을 변형할 수는 없고, 전에 합성을 하든, 후에 합성을 하는 수 밖에 없습니다. 안에 있는 <code>x</code>에 <code>f</code>를 적용한다는 메타포로 보면, <code>Maybe</code> 안에 있는 <code>(x -&gt; y)</code>에 <code>f</code>를 적용할 순 있어도, 더 들어가 <code>x</code>에 적용할 순 없습니다.<br />
+※ 함수 펑터가 가지고 있는 <code>fmap</code>을 쓴다면 <code>(-&gt;) a b</code>에서 <code>a</code>에 접근할 수 있습니다. 여기선 <code>Maybe</code>의 <code>fmap</code>으론 함수 펑터 안에 있는 대상에 도달하지 못한다는 말입니다.</p>
 </blockquote>
 <p><code>A-&gt;</code><strong>X</strong>를 변환해서 <code>A-&gt;</code><strong>Y</strong>가 되게 하려면, <code>A-&gt;</code><strong>X</strong> 다음에 <code>f:</code> <strong>X</strong><code>-&gt;</code><strong>Y</strong>를 합성(<strong>(X-&gt;Y) ∘ (A-&gt;X)</strong>)하면 됩니다. 또는 새로운 구조 <code>A-&gt;</code><strong>X</strong> 안 쪽에 있는 <strong>X</strong>에 <code>f</code>를 적용하는 것이 아니라, <code>A-&gt;X</code>의 결과로 함수를 빠져나올 <code>X</code>에 <code>f</code>를 적용합니다.</p>
 <p>하나의 <strong>hom-Set</strong> <code>Hom(A,X)</code>에 들어 있는 모피즘(:<strong>A-&gt;X</strong>)을 <code>g1</code>, <code>g2</code>, <code>...</code> 라 하면, <strong>Hom-Functor</strong> <code>Hom(A,-)</code>는 이 모피즘들을 각 각 <code>f:</code><strong>(X-&gt;Y) ∘</strong>와 합성합니다. 결국 <strong>hom-set</strong> <code>Hom(A,Y)</code>에 있는 모피즘(:<strong>A-&gt;Y</strong>) <code>f∘g1</code>, <code>f∘g2</code>, <code>...</code>로 매핑하는 모양이 됩니다.</p>
@@ -151,10 +152,11 @@
 <p>※ 모피즘 매핑을 보면 <code>X</code> <strong>-&gt;</strong> <code>Y</code>에 펑터를 적용한 결과가 <code>X</code> <strong>-&gt;</strong> <code>Y</code> 그대로여서 Covariant 펑터라 합니다.</p>
 <p>(※ 보통 카테고리 이론에서는 대상을 구조가 없는, 아무 성질도 없는 점 쯤으로 생각합니다. 그런데, 만일 <code>Hom(A,-)</code> 펑터를 적용하니, 위와 같은 합성 성질이 나왔다면, 대상이 <code>A-&gt;X</code>를 가지고 있다고 유추할 수 있을 것 같습니다. (검증 필요))</p>
 <h2 id="hom---b-c---set">Hom (-, B) : C -&gt; Set</h2>
+<p>※ <code>Hom (A,-)</code>는 컴퓨테이션을 거친 결과가 <code>A</code>는 아니라서, 전 Contravariant한 <code>Hom (-,B)</code>가 더 생각하기에 편한 듯 합니다.</p>
 <p><code>B</code>는 일단 고정한 채로<br />
 <code>Hom(-,B)</code>는 아래와 같이 매핑하는 펑터입니다.<br />
-<code>X</code> —&gt; <code>Hom(X,B)</code><br />
-<code>Y</code> —&gt; <code>Hom(Y,B)</code><br />
+<code>X</code> —&gt; <code>Hom(X,B)</code> : <code>X</code>를 주면 <code>B</code>가 되는 함수<br />
+<code>Y</code> —&gt; <code>Hom(Y,B)</code> : <code>Y</code>를 주면 주면 <code>B</code>가 되는 함수<br />
 …</p>
 <p>모피즘 매핑을 보겠습니다.<br />
 (1) <code>h:X -&gt; Y</code> —&gt; <code>Hom(</code><strong>h</strong><code>,B): Hom(</code><strong>X</strong><code>,B) -&gt; Hom(</code><strong>Y</strong><code>,B) -- ???</code><br />
@@ -189,6 +191,7 @@
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>Y-&gt;X ---&gt; X-&gt;X           ----------&gt; Y-&gt;X </span></code></pre></div>
 <p>대상 속에 <code>-&gt;</code>가 있다면(모든 게 Computation인 세상이라면), “Contravariant는 항상 따라다니고 있던 것이었다”라고 상상해 봤습니다.<br />
 ※ <code>Id_X</code>가 <code>Id_Y</code>로 가려면, <code>Y-&gt;X</code>, <code>X-&gt;Y</code>가 있어야 합니다. <a href="../posts/2023-12-05-adjunction_arrow_meaning.html">Adjunction</a>으로 생각이 이어집니다.</p>
+<p><code>a-&gt;b</code>는 <code>a</code>라는 기준점을 봤을 때 <code>b</code>로 가는 길Computation입니다. <code>a</code>를 바꾼다는 건, 자로 길이를 잴 때 기준점을 바꾸는 것과 동일한 동작입니다. Contravariant합니다.</p>
 </blockquote>
 <p>※ 모피즘 매핑을 보면 <code>X</code> <strong>-&gt;</strong> <code>Y</code>에 펑터를 적용한 결과가 방향이 뒤집어진 <code>Y</code> <strong>-&gt;</strong> <code>X</code>여서 Contravariant 펑터입니다. 입력이었던 것이 출력이 되고, 출력이었던 것이 입력이 되었습니다.</p>
 <p>참고 - <a href="../posts/2022-11-10-coContraVarint.html">Covariant, Contravariant, Positive, Negative</a></p>
@@ -285,12 +288,13 @@
 <pre><code>A -&gt; Hom(-,A)
 B -&gt; Hom(-,B)
 ...</code></pre>
-<p>이렇게 매핑하는 걸 요네다 임베딩embedding이라 부릅니다.</p>
+<p>이렇게 매핑하는 걸 요네다 임베딩embedding이라 부릅니다. <code>Set</code> 카테고리에 <code>A</code>와 대응하는 집합, <code>B</code>와 대응하는 집합, … 들을 모두 모아서 보면 <code>Set</code> 카테고리에 현재 카테고리 <code>C</code>와 대응되는 상image을 만든다고 볼 수 있겠습니다.</p>
 <p><code>F펑터: C^op -&gt; Set</code>일 때,<br />
-<code>Hom(-,A)홈펑터 -&gt; F펑터</code> 자연 변환이 <code>F(A)</code>와 (일대일 대응bijection | 동형)</p>
+<code>Hom(-,A)홈펑터 -&gt; F펑터</code> 자연 변환이 <code>F(A)</code>와 (일대일 대응bijection | 동형?)</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>Nat(Hom(-,A),F) ~= F(A)</span></code></pre></div>
 <p>위 식이 성립한다가 요네다 보조 정리입니다. 좀 더 정확히는</p>
-<p>“<code>F</code>가 locally small category <code>C</code>에서 <code>Set</code>으로 가는 펑터일 때, C에 있는 각 대상 <code>A</code>에 대해, <code>h_A</code>에서 <code>F</code>로가는 자연 변환 <code>Nat(h_A,F) ≡ Hom(Hom(A,-),F)</code>는 <code>F(A)</code> 원소와 일대일 대응이다.”</p>
+<p>“<code>F</code>가 locally small category <code>C</code>에서 <code>Set</code>으로 가는 펑터일 때, C에 있는 각 대상 <code>A</code>에 대해, <code>h_A</code>에서 <code>F</code>로가는 자연 변환 <code>Nat(h_A,F) ≡ Hom(Hom(A,-),F)</code>는 <code>F(A)</code> 원소와 일대일 대응이다.”<br />
+※ <code>Hom</code>이라 써도 되지만, 자연 변환임을 드러내기 위해 <code>Nat</code>가 더 적당해 보입니다.</p>
 <blockquote>
 <p>Let <code>F</code> be a functor from a locally small category <code>C</code> to <code>Set</code>. Then for each object <code>A</code> of <code>C</code>, the natural transformations <code>Nat(h_A,F) ≡ Hom (Hom(A,−),F)</code> from <code>h_A</code> to <code>F</code> are in one-to-one correspondence with the elements of <code>F(A)</code>.</p>
 </blockquote>
@@ -320,6 +324,7 @@ B -&gt; Hom(-,B)
 <div class="sourceCode" id="cb14"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>F X = (  F f) u -- 아래 쪽 경로</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>F X = (Φ_X f)   -- 오른 쪽 경로</span></code></pre></div>
 <p>우선 보이는 대로, 제 방식대로 직관적으로 읽으면, <strong>f를 F로 변환한 것과, f를 Φ_X로 변환한 것의 차이는 u</strong>입니다. <code>u</code>가 isomorphism에서 어떤 역할을 할 것 같이 보이는 대목입니다.</p>
+<p>※ 여러 개의 텍스트를 동시에 보다 보니, 표기가 마구 섞여 있습니다. <code>Hom(-,A)</code>에 대한 것을 모두 확인했다면, <code>Hom(A,-)</code>는 화살표만 모두 뒤집으면 그대로 성립하는 듀얼이라 합니다. 듀얼에 대한 심상이 아직 명확하지 않지만, 어쨌든 한 쪽을 알면, 간단히 다른 한 쪽도 알 수 있어서, 그 때 그 때 필요한 걸로 설명을 풀어가고 있습니다.</p>
 <h3 id="왜-u만-알면-가환-다이어그램이-결정되지">왜 u만 알면, 가환 다이어그램이 결정되지?</h3>
 <p>좀 더 자세히 해석해 보겠습니다. (검증 필요)<br />
 목표는 <code>Φ</code>와 <code>F</code>가 일대일 대응인지를, 즉 <code>Φ</code>가 정해지면 유일한 <code>F</code>가 정해지고, 거꾸로 <code>F</code>가 정해지면 유일한 <code>Φ</code>가 정해지는지를 봅니다.</p>
@@ -517,7 +522,7 @@ B -&gt; Hom(-,B)
 <code>Hom(a,-)</code>는 모든 대상을 <code>a</code>와 연관 짓습니다. 이 걸 다른말로 하면, 모든 대상을 <code>a</code>를 받는 함수로 만든다는 말입니다. 그냥 <code>b</code>,<code>c</code>,…로 있던 대상들을 <code>a-&gt;b</code>,<code>a-&gt;c</code>,…로 <code>a</code>를 받아야만 값이 되도록 모두 바꿔 놓았습니다.</p>
 <p><code>b</code>를 홈펑터 <code>Hom(a,-)</code>로 변환한 값은 <code>a</code>를 필요로 하는 <code>a-&gt;b</code>이지만, 펑터<code>F</code>로 변환한 값은 <code>F b</code>입니다. 이 때 두 펑터의 차이를 구한다면, 즉 <code>Hom(a,-)</code>를 거친 후 <code>F a</code>에 도달하려면 어떤 과정을 거쳐야 하는지 본다면,</p>
 <p><strong>“어디엔가는 a가 있어야만 합니다.”</strong></p>
-<p><code>Hom(a,-)</code>에는 <code>a</code>가 있지 않습니다. <code>a</code>를 받을 수 있지, 가지고 있지는 않습니다. 이 펑터가 <code>F a</code>에 도달하려면, 결국 <code>Hom(a,-)</code>와 <code>F</code>의 자연 변환이 <code>a</code>를 가지고 있어야만 합니다. 대상을 모피즘 집합으로 표현하면서, 원래 대상은 자연 변환에 담아 뒀습니다.</p>
+<p><code>Hom(a,-)</code>에는 <code>a</code>가 있지 않습니다. <code>a</code>를 받을 수 있지, 가지고 있지는 않습니다. 이 펑터가 <code>F a</code>에 도달하려면, 결국 <code>Hom(a,-)</code>와 <code>F</code>의 자연 변환이 <code>a</code>를 가지고 있어야만 합니다. 대상을 모피즘 집합으로 표현하면서, <strong><em>원래 대상은 자연 변환에 담아 뒀습니다.</em></strong></p>
 <p>요네다를 모를 때, 프로그래머 지식으로 Contravariant를 해석한 직관이었는데, 요네다 동작을 살필 때도 떠올려 볼만합니다.</p>
 <h2 id="lens">Lens</h2>
 <p>이제, 이런 결과를 Lens에 어떻게 적용하는지 볼 차례입니다. 많은 내용을 그대로 얘기해야 하니 <a href="https://lionhairdino.github.io/posts/2021-05-13-lens.html#%EC%99%9C-%ED%8E%91%ED%81%AC%ED%84%B0%EA%B0%80-%EB%93%A4%EC%96%B4%EA%B0%80-%EC%9E%88%EC%9D%84%EA%B9%8C%EC%9A%94">Lens 정의에 왜 펑터가 들어가 있을까요?</a>를 같이 봐주세요. 링크 글에서는 요네다 보조 정리를 모르는 상황에서 코드만으로 따라 갔는데, 이제 요네다 보조 정리를 알고 있는 상태에선 어떤 식으로 접근하는지 살펴 보겠습니다.</p>
@@ -531,21 +536,25 @@ B -&gt; Hom(-,B)
 <span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">LensGetter</span> s a <span class="ot">=</span> (a <span class="ot">-&gt;</span> _) <span class="ot">-&gt;</span> (s <span class="ot">-&gt;</span> _) </span>
 <span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a><span class="co">--                    ^^^^^^^^^^^^^^^^^^^^</span></span>
 <span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a><span class="co">--                    (a-&gt;s)와 (s-&gt;s)의 차이는 (s-&gt;a)입니다.      </span></span></code></pre></div>
-<p>이제 GHC한테 맡길 방법을 찾아야 합니다. <code>f</code>를 폴리모픽하게 두고, GHC가 채워넣게 해서 어쩔 땐 <code>a</code>를, 어쩔 땐 <code>s</code>를 고르게 한다면, 하나의 모양으로 표기할 수 있습니다.</p>
+<p>이제 GHC한테 맡길 방법을 찾아야 합니다. 아래와 같이 멀쩡한 타입에다 폴리모픽 펑터를 붙입니다.</p>
 <div class="sourceCode" id="cb31"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">LensModify</span> s a <span class="ot">=</span> (a <span class="ot">-&gt;</span> f a) <span class="ot">-&gt;</span> (s <span class="ot">-&gt;</span> f s) </span>
 <span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">LensGetter</span> s a <span class="ot">=</span> (a <span class="ot">-&gt;</span> f a) <span class="ot">-&gt;</span> (s <span class="ot">-&gt;</span> f a) <span class="co">-- _ 자리에 f a를 넣었습니다.</span></span></code></pre></div>
-<p>이제 GHC가 컨텍스트에 따라서 <code>Identity</code> 또는 <code>Const a</code>를 선택하게 하는 일만 남았습니다.<br />
-펑터 타입을 열어 둔</p>
+<p><code>f</code>를 폴리모픽하게 두고, GHC가 채워넣게 해서 어쩔 땐 <code>a</code>를, 어쩔 땐 <code>s</code>를 고르게 한다면, 하나의 모양으로 표기할 수 있습니다. (물론, <code>f</code>안의 값을 보기 위해 패턴매칭을 하는 <code>run f</code>과정이 필요하지만 가지고 있는 정보 자체는 달라지지 않습니다.)</p>
+<p>펑터 타입을 열어 둔</p>
 <div class="sourceCode" id="cb32"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">Lens</span> s a <span class="ot">=</span> <span class="kw">forall</span> f <span class="op">.</span> <span class="dt">Functor</span> f <span class="ot">=&gt;</span> (a <span class="ot">-&gt;</span> f a) <span class="ot">-&gt;</span> (s <span class="ot">-&gt;</span> f s)</span></code></pre></div>
 <p>를 만듭니다. 하지만 타입을 잘 보면 문제가 한가지 있습니다.<br />
-<code>LensGetter</code>의 끝 부분을 보면 <code>f a</code>인데, 추상화한 타입 <code>Lens</code>의 끝 부분을 보면 <code>f s</code>입니다. 이대로는 추상화가 되지 않습니다. 이 부분을 해결하는 트릭이 번뜩입니다.<br />
+</p>
+<p><code>LensGetter</code>의 끝 부분을 보면 <code>f a</code>인데, 추상화한 타입 <code>Lens</code>의 끝 부분을 보면 <code>f s</code>입니다. 이대로는 추상화가 되지 않습니다. 이 부분을 해결하는 트릭이 번뜩입니다.<br />
 아래는 아무리 요네다를 알고 있었다해도 어떻게 이런 걸 떠올렸지 싶은 트릭입니다.</p>
 <div class="sourceCode" id="cb33"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">Identity</span> a <span class="ot">=</span> <span class="dt">Identity</span> {<span class="ot"> runIdentity ::</span> a } <span class="kw">deriving</span> <span class="dt">Functor</span></span>
 <span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">Const</span>  a b <span class="ot">=</span> <span class="dt">Const</span>    {<span class="ot"> getConst    ::</span> a } <span class="kw">deriving</span> <span class="dt">Functor</span></span>
 <span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">LensModify</span> s a <span class="ot">=</span> (a <span class="ot">-&gt;</span> <span class="dt">Identity</span> a) <span class="ot">-&gt;</span> (s <span class="ot">-&gt;</span> <span class="dt">Identity</span> s) </span>
 <span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">LensGetter</span> s a <span class="ot">=</span> (a <span class="ot">-&gt;</span> <span class="dt">Const</span> a  a) <span class="ot">-&gt;</span> (s <span class="ot">-&gt;</span> <span class="dt">Const</span> a  s)</span></code></pre></div>
-<p>요네다 임베딩으로 보면 <code>(a -&gt; _) -&gt; (s -&gt; _)</code>에서 <code>_</code>부분에는 뭐가 들어가도, 같은 게 양쪽에 들어가면 상관없습니다. <code>Lens</code>에 <code>f</code>로 <code>Const a</code>를 넣고, 나중에 <code>runConst</code>를 거치면, 원하는대로 <code>(a -&gt; a) -&gt; (s -&gt; a)</code>가 나옵니다. 그럼 <code>Const</code>만 가능한 건지 <code>Maybe</code>를 한번 넣어 보겠습니다.<br />
+<p>요네다 임베딩으로 보면 <code>(a -&gt; _) -&gt; (s -&gt; _)</code>에서 <code>_</code>부분에는 뭐가 들어가도, 같은 게 양쪽에 들어가면 상관없습니다. <code>Lens</code>에 <code>f</code>로 <code>Const a</code>를 넣고, 나중에 <code>runConst</code>를 거치면, 원하는대로 <code>(a -&gt; a) -&gt; (s -&gt; a)</code>가 나옵니다.</p>
+<p>이제 GHC가 컨텍스트에 따라서 <code>Identity</code> 또는 <code>Const a</code>를 선택하게 하는 일만 남았습니다.<br />
+</p>
+<p>출력값은 아무 것이나 같기만 하면 된다는 말이 혼동되어 아무 펑터나 되는 것인가 궁금하다면 <code>Const</code>대신 <code>Maybe</code>를 한번 넣어서 확인하면 됩니다.<br />
 </p>
 <div class="sourceCode" id="cb34"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">LensGetter</span> s a <span class="ot">=</span> (a <span class="ot">-&gt;</span> <span class="dt">Maybe</span> s) <span class="ot">-&gt;</span> (s <span class="ot">-&gt;</span> <span class="dt">Maybe</span> s)</span></code></pre></div>
 <p><code>runMaybe</code>가 없긴 하지만, 어찌해서 <code>Maybe</code>를 떼어냈다 해도 <code>(a -&gt; s) -&gt; (s -&gt; s)</code>입니다.<br />
