@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko" lang="ko">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <title>lionhairdino - 한 가지 절차, 혹은 개념으로 봐 오던 걸 여러 개로 쪼개기</title>
+
+        <meta name="description" content="Monad, Adjunction, Yoneda를 공부하면서 보였던 작은 아이디어에 관한 얘기입니다. 이 개념들을 관통하는 하나의 큰 생각이 아니라, 이론의 시작에서 도구처럼 쓰인 아이디어에 관한 얘기입니다." />
+        <meta property="og:description" content="Monad, Adjunction, Yoneda를 공부하면서 보였던 작은 아이디어에 관한 얘기입니다. 이 개념들을 관통하는 하나의 큰 생각이 아니라, 이론의 시작에서 도구처럼 쓰인 아이디어에 관한 얘기입니다." />
+
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <link rel="icon" href="https://lionhairdino.github.io/favicon.svg" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino16px.png" sizes="16x16" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino24px.png" sizes="24x24" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino32px.png" sizes="32x32" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino48px.png" sizes="48x48" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino57px.png" sizes="57x57" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino60px.png" sizes="60x60" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino64px.png" sizes="64x64" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino72px.png" sizes="72x72" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino76px.png" sizes="76x76" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino114px.png" sizes="114x114" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino120px.png" sizes="120x120" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino144px.png" sizes="144x144" />
+        <link rel="shortcut icon" href="../favicon.ico" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino152px.png" sizes="152x152" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino180px.png" sizes="180x180" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino192px.png" sizes="192x192" />
+        <link rel="manifest" href="../site.webmanifest" />
+        <link rel="mask-icon" href="https://lionhairdino.github.io/Lionhairdino_black.svg" color="#ff7500" />
+        <meta name="msapplication-TileImage" content="/images/favicon/Lionhairdino144px.png" />
+        <meta name="msapplication-TileColor" content="#ff7500" />
+        <meta name="theme-color" content="#ffffff" />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="한 가지 절차, 혹은 개념으로 봐 오던 걸 여러 개로 쪼개기" />
+        <meta property="og:site_name" content="Lionhairdino" />
+        <meta property="og:url" content="https://lionhairdino.github.io/posts/2024-01-21-divide.html" />
+
+        <meta property="og:image" content="https://lionhairdino.github.io/images/state400px.png" />
+
+      <meta name="keywords" content="Monad, Adjuntion, Yoneda">
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-E9WZ6VXGHP"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-E9WZ6VXGHP');
+</script>
+<script src="../script/copycode.js"></script>
+<script async src="https://cse.google.com/cse.js?cx=9c53b4915cbb2605c"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.11.1/tocbot.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.11.1/tocbot.css" />
+    </head>
+    <body>
+        <div id="header">
+            <div style="display:inline-block;margin-right:5px;padding-top: 5px;" id="logo">
+                <a href="../"><img style="width:30px;border:none" src="../images/favicon/Lionhairdino48px.png"></a>
+            </div>
+            <div style="display:inline-block;vertical-align: top;padding-top:5px;" id="navigation">
+                <a href="../">lionhairdino</a>
+                <a href="../about.html">about</a>
+                <!--<a href="/archive.html">archive</a>-->
+            </div>
+            <div style="display:inline-block;font-size:0.8em;vertical-align: top;">
+                <div style="display:inline-block;vertical-align: top;padding-top: 5px">사이트내 검색</div>
+                <div style="display:inline-block;width:180px;"> 
+                    <div class="gcse-searchbox-only"></div>
+                </div>
+            </div>
+            <div>
+                여기 글들은 일종의 질문입니다. 용어 선택도 학계, 업계에서 쓰는 걸로 되어 있지 않고, 틀린 내용이 있을 수도 있습니다.
+            </div>
+        </div>
+        <div class="js-toc-content">
+            <h1>한 가지 절차, 혹은 개념으로 봐 오던 걸 여러 개로 쪼개기</h1>
+            <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+<div class="info">
+    Posted on January 21, 2024
+    
+</div>
+
+<p>Monad, Adjunction, Yoneda를 공부하면서 비슷하게 쓰인 것 같은, 아이디어 조각이 보여 정리해 봤습니다. 너무 일반적으로 쓰이는 생각이어서 하나 마나한 얘기일 수 있습니다. 각 개념들의 근본 생각이 아니라, 이론을 쫓아가는 과정에서 보이는 작은 도구같은 아이디어에 관한 얘기입니다. (세 개념을 이미 공부한 적이 있는 분을 대상으로 하는 글입니다)</p>
+<p><strong>“하나의 개념으로 보이는 걸, 여러 단계로 쪼개서 보면 새로운 일이 일어난다.”</strong><br />
+(하나인 줄 알았던 게, 사실은 여러 절차로 이루어져 있던 겁니다)</p>
+<h3 id="monad">Monad</h3>
+<p><a href="../posts/2023-03-10-monoidalCategory.html">비수학인이 해석한 모노이달 카테고리</a></p>
+<p>하나의 동작으로만 보였던 모노이드의 이항 연산을</p>
+<ol type="1">
+<li>둘을 모아서 (<code>M∘M</code>)</li>
+<li>하나로 만든다 (<code>join</code>)</li>
+</ol>
+<p>로 쪼개서 보고 있습니다.</p>
+<h3 id="adjunction">Adjunction</h3>
+<p><a href="../posts/2023-11-16-adjoint.html">Adjunction을 만드는 두 Adjoint 펑터로 모나드 표현하기</a></p>
+<p>두 카테고리가 동형, 혹은 동형 비슷한가?..라는 문장에는</p>
+<ol type="1">
+<li><code>F:C-&gt;D</code>, <code>G:D-&gt;C</code> 존재하고,</li>
+<li><code>G∘F</code>가 <code>Id_C</code>와 같아지는 방법이 있어야 하고,</li>
+<li><code>F∘G</code>가 <code>id_D</code>와 같아지는 방법이 있어야 한다.</li>
+</ol>
+<p>가 포함되어 있습니다.<br />
+동형이라는 조건을 여러 개로 쪼개서, 그 중 일부만 만족할 때를 보고 있습니다.</p>
+<h3 id="yoneda-lemma">Yoneda lemma</h3>
+<p><a href="../posts/2023-12-16-homFunctor.html">홈펑터Hom Functor와 요네다 보조 정리Yoneda lemma</a></p>
+<p>Monad, Adjunction 까지 그렇구나 하고 있었는데, 문득 Yoneda에도 비슷한 구석이 보였습니다.<br />
+값을 기준값과 컴퓨테이션으로 쪼개서 보고 있습니다. 예를 들면, <code>1</code>은 기준값 <code>0</code>과 <code>(+1)</code>로 쪼개어 봅니다. 그동안 다루던 값에는 기준값이라는 정보가 암묵적으로 들어 있는 컴퓨테이션이었다고 볼 수 있습니다. (자로 거리를 잰다면, 기준값 어디서부터 잰다고 할 때 그 기준값입니다.)</p>
+<p>아주 직관적으로 보이는 예를 들면,<br />
+<code>0</code>포함 자연수들이 있고, <code>F</code>가 이들을 <code>(+10)</code>한 대상과 대응시키고 있을 때, 홈펑터<code>Hom(-,A)</code>와 <code>F</code>의 자연 변환을 성분별로 보겠습니다.</p>
+<p>홈펑터<code>Hom(-,A)</code>에서 <code>A</code>를 <code>0</code>으로 둔 것과, (<code>A</code>를 <strong>기준값</strong>으로 보겠습니다.)<br />
+<code>A</code>를 <code>1</code>로 둔 것을 보겠습니다.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Hom(-,기준값A) 성분</th>
+<th>F 성분</th>
+<th>둘 사이의 자연 변환</th>
+<th>F 기준값A</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1 -&gt; 기준값 0 = (-1)</td>
+<td>1 (+10)</td>
+<td>-1+11= <strong>(+10)</strong></td>
+<td>10+기준값 0 = <strong>10</strong></td>
+</tr>
+<tr class="even">
+<td>2 -&gt; 기준값 0 = (-2)</td>
+<td>2 (+10)</td>
+<td>-2+12= <strong>(+10)</strong></td>
+<td>10+기준값 0 = <strong>10</strong></td>
+</tr>
+<tr class="odd">
+<td>3 -&gt; 기준값 0 = (-3)</td>
+<td>3 (+10)</td>
+<td>-3+13= <strong>(+10)</strong></td>
+<td>10+기준값 0 = <strong>10</strong></td>
+</tr>
+<tr class="even">
+<td>…</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>1 -&gt; 기준값 1 = (-0)</td>
+<td>1 (+10)</td>
+<td>-0+11= <strong>(+11)</strong></td>
+<td>10+기준값 1 = <strong>11</strong></td>
+</tr>
+<tr class="even">
+<td>2 -&gt; 기준값 1 = (-1)</td>
+<td>2 (+10)</td>
+<td>-1+12= <strong>(+11)</strong></td>
+<td>10+기준값 1 = <strong>11</strong></td>
+</tr>
+<tr class="odd">
+<td>3 -&gt; 기준값 1 = (-2)</td>
+<td>3 (+10)</td>
+<td>-2+13= <strong>(+11)</strong></td>
+<td>10+기준값 1 = <strong>11</strong></td>
+</tr>
+<tr class="even">
+<td>…</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><code>(+10)이라는 컴퓨테이션</code>과 <code>(+10)에 기준값 0을 적용한 결과값 10</code>을 대응시키고 있습니다.<br />
+<code>1</code>일 때는 <code>(+11)</code>과 <code>11</code>을 대응하고 있습니다.<br />
+기준값이 <code>0</code>일 때의 펑터 <code>(+10)</code>과 기준값이 <code>1</code>일 때의 펑터 <code>(+11)</code>, 즉 영향을 주는 정보를 튜플로 표현하면<code>(기준값0, (+10))</code>과 <code>(기준값1,(+11))</code>은 같은 펑터입니다.</p>
+<p>혹은 Adjunction은 단일한 개념으로 보이는 <strong>값</strong>이란 대상을, 다른 모든 것들과의 관계로 쪼개어 보고 있다고 볼 수도 있습니다.</p>
+<h3 id="결론">결론</h3>
+<p>다시 말하지만, 각 개념들의 근본이 되는 생각에 관한 얘기가 아닙니다. 공통적으로 쓰이는 작은 도구에 관한 얘기입니다. 얼핏 하나의 개념인 걸 잘 쪼개서 보면, 추상화나 일반화가 가능하다든지하는 다른 무언가가 보일 수도 있겠다는… 뭐 그런 얘기입니다. 각 개념들의 증명을 시작할 때, 이런 도구를 쓸 것이다를 알면, 증명을 읽을 때 조금은 도움이 되지 않을까요? 이런 도구들이 몸에 밴다면, 하스켈로 현실을 모델링할 때 써먹을 수 있지 않을까요?</p>
+
+<div class="comment">
+<script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
+</script>
+</div>
+<div style="text-align:right">Github 계정이 없는 분은 메일로 보내주세요. lionhairdino at gmail.com </div>
+        </div>
+        <nav class="toc toc-right js-toc relative z-1 transition--300 absolute pa4 pt5 is-position-fixed"></nav>
+        <div id="footer">
+            © 2022 lionhairdino. All rights reserved. Generated by <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+        <script>
+            tocbot.init({
+                tocSelector: '.js-toc',
+                contentSelector: '.js-toc-content',
+                headingSelector: 'h2, h3',
+                hasInnerContainers: true,
+            });
+        </script>
+    </body>
+</html>

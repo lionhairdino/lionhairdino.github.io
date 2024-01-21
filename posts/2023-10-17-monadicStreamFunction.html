@@ -88,7 +88,7 @@
 <p>하나의 함수를, 하나의 값에 적용하는 보통의 상황과 달리 스트림 함수라 부를 때는,<br />
 하나의 함수를, 스트림 원소 마다 계속 적용하는 게 아니라<br />
 하나의 함수를, <strong><em>스트림에서 꺼내온 한 원소에 적용하고 나면, 함수를 변형해서 그 다음 원소에 적용할 준비</em></strong>를 합니다. 그리고, 다음 원소가 존재한다면 계속 적용, 변형해서 준비를 반복합니다.</p>
-<p><span class="citation" data-cites="todo">@todo</span> - 지금 지식으론 스트림에 적용하는 용도로 쓰는 “스트림 함수”도 맞지만, 위에 얘기한 함수 상자를 “함수 스트림”이라 부를 수도 있지 않나 싶은데요. 잘 못 생각하는 뭔가가 있을지도 모르겠습니다.</p>
+<p><span class="citation" data-cites="todo">@todo</span> - 지금 지식으론 스트림에 적용하는 용도로 쓰는 “스트림 함수”도 맞지만, 위에 얘기한 함수 상자를 “함수 스트림”이라 부를 수도 있지 않을까?</p>
 <p><code>MSF</code>는 스트림을 다루면서, 프로그래머에게 드러나지 않게 상태, 혹은 컨텍스트, 혹은 side-effect를 어떻게 잘 유지, 전달할 것인가에 대한 해결책 중 하나입니다.</p>
 <h2 id="모나딕-스트림-함수---msf-타입">모나딕 스트림 함수 - MSF 타입</h2>
 <p>자기 자신과 같은 타입을 가지고 있는 재귀 타입입니다.</p>
@@ -99,6 +99,12 @@
 모나딕 컨텍스트 안에 결과값과 <strong>Continuation</strong>을 넣어 반환하는 함수</p>
 <p>두 가지로 이루어져 있습니다.</p>
 <p>순환 타입이 불편한 분은 <a href="../posts/2023-09-29-needArrow.html#circuit">Arrow 예시 - Circuit</a>의 <code>Circuit</code> 타입을 참고해 보세요. 거의 같은 아이디어입니다. 아래 <code>step</code>함수로 <code>MSF</code>가 가진 함수를 <code>a</code>에 한 번 적용하게 되면, 결과와 함께 조금 바뀌었을 수도 있는, 다음에 쓸 <code>MSF</code>를 준비합니다.</p>
+<p>위 타입을 읽을 때 불편한 이유는, 파트너 Runner 언급이 없는 것도 한 몫합니다. MSF는 <strong>함수 하나를 가지고 있을 뿐</strong>입니다. 어디선가 이 함수를 꺼내서 적용을 하면 결과로 <code>m (b, MSF m a b)</code>를 받을 겁니다. 타입만으로 알 수 있는 건 여기까지입니다. 이 후 매직은 Runner가 어찌 할 거라 믿고 넘어가야 합니다. 예를 들면, Runner가 어떤 조건에 맞으면 이 결과를 이용하게 될텐데</p>
+<ul>
+<li><code>m</code> 컨텍스트를 동작 시키기 위해 패턴 매칭을 할테고,</li>
+<li><code>(b, Next:MSF m a b)</code>에서 <code>b</code>가 필요한 곳이 있으면 넘겨 주고, 스트림의 다음 요소에 <code>Next</code>를 적용하겠거니 예측할 수 있습니다.</li>
+</ul>
+<p>Runner의 언급이 있었다면 좀 더 편하게 보이지 않았을까요?</p>
 <h2 id="step">step</h2>
 <p>예를 들면, 시간을 Discrete하게 모델링(샘플링)해서 단위 시간마다 잘라서 바라 볼때, 다음 단위 시간으로 넘어가는 함수를 <code>step</code>이라고 부릅니다.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ot">step ::</span> <span class="dt">Monad</span> m <span class="ot">=&gt;</span> <span class="dt">MSF</span> m a b <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> m (b, <span class="dt">MSF</span> m a b)</span></code></pre></div>
@@ -107,6 +113,7 @@
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co">--              ^^^^^^^</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co">--            continuation</span></span></code></pre></div>
 <p>스트림에서 한 원소를 가져와 함수를 적용하고 나면, 결과와 <strong>다음 원소에 적용할 함수</strong>를 준비합니다. 잊어버리지 말아야 할 정보들은 이 함수에 넣어 준비하면 됩니다. 그럼 <strong>누군가</strong> 가져다 쓸 겁니다. (항상 이 조건이 맞아야 범용적인 용어로서의 스트림 함수라 부르는지는 잘 모르겠습니다. 일단, 여기선 스트림 함수라 하는 것은, 모두 다음에 쓸 Continuation을 준비합니다.) <code>step by step</code> 또는 <code>sample by sample</code>로 동작하는 <code>step</code>을 유심히 보면, 출력 스트림의 <code>n</code>번 째 요소를 보려면, 그 전에 입력 스트림 <code>n</code>개를 거쳐서 오는게 보입니다.</p>
+<p>물론 <code>m</code>컨텍스트가 있으니 패턴 매칭으로 이를 처리하는 코드도 있을 겁니다.</p>
 <h2 id="embed">embed</h2>
 <p>타입과 <code>step</code>만으론 스트림 causal(인과관계)을 표현하지 못 합니다. 스트림 입력에 함수를 연이어 적용하고, 매 번 나오는 effect도 잘 join해서 끌고 가는 함수가 필요합니다.</p>
 <p><a href="https://hackage.haskell.org/package/dunai-0.11.2/docs/src/Data.MonadicStreamFunction.InternalCore.html#feedback">Data.MonadicStreamFunction</a>에서 발췌</p>
@@ -116,7 +123,7 @@
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  (b, sf') <span class="ot">&lt;-</span> unMSF sf a</span>
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  bs       <span class="ot">&lt;-</span> embed sf' as <span class="co">-- 다음 원소에 접근 할 땐 sf가 아니라 변형된 sf'입니다.</span></span>
 <span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span> (b<span class="op">:</span>bs)</span></code></pre></div>
-<p>당연히 스트림에 다음 원소가 아직 안들어 오면, <code>bs</code>는 준비되지 않습니다. 하지만 <code>b</code>는 준비 됐으니, Lazy한 스트림을 다루는 함수들은 <code>b</code>만 먼저 가져가게 될 겁니다.</p>
+<p>당연히 스트림에 다음 원소가 아직 안들어 오면, <code>bs</code>는 준비되지 않습니다. 하지만 <code>b</code>는 준비 됐으니, Lazy한 스트림을 다루는 함수들은 <code>b</code>만 먼저 가져가게 될 겁니다. 모나드 컨텍스트 안이니 매 번 바인드가 동작하면서 이펙트에 관한 처리(패턴 매칭)를 하고 있을 겁니다.</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="kw">do</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  embed (arr (\n <span class="ot">-&gt;</span> <span class="dv">1</span> <span class="op">+</span> n)) [<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>]</span></code></pre></div>
 <div class="sourceCode" id="cb8"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>λ&gt; [2,3,4]</span></code></pre></div>
@@ -131,7 +138,7 @@
 <p>위에서 <code>bs</code>를 구하는 과정 <code>embed sf' as</code>를 보면, 이전 작업 결과 <code>b</code>를 참조하거나 하지 않습니다. 이 전 작업의 결과를 참조하려면 어떻게 할까요? (텍스트에선 과거에 의존하기라 부르고 있습니다.)<code>embed</code>는 후임<code>MSF</code>를 받아 그냥 적용할 뿐입니다. 한 가지 방법은 <code>embed</code>에 넘기기 전에 후임 <code>MSF</code>에 이전 결과를 심어 놓으면 됩니다. (추측-<code>MSF</code>로 만들어 낸 결과를 다시 <code>MSF</code>에 넣는다 해서 feed-back 아닐까요?)</p>
 <p>※ 이전 작업의 결과를 다음 작업에 넣어주는, <code>embed</code> 비슷한 별도의 <code>runner</code>를 만들어도 될 것 같은데, 여기선 스트림 함수 자체에 필요한 정보를 실어 놓는 컴비네이터를 소개하고 있습니다. 모로 가도 서울로만 가면 되니, 일단 따라가 보겠습니다. 텍스트의 과거 의존이란 설명보다 <a href="https://hackage.haskell.org/package/dunai-0.11.2/docs/src/Data.MonadicStreamFunction.InternalCore.html#feedback">소스</a> 동작을 보는 게 더 이해하기 편합니다.</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ot">feedback ::</span> <span class="dt">Monad</span> m <span class="ot">=&gt;</span> past <span class="ot">-&gt;</span> <span class="dt">MSF</span> m (future_a, past) (result, past) <span class="ot">-&gt;</span> <span class="dt">MSF</span> m future_a result </span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>feedback past sf <span class="ot">=</span> <span class="dt">MSF</span> <span class="op">$</span> \future <span class="ot">-&gt;</span> </span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>feedback past sf <span class="ot">=</span> <span class="dt">MSF</span> <span class="op">$</span> \future_a <span class="ot">-&gt;</span> </span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>        <span class="co">-- m 모나드의 do</span></span>
 <span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>        <span class="kw">do</span> </span>
 <span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>          ((result', past'), sf') <span class="ot">&lt;-</span> unMSF sf (future_a, past)</span>
