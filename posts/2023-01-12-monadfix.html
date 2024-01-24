@@ -81,19 +81,23 @@
     
 </div>
 
+<p><a href="https://wiki.haskell.org/MonadFix">하스켈 위키 - MonadFix</a></p>
+<p>재귀를 위해 <code>mfix</code> 메소드를 정의합니다. 직접 <code>mfix</code>를 쓰는 경우도 있고, <code>RecursiveDo</code> 확장을 통해 사용되기도 합니다. 모나딕 코드안에 데이터를 반복 돌릴 때 씁니다.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">Monad</span> m <span class="ot">=&gt;</span> <span class="dt">MonadFix</span> m <span class="kw">where</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ot">  mfix ::</span> (a <span class="ot">-&gt;</span> m a) <span class="ot">-&gt;</span> m a</span></code></pre></div>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ot">  mfix ::</span> la <span class="ot">-&gt;</span> m al <span class="ot">-&gt;</span> m a</span></code></pre></div>
 <p>먼저 타입으로만 추측하며 읽어 보겠습니다.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ot">fix ::</span> (a <span class="ot">-&gt;</span> a) <span class="ot">-&gt;</span> a</span>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ot">fix  ::</span> (a <span class="ot">-&gt;</span>   a) <span class="ot">-&gt;</span>   a</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ot">mfix ::</span> (a <span class="ot">-&gt;</span> m a) <span class="ot">-&gt;</span> m a</span></code></pre></div>
-<p><code>fix f</code>의 결과는 <code>f(f(f(f...</code> 이런 모양이 되니, <code>mfix f</code>도 아마 <code>f(f(f(f...</code> 이런 모양일텐데, 한 겹 넘어갈 때마 effect <code>m</code>이 쌓일 것으로 추측합니다.</p>
-<p><code>mfix</code>는 <code>fix</code>의 모나딕 버전입니다. 그러면,</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>mfix f <span class="ot">=</span> f <span class="op">&lt;&lt;=</span> mfix f</span></code></pre></div>
+<p><code>fix f</code>의 결과는 <code>f(f(f(f...</code> 이런 모양이 되니, <code>mfix f</code>도 아마 <code>f(f(f(f...</code> 이런 모양일텐데, 한 겹 넘어갈 때마 effect <code>m</code>이 쌓일 것으로 추측할 수 있습니다.<br />
+<code>mfix</code>는 <code>fix</code>의 모나딕 버전입니다.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>mfix f <span class="ot">=</span> f <span class="op">&lt;&lt;=</span> mfix f</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co">--     = fix (&gt;&gt;= f)</span></span></code></pre></div>
+<p><code>(((...) &gt;&gt;= f) &gt;&gt;= f) &gt;&gt;= f</code> 이런 모양이 나옵니다.</p>
 <blockquote>
 <p>생각 스트레칭</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>(<span class="op">.</span>) f g <span class="ot">=</span> \x <span class="ot">-&gt;</span> f (g x)</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>(<span class="op">.</span>) f g   <span class="ot">=</span> \x <span class="ot">-&gt;</span> f (g x)</span></code></pre></div>
 <p><code>(.)</code>은 모나드 <code>(&gt;=&gt;)</code>의 특별 버전으로 볼 수 있습니다.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>f <span class="op">&gt;=&gt;</span> g     <span class="ot">=</span> \x <span class="ot">-&gt;</span> f x <span class="op">&gt;&gt;=</span> g</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>(<span class="op">&gt;=&gt;</span>) f g <span class="ot">=</span> \x <span class="ot">-&gt;</span> f x <span class="op">&gt;&gt;=</span> g</span></code></pre></div>
 </blockquote>
 <p>이펙트가 어떻게 쌓이는지 리스트 인스턴스를 보겠습니다.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">MonadFix</span> [] <span class="kw">where</span></span>
