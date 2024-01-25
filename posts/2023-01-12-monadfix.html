@@ -87,7 +87,7 @@
 <blockquote>
 <p><strong>생각 스트레칭</strong><br />
 “미래값을 바꾸는 미래값을 요구하는 역설paradox”<br />
-무한이라든지, 아직은 없는 미래값이라든지 하는 말들을 보면, 머릿속에서 시뮬레이션하기 까다로워서 불편합니다. 불편한 이유는 우리가 너무 부지런해서 입니다. 값이 아직 다 필요하지도 않은데, 무한히 준비할 생각부터 하고, 미래값이 아직 필요하지도 않은데, 무슨 값일지 걱정해서 그렇습니다. 사실 이들 개념들은 적절히 <strong>파트너</strong>로 동작하는 함수들이 있거나, 아니면 알고 보니 알 <strong>필요 없는 값</strong>이다라는 식으로 동작합니다. 무한 리스트값들은 <code>take</code> 같은 함수들이 파트너로 반드시 있어야 실용적인 의미가 생기는 것처럼 말입니다. <code>f undefined</code>를 적절한 파트너와 함께 써서 오류없이 결과값을 얻을 수 있다면(해당 인자를 평가하는 순간 undefined 오류가 나는데, 특정 조건하에선 평가할 일이 없다면), fix에 넣어 줄 수 있습니다.</p>
+무한이라든지, 아직은 없는 미래값이라든지 하는 말들을 보면, 머릿속에서 시뮬레이션하기 까다로워서 불편합니다. 불편한 이유는 우리가 너무 부지런해서 입니다. 값이 아직 다 필요하지도 않은데, 무한히 준비할 생각부터 하고, 미래값이 아직 필요하지도 않은데, 무슨 값일지 걱정해서 그렇습니다. 사실 이들 개념들은 적절히 <strong>파트너</strong>로 동작하는 함수들이 있거나, 아니면 알고 보니 알 <strong>필요 없는 값</strong>이다라는 식으로 동작합니다. 무한 리스트값들은 <code>take</code> 같은 함수들이 파트너로 반드시 있어야 실용적인 의미가 생기는 것처럼 말입니다. <code>f undefined</code>를 적절한 파트너와 함께 써서 오류없이 결과값을 얻을 수 있다면(해당 인자를 평가하는 순간 undefined 오류가 나는데, 특정 조건하에선 평가할 일이 없다면), <code>fix</code>에 넣어 줄 수 있습니다.</p>
 </blockquote>
 <p>현실적으로 내가 아직 만들지도 않은 결과를 내가 참조할 수는 없습니다. 그런 일은 일어나지 않습니다. 패러독스 해결은 제3자가 개입하거나, 단계를 나누는 방법이 있을 수 있습니다.</p>
 <p>시간이 개입하면 어찌되나 보겠습니다. 모두 <strong>동작은 같은 <code>f</code>지만, 다른 시점에 동작한 <code>f</code>는 다르다</strong>는 뜻으로 번호를 붙여 보겠습니다. - <span class="citation" data-cites="todo">@todo</span> 편하게 생각할 방법을 고민 중입니다.<br />
@@ -177,10 +177,11 @@
 <p><strong>unsafeDupableInterleaveIO :: IO a -&gt; IO a</strong><br />
 <code>IO</code> 컴퓨테이션을 Lazy하게 할 수 있습니다. <code>IO a</code> 타입을 받고, <code>a</code>를 요구demand하는 곳이 있을 때 계산을 합니다. <code>readMVar</code>의 반환값은 <code>IO a</code>로 이 <code>a</code>가 필요한 순간이 되어야만 <code>readMVar</code>를 실행합니다. <code>ans</code>는 <code>thunk</code>를 받은 상태입니다.</p>
 <p>어디선가 <code>ans</code>가 평가될 때 <code>readMVar</code>가 실행됩니다.</p>
+<p><code>fibIO3</code>이 반환하는 값은 <code>start : 1 : zipWith (+) fib (tail fib)</code>를 반환할텐데, <code>fib</code>는 <code>MVar</code>에 저장해 두었던 미래 함수의 결과<code>ans</code>입니다. 그 미래 함수의 결과는 또 더 미래 함수의 결과를 참조합니다.</p>
+<p>매직이 일어나는 것처럼 보이지만, 사실은 미래 결과를 받아서 돌린다 한들 알 수 있는 건 <code>0</code>과 <code>1</code>만 있을 뿐입니다.</p>
 <figure>
 <img src="../images/fibonacci.jpg" alt="0과 1로 만드는 피보나치" /><figcaption aria-hidden="true">0과 1로 만드는 피보나치</figcaption>
 </figure>
-<p><code>fibIO3</code>이 반환하는 값은 <code>start : 1 : zipWith (+) fib (tail fib)</code>를 반환할텐데, <code>fib</code>는 <code>MVar</code>에 저장해 두었던 미래 함수의 결과<code>ans</code>입니다. 그 미래 함수의 결과는 또 더 미래 함수의 결과를 참조합니다.</p>
 <h2 id="결론">결론</h2>
 <p><strong>“mfix는 액션 전체가 아니라, 결과값만 재귀하기 위한 방법입니다.”</strong></p>
 <p><code>mfix</code>로 <code>a -&gt; m a</code>함수를 감싸면, <code>a</code>를 재귀 돌려 <code>m (a 재귀)</code>값을 반환합니다.</p>
