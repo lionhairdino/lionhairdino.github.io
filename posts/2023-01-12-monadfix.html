@@ -37,7 +37,7 @@
         <meta property="og:site_name" content="Lionhairdino" />
         <meta property="og:url" content="https://lionhairdino.github.io/posts/2023-01-12-monadfix.html" />
 
-        <meta property="og:image" content="https://lionhairdino.github.io/images/state400px.png" />
+        <meta property="og:image" content="https://lionhairdino.github.io/images/fibonacci.jpg" />
 
       <meta name="keywords" content="monad, fix, 재귀, fix point, RecursiveDo">
 <!-- Global site tag (gtag.js) - Google Analytics -->
@@ -177,6 +177,9 @@
 <p><strong>unsafeDupableInterleaveIO :: IO a -&gt; IO a</strong><br />
 <code>IO</code> 컴퓨테이션을 Lazy하게 할 수 있습니다. <code>IO a</code> 타입을 받고, <code>a</code>를 요구demand하는 곳이 있을 때 계산을 합니다. <code>readMVar</code>의 반환값은 <code>IO a</code>로 이 <code>a</code>가 필요한 순간이 되어야만 <code>readMVar</code>를 실행합니다. <code>ans</code>는 <code>thunk</code>를 받은 상태입니다.</p>
 <p>어디선가 <code>ans</code>가 평가될 때 <code>readMVar</code>가 실행됩니다.</p>
+<figure>
+<img src="../images/fibonacci.jpg" alt="0과 1로 만드는 피보나치" /><figcaption aria-hidden="true">0과 1로 만드는 피보나치</figcaption>
+</figure>
 <p><code>fibIO3</code>이 반환하는 값은 <code>start : 1 : zipWith (+) fib (tail fib)</code>를 반환할텐데, <code>fib</code>는 <code>MVar</code>에 저장해 두었던 미래 함수의 결과<code>ans</code>입니다. 그 미래 함수의 결과는 또 더 미래 함수의 결과를 참조합니다.</p>
 <h2 id="결론">결론</h2>
 <p><strong>“mfix는 액션 전체가 아니라, 결과값만 재귀하기 위한 방법입니다.”</strong></p>
