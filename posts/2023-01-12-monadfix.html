@@ -120,7 +120,7 @@
 <p>눈에는 <code>(\_-&gt;Just 1)</code>이란 게 보이니, 뭐가 됐든 <code>Just 1</code>이 나올테니, Lazy하게 볼 수 있다면 굳이 미래를 모두 평가할 필요가 없는 게 보입니다. Fancher의 글에선 <code>(...)</code>부분을 미래라 말하고 있습니다. 가장 먼 미래에서 시작해서 무한히 <code>&gt;&gt;= (\_-&gt;Just 1)</code>을 반복하는 것으로 해석할 수 있습니다. <code>mfix'</code>은 <code>...</code>부분에 <code>Nothing</code>이 있는지 계속 찾아야만 합니다. 그래서 무한 실행에 빠지고, 마찬가지로 <code>IO</code>도 무한 실행하지만 스택이 꽉 차버립니다.</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>ghci&gt; mfix' (\_ -&gt; print 1)</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>*** Exception: stack overflow</span></code></pre></div>
-<p>인스턴스 정의 목록을 보면, <code>IO</code>, <code>Maybe</code>, <code>[],</code> <code>ST</code>, <code>Either</code> 등 만은 수가 별도의 인스턴스가 정의되어 있습니다. 바인드들에게 <code>undefined</code>를 주며 테스트 해 볼 수 있습니다. 조금 사례를 찾아보니 <code>Reader</code> 모나드 바인드 정도는 <code>mfix'</code>으로 가능했습니다.</p>
+<p>인스턴스 정의 목록을 보면, <code>IO</code>, <code>Maybe</code>, <code>[],</code> <code>ST</code>, <code>Either</code> 등 많은 수가 별도의 인스턴스를 정의하고 있습니다. 바인드들에게 <code>undefined</code>를 주며 테스트 해 볼 수 있는데, 조금 사례를 찾아보니 <code>Reader</code> 모나드 바인드 정도는 <code>mfix'</code>으로 가능했습니다. 결론에서 추가로 설명하겠습니다.</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>ghci&gt; flip runReader 0 $ undefined &gt;&gt;= \_ -&gt; reader (\_ -&gt; 1)</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>1</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>ghci&gt; flip runReader () $ mfix' $ \_ -&gt; reader(\_ -&gt; 1)</span>
@@ -190,7 +190,7 @@
 <p><strong>“mfix는 액션 전체가 아니라, 결과값만 재귀시켜도 될 때만 의미가 있습니다.”</strong></p>
 <p><code>mfix</code>로 <code>a -&gt; m a</code>함수를 감싸면, <code>a -&gt; a</code>를 재귀 돌려 <code>m (재귀 결과)</code>값을 반환합니다. (이론상은 <code>fix (&gt;&gt;= f)</code>가 <code>mfix</code> 구현이지만, 이 걸로 그냥 돌리면 무한히 실행되어 의미가 없을 때, 무한히 돌지 않아도 의미 있는 결과를 내는 <code>mfix</code>를 별도로 만든다는 뜻입니다.)</p>
 <p>애초에 액션 <code>a -&gt; m a</code>는 고정점이 있을 수가 없습니다. <code>a</code>를 입력 받고, 출력으로 <code>m a</code>를 내뱉으니 있을 수가 없습니다. 그런데 모나드에서 처럼 <code>m a -&gt; m (m a)</code>로 보고, <code>join</code>이 존재한다면 고정점(고정점이라 우길 수 있는 것)을 찾을 수 있을 겁니다. (모나드에서 <code>a -&gt; m b</code> 액션에 <code>m a</code>를 넣어줘서 <code>m (m b)</code>가 나오면 <code>join</code>을 해서 <code>m</code>으로 맞춰 줬습니다.) <code>join</code>을 <code>μ</code>로 표기하면</p>
-<p><code>f(μf(μf(...)))</code> = <strong>f(μ</strong><code>f(μf(μf(...)))</code><strong>)</strong></p>
+<p><code>f(μf(μf(...)))</code> = <strong><em>f(μ</em></strong><code>f(μf(μf(...)))</code><strong><em>)</em></strong></p>
 <p>이런식으로 반복하게 될겁니다. 근데 이 때 <code>μ</code>가 계속 스택을 잡아 먹거나, 혹은 계속 인과관계가 있다면, 정보를 무한히 갖고 있어야 하니 의미 있는 일을 할 수 없을 겁니다. <code>μ</code>가 trivial한 일을 하는 거라 (<code>Reader</code>같은 것들) 마지막에 한 번만 해줘도 되는 것들이라면, 즉 <code>m a -&gt; m (m a)</code> 에서 <code>a -&gt; a</code>로만 무한 반복 시키고 <code>m</code>(<code>return</code>)을 나중에 한 번만 붙여도 의미가 달라지지 않는 것들만 <code>mfix</code>가 가능하다고 보고 있습니다.(검증 필요)</p>
 <p>※ <code>Maybe</code> 인스턴스의 경우, <code>Nothing</code>인지 계속 살펴봐야 하지만, 무조건 <code>Just</code>라 놓고 실행하다 <code>Nothing</code>을 만나면 폭파!시켜버리는 편법을 쓰고 있습니다.</p>
 <div class="sourceCode" id="cb17"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- Control.Monad.Fix</span></span>
