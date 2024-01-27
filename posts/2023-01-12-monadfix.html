@@ -82,7 +82,9 @@
 </div>
 
 <p><a href="https://wiki.haskell.org/MonadFix">하스켈 위키 - MonadFix</a><br />
-<a href="https://elvishjerricco.github.io/2017/08/22/monadfix-is-time-travel.html">MonadFix is Time Travel - Will Fancher</a></p>
+<a href="https://elvishjerricco.github.io/2017/08/22/monadfix-is-time-travel.html">MonadFix is Time Travel - Will Fancher</a><br />
+<a href="https://leventerkok.github.io/papers/recdo.pdf">A Recursive do for Haskell</a><br />
+</p>
 <p><strong>“자기가 반환하는 값을 인자로 받아서 실행”</strong></p>
 <blockquote>
 <p><strong>생각 스트레칭</strong><br />
@@ -92,107 +94,128 @@
 <p>현실적으로 내가 아직 만들지도 않은 결과를 내가 참조할 수는 없습니다. 그런 일은 일어나지 않습니다. 패러독스 해결은 제3자가 개입하거나, 단계를 나누는 방법이 있을 수 있습니다.</p>
 <p>시간이 개입하면 어찌되나 보겠습니다. 모두 <strong>동작은 같은 <code>f</code>지만, 다른 시점에 동작한 <code>f</code>는 다르다</strong>는 뜻으로 번호를 붙여 보겠습니다. - <span class="citation" data-cites="todo">@todo</span> 편하게 생각할 방법을 고민 중입니다.<br />
 <code>fix f = f1 (f2 (f3 ...</code><br />
-<code>f1</code>은 <code>f2</code>의 결과를 받아 계산합니다. ※ <code>f2</code>가 <code>f1</code>과 다른 것이라 생각하면 좀 낫지 않나요?</p>
+<code>f1</code>은 <code>f2</code>의 결과를 받아 계산합니다. ※ <code>f2</code>가 <code>f1</code>과 다른 것이라 생각하면 좀 낫지 않나요?<br />
+하나 주의해서 볼 게, <code>f1 (f2 (f3 (...)))</code>는 함수 상태가 아닙니다. 어찌 됐든, 무한이긴 하지만, 미래의 값이긴 하지만, 인자를 준 상태입니다.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>[1..] = fix (\xs -&gt; 1 : fmap (+1) xs)  </span></code></pre></div>
 <p><code>xs</code>는 다른 시간(미래)의 <code>f</code>의 결과값입니다. 어떤 값을 가질지는, 늘 그렇듯 Lazy하게 필요할 때 보면 됩니다. 처음 결과는 <code>1 : ...</code>값입니다. 아는데 까지만 써주고, 모르는 건 모르는 채로 두면 됩니다. <code>1</code>만 필요하다면 여기서 끝이지만, <code>...</code> 부분을 알고 싶다면, <strong><em>또 다른 f</em></strong>를 실행하면 됩니다. 이제 <code>...</code>을 알기 위한 <code>현재 f</code>는 <code>미래 f</code>의 결과값 <code>1 : ...</code> 값을 가지고 실행하면 적어도 <code>1 : (1 + 1) : ...</code>까지는 알 수 있는 상태가 됩니다. 반복하면, (<code>fmap (+1)</code>을 적용한 걸 <code>+1</code>로 표기) <code>1 : 1+1 : 1+1+1 : 1+1+1+1 : ...</code>이 나옵니다. 파트너 <code>take</code>와 같이 쓰면,</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>ghci&gt; take 5 $ fix (\xs -&gt; 1: fmap (+1) xs)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>[1,2,3,4,5]</span></code></pre></div>
 <p>전혀 알 수 없는 미래값에 대해선 위와 같이 할 수 없습니다. 미래값에 의존해서 실행한 함수 결과에는 적어도 <code>1:</code>이 들어가 있는 걸 알기 때문에 벌어지는 일입니다. 미래값이 뭔지 모르는데, 현재에서 미래값을 참조하는 일이 어떻게 의미를 가질까의 비밀은 여기 있는 건지도 모르겠습니다. 어떤 미래값으로 돌리든 예정되어 있는 일부 결과 모양을 알아야만 cyclic 정의가 의미가 있습니다.</p>
-<h2 id="mfix">mfix</h2>
-<p>재귀를 위해 <code>mfix</code> 메소드를 정의합니다. 직접 <code>mfix</code>를 쓰는 경우도 있고, <code>RecursiveDo</code> 확장을 통해 사용되기도 합니다.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">Monad</span> m <span class="ot">=&gt;</span> <span class="dt">MonadFix</span> m <span class="kw">where</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ot">  mfix ::</span> a <span class="ot">-&gt;</span> m a <span class="ot">-&gt;</span> m a</span></code></pre></div>
-<p>먼저 타입으로만 추측하여 읽어 보면,</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ot">fix  ::</span> (a <span class="ot">-&gt;</span>   a) <span class="ot">-&gt;</span>   a</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ot">mfix ::</span> (a <span class="ot">-&gt;</span> m a) <span class="ot">-&gt;</span> m a</span></code></pre></div>
-<p><a href="../posts/2020-07-07-fix.html">fix f</a>의 결과는 <code>f(f(f(f...</code> 이런 모양이 되니, <code>mfix f</code>도 아마 <code>f(f(f(f...</code> 이런 모양일텐데, 한 겹 넘어갈 때마다 effect <code>m</code>을 어찌하고 있는지만 찾으면 될 것 같습니다. <code>fix</code>는 일반 함수지만, <code>mfix</code>는 <code>MonadFix</code>클래스의 메소드로 타입마다 다른 인스턴스를 가지고 있습니다. 그런데, 특정 모나드에서는 아래 코드로 해결할 수도 있습니다.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>mfix f <span class="ot">=</span> fix (<span class="op">&gt;&gt;=</span> f)</span></code></pre></div>
-<p>단, <code>fix</code>함수는 인자가 strict인 함수를 받지 못하기 때문에, <code>(&gt;&gt;=)</code>가 strict한 인스턴스에선, 이 <code>mfix</code>를 쓸 수 없습니다. <code>fix</code>함수는 <code>(a -&gt; a) -&gt; a</code>타입이니, <code>(&gt;&gt;=):m a -&gt; (a -&gt; m b) -&gt; m b</code>에 두번 째 인자로 <code>f:a -&gt; m a</code>를 줘서 <code>(&gt;&gt;= f):m a -&gt; m a</code>로 만드니, <code>fix</code>에 넣어 줄 수 있습니다.</p>
-<p><code>Maybe</code>의 <code>mfix</code> 인스턴스가 이미 있으니, <code>mfix'</code>으로 이름지어 아래같이 돌리면 무한으로 가버립니다.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>mfix' f <span class="ot">=</span> fix (<span class="op">&gt;&gt;=</span> f)</span></code></pre></div>
-<div class="sourceCode" id="cb7"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>ghci&gt; mfix' $ \_ &gt; Just 1 -- 원래 mfix는 Just 1이 나온다.</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>&lt;무한 실행&gt;</span></code></pre></div>
-<p><code>mfix</code>는 <code>(((...) &gt;&gt;= f) &gt;&gt;= f) &gt;&gt;= f</code> 이런 모양이 나옵니다. 차근 차근 쫓아가 보겠습니다.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>mfix' (\_<span class="ot">-&gt;</span><span class="dt">Just</span> <span class="dv">1</span>) <span class="ot">=</span> fix (<span class="op">&gt;&gt;=</span> (\_<span class="ot">-&gt;</span><span class="dt">Just</span> <span class="dv">1</span>))</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>                   <span class="ot">=</span> (<span class="op">&gt;&gt;=</span> (\_<span class="ot">-&gt;</span><span class="dt">Just</span> <span class="dv">1</span>)) (fix (<span class="op">&gt;&gt;=</span> (\_<span class="ot">-&gt;</span><span class="dt">Just</span> <span class="dv">1</span>))) <span class="co">-- 편의상 표기</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>                   <span class="ot">=</span> (fix (<span class="op">&gt;&gt;=</span> (\_<span class="ot">-&gt;</span><span class="dt">Just</span> <span class="dv">1</span>))) <span class="op">&gt;&gt;=</span> (\_<span class="ot">-&gt;</span><span class="dt">Just</span> <span class="dv">1</span>)</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>                   <span class="ot">=</span> ((<span class="op">...</span>) <span class="op">&gt;&gt;=</span> (\_<span class="ot">-&gt;</span><span class="dt">Just</span> <span class="dv">1</span>)) <span class="op">&gt;&gt;=</span> (\_<span class="ot">-&gt;</span><span class="dt">Just</span> <span class="dv">1</span>)</span></code></pre></div>
-<p>눈에는 <code>(\_-&gt;Just 1)</code>이란 게 보이니, 뭐가 됐든 <code>Just 1</code>이 나올테니, Lazy하게 볼 수 있다면 굳이 미래를 모두 평가할 필요가 없는 게 보입니다. Fancher의 글에선 <code>(...)</code>부분을 미래라 말하고 있습니다. 가장 먼 미래에서 시작해서 무한히 <code>&gt;&gt;= (\_-&gt;Just 1)</code>을 반복하는 것으로 해석할 수 있습니다. <code>mfix'</code>은 <code>...</code>부분에 <code>Nothing</code>이 있는지 계속 찾아야만 합니다. 그래서 무한 실행에 빠지고, 마찬가지로 <code>IO</code>도 무한 실행하지만 스택이 꽉 차버립니다.</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>ghci&gt; mfix' (\_ -&gt; print 1)</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>*** Exception: stack overflow</span></code></pre></div>
-<p>인스턴스 정의 목록을 보면, <code>IO</code>, <code>Maybe</code>, <code>[],</code> <code>ST</code>, <code>Either</code> 등 많은 수가 별도의 인스턴스를 정의하고 있습니다. 바인드들에게 <code>undefined</code>를 주며 테스트 해 볼 수 있는데, 조금 사례를 찾아보니 <code>Reader</code> 모나드 바인드 정도는 <code>mfix'</code>으로 가능했습니다. 결론에서 추가로 설명하겠습니다.</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>ghci&gt; flip runReader 0 $ undefined &gt;&gt;= \_ -&gt; reader (\_ -&gt; 1)</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>1</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>ghci&gt; flip runReader () $ mfix' $ \_ -&gt; reader(\_ -&gt; 1)</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>1</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>ghci&gt; runWriter $ undefined &gt;&gt;= \_ -&gt; writer (2,&quot;b&quot;)</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>(2,&quot;*** Exception: Prelude.undefined</span></code></pre></div>
-<h2 id="왜-필요하지">왜 필요하지?</h2>
-<p><code>mfix</code>는 <code>fix</code>의 모나딕 버전이니, 이펙트가 있는 작업 즉, 액션을 반복시킬 때 쓰겠거니 생각할 수 있는데, 액션 반복은 <code>fix</code>로도 됩니다. 아래 코드는 <a href="https://ro-che.info/articles/2015-09-02-monadfix">Roman Cheplyaka - MonadFix example</a>에서 발췌했습니다.<br />
-※ <code>fix f</code>에서 <code>f</code>가 받는 함수가 <code>m a -&gt; m a</code>일 뿐(<code>a -&gt; a</code>에서 <code>a</code>자리에 <code>m a</code>)입니다. 아래 <code>\repeat</code>가 받는 값은 <code>m a</code>입니다.</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>guessNumber m <span class="ot">=</span> fix <span class="op">$</span> \<span class="fu">repeat</span> <span class="ot">-&gt;</span> <span class="kw">do</span> <span class="co">-- 액션도 fix로 반복할 수 있습니다.</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">putStrLn</span> <span class="st">&quot;Enter a guess&quot;</span></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  n <span class="ot">&lt;-</span> readMaybe <span class="op">&lt;$&gt;</span> <span class="fu">getLine</span></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">if</span> n <span class="op">==</span> <span class="dt">Just</span> m</span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">then</span> <span class="fu">putStrLn</span> <span class="st">&quot;You guessed it!&quot;</span></span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">else</span> <span class="kw">do</span></span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>      <span class="fu">putStrLn</span> <span class="st">&quot;You guessed wrong; try again&quot;</span></span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>      <span class="fu">repeat</span></span></code></pre></div>
-<p><code>\repeat</code>이 받는 함수가 <code>a -&gt; m b</code>로 오해할 수 있는데, 아래와 같은 상황입니다.</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>ghci&gt; let f = \repeat -&gt; do repeat </span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>ghci&gt; f $ print 1 -- IO ()를 받고 있다.</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>1</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>ghci&gt; :t f</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>f :: p -&gt; p</span></code></pre></div>
-<p><code>fix</code>만으로 무리 없이 돌아갑니다. 그럼 아래같이 피보나치수를 구하는 경우는 어떨까요?<br />
-※ 비교 <code>fib = 0 : 1 : zipWith (+) fib (tail fib)</code></p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>fibIO1 <span class="ot">=</span> <span class="kw">do</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">putStrLn</span> <span class="st">&quot;Enter the start number&quot;</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  start <span class="ot">&lt;-</span> <span class="fu">read</span> <span class="op">&lt;$&gt;</span> <span class="fu">getLine</span></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span> <span class="op">$</span> start <span class="op">:</span> <span class="dv">1</span> <span class="op">:</span> <span class="fu">zipWith</span> (<span class="op">+</span>) fibIO1 (<span class="fu">tail</span> fibIO1)</span></code></pre></div>
-<p>타입 체커를 통과하지 못합니다. <code>fibIO1</code>은 리스트가 아니라, 리스트를 만들어 내는 액션입니다.</p>
-<p>이제 <code>mfix</code>를 써보겠습니다.</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>fibIO3 <span class="ot">=</span> mfix <span class="op">$</span> \fib <span class="ot">-&gt;</span> <span class="kw">do</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">putStrLn</span> <span class="st">&quot;Enter the start number&quot;</span></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  start <span class="ot">&lt;-</span> <span class="fu">read</span> <span class="op">&lt;$&gt;</span> <span class="fu">getLine</span></span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span> <span class="op">$</span> start <span class="op">:</span> <span class="dv">1</span> <span class="op">:</span> <span class="fu">zipWith</span> (<span class="op">+</span>) fib (<span class="fu">tail</span> fib)</span></code></pre></div>
-<p>위에 <code>fix</code> 예시에서 그랬던 것처럼 <code>fix (&gt;&gt;=f)</code>에서 <code>(&gt;&gt;=f)</code>는 계속 실행되어, 실행될 때마다 <code>"Enter the start number"...getLine</code>이 돌아 계속 입력을 받게 될까요?</p>
-<p>※ 순환cyclic정의를 할 때 <a href="https://wiki.haskell.org/Tying_the_Knot">Tying the Knot</a>이란 동작이 있습니다. Lazy하게 동작하니, 필요한 곳까지만 가면 됩니다. 이 필요한 곳을 매듭knot이라 부릅니다.</p>
-<p>위 <code>fibIO</code> 예시 자체가 살짝 억지스럽긴 합니다만, 동작을 보는데 문제는 없습니다. 원하는 동작은 이펙트를 만들어내는 액션 동작은 딱 한 번만 실행되고, 그 후에는 액션이 아닌 값만 가지고 반복해야 합니다. <code>\fib</code>에는 액션이 아니라 미래 함수의 결과값 <code>start : 1 : zipWith (+) fib (tail fib)</code>가 들어가긴 할텐데, 그 미래 함수가 실행될 때 <code>getLine</code>이 또 실행되어야 하는 것 아닐까 혼란스럽습니다. 그렇게 동작하는 건 바로 <code>fix</code>함수가 <code>m a -&gt; m a</code>를 받았을 때의 동작입니다.</p>
-<p><code>mfix</code>는 <code>a -&gt; m a</code>를 위해서 만들었습니다. 미래의 <code>a -&gt; m a</code>를 실행한 결과 <code>m a</code>를 현재의 <code>a -&gt; m a</code>에 넣기 위해 <code>m</code>을 어떻게 관리할 것인가가 문제입니다. <code>bind</code>가 그랬던 것처럼 말입니다.</p>
-<p><code>mfix</code>가 <code>(a -&gt; m a)</code>를 받아야 하니 <code>\fib</code>로 받는 건 <code>m a</code>가 아니라 <code>a</code>입니다.</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- Control.Monad.Fix</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">MonadFix</span> <span class="dt">IO</span> <span class="kw">where</span></span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    mfix <span class="ot">=</span> fixIO</span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="ot">fixIO ::</span> (a <span class="ot">-&gt;</span> <span class="dt">IO</span> a) <span class="ot">-&gt;</span> <span class="dt">IO</span> a</span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>fixIO k <span class="ot">=</span> <span class="kw">do</span></span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>    m <span class="ot">&lt;-</span> newEmptyMVar <span class="co">-- mutable 변수를 만들고,</span></span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>    ans <span class="ot">&lt;-</span> unsafeDupableInterleaveIO <span class="co">-- 미래 값을 예측하고</span></span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>             (readMVar m <span class="ot">`catch`</span> \<span class="dt">BlockedIndefinitelyOnMVar</span> <span class="ot">-&gt;</span> <span class="co">-- 블록 에러 패턴매칭</span></span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>                                    throwIO <span class="dt">FixIOException</span>)</span>
-<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>    result <span class="ot">&lt;-</span> k ans <span class="co">-- 미래 값에 k 적용</span></span>
-<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>    putMVar m result <span class="co">-- 여기서 값을 저장하면, 언제든 ans가 필요할 때 읽어간다. </span></span>
-<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span> result</span></code></pre></div>
-<p><strong>unsafeDupableInterleaveIO :: IO a -&gt; IO a</strong><br />
-<code>IO</code> 컴퓨테이션을 Lazy하게 할 수 있습니다. <code>IO a</code> 타입을 받고, <code>a</code>를 요구demand하는 곳이 있을 때 계산을 합니다. <code>readMVar</code>의 반환값은 <code>IO a</code>로 이 <code>a</code>가 필요한 순간이 되어야만 <code>readMVar</code>를 실행합니다. <code>ans</code>는 <code>thunk</code>를 받은 상태입니다.</p>
-<p>어디선가 <code>ans</code>가 평가될 때 <code>readMVar</code>가 실행됩니다.</p>
-<p><code>fibIO3</code>이 반환하는 값은 <code>start : 1 : zipWith (+) fib (tail fib)</code>를 반환할텐데, <code>fib</code>는 <code>MVar</code>에 저장해 두었던 미래 함수의 결과<code>ans</code>입니다. 그 미래 함수의 결과는 또 더 미래 함수의 결과를 참조합니다.</p>
+<p>또 다른 피보나치 수를 fix로 구하는 걸 보겠습니다.</p>
+<p><code>fix (\fib -&gt; 0 : 1 : zipWith (+) fib (tail fib))</code></p>
 <p>매직이 일어나는 것처럼 보이지만, 사실은 미래 결과를 받아서 돌린다 한들 알 수 있는 건 <code>0</code>과 <code>1</code>만 있을 뿐입니다.</p>
 <figure>
 <img src="../images/fibonacci.jpg" alt="0과 1로 만드는 피보나치" /><figcaption aria-hidden="true">0과 1로 만드는 피보나치</figcaption>
 </figure>
-<div class="sourceCode" id="cb16"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>0:1:&lt;thunk&gt; ----------- f -----------&gt; 0:1:&lt;thunk&gt;</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>0:1:&lt;thunk&gt; ----------- f -----------&gt; 0:1:&lt;thunk&gt;</span></code></pre></div>
 <p><code>f</code>가 인자로 <strong>자신의 결과값</strong>을 받아서, 한 번 실행하면 <code>0:1:&lt;thunk&gt;</code>결과를 얻습니다. 미래의 자신이 돌리든, 과거의 자신이 돌리든, 결과에 <code>0:1</code>이 있는 것만은 알고 있다는 뜻입니다. <code>f</code>가 받는 인자도 <code>0:1:&lt;thunk&gt;</code>고, 결과값도 <code>0:1:&lt;thunk&gt;</code>입니다. <code>f a = a</code>로 말하면 <code>f</code>에 입력으로 준 것도 <code>a</code>이고, 결과도 <code>a</code>입니다. 이 때 <code>a</code>를 고정점이라 부릅니다. <code>fix f</code>로 <code>0:1:&lt;thunk&gt;</code>를 얻었는데, 이 걸 <code>f</code>의 입력값으로 <code>f (fix f)</code> - <code>f(0:1:&lt;thunk&gt;)</code> 다시 넣어줘도 둘이 결과가 같다는 뜻입니다. <code>f</code> 함수의 고정점은 <code>fix f</code>입니다.</p>
 <p><code>&lt;thunk&gt;</code>를 평가할 일이 생기면, 또 다시 <code>f</code>를 실행해서 얻은 결과를 <code>zipWith (+) [0,1,&lt;thunk&gt;] [1,&lt;thunk&gt;]</code> 하는 절차가 한 번씩 돌고 있습니다.</p>
 <p><strong>f</strong><code>(f(f(...)))</code> = <code>(f(f(...)))</code> 이란 뜻입니다. <strong>f를 적용하나 안하나 같은 값</strong>을 찾는다면, 명쾌하기도 하고, 허탈하기도 한 <code>f</code>가 무한히 적용되어 있는 값을 고르면 된다는 뜻입니다.</p>
+<p>여기까지가 <code>fix</code>의 동작 요약입니다. 이제 <code>mfix</code>로 넘어가 보겠습니다.</p>
+<h2 id="mfix">mfix</h2>
+<p>값 재귀를 위해 <code>mfix</code> 메소드를 정의합니다. 직접 <code>mfix</code>를 쓰는 경우도 있고, <code>RecursiveDo</code> 확장을 통해 사용되기도 합니다.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">Monad</span> m <span class="ot">=&gt;</span> <span class="dt">MonadFix</span> m <span class="kw">where</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ot">  mfix ::</span> (a <span class="ot">-&gt;</span> m a) <span class="ot">-&gt;</span> m a</span></code></pre></div>
+<p>먼저 타입으로만 추측하여 읽어 보면,</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ot">fix  ::</span> (a <span class="ot">-&gt;</span>   a) <span class="ot">-&gt;</span>   a</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ot">mfix ::</span> (a <span class="ot">-&gt;</span> m a) <span class="ot">-&gt;</span> m a</span></code></pre></div>
+<blockquote>
+<p>MonadFix is just a monadic version of fix</p>
+</blockquote>
+<p><a href="../posts/2020-07-07-fix.html">fix f</a>의 결과는 <code>f(f(f(f...</code> 이런 모양이 되니, <code>mfix f</code>도 아마 <code>f(f(f(f...</code> 이런 모양일텐데, 한 겹 넘어갈 때마다 effect <code>m</code>을 어찌하고 있는지만 찾으면 될 것만 같습니다. (뒤에 잘못된 접근인 걸 보입니다.) <code>fix</code>는 일반 함수지만, <code>mfix</code>는 <code>MonadFix</code>클래스의 메소드로 타입마다 다른 인스턴스를 가지고 있습니다. 그런데, 특정 모나드에서는 아래 코드로 해결할 수도 있습니다.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>mfix f <span class="ot">=</span> fix (<span class="op">&gt;&gt;=</span> f)</span></code></pre></div>
+<p>단, <code>fix</code>함수는 인자가 strict인 함수를 받지 못하기 때문에, <code>(&gt;&gt;=)</code>가 strict한 인스턴스에선, 이 <code>mfix</code>를 쓸 수 없습니다. <code>fix</code>함수는 <code>(a -&gt; a) -&gt; a</code>타입이니, <code>(&gt;&gt;=):m a -&gt; (a -&gt; m b) -&gt; m b</code>에 두번 째 인자로 <code>f:a -&gt; m a</code>를 줘서 <code>(&gt;&gt;= f):m a -&gt; m a</code>로 만드니, <code>fix</code>에 넣어 줄 수 있습니다.</p>
+<p><code>Maybe</code>의 <code>mfix</code> 인스턴스가 이미 있으니, <code>mfix'</code>으로 이름지어 아래같이 돌리면 무한으로 가버립니다.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>mfix' f <span class="ot">=</span> fix (<span class="op">&gt;&gt;=</span> f)</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>ghci&gt; mfix' $ \_ &gt; Just 1 -- 원래 mfix는 Just 1이 나온다.</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>&lt;무한 실행&gt;</span></code></pre></div>
+<p><code>mfix</code>는 <code>(((...) &gt;&gt;= f) &gt;&gt;= f) &gt;&gt;= f</code> 이런 모양이 나옵니다. 차근 차근 쫓아가 보겠습니다.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>mfix' (\_<span class="ot">-&gt;</span><span class="dt">Just</span> <span class="dv">1</span>) <span class="ot">=</span> fix (<span class="op">&gt;&gt;=</span> (\_<span class="ot">-&gt;</span><span class="dt">Just</span> <span class="dv">1</span>))</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>                   <span class="ot">=</span> (<span class="op">&gt;&gt;=</span> (\_<span class="ot">-&gt;</span><span class="dt">Just</span> <span class="dv">1</span>)) (fix (<span class="op">&gt;&gt;=</span> (\_<span class="ot">-&gt;</span><span class="dt">Just</span> <span class="dv">1</span>))) <span class="co">-- 편의상 표기</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>                   <span class="ot">=</span> (fix (<span class="op">&gt;&gt;=</span> (\_<span class="ot">-&gt;</span><span class="dt">Just</span> <span class="dv">1</span>))) <span class="op">&gt;&gt;=</span> (\_<span class="ot">-&gt;</span><span class="dt">Just</span> <span class="dv">1</span>)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>                   <span class="ot">=</span> ((<span class="op">...</span>) <span class="op">&gt;&gt;=</span> (\_<span class="ot">-&gt;</span><span class="dt">Just</span> <span class="dv">1</span>)) <span class="op">&gt;&gt;=</span> (\_<span class="ot">-&gt;</span><span class="dt">Just</span> <span class="dv">1</span>)</span></code></pre></div>
+<p>눈에는 <code>(\_-&gt;Just 1)</code>이란 게 보이니, 뭐가 됐든 <code>Just 1</code>이 나올테니, Lazy하게 볼 수 있다면 굳이 미래를 모두 평가할 필요가 없는 게 보입니다. Fancher의 글에선 <code>(...)</code>부분을 미래라 말하고 있습니다. 가장 먼 미래에서 시작해서 무한히 <code>&gt;&gt;= (\_-&gt;Just 1)</code>을 반복하는 것으로 해석할 수 있습니다. <code>mfix'</code>은 <code>...</code>부분에 <code>Nothing</code>이 있는지 계속 찾아야만 합니다. 그래서 무한 실행에 빠지고, 마찬가지로 <code>IO</code>도 무한 실행하지만 스택이 꽉 차버립니다.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>ghci&gt; mfix' (\_ -&gt; print 1)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>*** Exception: stack overflow</span></code></pre></div>
+<p>인스턴스 정의 목록을 보면, <code>IO</code>, <code>Maybe</code>, <code>[],</code> <code>ST</code>, <code>Either</code> 등 많은 수가 별도의 인스턴스를 정의하고 있습니다. 바인드들에게 <code>undefined</code>를 주며 테스트 해 볼 수 있는데, 조금 사례를 찾아보니 <code>Reader</code> 모나드 바인드 정도는 <code>mfix'</code>으로 가능했습니다. 결론에서 추가로 설명하겠습니다.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>ghci&gt; flip runReader 0 $ undefined &gt;&gt;= \_ -&gt; reader (\_ -&gt; 1)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>1</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>ghci&gt; flip runReader () $ mfix' $ \_ -&gt; reader(\_ -&gt; 1)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>1</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>ghci&gt; runWriter $ undefined &gt;&gt;= \_ -&gt; writer (2,&quot;b&quot;)</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>(2,&quot;*** Exception: Prelude.undefined</span></code></pre></div>
+<p>처음엔, <code>fix</code>와 유사한 동작을 할 것이다란 생각으로 위와 같이 접근했는데, <code>mfix</code>의 목적이 <code>a -&gt; m a</code>의 고정점을 찾는 게 아닙니다.</p>
+<h2 id="왜-필요하지">왜 필요하지?</h2>
+<p><code>mfix</code>는 <code>fix</code>의 모나딕 버전이니, 이펙트가 있는 작업 즉, 액션을 반복시킬 때 쓰겠거니 생각할 수 있는데, 액션 반복은 <code>fix</code>로도 됩니다. 아래 코드는 <a href="https://ro-che.info/articles/2015-09-02-monadfix">Roman Cheplyaka - MonadFix example</a>에서 발췌했습니다.<br />
+※ <code>fix f</code>에서 <code>f</code>가 받는 함수가 <code>m a -&gt; m a</code>일 뿐(<code>a -&gt; a</code>에서 <code>a</code>자리에 <code>m a</code>)입니다. 아래 <code>\repeat</code>가 받는 값은 <code>m a</code>입니다.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>guessNumber m <span class="ot">=</span> fix <span class="op">$</span> \<span class="fu">repeat</span> <span class="ot">-&gt;</span> <span class="kw">do</span> <span class="co">-- 액션도 fix로 반복할 수 있습니다.</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">putStrLn</span> <span class="st">&quot;Enter a guess&quot;</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  n <span class="ot">&lt;-</span> readMaybe <span class="op">&lt;$&gt;</span> <span class="fu">getLine</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">if</span> n <span class="op">==</span> <span class="dt">Just</span> m</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">then</span> <span class="fu">putStrLn</span> <span class="st">&quot;You guessed it!&quot;</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">else</span> <span class="kw">do</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>      <span class="fu">putStrLn</span> <span class="st">&quot;You guessed wrong; try again&quot;</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>      <span class="fu">repeat</span></span></code></pre></div>
+<p><code>\repeat</code>이 받는 함수가 <code>a -&gt; m b</code>로 오해할 수 있는데, 아래와 같은 상황입니다.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>ghci&gt; let f = \repeat -&gt; do repeat </span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>ghci&gt; f $ print 1 -- IO ()를 받고 있다.</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>1</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>ghci&gt; :t f</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>f :: p -&gt; p</span></code></pre></div>
+<p><code>fix</code>만으로 무리 없이 돌아갑니다. 그럼 아래같이 피보나치수를 구하는 경우는 어떨까요?<br />
+※ 비교 <code>fib = 0 : 1 : zipWith (+) fib (tail fib)</code></p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>fibIO1 <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">putStrLn</span> <span class="st">&quot;Enter the start number&quot;</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  start <span class="ot">&lt;-</span> <span class="fu">read</span> <span class="op">&lt;$&gt;</span> <span class="fu">getLine</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span> <span class="op">$</span> start <span class="op">:</span> <span class="dv">1</span> <span class="op">:</span> <span class="fu">zipWith</span> (<span class="op">+</span>) fibIO1 (<span class="fu">tail</span> fibIO1)</span></code></pre></div>
+<p>타입 체커를 통과하지 못합니다. <code>fibIO1</code>은 리스트가 아니라, 리스트를 만들어 내는 액션입니다.</p>
+<p>이제 <code>mfix</code>를 써보겠습니다.</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>fibIO3 <span class="ot">=</span> mfix <span class="op">$</span> \fib <span class="ot">-&gt;</span> <span class="kw">do</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">putStrLn</span> <span class="st">&quot;Enter the start number&quot;</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  start <span class="ot">&lt;-</span> <span class="fu">read</span> <span class="op">&lt;$&gt;</span> <span class="fu">getLine</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span> <span class="op">$</span> start <span class="op">:</span> <span class="dv">1</span> <span class="op">:</span> <span class="fu">zipWith</span> (<span class="op">+</span>) fib (<span class="fu">tail</span> fib)</span></code></pre></div>
+<p>위에 <code>fix</code> 예시에서 그랬던 것처럼 <code>fix (&gt;&gt;=f)</code>에서 <code>(&gt;&gt;=f)</code>는 계속 실행되어, 실행될 때마다 <code>"Enter the start number"...getLine</code>이 돌아 계속 입력을 받게 될까요?</p>
+<p>※ 순환cyclic정의를 할 때 <a href="https://wiki.haskell.org/Tying_the_Knot">Tying the Knot</a>이란 동작이 있습니다. Lazy하게 동작하니, 필요한 곳까지만 가면 됩니다. 이 필요한 곳을 매듭knot이라 부릅니다.</p>
+<p>위 <code>fibIO</code> 예시 자체가 살짝 억지스럽긴 합니다만, 동작을 보는데 문제는 없습니다. 원하는 동작은 이펙트를 만들어내는 액션 동작은 딱 한 번만 실행되고(effectful하게 외부에서 start값을 입력받습니다.), 그 후에는 액션이 아닌 값만 가지고 반복해야 합니다. <code>\fib</code>에는 액션이 아니라 미래 함수의 결과값 <code>start : 1 : zipWith (+) fib (tail fib)</code>가 들어가긴 할텐데, 그 미래 함수가 실행될 때 <code>getLine</code>이 또 실행되어야 하는 것 아닐까 혼란스럽습니다. 그렇게 동작하는 건 바로 <code>fix</code>함수가 <code>m a -&gt; m a</code>를 받았을 때의 동작입니다.</p>
+<p><code>mfix</code>는 <code>a -&gt; m a</code>를 위해서 만들었습니다. 그런데, <code>fix</code>가 <code>a -&gt; a</code>를 받아 고정점을 찾듯, <code>a -&gt; m a</code>의 고정점을 찾는게 아니라, 인포멀하게 얘기하면 <code>m</code>을 한 번만 동작하게 하고, <code>m</code>을 제외한 <code>a -&gt; a</code>의 고정점을 찾는 게 목적입니다.</p>
+<p><code>fibIO3</code>에서 보면, <code>mfix</code>가 <code>(a -&gt; m a)</code>를 받아야 하니 <code>\fib</code>로 들어 오는 건 <code>m a</code>가 아니라 <code>a</code>입니다. 실제 동작을 보기 위해, 실제 라이브러러리에 있는 <code>IO</code> 인스턴스를 보겠습니다.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- Control.Monad.Fix</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">MonadFix</span> <span class="dt">IO</span> <span class="kw">where</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    mfix <span class="ot">=</span> fixIO</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="ot">fixIO ::</span> (a <span class="ot">-&gt;</span> <span class="dt">IO</span> a) <span class="ot">-&gt;</span> <span class="dt">IO</span> a</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>fixIO k <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>    m <span class="ot">&lt;-</span> newEmptyMVar <span class="co">-- mutable 변수를 만들고,</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>    ans <span class="ot">&lt;-</span> unsafeDupableInterleaveIO <span class="co">-- 미래 값을 예측하고</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>             (readMVar m <span class="ot">`catch`</span> \<span class="dt">BlockedIndefinitelyOnMVar</span> <span class="ot">-&gt;</span> <span class="co">-- 블록 에러 패턴매칭</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>                                    throwIO <span class="dt">FixIOException</span>)</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>    result <span class="ot">&lt;-</span> k ans <span class="co">-- 미래값 ans에 k를 적용한 후, result에 effect없는 값을 넣고 있다.</span></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>                    <span class="co">-- 이 값은 완성된 결과값이 아니라, 일부만 알고 있는 결과다.</span></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>    putMVar m result <span class="co">-- 여기서 값을 저장하면, 언제든 ans가 필요할 때 읽어간다. </span></span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span> result</span></code></pre></div>
+<p><strong>unsafeDupableInterleaveIO :: IO a -&gt; IO a</strong><br />
+<code>IO</code> 컴퓨테이션을 Lazy하게 할 수 있습니다. <code>IO a</code> 타입을 받고, <code>a</code>를 요구demand하는 곳이 있을 때 계산을 합니다. <code>readMVar</code>의 반환값은 <code>IO a</code>로 이 <code>a</code>가 필요한 순간이 되어야만 <code>readMVar</code>를 실행합니다. <code>ans</code>는 <code>thunk</code>를 받은 상태입니다.</p>
+<p>어디선가 <code>ans</code>가 평가될 때 <code>readMVar</code>가 실행될 겁니다.</p>
+<p><code>fibIO3</code>이 반환하는 값은 <code>start : 1 : zipWith (+) fib (tail fib)</code>를 반환합니다. 어디신가 <code>zipWith~</code> 부분에 대한 요구demand가 생겨 평가하게 되면, <code>fib</code>는 <code>MVar</code>에 저장해 두었던 미래 함수의 결과<code>ans</code>를 가져 옵니다. 그 미래 함수의 결과는 또 더 미래 함수의 결과를 참조하고 있습니다.</p>
 <h2 id="결론">결론</h2>
-<p><strong>“mfix는 액션 전체가 아니라, 결과값만 재귀시켜도 될 때만 의미가 있습니다.”</strong></p>
-<p><code>mfix</code>로 <code>a -&gt; m a</code>함수를 감싸면, <code>a -&gt; a</code>를 재귀 돌려 <code>m (재귀 결과)</code>값을 반환합니다. (이론상은 <code>fix (&gt;&gt;= f)</code>가 <code>mfix</code> 구현이지만, 이 걸로 그냥 돌리면 무한히 실행되어 의미가 없을 때, 무한히 돌지 않아도 의미 있는 결과를 내는 <code>mfix</code>를 별도로 만든다는 뜻입니다.)</p>
-<p>애초에 액션 <code>a -&gt; m a</code>는 고정점이 있을 수가 없습니다. <code>a</code>를 입력 받고, 출력으로 <code>m a</code>를 내뱉으니 있을 수가 없습니다. 그런데 모나드에서 처럼 <code>m a -&gt; m (m a)</code>로 보고, <code>join</code>이 존재한다면 고정점(고정점이라 우길 수 있는 것)을 찾을 수 있을 겁니다. (모나드에서 <code>a -&gt; m b</code> 액션에 <code>m a</code>를 넣어줘서 <code>m (m b)</code>가 나오면 <code>join</code>을 해서 <code>m</code>으로 맞춰 줬습니다.) <code>join</code>을 <code>μ</code>로 표기하면</p>
-<p><code>f(μf(μf(...)))</code> = <strong><em>f(μ</em></strong><code>f(μf(μf(...)))</code><strong><em>)</em></strong></p>
-<p>이런식으로 반복하게 될겁니다. 근데 이 때 <code>μ</code>가 계속 스택을 잡아 먹거나, 혹은 계속 인과관계가 있다면, 정보를 무한히 갖고 있어야 하니 의미 있는 일을 할 수 없을 겁니다. <code>μ</code>가 trivial한 일을 하는 거라 (<code>Reader</code>같은 것들) 마지막에 한 번만 해줘도 되는 것들이라면, 즉 <code>m a -&gt; m (m a)</code> 에서 <code>a -&gt; a</code>로만 무한 반복 시키고 <code>m</code>(<code>return</code>)을 나중에 한 번만 붙여도 의미가 달라지지 않는 것들만 <code>mfix</code>가 가능하다고 보고 있습니다.(검증 필요)</p>
-<p>※ <code>Maybe</code> 인스턴스의 경우, <code>Nothing</code>인지 계속 살펴봐야 하지만, 무조건 <code>Just</code>라 놓고 실행하다 <code>Nothing</code>을 만나면 폭파!시켜버리는 편법을 쓰고 있습니다.</p>
+<p><del>“mfix는 액션 전체가 아니라, 결과값만 재귀시켜도 될 때만 의미가 있습니다.”</del><br />
+<strong>“mfix는 액션 전체가 아니라, 컨텍스트 안에 있는 결과값만 재귀시키기 위해 만들었습니다.”</strong></p>
+<p><code>mfix</code>로 <code>a -&gt; m a</code>함수를 감싸면, <code>m</code>은 한 번만 영향을 미치고, <code>m</code>이 없는 <code>a -&gt; a</code>를 재귀 돌려 <code>m (재귀 결과)</code>값을 반환합니다.</p>
+<p>처음 개념을 봤을 때는,
+&gt; <strong>※ 잘못된 접근</strong><br />
+&gt; 애초에 액션 <code>a -&gt; m a</code>는 고정점이 있을 수가 없습니다. <code>a</code>를 입력 받고, 출력으로 <code>m a</code>를 내뱉으니 있을 수가 없습니다. 그런데 모나드에서 처럼 <code>m a -&gt; m (m a)</code>로 보고, <code>join</code>이 존재한다면 고정점(고정점이라 우길 수 있는 것)을 찾을 수 있을 겁니다. (모나드에서 <code>a -&gt; m b</code> 액션에 <code>m a</code>를 넣어줘서 <code>m (m b)</code>가 나오면 <code>join</code>을 해서 <code>m</code>으로 맞춰 줬습니다.) <code>join</code>을 <code>μ</code>로 표기하면
+&gt;
+&gt; <code>f(μf(μf(...)))</code> = <strong><em>f(μ</em></strong><code>f(μf(μf(...)))</code><strong><em>)</em></strong>
+&gt;
+&gt; 이런식으로 반복하게 될겁니다. 근데 이 때 <code>μ</code>가 계속 스택을 잡아 먹거나, 혹은 계속 인과관계가 있다면, 정보를 무한히 갖고 있어야 하니 의미 있는 일을 할 수 없을 겁니다. <code>μ</code>가 trivial한 일을 하는 거라 (<code>Reader</code>같은 것들) 마지막에 한 번만 해줘도 되는 것들이라면, 즉 <code>m a -&gt; m (m a)</code> 에서 <code>a -&gt; a</code>로만 무한 반복 시키고 <code>m</code>(<code>return</code>)을 나중에 한 번만 붙여도 의미가 달라지지 않는 것들만 <code>mfix</code>가 가능하다고 보고 있습니다.</p>
+<p>라고 <strong><em>오해 했습니다.</em></strong></p>
+<p>이론상은 <code>fix (&gt;&gt;= f)</code>가 <code>mfix</code> 구현이고, 이 걸로 그냥 돌리면 무한히 실행되어 의미가 없을 때, 무한히 돌지 않아도 의미 있는 결과를 내는 <code>mfix</code>를 별도로 만든 게 아니라, <code>mfix</code>는 컨텍스트 안에 있는 값을 재귀 시키기 위한 것입니다.</p>
+<p>“Value Recursion in Monadic Computations”</p>
+<p>이펙트가 여러번 발현되든, 한 번 발현되든 의미가 다르지 않은 일부 모나드에선 이 동작을 <code>fix (&gt;&gt;= f)</code>로 써도 같은 동작을 한다는 뜻이지, 모든 모나드의 <code>mfix</code>가 <code>fix (&gt;&gt;= f)</code>와 같은 동작을 한다는 얘기가 아닙니다.</p>
+<p>MonadFix의 아래 성질이 오해한 부분을 명확히 보여 주는 것 같습니다.<br />
+<strong>purity 법칙</strong>: <code>mfix (return . h) = return (fix h)</code></p>
+<p>일부 문서에서 <code>fix (&gt;&gt;= f)</code>를 먼저 보여주며, MonadFix is just a monadic version of fix라 해서, 오히려 혼란스럽게 접근한 건 아닌가 합니다.</p>
+<p>※ <code>Maybe</code> 인스턴스의 경우, <code>Nothing</code>인지 계속 살펴봐야 하지만, 무조건 <code>Just</code>라 놓고 실행하다 <code>Nothing</code>을 만나면 폭파!시켜버리는 편법?을 쓰고 있습니다.</p>
 <div class="sourceCode" id="cb17"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- Control.Monad.Fix</span></span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">MonadFix</span> <span class="dt">Maybe</span> <span class="kw">where</span></span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    mfix f <span class="ot">=</span> <span class="kw">let</span> a <span class="ot">=</span> f (unJust a) <span class="kw">in</span> a</span>
