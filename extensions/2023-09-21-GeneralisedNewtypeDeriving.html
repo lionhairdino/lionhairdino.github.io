@@ -84,17 +84,17 @@
 <p><a href="https://ghc.gitlab.haskell.org/ghc/doc/users_guide/exts/newtype_deriving.html">6.6.5. Generalised derived instance for newtypes</a><br />
 재미난게, 영어 스펠링이 나라에 따라 <code>s</code>나 <code>z</code>가 쓰이고 있어, Generalised(영국), Generalized 둘 다 준비 해놨습니다.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">Dollars</span> <span class="ot">=</span> <span class="dt">Dollars</span> <span class="dt">Int</span></span></code></pre></div>
-<p><code>Dollars</code>를 더하기 하려면, 명시적으로 <code>Dollars</code>를 <code>Num</code>클래스의 인스턴스로 정의해야 합니다.</p>
+<p>이 확장이 없이 <code>Dollars</code>를 더하기 하려면, 명시적으로 <code>Dollars</code>를 <code>Num</code>클래스의 인스턴스로 정의해야 합니다.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Num</span> <span class="dt">Dollars</span> <span class="kw">where</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">Dollars</span> a <span class="op">+</span> <span class="dt">Dollars</span> b <span class="ot">=</span> <span class="dt">Dollars</span> (a <span class="op">+</span> b)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="op">^^^^^^^</span>     <span class="op">^^^^^^^</span>     <span class="op">^^^^^^^</span></span></code></pre></div>
 <p>위 인스턴스 정의가 하는 일은 <code>Dollars</code> 생성자를 적용하는 일만 하고 있습니다. 생성자는 런타임에선 사라지기 때문에, 이 인스턴스 선언은 <code>Int</code> 딕셔너리<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>와 완전히 동일한 정의입니다.</p>
-<p>이 확장을 일반화한 게 <a href="../extensions/2023-01-21-derivingVia.html">확장 DerivingVia</a> 입니다.</p>
+<p>※ 이 아이디어를 일반화한 게 <a href="../extensions/2023-01-21-derivingVia.html">확장 DerivingVia</a> 입니다.</p>
 <p><code>GeneralisedNewtypeDeriving</code> 확장을 켜면, 다음처럼만 쓰면 GHC가 인스턴스를 유도해 줍니다.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">Dollars</span> <span class="ot">=</span> <span class="dt">Dollars</span> {<span class="ot"> getDollars ::</span> <span class="dt">Int</span> } <span class="kw">deriving</span> (<span class="dt">Eq</span>, <span class="dt">Show</span>, <span class="dt">Num</span>)</span></code></pre></div>
 <p>구현은 <code>Int</code>의 <code>Num</code> 딕셔너리를 씁니다. 다시 말해, GHC가 다음과 비슷한 걸 생성합니다.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Num</span> <span class="dt">Int</span> <span class="ot">=&gt;</span> <span class="dt">Num</span> <span class="dt">Dollars</span></span></code></pre></div>
-<p>※ 위 표현이 낯습니다. <code>Num Int</code>란 제약이 있는데 <code>=&gt;</code> 오른 쪽에 <code>Int</code>가 없습니다. <code>Dollars</code>가 안에 <code>Int</code>를 가지고 있긴 한데, 이런 식으로 써도 되는지 아직 “문법” 자체를 잘 모르겠습니다.</p>
+<p>※ 위 표현이 낯섭니다. <code>Num Int</code>란 제약이 있는데 <code>=&gt;</code> 오른 쪽에 <code>Int</code>가 없습니다. <code>Dollars</code>가 안에 <code>Int</code>를 가지고 있긴 한데, 이런 식으로 써도 되는지 아직 “문법” 자체를 잘 모르겠습니다.</p>
 <p>GHC는 <code>Num Int</code> 인스턴스가 유효 스코프에 있는 걸 알기 때문에, 다음 처럼만 생성합니다.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Num</span> <span class="dt">Dollars</span></span></code></pre></div>
 <p>…작성 중</p>
