@@ -4,9 +4,9 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-        <title>lionhairdino - 확장 RecursiveDo (작성 중)</title>
+        <title>lionhairdino - 확장 RecursiveDo</title>
 
-        <meta name="description" content="lionhairdino - 확장 RecursiveDo (작성 중)" />
+        <meta name="description" content="lionhairdino - 확장 RecursiveDo" />
         <meta property="og:description" content="하스켈 함수형 프로그래밍" />
 
         <link rel="stylesheet" type="text/css" href="../css/default.css" />
@@ -33,7 +33,7 @@
         <meta name="msapplication-TileColor" content="#ff7500" />
         <meta name="theme-color" content="#ffffff" />
         <meta property="og:type" content="website" />
-        <meta property="og:title" content="확장 RecursiveDo (작성 중)" />
+        <meta property="og:title" content="확장 RecursiveDo" />
         <meta property="og:site_name" content="Lionhairdino" />
         <meta property="og:url" content="https://lionhairdino.github.io/extensions/2023-10-07-RecursiveDo.html" />
 
@@ -74,7 +74,7 @@
             </div>
         </div>
         <div class="js-toc-content">
-            <h1>확장 RecursiveDo (작성 중)</h1>
+            <h1>확장 RecursiveDo</h1>
             <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
 <div class="info">
     Posted on October  7, 2023
@@ -87,6 +87,7 @@ Haskell 98의 <code>do</code>표기notation는 재귀적 바인딩을 허용하�
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>              ; <span class="fu">return</span> (<span class="fu">map</span> <span class="fu">negate</span> xs) }</span></code></pre></div>
 <p><code>xs</code>는 재귀적으로 바인딩되고 있습니다. 아마 가능했다면 <code>[1,1,...]</code>를 <code>negate</code>한 <code>[-1,-1,...]</code>이 될 겁니다.</p>
 <p>effect를 적절히 처리하며 재귀하려면 <code>MonadFix</code> 클래스의 <code>mfix</code> 메소드가 있어야 합니다. <code>Maybe</code>, <code>[]</code>, <code>ST</code>, <code>IO</code> 등의 모나드는 <code>MonadFix</code> 인스턴스 구현을 이미 가지고 있습니다.</p>
+<p><a href="../posts/2023-01-12-monadfix.md">MonadFix</a> 글을 확인하세요.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ot">{-# LANGUAGE RecursiveDo #-}</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>justOnes <span class="ot">=</span> mdo { xs <span class="ot">&lt;-</span> <span class="dt">Just</span> (<span class="dv">1</span><span class="op">:</span>xs)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>               ; <span class="fu">return</span> (<span class="fu">map</span> <span class="fu">negate</span> xs) }</span></code></pre></div>
