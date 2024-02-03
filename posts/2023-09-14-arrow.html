@@ -115,29 +115,77 @@
 <code>applySome (SomeType f) a = f a</code>라는 함수나 메소드를 준비해 놓으면, <code>a -&gt; b</code>가 할 수 있는 일은 모두 할 수 있으며, 추가로 연계된 메소드를 둘 수도 있고,<br />
 <code>specialApplySome (SomeType f) a = 추가 작업 후 f a</code> 등으로 함수를 적용할 때 항상 해야만 하는 일을 심어 둘 수도 있습니다. 이런 의미에서 전 타입이 더 표현력이 좋다 생각합니다.</p>
 <p>타입이 함수의 일반화가 아닌가 생각한 적이 있는데요, 텍스트도 그리 말하는 곳이 없고, 가끔 저와 대화를 하는 분들 모두 “일반화”라고까지 말할 순 없다라고들 합니다. 저는 <code>Int</code> 타입이라고 하면 <code>Class DoNothing</code>의 인스턴스이거나, 특별한 메소드를 갖고 있지 않거나, 생성자 자체도 특별한 일을 하진 않는 함수로, <code>Value</code>에 접근 할 때 “아무것도 안하는 함수”를 실행하는 함수의 확장 정도로 보는 경우를 상상해 봤습니다. 그다지 그럴싸한 생각은 아닌가 봅니다. 이런 잡스러운 생각이, Arrow 인터페이스가 왜 모나드 인터페이스보다 표현력이 좋을까를 생각할 때 전 도움이 됐습니다.</p>
+<h3 id="왜-arrow가-필요할까">왜 Arrow가 필요할까?</h3>
+<p>하스켈은 순수 함수만 있어, 인자로 넘어 오지 않으면 쓰질 못합니다. 전역 변수를 쓸 수 있는 <strong>순수하지 않은 상황</strong>에서, 함수를 합성해서 체인을 만들어 두는데, 각 함수들이 만들어 낸 결과들을 모두 개별로 유지할 필요가 있는 경우를 생각해 보면,</p>
+<pre><code>globalRes1;
+globalRes2;
+globalRes3;
+
+chain {
+  globalRes1 = func1 결과 
+  globalRes2 = func2 결과 
+  globalRes3 = func3 결과 
+}
+
+another {
+  globalRes1 + globalRes2 + globalRes3  
+}</code></pre>
+<p>이런 식의 코드가 가능하겠지만, 순수 함수만 있는 동네에선 불가능합니다.</p>
+<p><strong>“결국, 필요한 정보는 다 가지고 다니는 수밖에 없습니다.”</strong></p>
+<p>단, 결과값에만 신경쓸 수 있도록, 추가적인 정보(컨텍스트)를 가지고 다니는 건 눈에 잘 안 보이게 해주는 패턴이 필요합니다. 모나드 바인드에선 람다 함수의 클로저가 이 역할을 합니다.</p>
+<pre class="defaul"><code>\x -&gt; \y -&gt; x + y
+            ^^^^^
+            이 식에서 x를 쓸 수 있어야 편하게 구현할 수 있습니다.</code></pre>
+<p>함수를 그냥 합성하지 않고, 합성할 때마다 모나드의 바인드처럼 추가 정보를 잃어버리지 않게 차곡 차곡 챙기려면 어떻게 할까요? 순수 함수만 있는 동네에선 2튜플이 중요한 수단입니다. <code>(결과값, 추가 정보)</code> 형태로 추가 정보를 잃어버리지 않게 넣어 놓는 방법이 있습니다. 2튜플을 쓰지 않는다면, 별도의 프로덕트 타입을 만들어서 해결해도 되는데, 이미 준비되어 있는 가장 단순한 2튜플이 있으니, 이 걸 쓰면 됩니다.</p>
+<pre><code>chain {
+  res1 = Arrow1의 결과
+  res2 = Arrow2의 결과
+  return (res1, res2)
+}</code></pre>
+<p>원래는 <code>res1</code> 하나, <code>res2</code> 하나 이렇게 단일 값을 반환하던 함수를 두 개 묶어서 실행한다면, 두 개의 결과를 언제든 다시 분리할 수 있는 튜플로 <code>(res1, res2)</code> 결과를 반환합니다. 만일, 이 상태에서 또 Arrow를 추가한다면,</p>
+<pre><code>chain2 {
+  (res1, res2) = chain1 {
+    res1 = Arrow1의 결과
+    res2 = Arrow2의 결과
+    return (res1, res2)
+  }
+  res3 = Arrow3의 결과
+  return ((res1, res2), res3)
+}</code></pre>
+<p>또 Arrow를 추가한다면 <code>(((res1, res2), res3), res4)</code> 이렇게 계속 2튜플의 2튜플로 유지한다면, 각 개별 결과에 언제든 접근할 수 있는 “가능성”이 생깁니다. 콕 찝어 “가능성”이라 한 이유는, 이 걸 인간이 계속 관리하면서 쓰기엔 사실 가능성만 있을 뿐, 실용적으로 쓰기는 힘들 겁니다.</p>
+<p>그냥 함수와 함수를 <code>(.)</code>으로 합성하지 않고, <code>Arrow</code>로 래핑해서 합성하면, <code>Arrow</code>가 제공하는 컴비네이터들을 이용해 이 2튜플들을 프로그래머가 신경쓰지 않아도, 알아서 안보이게 2튜플 결과를 만들도록 할 수 있습니다.</p>
+<p>이제, 마지막으로 이렇게 2튜플의 2튜플로 만든, 어떻게 보면 우악스러워 보이는 <code>((((...)...)...)...)</code> 형태의 각 각에 접근하는 방법을 모나드의 <code>do</code>표기처럼 쉽게 해 주는 뭔가가 필요합니다.<br />
+<code>m1 &gt;&gt;= \r1 -&gt; m2 &gt;&gt;= \r2 -&gt; m3 &gt;&gt;= \r3 -&gt; m4...</code>로 쓰면 복잡하지만,</p>
+<pre><code>do
+  r1 &lt;- m1
+  r2 &lt;- m2
+  r3 &lt;- m3
+  ...</code></pre>
+<p>이렇게 이쁘게 쓸 수 깄게 됐듯이, Arrow를 쓰기 편하게 해주는 확장이 있습니다. 아래에서 이어가도록 하겠습니다.</p>
+<p>모든 분들에게 어울리는 접근 방법은 아니겠지만, 저는 이렇게 무얼 위해 개념을 도입, 혹은 만들어 내고 있는 지 알면 텍스트를 쫓아가기가 편했습니다.</p>
 <h1 id="arrow">Arrow</h1>
 <h2 id="입출력-타입에-의존하는-클래스">입,출력 타입에 의존하는 클래스</h2>
 <p>출력 타입에만 의존하지 않고, 입,출력 모두에 의존하도록, 입출력 타입을 타입 매개 변수로 가진 클래스를 정의해, 출력뿐만이 아니라 입력이 달라질 때도 명시적인 리프팅 없이 작업을 할 수 있습니다.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">Arrow</span> arr <span class="kw">where</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ot">  arr ::</span> (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> arr a b <span class="co">-- 메소드명 arr과 타입인자 arr는 다르다.</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>                             <span class="co">-- 모나드 코드 m a에서 m에 해당하는데</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>                             <span class="co">-- arr a b를 a b c로 표기하기도 한다.</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="ot">  (&gt;&gt;&gt;) ::</span> arr a b <span class="ot">-&gt;</span> arr b c <span class="ot">-&gt;</span> arr a c</span></code></pre></div>
-<p>함수 합성 <code>(.)</code>과 비슷하게 arrow를 합성하는데, 인자 순서는 <code>(.)</code>과 거꾸로입니다.<br />
+<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">Arrow</span> arr <span class="kw">where</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="ot">  arr ::</span> (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> arr a b <span class="co">-- 메소드명 arr과 타입인자 arr는 다르다.</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>                             <span class="co">-- 모나드 코드 m a에서 m에 해당하는데</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>                             <span class="co">-- (b -&gt; c) -&gt; a b c로 표기하기도 한다.</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="ot">  (&gt;&gt;&gt;) ::</span> arr a b <span class="ot">-&gt;</span> arr b c <span class="ot">-&gt;</span> arr a c</span></code></pre></div>
+<p>아래 <code>(&gt;&gt;&gt;)</code>는 함수 합성 <code>(.)</code>과 비슷하게 arrow를 합성하는데, 인자 순서는 <code>(.)</code>과 거꾸로입니다.<br />
 함수 타입을 위한 인스턴스를 만들면,</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Arrow</span> (<span class="ot">-&gt;</span>) <span class="kw">where</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  arr <span class="ot">=</span> <span class="fu">id</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  (<span class="op">&gt;&gt;&gt;</span>) <span class="ot">=</span> <span class="fu">flip</span> (<span class="op">.</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Arrow</span> (<span class="ot">-&gt;</span>) <span class="kw">where</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  arr <span class="ot">=</span> <span class="fu">id</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  (<span class="op">&gt;&gt;&gt;</span>) <span class="ot">=</span> <span class="fu">flip</span> (<span class="op">.</span>)</span></code></pre></div>
 <p>Effect가 있는 Kleisli 타입을 위한 인스턴스를 만들면,</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">Kleisli</span> m a b <span class="ot">=</span> <span class="dt">Kleisli</span> {<span class="ot">runKleisli ::</span> a <span class="ot">-&gt;</span> m b}</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Monad</span> m <span class="ot">=&gt;</span> <span class="dt">Arrow</span> (<span class="dt">Kleisli</span> m) <span class="kw">where</span> </span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="ot">  arr ::</span> <span class="dt">Monad</span> m <span class="ot">=&gt;</span> (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> <span class="dt">Kleisli</span> m a b</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  arr f <span class="ot">=</span> <span class="fu">return</span> <span class="op">.</span> f</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="ot">  (&gt;&gt;&gt;) ::</span> <span class="dt">Monad</span> m <span class="ot">=&gt;</span> <span class="dt">Kleisli</span> m a b <span class="ot">-&gt;</span> <span class="dt">Kleisli</span> m b c <span class="ot">-&gt;</span> <span class="dt">Kleisli</span> m a c</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co">-- f를 a -&gt; m b, g를  b -&gt; m c 라고 하면</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  (f <span class="op">&gt;&gt;&gt;</span> g) a <span class="ot">=</span> <span class="kw">do</span> b <span class="ot">&lt;-</span> f a <span class="co">-- 숨어 있는 바인드가 동작하면 Effect 작업을 합니다.</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>                   g b</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">Kleisli</span> m a b <span class="ot">=</span> <span class="dt">Kleisli</span> {<span class="ot">runKleisli ::</span> a <span class="ot">-&gt;</span> m b}</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Monad</span> m <span class="ot">=&gt;</span> <span class="dt">Arrow</span> (<span class="dt">Kleisli</span> m) <span class="kw">where</span> </span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="ot">  arr ::</span> <span class="dt">Monad</span> m <span class="ot">=&gt;</span> (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> <span class="dt">Kleisli</span> m a b</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  arr f <span class="ot">=</span> <span class="fu">return</span> <span class="op">.</span> f</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="ot">  (&gt;&gt;&gt;) ::</span> <span class="dt">Monad</span> m <span class="ot">=&gt;</span> <span class="dt">Kleisli</span> m a b <span class="ot">-&gt;</span> <span class="dt">Kleisli</span> m b c <span class="ot">-&gt;</span> <span class="dt">Kleisli</span> m a c</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="co">-- f를 a -&gt; m b, g를  b -&gt; m c 라고 하면</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  (f <span class="op">&gt;&gt;&gt;</span> g) a <span class="ot">=</span> <span class="kw">do</span> b <span class="ot">&lt;-</span> f a <span class="co">-- 숨어 있는 바인드가 동작하면 Effect 작업을 합니다.</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>                   g b</span></code></pre></div>
 <h2 id="arr-만-있으면-return-를-즉-모나드를-대체할-수-있을까">arr, (&gt;&gt;&gt;)만 있으면 return, (&gt;&gt;=)를, 즉 모나드를 대체할 수 있을까?</h2>
 <p>Kleisli 타입을 가진 Arrow가 모나드와 같은 동작을 하고 있을까요? <code>(&gt;&gt;&gt;)</code>의 구현을 보면 바인드가 돌고 있습니다. <code>(&gt;&gt;&gt;)</code>는 그대로 바인드와 대응하는 것으로 보입니다. 텍스트 설명을 보면, <code>(&gt;&gt;=)</code>는 두 번째 인자로 <code>a -&gt; m b</code> 함수를 받기 때문에, 두 개의 Effectful Computation을 순차적으로 실행하는 동안 하스켈 코드를 실행할 수 있는 기회가 있다고 얘기합니다.</p>
 <p>※ 그런데, 위에서 보듯 <code>(&gt;&gt;&gt;)</code>가 함수가 아닌 <code>Arrow</code>값 두개를 받긴 해도, 안에서 <code>(&gt;&gt;=)</code>가 도는데 차이가 없지 않을까란 생각이 들었습니다. 원문에는 아래 같은 내용이 있습니다. (Programming with Arrows - John Hughes 발췌)</p>
@@ -160,22 +208,22 @@
 <blockquote>
 <p>아래는 <span class="citation" data-cites="Ailrun">@Ailrun</span> 님의 설명을 옮겼습니다.<br />
 예를 들어 <code>State</code>를 다음처럼 모나드 인터페이스를 쓰는 것과, <code>Arrow</code> 인터페이스를 쓰는 것을 비교하면</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- Monad</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ot">get ::</span> <span class="dt">State</span> <span class="dt">Int</span> <span class="dt">Int</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="ot">set ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">State</span> <span class="dt">Int</span> ()</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co">-- Arrow</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="ot">getA ::</span> <span class="dt">StateArr</span> <span class="dt">Int</span> <span class="dt">Int</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="ot">setA ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">StateArr</span> <span class="dt">Int</span> ()</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>λ<span class="op">&gt;</span> getA <span class="op">&gt;&gt;&gt;</span> setA <span class="dv">5</span> <span class="co">-- 가능</span></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>λ<span class="op">&gt;</span> get <span class="op">&gt;&gt;=</span> (\x <span class="ot">-&gt;</span> set (x <span class="op">+</span> <span class="dv">1</span>)) <span class="co">-- 가능</span></span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>λ<span class="op">&gt;</span> getA <span class="op">&gt;&gt;&gt;</span> (\x <span class="ot">-&gt;</span> set (x <span class="op">+</span> <span class="dv">1</span>)) <span class="co">-- 불가능</span></span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- Monad</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="ot">get ::</span> <span class="dt">State</span> <span class="dt">Int</span> <span class="dt">Int</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="ot">set ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">State</span> <span class="dt">Int</span> ()</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="co">-- Arrow</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="ot">getA ::</span> <span class="dt">StateArr</span> <span class="dt">Int</span> <span class="dt">Int</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="ot">setA ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">StateArr</span> <span class="dt">Int</span> ()</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>λ<span class="op">&gt;</span> getA <span class="op">&gt;&gt;&gt;</span> setA <span class="dv">5</span> <span class="co">-- 가능</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>λ<span class="op">&gt;</span> get <span class="op">&gt;&gt;=</span> (\x <span class="ot">-&gt;</span> set (x <span class="op">+</span> <span class="dv">1</span>)) <span class="co">-- 가능</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>λ<span class="op">&gt;</span> getA <span class="op">&gt;&gt;&gt;</span> (\x <span class="ot">-&gt;</span> set (x <span class="op">+</span> <span class="dv">1</span>)) <span class="co">-- 불가능</span></span></code></pre></div>
 <p><code>a b c</code> 와 <code>a c d</code> 를 섞는 것 뿐만 아니라<br />
 <code>a b c</code> 와 <code>c -&gt; a d e</code> 도 섞을 수 있냐를 얘기하는 겁니다.</p>
 <p><code>arr</code>과 <code>(&gt;&gt;&gt;)</code>만으론 다음처럼이 한계입니다.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ot">mix ::</span> a b c <span class="ot">-&gt;</span> (c <span class="ot">-&gt;</span> a d e) <span class="ot">-&gt;</span> a b (a d e)</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>mix p q <span class="ot">=</span> p <span class="op">&gt;&gt;&gt;</span> arr q <span class="co">-- q를 Arrow로 만들어야 하니 arr q</span></span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ot">mix ::</span> a b c <span class="ot">-&gt;</span> (c <span class="ot">-&gt;</span> a d e) <span class="ot">-&gt;</span> a b (a d e)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>mix p q <span class="ot">=</span> p <span class="op">&gt;&gt;&gt;</span> arr q <span class="co">-- q를 Arrow로 만들어야 하니 arr q</span></span></code></pre></div>
 <p><code>first</code>나 <code>app</code> 등이 추가되어야 비로소 (<code>a</code>가 중첩되어 있는 <code>a b (a d e)</code>가 아닌) <code>a (b,d) e</code>를 얻을 수 있게 됩니다.</p>
 <p><code>Arrow</code>가 모나드 동작을 할 수 있는가는, “언제 <strong><em>Uncurrying</em></strong>이 가능한 <code>a</code>를 얻을 수 있는가?”라고 볼 수도 있습니다.</p>
 <p><code>Monad</code>의 핵심이 <code>join :: m (m a) -&gt; m a</code>이니, 이와 비교하기 좋게 바꿔서 보면,<br />
@@ -192,17 +240,18 @@
 <h2 id="applicatives와-arrow-비교">Applicatives와 Arrow 비교</h2>
 <p><span class="citation" data-cites="todo">@todo</span></p>
 <h2 id="모나드가-하는-일을-할-수-있도록-인터페이스를-확장해-보자">모나드가 하는 일을 할 수 있도록 인터페이스를 확장해 보자</h2>
+<p>지금부터 2튜플의 2튜플…로 함수들의 결과들을 각 각 기억하는 방법을 위해 필요한 도구(<code>&amp;&amp;&amp;</code>,<code>***</code>,<code>first</code>,<code>second</code>)들을 보겠습니다.</p>
 <p>모나드에 들어 있는 두 값을 더하는 것을 보면</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>addM a b <span class="ot">=</span> <span class="kw">do</span> x <span class="ot">&lt;-</span> a</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>              y <span class="ot">&lt;-</span> b</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>              <span class="fu">return</span> (x <span class="op">+</span> y)</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co">-- 바인드가 보이게 하면</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>a <span class="op">&gt;&gt;=</span> \x <span class="ot">-&gt;</span> b <span class="op">&gt;&gt;=</span> \y <span class="ot">-&gt;</span> <span class="fu">return</span> (x <span class="op">+</span> y)</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>addM a b <span class="ot">=</span> <span class="kw">do</span> x <span class="ot">&lt;-</span> a</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>              y <span class="ot">&lt;-</span> b</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>              <span class="fu">return</span> (x <span class="op">+</span> y)</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co">-- 바인드가 보이게 하면</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>a <span class="op">&gt;&gt;=</span> \x <span class="ot">-&gt;</span> b <span class="op">&gt;&gt;=</span> \y <span class="ot">-&gt;</span> <span class="fu">return</span> (x <span class="op">+</span> y)</span></code></pre></div>
 <p>위를 읽을 때, <code>a</code> 계산식의 결과를 <code>b</code>가 받는 것으로 읽는 게 아닙니다. <code>a</code> 계산식의 결과로 <code>x</code>를 만들고, (이 경우는) <code>a</code>의 결과와 상관 없이 <code>b</code>계산식의 결과로 <code>y</code>를 만들어, 마지막에 둘을 <code>+</code>하는 작업입니다. 어떤 M이 들어왔냐에 따라, 숨어 있는 바인드 인스턴스가 알아서 Effect 작업을 담당합니다. 바인드 <code>(&gt;&gt;=)</code>의 타입은 <code>m a -&gt; (a -&gt; m b) -&gt; m b</code> 입니다. <code>m a</code>와 <code>m b</code>는 아직 Computeation이 끝난 값들이 아닙니다. 언젠가, 어떤 절차를 거쳐 값이 될 Computation입니다. <code>(a -&gt; m b)</code>는 <code>a</code>가 있어야 <code>m b</code> 계산식을 만듭니다.</p>
 <p>함수형에서는 스코프가 넒은 변수를 쓸 수가 없어, 여러 개의 정보를 “유통”시키려면 인자를 늘리거나 튜플을 씁니다.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ot">addA ::</span> <span class="dt">Arrow</span> arr <span class="ot">=&gt;</span> arr a <span class="dt">Int</span> <span class="ot">-&gt;</span> arr a <span class="dt">Int</span> <span class="ot">-&gt;</span> arr a <span class="dt">Int</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>addA f g <span class="ot">=</span> f_and_g <span class="op">&gt;&gt;&gt;</span> arr (<span class="fu">uncurry</span> (<span class="op">+</span>))</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- uncurry는 인자를 두 개 받는 함수를 2튜플 하나를 받는 함수로 바꿔줍니다.</span></span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="ot">addA ::</span> <span class="dt">Arrow</span> arr <span class="ot">=&gt;</span> arr a <span class="dt">Int</span> <span class="ot">-&gt;</span> arr a <span class="dt">Int</span> <span class="ot">-&gt;</span> arr a <span class="dt">Int</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>addA f g <span class="ot">=</span> f_and_g <span class="op">&gt;&gt;&gt;</span> arr (<span class="fu">uncurry</span> (<span class="op">+</span>))</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- uncurry는 인자를 두 개 받는 함수를 2튜플 하나를 받는 함수로 바꿔줍니다.</span></span></code></pre></div>
 <p><code>f</code>,<code>g</code> 계산을 튜플로 묶은 후 다음으로 넘기면 됩니다. 여기서 <code>f_and_g</code>는 <code>f, g, (&gt;&gt;&gt;), arr</code>만으론 구현할 수 있을까요?</p>
 <p><code>... &gt;&gt;&gt; f &gt;&gt;&gt; ...</code>는 <code>f</code>가 나온 뒤에는 <code>f</code>의 결과값 말고는 다 잃어버립니다. 위에 모나드 예시로 보면 <code>x</code>를 기억시키지 못합니다. <code>g</code>의 출력도, 제일 처음에 입력으로 받았던 값도 모두 잃어버립니다.</p>
 <blockquote>
@@ -211,83 +260,83 @@ A. <code>(&gt;&gt;&gt;)</code>를 “자유”롭게 만들 수 있는 건 아�
 </blockquote>
 <h2 id="section">(&amp;&amp;&amp;)</h2>
 <p>그래서 2튜플을 이용해 각 각의 결과를 유지하기 위해 <code>Arrow</code>에 다음 컴비네이터를 추가합니다. 2튜플은 두 개의 값을 담아 둘 수 있으니, <code>(&amp;&amp;&amp;)</code>를 적절히 구현해서 두 <code>Arrow</code>의 결과가 각각 2튜플에 담기도록 하면, 일단 필요한 정보는 살릴 수 있습니다.</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">Arrow</span> arr <span class="kw">where</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="op">...</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="ot">  (&amp;&amp;&amp;) ::</span> arr a b <span class="ot">-&gt;</span> arr a c <span class="ot">-&gt;</span> arr a (b, c)</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>                                       <span class="op">^^^^^^</span></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>                                        2튜플</span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">Arrow</span> arr <span class="kw">where</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="op">...</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="ot">  (&amp;&amp;&amp;) ::</span> arr a b <span class="ot">-&gt;</span> arr a c <span class="ot">-&gt;</span> arr a (b, c)</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>                                       <span class="op">^^^^^^</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>                                        2튜플</span></code></pre></div>
 <p><code>Arrow</code> 두 개를 받아 각 각의 Computation을 실행하고, <code>(&gt;&gt;&gt;)</code>처럼 이어지는 Computation에 결과를 넘기는 게 아니라, 결과를 2튜플로 만드는 컴비네이터입니다. 이제, 이를 이용하면 <code>f_and_g</code>를 구현할수 있습니다.</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>addA f g <span class="ot">=</span> f <span class="op">&amp;&amp;&amp;</span> g <span class="op">&gt;&gt;&gt;</span> arr (<span class="fu">uncurry</span> (<span class="op">+</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>addA f g <span class="ot">=</span> f <span class="op">&amp;&amp;&amp;</span> g <span class="op">&gt;&gt;&gt;</span> arr (<span class="fu">uncurry</span> (<span class="op">+</span>))</span></code></pre></div>
 <p>위에서 봤던 함수와 Kleisli 타입을 위한 인스턴스를 다음과 같이 구현할 수 있습니다.</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Arrow</span> (<span class="ot">-&gt;</span>) <span class="kw">where</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  (f <span class="op">&amp;&amp;&amp;</span> g) a <span class="ot">=</span> (f a, g a)</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Monad</span> m <span class="ot">=&gt;</span> <span class="dt">Arrow</span> (<span class="dt">Kleisli</span> m) <span class="kw">where</span></span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">Kleisli</span> f <span class="op">&amp;&amp;&amp;</span> <span class="dt">Kleisli</span> g <span class="ot">=</span> <span class="dt">Kleisli</span> <span class="op">$</span> \a <span class="ot">-&gt;</span> <span class="kw">do</span> b <span class="ot">&lt;-</span> f a</span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>                                               c <span class="ot">&lt;-</span> g a</span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>                                               <span class="fu">return</span> (b, c)</span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="co">-- stream 함수 `SF`의 경우는 `f`와 `g`의 출력을 `zip`하면 된다.</span></span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Arrow</span> <span class="dt">SF</span> <span class="kw">where</span></span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>  <span class="dt">SF</span> f <span class="op">&amp;&amp;&amp;</span> <span class="dt">SF</span> g <span class="ot">=</span> <span class="dt">SF</span> (f <span class="op">&amp;&amp;&amp;</span> g <span class="op">&gt;&gt;&gt;</span> <span class="fu">uncurry</span> <span class="fu">zip</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Arrow</span> (<span class="ot">-&gt;</span>) <span class="kw">where</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  (f <span class="op">&amp;&amp;&amp;</span> g) a <span class="ot">=</span> (f a, g a)</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Monad</span> m <span class="ot">=&gt;</span> <span class="dt">Arrow</span> (<span class="dt">Kleisli</span> m) <span class="kw">where</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">Kleisli</span> f <span class="op">&amp;&amp;&amp;</span> <span class="dt">Kleisli</span> g <span class="ot">=</span> <span class="dt">Kleisli</span> <span class="op">$</span> \a <span class="ot">-&gt;</span> <span class="kw">do</span> b <span class="ot">&lt;-</span> f a</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>                                               c <span class="ot">&lt;-</span> g a</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>                                               <span class="fu">return</span> (b, c)</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="co">-- stream 함수 `SF`의 경우는 `f`와 `g`의 출력을 `zip`하면 된다.</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Arrow</span> <span class="dt">SF</span> <span class="kw">where</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>  <span class="dt">SF</span> f <span class="op">&amp;&amp;&amp;</span> <span class="dt">SF</span> g <span class="ot">=</span> <span class="dt">SF</span> (f <span class="op">&amp;&amp;&amp;</span> g <span class="op">&gt;&gt;&gt;</span> <span class="fu">uncurry</span> <span class="fu">zip</span>)</span></code></pre></div>
 <p>각각의 <code>Arrow</code>에 들어 있는 함수들의 결과를 튜플에 넣게만 만들면 됩니다.<br />
 ※ “각각” 돌기 때문에 <code>&amp;</code>를 쓴 것 같은데, 네이밍에 관한 설명은 따로 안 보입니다.</p>
 <p>※ <code>(&amp;&amp;&amp;)</code>의 결과를 머릿속에서 단순한 모양으로 reduce하려 하지 말아야 합니다.</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Kleisli</span> <span class="op">$</span> \a <span class="ot">-&gt;</span> <span class="kw">do</span> b <span class="ot">&lt;-</span> f a</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>                   c <span class="ot">&lt;-</span> g a</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>                   <span class="fu">return</span> (b, c)</span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Kleisli</span> <span class="op">$</span> \a <span class="ot">-&gt;</span> <span class="kw">do</span> b <span class="ot">&lt;-</span> f a</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>                   c <span class="ot">&lt;-</span> g a</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>                   <span class="fu">return</span> (b, c)</span></code></pre></div>
 <p>이 자체가 가장 단순한 모양입니다.</p>
 <h2 id="section-1">(***)</h2>
 <p>다음으로 할 일은, 최대한 타입에 따라 바뀌지 않는 부분을 분리해기 위해 다음처럼 생각해 볼 수 있습니다. 위 구현을 보면 <code>a</code>를 한 번 받아 <code>f</code>에 한 번, <code>g</code>에 한 번씩 쓰고 있습니다. <code>a</code>를 복사duplicate하는 성질(<code>\x -&gt; (x,x)</code>)을 빼내면 다음 처럼 볼 수 있습니다.</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>f <span class="op">&amp;&amp;&amp;</span> g <span class="ot">=</span> arr (\x <span class="ot">-&gt;</span> (x, x)) <span class="op">&gt;&gt;&gt;</span> f <span class="op">***</span> g</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="co">--              a -&gt;   b     &gt;&gt;&gt; b -&gt; c</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- b가 2튜플 타입이고, (f *** g)는 2튜플을 받는 함수를 가지고 있는 Arrow다.</span></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">Arrow</span> arr <span class="kw">where</span></span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="ot">  (***) ::</span> arr a b <span class="ot">-&gt;</span> arr c d <span class="ot">-&gt;</span> arr (a,c) (b,d)</span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="co">-- 따로 받던 a, c를 같이 튜플로 묶어서 받고, 결과값도 튜플로 묶는다. 그냥, 각각 동작할 함수들의 입력을 짝 짓고, 출력을 짝지어 묶어놨을 뿐이다.</span></span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="co">-- a, b는 같을 필요 없다. 이 경우는 duplicate해서 들어오고 있다.</span></span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>f <span class="op">&amp;&amp;&amp;</span> g <span class="ot">=</span> arr (\x <span class="ot">-&gt;</span> (x, x)) <span class="op">&gt;&gt;&gt;</span> f <span class="op">***</span> g</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="co">--              a -&gt;   b     &gt;&gt;&gt; b -&gt; c</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- b가 2튜플 타입이고, (f *** g)는 2튜플을 받는 함수를 가지고 있는 Arrow다.</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">Arrow</span> arr <span class="kw">where</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="ot">  (***) ::</span> arr a b <span class="ot">-&gt;</span> arr c d <span class="ot">-&gt;</span> arr (a,c) (b,d)</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="co">-- 따로 받던 a, c를 같이 튜플로 묶어서 받고, 결과값도 튜플로 묶는다. 그냥, 각각 동작할 함수들의 입력을 짝 짓고, 출력을 짝지어 묶어놨을 뿐이다.</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="co">-- a, b는 같을 필요 없다. 이 경우는 duplicate해서 들어오고 있다.</span></span></code></pre></div>
 <p><code>(***)</code>는 두 개의 <code>Arrow</code>를 받아 튜플을 가진 <code>Arrow</code>로 만듭니다. 이 건 하나의 <code>Arrow</code>를 튜플을 가진 <code>Arrow</code>로 리프팅해서 얻을 수도 있습니다. 저는 이 아이디어가 금방 눈에 들어오지 않았습니다.<br />
 <strong><em>현재 목표는 값 하나를 넣어주면, 두 개로 만들어 (이 작업은 이미 <code>(***)</code>전에 이루어집니다.),<br />
 넘어오면 결과를 2튜플에 저장할 수 있어야 합니다.(<code>(***)</code>가 하는 일)</em></strong></p>
 <h2 id="first">first</h2>
 <p>왜 모나딕한 동작을 위해서, <code>first</code>가 필요할까요? 텍스트에선 친절하게 말해주지 않습니다.</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">Arrow</span> arr <span class="kw">where</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="ot">  first ::</span> arr a b <span class="ot">-&gt;</span> arr (a,c) (b,c)</span></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">Arrow</span> arr <span class="kw">where</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="ot">  first ::</span> arr a b <span class="ot">-&gt;</span> arr (a,c) (b,c)</span></code></pre></div>
 <p>first를 함수, Kleisli arrow, Stream function을 위한 구현을 보면</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Arrow</span> (<span class="ot">-&gt;</span>) <span class="kw">where</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- arr에 (-&gt;)를 넣으면</span></span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- ((-&gt;) a b) -&gt; ((-&gt;) (a,c) (b,c))</span></span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="co">--      (a -&gt; b) -&gt; (a,c) -&gt; (b  ,c)</span></span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  first     f       (a,c) <span class="ot">=</span>  (f a,c) </span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Monad</span> m <span class="ot">=&gt;</span> <span class="dt">Arrow</span> (<span class="dt">Kleisli</span> m) <span class="kw">where</span></span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>  first (<span class="dt">Kleisli</span> f) <span class="ot">=</span> <span class="dt">Kleisli</span> (\(a,c) <span class="ot">-&gt;</span> <span class="kw">do</span> b <span class="ot">&lt;-</span> f a</span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>                                            <span class="fu">return</span> (b,c))</span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Arrow</span> <span class="dt">SF</span> <span class="kw">where</span></span>
-<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>  first (<span class="dt">SF</span> f) <span class="ot">=</span> <span class="dt">SF</span> (<span class="fu">unzip</span> <span class="op">&gt;&gt;&gt;</span> first f <span class="op">&gt;&gt;&gt;</span> <span class="fu">uncurry</span> <span class="fu">zip</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Arrow</span> (<span class="ot">-&gt;</span>) <span class="kw">where</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- arr에 (-&gt;)를 넣으면</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- ((-&gt;) a b) -&gt; ((-&gt;) (a,c) (b,c))</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="co">--      (a -&gt; b) -&gt; (a,c) -&gt; (b  ,c)</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>  first     f       (a,c) <span class="ot">=</span>  (f a,c) </span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Monad</span> m <span class="ot">=&gt;</span> <span class="dt">Arrow</span> (<span class="dt">Kleisli</span> m) <span class="kw">where</span></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>  first (<span class="dt">Kleisli</span> f) <span class="ot">=</span> <span class="dt">Kleisli</span> (\(a,c) <span class="ot">-&gt;</span> <span class="kw">do</span> b <span class="ot">&lt;-</span> f a</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>                                            <span class="fu">return</span> (b,c))</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Arrow</span> <span class="dt">SF</span> <span class="kw">where</span></span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>  first (<span class="dt">SF</span> f) <span class="ot">=</span> <span class="dt">SF</span> (<span class="fu">unzip</span> <span class="op">&gt;&gt;&gt;</span> first f <span class="op">&gt;&gt;&gt;</span> <span class="fu">uncurry</span> <span class="fu">zip</span>)</span></code></pre></div>
 <p><strong><em>눈여겨 볼 부분은 현재 계산식에 영향을 미치지 않는 정보를 얹힐 <code>( ,c)</code>가 있는 겁니다.</em></strong><br />
 구현을 말로 읽어 보면, 당장은 필요 없는 <code>c</code>를, 지금 필요한 <code>a</code>와 묶어서 넘기면 <code>a</code>에만 작업을 해주는 단순한 일을 하는 컴비네이터입니다. 물론 컨텍스트는 유지해 주면서요.</p>
 <p><code>first</code>로 <code>(***)</code>을 구현하려면 우선 <code>second</code>를 정의합니다.</p>
 <h2 id="second">second</h2>
-<div class="sourceCode" id="cb16"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="ot">second ::</span> <span class="dt">Arrow</span> arr <span class="ot">=&gt;</span> arr a b <span class="ot">-&gt;</span> arr (c,a) (c,b)</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>second f <span class="ot">=</span> arr swap <span class="op">&gt;&gt;&gt;</span> first f <span class="op">&gt;&gt;&gt;</span> arr swap</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span> swap (x,y) <span class="ot">=</span> (y,x)</span></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="ot">second ::</span> <span class="dt">Arrow</span> arr <span class="ot">=&gt;</span> arr a b <span class="ot">-&gt;</span> arr (c,a) (c,b)</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>second f <span class="ot">=</span> arr swap <span class="op">&gt;&gt;&gt;</span> first f <span class="op">&gt;&gt;&gt;</span> arr swap</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span> swap (x,y) <span class="ot">=</span> (y,x)</span></code></pre></div>
 <p><strong><em>역시 눈여겨 볼 부분은 현재 계산식에 영향을 미치지 않는 정보를 얹힐 <code>(c, )</code>가 있는 겁니다.</em></strong></p>
 <p><code>second</code>는 <code>first</code>로 구현되기 때문에 따로 구현할 필요 없이, 위 디폴트 구현으로 어디든 쓰면 됩니다. <code>first</code>만 있다면 말입니다.</p>
 <h2 id="다시-정의">(***) 다시 정의</h2>
 <p>이제, <code>first</code>, <code>second</code>를 써서 <code>(***)</code>를 정의할 수 있습니다.</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>f <span class="op">***</span> g <span class="ot">=</span> first f <span class="op">&gt;&gt;&gt;</span> second g</span></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>f <span class="op">***</span> g <span class="ot">=</span> first f <span class="op">&gt;&gt;&gt;</span> second g</span></code></pre></div>
 <p>왜 이렇게 될까요?</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- 비교하기 좋게 constraint는 생략하고 보면</span></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="ot">first  ::</span> arr a b <span class="ot">-&gt;</span> arr (a,c) (b,c)</span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="ot">second ::</span> arr x y <span class="ot">-&gt;</span> arr (d,x) (d,y)</span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="ot">(&gt;&gt;&gt;)  ::</span> arr a b         <span class="ot">-&gt;</span> arr b c         <span class="ot">-&gt;</span> arr a c</span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>          arr (a,c) (b,c) <span class="ot">-&gt;</span> arr (d,x) (d,y) <span class="ot">-&gt;</span> arr (a,c) (d,y) </span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>                <span class="co">--  (b,c) = (d,x) 가 같아야만 합니다.</span></span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>                <span class="co">-- d = b 이고, c = x 입니다.</span></span>
-<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>                                             <span class="ot">-&gt;</span> arr (a,x) (b,y)</span></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- 비교하기 좋게 constraint는 생략하고 보면</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="ot">first  ::</span> arr a b <span class="ot">-&gt;</span> arr (a,c) (b,c)</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="ot">second ::</span> arr x y <span class="ot">-&gt;</span> arr (d,x) (d,y)</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="ot">(&gt;&gt;&gt;)  ::</span> arr a b         <span class="ot">-&gt;</span> arr b c         <span class="ot">-&gt;</span> arr a c</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>          arr (a,c) (b,c) <span class="ot">-&gt;</span> arr (d,x) (d,y) <span class="ot">-&gt;</span> arr (a,c) (d,y) </span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>                <span class="co">--  (b,c) = (d,x) 가 같아야만 합니다.</span></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>                <span class="co">-- d = b 이고, c = x 입니다.</span></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>                                             <span class="ot">-&gt;</span> arr (a,x) (b,y)</span></code></pre></div>
 <p>최종 결과 타입만 보면 <code>arr (a,x) (b,y)</code>에<br />
 처음 액션 혹은 함수인 <code>f</code>의 결과 값 <code>b</code>가 살아 있어야 하고,<br />
 다음 액션 혹은 함수인 <code>g</code>의 결과 값 <code>y</code>가 살아 있어야 합니다.<br />
@@ -298,75 +347,76 @@ A. <code>(&gt;&gt;&gt;)</code>를 “자유”롭게 만들 수 있는 건 아�
 - <code>f</code>로 앞에 <code>a</code>만 바꿉니다. <code>(f a, a)</code>
 - <code>g</code>로 뒤에 <code>a</code>만 바꿉니다. <code>(f a, g a)</code></p>
 <p>만일 <code>(***)</code>가 먼저 위와 같은 동작을 하도록 정의되어 있다면,</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>first f <span class="ot">=</span> f <span class="op">***</span> arr <span class="fu">id</span></span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- (***) :: arr a b -&gt; arr c d -&gt; arr (a,c) (b,d)</span></span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- arr a b *** arr b b = arr (a,b) (b,b)</span></span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="co">-- 2튜플을 받아 앞에 것에만 작업 할 수 있게 했을 뿐, 별다른 작업은 없습니다.</span></span></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>first f <span class="ot">=</span> f <span class="op">***</span> arr <span class="fu">id</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- (***) :: arr a b -&gt; arr c d -&gt; arr (a,c) (b,d)</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- arr a b *** arr b b = arr (a,b) (b,b)</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="co">-- 2튜플을 받아 앞에 것에만 작업 할 수 있게 했을 뿐, 별다른 작업은 없습니다.</span></span></code></pre></div>
 <p><code>second</code>도, <code>(***)</code>도 <code>first</code>만 있으면 구현할 수 있으니, <code>first</code>만 있으면 합성하며, 이전 액션(혹은 함수)의 결과를 다음에 넘기는 “모나딕”한 일을 할 수 있습니다.</p>
 <p>그 외, <code>(^&gt;&gt;)</code>, <code>(&gt;&gt;^)</code>, <code>(&lt;&lt;^)</code>, <code>(^&lt;&lt;)</code> 들은 순수 함수들을 합성compose할 때 <code>arr</code>을 매 번 쓰는 귀찮음을 덜어주는 편의 컴비네이터들입니다.</p>
 <h2 id="조건부로-arrow-컴비네이션하기">조건부로 Arrow 컴비네이션하기</h2>
+<p>지금부턴 Arrow를 막강하게 해주는 특징, 다이내믹한 흐름을 위한 도구(<code>|||</code>, <code>mapA</code>, <code>+++</code>, <code>left</code>, <code>right</code>)들을 보겠습니다.</p>
 <p>If Then Else - ifte</p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="ot">ifte ::</span> <span class="dt">Arrow</span> arr <span class="ot">=&gt;</span> arr a <span class="dt">Bool</span> <span class="ot">-&gt;</span> arr a b <span class="ot">-&gt;</span> arr a b <span class="ot">-&gt;</span> arr a b</span></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="ot">ifte ::</span> <span class="dt">Arrow</span> arr <span class="ot">=&gt;</span> arr a <span class="dt">Bool</span> <span class="ot">-&gt;</span> arr a b <span class="ot">-&gt;</span> arr a b <span class="ot">-&gt;</span> arr a b</span></code></pre></div>
 <p><code>ifte p f g</code>는 불린값 <code>p</code>가 참이면 <code>f</code>, 거짓이면 <code>g</code></p>
-<div class="sourceCode" id="cb21"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- (&amp;&amp;&amp;) :: arr a b -&gt; arr a c -&gt; arr a (b, c)</span></span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>ifte p f g <span class="ot">=</span> p <span class="op">&amp;&amp;&amp;</span> arr <span class="fu">id</span> <span class="op">&gt;&gt;&gt;</span> f <span class="op">|||</span> g</span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>             <span class="op">^^^^^^^^^^^^</span></span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>        <span class="co">-- 왜 이렇게 할까요?</span></span></code></pre></div>
+<div class="sourceCode" id="cb26"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- (&amp;&amp;&amp;) :: arr a b -&gt; arr a c -&gt; arr a (b, c)</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>ifte p f g <span class="ot">=</span> p <span class="op">&amp;&amp;&amp;</span> arr <span class="fu">id</span> <span class="op">&gt;&gt;&gt;</span> f <span class="op">|||</span> g</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>             <span class="op">^^^^^^^^^^^^</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>        <span class="co">-- 왜 이렇게 할까요?</span></span></code></pre></div>
 <p><code>p &amp;&amp;&amp; arr id</code>는 왜 해주는 걸까요?<br />
 <code>arr a Bool &amp;&amp;&amp; arr a a = arr a (Bool, a)</code><br />
 결과에 <code>Bool</code>값과 처음 입력한 값을 같이 2튜플에 남겨 둘 수 있습니다.</p>
 <h2 id="section-2">(|||)</h2>
-<div class="sourceCode" id="cb22"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>p <span class="op">&amp;&amp;&amp;</span> arr<span class="ot"> id ::</span> arr a (불린값, f나g에 넣어줄 입력값)</span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>f <span class="op">|||</span><span class="ot"> g ::</span> arr (a, b) c</span></code></pre></div>
+<div class="sourceCode" id="cb27"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>p <span class="op">&amp;&amp;&amp;</span> arr<span class="ot"> id ::</span> arr a (불린값, f나g에 넣어줄 입력값)</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>f <span class="op">|||</span><span class="ot"> g ::</span> arr (a, b) c</span></code></pre></div>
 <p><code>(|||)</code>는 불린값에 따라 <code>f</code> 혹은 <code>g</code>를 고르고 입력값을 넣어줍니다.</p>
 <p>입력값을 2튜플이 아닌 <code>Either</code>를 받도록 하면 좀 더 매끄러울 수 있습니다. <code>(True, a)</code>를 <code>Left a</code>로, <code>(False, a)</code>를 <code>Right a</code>로 하면 <code>Left</code>일 때와 <code>Right</code>일 때 다른 타입을 갖고 있게 할 수 있어 표현력이 늘어 납니다.</p>
-<div class="sourceCode" id="cb23"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">Arrow</span> arr <span class="ot">=&gt;</span> <span class="dt">ArrowChoice</span> arr <span class="kw">where</span></span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="ot">  (|||) ::</span> arr a c <span class="ot">-&gt;</span> arr b c <span class="ot">-&gt;</span> arr (<span class="dt">Either</span> a b) c</span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>                                     <span class="op">^^^^^^^^^^^^</span></span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>                    <span class="co">-- 여기를 2튜플이 아닌 Either로 바꾼다.</span></span></code></pre></div>
+<div class="sourceCode" id="cb28"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">Arrow</span> arr <span class="ot">=&gt;</span> <span class="dt">ArrowChoice</span> arr <span class="kw">where</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="ot">  (|||) ::</span> arr a c <span class="ot">-&gt;</span> arr b c <span class="ot">-&gt;</span> arr (<span class="dt">Either</span> a b) c</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>                                     <span class="op">^^^^^^^^^^^^</span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>                    <span class="co">-- 여기를 2튜플이 아닌 Either로 바꾼다.</span></span></code></pre></div>
 <p>아직 duality에 대한 지식이 없어 정확한 “감탄”은 못하지만, 위 서명에서 <code>arr</code>의 인자 순서를 바꾸고, <code>Either a b</code>를 <code>(a, b)</code>로 대체하면 <code>(&amp;&amp;&amp;)</code>가 나옵니다.</p>
-<div class="sourceCode" id="cb24"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="ot">  (|||) ::</span> arr a c <span class="ot">-&gt;</span> arr b c <span class="ot">-&gt;</span> arr (<span class="dt">Either</span> a b) c</span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="ot">  (&amp;&amp;&amp;) ::</span> arr a b <span class="ot">-&gt;</span> arr a c <span class="ot">-&gt;</span> arr a (b, c)</span></code></pre></div>
+<div class="sourceCode" id="cb29"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="ot">  (|||) ::</span> arr a c <span class="ot">-&gt;</span> arr b c <span class="ot">-&gt;</span> arr (<span class="dt">Either</span> a b) c</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="ot">  (&amp;&amp;&amp;) ::</span> arr a b <span class="ot">-&gt;</span> arr a c <span class="ot">-&gt;</span> arr a (b, c)</span></code></pre></div>
 <p>conditional을 쓴 예시로 <code>mapA</code> 함수를 보겠습니다.</p>
 <h2 id="mapa">mapA</h2>
-<div class="sourceCode" id="cb25"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="ot">mapA ::</span> <span class="dt">ArrowChoice</span> arr <span class="ot">=&gt;</span> arr a b <span class="ot">-&gt;</span> arr [a] [b]</span></code></pre></div>
+<div class="sourceCode" id="cb30"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="ot">mapA ::</span> <span class="dt">ArrowChoice</span> arr <span class="ot">=&gt;</span> arr a b <span class="ot">-&gt;</span> arr [a] [b]</span></code></pre></div>
 <p><code>mapA</code>는 choice가 필요합니다. 왜 필요할까요?</p>
-<div class="sourceCode" id="cb26"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">map</span> _ []     <span class="ot">=</span> [] <span class="co">-- base case 혹은 edge case</span></span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="fu">map</span> f (x<span class="op">:</span>xs) <span class="ot">=</span> f x <span class="op">:</span> <span class="fu">map</span> f xs <span class="co">-- recursive case</span></span></code></pre></div>
+<div class="sourceCode" id="cb31"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">map</span> _ []     <span class="ot">=</span> [] <span class="co">-- base case 혹은 edge case</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="fu">map</span> f (x<span class="op">:</span>xs) <span class="ot">=</span> f x <span class="op">:</span> <span class="fu">map</span> f xs <span class="co">-- recursive case</span></span></code></pre></div>
 <p><code>map</code>은 보통 base, recursive를 구분해야 합니다. 다음처럼 표현할 수 있습니다.<br />
 <code>base case ||| recursive case</code></p>
 <p>우선 입력을 <code>Either</code> 타입으로 바꿔주는 보조 함수를 만들고,</p>
-<div class="sourceCode" id="cb27"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>listcase [] <span class="ot">=</span> <span class="dt">Left</span> ()</span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>listcase (x<span class="op">:</span>xs) <span class="ot">=</span> <span class="dt">Right</span> (x,xs)</span></code></pre></div>
+<div class="sourceCode" id="cb32"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>listcase [] <span class="ot">=</span> <span class="dt">Left</span> ()</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>listcase (x<span class="op">:</span>xs) <span class="ot">=</span> <span class="dt">Right</span> (x,xs)</span></code></pre></div>
 <p>이제 <code>mapA</code>를 구현하면</p>
-<div class="sourceCode" id="cb28"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>mapA f <span class="ot">=</span> arr listcase <span class="op">&gt;&gt;&gt;</span></span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>         arr (<span class="fu">const</span> []) <span class="op">|||</span> (f <span class="op">***</span> mapA f <span class="op">&gt;&gt;&gt;</span> arr (<span class="fu">uncurry</span> (<span class="op">:</span>)))</span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="co">--                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</span></span>
-<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="co">--                      map의 f x : map f xs 와 비슷한 동작을 한다.</span></span>
-<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a><span class="co">--            uncurry는 인자 두 개를 받던 함수를 2튜플 하나 받는 걸로 바꾼다.</span></span></code></pre></div>
+<div class="sourceCode" id="cb33"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>mapA f <span class="ot">=</span> arr listcase <span class="op">&gt;&gt;&gt;</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>         arr (<span class="fu">const</span> []) <span class="op">|||</span> (f <span class="op">***</span> mapA f <span class="op">&gt;&gt;&gt;</span> arr (<span class="fu">uncurry</span> (<span class="op">:</span>)))</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="co">--                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</span></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a><span class="co">--                      map의 f x : map f xs 와 비슷한 동작을 한다.</span></span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a><span class="co">--            uncurry는 인자 두 개를 받던 함수를 2튜플 하나 받는 걸로 바꾼다.</span></span></code></pre></div>
 <p>컴비네이터 스타일의 우아함이 폭발하는데, 저는 금방 우아할 수가 없습니다. 어렵습니다.</p>
 <h2 id="section-3">(+++)</h2>
 <p><code>f ||| g</code>는 <code>f</code>와 <code>g</code>가 같은 타입의 출력이어야 하는데, <code>Either</code>를 쓰면 다른 타입도 가능합니다.</p>
-<div class="sourceCode" id="cb29"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">Arrow</span> arr <span class="ot">=&gt;</span> <span class="dt">ArrowChoice</span> arr <span class="kw">where</span></span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="ot">  (+++) ::</span> arr a b <span class="ot">-&gt;</span> arr c d <span class="ot">-&gt;</span> arr (<span class="dt">Either</span> a c) (<span class="dt">Either</span> b d)</span></code></pre></div>
+<div class="sourceCode" id="cb34"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">Arrow</span> arr <span class="ot">=&gt;</span> <span class="dt">ArrowChoice</span> arr <span class="kw">where</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="ot">  (+++) ::</span> arr a b <span class="ot">-&gt;</span> arr c d <span class="ot">-&gt;</span> arr (<span class="dt">Either</span> a c) (<span class="dt">Either</span> b d)</span></code></pre></div>
 <p><code>(+++)</code>과 <code>(|||)</code>의 관계는 <code>(***)</code>과 <code>(&amp;&amp;&amp;)</code>의 관계와 비슷합니다. <code>(|||)</code>를 직접 구현하는 것 보다는 <code>(+++)</code>를 먼저 구현하고, <code>(+++)</code>을 써서 <code>(|||)</code>를 구현하는 게 편합니다.</p>
 <p><code>(+++)</code>는 <code>(***)</code>와 dual입니다. <code>Either</code> 타입을 2튜플로 바꾸고, <code>arr</code>의 인자 순서를 바꾸면 <code>(|||)</code>의 정의는</p>
-<div class="sourceCode" id="cb30"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>f <span class="op">|||</span> g <span class="ot">=</span> f <span class="op">+++</span> g <span class="op">&gt;&gt;&gt;</span> arr join</span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span> join (<span class="dt">Left</span> b)  <span class="ot">=</span> b</span>
-<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>        join (<span class="dt">Right</span> b) <span class="ot">=</span> b</span></code></pre></div>
+<div class="sourceCode" id="cb35"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>f <span class="op">|||</span> g <span class="ot">=</span> f <span class="op">+++</span> g <span class="op">&gt;&gt;&gt;</span> arr join</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span> join (<span class="dt">Left</span> b)  <span class="ot">=</span> b</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>        join (<span class="dt">Right</span> b) <span class="ot">=</span> b</span></code></pre></div>
 <p><code>(***)</code>를 <code>first</code>로 표현하듯, <code>(+++)</code>는 <code>Either</code>의 <code>left</code>로 리프팅하는 단순한 컴비네이터로 정의할 수 있습니다.</p>
 <h2 id="left">left</h2>
-<div class="sourceCode" id="cb31"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">Arrow</span> arr <span class="ot">=&gt;</span> <span class="dt">ArrowChoice</span> arr <span class="kw">where</span></span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="ot">  left ::</span> arr a b <span class="ot">-&gt;</span> arr (<span class="dt">Either</span> a c) (<span class="dt">Either</span> b c)</span></code></pre></div>
+<div class="sourceCode" id="cb36"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">Arrow</span> arr <span class="ot">=&gt;</span> <span class="dt">ArrowChoice</span> arr <span class="kw">where</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="ot">  left ::</span> arr a b <span class="ot">-&gt;</span> arr (<span class="dt">Either</span> a c) (<span class="dt">Either</span> b c)</span></code></pre></div>
 <p><code>left f</code>는 <code>Left</code>라고 태깅된 입력은 <code>f</code>에 넣어주고, <code>Right</code>라고 태깅된 입력은 그냥 통과시킵니다.</p>
 <h2 id="right">right</h2>
 <p><code>first</code>로 <code>second</code>를 정의하듯 <code>left</code>로 <code>right</code>를 정의할 수 있습니다.</p>
-<div class="sourceCode" id="cb32"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>right f <span class="ot">=</span> arr mirror <span class="op">&gt;&gt;&gt;</span> left f <span class="op">&gt;&gt;&gt;</span> arr mirror</span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span> mirror (<span class="dt">Left</span> a) <span class="ot">=</span> <span class="dt">Right</span> a <span class="co">-- swap을 정의하 듯</span></span>
-<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>        mirror (<span class="dt">Right</span> a) <span class="ot">=</span> <span class="dt">Left</span> a</span></code></pre></div>
+<div class="sourceCode" id="cb37"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>right f <span class="ot">=</span> arr mirror <span class="op">&gt;&gt;&gt;</span> left f <span class="op">&gt;&gt;&gt;</span> arr mirror</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span> mirror (<span class="dt">Left</span> a) <span class="ot">=</span> <span class="dt">Right</span> a <span class="co">-- swap을 정의하 듯</span></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>        mirror (<span class="dt">Right</span> a) <span class="ot">=</span> <span class="dt">Left</span> a</span></code></pre></div>
 <p>…작성 중</p>
 <h2 id="다시-정의-1">(+++) 다시 정의</h2>
-<div class="sourceCode" id="cb33"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>f <span class="op">+++</span> g <span class="ot">=</span> left f <span class="op">&gt;&gt;&gt;</span> right g</span></code></pre></div>
+<div class="sourceCode" id="cb38"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>f <span class="op">+++</span> g <span class="ot">=</span> left f <span class="op">&gt;&gt;&gt;</span> right g</span></code></pre></div>
 <h2 id="사용-예시">사용 예시</h2>
 <p><a href="../posts/2023-09-22-using_arrow.html">Arrow 쓰는 방법</a></p>
 <h2 id="arrow-확장">Arrow 확장</h2>

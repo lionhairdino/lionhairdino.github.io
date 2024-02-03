@@ -165,6 +165,24 @@
 evolving value<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
 <p>first class value<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a></p>
 <p><a href="https://stackoverflow.com/questions/5875929/specification-for-a-functional-reactive-programming-language">Specification for a Functional Reactive Programming language</a></p>
+<h2 id="a와-t---a의-차이">a와 t -&gt; a의 차이</h2>
+<p>(가)</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>int1 <span class="ot">=</span> <span class="dv">1</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>int2 <span class="ot">=</span> <span class="dv">2</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>add x y <span class="ot">=</span> x <span class="op">+</span> y </span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> add int1 int2</span></code></pre></div>
+<p>(나)</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>like1 <span class="ot">=</span> \t <span class="ot">-&gt;</span> <span class="kw">case</span> t <span class="op">...</span> </span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>like2 <span class="ot">=</span> \t <span class="ot">-&gt;</span> <span class="kw">case</span> t <span class="op">...</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>likeAdd f g <span class="ot">=</span> \t <span class="ot">-&gt;</span> f t <span class="op">+</span> g t </span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> likeAdd like1 like2 <span class="op">$</span> ()</span></code></pre></div>
+<p>둘은 무슨 차이가 있을까요?</p>
+<p>(가)와 같이 해도 <code>add</code>는 <code>int1</code>과 <code>int2</code>에 의존합니다. 단순히 의존성만 필요하다면 굳이 (나)와 같이 할 필요가 없습니다. <code>add</code>가 실행되는 순간 <code>int1</code>도 <code>int2</code>도 바뀔 일은 없으니, 그대로 값을 얻을 수 있습니다. 다르게 얘기하면, <code>add</code>가 실행된 후에는 <code>int1</code>이 바뀌어도 <code>int2</code>가 바뀌어도 <code>add</code>값이 달라지지 않습니다. (나)의 <code>likeAdd</code>는 다릅니다. (가)와는 달리 <code>likeAdd</code>를 실행 후에도 <code>like1</code>나 <code>like2</code>가 바뀐다면, <code>likeAdd</code>값, 엄밀히 말하면 <code>likeAdd</code> 자체는 함수니 달라지는 건 없지만, <strong>함수를 실행 후 받는 최종 결과값</strong>은 달라질 수 있습니다. 오호! 마치 최종 결과에 도달했는데도 원인이 바뀐다면 , 즉 언제든지 <code>like1</code>이나 <code>like2</code>가 바뀐다면 값이 바뀔 수 있습니다. 단, 함수를 실행, 즉 runner를 거쳐야만 변하는 값을 볼 수 있지만 말입니다. 이 상태에선 <code>likeadd</code>는 그냥 함수니 하스켈에선 일등급 시민입니다. <code>likeAdd</code>를 그냥 값처럼 쓰면 됩니다. 나중에 필요할 때, <code>runner</code>를 돌리면 <code>likeAdd</code>값을 결정 지을 수 있습니다.</p>
+<p>리액티브 모델링은 이벤트가 발생하면, 리스너를 실행시켜 상태를 바꿉니다. 상태는 이벤트에 의존합니다. 언제라도 이벤트가 바뀌면 상태도 바뀝니다.<br />
+리액티브를 구현, 표현하기 위해 필요한 건, 인과 관계 표현입니다.<br />
+</p>
+<p>위 설명과 아래 설명이 추상적으로 보면 같은 얘기로 보입니다. 함수형Functional으로 리액티브를 구현한다면 이보다 적당한 표현이 없지 않을까 합니다.</p>
+<p>어떻게 핸들러 등록같은 코드없이 causal을 표현하는지 궁금했습니다.</p>
 <section class="footnotes" role="doc-endnotes">
 <hr />
 <ol>
