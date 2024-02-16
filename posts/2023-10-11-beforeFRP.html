@@ -85,16 +85,69 @@
 <p>사실, 그리 깊게 알고 싶진 않고 구현 아이디어와 사용법 정도 알고싶을 때가 많은데, 하스켈의 자료들은 여차하면 논문으로, 여차하면 소스 코드로 끌고 들어갑니다. 그런 곳으로 잘 못 끌려가면 카테고리 이론 용어들이 떡하니 버틴 경우도 많고, 처음 보는 문법으로 풀어 나가는 코드도 보게 되곤 합니다.</p>
 <p>저런 곳으로 끌려가지 않기 위해, 서두의 내용만 갖고, 상상 했던 내용과 아귀를 맞추려고 시도합니다. 그러다 그럴싸하게 맞아 떨어지면 맞는 내용이겠거니 하고 넘어갑니다. 혹시나 의논을 할 수 있는 분을 만날까 해서 블로그에 글도 올려 놓고요. 그러니, 틀리는 경우가 종종 있을 수 밖에 없습니다. 틀리거나 의심스런 내용이 보이면 댓글, 혹은 메일 꼭 부탁드립니다.</p>
 <p>새로운 프로그래밍 대상을 공부할 때, 먼저 상상해 보곤 합니다. 해결해야 하는 문제를 정리해 보고, 문제들을 어떻게 풀어나갈지 생각해 봅니다. 이러고 개념을 보기 시작하면 단점이 하나 생깁니다. 제 상상이 일종의 기준이 되어 계속 맞춰보게 됩니다. 기준이 크게 무리가 없는 상상이면 굉장히 도움이 많이 되지만, 반대의 경우도 생깁니다.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">Event</span> a    <span class="ot">=</span> <span class="dt">Event</span>    {<span class="ot"> occ ::</span> (<span class="dt">Time</span>, a) }</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">Behavior</span> a <span class="ot">=</span> <span class="dt">Behavior</span> {<span class="ot"> at  ::</span> <span class="dt">Time</span> <span class="ot">-&gt;</span> a }</span></code></pre></div>
-<p>텍스트에선 실제가 아닌 이론적인 두 가지 형태를 먼저 설명하고 있습니다.
-<code>Event</code>는 “특정 시간에 일어난 일”이고, <code>Behavior</code>는 시간마다 바뀔 수 있는 (mutation) 값인데, 언제고 알고 싶은 시간을 주면 값을 알려주는 함수입니다.</p>
-<p>다음도 역시 실구현이 아닌, 개념을 더 직관적으로 보면 아래처럼 되는데, <code>Behavior</code>와 <code>Event</code>를 굳이 나누게 된 동기?가 궁금해서 계속 뒤저 보는 중입니다. <span class="citation" data-cites="todo">@todo</span> Fri Nov 3 10:43:12 AM KST 2023</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>Event는    [_,_,_,_,e,_,_,e,_,...]</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>Behavior는 [b,b,b,b,b,b,b,b,b,...]</span></code></pre></div>
-<p>세상에 존재하는 걸 두가지로만 봅니다. 어떤 순간에도 값이 존재하는 것과, 특정 순간에만 값이 존재하는 것. 위 <code>occ</code>, <code>at</code>보다 더 의미가 직관적으로 보이지 않나 싶은데요. 원소를 <code>Maybe</code>로 모델링하면, <code>Behavior</code>는 <code>Just</code> 값으로만 이루어진 걸로 보면되니, 위 둘을 하나로 추상화할 수 있지 않을까 싶은데요. (어떤 라이브러리는 둘이 합쳐 하나의 <code>Signal</code>로 모델링한 것도 있습니다.) FRP는 왜 두 가지로 나누어서 모델링 했을까요?</p>
-<p>다음 원소로 진행하는 걸 단위 시간 한 스텝을 나아가는 걸로 해석하고 있습니다.</p>
+<p>Sat Feb 17 12:15:27 AM KST 2024 <strong><em>아직 아래 생각이 맞는지 확신히 없습니다. 어설프게 알고 있는 테크닉들이 아귀가 맞아 오해하고 있을 수 있습니다. 검증이 되면 이 메시지를 지우겠습니다.</em></strong></p>
 <h2 id="생각-스트레칭">생각 스트레칭</h2>
+<p><strong>“버튼이 눌리면 빨간색 연필로”</strong><br />
+버튼이 눌리는 <strong>이벤트</strong>, 연필 색깔 <strong>값</strong> 빨간색으로 변경합니다.</p>
+<p>여기에 “5초가 지나면” 빨간색으로 바꾸는 이벤트를 추가해 보겠습니다.</p>
+<p><strong>“버튼이 눌리거나, 5초가 되면 빨간색 연필로”</strong><br />
+이벤트가 두 개가 되었습니다.</p>
+<p>이 상황을 모델링 해보겠습니다.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">if</span> (evButton <span class="op">==</span> <span class="dt">True</span> <span class="op">|</span> ev5sec <span class="op">==</span> <span class="dt">True</span>) <span class="dt">Then</span> <span class="dt">Color</span> <span class="ot">=</span> <span class="dt">Red</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- 혹은 </span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="kw">if</span> (evButton <span class="op">==</span><span class="dt">True</span>) <span class="dt">Then</span> <span class="dt">Color</span> <span class="ot">=</span> <span class="dt">Red</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="kw">if</span> (ev5sec<span class="op">==</span><span class="dt">True</span>) <span class="dt">Then</span> <span class="dt">Color</span> <span class="ot">=</span> <span class="dt">Red</span></span></code></pre></div>
+<p>여기에, “<strong>키를 누르면 빨간색 연필로</strong>” 를 추가하려면,</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">if</span> (evButton <span class="op">==</span> <span class="dt">True</span> <span class="op">|</span> ev5sec <span class="op">==</span> <span class="dt">True</span> <span class="op">|</span> evKey <span class="op">==</span> <span class="dt">True</span>) <span class="dt">Then</span> <span class="dt">Color</span> <span class="ot">=</span> <span class="dt">Red</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- 혹은 </span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="kw">if</span> (evButton <span class="op">==</span> <span class="dt">True</span>) <span class="dt">Then</span> <span class="dt">Color</span> <span class="ot">=</span> <span class="dt">Red</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="kw">if</span> (ev5sec <span class="op">==</span> <span class="dt">True</span>) <span class="dt">Then</span> <span class="dt">Color</span> <span class="ot">=</span> <span class="dt">Red</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="kw">if</span> (evKey <span class="op">==</span> <span class="dt">True</span>) <span class="dt">Then</span> <span class="dt">Color</span> <span class="ot">=</span> <span class="dt">Red</span></span></code></pre></div>
+<p>위 조건을 확인하는 절차를 가변적으로 유지할 방법이 뭐가 좋을까요?
+조건이 하나든, 열 개든 하나의 모양(타입)으로 볼 수 있다면 편할 것 같습니다. 함수형에선 가변 정보를 끌고 다닐 때는 튜플속 튜플같은 <strong>재귀</strong>적인 구조, 즉 리스트같은 구조에 담아 두면서 갈 수도 있겠지만, 좀 더 편한 인터페이스가 있습니다.<br />
+바로 <strong>함수</strong>와 <strong>컴비네이터</strong>입니다.</p>
+<h3 id="한-가지-모양으로-보기-combination">한 가지 모양으로 보기 Combination</h3>
+<p>여러 조건들은 합쳐져서Combination 하나의 조건처럼 다룰 수 있어야 합니다. <code>.add.</code>, <code>.or.</code>, 그리고 그외 로직에 필요한 컴비네이터들을 정의합니다.
+<code>Red</code>로 바꿀 이벤트들은 모두 합쳐 하나의 이벤트로 만듭니다.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>evRed <span class="ot">=</span> evButtonFunc <span class="op">.</span><span class="fu">or</span><span class="op">.</span> ev5secFunc <span class="op">.</span><span class="fu">or</span><span class="op">.</span> evKeyFunc</span></code></pre></div>
+<p>각 이벤트가 발생하면 <code>ev~</code> 변수들에 <code>True</code>를 담아 놓는 대신, 바로 <code>Color</code>를 <code>Red</code>로 바꿔 놓으면 되겠습니다.</p>
+<p><strong>“연필 아이콘을 빨간색으로 바꾸기”</strong> 와 같이 바꿔야 되는 값을 더 추가해 보겠습니다.</p>
+<p>값도 역시 컴비네이터 스타일로 처리합니다. 값을 위한 컴비네이터는 <code>:add:</code>,<code>:or:</code> 쯤으로 표기하겠습니다.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>valRed <span class="ot">=</span> valIcon <span class="op">:</span><span class="fu">and</span><span class="op">:</span> valColor</span></code></pre></div>
+<p>그럼 최종 로직은, <code>evRed</code>가 발생하면 <code>valRed</code>에 있는 작업을 합니다.<br />
+이벤트에 따라 값을 바꿔 놓는 <code>apply</code>같은 일을 하는 <code>이벤트 -&gt; 값</code> 같은 변환 함수를 <code>watcher</code>라 하면</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>watcherR(evRed, valRed)</span></code></pre></div>
+<p>만일, 파란색으로 바꾸는 기능도 들어간다면,
+<code>watcher</code>들을 붙일 수 있는 컴비네이터 <code>:&gt;&gt;:</code>를 만듭니다.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>watcher <span class="ot">=</span> watcherR(evRed, valRed) <span class="op">:&gt;&gt;:</span> watcherB(evBlue, valBlue)</span></code></pre></div>
+<p>이제, 샘플링 단위 시간마다 <code>watcher</code>를 실행하면 됩니다.</p>
+<h3 id="아직-값은-아니다.-값이-될-타입">아직 값은 아니다. 값이 될 타입</h3>
+<p>위와 같은 컴비네이터 패턴으로 여러 이벤트와 상태들을 물려서 돌아가게 할 수 있게 되었습니다. 여기에, 타입을 넣으면 좀 더 그럴싸해집니다.</p>
+<p>이벤트가 아직 발생하지 않았지만, 이벤트가 일어났을 때 할 일을 지정해 놓는 방법으로 다음과 같이 할 수 있습니다.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">WillBeValue</span> a <span class="ot">=</span> <span class="dt">WillBeValue</span> a</span></code></pre></div>
+<p>그리기 함수는 <code>Color</code>를 읽어와 그립니다. 그런데 <code>Color</code>는 지금 정해진 값이 아니라, 이벤트에 따라 변할 값입니다. 이벤트가 발생했을 때 <code>IORef</code>나 <code>MVar</code>등에서 색을 읽어 오게 만들어 두거나, 스트림 함수 같은 걸 이용해서, 매 번 프로그래머가 신경쓰지 않게 할 수 있습니다. <code>WillBeValue</code>가 가진 <code>a</code>값을 보기위한 절차<code>WillBeValue_Runner</code>에 넣어두면 다음과 같이 쓸 수 있습니다.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co">--   :: a -&gt; IO () 가 아니라</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="ot">draw ::</span> <span class="dt">WillBeValue</span> a <span class="ot">-&gt;</span> <span class="dt">IO</span> ()</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>draw future <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  color <span class="ot">&lt;-</span> <span class="dt">WillBeValue_Runner</span> future </span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  color로 그리기 </span></code></pre></div>
+<p>나중 <code>draw</code>를 쓰는 입장에서 보면, “<code>WillBeValue</code> 색깔로 그려라”라는 간단한 구문이 되었습니다. 폴링 파트에서 계속 <code>draw</code>를 호출하면 되는 간단한 모양이 되었습니다.</p>
+<p>그리고 Lazy 성질로 WHNF까지만 보니, <code>WillBeValue</code>가 안에 가지고 있는 값은 필요할 때 계산하게 될 겁니다.</p>
+<p>IORef나 MVar등을 안쓴다면, <code>t -&gt; a</code> 함수가</p>
+<h3 id="샘플링과-스트림">샘플링과 스트림</h3>
+<p>만일 <code>1</code>초마다 샘플링 하는 설계라면 <code>1</code>초 안에 더블 클릭 했을 때는 한 번 클릭한 것만 받을 수 있을 겁니다. <code>1</code>초 마다 샘플링해도 <code>1</code>초 미만 간격으로 누른 더블 클릭을 잡아내려면, 이벤트를 <code>버튼 눌림</code>이 아니라 <code>[버튼 눌림]</code> 리스트로 받으면 될 겁니다. 이벤트 값을 받아서 뭔가를 하던 작업들은</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ot">draw ::</span> [<span class="dt">WillBeValue</span> a] <span class="ot">-&gt;</span> <span class="dt">IO</span> ()</span></code></pre></div>
+<p>리스트(스트림)를 받도록 바꾸고, 샘플링 단위 시간 만큼의 이벤트만 꺼내도록 만들면 되겠습니다. 이벤트는 샘플링 단위 시간과 관계없이 발생하고, 이를 최종 어떤 단위 시간으로 샘플링하든 더블 클릭을 잡아낼 수 있습니다. 코널 교수가 얘기한 벡터 그래픽과 비트맵의 관계가 이 걸 말하는 듯 한데, 아직 확실하지 않습니다. 이벤트는 샘플링 시간에 관계 없이 발생하고(마치 벡터), 이 걸 샘플링 해서 보여주는 작업(마치 비트맵)을 합니다.</p>
+<h3 id="타입에-시간-개념-집어-넣기">타입에 시간 개념 집어 넣기</h3>
+<p>아래는 이론을 설명할 때 등장하는 타입들로, 이 글의 주인공들입니다.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">Event</span> a    <span class="ot">=</span> <span class="dt">Event</span>    {<span class="ot"> occ ::</span> (<span class="dt">Time</span>, a) }</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">Behavior</span> a <span class="ot">=</span> <span class="dt">Behavior</span> {<span class="ot"> at  ::</span> <span class="dt">Time</span> <span class="ot">-&gt;</span> a }</span></code></pre></div>
+<p>텍스트에선 실제가 아닌 이론적인 두 가지 형태를 먼저 설명하고 있습니다. <code>Event</code>는 “특정 시간에 일어난 일”이고, <code>Behavior</code>는 시간마다 바뀔 수 있는 (mutation) 값인데, 언제고 알고 싶은 시각을 주면 값을 알려주는 함수입니다. 위에서 나온 <code>Color</code>같은 <code>Value</code>를 <code>Behavior</code>로 보면 됩니다.</p>
+<p>다음도 역시 실구현이 아닌, 개념을 더 직관적으로 보면 아래처럼 볼 수도 있습니다. <code>Behavior</code>와 <code>Event</code>를 굳이 나누지 않고 하나의 타입으로 처리할 수도 있을 것처럼 보입니다.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>Event는    [_,_,_,_,e,_,_,e,_,...]</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>Behavior는 [b,b,b,b,b,b,b,b,b,...]</span></code></pre></div>
+<p>세상에 존재하는 걸 두가지로만 봅니다. 어떤 순간에도 값이 존재하는 것과, 특정 순간에만 값이 존재하는 것. 위 <code>occ</code>, <code>at</code>보다 더 의미가 직관적으로 보이지 않나 싶은데요. 원소를 <code>Maybe</code>로 모델링하면, <code>Behavior</code>는 <code>Just</code> 값으로만 이루어진 걸로 보면되니, 위 둘을 하나로 추상화할 수 있지 않을까 싶은데요. Yampa는 둘이 합쳐 하나의 <code>Signal</code>로 모델링했고, Reactive-banana는 두 가지로 나누어서 모델링 했습니다.</p>
+<p>다음 원소로 진행하는 걸 단위 시간 한 스텝을 나아가는 걸로 해석하고 있습니다.</p>
 <p>텍스트들의 도입부를 읽고, 내가 구현한다면, 어떻게 할까 생각해 봤습니다. 변하는 시스템을 <strong><em>모두 반응Reaction</em></strong>으로 표현한다면</p>
 <pre><code>E1   -&gt;   E2   -&gt;   E3 </code></pre>
 <p>이벤트들이 연쇄적으로 반응Reactive하며 이어가는 동작이 있겠고,<br />
@@ -105,60 +158,43 @@
                               |                 |
                           값이 필요해서 들여다 보는 순간        -- Discrete하게 읽기 </code></pre>
 <p>(“시작”같은 “특정 시각”도 시간 이벤트라 볼 수 있으니) 이벤트로 시스템에 변경을 가하면, 시간이 흘러가면서 지속적으로 바뀌는 정보를 생각해 볼 수 있습니다. 물론 꼭 계속 바뀌지 않고, 한 번 바뀐 값으로 계속 가는 “유지”도 포함입니다. 이런 것들은 시간에 따라 계속 바뀌고 있지만, 바뀌는 값을 실제로 꼭 계속 업데이트 할 필요는 없습니다. 필요한 순간에 <code>t -&gt; a</code>에 <code>t</code>값을 넘겨 함수를 실행해서 값을 받아오면 됩니다.</p>
-<p>여기에선 <code>Event</code>와 <code>Behavior</code>의 실제 구현을 보는 게 아니라, FRP 프레임워크를 설계하면서 이들이 어떤 걸 모델링 했는지, 의미를 보려 합니다.</p>
-<p>※ <span class="citation" data-cites="todo">@todo</span> - 시간, 시각 : 시는 시각처럼 특정 포인트(“각”)가 아니라, 언제부터 언제까지란 “간”이 항상 존재하는 것으로 본다면, 시각이란 말을 안쓰고 시간이란 말만 쓰면 될 것 같기도 합니다.</p>
+<p>지금까지 말한 내용이 그대로 이론이나 구현과 딱 맞아 떨어지는 것이 아닙니다. 어디까지나 수학적 해석없이 이벤트 전파 길(혹은 그래프, 혹은 네트워크)을 어떻게 만들 것인가 생각 스트레칭을 해 본 것입니다. 여기에선 <code>Event</code>와 <code>Behavior</code>의 실제 구현을 보는 게 아니라, FRP 프레임워크를 설계하면서 이들이 어떤 걸 모델링 했는지, 의미를 보려 합니다.</p>
 <h2 id="event-혹은-event-stream">Event (혹은 Event Stream)</h2>
 <p>참고 - <a href="https://github.com/HeinrichApfelmus/reactive-banana/blob/master/reactive-banana/src/Reactive/Banana/Model.hs">Reactive-banana의 학습용 소스 - Model.hs</a></p>
 <p>구현을 생각하면, (발생 시각, 값) 두 가지 정보만 가지고 있습니다. 시간을 인자로 주거나 하는 게 아닙니다. 여러 시간이 아니라, 특정 시각에 변화를 주는 일이 일어났을 뿐입니다.</p>
 <h2 id="behavior">Behavior</h2>
-<p><code>Event</code>는 그리 어렵지 않게 넘어 갔는데 <code>Behavior</code>는 설명들이 혼란을 줍니다. 어떤 라이브러리 구현은 이 둘을 구분하지 않고 <code>Signal</code>이란 하나의 타입을 두고 구현한 것도 있다고 합니다. 둘은 성격이 달라 보이는데, 하나로 본다니 금방 수긍이 가지 않습니다. 이벤트 발생과 지속을 구분하는 게 무슨 철학적인 접근인가 싶기도 합니다.</p>
+<p><code>Event</code>는 그리 어렵지 않게 넘어 갔는데 <code>Behavior</code>는 설명들이 혼란을 줍니다. 얌파는 이 둘을 구분하지 않고 <code>Signal</code>이란 하나의 타입으로 구현했습니다. 둘은 성격이 달라 보이는데, 하나로 본다니 금방 수긍이 가지 않습니다. 이벤트 발생과 지속을 구분하는 게 무슨 철학적인 접근인가 싶기도 합니다.</p>
 <p>시간에 따라 변하는 값입니다. (실제 구현은 아니고) <strong>의미</strong>로는 <code>t -&gt; a</code>로 볼 수 있다고 합니다. (<strong>semantic</strong> function)</p>
 <blockquote>
 <p><strong>생각 스트레칭</strong><br />
-아직 정답은 모르고 추측입니다.<br />
-수정: 아래같이 접근하는 게 아닌 것 같습니다. 의미상으로만 t -&gt; a 일 뿐, 실제로 간단한 t -&gt; a 함수로만 구현하는 건 아닌 것 같습니다. 아래는 삭제 예정입니다.</p>
-<p><strong>Q1. 어떻게 <code>t -&gt; a</code> “함수”로 현실을 모델링 할 수 있을까요?</strong><br />
-함수는 이미 벌어질 일을 다 알고 있는, 즉 매핑이 정해져 있는데, 이 걸로 어떻게 변할지 모를 현실을 어떻게 표현할까요?</p>
-<p><strong>ex1)</strong> 정말로 시간에 따라 벌어질 일을 이미 알고 있을 수 있습니다.
-빨간불을 시작으로 60초 주기로 바뀌는 신호등을 위한 함수는</p>
-<pre><code>신호등함수 = \t -&gt; if t를 120으로 나눈 나머지가 &lt; 60 이면 녹색, 아니면 빨강</code></pre>
-<p>신호등 시작 스위치를 켜는 이벤트에 반응으로 위 함수를 가진 <code>Behavior</code>를 만듭니다. 언제든 어떤 순간에 신호등 상태를 알고 싶다면, 신호등함수에 현재 시각을 넣고 결과값을 받아 오면 됩니다.</p>
-<p>그런데 문제가 있습니다. <code>Behavior</code>는 <code>Event</code>와 달리 자신의 변화를 다른 곳에 알릴 수가 없습니다. 화면에 신호등을 표시해 주는 그림이 있다면, <code>Behavior</code> 자체가 외부에 알려주는 기능이 없으니 계속 물어 보는(폴링하는) 수밖에 없습니다.</p>
-<p>원하는 순간에만 값을 알면 되는 경우와, 값의 변화가 있으면 눈치 채야 하는 경우가 있습니다. 신호등의 경우는 시간에 따라 변하는 값이기도 하고, 외부에 변화를 알려줘야 되기도 합니다. 이럴 때는 <code>Behavior</code>만으로 해결할 수 없습니다.</p>
-<p><strong>ex2)</strong> <code>\_ -&gt; constant</code> 이벤트에 대한 리액트로 한 번 바뀐값이 그대로 유지되고 있을 수도 있습니다.</p>
-<p><strong>ex3)</strong> <code>t -&gt; a</code>에서 반환값 <code>a</code>가 함수인 <code>t -&gt; (b -&gt; c)</code> 이런식이면 어떨까요? 순간마다 함수를 돌려주는데, 함수들이 가지고 있는 정보들은 불특정 순간에 바뀔 수 있는 값들을 참조할 수도 있습니다.</p>
-<p><strong>ex4)</strong> 이미 지난 과거라면 매핑 테이블이 만들어진 것으로 볼 수 있습니다.</p>
-<p>저는 <code>t -&gt; a</code>란 걸, 항상 값을 얻을 수 있지만, 실제론 <strong>불특정 순간에 항상 값을 얻을 수 있다는 표현</strong>으로 이해했습니다. 항상 값을 폴링해간다면 효율적인 다른 방식이 있습니다.
-<code>t -&gt; a</code>는 시간<code>t</code>에 따라 <code>a</code>가 달라질 수 있다는 뜻이지, 엄밀히 얘기하면 통상의 “함수”는 아니지 않을까요?</p>
-<p><strong>Q2. <code>Event</code>와 다르게 연속Continuous적인 시간에 벌어지는 일이라고 합니다. 결국 컴퓨터로 표현하려면 모두 discrete하게(불연속, 이산) 바꿔야 하는 것 아닌가요?</strong></p>
+<strong>Q. <code>Event</code>와 다르게 연속Continuous적인 시간에 벌어지는 일이라고 합니다. 결국 컴퓨터로 표현하려면 모두 discrete하게(불연속, 이산) 바꿔야 하는 것 아닌가요?</strong></p>
 <p>실제 구현이 연속Continuous적인 동작을 한다는 게 아니라, 시간에 연속인 대상을 모델링을 했다는 뜻일 뿐, <code>Behavior</code>가 연속으로 계속 업데이트 하고 있는 모양은 아닙니다. <code>Behavior</code>의 값을 가져다는 쓰는 쪽에서 연속이란 의미는, 바꿔 말하면, 언제든 “값을 원하는 순간”에 값을 얻을 수 있다는 말입니다. 무엇이 일정 시간동안 “존재”한다는 뜻에는 Continuous란 의미가 들어가 있다는 생각이 듭니다.</p>
-<p><strong>Q3. <code>Behavior</code>는 시간의 흐름을 강조합니다. FRP가 내부적으로 흘러가는 타이머를 두는 건가요?</strong><br />
+<p><strong>Q. <code>Behavior</code>는 시간의 흐름을 강조합니다. FRP가 내부적으로 흘러가는 타이머를 두는 건가요?</strong><br />
 추측 - 폴링 작업이 들어가면 타이머가 돈다고 볼 수 있겠습니다. 항상 변경되는 걸 결과로 바로 보여야 하는 건 아니니, 그럴 수도 아닐 수도 있습니다. 만일 실시간으로 계속 값을 가져와야 한다면 타이머가 돌아야 합니다. 참고 - <a href="http://conal.net/papers/push-pull-frp/push-pull-frp.pdf">Push-Pull FRP - Conal Elliot 섹션5.1</a><br />
 보통 예시들을 보면 입력을 스트림으로 주는데, <code>[_, _, _, ...]</code>에서 원소 하나를 가져와 작업하고, 다음 원소를 가져오는 걸 시간이 흘러간 것으로 표현하는 곳도 있습니다.</p>
 </blockquote>
 <p>전 <code>Behavior</code>가 FRP에서 일종의 <strong>기억 장소</strong> 역할을 하는 것으로 이해했습니다. 시간에 연속적으로 변할 수 있는 값이긴 하나, 실 구현에선 (매 단위시간마다 업데이트를 하고 있는 게 아니라) 적절한 동작이 필요하겠습니다. 마치, FRP의 원조처럼 여기 저기 거론되는 <a href="http://conal.net/papers/icfp97/icfp97.pdf">FRAN</a>에선, 이론대로</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Behavior</span> a <span class="ot">=</span> <span class="dt">Behavior</span> (<span class="dt">Time</span> <span class="ot">-&gt;</span> a)</span></code></pre></div>
-<p>로 표현하는데, 이렇게 하면 공간 시간 낭비가 너무 심하니, 적절한 트레이드 오프가 필요하다고 합니다.</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Behavior</span> a <span class="ot">=</span> <span class="dt">Behavior</span> (<span class="dt">Time</span> <span class="ot">-&gt;</span> a)</span></code></pre></div>
+<p>로 표현하고, 현재 시간의 값을 알려면 처음 시작 시간부터 지금까지의 히스토리를 추적해 값을 만드는 것으로 되어 있습니다. 이렇게 하면 당연히 공간 시간 낭비가 너무 심하니, 적절한 트레이드 오프가 필요하다고 합니다.</p>
 <p><a href="https://wiki.haskell.org/Functional_Reactive_Programming">Functional Reactive Programming - Haskell Wiki</a>에 보면 위젯을 1급first class 값으로 다루는 것에 대한 얘기가 나옵니다. Lazy 평가를 기본으로 하는 하스켈에서 <code>Behavior</code>를 시간에 대한 <strong>함수</strong>로 모델링하면, 다음과 같은 코드 모양이 가능합니다. WHNF까지만 reduce하는 Lazy가 영향이 있을 것 같긴 한데, 아직 정리가 안됩니다.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>myEditWidget <span class="op">:</span>; <span class="dt">Behavior</span> <span class="dt">Text</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="kw">do</span> edit1 <span class="ot">&lt;-</span> editWidget</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>   edit2 <span class="ot">&lt;-</span> editWidget</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>   label <span class="ot">&lt;-</span> label (liftA2 (<span class="op">&lt;&gt;</span>) edit1 edit2)</span></code></pre></div>
-<p><span class="citation" data-cites="todo">@todo</span> 아직 아하 모먼트가 오지 않은 채 작성 중입니다. Fri Nov 3 10:32:18 AM KST 2023</p>
-<p>어찌 됐건 <code>Behavior</code>는 시간을 주면 값을 돌려줘야 합니다. 실제 단순 함수로 구현됐든, 복잡하게 구현 됐든, 뭐가 됐든 말입니다.</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>myEditWidget <span class="op">:</span>; <span class="dt">Behavior</span> <span class="dt">Text</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="kw">do</span> edit1 <span class="ot">&lt;-</span> editWidget</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>   edit2 <span class="ot">&lt;-</span> editWidget</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>   label <span class="ot">&lt;-</span> label (liftA2 (<span class="op">&lt;&gt;</span>) edit1 edit2)</span></code></pre></div>
+<p>editWidget이 바뀌면, 알아서 myEditWidget이 바뀌길 바라지만, 그렇게 실행되는 건 아닙니다. 실행 시작은 myEditWidget입니다. editWidget이 바뀌는 이벤트가 발생하면, myEditWidget를 실행하도록 해놔야 합니다. 이 건 프레임워크 바깥에서 해결할 일입니다. 위와 같은 함수는 계속 폴링할 때 실행한다는 걸 전제하고 있는 듯 합니다.</p>
 <h2 id="예시">예시</h2>
 <p>마우스는 움직일 때마다 <code>Event</code>가 발생하고, 이 <code>Event</code>가 <code>Behavior</code>에 마우스 위치를 저장합니다. 마우스 위치값이 필요하면 이 <code>Behavior</code>를 읽어 오면 됩니다. 값이 필요할 때 직접 <code>Event</code>에서 값을 받아 오지 않는 이유가 뭘까요? 마우스가 멈춰 있다면 <code>Event</code>는 발생하지 않지만, 위치값은 존재해야 합니다.</p>
 <p><code>Behavior</code>의 시간은 Continuous하게 흐르지만, <code>Behavior</code>의 값이 변경되는 시점과, 값을 필요로 하는 시점은 Discrete합니다.<br />
 반면, <code>Event</code>의 시간은 Discrete하고, Event의 값을 받아가는 시점은, <code>Event</code>가 발생한 순간입니다.</p>
 <p>※ Reflex에는 위 두개에 더해 <code>Dynamic</code>이란 타입이 있습니다.
 <code>Behavior</code>처럼 모든 시간에 값을 가지는데, 가지고 있는 값이 바뀌면 외부로 알릴 수 있습니다. 기본적인 구현은 <code>Event</code>와 <code>Behavior</code>를 튜플로 가지고 있습니다.</p>
-<p>참고 - <a href="http://docs.reflex-frp.org/en/latest/overview.html#reflex-basics">Reflex Basics</a></p>
-<p><span class="citation" data-cites="todo">@todo</span> 작성 중 …</p>
+<p>참고 - <a href="http://docs.reflex-frp.org/en/latest/overview.html#reflex-basics">Reflex Basics</a>
+<span class="citation" data-cites="todo">@todo</span> 작성 중 …</p>
 <h2 id="연속된-시간">연속된 시간</h2>
 <p>연속된 시간을 어떻게 표현할 수 있을까요?</p>
 <p>연속된 시간을 다른 말로 풀면, <strong>어떤 시간에도 값이 존재</strong>한다고 말할 수 있습니다. 이 풀이는, 어떤 시간과도 매핑되는 값이 있는 함수로 볼 수 있다로 연결됩니다. 그럴만하다고 끄덕하게 되는 Representation입니다.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>t <span class="ot">-&gt;</span> a</span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>t <span class="ot">-&gt;</span> a</span></code></pre></div>
 <p><a href="http://conal.net/">Conal Elliot</a> 교수는 연속된 시간을 비트맵과 벡터 그래픽에 비유하기도 합니다. 비트맵은 정해진 해상도가 아닌 곳에서 보면 일그러지지만, 벡터 그래픽은 어떠한 해상도에도 대응할 수 있습니다. 여기에 제 생각을 더하자면, 비트맵이란 벡터 그래픽을 특정 해상도에 맞춰 해석한 값입니다. <code>벡터 그래픽 :: 해상도 -&gt; 비트맵 그래픽</code> 쯤으로 볼 수 있습니다. 결국 눈으로 보는 건 해상도에 맞춰진 비트맵을 보는 걸로 생각할 수 있습니다. 반대 방향에서 들어가며 보면, 만일 <code>t -&gt; a</code>로 문제가 생기지 않는 모델링을 할 수만 있다면, 연속된 시간을 모델링했다고 말할 수 있겠습니다.</p>
 <p>stackoverflow에 있는 Conal 교수 답변<br />
 <a href="https://stackoverflow.com/questions/1028250/what-is-functional-reactive-programming">What is (functional) reactive programming?</a><br />
@@ -167,27 +203,196 @@ evolving value<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"
 <p><a href="https://stackoverflow.com/questions/5875929/specification-for-a-functional-reactive-programming-language">Specification for a Functional Reactive Programming language</a></p>
 <h2 id="a와-t---a의-차이">a와 t -&gt; a의 차이</h2>
 <p>(가)</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>int1 <span class="ot">=</span> <span class="dv">1</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>int2 <span class="ot">=</span> <span class="dv">2</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>add x y <span class="ot">=</span> x <span class="op">+</span> y </span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> add int1 int2</span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>int1 <span class="ot">=</span> <span class="dv">1</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>int2 <span class="ot">=</span> <span class="dv">2</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>add x y <span class="ot">=</span> x <span class="op">+</span> y </span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> add int1 int2</span></code></pre></div>
 <p>(나)</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>like1 <span class="ot">=</span> \t <span class="ot">-&gt;</span> <span class="kw">case</span> t <span class="op">...</span> </span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>like2 <span class="ot">=</span> \t <span class="ot">-&gt;</span> <span class="kw">case</span> t <span class="op">...</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>likeAdd f g <span class="ot">=</span> \t <span class="ot">-&gt;</span> f t <span class="op">+</span> g t </span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> likeAdd like1 like2 <span class="op">$</span> ()</span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>like1 <span class="ot">=</span> \t <span class="ot">-&gt;</span> <span class="kw">case</span> t <span class="op">...</span> </span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>like2 <span class="ot">=</span> \t <span class="ot">-&gt;</span> <span class="kw">case</span> t <span class="op">...</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>likeAdd f g <span class="ot">=</span> \t <span class="ot">-&gt;</span> f t <span class="op">+</span> g t </span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> likeAdd like1 like2 <span class="op">$</span> ()</span></code></pre></div>
 <p>둘은 무슨 차이가 있을까요?</p>
 <p>(가)와 같이 해도 <code>add</code>는 <code>int1</code>과 <code>int2</code>에 의존합니다. 단순히 의존성만 필요하다면 굳이 (나)와 같이 할 필요가 없습니다. <code>add</code>가 실행되는 순간 <code>int1</code>도 <code>int2</code>도 바뀔 일은 없으니, 그대로 값을 얻을 수 있습니다. 다르게 얘기하면, <code>add</code>가 실행된 후에는 <code>int1</code>이 바뀌어도 <code>int2</code>가 바뀌어도 <code>add</code>값이 달라지지 않습니다. (나)의 <code>likeAdd</code>는 다릅니다. (가)와는 달리 <code>likeAdd</code>를 실행 후에도 <code>like1</code>나 <code>like2</code>가 바뀐다면, <code>likeAdd</code>값, 엄밀히 말하면 <code>likeAdd</code> 자체는 함수니 달라지는 건 없지만, <strong>함수를 실행 후 받는 최종 결과값</strong>은 달라질 수 있습니다. 오호! 마치 최종 결과에 도달했는데도 원인이 바뀐다면 , 즉 언제든지 <code>like1</code>이나 <code>like2</code>가 바뀐다면 값이 바뀔 수 있습니다. 단, 함수를 실행, 즉 runner를 거쳐야만 변하는 값을 볼 수 있지만 말입니다. 이 상태에선 <code>likeadd</code>는 그냥 함수니 하스켈에선 일등급 시민입니다. <code>likeAdd</code>를 그냥 값처럼 쓰면 됩니다. 나중에 필요할 때, <code>runner</code>를 돌리면 <code>likeAdd</code>값을 결정 지을 수 있습니다.</p>
 <p>리액티브 모델링은 이벤트가 발생하면, 리스너를 실행시켜 상태를 바꿉니다. 상태는 이벤트에 의존합니다. 언제라도 이벤트가 바뀌면 상태도 바뀝니다.<br />
-리액티브를 구현, 표현하기 위해 필요한 건, 인과 관계 표현입니다.<br />
+리액티브를 구현, 표현하기 위해 필요한 건, 인과 관계 표현입니다.</p>
+<p>위 설명과 아래 설명이 추상적으로 보면 같은 얘기로 보입니다. 함수형Functional으로 리액티브를 구현한다면 이보다 적당한 표현이 없지 않을까 하는 생각이 듭니다.</p>
+<h2 id="addlistner하는-절차-없이-이벤트-발생을-어찌-전파하지">AddListner하는 절차 없이 이벤트 발생을 어찌 전파하지?</h2>
+<p>어떻게 핸들러 등록같은 코드없이 인과 관계causal를 표현하는지 궁금했습니다.</p>
+<p>외부 이벤트와 FRP 프레임워크에서 만들어 놓은 이벤트 네트워크를 연결할 때는 <strong>핸들러 등록 절차AddListner가 있습니다.</strong></p>
+<p>아래 예시는 <a href="https://hackage.haskell.org/package/reactive-banana-1.3.2.0/docs/Reactive-Banana-Frameworks.html">reactive-banana</a> 프레임워크의 코드입니다.</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">AddHandler</span> a <span class="ot">=</span> <span class="dt">AddHandler</span> {<span class="ot"> register ::</span> <span class="dt">Handler</span> a <span class="ot">-&gt;</span> <span class="dt">IO</span> (<span class="dt">IO</span> ()) } </span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>                                                            <span class="co">-- 안 쪽에 또 IO가 있는 이유는</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>                                                            <span class="co">-- 핸들러 제거용 함수를 돌려주기 때문</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="ot">newAddHandler ::</span> <span class="dt">IO</span> (<span class="dt">AddHandler</span> a, <span class="dt">Handler</span> a)</span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="kw">do</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  (addHandler, fire) <span class="ot">&lt;-</span> newAddHandler</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  register addHandler <span class="fu">putStrLn</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>  fire <span class="st">&quot;Hello&quot;</span></span></code></pre></div>
+<p><code>newAddHandler</code>는 함수를 두 개 만들어 반환합니다. 하나는 핸들러를 등록하는 함수고, 다른 하나는 이벤트를 시작하게 하는 트리거 함수입니다.</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="ot">fromAddHandler ::</span> <span class="dt">AddHandler</span> a <span class="ot">-&gt;</span> <span class="dt">MomentIO</span> (<span class="dt">Behavior</span> a)</span></code></pre></div>
+<p><code>이벤트 네트워크</code>가 동작을 시작actuated하면, 이 함수로 콜백을 등록합니다. 언제든, 이 콜백을 부르면 <code>이벤트 네트워크</code>가 보고 있는 <code>이벤트</code>가 발생합니다.</p>
+<p>아마도 다음 소스가 궁금함을 해결하는 포인트가 아닐까 합니다.</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="ot">newAddHandler ::</span> <span class="dt">IO</span> (<span class="dt">AddHandler</span> a, <span class="dt">Handler</span> a)</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>newAddHandler <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    handlers <span class="ot">&lt;-</span> newIORef Map.empty <span class="co">-- 핸들러를 기억할 메모리</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> register handler <span class="ot">=</span> <span class="kw">do</span> <span class="co">-- (1) AddHandler용 함수 만들기</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>            key <span class="ot">&lt;-</span> Data.Unique.newUnique</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>            atomicModifyIORef_ handlers <span class="op">$</span> Map.insert key handler <span class="co">-- 핸들러 목록에 추가</span></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>            <span class="fu">return</span> <span class="op">$</span> atomicModifyIORef_ handlers <span class="op">$</span> Map.delete key</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>        runHandlers a <span class="ot">=</span> <span class="co">-- (2) 트리거용 함수 만들기</span></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>            runAll a <span class="op">=&lt;&lt;</span> readIORef handlers</span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span> (<span class="dt">AddHandler</span> register, runHandlers)</span></code></pre></div>
+<p>추상적으로 얘기하면, 핸들러를 등록하는 <code>Map</code>을 만들어 놓고, 여기다 넣는 함수, 여기에 있는 것들 실행하는 함수를 만들어 반환합니다. 등록이 있으니 제거도 있어야 합니다. <code>register</code> 함수의 반환값이 제거용 함수입니다.</p>
+<p>외부 이벤트와 연결하는 건 똑같이 <code>AddListner</code>하는 절차가 있습니다. 처음 설명을 보면 FRP는 마치 이런 절차없이 Functional하게 해결하는 것처럼 보이지만, Functional하게 해결하는 부분은 외부 이벤트가 발생한 후 돌아가는 로직에 관한 얘기입니다.</p>
+<p>Reactive-banana는 딱히 연속 시간에 대한 개념을 녹여낸 것처럼 보이진 않습니다. 확실치 않으나, 연속 시간에 대한 모델링(시간 변화에 따른 미분, 적분같은 작업)을 하려면 Yampa가 적합하다고 합니다.</p>
+<h2 id="이벤트-발생을-어떻게-눈치-채지">이벤트 발생을 어떻게 눈치 채지?</h2>
+<p>폴 후닥 교수의 first principle에서 발췌</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">Behavior</span> a <span class="ot">=</span> [<span class="dt">Time</span>] <span class="ot">-&gt;</span> [a]</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">Event</span> a <span class="ot">=</span> [<span class="dt">Time</span>] <span class="ot">-&gt;</span> [<span class="dt">Maybe</span> a]</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="fu">until</span><span class="ot"> ::</span> <span class="dt">Behavior</span> a <span class="ot">-&gt;</span> <span class="dt">Event</span> (<span class="dt">Behavior</span> a) <span class="ot">-&gt;</span> <span class="dt">Behavior</span> a</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>fb <span class="ot">`until`</span> fe <span class="ot">=</span> \ts <span class="ot">-&gt;</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  loop ts (fe ts) (fb ts)</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>    loop ts<span class="op">@</span>(_<span class="op">:</span>ts') <span class="op">~</span>(e<span class="op">:</span>es) (b<span class="op">:</span>bs) <span class="ot">=</span></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>      b <span class="op">:</span> <span class="kw">case</span> e <span class="kw">of</span></span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>            <span class="dt">Nothing</span> <span class="ot">-&gt;</span> loop ts' es bs</span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>            <span class="dt">Just</span> fb' <span class="ot">-&gt;</span> <span class="fu">tail</span> (fb' ts)</span></code></pre></div>
+<p><code>B = B1 until E1(B2)</code>라 하면, <code>E1</code>이 일어나기 전까진 <code>B</code>는 <code>B1</code>, <code>E1</code>이 일어나면 <code>B</code>는 <code>B2</code>란 말입니다.<br />
+<code>[Time]</code>은 <code>(_:ts')</code>으로 버려지니 <code>[(),(),(),...]</code> 쯤으로 봐도 될테고,<br />
+<code>Behavior a</code>는 이런 <code>[Time]</code>을 받으면 <code>[a,a,a,...]</code>를 반환하는 함수고,<br />
+<code>Event a</code>는 이런 <code>[Time]</code>을 받으며 <code>[Nothing, Just a, Nothing,...]</code>을 반환하는 함수입니다.<br />
 </p>
-<p>위 설명과 아래 설명이 추상적으로 보면 같은 얘기로 보입니다. 함수형Functional으로 리액티브를 구현한다면 이보다 적당한 표현이 없지 않을까 합니다.</p>
-<p>어떻게 핸들러 등록같은 코드없이 causal을 표현하는지 궁금했습니다.</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>loop [(),(),()<span class="op">....</span>] [<span class="dt">Nothing</span>, <span class="dt">Just</span> a, <span class="dt">Nothing</span>, <span class="op">...</span>] [a,a,a,<span class="op">...</span>]</span></code></pre></div>
+<p>마치 세상 일이 이미 정해져 있는 것처럼, 혹은 모두 과거의 일로 생각한다면, 이벤트는 <code>[Nothing, Nothing, Just a, Nothing, Nothing, ...]</code> 이런식의 리스트로 표현 가능할 겁니다. 리스트에서 다음 원소로 가는 걸, 다음 프레임으로 넘어가는 것으로 해석합니다. 세 번째 프레임에서 Event가 발생했습니다. <code>B</code> Behavior 는 <code>B1 = [x1,x2,x3,...]</code>에서 하나씩 꺼내오다가 Event가 발생하면, 그 후론 <code>B2 = [y1,y2,y3,y4,y5,...]</code>에서 꺼내옵니다. 그럼 <code>B</code>의 값은 <code>[x1,x2,x3,y4,y5,...]</code>가 됩니다. 나중에 복잡하게 Behavior와 Event가 체이닝 되어도, 프레임에 따라서 <code>B</code>의 값은 <code>x_</code>값에서 <code>y_</code>값으로 변한 게 반영됩니다.</p>
+<p>그런데, 이 건 이미 정해진 일에 대해서만 가능한 표현 방법 아닌가 싶어, 생각이 막힙니다.</p>
+<p>말장난 같은, 사기? 같은 아이디어로, 모두 정해져 있지만, 우리가 알지는 못하는 상황이라 생각해 봤습니다. <code>버튼 클릭</code>이라는 이벤트를, 프레임마다 원소를 하나씩 내어주는 함수라고 생각하겠습니다. 함수 안에선 무슨 일이 일어나는지 모릅니다. 함수 안에서 실제 세상의 버튼 클릭과 연결해 두는 겁니다. 꺼내가는 사람은 정해진 값을 꺼내간다 생각해도 달라질 게 없습니다.</p>
+<p>다른 값을 주기 위해 함수를 변형하는 게 아닙니다. <strong>다른 함수</strong>를 가져오면 됩니다.</p>
+<p>나중에 러너(실행기? 해석기?)가 <strong>until로 만들어진</strong> <code>Behavior</code>를 가져다 <code>[Time]</code>을 넣어주면, 최종 <code>[a]</code>를 <strong>Lazy하게</strong> 얻게 될 겁니다.</p>
+<p>무엇이 궁금한지 명확해졌습니다.</p>
+<p>Event는 함수인데, 버튼을 눌린 시점에 값을 요구하면 <code>Just a</code>를, 그 외의 시간에 요구하면 <code>Nothing</code>을 돌려주는 함수를 어떻게 만들 수 있는가?</p>
+<blockquote>
+<p>Q. 그냥 의존 관계는 <code>t -&gt; a</code> 꼴이 아니더라도, 이벤트 전파 네트워크는 구현된다. 굳이 시간에 대한 의존이 있도록, <code>t -&gt;</code>를 해주는 이유가 뭘까?<br />
+A. 아직 정해지지 않은 값을 의미합니다. <code>t</code>가 정해져야 <code>a</code>가 정해진다는 말입니다.</p>
+</blockquote>
+<blockquote>
+<p>Q. 그런데, 이벤트에 따라 바뀔 세상, 즉 미래 <code>t</code>에 어떤 값이 있을지는 결정이 나지 않은 게 아닌가?<br />
+A. 이론상 t -&gt; a일뿐 실 구현은, 이들이 Effectful한 IORef, MVar 등을 읽어 오는 작업이거나, 함수 자체를 스트림 함수(circuit에서 돌아가는 함수)로 정의해서, 함수 자체가 한 번 실행되면, 다음 실행할 함수로 바뀌게 한다든지 하는 테크닉을 쓰는 것으로 보입니다.</p>
+</blockquote>
+<p><code>t</code>의 쓰임을 쫓아가 봤습니다. 아래 내용은 프레임워크를 쓰기 위해 꼭 알아야 되는 내용은 아닙니다. 시간이 어떤 역할을 하는지 보고싶은 호기심에 뜯어 봤습니다.</p>
+<p>아래는 reactive-banana의 <code>reactimate</code> 구현입니다.</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">Event</span> a <span class="ot">=</span> <span class="dt">E</span> {<span class="ot"> unE ::</span> <span class="dt">Prim.Event</span> a }</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">Event</span> a    <span class="ot">=</span> <span class="dt">Cached</span> <span class="dt">Moment</span> (<span class="dt">Pulse</span> a) <span class="co">-- Prim.Event</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a><span class="ot">reactimate ::</span> <span class="dt">Event</span> (<span class="dt">IO</span> ()) <span class="ot">-&gt;</span> <span class="dt">MomentIO</span> ()</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>reactimate <span class="ot">=</span> <span class="dt">MIO</span> <span class="op">.</span> Prim.addReactimate <span class="op">.</span> Prim.mapE <span class="fu">return</span> <span class="op">.</span> unE</span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>addReactimate e <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>    network   <span class="ot">&lt;-</span> ask</span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>    liftBuild <span class="op">$</span> Prim.buildLater <span class="op">$</span> <span class="kw">do</span></span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>        <span class="co">-- Run cached computation later to allow more recursion with `Moment`</span></span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>        p <span class="ot">&lt;-</span> runReaderT (runCached e) network</span>
+<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>        Prim.addHandler p <span class="fu">id</span></span>
+<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Cached</span> m a <span class="ot">=</span> <span class="dt">Cached</span> (m a)</span>
+<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a><span class="ot">runCached ::</span> <span class="dt">Cached</span> m a <span class="ot">-&gt;</span> m a</span>
+<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a>runCached (<span class="dt">Cached</span> x) <span class="ot">=</span> x</span>
+<span id="cb25-19"><a href="#cb25-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-20"><a href="#cb25-20" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">AddHandler</span> a <span class="ot">=</span> <span class="dt">AddHandler</span> {<span class="ot"> register ::</span> <span class="dt">Handler</span> a <span class="ot">-&gt;</span> <span class="dt">IO</span> (<span class="dt">IO</span> ()) }</span></code></pre></div>
+<p><code>Moment</code>는 이론상은 <code>t</code>를 <code>Time</code>으로, <code>Time -&gt;</code>를 붙여 줬었는데, 실제 구현은 <code>EventNetwork { actuated, size, s }</code>를 받는 <code>Reader</code> 모나드입니다.</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">ReaderWriterIOT</span> r w m a <span class="ot">=</span> <span class="dt">ReaderWriterIOT</span> {<span class="ot"> run ::</span> r <span class="ot">-&gt;</span> <span class="dt">IORef</span> w <span class="ot">-&gt;</span> m a }</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">Build</span> <span class="ot">=</span> <span class="dt">ReaderWriterIOT</span> <span class="dt">BuildR</span> <span class="dt">BuildW</span> <span class="dt">IO</span> </span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>             <span class="co">-- 시간을 받아 작업을 한 후 IORef에 뭔가를 넣는 함수, 아래 (가)를 의미한다.</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">BuildW</span> <span class="ot">=</span> <span class="dt">BuildW</span> (<span class="dt">DependencyChanges</span>, [<span class="dt">Output</span>], <span class="dt">Action</span>, <span class="dt">Maybe</span> (<span class="dt">Build</span> ()))</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>                      <span class="co">--                                      late 빌드 액션</span></span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>                      <span class="co">--                              late IO 액션</span></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>                      <span class="co">--                    네트워크에 추가될 출력</span></span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>                      <span class="co">-- 네트워크 토폴로지를 변형하는 액션</span></span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a><span class="co">-- reader가 쓸 BuildR, writer가 쓸 BuildW</span></span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a><span class="ot">buildLater ::</span> <span class="dt">Build</span> () <span class="ot">-&gt;</span> <span class="dt">Build</span> ()</span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>buildLater x <span class="ot">=</span> RW.tell <span class="op">$</span> <span class="dt">BuildW</span> (<span class="fu">mempty</span>, <span class="fu">mempty</span>, <span class="fu">mempty</span>, <span class="dt">Just</span> [x)](x)<span class="op">.</span>md)</span></code></pre></div>
+<p>아래는 reactive-banana의 <code>compile</code> 구현입니다.<br />
+시간 <code>t</code>에 의존하는 이벤트 네트워크를 IO 액션으로 만들고 있습니다.</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- | 컴파일해서 이벤트 네트워크를 만든다.</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="ot">compile ::</span> <span class="dt">Moment</span> () <span class="ot">-&gt;</span> <span class="dt">IO</span> <span class="dt">EventNetwork</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>compile setup <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>    actuated <span class="ot">&lt;-</span> newIORef <span class="dt">False</span> <span class="co">-- 현재 running상태를 나타내는 플래그</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>    s        <span class="ot">&lt;-</span> newEmptyMVar <span class="co">-- setup 콜백 함수 덩어리</span></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>    size     <span class="ot">&lt;-</span> newIORef <span class="dv">0</span></span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> eventNetwork <span class="ot">=</span> <span class="dt">EventNetwork</span>{ actuated, s, size }</span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>    (_output, s0) <span class="ot">&lt;-</span> <span class="co">-- 그래프 초기화</span></span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>        Prim.compile (runReaderT setup eventNetwork) <span class="op">=&lt;&lt;</span> Prim.emptyNetwork</span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>        <span class="co">--            ^^^^^^^^^^^^(가)^^^^^^^^^^^^^^</span></span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>        <span class="co">-- emptyNetwork가 초기화된 네트워크를 만들어서 넘겨 주면, </span></span>
+<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a>        <span class="co">-- 여기에 &quot;할 일 덩어리&quot;를 섞어서 이벤트 네트워크를 만든다.</span></span>
+<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a>        <span class="co">-- 이 네트워크 안에 시간 `T`가 들어 있다.</span></span>
+<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a>        <span class="co">-- 이 후 Evaluation step할 때마다 `T`를 1 증가 시킨다.</span></span>
+<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a>    putMVar s s0 <span class="co">-- 초기 상태 저장</span></span>
+<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a>    writeIORef size <span class="op">=&lt;&lt;</span> Prim.getSize s0</span>
+<span id="cb27-19"><a href="#cb27-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-20"><a href="#cb27-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span> eventNetwork</span>
+<span id="cb27-21"><a href="#cb27-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-22"><a href="#cb27-22" aria-hidden="true" tabindex="-1"></a><span class="co">-- 아래는 Prim.compile</span></span>
+<span id="cb27-23"><a href="#cb27-23" aria-hidden="true" tabindex="-1"></a><span class="ot">compile ::</span> <span class="dt">BuildIO</span> a <span class="ot">-&gt;</span> <span class="dt">Network</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> (a, <span class="dt">Network</span>)</span>
+<span id="cb27-24"><a href="#cb27-24" aria-hidden="true" tabindex="-1"></a>compile m <span class="dt">Network</span>{nTime, nOutputs, nAlwaysP, nGraphGC} <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb27-25"><a href="#cb27-25" aria-hidden="true" tabindex="-1"></a>    (a, dependencyChanges, os) <span class="ot">&lt;-</span> runBuildIO (nTime, nAlwaysP) m</span>
+<span id="cb27-26"><a href="#cb27-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-27"><a href="#cb27-27" aria-hidden="true" tabindex="-1"></a>    applyDependencyChanges dependencyChanges nGraphGC</span>
+<span id="cb27-28"><a href="#cb27-28" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> state2 <span class="ot">=</span> <span class="dt">Network</span></span>
+<span id="cb27-29"><a href="#cb27-29" aria-hidden="true" tabindex="-1"></a>            { nTime    <span class="ot">=</span> next nTime <span class="co">-- 여기서 시간 `T`를 1 증가 시킨다.</span></span>
+<span id="cb27-30"><a href="#cb27-30" aria-hidden="true" tabindex="-1"></a>            , nOutputs <span class="ot">=</span> OB.inserts nOutputs os</span>
+<span id="cb27-31"><a href="#cb27-31" aria-hidden="true" tabindex="-1"></a>            , nAlwaysP</span>
+<span id="cb27-32"><a href="#cb27-32" aria-hidden="true" tabindex="-1"></a>            , nGraphGC</span>
+<span id="cb27-33"><a href="#cb27-33" aria-hidden="true" tabindex="-1"></a>            }</span>
+<span id="cb27-34"><a href="#cb27-34" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span> (a,state2)</span></code></pre></div>
+<p><code>setup</code>으로 들어오는 값은, “외부 이벤트와 연관 지어 놓은 할 일 덩어리”쯤입니다.</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">BuildIO</span> <span class="ot">=</span> <span class="dt">Build</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">BuildR</span> <span class="ot">=</span> (<span class="dt">Time</span>, <span class="dt">Pulse</span> ())</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="co">--          현재 시각, </span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a><span class="ot">runBuildIO ::</span> <span class="dt">BuildR</span> <span class="ot">-&gt;</span> <span class="dt">BuildIO</span> a <span class="ot">-&gt;</span> <span class="dt">IO</span> (a, <span class="dt">DependencyChanges</span>, [<span class="dt">Output</span>])</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>runBuildIO i m <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>    (a, buildW) <span class="ot">&lt;-</span> unfold <span class="fu">mempty</span> m <span class="co">-- BuildW (topologyUpdates, os, liftIOLaters, _)) &lt;- unfold mempty m</span></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>    bwLateIO buildW <span class="co">-- execute late IOs</span></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span> (a, bwDependencyChanges buildW, bwOutputs buildW)</span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span></span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>    <span class="co">-- Recursively execute the  buildLater  calls.</span></span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a><span class="ot">    unfold ::</span> <span class="dt">BuildW</span> <span class="ot">-&gt;</span> <span class="dt">BuildIO</span> a <span class="ot">-&gt;</span> <span class="dt">IO</span> (a, <span class="dt">BuildW</span>)</span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a>    unfold w m <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a>        (a, buildW) <span class="ot">&lt;-</span> RW.runReaderWriterIOT m i <span class="co">-- 여기서 i를 써먹고 있다.</span></span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a>                         <span class="co">-- m은 이벤트 네트워크.</span></span>
+<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a>                         <span class="co">-- m이 가진 함수에 시간을 넣어 주고,</span></span>
+<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a>                         <span class="co">-- IORef에 무언가를 읽어내거나 담아 두는 작업 </span></span>
+<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a>        <span class="kw">let</span> w' <span class="ot">=</span> w <span class="op">&lt;&gt;</span> buildW{ bwLateBuild <span class="ot">=</span> <span class="dt">Nothing</span> }</span>
+<span id="cb28-19"><a href="#cb28-19" aria-hidden="true" tabindex="-1"></a>        w'' <span class="ot">&lt;-</span> <span class="kw">case</span> bwLateBuild buildW <span class="kw">of</span></span>
+<span id="cb28-20"><a href="#cb28-20" aria-hidden="true" tabindex="-1"></a>            <span class="dt">Just</span> m  <span class="ot">-&gt;</span> <span class="fu">snd</span> <span class="op">&lt;$&gt;</span> unfold w' m</span>
+<span id="cb28-21"><a href="#cb28-21" aria-hidden="true" tabindex="-1"></a>            <span class="dt">Nothing</span> <span class="ot">-&gt;</span> <span class="fu">return</span> w'</span>
+<span id="cb28-22"><a href="#cb28-22" aria-hidden="true" tabindex="-1"></a>        <span class="fu">return</span> (a,w'')</span></code></pre></div>
+<p><code>ReaderWriterIOT</code>는 <code>Reader</code>/<code>Writer</code> 모나드 트랜스포머인데, <code>Writer</code>가 <code>IORef</code>를 씁니다. 타입이 가진 인자로 값을 유지하지 않고, IORef로 유지한다는 건 다른 곳에서도 참고하는 값일 듯 합니다.</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="ot">runReaderWriterIOT ::</span> (<span class="dt">MonadIO</span> m, <span class="dt">Monoid</span> w) <span class="ot">=&gt;</span> <span class="dt">ReaderWriterIOT</span> r w m a <span class="ot">-&gt;</span> r <span class="ot">-&gt;</span> m (a,w)</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>runReaderWriterIOT m r <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>    ref <span class="ot">&lt;-</span> liftIO <span class="op">$</span> newIORef <span class="fu">mempty</span></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>    a   <span class="ot">&lt;-</span> run m r ref <span class="co">-- 실행 결과는 a에 바인딩하고, writer모나드가 ref에 뭔가를 담습니다.</span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>    w   <span class="ot">&lt;-</span> liftIO <span class="op">$</span> readIORef ref</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span> (a,w)</span></code></pre></div>
+<h2 id="정리">정리</h2>
+<p>지금까지 확실한 건,</p>
+<p>이벤트와 상태를 <code>Event</code>, <code>Behavior</code> 라는 일등급 요소로 모델링한 후 여러 컴비네이터를 이용해 이벤트가 전파되도록 만드는 게 FRP입니다. 일등급 시민이니 함수에 인자로 주고, 결과로 받는, 즉 평범한 값처럼 처리하는 코드 모양이 나오는 장점이 있습니다. 이 때 제대로 설계하려면 샘플링 단위 시간에 의존하지 않고, 연속된 시간을 기반으로 최대한 로직을 끌고 나갈 수 있게 해야 합니다.</p>
+<p>그리고, 또 하나, 코널 교수는 Denotaional하게 (수학적 의미를 고려하며) 설계하는 것도 FRP가 가져야 할 요소로 얘기하는데, 실무를 위해 보고 있는지라, 아직 이 것까지는 깊이 보지 않고 있습니다.</p>
+<p>이론에선 시작 시점부터 모든 <code>Event</code>를 기억하고, 모든 <code>Behavior</code>의 변화를 기억한다는데, 실용적으로 이 걸 어찌 쓸까도 고민입니다. 마치 <code>무한 리스트</code>에서 <code>take</code>로 일부 가져오는 게 의미가 있듯, 이들도 이론상은 시작 시점부터 모든 걸 기록하지만, 실제적으론 최근 것만 쓰는 것 아닐까 싶은데요. 무한인 것들은, 만일 전부가 필요할 땐 실용적으론 값의 의미가 있을 수 없으니까요.</p>
+<p>RP와는 큰 틀에서 같은 목표를 가진 건 맞지만, 세부적인 구현으로 보면 FRP는 RP와는 무관한 스타일이 아닌가 하는 생각도 듭니다.</p>
 <section class="footnotes" role="doc-endnotes">
 <hr />
 <ol>
 <li id="fn1" role="doc-endnote"><p><strong>evolving value</strong>: 시간에 따라 변하는 값을 evolving value라고 말하고 있습니다. 진화evolve하는 값인데, 진화에는 뭔가 더 나아지고, 복잡해지는 뉘앙스가 있는데, 영어는 시간이 지나면서 변화한다는 뜻만 있는 걸까요? 단순 변화를 evolving이라 하면 안 어울리긴 합니다만, 어쨌든 시간 의존 변화를 뜻합니다.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn2" role="doc-endnote"><p><strong>1급 값(first class value)</strong>: 정의할 수 있고, 연결combine할 수 있고, 함수의 입, 출력으로 쓰일 수 있는 대상에 1급이란 말을 붙입니다. 종종 first class citizen이란 말을 쓰는데, 추측으론 영어권에선 차별하지 않는 다는 뜻으로 <strong>1급 시민</strong>이란 말을 종종 쓰는 것 같습니다. 차별이 되는 대상을 2급이라 표현하기도 합니다. 하스켈에선 보통의 타입과 다를바 없다는 뜻과 같습니다.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2" role="doc-endnote"><p><strong>1급 값(first class value)</strong>: 정의할 수 있고, 연결combine할 수 있고, 함수의 입, 출력으로 쓰일 수 있는 대상에 1급이란 말을 붙입니다. 종종 first class citizen이란 말을 쓰는데, 추측으론 영어권에선 차별하지 않는 다는 뜻으로 <strong>1급 시민</strong>이란 말을 종종 쓰는 것 같습니다. 차별이 되는 대상을 2급이라 표현하기도 합니다. 하스켈에선 보통의 타입과 다를바 없다는 뜻으로 쓰입니다.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section>
 

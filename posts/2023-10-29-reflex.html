@@ -81,10 +81,94 @@
     
 </div>
 
-<p><a href="https://reflex-frp.org/">Reflex 공식 사이트</a></p>
-<p><a href="https://github.com/obsidiansystems/obelisk">obsidiansystems / obelisk</a><br />
-고퀄의 웹, 모바일 앱을 Reflex를 써서 매우 빠르게 만들 수 있다고 합니다. 안 써봐서 얼마나 빠르게 만들 수 있을까 싶습니다. 같은 하스켈 코드로 web, iOS, Android에서 돌아가게 만들 수 있다고 하니, 일단 눈이 갑니다.</p>
-<p>Sun Oct 29 10:53:44 PM KST 2023</p>
+<p><a href="https://reflex-frp.org/">Reflex 공식 사이트</a><br />
+<a href="http://docs.reflex-frp.org/en/latest/reflex_docs.html">Reflex 공식 문서</a></p>
+<p>앱 만들기를 빠르게 시작하려면 Obelisk를 쓰든가, reflex-platform을 씁니다.</p>
+<h2 id="obelisk">Obelisk</h2>
+<p><a href="https://github.com/obsidiansystems/obelisk">obsidiansystems/obelisk</a><br />
+고퀄의 웹, 모바일 앱을 Reflex를 써서 매우 빠르게 만들 수 있다고 합니다. 아직은 제대로 안 써봐서 얼마나 빠르게 만들 수 있을까 싶습니다. 같은 하스켈 코드로 Web, iOS, Android, MacOS, Linux에서 돌아가게 만들 수 있다고 하니, 일단 눈이 갑니다.</p>
+<p>명령행에서 쓰는 CLI툴입니다.</p>
+<ul>
+<li>자동으로 최신 reflex, ghc, ghcjs를 설치하고, 닉스로 하스켈 의존성을 잡아 줍니다.</li>
+<li>프로젝트 뼈대를 생성합니다.
+<ul>
+<li><code>reflex</code>를 써서 프론트 엔드 뼈대를 만듭니다.</li>
+<li><code>snap</code>을 써서 백엔드 뼈대를 만듭니다.</li>
+</ul></li>
+<li>개발 워크플로우와 관련된 명령어
+<ul>
+<li><code>ob run</code> 파일에 저장하면 자동으로 앱을 리빌드 합니다. jsaddle-warp를 쓰는 프론트엔드를 제공합니다.</li>
+<li><code>ob repl</code> ghci 쉘</li>
+<li><code>ob deploy</code> EC2에 배포하는 걸 도와줍니다. 최적화하고 짧게 만든 js를 생성합니다.</li>
+<li>닉스 명령어로 안드로이드 앱과 iOS 앱을 만듭니다.</li>
+</ul></li>
+<li>라우팅 라이브러리 <code>obelisk-route</code></li>
+</ul>
+<h2 id="reflex-platform">Reflex Platform</h2>
+<p><a href="https://github.com/reflex-frp/reflex-platform">Reflex Platform</a></p>
+<p>Reflex를 쓰는 하스켈 패키지를 다양한 플래폼에서 돌아가게 빌드할 수 있는 엄선된curated 패키지 세트 및 도구 입니다. 닉스 패키지 매니저로 돌릴 닉스 표현식 모음과 ghc, ghcjs를 쓰기 위한 스크립트 모음이라 보면 됩니다.</p>
+<ol type="1">
+<li>엄선된 패키지와 도구: Reflex Platform의 핵심 패키지는, 서로 함께 돌리는 테스트를 마쳤습니다.</li>
+<li>바이너리로 받을 수 있어(public cache가 있습니다.), 소스에서부터 빌드할 필요가 없습니다.</li>
+<li>하스켈 생태계 바깥쪽의 요소(C라이브러리 같은 것들)까지도 닉스가 의존성을 잠궈놨습니다.</li>
+<li>크로스 플래폼. 모바일(iOS, Android) 웹(Javascript), 데스크탑(리눅스, 맥OS)에서 돌아갑니다.</li>
+<li>쉽게 개발하도록 도와주는 도구들을 포함하고 있습니다. (hoogle 서버도 포함되어 있어 로컬에서 돌릴 수 있습니다.)</li>
+</ol>
+<blockquote>
+<p>GHCJS로 컴파일하면, 메모리를 엄청 잡아 먹습니다. 최소 8GB, 권장 16GB라 합니다.<br />
+<code>TMPDIR</code> 디렉토리도, <code>/nix/store</code>도 꽤 잡아 먹습니다.</p>
+</blockquote>
+<p>공부용이나, 작은 프로젝트는 <code>try-reflex</code> 스크립트를 돌려서 환경을 잡으면 되는데, 큰 프로젝트는 cabal을 쓰는 게 좋다 합니다. <a href="http://docs.reflex-frp.org/en/latest/installation.html">cabal로 환경 잡기</a></p>
+<p>※ <code>try-reflex</code>를 실행하는데, 세 시간이 넘게 걸리고, 디스크 용량은 거의 30GB를 먹었습니다. 환경마다 다르겠지만, 엔간한 장비에선 긴 시간이 필요한 작업 같습니다.</p>
+<blockquote>
+<p>실행 후 한참을 기다렸는데, 믿었던 닉스가 <code>No space left on device</code> 오류를 뱉습니다. 설치할 곳의 공간은 여유가 있는데도 계속 오류가 나서, 찾아 보니 닉스가 쓰는 임시 폴더 용량이 문제였습니다.<br />
+<code>export TEMP=/other/sufficientDir</code> 혹은<br />
+<code>export TMPDIR=/other/sufficientDir</code>을 했는데도<br />
+임시 디렉토리를 사용하는 곳이 바뀌지 않았습니다. 닉스가 딱히 시스템 수준의 환경 변수를 읽어가지 않나 봅니다. 시스템 수준의 환경 변수가 아닌 데몬을 위한 환경 변수를 잡아주어 성공했습니다. 데비안6.1.66-1 (2023-12-09) 환경.</p>
+<p><code>sudo vim /etc/systemd/system/nix-daemon.service</code></p>
+<pre><code>[Service]
+...
+Environment=TMPDIR=/other/sufficientDir</code></pre>
+<p>위와 같이 추가하고</p>
+<p><code>sudo systemctl daemon-reload</code><br />
+<code>sudo service nix-daemon restart</code></p>
+<p>※ NTFS 파티션에 잡으니 cp: perserving times for …: Operation not permitted 오류가 납니다.</p>
+</blockquote>
+<h2 id="reflex-basics">Reflex Basics</h2>
+<p><a href="http://docs.reflex-frp.org/en/latest/overview.html#reflex-basics">Reflex Basics</a></p>
+<p><strong>reflex</strong><br />
+콜백 스타일을 쓰지 않고, side effect도 없이 인터랙티브 프로그램을 만듭니다. <strong>조합compositable 가능한 이벤트</strong>와 <strong>시간에 따라 변하는 값</strong>을 써서 인터랙티브 시스템을 순수 함수로 표현합니다.
+DOM 생성 코드와는 무관합니다. reflex는 reflex-dom의 기반이긴 하지만, 꼭 웹 관련 앱이 아니더라도 FRP 아키텍처로 구현할 때 쓸 수 있습니다.</p>
+<p><strong>reflex-dom-core와 reflex-dom</strong><br />
+DOM 위젯, 웹 소켓, XHR 요청을 만들기 위한 API를 제공합니다.</p>
+<p>이론에 대한 설명은 딱히 같이 하지 않아, Reflex만 보는 분들은 다른 쪽(FRAN, Yampa, reactive-banana, …) 문서들을 참고해야겠습니다.</p>
+<p><strong>Behavior</strong><br />
+시간에 따라 변하는 값을 위한 컨테이너. 샘플링할 수는 있지만, 자신이 변한다고 외부에 알릴 방법은 없습니다.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Behavior</span> t a</span></code></pre></div>
+<p>모든 시간에 값이 존재해야 하는데, 만일 그렇지 않은 값을 <code>Behavior</code>로 모델링 한다면 <code>Behavior t (Maybe a)</code>를 써야 합니다. Behavior 값들은 <code>tag</code>나 <code>attach</code> 함수를 써서 Event로 태깅할 수 있습니다. 처음 생성할 때 <code>sample</code> 함수를 쓰면 위젯 안에서 샘플링될 수 있습니다.</p>
+<p><strong>Event</strong></p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Event</span> t a</span></code></pre></div>
+<p>버튼 클릭 <code>Event t ()</code><br />
+키 누름 <code>Event t Char</code></p>
+<p>다른 프레임워크에서 이벤트 네트워크라 부르는 걸, 여기선 이벤트-전파-그래프라 부르는 것 같습니다. 외부 값(외부 이벤트)을 이벤트-전파-그래프에 넣을 때는 <code>newTriggerEvent</code> IO 액션을 씁니다.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ot">newTriggerEvent ::</span> <span class="dt">TriggerEvent</span> t m <span class="ot">=&gt;</span> m (<span class="dt">Event</span> t a, a <span class="ot">-&gt;</span> <span class="dt">IO</span> ())</span></code></pre></div>
+<p><strong>Dynamic</strong><br />
+Event와 Behavior를 튜플에 담아 둔 것</p>
+<p>DOM API는 기본적으로 push-기반입니다. 그래서 Behavior를 쓸 곳에 Dynamic을 쓰는 경우가 많습니다.</p>
+<p><code>Dynamic</code>값에 <code>updated</code>를 적용해서, 값이 변했을 때 이벤트를 얻을 수 있습니다.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ot">updated ::</span> (<span class="dt">Reflex</span> t) <span class="ot">=&gt;</span> <span class="dt">Dynamic</span> t a <span class="ot">-&gt;</span> <span class="dt">Event</span> t a</span></code></pre></div>
+<p>타임라인 <code>t</code>는 FRP 컨텍스트와 별 개입니다. 단일 프로그램이 Reflex를 여러 컨텍스트에서 돌릴 경우 꼬이지 않게 해줍니다.?</p>
+<h2 id="reflex-dom-앱의-아키텍처">Reflex-DOM 앱의 아키텍처</h2>
+<p>위젯과 위젯들을 연결하는 접착glue 코드로 구성됩니다. 위젯은 Event나 Dynamic value에 따라 컨텐츠를 수정할 수 있는 능력을 가진 DOM 구조의 무언가로 볼 수 있습니다. 이벤트를 발생시키는 input field 같은 구조들도 있습니다. 위젯들은 마우스 클릭같은 사용자 인터랙션에 반응할 수 있습니다. (이 걸 위젯이 마우스 클릭을 캡처한다고 말하기도 합니다.)</p>
+<h2 id="dom-생성">DOM 생성</h2>
+<p>“오브젝트” 트리<br />
+모나드 <code>DomBuilder</code>로 DOM 생성 작업을 합니다.</p>
+<p><strong>ghcjs</strong><br />
+ghc같은 컴파일러</p>
+<p><strong>ghcjs-dom</strong><br />
+DOM과 웹API와 쓰일 인터페이스 API를 제공하는 라이브러리</p>
+<h2 id="webkit">Webkit</h2>
+<p>KDE의 KHTML과 KJS에 파생된 웹 컨텐트 엔진. Apple 사파리 브라우저에 쓰입니다. HTML, SVG, XML 등을 디스플레이할 때 쓰입니다. DOM, XMLHttpRequest, XSLT, CSS, Javascript/ECMAscript 등을 지원합니다.</p>
 
 <div class="comment">
 <script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>

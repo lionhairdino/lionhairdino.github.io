@@ -82,10 +82,10 @@
 </div>
 
 <p>Tue Nov 14 08:08:18 PM KST 2023 스케치 중…</p>
-<p><a href="https://github.com/ivanperez-keera/Yampa">ivanperez-keera / Yampa</a></p>
-<p><a href="https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.65.8016&amp;rep=rep1&amp;type=pdf&amp;rct=j&amp;q=yampa%20arcade&amp;ei=p2b6TPv4HMOBlAe0luW4DA&amp;usg=AFQjCNEIW_IZQ9qAg-Jc8RbGfx9981RJBw&amp;sig2=k1V5vp6kH16B3U0-wNV00w">The Yampa Arcade</a>
-<a href="https://github.com/ivanperez-keera/SpaceInvaders">ivanperez-keera / SpaceInvaders</a></p>
-<p><a href="https://yampa-book.readthedocs.io/en/latest/index.html">Yampa Book</a></p>
+<p><a href="https://github.com/ivanperez-keera/Yampa">ivanperez-keera / Yampa</a><br />
+<a href="https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.65.8016&amp;rep=rep1&amp;type=pdf&amp;rct=j&amp;q=yampa%20arcade&amp;ei=p2b6TPv4HMOBlAe0luW4DA&amp;usg=AFQjCNEIW_IZQ9qAg-Jc8RbGfx9981RJBw&amp;sig2=k1V5vp6kH16B3U0-wNV00w">The Yampa Arcade</a><br />
+<a href="https://github.com/ivanperez-keera/SpaceInvaders">ivanperez-keera / SpaceInvaders</a><br />
+<a href="https://yampa-book.readthedocs.io/en/latest/index.html">Yampa Book</a></p>
 <p>Arrowized FRP</p>
 <p>Arrow 인터페이스를 이용해서 FRP 프레임워크 구현</p>
 <h2 id="signal-sf-signal-function">Signal, SF (Signal Function)</h2>
@@ -95,13 +95,12 @@
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co">-- 시그널 함수 </span></span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="dt">SF</span> α β ≃ <span class="dt">Signal</span> α <span class="ot">-&gt;</span> <span class="dt">Signal</span> β</span></code></pre></div>
-<p>Reactive-Banana에서는 Conal Elliot 논문과 같은 Behavior (<code>t -&gt; a</code>)와 Event (<code>(t,a)</code>)에서 시작했다. 얌파는 “특정 시간에만 존재하는 Event” 즉, <code>(Time, Event)</code> 모양이 없다. Behavior와 Event를 최대한 비슷하게 표현(모델링)한다면,</p>
+<p>Reactive-Banana에서는 Conal Elliot 논문과 같은 Behavior (<code>t -&gt; a</code>)와 Event (<code>(t,a)</code>)에서 시작했다. <del>얌파는 “특정 시간에만 존재하는 Event” 즉, <code>(Time, Event)</code> 모양이 없다. Behavior와 Event를 최대한 비슷하게 표현(모델링)한다면,</del></p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Behavior</span> <span class="ot">=</span> [b, b, b, b, b, <span class="op">...</span>] <span class="co">-- [ Just b,  Just b, Just b,  Just b, ...]</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="dt">Event</span>    <span class="ot">=</span> [_, _, e, _, e, <span class="op">...</span>] <span class="co">-- [Nothing, Nothing, Just e, Nothing, ...]</span></span></code></pre></div>
 <p>이런 모양으로 표현할 수도 있다. 아마도 얌파에선 이런 방식으로, <code>Signal</code> 하나로 둘 모두를 표현하지 않았을까?<br />
 ( ※ 연속 시간을 음이 아닌 실수로 표현한다. )<br />
 <code>SF</code> 해석을 어떻게 하면 좋을까? <code>Signal α</code>란 걸 주면 <code>Signal β</code>로 바꿔놓는 함수다.
-<code>α</code> 를 돌려주던 함수에서 <code>β</code>를 돌려주는 함수로 바뀌었다. 무슨 의미일까?
 <code>Time</code>을 주면 <code>α</code>를 내어 줄 준비를 하고 있었는데, 이를 변환 <code>β</code>를 내어주게 변환한다. 어떻게 변환할지는 이를 받아가는 모피즘, 즉 런타임의 동작을 봐야 한다.</p>
 <p><code>(Signal α, Signal β)</code></p>
 <p>위와 같이 쓴다면, <code>(,)</code>는 이를 만나는 모피즘들이 모두 별 일을 하지 않는다. 그저 단순히 두 개의 정보를 “함께” 가지고 있다는 뜻이다. <code>SF</code>는 <code>(,)</code>자리에 <code>(-&gt;)</code>를 넣어 정의했다. <code>(-&gt;) (Signal α) (Signal β)</code>, 나중 <code>SF</code>와 만나는 Runner들이 이 걸 실행하든, 다른 것과 합성하든 할 것이다. 뭘 할지는 그들에게 달렸다.<br />
@@ -127,7 +126,7 @@
 <p>※ <a href>The Yampa Arcade - 3.2 Composing Signal Functions</a> 참고</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ot">arr ::</span> (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> <span class="dt">SF</span> a b</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>arr f <span class="ot">=</span> \s <span class="ot">-&gt;</span> \t <span class="ot">-&gt;</span> f (s t)</span></code></pre></div>
-<p>이제 일반 함수를 <code>arr</code>을 써서 <code>SF</code>세상으로 리프팅할 수 있다. 요네다하고도 맞아 떨어지고, <code>a-&gt;b</code>라는 함수의 의미 - <code>a</code>가 먼저 일어나면, 그 것에 의존해서 <code>b</code>가 일어난다는 직관하고도 맞아 떨어진다. 요네다 식 자체가 가지고 있는 뜻이, 원래부터 이 의미로 보인다. 마치 시간의 개념이 없던 수학식에 시간 개념을 불어 넣는 느낌이다. 이제 막 요네다를 공부해서 어설프게 다 적용하고 있는지도 모르겠다. 직관적으로 해석하면, 시간에 따라 <code>a</code>가 일어나는 함수를 받아서 <code>b</code>가 일어나는 함수로 바꿔 놓았다.</p>
+<p>이제 일반 함수를 <code>arr</code>을 써서 <code>SF</code>세상으로 리프팅할 수 있다. 요네다하고도 맞아 떨어지고, <code>a -&gt; b</code>라는 함수의 의미 - <code>a</code>가 먼저 일어나면, 그 것에 의존해서 <code>b</code>가 일어난다는 직관하고도 맞아 떨어진다. 요네다 식 자체가 가지고 있는 뜻이, 원래부터 이 의미로 보인다. 마치 시간의 개념이 없던 수학식에 시간 개념을 불어 넣는 느낌이다. 이제 막 요네다를 공부해서 어설프게 다 적용하고 있는지도 모르겠다. 직관적으로 해석하면, 시간에 따라 <code>a</code>가 일어나는 함수를 받아서 <code>b</code>가 일어나는 함수로 바꿔 놓았다.</p>
 <p>※ <a href="../posts/2021-05-07-callbackTraining.html">함수가 들어있는 데이터 타입의 펑크터 만들기</a> 참고</p>
 <hr />
 <p><a href="https://reasonablypolymorphic.com/blog/yampa-frp/index.html">FRP in Yampa: Part1 - Reasonably Polymorphic</a></p>
@@ -138,7 +137,8 @@
 <pre><code>aState :: SF () Bool
 aStateTwoSecondsAgo :: SF () Bool
 
-integral :: Fractional a =&gt; SF a a</code></pre>
+integral :: (Fractional s, VectorSpace a s) =&gt; SF a a</code></pre>
+<p><code>integral</code>: rectangle 규칙을 써서 통합</p>
 <p>transformer 우리말로 번역하면 변환기 정도 되겠다.
 SF는 연속 시그널 변환기다.
 머릿속이 모호한 이유는 바로 “연속” 때문이다. 연속이란 개념을 어떻게 처리했을까?
@@ -183,6 +183,59 @@ SF는 이벤트가 흘러갈 경로를 만드는 프리미티브다.
 <span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>                 +----&gt; SF ----&gt; ...</span></code></pre></div>
 <p>이 존재한다.</p>
 <p>엘리엇과 후닥이 Functional 반응 애니메이션을 내놓은지 20년이 지났다.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ot">reactimate ::</span> <span class="dt">Monad</span> m <span class="ot">=&gt;</span> m a <span class="co">-- 초기 액션</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>                      <span class="ot">-&gt;</span> (<span class="dt">Bool</span> <span class="ot">-&gt;</span> m (<span class="dt">DTime</span>, <span class="dt">Maybe</span> a))  <span class="co">-- 입력 sensing 액션</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>                      <span class="ot">-&gt;</span> (<span class="dt">Bool</span> <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> m <span class="dt">Bool</span>) <span class="co">-- Actuation (출력 처리) 액션</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>                      <span class="ot">-&gt;</span> <span class="dt">SF</span> a b</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>                      <span class="ot">-&gt;</span> m ()</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>reactimate <span class="fu">init</span> sense actuate (<span class="dt">SF</span> {sfTF <span class="ot">=</span> tf0}) <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    a0 <span class="ot">&lt;-</span> <span class="fu">init</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> (sf, b0) <span class="ot">=</span> tf0 a0</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    loop sf a0 b0</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>    loop sf a b <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>      done <span class="ot">&lt;-</span> actuate <span class="dt">True</span> b</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>      unless (a <span class="ot">`seq`</span> b <span class="ot">`seq`</span> done) <span class="op">$</span> <span class="kw">do</span></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>        (dt, ma') <span class="ot">&lt;-</span> sense <span class="dt">False</span></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>        <span class="kw">let</span> a'        <span class="ot">=</span> fromMaybe a ma'</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>            (sf', b') <span class="ot">=</span> (sfTF' sf) dt a'</span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>        loop sf' a' b'</span></code></pre></div>
+<p>IO 액션을 써서 새로운 입력을 받고, 출력을 내보내는 <code>SF</code> 함수를 무한히 실행하는 함수입니다. SF 코드 덩어리의 runner쯤 되겠습니다.</p>
+<p>컴비네이터
+Time
+Lifting
+Integration
+Choice
+Behavior Switching
+Snapshot</p>
+<p><a href="https://lambdor-net.readthedocs.io/learn.html">Learning Yampa and Functional Reactive Programming</a></p>
+<ul>
+<li>모든 걸 Signal의 조합combination으로 모델링하면, 모든 곳에 시간 개념이 존재하게 된다.</li>
+<li>reactimate는 프로그램을 입력IO(sense), 시그널 함수(SF), 출력IO(actuate)로 나눈다.</li>
+<li>Switch들로 리액티브 시스템을 동적으로 변형할 수 있다.</li>
+<li>동적으로 시스템에 등장하는 오브젝트 모음을 제어하라면 delayed parallel switch (<code>dpSwtich</code>) 시그널 함수를 쓴다.</li>
+<li>입력 이벤트는 <code>route</code>를 통해 오브젝트들을 타고 전파된다.</li>
+<li><code>route</code>는 전체 오브젝트 컬렉션을 추론해서 logical 이벤트를 생산한다.? (충돌 검출 같은 걸 말한다.)</li>
+<li><code>killOrSpawn</code> 시스템에 등장 및 제거해야 하는 모든 이벤트를 모아 하나의 큰 함수 합성으로 만든다.</li>
+<li>In the Space Invaders example gameCore :: IL Object -&gt; SF (GameInput, IL ObjOutput) (IL ObjOutput) is actually embedded in the function core :: … -&gt; SF GameInput (IL ObjOutput) which acts as the intermediate between sense and actuate (this is not mentioned in the Yampa Arcade paper)</li>
+</ul>
+<div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>FRP.Yampa.embed<span class="ot"> ::</span> <span class="dt">SF</span> a b <span class="ot">-&gt;</span> (a, [(<span class="dt">DTime</span>, <span class="dt">Maybe</span> a)]) <span class="ot">-&gt;</span> [b]</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="co">--                   |        |           |</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co">--       run할 시그널 함수    |           |</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co">--                          초기값        |</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="co">--                          (time, Nothing | Just nextValue)</span></span></code></pre></div>
+<p>입력 시그널을 위해 초기 입력 샘플과 샘플링 리스트, 그리고 시그널 함수를 인자로 받아 출력 샘플을 만들어 냅니다. <code>reactimate</code>의 순수 함수 버전입니다.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">putStrLn</span> <span class="op">$</span> <span class="fu">show</span> <span class="op">$</span> embed time (<span class="dt">Nothing</span>, [(<span class="fl">1.0</span>, <span class="dt">Nothing</span>), (<span class="fl">0.2</span>, <span class="dt">Nothing</span>), (<span class="fl">0.03</span>, <span class="dt">Nothing</span>)])</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">putStrLn</span> <span class="op">$</span> <span class="fu">show</span> <span class="op">$</span> embed time (<span class="dv">123</span>, [(<span class="fl">1.0</span>, <span class="dt">Just</span> <span class="dv">234</span>), (<span class="fl">0.2</span>, <span class="dt">Just</span> <span class="dv">345</span>), (<span class="fl">0.03</span>, <span class="dt">Just</span> <span class="dv">456</span>)])</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">putStrLn</span> <span class="op">$</span> <span class="fu">show</span> <span class="op">$</span> embed identity (<span class="dv">123</span>, [(<span class="fl">1.0</span>, <span class="dt">Just</span> <span class="dv">234</span>), (<span class="fl">0.2</span>, <span class="dt">Just</span> <span class="dv">345</span>), (<span class="fl">0.03</span>, <span class="dt">Just</span> <span class="dv">456</span>)])</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">putStrLn</span> <span class="op">$</span> <span class="fu">show</span> <span class="op">$</span> embed identity (<span class="dv">537</span>, [(<span class="fl">1.0</span>, <span class="dt">Nothing</span>), (<span class="fl">0.2</span>, <span class="dt">Nothing</span>), (<span class="fl">0.03</span>, <span class="dt">Just</span> <span class="dv">123</span>)])</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">putStrLn</span> <span class="op">$</span> <span class="fu">show</span> <span class="op">$</span> embed (constant <span class="dv">537</span>) (<span class="dt">Nothing</span>, [(<span class="fl">1.0</span>, <span class="dt">Nothing</span>), (<span class="fl">0.2</span>, <span class="dt">Nothing</span>), (<span class="fl">0.03</span>, <span class="dt">Nothing</span>)])</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">putStrLn</span> <span class="op">$</span> <span class="fu">show</span> <span class="op">$</span> embed (constant <span class="dv">537</span>) (<span class="dv">123</span>, [(<span class="fl">1.0</span>, <span class="dt">Just</span> <span class="dv">234</span>), (<span class="fl">0.2</span>, <span class="dt">Just</span> <span class="dv">345</span>), (<span class="fl">0.03</span>, <span class="dt">Just</span> <span class="dv">456</span>)])</span></code></pre></div>
 
 <div class="comment">
 <script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>

@@ -4,7 +4,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-        <title>lionhairdino - Arrow는 모나드의 일반화 (작성 중)</title>
+        <title>lionhairdino - Arrow로 함수 컴비네이션 (작성 중)</title>
 
         <meta name="description" content="주로 John hughes 텍스트를 보며 Arrow를 공부하면서 노트한 글입니다." />
         <meta property="og:description" content="주로 John hughes 텍스트를 보며 Arrow를 공부하면서 노트한 글입니다." />
@@ -33,7 +33,7 @@
         <meta name="msapplication-TileColor" content="#ff7500" />
         <meta name="theme-color" content="#ffffff" />
         <meta property="og:type" content="website" />
-        <meta property="og:title" content="Arrow는 모나드의 일반화 (작성 중)" />
+        <meta property="og:title" content="Arrow로 함수 컴비네이션 (작성 중)" />
         <meta property="og:site_name" content="Lionhairdino" />
         <meta property="og:url" content="https://lionhairdino.github.io/posts/2023-09-14-arrow.html" />
 
@@ -74,7 +74,7 @@
             </div>
         </div>
         <div class="js-toc-content">
-            <h1>Arrow는 모나드의 일반화 (작성 중)</h1>
+            <h1>Arrow로 함수 컴비네이션 (작성 중)</h1>
             <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
 <div class="info">
     Posted on September 14, 2023
@@ -92,7 +92,7 @@
 <li>모나드가 할 수 있는 일은 다 할 수있고, 모나드가 못하는 일도 할 수 있다.</li>
 </ul>
 <p><a href="https://www.cse.chalmers.se/~rjmh/afp-arrows.pdf">Programming with Arrows - John hughes</a><br />
-모나드를 일반화하는 과정을 설명하는 텍스트인데, 여기에 제가 읽으면서 가졌던 의문들과 알게된 답을 같이 적었습니다. 늘 그렇듯, 읽는 이가 스스로 감수자가 되어 읽어주셔야 합니다.</p>
+위 텍스트를 읽으면서 가졌던 의문들과 알게된 답을 같이 적었습니다. 늘 그렇듯, 읽는 이가 스스로 감수자가 되어 읽어주셔야 합니다.</p>
 <h2 id="생각-스트레칭">생각 스트레칭</h2>
 <h3 id="타입이-할-수-있는-일검증-안된-혼자-상상입니다.">타입이 할 수 있는 일(검증 안된 혼자 상상입니다.)</h3>
 <p>수학이 강한 분들은, 아래 같은 얘기를 별로 안 좋아하는 경우가 있습니다. 너무 “인문학”스럽게 접근하는 걸로 보이나 봅니다. 전, 논리적으로 딱 맞아 떨어져도, 아래 같은 이해를 하지 못하면 현실을 모델링할 때 써먹질 못합니다. 여하튼, 그다지 환영 받는 얘기는 아니니, 적당히 한 귀로 흘리시면서 보세요.</p>
@@ -107,28 +107,28 @@
 <code>applySome (SomeType f) a = f a</code>라는 함수나 메소드를 준비해 놓으면, <code>a -&gt; b</code>가 할 수 있는 일은 모두 할 수 있으며, 추가로 연계된 메소드를 둘 수도 있고,<br />
 <code>specialApplySome (SomeType f) a = 추가 작업 후 f a</code> 등으로 함수를 적용할 때 항상 해야만 하는 일을 심어 둘 수도 있습니다. 이런 의미에서 전 타입이 더 표현력이 좋다 생각합니다.</p>
 <p>타입이 함수의 일반화가 아닌가 생각한 적이 있는데요, 텍스트도 그리 말하는 곳이 없고, 가끔 저와 대화를 하는 분들 모두 “일반화”라고까지 말할 순 없다라고들 합니다. 저는 <code>Int</code> 타입이라고 하면 <code>Class DoNothing</code>의 인스턴스이거나, 특별한 메소드를 갖고 있지 않거나, 생성자 자체도 특별한 일을 하진 않는 함수로, <code>Value</code>에 접근 할 때 “아무것도 안하는 함수”를 실행하는 함수의 확장 정도로 보는 경우를 상상해 봤습니다. 그다지 그럴싸한 생각은 아닌가 봅니다. 이런 잡스러운 생각이, Arrow 인터페이스가 왜 모나드 인터페이스보다 표현력이 좋을까를 생각할 때 전 도움이 됐습니다.</p>
-<h3 id="왜-arrow가-필요할까">왜 Arrow가 필요할까?</h3>
+<h3 id="함수를-타입으로-감싸서-얻는-이득">함수를 타입으로 감싸서 얻는 이득</h3>
 <p>함수를 래핑해서 별도의 인터페이스(컴비네이터)를 만들어 두면 얻을 수 있는, 기능 예시를 보겠습니다.</p>
 <p>하스켈은 순수 함수만 있어, 인자로 넘어 오지 않으면 쓰질 못합니다. 전역 변수를 쓸 수 있는 <strong>순수하지 않은 상황</strong>에서, 함수를 합성해서 체인을 만들어 두는데, 각 함수들이 만들어 낸 결과들을 모두 개별로 유지할 필요가 있는 경우를 생각해 보면,</p>
-<pre><code>globalRes1;
-globalRes2;
-globalRes3;
-
-chain init {
-  globalRes1 = func1 init 
-  globalRes2 = func2 globalRes1
-  globalRes3 = func3 globalRes2
-}
-
-another {
-  globalRes1 + globalRes2 + globalRes3  
-}</code></pre>
+<div class="sourceCode" id="cb2"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>globalRes1;</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>globalRes2;</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>globalRes3;</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>chain init {</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  globalRes1 = func1 init </span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  globalRes2 = func2 globalRes1</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  globalRes3 = func3 globalRes2</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>another {</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  globalRes1 + globalRes2 + globalRes3  </span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 <p>(억지스럽긴 하지만) 대비 되게 보면 이런 식의 코드도 가능하겠지만, 순수 함수만 있는 동네에선 불가능합니다. 순수 함수로만 해결하려면,</p>
 <p><strong>“결국, 필요한 정보는 다 가지고 다니는 수밖에 없습니다.”</strong></p>
 <p>단, 결과값에만 신경쓸 수 있도록, 추가적인 정보(컨텍스트)를 가지고 다니는 건 눈에 잘 안 보이게 해주는 패턴이 필요합니다. 모나드 바인드에선 람다 함수의 클로저가 이 역할을 합니다.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>\x -&gt; \y -&gt; x + y</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>            ^^^^^</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>            이 식에서 x를 쓸 수 있어야 편하게 구현할 수 있습니다.</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>\x <span class="ot">-&gt;</span> \y <span class="ot">-&gt;</span> x <span class="op">+</span> y</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>            <span class="op">^^^^^</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>            이 식에서 x를 쓸 수 있어야 편하게 구현할 수 있습니다<span class="op">.</span></span></code></pre></div>
 <p>함수를 그냥 합성하지 않고, 합성할 때마다 모나드의 바인드처럼 추가 정보를 잃어버리지 않게 차곡 차곡 챙기려면 어떻게 할까요? 순수 함수만 있는 동네에선 2튜플이 중요한 수단입니다. <code>(결과값, 추가 정보)</code> 형태로 추가 정보를 잃어버리지 않게 넣어 놓는 방법이 있습니다. 2튜플을 쓰지 않는다면, 별도의 프로덕트 타입을 만들어서 해결해도 되는데, 이미 준비되어 있는 가장 단순한 2튜플이 있으니, 이 걸 쓰면 됩니다.</p>
 <pre><code>chain init {
   res1 = Arrow1 init
@@ -154,7 +154,7 @@ another {
   r2 &lt;- m2
   r3 &lt;- m3
   ...</code></pre>
-<p>이렇게 이쁘게 쓸 수 깄게 됐듯이, Arrow를 쓰기 편하게 해주는 확장이 있습니다. 아래에서 이어가도록 하겠습니다.</p>
+<p>이렇게 이쁘게 쓸 수 있게 됐듯이, Arrow를 쓰기 편하게 해주는 확장이 있습니다. 아래에서 이어가도록 하겠습니다.</p>
 <p>물론, Arrow의 특 장점이 이게 전부는 아닙니다. 체인을 만들면서, 병행 길을 만들기도, 조건에 따라 분기를 만들기도 할 수 있습니다. 위 스트레칭은 그냥 합성composition하지 않고, 타입으로 래핑해서 얻을 수 있는 능력의 일부를 보이려고 든 예시입니다.</p>
 <p>모든 분들에게 어울리는 접근 방법은 아니겠지만, 저는 이렇게 뭘 위해 개념을 도입, 혹은 만들어 내고 있는 지 알면 텍스트를 쫓아가기가 편합니다.</p>
 <h1 id="arrow">Arrow</h1>
@@ -197,17 +197,20 @@ another {
 <span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="ot">  arr ::</span> <span class="dt">Monad</span> m <span class="ot">=&gt;</span> (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> <span class="dt">Kleisli</span> m a b <span class="co">-- (a -&gt; m b)가 아님</span></span>
 <span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  arr f <span class="ot">=</span> <span class="fu">return</span> <span class="op">.</span> f</span>
 <span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="ot">  (&gt;&gt;&gt;) ::</span> <span class="dt">Monad</span> m <span class="ot">=&gt;</span> <span class="dt">Kleisli</span> m a b <span class="ot">-&gt;</span> <span class="dt">Kleisli</span> m b c <span class="ot">-&gt;</span> <span class="dt">Kleisli</span> m a c</span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="co">-- f를 a -&gt; m b, g를  b -&gt; m c 라고 하면</span></span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  (f <span class="op">&gt;&gt;&gt;</span> g) a <span class="ot">=</span> <span class="kw">do</span> b <span class="ot">&lt;-</span> f a <span class="co">-- 숨어 있는 바인드가 동작하면 Effect 작업을 합니다.</span></span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>                   g b</span></code></pre></div>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  (f <span class="op">&gt;&gt;&gt;</span> g) a <span class="ot">=</span> <span class="kw">do</span> b <span class="ot">&lt;-</span> f a </span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>                 g b</span></code></pre></div>
 <p><code>Kleisli</code> 타입은 내부에서 이미 존재하는 <code>m</code>이 가지고 있는 바인드를 써서 <code>(&gt;&gt;&gt;)</code>를 구현합니다. <code>(-&gt;)</code>와 <code>Kleisli</code>의 <code>arr</code>이나 <code>(&gt;&gt;&gt;)</code>가 별다른 일을 하지 않고 있지만, <code>Arrow</code> 인스턴스가 되면서 <code>&amp;&amp;&amp;, ***, first, second</code>등을 쓸 수 있게 됩니다.</p>
 <h2 id="arr-만-있으면-return-를-즉-모나드를-대체할-수-있을까">arr, (&gt;&gt;&gt;)만 있으면 return, (&gt;&gt;=)를, 즉 모나드를 대체할 수 있을까?</h2>
-<p>Kleisli 타입을 가진 Arrow가 모나드와 같은 동작을 하고 있을까요? <code>(&gt;&gt;&gt;)</code>의 구현을 보면 바인드가 돌고 있습니다. <code>(&gt;&gt;&gt;)</code>는 그대로 바인드와 대응하는 것으로 보입니다. 텍스트 설명을 보면, <code>(&gt;&gt;=)</code>는 두 번째 인자로 <code>a -&gt; m b</code> 함수를 받기 때문에, 두 개의 Effectful Computation을 순차적으로 실행하는 동안 하스켈 코드를 실행할 수 있는 기회가 있다고 얘기합니다.</p>
-<p>※ 그런데, 위에서 보듯 <code>(&gt;&gt;&gt;)</code>가 함수가 아닌 <code>Arrow</code>값 두개를 받긴 해도, 안에서 <code>(&gt;&gt;=)</code>가 도는데 차이가 없을 것처럼 보입니다. 원문에는 아래 같은 내용이 있습니다. (Programming with Arrows - John Hughes 발췌)</p>
+<p>Kleisli 타입을 가진 Arrow가 모나드와 같은 동작을 하고 있을까요? <code>(&gt;&gt;&gt;)</code>의 구현을 보면 바인드가 돌고 있습니다. <code>(&gt;&gt;&gt;)</code>는 그대로 바인드와 대응하는 것으로 보입니다. 텍스트를 보면, <code>(&gt;&gt;=)</code>는 두 번째 인자로 <code>a -&gt; m b</code> 함수를 받기 때문에, 두 개의 Effectful Computation을 순차적으로 실행하는 동안 어떤 하스켈 코드all of Haskell든 실행할 수 있는 기회가 있다고 얘기합니다.</p>
+<p>그런데, 위에서 보듯 <code>(&gt;&gt;&gt;)</code>가 함수가 아닌 <code>Arrow</code>값 두개를 받긴 해도, 안에서 <code>(&gt;&gt;=)</code>가 도는데 차이가 없을 것처럼 보입니다. 원문에는 아래 같은 내용이 있습니다. (Programming with Arrows - John Hughes 발췌)</p>
 <blockquote>
-<p>In the case of monads, the second argument of (&gt;&gt;=) is a Haskell function, which permits the user of this interface to <strong><em>use all of Haskell to map the result of the first computation to the computation to be performed next.Every time we sequence two monadic computations, we have an opportunity to run arbitrary Haskell code in between them.</em></strong> But in the case of arrows, in contrast, the second argument of (&gt;&gt;&gt;) is just an arrow, an element of an abstract datatype, and the only things we can do in that arrow are things that the abstract data type interface provides. Certainly, the arr combinator enables us to have the output of the first arrow passed to a Haskell function — but this function is a pure function, with the type b -&gt; c, which thus has no opportunity to perform further effects. If we want the effects of the second arrow to depend on the output of the first, then we must construct it using operations other than arr and (&gt;&gt;&gt;)</p>
+<p>In the case of monads, the second argument of (&gt;&gt;=) is a Haskell function, which permits the user of this interface to <strong><em>use all of Haskell to map the result of the first computation to the computation to be performed next. Every time we sequence two monadic computations, we have an opportunity to run arbitrary Haskell code in between them.</em></strong> But in the case of arrows, in contrast, the second argument of (&gt;&gt;&gt;) is just an arrow, an element of an abstract datatype, and the only things we can do in that arrow are things that the abstract data type interface provides. Certainly, the arr combinator enables us to have the output of the first arrow passed to a Haskell function — but this function is a pure function, with the type b -&gt; c, which thus has no opportunity to perform further effects. If we want the effects of the second arrow to depend on the output of the first, then we must construct it using operations other than arr and (&gt;&gt;&gt;)</p>
 </blockquote>
-<p>하지만, 둘이 다른 점이 있습니다.</p>
+<p>이 부분이 스윽 넘어가지지 않아, 아래와 같이 <code>Maybe</code>모나드로 풀어 봤습니다.</p>
+<p>첫 컴퓨테이션 값이 <code>Nothing</code>이면, 다음 이어지는 컴퓨테이션에서 <code>a -&gt; m b</code>가 무슨 동작을 하든 <code>Nothing</code> 결과가 나옵니다. 타입을 눈에 보는 그대로 읽으면, <code>m</code>(the effect)도, <code>b</code>도 <code>a</code>에 의존합니다. 하지만, 바인드와 다르게 <code>(&gt;&gt;&gt;)</code>는 이미 <strong>결정된</strong> Arrow 컴퓨테이션 두 개만 받습니다. 이미 정해진 Arrow 컴퓨테이션에 할 수 있는 일은 Arrow가 제공하는 인터페이스를 이용해서 할 수 있는 일만 가능합니다. (Applicatives도 결정된 컴퓨테이션만 받으니, 둘이 연결되는 개념이 있지 않을까 합니다.) 만일, 지금 손에 쥔 인터페이스가 <code>arr</code>과 <code>(&gt;&gt;&gt;)</code>만 있다면, 어떤 일을 할 수 있는지 보겠습니다.</p>
+<p><code>arr</code>의 서명은 <code>(b -&gt; m c) -&gt; a b c</code>가 아니라 <code>(b -&gt; c) -&gt; a m b c</code> 입니다.<br />
+<code>Kleisli Maybe</code> Arrow를 생각해 보면, <code>arr f</code>는 <code>Just . f</code>입니다. <code>Just</code>일지 <code>Nothing</code>일지 고르는 절차 없이 바로 <code>Just</code> 값 생성자를 쓸 뿐입니다. <code>arr</code>로 리프팅하여 만든 컴퓨테이션엔 이미 <code>Just</code>로 고정되어 있지, 바인드의 두 번째 인자 <code>a -&gt; m b</code>처럼, <code>a</code>에 따라 <code>m</code>이 <code>Just</code>인지 <code>Nothing</code>인지 결정하는 절차가 파고 들어갈 기회가 없습니다.</p>
+<p>Mon Feb 5 01:04:47 PM KST 2024 작성 중…</p>
 <blockquote>
 <p>아래는 <span class="citation" data-cites="Ailrun">@Ailrun</span> 님의 설명을 옮겼습니다.<br />
 예를 들어 <code>State</code>를 다음처럼 모나드 인터페이스를 쓰는 것과, <code>Arrow</code> 인터페이스를 쓰는 것을 비교하면</p>
@@ -231,7 +234,7 @@ another {
 <p><code>Arrow</code>가 모나드 동작을 할 수 있는가는, “언제 <strong><em>Uncurrying</em></strong>이 가능한 <code>a</code>를 얻을 수 있는가?”라고 볼 수도 있습니다.</p>
 <p><code>Monad</code>의 핵심이 <code>join :: m (m a) -&gt; m a</code>이니, 이와 비교하기 좋게 바꿔서 보면,<br />
 <code>joinLikeArr :: a b (a c d) -&gt; a (b, c) d</code>를 구현할 수 있냐 없냐가 <code>Arrow a</code>로 <code>Monad</code>가 하던 일을 할 수 있냐 없냐를 결정한다고 볼 수도 있겠습니다.<br />
-<code>a</code>가 <code>(-&gt;)</code>인 경우는 다음처럼 됩니다.<br />
+<code>a b c</code>에서 <code>a</code>가 <code>(-&gt;)</code>인 경우는 다음처럼 됩니다.<br />
 <code>uncurry :: (b -&gt; c -&gt; d) -&gt; ((b, c) -&gt; d)</code></p>
 </blockquote>
 <p>(※ <a href="https://lionhairdino.github.io/posts/2022-09-06-applicative_functor.html">모나드와 Applicatives의 차이</a>를 고민할 때, 모나딕한 동작을 하려면 <code>a -&gt; m b</code> 형태가 반드시 있어야 하고, <code>m b</code> 만으론 부족하다고 틀리게 생각했던 것과 약간 비슷한 요소가 보입니다. )</p>
@@ -301,8 +304,9 @@ A. <code>(&gt;&gt;&gt;)</code>를 “자유”롭게 만들 수 있는 건 아�
 <p><code>(***)</code>는 두 개의 <code>Arrow</code>를 받아 2튜플을 받고 뱉는 하나의 <code>Arrow</code>로 만듭니다. 이 건 하나의 <code>Arrow</code>를 2튜플을 가진 <code>Arrow</code>로 리프팅해서 얻을 수도 있습니다. 저는 이 아이디어가 금방 눈에 들어오지 않았습니다.<br />
 현재 목표는 값 하나를 넣어주면, 두 개로 만들어 (이 작업은 이미 <code>(***)</code>전에 이루어집니다.),<br />
 <code>(***)</code>이 2튜플로 결과를 반환 할 수 있어야 합니다.(<code>(***)</code>가 하는 일)</p>
+<p>그런데, 이 전 구현보다 더 단순해진 것도 아니고, 굳이 이렇게 구현해야 하는 생각이 잠깐 들었습니다. 뒤에 보면, 2튜플로 저글링을 많이 합니다. 아마도 이를 위한 컴비네이터 아닌가 싶습니다.</p>
 <h2 id="first">first</h2>
-<p>처음 봤을 때는, 왜 필요한지 금방 눈에 들어오지 않았습니다.<br />
+<p>처음 봤을 때는, 이 것도 왜 필요한지 금방 눈에 들어오지 않았습니다.<br />
 왜 모나딕한 동작을 위해서, <code>first</code>가 필요할까요? 텍스트에선 친절하게 말해주지 않습니다. (제가 못찾거나요)</p>
 <div class="sourceCode" id="cb20"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">Arrow</span> arr <span class="kw">where</span></span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="ot">  first ::</span> arr a b <span class="ot">-&gt;</span> arr (a,c) (b,c)</span></code></pre></div>
@@ -360,6 +364,7 @@ A. <code>(&gt;&gt;&gt;)</code>를 “자유”롭게 만들 수 있는 건 아�
 <p><code>f</code>는 <code>a -&gt; b</code> 함수고, <code>first f</code>는 <code>(a,dontTouch) -&gt; (b,dontTouch)</code>함수 입니다.<br />
 <code>second</code>도, <code>(***)</code>도 <code>first</code>만 있으면 구현할 수 있습니다. 이제 <code>first</code>만 있으면 합성하며, 이전 액션(혹은 함수)의 결과를 다음에 넘기는 일을 할 수 있습니다.</p>
 <p>그 외, <code>(^&gt;&gt;)</code>, <code>(&gt;&gt;^)</code>, <code>(&lt;&lt;^)</code>, <code>(^&lt;&lt;)</code> 들은 순수 함수들을 합성compose할 때 <code>arr</code>을 매 번 쓰는 귀찮음을 덜어주는 편의 컴비네이터들입니다.</p>
+<p><code>(***)</code>, <code>first</code>, <code>second</code> 모두 어떤 함수가 들어오든 상관없이 <strong>튜플 구조에만</strong> 관여하는 컴비네이터들로, 이들 중 하나만 구현되어 있으면, 그 걸로 나머지를 구현할 수 있습니다.</p>
 <h2 id="조건부로-arrow-컴비네이션하기">조건부로 Arrow 컴비네이션하기</h2>
 <p>지금부턴 Arrow를 막강하게 해주는 특징, 다이내믹한 흐름을 위한 도구(<code>|||</code>, <code>mapA</code>, <code>+++</code>, <code>left</code>, <code>right</code>)들을 보겠습니다.</p>
 <p>If Then Else - ifte</p>
@@ -369,9 +374,9 @@ A. <code>(&gt;&gt;&gt;)</code>를 “자유”롭게 만들 수 있는 건 아�
 <span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>ifte p f g <span class="ot">=</span> p <span class="op">&amp;&amp;&amp;</span> arr <span class="fu">id</span> <span class="op">&gt;&gt;&gt;</span> f <span class="op">|||</span> g</span>
 <span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>             <span class="op">^^^^^^^^^^^^</span></span>
 <span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>        <span class="co">-- 왜 이렇게 할까요?</span></span></code></pre></div>
-<p><code>p &amp;&amp;&amp; arr id</code>는 왜 해주는 걸까요?<br />
+<p><code>p &amp;&amp;&amp; arr id</code>는 왜 해주는 걸까요? <code>p</code>는 조건에 맞는지 검사 후 <code>Bool</code>값을 반환하는 함수입니다.<br />
 <code>arr a Bool &amp;&amp;&amp; arr a a = arr a (Bool, a)</code><br />
-결과에 <code>Bool</code>값과 처음 입력한 값을 같이 2튜플에 남겨 둘 수 있습니다.</p>
+원래의 함수는 <code>Bool</code>만 돌려주는데, <strong>변환한 함수</strong>는 결과에 <code>Bool</code>값과 처음 입력한 값을 같이 2튜플에 남겨 둘 수 있습니다.</p>
 <h2 id="section-2">(|||)</h2>
 <div class="sourceCode" id="cb28"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>p <span class="op">&amp;&amp;&amp;</span> arr<span class="ot"> id ::</span> arr a (불린값, f나g에 넣어줄 입력값)</span>
 <span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>f <span class="op">|||</span><span class="ot"> g ::</span> arr (a, b) c</span></code></pre></div>
@@ -408,10 +413,13 @@ A. <code>(&gt;&gt;&gt;)</code>를 “자유”롭게 만들 수 있는 건 아�
 <span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="ot">  (+++) ::</span> arr a b <span class="ot">-&gt;</span> arr c d <span class="ot">-&gt;</span> arr (<span class="dt">Either</span> a c) (<span class="dt">Either</span> b d)</span></code></pre></div>
 <p><code>(+++)</code>과 <code>(|||)</code>의 관계는 <code>(***)</code>과 <code>(&amp;&amp;&amp;)</code>의 관계와 비슷합니다. <code>(|||)</code>를 직접 구현하는 것 보다는 <code>(+++)</code>를 먼저 구현하고, <code>(+++)</code>을 써서 <code>(|||)</code>를 구현하는 게 편합니다.</p>
 <p><code>(+++)</code>는 <code>(***)</code>와 dual입니다. <code>Either</code> 타입을 2튜플로 바꾸고, <code>arr</code>의 인자 순서를 바꾸면 <code>(|||)</code>의 정의는</p>
-<div class="sourceCode" id="cb36"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>f <span class="op">|||</span> g <span class="ot">=</span> f <span class="op">+++</span> g <span class="op">&gt;&gt;&gt;</span> arr join</span>
+<div class="sourceCode" id="cb36"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>f <span class="op">|||</span> g <span class="ot">=</span> f <span class="op">+++</span> g <span class="op">&gt;&gt;&gt;</span> arr join <span class="co">-- 라이브러리에선 join대신 untag란 이름을 쓴다.</span></span>
 <span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span> join (<span class="dt">Left</span> b)  <span class="ot">=</span> b</span>
 <span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>        join (<span class="dt">Right</span> b) <span class="ot">=</span> b</span></code></pre></div>
 <p><code>(***)</code>를 <code>first</code>로 표현하듯, <code>(+++)</code>는 <code>Either</code>의 <code>left</code>로 리프팅하는 단순한 컴비네이터로 정의할 수 있습니다.</p>
+<p><code>(***)</code>는 두 개의 Arrow를 받아 2튜플로 묶는 작업을 했고,(두 Arrow 모두 실행)<br />
+<code>(+++)</code>는 두 개의 Arrow를 받아 <code>Either</code>로 묶는 작업을 했습니다. (두 Arrow 중 하나만 실행하기 위한 사전 동작?)<br />
+</p>
 <h2 id="left">left</h2>
 <div class="sourceCode" id="cb37"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">Arrow</span> arr <span class="ot">=&gt;</span> <span class="dt">ArrowChoice</span> arr <span class="kw">where</span></span>
 <span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="ot">  left ::</span> arr a b <span class="ot">-&gt;</span> arr (<span class="dt">Either</span> a c) (<span class="dt">Either</span> b c)</span></code></pre></div>
@@ -428,6 +436,7 @@ A. <code>(&gt;&gt;&gt;)</code>를 “자유”롭게 만들 수 있는 건 아�
 <p><a href="../posts/2023-09-22-using_arrow.html">Arrow 쓰는 방법</a></p>
 <h2 id="arrow-확장">Arrow 확장</h2>
 <p><a href="../extensions/2023-09-14-arrow-extension.html">확장 Arrows</a></p>
+<p>마치 함수를 일반 수처럼 여러 연산자들로 식을 만드는 것 같이 보입니다. Arrow 대수라고 불러도 되지 않을까 싶은데요. 따로 대수라고 부르는데는 못 봤습니다. 컴비네이터 패턴이란게 다 대수와 같은 것들 아닌가 싶습니다.</p>
 <p>참고<br />
 시간과 머리가 허락한다면, <a href="https://wiki.haskell.org/Arrow#Parser">wiki.haskell.org - Arrow</a> 사이트에 있는 링크를 쫓아다니며 공부하면 Arrow 마스터!가 될 수도 있겠습니다만, 분량이 너무 많습니다.<br />
 </p>
