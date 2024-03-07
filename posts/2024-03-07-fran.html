@@ -37,9 +37,9 @@
         <meta property="og:site_name" content="Lionhairdino" />
         <meta property="og:url" content="https://lionhairdino.github.io/posts/2024-03-07-fran.html" />
 
-        <meta property="og:image" content="https://lionhairdino.github.io/images/state400px.png" />
+        <meta property="og:image" content="https://lionhairdino.github.io/images/fran_untilB.png" />
 
-      <meta name="keywords" content="FRP, 함수형, 절차형, if구문">
+      <meta name="keywords" content="FRP, 함수형, 절차형, if구문, Conal Elliott, Paul Hudak">
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-E9WZ6VXGHP"></script>
 <script>
@@ -81,46 +81,46 @@
     
 </div>
 
+<p><a href="http://conal.net/papers/icfp97/">Functional Reactive Animation - Conal Elliott and Paul Hudak, 1997</a> 논문을 본 분들을 대상으로 삼는 글입니다. 무려 27년 전 글이지만, 아직도 많이 읽힌다고 하는데, 검색에는 딱히 걸려드는 한글 자료는 없습니다. 수많은 선행자들이 이해하고 넘어 갔을텐데 자료가 없는 게 아쉽습니다.</p>
 <h2 id="생각-스트레칭">생각 스트레칭</h2>
-<p>절차형에서는 여러 단계로 되어 있는 <code>if</code>문들이 함수형에선 모두 사라진 느낌의 표현입니다. 이게 익숙하게 보이지 않는다면, 람다 산법에서 <code>if</code>문을 어떻게 처리하는지 먼저 살펴 보겠습니다.</p>
-<p><code>if</code>문은
-외부에서 들어오는 값을
-값을 받아 <code>true</code> 또는 <code>false</code>로 판단하는 구문을 거치고,
-<code>if</code>구문으로 <code>true</code>일 때 실행할 코드, <code>false</code>일 때 실행할 코드로 진행합니다. –(가)</p>
-<p>람다 산법에서 <code>true</code>는 <code>select_first</code>로, <code>false</code>는 <code>select_second</code>로 정합니다.
+<div class="sourceCode" id="cb1"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>b1 untilB (lbp t0) ==&gt; λe.b2 untilB e -=&gt; b3</span></code></pre></div>
+<p>절차형에서는 여러 단계로 되어 있는 <code>if</code>문들이 함수형에선 모두 사라진 느낌의 표현입니다. 이게 익숙하게 보이지 않아, 람다 산법에서 <code>if</code>문을 어떻게 처리하는지 다시 상기해 봤습니다.</p>
+<p><code>if</code>문은<br />
+“외부에서 들어온 값”을<br />
+“값을 받아 <code>true</code> 또는 <code>false</code>로 판단하는 구문”을 거치고,<br />
+“<code>if</code>구문”으로 <code>true</code>일 때 실행할 코드, <code>false</code>일 때 실행할 코드로 진행합니다. –(가)</p>
+<p>람다 산법에서 <code>true</code>는 <code>select_first</code>로, <code>false</code>는 <code>select_second</code>로 정합니다. ※ 참고 <a href="https://lionhairdino.github.io/posts/2021-04-08-lambdaCalculus.html#%EB%B6%84%EA%B8%B0%EB%AC%B8">람다 대수 기본 용어 - 분기문</a><br />
 실행할 코드 두 가지를 튜플로 가지고 있고, 외부에서 “튜플 중 하나를 선택하는 함수”를 받는 고차 함수를 정의합니다. 고차 함수에 <code>select_first</code> 또는 <code>select_second</code>를 넣어줘서 진행할 길을 결정합니다. –(나)</p>
 <p>좀 더 추상적으로 정리하면, 함수형에서는 가능한 경우의 수에 따른 코드를 튜플로 준비해 놓고, 튜플의 위치를 고르는 함수를 받아, 그 함수를 튜플에 <strong><em>적용</em></strong>해서 분기를 구현하고 있습니다. 값으로 표현하던 <code>true</code>가 함수가 됐으니, 고차 함수는 이 함수를 적용할 값을 가지고 있어야 합니다.</p>
 <p>처음 볼 때는, 값과 함수의 역할이 뒤바뀌는 식으로 생각해야 하나 싶었는데, 잘 따져 보면, 두 개가 그리 달라 보이지 않습니다.</p>
-<p>값 <code>true</code>를 받았다면, 컴비네이터 안에는 값에 적용할 함수가 있고,(<code>if</code>구문을 별도의 함수로 생각)
+<p>값 <code>true</code>를 받았다면, 컴비네이터 안에는 값에 적용할 함수가 있고,(<code>if</code>구문을 별도의 함수로 생각)<br />
 함수 <code>true</code> 즉, <code>select_first</code>를 받았다면, 컴비네이터 안에는 이 함수를 적용할 값을 가지고 있습니다.</p>
 <p>분기란 건, “조건”과 “조건에 따라서 실행될 코드”, 그리고 <strong><em>둘을 매핑해주는 역할</em></strong>이 필요합니다. (이 역할을 <strong><em>런타임</em></strong>이라 보겠습니다.)
 매핑해주는 역할을 <code>true</code>에 심어 놓든가(함수형의 <code>select_first</code>), 별도 함수(절차형의 <code>if</code>)로 두든가의 차이입니다.</p>
-<p>프로그래밍은 매핑한 결과를 또다른 실행 코드와 매핑하고, 그래서 나온 결과를 또 다른 실행 코드와 매핑하는, 매핑의 반복으로 이루어져 있습니다. 매핑할 때 분기를 하든가, 갈 길이 하나뿐이 없는 시퀀싱으로 매핑하든가 합니다. 절차형이 됐든, 함수형이 됐든 이 동작으로 현실을 매핑으로 모델링하는데는 차이가 없습니다. 매핑 결과를 다음 매핑에 어떻게 넘겨 주냐의 차이만 있을 뿐입니다.</p>
-<p>절차형에선 프로시저가 작업이 끝나면, 작업 결과를 메모리에 넣어두고, 항상 다음 프로시저로 진행합니다. 다음 프로시저를 정하는 건 <strong><em>런타임</em></strong>이 합니다.
+<p>프로그래밍은 매핑한 결과를 또다른 실행 코드와 매핑하고, 그래서 나온 결과를 또 다른 실행 코드와 매핑하는, 매핑의 반복으로 이루어져 있습니다. 매핑할 때 분기를 하든가, 갈 길이 하나뿐이 없는 시퀀싱으로 매핑하든가 합니다. 절차형이 됐든, 함수형이 됐든 이 동작으로, 현실을 모델링하는데는 차이가 없습니다. 매핑 결과를 다음 매핑에 어떻게 넘겨 주냐의 차이만 있을 뿐입니다.</p>
+<p>절차형에선 프로시저가 작업이 끝나면, 작업 결과를 메모리에 넣어두고, 항상 다음 프로시저로 진행합니다. 다음 프로시저를 정하는 건 <strong><em>런타임</em></strong>이 합니다. (내부 구현은 함수형과 같이 CPS로 되어 있을 수도 있겠습니다.)
 함수형에선 함수가 작업이 끝나면, 작업 결과를 바로 다음 함수에 넣어주며 진행합니다. 다음 함수를 정하는 건 <strong><em>함수 자체가</em></strong>가 정합니다. (CPS를 알고 있다면, 함수형은 CPS로 이루어져 있다고 말할 수 있습니다.)</p>
 <h2 id="event와-behavior-컴비네이션">Event와 Behavior 컴비네이션</h2>
 <p>2.3 Semantics of Events 섹션에 External events 부분에 아래 예시가 나옵니다.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>b1 untilB (lbp t0) <span class="op">==&gt;</span> λe<span class="op">.</span>b2 untilB e <span class="op">-=&gt;</span> b3</span></code></pre></div>
-<pre><code>untilB :: Behavior α -&gt; Event (Behavior α) -&gt; Behavior α
--=&gt; :: Evant α -&gt; β -&gt; Event β
-==&gt; :: Evnet α -&gt; (α -&gt; β) -&gt; Event β
-
-lbp, rbp :: Time -&gt; Event (Event ())</code></pre>
+<div class="sourceCode" id="cb2"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>b1 untilB (lbp t0) ==&gt; λe.b2 untilB e -=&gt; b3</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>untilB :: Behavior α -&gt; Event (Behavior α) -&gt; Behavior α</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>-=&gt; :: Evant α -&gt; β -&gt; Event β</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>==&gt; :: Evnet α -&gt; (α -&gt; β) -&gt; Event β</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>lbp, rbp :: Time -&gt; Event (Event ()) -- 마우스 클릭</span></code></pre></div>
 <p>결합 순서를 뜻하는 괄호는 없지만, 타입을 고려하면, 아래처럼 해석해야 말이 됩니다.</p>
 <figure>
 <img src="../images/fran_untilB.png" alt="untilB" /><figcaption aria-hidden="true">untilB</figcaption>
 </figure>
 <p>마우스 버튼이 눌리기 전에, 위 체인의 결과는 <code>b1</code><br />
-마우스 버튼이 떼어지기 전에 , 위 체인의 결과는 <code>b2</code><br />
+마우스 버튼이 떼지기 전에, 위 체인의 결과는 <code>b2</code><br />
 마우스 버튼이 떼어진 후에, 위 체인의 결과는 <code>b3</code></p>
 <p>예를 들면 상태가 <code>b1</code>인데, 마우스 버튼을 누르면 <code>b2</code>가 되고, 그 후 버튼을 떼면 <code>b3</code>가 되는 동작을 모델링한 체인입니다. 어떻게 이렇게 해석되는지 하나 하나 뜯어 봤습니다.</p>
-<p><code>-=&gt;</code>는 <code>Event α</code>와 값<code>β</code>를 받아 <code>Event β</code>를 돌려주고, (<code>Event</code>가 가지고 있는 값을 바꿔치는 작업을 합니다.)
-<code>==&gt;</code>는 <code>Event α</code>와 함수<code>(α -&gt; β)</code>를 받아 <code>Event β</code>를 돌려 줍니다. (<code>Event</code>가 가지고 있는 값을 바뀌주는 함수를 받아 값을 변환하는 작업을 합니다.)
-<code>-=&gt;</code>와 <code>==&gt;</code>는 <code>Event</code> 컴비네이션을 만들어 내는 컴비네이터들로 최종 결과는 <code>Event</code>를 만들어 내는 함수들입니다.</p>
-<p>매직같은, 번뜩이는 아이디어는 <code>λe.b2 untilB e -=&gt; b3</code> 부분입니다. <code>lbp t0</code>는 <code>Event ()</code>가 아니라 <code>Event (Event ())</code> 값을 만들어 냅니다. <code>e -=&gt; b3</code>는 안에 있는 <code>Event ()</code>의 값을 바꿔 놓는 역할을 합니다.<br />
-</p>
-<p>순서를 가진 <code>Event</code>들은 <code>Event(Event(Event ...))</code> 모양으로 표현할 수 있습니다.<br />
-버튼 떼기는, 버튼 누르기 후 일어납니다. <code>Event(Event ())</code>로 표현하고 있습니다.</p>
+<p><code>-=&gt;</code>는 <code>Event α</code>와 값<code>β</code>를 받아 <code>Event β</code>를 돌려주고, (<code>Event</code>가 가지고 있는 <strong>값을 바꿔치는 작업</strong>을 합니다.)<br />
+<code>==&gt;</code>는 <code>Event α</code>와 함수<code>(α -&gt; β)</code>를 받아 <code>Event β</code>를 돌려 줍니다. (<code>Event</code>가 가지고 있는 값을 바뀌주는 <strong>함수를 받아 값을 변환하는 작업</strong>을 합니다. 폴리모픽으로 타입을 규정하고 있진 않지만, 위 사용례를 보면 <code>α</code>는 <code>Event</code>타입을 받고, 이 <code>Event</code>가 발생하면, 조건에 따라 <code>Behavior</code>를 결정해서 <code>β</code>로 내뱉는 함수가 주로 올 것 같습니다.)</p>
+<p><code>-=&gt;</code>와 <code>==&gt;</code>는 <code>Event</code> 컴비네이션을 만들어 내는 컴비네이터들로 최종 결과는 <code>Event</code>를 만들어 내는 함수들입니다.</p>
+<p>매직같은, 번뜩이는 아이디어는 <code>λe.b2 untilB e -=&gt; b3</code> 부분입니다. <code>lbp t0</code>는 <code>Event ()</code>가 아니라 <code>Event (Event ())</code> 값을 만들어 냅니다. <code>e -=&gt; b3</code>는 안에 있는 <code>Event ()</code>의 값을 바꿔 놓는 역할을 합니다.</p>
+<p>순서를 가진 <code>Event</code>들은 <code>Event(Event(Event ...))</code> 모양으로 표현할 수 있습니다. 버튼 떼기는, 버튼 누르기 후 일어납니다. <code>Event(Event ())</code>로 표현하고 있습니다.</p>
 <p>아무도 일도 일어나지 않으면 <code>b1</code>,<br />
 바깥 <code>Event</code>까지만 일어났다면 <code>b2</code>,<br />
 안 쪽 <code>Event</code>까지 일어났다면 <code>b3</code>입니다.</p>
@@ -133,19 +133,23 @@ lbp, rbp :: Time -&gt; Event (Event ())</code></pre>
 <p>마치 <code>if</code>문이 없는 것처럼 보이지만, <code>untilB</code>에서 이뤄지고 있습니다.</p>
 <blockquote>
 <p>절차형으로 위 동작을 표현하려면 어찌할지 생각해 봤습니다.</p>
-<pre><code>if (마우스 버튼 클릭) then
-  if (마우스 버튼 릴리즈) then return b3
-  else return b2
-else
-  return b1</code></pre>
+<div class="sourceCode" id="cb4"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>if (마우스 버튼 클릭) then</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  if (마우스 버튼 릴리즈) then return b3</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  else return b2</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>else</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  return b1</span></code></pre></div>
 </blockquote>
-<p>절차형에 비해 생각이 걸리적 거리는 이유는 <code>버튼 클릭 -&gt; 버튼 릴리즈</code> 처럼 순서대로 가지 않고,</p>
-<h2 id="push-or-pull">push or pull</h2>
+<p>절차형에 비해 생각이 걸리적 거리는 이유는 <code>버튼 클릭 -&gt; 버튼 릴리즈</code> 처럼 순서대로 가지 않고, 생각 흐름과 일치하지 않는 것처럼 보일 수도 있습니다. 하지만, <code>if</code>가 <code>untilB</code>에 숨은 것을 생각하고 보면 절차형과 그리 달라 보이지 않습니다. 잘 보면 <code>==&gt;</code>는 두 번째 인자로 <code>α -&gt; β</code> 함수를 받습니다. 여기서는 <code>Event () -&gt; b2 혹은 b3</code>이 됩니다. 의사 코드로 쓰면</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>b1 until 클릭 이벤트 </span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>         b2 until 릴리즈 이벤트 </span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>                  b3 </span></code></pre></div>
+<p>이런 느낌입니다. 이렇게 봐도 아직 편하진 않습니다.</p>
+<h2 id="push-or-pull">Push or Pull</h2>
 <blockquote>
 <p>어느 한 쪽에서 무슨 일이 일어났는지 아는 방법은</p>
 <ul>
 <li>일이 일어난 쪽에서, 청자에게 알려 주든가,</li>
-<li>청자가 계속 일이 일어났는지 물어 보든가</li>
+<li>청자가(혹은 제3자가) 계속 일이 일어났는지 물어 보든가</li>
 </ul>
 <p>두 가지 방법뿐이 없습니다.</p>
 </blockquote>
@@ -158,23 +162,22 @@ else
 <p>첫 번째 방법을 pull, 두 번째 방법을 push로 부르는 것 같습니다. push 방법은 바로 전체 체인의 결과가 바로 나오는 게 아니니, 체인 중간 중간 결과가 의미있게 드러난다면 가능할 것으로 보입니다. 어차피 <code>MVar</code>나 <code>IORef</code>를 써야하니, 이펙트에 의미를 잘 심으면 될 것으로 보입니다.</p>
 <h2 id="시간-연속-continuous">시간 연속 Continuous</h2>
 <p>FRAN 논문의 2.1 Semantic Domains</p>
-<p>추측:</p>
+<p>아래는 추측입니다.</p>
 <p>pull로 구현한 상황을 보겠습니다. <code>Event</code>가 <code>3.5초</code>에 일어났다고 보겠습니다. <code>0.5초</code> 단위로 샘플링하고 있었다면, 이 이벤트는 정상적으로 캡처됐겠지만, 만일 <code>1초</code> 단위로 샘플링하면 <code>3초</code>에 샘플링할 때도 이 값은 없고, <code>4초</code>에 샘플링할 때도 이 값은 없습니다. 이 <code>Event</code>를 놓치지 않는 방법을 생각해 봤습니다.</p>
 <ul>
 <li>이벤트를 스트림에 담아 둡니다. <code>4초</code>에 샘플링을 할 때 볼 수 있어야 합니다.</li>
 <li>FRAN에선 애초에 의미를 <code>3.5초</code>가 아니라, <strong>3.5초 이상</strong>에 일어났다고 정의하고 있습니다. 항상 <code>3.5초</code>보다 큰 다음 샘플링 시각이 최상위 값입니다.</li>
 </ul>
 <p>이렇게 정의하면 샘플링 단위 시간에 상관없이 이벤트를 놓치지 않을 수 있습니다. 벡터 그래픽을 비트맵으로 만드는 것과 비슷한데, 너무 일찍 비트맵으로 만들어 버리면 데이터를 잃어버리는 양이 늘어 나듯이, 최대한 시각이 아닌, 시간, 즉 범위로 정보를 끌고 다녀야 합니다.</p>
-<p>샘플링에 상관없이 결과를 내려면, 확정된 하나의 값이 아닌, 최대한 <strong>범위</strong>로 정보를 들고 다녀야 합니다.</p>
-<p>이렇게 하기 위해 논문에선, 시간을 집합론의 Order Theory로 정의하고 있습니다.</p>
-<pre><code>1 ⊑ 2 ⊑ 3.5이상 ⊑ 4</code></pre>
-<p><code>3.5 이상</code>이면 <code>4</code>일지 더 큰 수일지 알지 못하지 않냐싶은데, 위 처럼 순서가 나오도록 다음과 같이 정의해 놨습니다.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>x ≤ y이상 if x ≤ y</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>x이상 ≤ y 는 undefined</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>x이상 ≤ y이상 undefined</span></code></pre></div>
-<p>처음 볼 때 금방 이해가 안갔습니다. <code>x이상</code>,<code>y이상</code>을 하나의 수처럼 바라보긴 하는데, <code>이상</code>이 붙은 것끼리 만났을 때는 크기 비교가 가능하게 정의하고, <code>x이상</code>이 <code>y</code>보다 작을지 클지는 모른다는 직관 그대로 <code>undeinfed</code>라 정의해놨습니다. denotational한 의미를 정의하는데 중요한 역할을 하는 정의라고 하는데, 천재적인 것 같기도 하고, 말장난 같기도 합니다. 어쨌든 시간의 <strong>크기</strong>보단 <strong>순서</strong>가 의미가 있다 정도로 넘어갔습니다.</p>
-<p><code>⊑</code>는 <strong>크기</strong>가 작다는 뜻이 아닙니다. 순서상으로 먼저와 나중을 표현하는 기호입니다. <code>3.5</code>는 <code>4</code>보다 작지 않을지 몰라도 순서상으론 앞에 오도록 약속, 규칙을 정의합니다. 만일 샘플링을 <code>0.2초</code> 단위로 한다면 <code>3.5</code>는 <code>3.6</code>보다는 (작은 게 아니라)** 먼저**라는 뜻입니다.</p>
-<p>현재 구현된 FRP 프레임워크들이 퍼포먼스도 잘 나오고, Continuous 시간도 이론대로 구현한, 두 마리 토끼를 다 잡는 프레임워크는 없다는 것 같습니다. 코널 엘리엇 교수의 여기 저기 글을 보면, FRP는 denotational하고, Continuous 시간을 표현, 구현해야 제대로 FRP라 하는데, 그런 의미에선 아직은 제대로 실용 가능한 퍼포먼스를 보이는 프레임워크는 없다는 뜻입니다.</p>
+<p>샘플링에 상관없이 결과를 내려면, 확정된 하나의 값이 아닌, 최대한 <strong>범위</strong>로 정보를 들고 다녀야 합니다. 이렇게 하기 위해 논문에선, 시간을 집합론의 Order Theory로 정의하고 있습니다.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>1 ⊑ 2 ⊑ 3.5이상 ⊑ 4</span></code></pre></div>
+<p><code>3.5 이상</code>이면 <code>4</code>일지 더 큰 수일지 알지 못하지 않나 싶은데, 위 처럼 순서가 나오도록 다음과 같이 정의해 놨습니다.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>x ≤ y이상 if x ≤ y</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>x이상 ≤ y 는 undefined</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>x이상 ≤ y이상 undefined</span></code></pre></div>
+<p>처음 볼 때 금방 이해가 안갔습니다. <code>x이상</code>,<code>y이상</code>을 하나의 수처럼 바라보긴 하는데, <code>x이상</code>이 <code>y</code>보다 작을지 클지는 모른다는 직관 그대로 <code>undeinfed</code>라 정의해놨습니다. denotational한 의미를 정의하는데 중요한 역할을 하는 정의라고 하는데, 천재적인 것 같기도 하고, 말장난 같기도 합니다. 어쨌든 시간의 <strong>크기</strong>보단 <strong>순서</strong>가 의미가 있다 정도로 넘어갔습니다.</p>
+<p><code>⊑</code>는 <strong>크기</strong>가 작다는 뜻이 아닙니다.(이름은 Square Image of or Equal To 라 부르는 기호입니다.) 순서상으로 먼저와 나중을 표현하는 기호입니다. <code>3.5</code>는 <code>4</code>보다 작지 않을지 몰라도 순서상으론 앞에 오도록 약속, 규칙을 정의합니다. 만일 샘플링을 <code>0.2초</code> 단위로 한다면 <code>3.5</code>는 <code>3.6</code>보다는 (작은 게 아니라) <strong>먼저</strong>라는 뜻입니다. “어떤 수 이상”이란 원소들은 자신이 속한 샘플링 구간을 넘지 않는다는 약속이니, 어떤 샘플링 단위에서도 정보를 잃어버리지 않는다로 이해하고 있습니다.</p>
+<p>현재 구현된 FRP 프레임워크들 중에 퍼포먼스도 잘 나오고, Continuous 시간도 이론대로 구현한, 두 마리 토끼를 다 잡은 프레임워크는 없다는 것 같습니다. 코널 엘리엇 교수의 여기 저기 글을 보면, FRP는 denotational하고, Continuous 시간을 표현, 구현해야 제대로 FRP라 할 수 있는데, 그런 의미에선 아직은 제대로 실용 가능한 퍼포먼스를 보이는 FRP프레임워크는 없다는 뜻입니다.</p>
 <!--
 //-->
 
