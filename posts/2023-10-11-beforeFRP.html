@@ -84,8 +84,8 @@
 <p>FRP 전체에 대한 얘기는 아니고, FRP 이해의 출발점인 <code>Event</code>와 <code>Behavior</code>를 이해가 목표입니다. <code>Event</code> 개념보다는 주로 <code>Behavior</code>에 대한 상상, 해석입니다.</p>
 <p>사실, 그리 깊게 알고 싶진 않고 구현 아이디어와 사용법 정도 알고싶을 때가 많은데, 하스켈의 자료들은 여차하면 논문으로, 여차하면 소스 코드로 끌고 들어갑니다. 그런 곳으로 잘 못 끌려가면 카테고리 이론 용어들이 떡하니 버틴 경우도 많고, 처음 보는 문법으로 풀어 나가는 코드도 보게 되곤 합니다.</p>
 <p>저런 곳으로 끌려가지 않기 위해, 서두의 내용만 갖고, 상상 했던 내용과 아귀를 맞추려고 시도합니다. 그러다 그럴싸하게 맞아 떨어지면 맞는 내용이겠거니 하고 넘어갑니다. 혹시나 의논을 할 수 있는 분을 만날까 해서 블로그에 글도 올려 놓고요. 그러니, 틀리는 경우가 종종 있을 수 밖에 없습니다. 틀리거나 의심스런 내용이 보이면 댓글, 혹은 메일 꼭 부탁드립니다.</p>
-<p>새로운 프로그래밍 대상을 공부할 때, 먼저 상상해 보곤 합니다. 해결해야 하는 문제를 정리해 보고, 문제들을 어떻게 풀어나갈지 생각해 봅니다. 이러고 개념을 보기 시작하면 단점이 하나 생깁니다. 제 상상이 일종의 기준이 되어 계속 맞춰보게 됩니다. 기준이 크게 무리가 없는 상상이면 굉장히 도움이 많이 되지만, 반대의 경우도 생깁니다.</p>
-<p>Sat Feb 17 12:15:27 AM KST 2024 <strong><em>아직 아래 생각이 맞는지 확신히 없습니다. 어설프게 알고 있는 테크닉들이 아귀가 맞아 오해하고 있을 수 있습니다. 검증이 되면 이 메시지를 지우겠습니다.</em></strong></p>
+<p>새로운 프로그래밍 개념을 공부할 때, 먼저 상상해 보곤 합니다. 이러고 개념을 보기 시작하면 단점이 하나 생깁니다. 제 상상이 일종의 기준이 되어 계속 맞춰보게 됩니다. 기준이 크게 무리가 없는 상상이면 굉장히 도움이 되지만, 반대의 경우도 생깁니다.</p>
+<p>Sat Feb 17 12:15:27 AM KST 2024 <strong><em>아직 아래 생각이 맞는지 확신이 없습니다. 어설프게 알고 있는 테크닉들이 아귀가 맞아 오해하고 있을 수 있습니다. 검증이 되면 이 메시지를 지우겠습니다.</em></strong></p>
 <h2 id="생각-스트레칭">생각 스트레칭</h2>
 <p><strong>“버튼이 눌리면 빨간색 연필로”</strong><br />
 버튼이 눌리는 <strong>이벤트</strong>, 연필 색깔 <strong>값</strong> 빨간색으로 변경합니다.</p>
@@ -133,7 +133,7 @@
 <span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  color로 그리기 </span></code></pre></div>
 <p>나중 <code>draw</code>를 쓰는 입장에서 보면, “<code>WillBeValue</code> 색깔로 그려라”라는 간단한 구문이 되었습니다. 폴링 파트에서 계속 <code>draw</code>를 호출하면 되는 간단한 모양이 되었습니다.</p>
 <p>그리고 Lazy 성질로 WHNF까지만 보니, <code>WillBeValue</code>가 안에 가지고 있는 값은 필요할 때 계산하게 될 겁니다.</p>
-<p>IORef나 MVar등을 안쓴다면, <code>t -&gt; a</code> 함수가</p>
+<p><code>IORef</code>나 <code>MVar</code>등을 안쓴다면, <code>t -&gt; a</code> 함수 자리에 스트림용 함수(순환 함수)를 넣어 줄 수도 있겠습니다. 실제 구현에선 <code>t -&gt; a</code>로 구현한 프레임워크는 아직 못 봤습니다.</p>
 <h3 id="샘플링과-스트림">샘플링과 스트림</h3>
 <p>만일 <code>1</code>초마다 샘플링 하는 설계라면 <code>1</code>초 안에 더블 클릭 했을 때는 한 번 클릭한 것만 받을 수 있을 겁니다. <code>1</code>초 마다 샘플링해도 <code>1</code>초 미만 간격으로 누른 더블 클릭을 잡아내려면, 이벤트를 <code>버튼 눌림</code>이 아니라 <code>[버튼 눌림]</code> 리스트로 받으면 될 겁니다. 이벤트 값을 받아서 뭔가를 하던 작업들은</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ot">draw ::</span> [<span class="dt">WillBeValue</span> a] <span class="ot">-&gt;</span> <span class="dt">IO</span> ()</span></code></pre></div>
@@ -143,20 +143,20 @@
 <div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">Event</span> a    <span class="ot">=</span> <span class="dt">Event</span>    {<span class="ot"> occ ::</span> (<span class="dt">Time</span>, a) }</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">Behavior</span> a <span class="ot">=</span> <span class="dt">Behavior</span> {<span class="ot"> at  ::</span> <span class="dt">Time</span> <span class="ot">-&gt;</span> a }</span></code></pre></div>
 <p>텍스트에선 실제가 아닌 이론적인 두 가지 형태를 먼저 설명하고 있습니다. <code>Event</code>는 “특정 시간에 일어난 일”이고, <code>Behavior</code>는 시간마다 바뀔 수 있는 (mutation) 값인데, 언제고 알고 싶은 시각을 주면 값을 알려주는 함수입니다. 위에서 나온 <code>Color</code>같은 <code>Value</code>를 <code>Behavior</code>로 보면 됩니다.</p>
-<p>다음도 역시 실구현이 아닌, 개념을 더 직관적으로 보면 아래처럼 볼 수도 있습니다. <code>Behavior</code>와 <code>Event</code>를 굳이 나누지 않고 하나의 타입으로 처리할 수도 있을 것처럼 보입니다.</p>
+<p>다음도 역시 실구현이 아닙니다만, 개념을 이해하기 위해 더 직관적으로 보면 아래처럼 볼 수도 있습니다. <code>Behavior</code>와 <code>Event</code>를 굳이 나누지 않고 하나의 타입으로 처리할 수도 있을 것처럼 보입니다.</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>Event는    [_,_,_,_,e,_,_,e,_,...]</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>Behavior는 [b,b,b,b,b,b,b,b,b,...]</span></code></pre></div>
-<p>세상에 존재하는 걸 두가지로만 봅니다. 어떤 순간에도 값이 존재하는 것과, 특정 순간에만 값이 존재하는 것. 위 <code>occ</code>, <code>at</code>보다 더 의미가 직관적으로 보이지 않나 싶은데요. 원소를 <code>Maybe</code>로 모델링하면, <code>Behavior</code>는 <code>Just</code> 값으로만 이루어진 걸로 보면되니, 위 둘을 하나로 추상화할 수 있지 않을까 싶은데요. Yampa는 둘이 합쳐 하나의 <code>Signal</code>로 모델링했고, Reactive-banana는 두 가지로 나누어서 모델링 했습니다.</p>
+<p>어떤 순간에도 값이 존재하는 것과, 특정 순간에만 값이 존재하는 것. 위 <code>occ</code>, <code>at</code>보다 더 의미가 직관적으로 보이지 않나 싶은데요. 원소를 <code>Maybe</code>로 모델링하면, <code>Behavior</code>는 <code>Just</code> 값으로만 이루어진 걸로 보면되니, 위 둘을 하나로 추상화할 수도 있습니다. Yampa는 둘이 합쳐 하나의 <code>Signal</code>로 모델링했고, Reactive-banana는 두 가지로 나누어서 모델링 했습니다.</p>
 <p>다음 원소로 진행하는 걸 단위 시간 한 스텝을 나아가는 걸로 해석하고 있습니다.</p>
 <p>텍스트들의 도입부를 읽고, 내가 구현한다면, 어떻게 할까 생각해 봤습니다. 변하는 시스템을 <strong><em>모두 반응Reaction</em></strong>으로 표현한다면</p>
-<pre><code>E1   -&gt;   E2   -&gt;   E3 </code></pre>
+<div class="sourceCode" id="cb12"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>E1   -&gt;   E2   -&gt;   E3 </span></code></pre></div>
 <p>이벤트들이 연쇄적으로 반응Reactive하며 이어가는 동작이 있겠고,<br />
 (※ 값이 유지되지 않는다는 뜻으로 화살표를 짧게 했습니다.)</p>
-<pre><code>E1 (혹은 특정 시각)            E2나 시간등의 변경 요인          -- Discrete하게 변경
-                |                         |
-       Behavior B1 -----------+-----------------+------------&gt;  -- Continuous하게 유지
-                              |                 |
-                          값이 필요해서 들여다 보는 순간        -- Discrete하게 읽기 </code></pre>
+<div class="sourceCode" id="cb13"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>E1 (혹은 특정 시각)            E2나 시간등의 변경 요인          -- Discrete하게 변경</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>                |                         |</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>       Behavior B1 -----------+-----------------+------------&gt;  -- Continuous하게 유지</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>                              |                 |</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>                          값이 필요해서 들여다 보는 순간        -- Discrete하게 읽기 </span></code></pre></div>
 <p>(“시작”같은 “특정 시각”도 시간 이벤트라 볼 수 있으니) 이벤트로 시스템에 변경을 가하면, 시간이 흘러가면서 지속적으로 바뀌는 정보를 생각해 볼 수 있습니다. 물론 꼭 계속 바뀌지 않고, 한 번 바뀐 값으로 계속 가는 “유지”도 포함입니다. 이런 것들은 시간에 따라 계속 바뀌고 있지만, 바뀌는 값을 실제로 꼭 계속 업데이트 할 필요는 없습니다. 필요한 순간에 <code>t -&gt; a</code>에 <code>t</code>값을 넘겨 함수를 실행해서 값을 받아오면 됩니다.</p>
 <p>지금까지 말한 내용이 그대로 이론이나 구현과 딱 맞아 떨어지는 것이 아닙니다. 어디까지나 수학적 해석없이 이벤트 전파 길(혹은 그래프, 혹은 네트워크)을 어떻게 만들 것인가 생각 스트레칭을 해 본 것입니다. 여기에선 <code>Event</code>와 <code>Behavior</code>의 실제 구현을 보는 게 아니라, FRP 프레임워크를 설계하면서 이들이 어떤 걸 모델링 했는지, 의미를 보려 합니다.</p>
 <h2 id="event-혹은-event-stream">Event (혹은 Event Stream)</h2>

@@ -208,14 +208,14 @@ head없이 body만 떼어내서 말할 때는, 어디 head에 묶여 있을지, 
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>((λarg<span class="op">.</span>((λx<span class="op">.</span>x) arg)) λs<span class="op">.</span>(s s))</span>
 <span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>((λarg<span class="op">.</span>(arg)) λs<span class="op">.</span>(s s))</span>
 <span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>(λs<span class="op">.</span>(s s))</span></code></pre></div>
-<h3 id="튜플">튜플</h3>
-<p>튜플을 만들어 내는 함수를 만들어 봅시다. 흔히 봤던 (a,b) 이런 외적인 모양이 아니라 튜플의 속성을 띄는 것이면 모양은 상관 없습니다. 첫 번째 값을 따로 꺼내거나, 두 번째 값을 따로 꺼낼 수 있는 걸 튜플의 속성이라 볼 수 있습니다.</p>
+<h3 id="튜플---순서쌍">2튜플 - 순서쌍</h3>
+<p>2튜플을 만들어 내는 함수를 만들어 봅시다. 흔히 봤던 (a,b) 이런 외적인 모양이 아니라 2튜플의 속성을 띄는 것이면 모양은 상관 없습니다. 첫 번째 값을 따로 꺼내거나, 두 번째 값을 따로 꺼낼 수 있는 걸 튜플의 속성이라 볼 수 있습니다.</p>
 <p>먼저 첫 번째 값, 두 번째 값을 꺼내는 함수를 만들면</p>
 <div class="sourceCode" id="cb23"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co">--첫 번째 인자를 고르는 함수</span></span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>λfirst<span class="op">.</span>λsecond<span class="op">.</span>first</span>
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="co">--두 번째 인자를 고르는 함수</span></span>
 <span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>λfirst<span class="op">.</span>λsecond<span class="op">.</span>second</span></code></pre></div>
-<p>※재밌는 건, 천 번째 인자를 고르는 함수를 Identity 함수에 적용하면 두 번째 인자를 고르는 함수가 됩니다.</p>
+<p>※재밌는 건, 첫 번째 인자를 고르는 함수를 Identity 함수에 적용하면 두 번째 인자를 고르는 함수가 됩니다.</p>
 <div class="sourceCode" id="cb24"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>(λfirst<span class="op">.</span>λsecond<span class="op">.</span>first) (λx<span class="op">.</span>x)</span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>λsecond<span class="op">.</span>(λx<span class="op">.</span>x)</span></code></pre></div>
 <p>alpha equivalence 특성을 이용해 second를 first로 x를 second로 바꿔서 표기하면</p>
@@ -258,7 +258,7 @@ True, False 일 때 길을 고르는 함수를 정의하기 전에, 당연히 <e
 <span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>expression2<span class="op">&gt;</span></span></code></pre></div>
 <p>조건에 따라 다른 결과를 만드는 함수를 만들었습니다. 어떤 문법 요소도 추가하지 않고, 오직 함수 적용 개념만으로 분기를 만들었습니다.</p>
 <p>값이란 개념이 따로 없기 때문에 True라는 속성, False라는 속성은 <em>어딘가에 적용되어야만 드러납니다.</em></p>
-<p>더 추상화해서 생각하면, 우리가 <em>속성</em>이라 부르는 것들은 다른 것들과의 <em>관계</em>에 의해서 정해집니다. 혼자서 어떤 속성을 가지고 있는데, 그게 다른 어떤 것과도 관계가 없다면 아무런 의미가 없습니다. 속성이란 결국 다른 것들과의 관계입니다. True라는 속성은 True, False 두 개를 가지고 정해놓은 연산에 의해 의미(속성)를 가지거나, isTrue 같은 함수들을 정의해서 결과값을 달리하거나… 어떤식으로든 다른 것들과 관계가 있어야 합니다. 관계는 함수로 표현되므로 모든 속성은 함수로 표현할 수 있을 것 같다는 생각에 이릅니다. 아마 람다 대수이나 카테고리 이론의 출발점이 이런 생각이 아니었을까요?</p>
+<p>더 추상화해서 생각하면, 우리가 <em>속성</em>이라 부르는 것들은 다른 것들과의 <em>관계</em>에 의해서 정해집니다. 혼자서 어떤 속성을 가지고 있는데, 그게 다른 어떤 것과도 관계가 없다면 아무런 의미가 없습니다. 속성이란 결국 다른 것들과의 관계입니다. True라는 속성은 True, False 두 개를 가지고 정해놓은 연산에 의해 의미(속성)를 가지거나, isTrue 같은 함수들을 정의해서 결과값을 달리하거나… 어떤식으로든 다른 것들과 관계가 있어야 합니다. 관계는 함수로 표현되므로 모든 속성은 함수로 표현할 수 있을 것 같다는 생각에 이릅니다. 아마 람다 대수나 카테고리 이론의 출발점이 이런 생각이 아니었을까요?</p>
 <h3 id="함수-결과를-임시-저장해메모리-놓을-바운드-변수---클로저">함수 결과를 임시 저장해(메모리) 놓을 바운드 변수 - 클로저</h3>
 <p>2021.8.5 추가</p>
 <p>다른 문서에서 콕 찝어서 이렇게 얘기한 걸 본적이 없으니 의심하면서 읽어주세요.<br />
@@ -266,9 +266,10 @@ True, False 일 때 길을 고르는 함수를 정의하기 전에, 당연히 <e
 <div class="sourceCode" id="cb34"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>𝜆x<span class="op">.</span>(𝜆y<span class="op">.</span>xy)</span></code></pre></div>
 <p>(𝜆y.xy) 함수 안에서 바깥쪽 함수에 있는 x를 참조할 수 있습니다. 이 함수 안쪽에서 x는 일종의 전역 변수입니다. 더 깊이 nested 되어 있는 함수들에서도 x에 접근 할 수 있습니다. 여기 함수 묶음에서는 모두 접근 가능하다는 중요한 속성입니다. 이 속성이 없었다면 람다 대수로 프로그래밍을 표현하는 건 불가능 했을 겁니다. 참고 - <a href="../posts/2021-05-18-stateless.html">모나드 액션들간의 소통</a></p>
 <hr />
-<p>참고 - 수학 관련 자료가 아닌 프로그래밍 관련 자료들입니다. 아무래도 이런 자료의 표기나 용어들이 프로그래머들에겐 더 익숙합니다.
+<p>참고 - 수학 관련 자료가 아닌 프로그래밍 관련 자료들입니다. 아무래도 이런 자료의 표기나 용어들이 프로그래머들에겐 더 익숙합니다.<br />
 AN INTRODUCTION TO FUNCTIONAL PROGRAMMING THROUGH LAMBDA CALCULUS - Greg Michaelson<br />
-HASKELL PROGRAMMING FROM FIRST PRINCIPLES - Christopher Allen, Julie Moronuki</p>
+HASKELL PROGRAMMING FROM FIRST PRINCIPLES - Christopher Allen, Julie Moronuki<br />
+</p>
 <p><span class="citation" data-cites="todo">@todo</span></p>
 <ol type="1">
 <li><p>람다 대수 용어를 아는 것을 넘어, 람다 대수가 컴퓨터 동작과 잘 맞아 떨어지는 이유를 생각해 보자.</p></li>

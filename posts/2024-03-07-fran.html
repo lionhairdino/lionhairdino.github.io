@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko" lang="ko">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <title>lionhairdino - FRAN - Functional Reactive ANimation</title>
+
+        <meta name="description" content="어딘가에서 FRAN 논문을 읽고 계신 분과, 의견을 나누기 위해 제 생각을 정리한 글입니다." />
+        <meta property="og:description" content="어딘가에서 FRAN 논문을 읽고 계신 분과, 의견을 나누기 위해 제 생각을 정리한 글입니다." />
+
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <link rel="icon" href="https://lionhairdino.github.io/favicon.svg" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino16px.png" sizes="16x16" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino24px.png" sizes="24x24" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino32px.png" sizes="32x32" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino48px.png" sizes="48x48" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino57px.png" sizes="57x57" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino60px.png" sizes="60x60" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino64px.png" sizes="64x64" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino72px.png" sizes="72x72" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino76px.png" sizes="76x76" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino114px.png" sizes="114x114" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino120px.png" sizes="120x120" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino144px.png" sizes="144x144" />
+        <link rel="shortcut icon" href="../favicon.ico" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino152px.png" sizes="152x152" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino180px.png" sizes="180x180" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino192px.png" sizes="192x192" />
+        <link rel="manifest" href="../site.webmanifest" />
+        <link rel="mask-icon" href="https://lionhairdino.github.io/Lionhairdino_black.svg" color="#ff7500" />
+        <meta name="msapplication-TileImage" content="/images/favicon/Lionhairdino144px.png" />
+        <meta name="msapplication-TileColor" content="#ff7500" />
+        <meta name="theme-color" content="#ffffff" />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="FRAN - Functional Reactive ANimation" />
+        <meta property="og:site_name" content="Lionhairdino" />
+        <meta property="og:url" content="https://lionhairdino.github.io/posts/2024-03-07-fran.html" />
+
+        <meta property="og:image" content="https://lionhairdino.github.io/images/state400px.png" />
+
+      <meta name="keywords" content="FRP, 함수형, 절차형, if구문">
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-E9WZ6VXGHP"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-E9WZ6VXGHP');
+</script>
+<script src="../script/copycode.js"></script>
+<script async src="https://cse.google.com/cse.js?cx=9c53b4915cbb2605c"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.11.1/tocbot.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.11.1/tocbot.css" />
+    </head>
+    <body>
+        <div id="header">
+            <div style="display:inline-block;margin-right:5px;padding-top: 5px;" id="logo">
+                <a href="../"><img style="width:30px;border:none" src="../images/favicon/Lionhairdino48px.png"></a>
+            </div>
+            <div style="display:inline-block;vertical-align: top;padding-top:5px;" id="navigation">
+                <a href="../">lionhairdino</a>
+                <a href="../about.html">about</a>
+                <!--<a href="/archive.html">archive</a>-->
+            </div>
+            <div style="display:inline-block;font-size:0.8em;vertical-align: top;">
+                <div style="display:inline-block;vertical-align: top;padding-top: 5px">사이트내 검색</div>
+                <div style="display:inline-block;width:180px;"> 
+                    <div class="gcse-searchbox-only"></div>
+                </div>
+            </div>
+            <div>
+                여기 글들은 일종의 질문입니다. 용어 선택도 학계, 업계에서 쓰는 걸로 되어 있지 않고, 틀린 내용이 있을 수도 있습니다.
+            </div>
+        </div>
+        <div class="js-toc-content">
+            <h1>FRAN - Functional Reactive ANimation</h1>
+            <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+<div class="info">
+    Posted on March  7, 2024
+    
+</div>
+
+<h2 id="생각-스트레칭">생각 스트레칭</h2>
+<p>절차형에서는 여러 단계로 되어 있는 <code>if</code>문들이 함수형에선 모두 사라진 느낌의 표현입니다. 이게 익숙하게 보이지 않는다면, 람다 산법에서 <code>if</code>문을 어떻게 처리하는지 먼저 살펴 보겠습니다.</p>
+<p><code>if</code>문은
+외부에서 들어오는 값을
+값을 받아 <code>true</code> 또는 <code>false</code>로 판단하는 구문을 거치고,
+<code>if</code>구문으로 <code>true</code>일 때 실행할 코드, <code>false</code>일 때 실행할 코드로 진행합니다. –(가)</p>
+<p>람다 산법에서 <code>true</code>는 <code>select_first</code>로, <code>false</code>는 <code>select_second</code>로 정합니다.
+실행할 코드 두 가지를 튜플로 가지고 있고, 외부에서 “튜플 중 하나를 선택하는 함수”를 받는 고차 함수를 정의합니다. 고차 함수에 <code>select_first</code> 또는 <code>select_second</code>를 넣어줘서 진행할 길을 결정합니다. –(나)</p>
+<p>좀 더 추상적으로 정리하면, 함수형에서는 가능한 경우의 수에 따른 코드를 튜플로 준비해 놓고, 튜플의 위치를 고르는 함수를 받아, 그 함수를 튜플에 <strong><em>적용</em></strong>해서 분기를 구현하고 있습니다. 값으로 표현하던 <code>true</code>가 함수가 됐으니, 고차 함수는 이 함수를 적용할 값을 가지고 있어야 합니다.</p>
+<p>처음 볼 때는, 값과 함수의 역할이 뒤바뀌는 식으로 생각해야 하나 싶었는데, 잘 따져 보면, 두 개가 그리 달라 보이지 않습니다.</p>
+<p>값 <code>true</code>를 받았다면, 컴비네이터 안에는 값에 적용할 함수가 있고,(<code>if</code>구문을 별도의 함수로 생각)
+함수 <code>true</code> 즉, <code>select_first</code>를 받았다면, 컴비네이터 안에는 이 함수를 적용할 값을 가지고 있습니다.</p>
+<p>분기란 건, “조건”과 “조건에 따라서 실행될 코드”, 그리고 <strong><em>둘을 매핑해주는 역할</em></strong>이 필요합니다. (이 역할을 <strong><em>런타임</em></strong>이라 보겠습니다.)
+매핑해주는 역할을 <code>true</code>에 심어 놓든가(함수형의 <code>select_first</code>), 별도 함수(절차형의 <code>if</code>)로 두든가의 차이입니다.</p>
+<p>프로그래밍은 매핑한 결과를 또다른 실행 코드와 매핑하고, 그래서 나온 결과를 또 다른 실행 코드와 매핑하는, 매핑의 반복으로 이루어져 있습니다. 매핑할 때 분기를 하든가, 갈 길이 하나뿐이 없는 시퀀싱으로 매핑하든가 합니다. 절차형이 됐든, 함수형이 됐든 이 동작으로 현실을 매핑으로 모델링하는데는 차이가 없습니다. 매핑 결과를 다음 매핑에 어떻게 넘겨 주냐의 차이만 있을 뿐입니다.</p>
+<p>절차형에선 프로시저가 작업이 끝나면, 작업 결과를 메모리에 넣어두고, 항상 다음 프로시저로 진행합니다. 다음 프로시저를 정하는 건 <strong><em>런타임</em></strong>이 합니다.
+함수형에선 함수가 작업이 끝나면, 작업 결과를 바로 다음 함수에 넣어주며 진행합니다. 다음 함수를 정하는 건 <strong><em>함수 자체가</em></strong>가 정합니다. (CPS를 알고 있다면, 함수형은 CPS로 이루어져 있다고 말할 수 있습니다.)</p>
+<h2 id="event와-behavior-컴비네이션">Event와 Behavior 컴비네이션</h2>
+<p>2.3 Semantics of Events 섹션에 External events 부분에 아래 예시가 나옵니다.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>b1 untilB (lbp t0) <span class="op">==&gt;</span> λe<span class="op">.</span>b2 untilB e <span class="op">-=&gt;</span> b3</span></code></pre></div>
+<pre><code>untilB :: Behavior α -&gt; Event (Behavior α) -&gt; Behavior α
+-=&gt; :: Evant α -&gt; β -&gt; Event β
+==&gt; :: Evnet α -&gt; (α -&gt; β) -&gt; Event β
+
+lbp, rbp :: Time -&gt; Event (Event ())</code></pre>
+<p>결합 순서를 뜻하는 괄호는 없지만, 타입을 고려하면, 아래처럼 해석해야 말이 됩니다.</p>
+<figure>
+<img src="../images/fran_untilB.png" alt="untilB" /><figcaption aria-hidden="true">untilB</figcaption>
+</figure>
+<p>마우스 버튼이 눌리기 전에, 위 체인의 결과는 <code>b1</code><br />
+마우스 버튼이 떼어지기 전에 , 위 체인의 결과는 <code>b2</code><br />
+마우스 버튼이 떼어진 후에, 위 체인의 결과는 <code>b3</code></p>
+<p>예를 들면 상태가 <code>b1</code>인데, 마우스 버튼을 누르면 <code>b2</code>가 되고, 그 후 버튼을 떼면 <code>b3</code>가 되는 동작을 모델링한 체인입니다. 어떻게 이렇게 해석되는지 하나 하나 뜯어 봤습니다.</p>
+<p><code>-=&gt;</code>는 <code>Event α</code>와 값<code>β</code>를 받아 <code>Event β</code>를 돌려주고, (<code>Event</code>가 가지고 있는 값을 바꿔치는 작업을 합니다.)
+<code>==&gt;</code>는 <code>Event α</code>와 함수<code>(α -&gt; β)</code>를 받아 <code>Event β</code>를 돌려 줍니다. (<code>Event</code>가 가지고 있는 값을 바뀌주는 함수를 받아 값을 변환하는 작업을 합니다.)
+<code>-=&gt;</code>와 <code>==&gt;</code>는 <code>Event</code> 컴비네이션을 만들어 내는 컴비네이터들로 최종 결과는 <code>Event</code>를 만들어 내는 함수들입니다.</p>
+<p>매직같은, 번뜩이는 아이디어는 <code>λe.b2 untilB e -=&gt; b3</code> 부분입니다. <code>lbp t0</code>는 <code>Event ()</code>가 아니라 <code>Event (Event ())</code> 값을 만들어 냅니다. <code>e -=&gt; b3</code>는 안에 있는 <code>Event ()</code>의 값을 바꿔 놓는 역할을 합니다.<br />
+</p>
+<p>순서를 가진 <code>Event</code>들은 <code>Event(Event(Event ...))</code> 모양으로 표현할 수 있습니다.<br />
+버튼 떼기는, 버튼 누르기 후 일어납니다. <code>Event(Event ())</code>로 표현하고 있습니다.</p>
+<p>아무도 일도 일어나지 않으면 <code>b1</code>,<br />
+바깥 <code>Event</code>까지만 일어났다면 <code>b2</code>,<br />
+안 쪽 <code>Event</code>까지 일어났다면 <code>b3</code>입니다.</p>
+<ol type="1">
+<li>마우스 버튼 클릭이 없었다면 <code>b1</code></li>
+<li>마우슨 버튼 클릭이 일어났다면, <code>Event(Event ())</code>중 안에 있는 <code>Event ()</code>를 <code>λe.b2 untilB e -=&gt; b3</code>에 넘겨 줍니다.</li>
+<li><code>e -=&gt; b3</code>로 이벤트<code>e</code>가 가지고 있는 <code>()</code>를 <code>b3</code>로 바꿉니다.</li>
+<li>그 후 <code>Event b3</code>가 아직 일어나지 않았다면, 첫 번째 <code>untilB</code>의 결과(전체 체인의 결과)가 <code>b1</code>대신 <code>b2</code>, 이벤트가 일어났다면 <code>b1</code>대신 <code>b3</code>가 됩니다.</li>
+</ol>
+<p>마치 <code>if</code>문이 없는 것처럼 보이지만, <code>untilB</code>에서 이뤄지고 있습니다.</p>
+<blockquote>
+<p>절차형으로 위 동작을 표현하려면 어찌할지 생각해 봤습니다.</p>
+<pre><code>if (마우스 버튼 클릭) then
+  if (마우스 버튼 릴리즈) then return b3
+  else return b2
+else
+  return b1</code></pre>
+</blockquote>
+<p>절차형에 비해 생각이 걸리적 거리는 이유는 <code>버튼 클릭 -&gt; 버튼 릴리즈</code> 처럼 순서대로 가지 않고,</p>
+<h2 id="push-or-pull">push or pull</h2>
+<blockquote>
+<p>어느 한 쪽에서 무슨 일이 일어났는지 아는 방법은</p>
+<ul>
+<li>일이 일어난 쪽에서, 청자에게 알려 주든가,</li>
+<li>청자가 계속 일이 일어났는지 물어 보든가</li>
+</ul>
+<p>두 가지 방법뿐이 없습니다.</p>
+</blockquote>
+<p>일등급 시민으로 타입(<code>Event</code>,<code>Behavior</code>)을 설계하고 그냥 함수로 일반 값 다루듯이 하는 게 언뜻 이해가지 않았습니다. 아마도 옵저버블 패턴(리스너 패턴) 자체가 어떻게 함수형으로 구현되는지 너무 일찍 궁금해 해서 그런 듯 합니다. 위 <code>untilB</code> 체인은 프레임마다 계속 실행하는 걸로 생각하고 읽으면 됩니다. 리스너를 쓰지 않는다는 말이 아닙니다. 나중 외부 이벤트와 붙이게 되면, 리스너를 써야만 합니다. 논문에서 구현 전에 나오는 내용은 리스너와 붙이는 것을 대체하는 게 아닌, 리스너로 통지를 받은 후에 전파되는, 일종의 이벤트 네트워크를 표현하는 방식에 관한 얘깁니다.</p>
+<p><code>Event</code> 타입은 특별한 동작이 있습니다. <code>Event</code>가 발생하기 전엔 코드가 진행되지 않게 막을, <strong><em>블록</em></strong>할 방법이 필요합니다. FRAN에선 바로 언급하지 않고 있지만, 저는 구현을 생각하며 쫓아가는 게 이해하기 편했습니다. 구현에선</p>
+<ul>
+<li><code>Event</code>값이 <code>Just</code>인지 <code>Nothing</code>인지 봐서, <code>Nothing</code>이면 더 이상 코드 진행을 하지 않고 끝내거나,</li>
+<li><code>Event</code>값이 <code>MVar</code>나 <code>IORef</code>등으로, 자체적으로 값이 생길 때까지 블록하는 능력을 쓰는 방법이 있겠습니다.</li>
+</ul>
+<p>첫 번째 방법을 pull, 두 번째 방법을 push로 부르는 것 같습니다. push 방법은 바로 전체 체인의 결과가 바로 나오는 게 아니니, 체인 중간 중간 결과가 의미있게 드러난다면 가능할 것으로 보입니다. 어차피 <code>MVar</code>나 <code>IORef</code>를 써야하니, 이펙트에 의미를 잘 심으면 될 것으로 보입니다.</p>
+<h2 id="시간-연속-continuous">시간 연속 Continuous</h2>
+<p>FRAN 논문의 2.1 Semantic Domains</p>
+<p>추측:</p>
+<p>pull로 구현한 상황을 보겠습니다. <code>Event</code>가 <code>3.5초</code>에 일어났다고 보겠습니다. <code>0.5초</code> 단위로 샘플링하고 있었다면, 이 이벤트는 정상적으로 캡처됐겠지만, 만일 <code>1초</code> 단위로 샘플링하면 <code>3초</code>에 샘플링할 때도 이 값은 없고, <code>4초</code>에 샘플링할 때도 이 값은 없습니다. 이 <code>Event</code>를 놓치지 않는 방법을 생각해 봤습니다.</p>
+<ul>
+<li>이벤트를 스트림에 담아 둡니다. <code>4초</code>에 샘플링을 할 때 볼 수 있어야 합니다.</li>
+<li>FRAN에선 애초에 의미를 <code>3.5초</code>가 아니라, <strong>3.5초 이상</strong>에 일어났다고 정의하고 있습니다. 항상 <code>3.5초</code>보다 큰 다음 샘플링 시각이 최상위 값입니다.</li>
+</ul>
+<p>이렇게 정의하면 샘플링 단위 시간에 상관없이 이벤트를 놓치지 않을 수 있습니다. 벡터 그래픽을 비트맵으로 만드는 것과 비슷한데, 너무 일찍 비트맵으로 만들어 버리면 데이터를 잃어버리는 양이 늘어 나듯이, 최대한 시각이 아닌, 시간, 즉 범위로 정보를 끌고 다녀야 합니다.</p>
+<p>샘플링에 상관없이 결과를 내려면, 확정된 하나의 값이 아닌, 최대한 <strong>범위</strong>로 정보를 들고 다녀야 합니다.</p>
+<p>이렇게 하기 위해 논문에선, 시간을 집합론의 Order Theory로 정의하고 있습니다.</p>
+<pre><code>1 ⊑ 2 ⊑ 3.5이상 ⊑ 4</code></pre>
+<p><code>3.5 이상</code>이면 <code>4</code>일지 더 큰 수일지 알지 못하지 않냐싶은데, 위 처럼 순서가 나오도록 다음과 같이 정의해 놨습니다.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>x ≤ y이상 if x ≤ y</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>x이상 ≤ y 는 undefined</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>x이상 ≤ y이상 undefined</span></code></pre></div>
+<p>처음 볼 때 금방 이해가 안갔습니다. <code>x이상</code>,<code>y이상</code>을 하나의 수처럼 바라보긴 하는데, <code>이상</code>이 붙은 것끼리 만났을 때는 크기 비교가 가능하게 정의하고, <code>x이상</code>이 <code>y</code>보다 작을지 클지는 모른다는 직관 그대로 <code>undeinfed</code>라 정의해놨습니다. denotational한 의미를 정의하는데 중요한 역할을 하는 정의라고 하는데, 천재적인 것 같기도 하고, 말장난 같기도 합니다. 어쨌든 시간의 <strong>크기</strong>보단 <strong>순서</strong>가 의미가 있다 정도로 넘어갔습니다.</p>
+<p><code>⊑</code>는 <strong>크기</strong>가 작다는 뜻이 아닙니다. 순서상으로 먼저와 나중을 표현하는 기호입니다. <code>3.5</code>는 <code>4</code>보다 작지 않을지 몰라도 순서상으론 앞에 오도록 약속, 규칙을 정의합니다. 만일 샘플링을 <code>0.2초</code> 단위로 한다면 <code>3.5</code>는 <code>3.6</code>보다는 (작은 게 아니라)** 먼저**라는 뜻입니다.</p>
+<p>현재 구현된 FRP 프레임워크들이 퍼포먼스도 잘 나오고, Continuous 시간도 이론대로 구현한, 두 마리 토끼를 다 잡는 프레임워크는 없다는 것 같습니다. 코널 엘리엇 교수의 여기 저기 글을 보면, FRP는 denotational하고, Continuous 시간을 표현, 구현해야 제대로 FRP라 하는데, 그런 의미에선 아직은 제대로 실용 가능한 퍼포먼스를 보이는 프레임워크는 없다는 뜻입니다.</p>
+<!--
+//-->
+
+<div class="comment">
+<script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
+</script>
+</div>
+<div style="text-align:right">Github 계정이 없는 분은 메일로 보내주세요. lionhairdino at gmail.com </div>
+        </div>
+        <nav class="toc toc-right js-toc relative z-1 transition--300 absolute pa4 pt5 is-position-fixed"></nav>
+        <div id="footer">
+            © 2022 lionhairdino. All rights reserved. Generated by <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+        <script>
+            tocbot.init({
+                tocSelector: '.js-toc',
+                contentSelector: '.js-toc-content',
+                headingSelector: 'h2, h3',
+                hasInnerContainers: true,
+            });
+        </script>
+    </body>
+</html>
