@@ -343,14 +343,14 @@
 <span id="cb33-37"><a href="#cb33-37" aria-hidden="true" tabindex="-1"></a>    </span>
 <span id="cb33-38"><a href="#cb33-38" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="kw">do</span>    </span>
 <span id="cb33-39"><a href="#cb33-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span> program </span></code></pre></div>
-<section class="footnotes" role="doc-endnotes">
+<section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes">
 <hr />
 <ol>
-<li id="fn1" role="doc-endnote"><p>실제 IO모나드 타입은 다음과 같습니다.</p>
+<li id="fn1"><p>실제 IO모나드 타입은 다음과 같습니다.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">IO</span> a <span class="ot">=</span> <span class="dt">IO</span> (<span class="dt">State</span><span class="op">#</span> <span class="dt">RealWorld</span> <span class="ot">-&gt;</span> (<span class="op">#</span> <span class="dt">State</span><span class="op">#</span> <span class="dt">RealWorld</span>, a <span class="op">#</span>))</span></code></pre></div>
 <p><code>#</code>은 타입이 <code>Unboxed</code>라는 뜻인데, 나중에 다른 글에서 다루도록 하고, <code>IO</code>는 <code>RealWorld</code>란 <code>State</code>를 받아, <code>RealWorld</code>와 <code>a</code> 튜플을 돌려주는 함수 타입입니다. 하스켈의 함수는 모두 순수 함수이기 때문에 입력이 같으면 출력이 같아야 합니다. 예를 들어 Random 값이 계속 다르게 받으려면 입력값을 계속 다르게 해서 불러야 합니다. <code>RealWorld</code>는 특별히 의미 있는 정보를 담고 있는게 아니라, 순수 함수 규칙을 깨지 않기위해 존재하며 하스켈 런타임에서 프리미티브하게 처리 합니다.<br />
 액션 하나를 실행하고 다음 액션으로 넘어갈 때는 변형된 <code>Realworld</code>가 들어간다는 의미로 쓰이는데, 실제 <code>Realworld</code> 값이 변하진 않고, 하스켈 런타임에서 프리미티브하게 처리하는 걸로 보입니다.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn2" role="doc-endnote"><p>이런 패턴으로 체이닝 한 것과 그냥 체이닝한 패턴이 같다가 모나드 제3법칙입니다.</p>
+<li id="fn2"><p>이런 패턴으로 체이닝 한 것과 그냥 체이닝한 패턴이 같다가 모나드 제3법칙입니다.</p>
 <div class="sourceCode" id="cb24"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>(m <span class="op">&gt;&gt;=</span> f) <span class="op">&gt;&gt;=</span> g     <span class="ot">=</span>     m <span class="op">&gt;&gt;=</span> (\x <span class="ot">-&gt;</span> f x <span class="op">&gt;&gt;=</span> g)</span></code></pre></div>
 <a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></li>
 </ol>

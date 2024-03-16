@@ -100,7 +100,8 @@
 </ol>
 <h2 id="파서엔-모나드가-딱이다">파서엔 모나드가 딱이다</h2>
 <figure>
-<img src="../images/parsec.png" alt="누가 봐도 이건 모나드로 만들걸!" /><figcaption aria-hidden="true">누가 봐도 이건 모나드로 만들걸!</figcaption>
+<img src="../images/parsec.png" alt="누가 봐도 이건 모나드로 만들걸!" />
+<figcaption aria-hidden="true">누가 봐도 이건 모나드로 만들걸!</figcaption>
 </figure>
 <p>왜 모나드 구조가 어울리는지부터 고민해보고 가겠습니다. 문자열stream을 받아서, 파서가 지정한 단어가 있으면, 문자열을 단어 길이만큼 consume하고 찾은 단어를 기억하고, 아니면 하나도 consume하지 않고 에러를 리턴합니다. 그 다음 이어지는 파서가 또 다시 원하는 단어가 있는지 봐서, 있으면 consume하고, 찾은 단어들을 누적하고 없으면 에러를 리턴할 겁니다.</p>
 <ol type="1">
@@ -468,7 +469,8 @@ A. 가능합니다. 이해한게 맞는지 확인하기 위해 에러에 에러,
 <p>reduce과정이야 무식하게 따라가면 읽을 수 있긴 한데, 이 상호 재귀의 종료 조건(엣지 조건)은 뭘까요?
 <code>v</code>를 반복해서 붙여 놓습니다. 붙일 때마다 언제든 다음 단계로 진행하지 않을 조건 바로 <code>&lt;|&gt; pure []</code>도 계속 같이 붙여 놓습니다. 이 함수들은 꼭 파서를 위한 함수들만은 아닌데, 파서를 만들면서 같이 나온 건 아닐까 싶습니다. 파서와 정말 찰떡인 함수들입니다. 몇 번이고 반복하다가 파서가 실패하면 <code>&lt;|&gt; pure []</code> 로 넘겨서 더 이상 진행하지 않고 결과값을 리턴합니다. <code>many_v</code> 는 <code>&lt;|&gt; pure []</code>를 붙이는 역할, <code>some_v</code>는 <code>v</code>를 리스트에 넣어두는 역할을 반복하고 있습니다. 하스켈을 공부하려면 충분히 Lazy해져야 합니다.</p>
 <figure>
-<img src="../images/mutualRecursion.png" alt="화살 주고 과녁 확인하고, 과녁 확인하고 화살 주고" /><figcaption aria-hidden="true">화살 주고 과녁 확인하고, 과녁 확인하고 화살 주고</figcaption>
+<img src="../images/mutualRecursion.png" alt="화살 주고 과녁 확인하고, 과녁 확인하고 화살 주고" />
+<figcaption aria-hidden="true">화살 주고 과녁 확인하고, 과녁 확인하고 화살 주고</figcaption>
 </figure>
 <p>이 파서 뭉치는 상호 재귀가 끊임 없이 되어 있어 쓸 수 있는 함수는 무한대로 준비 되어 있습니다. 하지만 함수를 꺼내 쓰다 한 번이라도 fail하면 더 이상 이 뭉치에서 함수를 꺼내지 않습니다. <em>끊임 없이 준비를 해야 하는데, 필요하면 그 때 준비를 하지, 미리 준비해 놓지 않습니다.</em> 하나를 적용한 후 fail하지 않으면, 다음 재귀를 돌려 또 함수 하나를 꺼내고, 또 꺼내고,… 그러다 fail이 나면 더 이상 진행하지 않고 결과를 리턴하는 함수 뭉치입니다.</p>
 <p>머릿속에서 시뮬레이션할 때, 딱 필요한 시점에 재귀를 한 단계만 돌리세요.</p>
@@ -558,18 +560,19 @@ A. 가능합니다. 이해한게 맞는지 확인하기 위해 에러에 에러,
 <p>파서들이 바인딩 되어 있을 때, 어느 한 파서라도 <code>[]</code>를 리턴하면 그냥 결과는 <code>[]</code>이 됩니다. 왜 그런지 정의에 넣어 보면, <code>concatMap</code>으로 함수를 <code>[]</code>에 적용하면 더 이상 다음 파서 연결 없이 체인은 끝납니다. 정말 모나드로 구현하기 딱 좋은 문제 같은데, 처음부터 이렇게 찰떡인 걸 알고 설계하기 시작했을까요?</p>
 <p>파서로 다른 파서를 만드는 모양인데, 이런게 대수학algebra 아닐까요? 아직 파서 대수학이라 표기한 곳은 못 보긴 했는데, 문제 풀이를 이렇게 대수학 느낌으로 가는게 함수형 스타일입니다. 파서 구현이 모나드를 이용해서 정말 깔끔하고 짧게 구현됩니다. 그래서 그런지 하스켈로 만든 애플리케이션 중 파서를 충분히 활용하는 <a href="https://pandoc.org/">Pandoc</a>은 꽤 알려져 있습니다.</p>
 <figure>
-<img src="../images/pandoc.png" alt="하스켈이 낳은 아이돌 Pandoc" /><figcaption aria-hidden="true">하스켈이 낳은 아이돌 Pandoc</figcaption>
+<img src="../images/pandoc.png" alt="하스켈이 낳은 아이돌 Pandoc" />
+<figcaption aria-hidden="true">하스켈이 낳은 아이돌 Pandoc</figcaption>
 </figure>
 <h2 id="happy-alex">Happy &amp; Alex</h2>
 <p>Happy는 c언어 파서를 뽑아내는 yacc처럼 하스켈 파서를 뽑아내는 파서 생성기입니다. 위에 봤던 콤비네이터들을 조합해서 만든 파서보다 빠르다고 합니다. Alex는 lex처럼 어휘lexeme 분석기를 뽑아내는 생성기입니다. GHC도 Happy와 Alex로 파서를 만들어서 쓸 정도로 충분히 파워풀하다고 합니다. 잊고 살았던 컴파일러 책을 다시 뒤적이다 그냥 덮었습니다. 지금은 XML, JSON, YML등의 범용 마크업 언어들이 자리잡아, 실전에서 규모 있는 파서를 만들 일이 거의 없어져서 조금 여유를 두고 보기로 했습니다.</p>
-<section class="footnotes" role="doc-endnotes">
+<section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes">
 <hr />
 <ol>
-<li id="fn1" role="doc-endnote"><p>참고 
+<li id="fn1"><p>참고 
 <a href="http://www.cs.nott.ac.uk/~pszgmh/monparsing.pdf">Monadic Parser Combinator - Graham Hutton, Erik Meijer</a><br />
 <a href="https://www.cs.rit.edu/~swm/cs561/monadic-parsing-jfp.pdf">Functional Perl - Graham Hutton, Erik Meijer</a><br />
 <a href="https://medium.com/@jooyunghan/javascript-모나딕-파서-c17fe5033f26">한주영님의 자바스크립트로 구현한 모나드 파서</a><a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn2" role="doc-endnote"><p>상호 재귀Mutual recursion (상호 교차 재귀라고 썼었는데, 상호 재귀란 용어로 수정합니다. 상호 재귀가 일반적인 용어라 합니다.)
+<li id="fn2"><p>상호 재귀Mutual recursion (상호 교차 재귀라고 썼었는데, 상호 재귀란 용어로 수정합니다. 상호 재귀가 일반적인 용어라 합니다.)
 아래 코드는 “Programming in Haskell - Graham Hutton”에서 발췌했습니다.</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">even</span><span class="ot"> ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Bool</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">even</span> <span class="dv">0</span>       <span class="ot">=</span> <span class="dt">True</span></span>

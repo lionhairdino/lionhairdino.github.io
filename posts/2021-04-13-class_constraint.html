@@ -122,7 +122,8 @@
 <p>func 선언에는 ClassA 클래스 제약( <code>func :: ClassA a =&gt; a</code> )이 없는데, 왜 에러가 나지 않을까요? func의 리턴 타입을 보고 method1의 구체 타입을 알 수 있기 때문에 굳이 제약을 써주지 않아도 적당한 인스턴스를 찾을 수 있기 때문입니다.</p>
 <h2 id="클래스까지-추론한-것-같긴-한데-에러-리턴-타입이-폴리모픽">클래스까지 추론한 것 같긴 한데 에러( 리턴 타입이 폴리모픽 )</h2>
 <figure>
-<img src="../images/constraint.png" alt="Player =&gt; 타입 제약을 자동으로 추론해 주진 않아" /><figcaption aria-hidden="true">Player =&gt; 타입 제약을 자동으로 추론해 주진 않아</figcaption>
+<img src="../images/constraint.png" alt="Player =&gt; 타입 제약을 자동으로 추론해 주진 않아" />
+<figcaption aria-hidden="true">Player =&gt; 타입 제약을 자동으로 추론해 주진 않아</figcaption>
 </figure>
 <div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Control.Monad.IO.Class</span> ( <span class="dt">MonadIO</span>(..) )</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Control.Monad.Reader</span> ( <span class="dt">MonadReader</span>, runReaderT, ask )</span>
@@ -169,10 +170,10 @@
 </ol>
 <p>참고 - <a href="../posts/2020-07-16-MonadTransformer.html">모나드 트랜스포머 포스트</a>, MonadIO<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>, MonadReader<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>, 클래스 네임스페이스<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a><br />
 <a href="http://learnyouahaskell.com/types-and-typeclasses" class="uri">http://learnyouahaskell.com/types-and-typeclasses</a></p>
-<section class="footnotes" role="doc-endnotes">
+<section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes">
 <hr />
 <ol>
-<li id="fn1" role="doc-endnote"><p>MonadIO 클래스 정의</p>
+<li id="fn1"><p>MonadIO 클래스 정의</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> (<span class="dt">Monad</span> m) <span class="ot">=&gt;</span> <span class="dt">MonadIO</span> m <span class="kw">where</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">-- | Lift a computation from the 'IO' monad.</span></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="ot">    liftIO ::</span> <span class="dt">IO</span> a <span class="ot">-&gt;</span> m a</span>
@@ -180,7 +181,7 @@
 <span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">MonadIO</span> <span class="dt">IO</span> <span class="kw">where</span></span>
 <span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    liftIO <span class="ot">=</span> <span class="fu">id</span></span></code></pre></div>
 <a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></li>
-<li id="fn2" role="doc-endnote"><p>MonadReader 클래스 정의</p>
+<li id="fn2"><p>MonadReader 클래스 정의</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">Monad</span> m <span class="ot">=&gt;</span> <span class="dt">MonadReader</span> r m <span class="op">|</span> m <span class="ot">-&gt;</span> r <span class="kw">where</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="ot">    ask   ::</span> m r</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    ask <span class="ot">=</span> reader <span class="fu">id</span></span>
@@ -201,7 +202,7 @@
 <span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>    local f m <span class="ot">=</span> m <span class="op">.</span> f</span>
 <span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>    reader    <span class="ot">=</span> <span class="fu">id</span></span></code></pre></div>
 <a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></li>
-<li id="fn3" role="doc-endnote"><p>클래스의 네임스페이스</p>
+<li id="fn3"><p>클래스의 네임스페이스</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">ClassA</span> a <span class="kw">where</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="ot">    method1 ::</span> a <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> a</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    method1 a1 a2 <span class="ot">=</span> a1</span>

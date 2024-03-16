@@ -105,7 +105,8 @@
 <p><code>fix (\fib -&gt; 0 : 1 : zipWith (+) fib (tail fib))</code></p>
 <p>매직이 일어나는 것처럼 보이지만, 사실은 미래 결과를 받아서 돌린다 한들 알 수 있는 건 <code>0</code>과 <code>1</code>만 있을 뿐입니다.</p>
 <figure>
-<img src="../images/fibonacci.jpg" alt="0과 1로 만드는 피보나치" /><figcaption aria-hidden="true">0과 1로 만드는 피보나치</figcaption>
+<img src="../images/fibonacci.jpg" alt="0과 1로 만드는 피보나치" />
+<figcaption aria-hidden="true">0과 1로 만드는 피보나치</figcaption>
 </figure>
 <div class="sourceCode" id="cb3"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>0:1:&lt;thunk&gt; ----------- f -----------&gt; 0:1:&lt;thunk&gt;</span></code></pre></div>
 <p><code>f</code>가 인자로 <strong>자신의 결과값</strong>을 받아서, 한 번 실행하면 <code>0:1:&lt;thunk&gt;</code>결과를 얻습니다. 미래의 자신이 돌리든, 과거의 자신이 돌리든, 결과에 <code>0:1</code>이 있는 것만은 알고 있다는 뜻입니다. <code>f</code>가 받는 인자도 <code>0:1:&lt;thunk&gt;</code>고, 결과값도 <code>0:1:&lt;thunk&gt;</code>입니다. <code>f a = a</code>로 말하면 <code>f</code>에 입력으로 준 것도 <code>a</code>이고, 결과도 <code>a</code>입니다. 이 때 <code>a</code>를 고정점이라 부릅니다. <code>fix f</code>로 <code>0:1:&lt;thunk&gt;</code>를 얻었는데, 이 걸 <code>f</code>의 입력값으로 <code>f (fix f)</code> - <code>f(0:1:&lt;thunk&gt;)</code> 다시 넣어줘도 인자와 결과값 둘이 같다는 뜻입니다. <code>f</code> 함수의 고정점은 <code>fix f</code>입니다.</p>
