@@ -179,7 +179,7 @@ Arrow 설명부터 활용까지 잘 나와 있는 위키북스에 있는 글인�
 <p>추측2) 만일 동적 파서가 빈 문자열 처리를 할 수 없다면, 이 옵션을 <code>False</code>로 만들어 정적 파서에서 걸러낼 수 있습니다. 아래에 나오는 <code>dpCharA</code> 같은 동적 파서는 <code>_:xs</code>로 패턴 매칭하므로, 빈 입력 문자열은 동적 파서까지는 오지 말아야 합니다.
 아래 Arrow 인스턴스를 만들 대 <code>arr</code>이 옵션을 <code>True</code>로 쓰고 있습니다.<br />
 <code>arr f = P (SP True []) (DP (\(b,s) -&gt; (f b, s)))</code><br />
-여기 있는 정적 파서는, 정적 파서들 합성에서 id 같이 어떤 영향도 주지 않아야 하고 (하나라도 <code>False</code>면 전부 <code>False</code>가 되니, 영향을 미치지 않기 위해 <code>True</code>값을 가지고, 당영히 첫 글자 목록도 비어있어야 합니다.)<br />
+여기 있는 정적 파서는, 정적 파서들 합성에서 id 같이 어떤 영향도 주지 않아야 하고 (하나라도 <code>False</code>면 전부 <code>False</code>가 되니, 영향을 미치지 않기 위해 <code>True</code>값을 가지고, 당연히 첫 글자 목록도 비어있어야 합니다.)<br />
 동적 파서도, 동적 파서들 합성에서 id 같은 역할을 해야 합니다.<br />
 <em>아직 확실한 이유는 모릅니다. 아시는 분은 댓글 부탁 드립니다.</em></p>
 </blockquote>
@@ -212,7 +212,7 @@ Arrow 설명부터 활용까지 잘 나와 있는 위키북스에 있는 글인�
 <p>한 글자기 때문에 정적 파서가 이미 필요한 글자 매칭 여부는 들여다 봤습니다. 이게 성공해서 동적 파서로 넘어가면, 항상 그렇다는 게 아니라, 딱 이 경우에는 동적 파서가 하는 일이 없습니다. 그냥 정적 파서가 매칭 성공한 한 글자와, 앞 글자 하나를 떼어내고 나머지 문자열을 반환하면 됩니다.</p>
 <p>파서를 실행하려면 정적 파서를 먼저 돌리고, 통과하면, 입력 문자열에 동적 파서를 적용하는 작업이 필요합니다.</p>
 <div class="sourceCode" id="cb15"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="ot">runParser ::</span> <span class="dt">Eq</span> s <span class="ot">=&gt;</span> <span class="dt">Parser</span> s a b <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> [s] <span class="ot">-&gt;</span> <span class="dt">Maybe</span> (b, [s])</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- 먹을게 없는 빈 문자열이 들어 왔을 때</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- 먹을 게 없는 빈 문자열이 들어 왔을 때</span></span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>runParser (<span class="dt">P</span> (<span class="dt">SP</span> emp _) (<span class="dt">DP</span> p))  a  [] </span>
 <span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="op">|</span> emp <span class="ot">=</span> <span class="dt">Just</span> (p (a, [])) <span class="co">-- emp는 불린값, 빈 문자열을 허용한다면, </span></span>
 <span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>                           <span class="co">-- (a, [])로 동적 파서를 부른다. </span></span>
@@ -229,7 +229,7 @@ Arrow 설명부터 활용까지 잘 나와 있는 위키북스에 있는 글인�
 <p>지금까지는 <code>전체파서</code>가 “한 글자”를 파싱하는 작업이었습니다. <code>runParser</code><a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> 서명을 보면, <code>전체파서</code>와 초기값 <code>a</code>를 받아 <code>[s] -&gt; Maybe (b, [s])</code> 함수를 반환합니다. 모나드 액션과 같은 타입입니다.</p>
 <p><code>Arrow</code>로 넘어가기 숨 차네요. 왜 필요한지 보이기 위한 “상황” 자체를 이해하는 것도 쉽지 않습니다.</p>
 <h3 id="arrow-컴비네이터-활용">Arrow 컴비네이터 활용</h3>
-<p><code>전체파서</code>에서 <code>동적파서</code>는 2튜플을 넣어 주며 “<em>실행</em>”하게 되지만, <code>정적파서</code>는 별다른 “실행” 없이도 어떻게 생겼는지 볼 수 있습니다. <code>전체파서</code> 3개를 합성했다면, <code>P (SP (True &amp;&amp; False &amp;&amp; True) ['a','b','c']) (...동적 파서 합성...)</code> 모양이 되고, 언제든 패턴 매칭만으로 <code>SP</code>를 꺼낼 수 있습니다. 외부 입력 값에 따라 <code>SP</code> 값은 변하지 않지만, <code>DP</code>는 값이 변합니다. 타입과 타입을 연결하는 게 아니라, 함수와 함수를 연결한다면, “정적”인 정보를 둘 데가 없습니다. 함수가 외부 통로를 열어 놨으니 더 융통성이 있을 것처럼 보이지만, 타입이 훨씬 표현력이 좋습니다. 체인에서 정적인 정보가 병행하는 게 보이면 <code>Arrow</code>를 떠올려야 할 때입니다.</p>
+<p><code>전체파서</code>에서 <code>동적파서</code>는 2튜플을 넣어 주며 “<em>실행compute</em>”하게 되지만, <code>정적파서</code>는 별다른 “실행” 없이도 어떻게 생겼는지 볼 수 있습니다. <code>전체파서</code> 3개를 합성했다면, <code>P (SP (True &amp;&amp; False &amp;&amp; True) ['a','b','c']) (...동적 파서 합성...)</code> 모양이 되고, 언제든 패턴 매칭만으로 <code>SP</code>를 꺼낼 수 있습니다. 외부 입력 값에 따라 <code>SP</code> 값은 변하지 않지만, <code>DP</code>는 값이 변합니다. 타입과 타입을 연결하는 게 아니라, 함수와 함수를 연결한다면, “정적”인 정보를 둘 데가 없습니다. 함수가 외부 통로를 열어 놨으니 더 융통성이 있을 것처럼 보이지만, 타입이 더 표현력이 좋습니다. 체인에서 정적인 정보가 병행하는 게 보이면 <code>Arrow</code>를 떠올려야 할 때입니다.</p>
 <div class="sourceCode" id="cb17"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Eq</span> s <span class="ot">=&gt;</span> <span class="dt">Arrow</span> (<span class="dt">Parser</span> s) <span class="kw">where</span></span></code></pre></div>
 <div class="sourceCode" id="cb18"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>  arr f <span class="ot">=</span> <span class="dt">P</span> (<span class="dt">SP</span> <span class="dt">True</span> []) (<span class="dt">DP</span> (\(b,s) <span class="ot">-&gt;</span> (f b, s)))</span></code></pre></div>
 <p><code>arr</code>은 보통의 함수를 Arrow로 바꿔 줍니다. <code>arr</code> 적용해 얻은 Arrow는 파싱할 첫 글자가 없고, 동적 파서에서도 문자열을 먹거나 하지 않습니다. 나중에 <code>runParser</code>를 돌릴 때, 동작할 수 있도록 동적 파서에 <code>f</code>를 끼워 놓기만 합니다. 별다른 작업은 안하고 Arrow 흐름 안에 <code>f</code>를 적용하는 인터페이스 입니다.</p>
@@ -256,30 +256,39 @@ Arrow 설명부터 활용까지 잘 나와 있는 위키북스에 있는 글인�
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>Nothing</span></code></pre></div>
 <p><code>charA</code>가 가진 동적 파서가 하는 일을 봐서는, 이렇게 합성하면 안될 게 뻔히 보입니다. 앞의 한 글자 파싱 예시가 어떻게 다음으로 연결되는지 아직 모르겠습니다.</p>
 <p>Sun Sep 24 03:07:26 AM KST 2023 작성 중…</p>
-<h2 id="section"></h2>
 <h2 id="모나딕으로-조합한-파서와-차이">모나딕으로 조합한 파서와 차이</h2>
 <p>첫 글자 파서를 두는 건 모나드로 표현 못한다고 하는데, 왜 그럴까요? “<code>Do</code>”를 파싱 중이면,</p>
 <blockquote>
-<p>Q. 왜 첫 글자 파서를 운용할 때는 static infomation이 필요할까?</p>
+<p>Q. 왜 첫 글자 파서를 운용할 때는 static infomation이 필요할까?<br />
+추측 A. 뒷 파서를 compute하지 않아도, 첫 글자 파서가 뭔지는 알 수 있기 때문입니다.</p>
 </blockquote>
 <p>Arrow 인터페이스는 두 개의 파서(정적, 동적)를 transparently compose and manipulate할 수 있게 해줍니다.
 Sun Sep 24 11:54:42 AM KST 2023 작성 중 …</p>
 <h2 id="arrow도-수학에서-온-걸까">Arrow도 수학에서 온 걸까?</h2>
 <p>Freyd-categories</p>
+<p>※ 프로그래밍과 수학은 표현 방식이 조금 다를 뿐, 한 쪽에서 구조를 위한 패턴, 개념이 보이면 다른 쪽에도 존재하는 것 같다.</p>
 <h2 id="정리">정리</h2>
 <p>그냥 <code>a -&gt; b</code>, <code>b -&gt; c</code> 함수를 정의하고, <code>(.)</code>를 이용해서 <code>a --...--&gt; c</code>를 만든 것과, Arrow 인터페이스를 이용하는 것의 차이는 뭘까요?</p>
 <div class="sourceCode" id="cb25"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>              (-&gt;) a    b    .                 (-&gt;) b    c</span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>              (-&gt;) a (m b)  &gt;=&gt;                (-&gt;) b (m c)</span>
 <span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>ArrowInstance (-&gt;) a    b   &gt;&gt;&gt;  ArrowInstnace (-&gt;) b    c</span></code></pre></div>
 <p>함수를 합성할 때마다, 반복되는 어떤 작업 (Effect를 잃어버리지 않기 위한 작업)이 있다면, 모나드 인터페이스가 딱이었습니다.
-<code>a -&gt; b</code>의 합성과 <code>m (m a) -&gt; m a</code> 작업을 “병행”해 주는 작업이 필요하면 모나드를 떠올리며 됐습니다.<br />
+<code>a -&gt; b</code>의 합성과 <code>m (m a) -&gt; m a</code> 작업을 “병행”해 주는 작업이 필요하면 모나드를 떠올리면 됐습니다.<br />
 추측) <code>a -&gt; b</code>든 <code>a -&gt; m b</code>든, 합성과 정적인 정보 유통<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>을 체인에서 병행해야 한다면 Arrow를 떠올리면 됩니다.</p>
 <p>Sun Sep 24 03:20:50 AM KST 2023 작성 중…</p>
+<p><span class="citation" data-cites="todo">@todo</span> 아래는 아직 생각 정리가 안된 끄적임입니다.</p>
+<p>타입과 함수의 차이, <strong>생성generate 방법</strong>이 정해져 있는 타입과, 외부 정보에 의존하는 함수의 차이</p>
+<pre><code>m1 a -&gt; (a -&gt; m2 b) -&gt; m3 b</code></pre>
+<p>이미 <strong>생성 방법</strong>이 정해진 <code>m1</code>과 <code>a</code><br />
+외부 정보 <code>a</code>에 의존해서 생성 방법을 결정될 <code>m2</code>, 그리고 <code>a</code>에 의존해서 결정될 <code>b</code></p>
+<p>바인드 자체는 <code>m1</code>이 어떤 생성 방법을 쓸 것이라 결정된 상태로 <strong>예정</strong>하고 동작한다는 뜻이 아니라, 바인드로 들어 올 때부터 이미 정해진 상태로 들어온다는 뜻이다.</p>
+<p>외부 정보를 받을 수 있는 인터페이스가 있는 것보다, 왜 타입이 표현력이 더 좋다고 할까?<br />
+타입은 당장 동작해야 할 코드가 아니라, 나중에 어떤 동작을 하겠다는 표기이다. 함수는 표기와 동시에 동작하는 것이고, 타입은 표기해 두고, 동작은 나중으로 미룰 수도 있게 해주니 더 표현력이 좋다.</p>
 <section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes">
 <hr />
 <ol>
 <li id="fn1"><p>이런 패턴이 선언형 프로그래밍의 좋은 예시 아닐까요? 딱, 양분할 순 없지만, 컴비네이터로 조합 할 때는, 할 일을 조합해서 목록(설계도)만 만들고, 실제 작업은 바로이런 <code>run~</code>이 붙은 것들이 “컴비네이터로 조합해서 만들어 둔 설계도”를 보고 합니다. 꼭 DSL처럼 완전 선언과 구현이 나뉘는 느낌은 아니더라도, 좀 감이 오는데 도움이 되는 것 같아 언급해 봤습니다.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn2"><p>아직 유통이란 말을 다른데서 본적이 없지만, 함수 합성으로 필요한 정보를 끌고 다니는 게 마치 “정보 유통” 체계를 잡는 느낌이 들어 써봤습니다.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>아직 유통distribution이란 말을 다른데서 본적이 없지만, 함수 합성으로 필요한 정보를 끌고 다니는 게 마치 “정보 유통” 체계를 잡는 느낌이 들어 써봤습니다.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section>
 
