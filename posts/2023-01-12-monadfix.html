@@ -6,8 +6,8 @@
 
         <title>lionhairdino - MonadFix</title>
 
-        <meta name="description" content="mfix 동작을 쉽게 이해하는 방법을 찾고 있습니다." />
-        <meta property="og:description" content="mfix 동작을 쉽게 이해하는 방법을 찾고 있습니다." />
+        <meta name="description" content="mfix (monadfix) 동작을 쉽게 이해하는 방법을 찾고 있습니다." />
+        <meta property="og:description" content="mfix (monadfix) 동작을 쉽게 이해하는 방법을 찾고 있습니다." />
 
         <link rel="stylesheet" type="text/css" href="../css/default.css" />
         <link rel="icon" href="https://lionhairdino.github.io/favicon.svg" />
@@ -39,7 +39,7 @@
 
         <meta property="og:image" content="https://lionhairdino.github.io/images/fibonacci.jpg" />
 
-      <meta name="keywords" content="monad, fix, 재귀, fix point, RecursiveDo, mdo, mfix, monadic fix, cyclic definition, 순환 정의">
+      <meta name="keywords" content="monadfix, monad, fix, 고정점, 재귀, fix point, RecursiveDo, mdo, mfix, monadic fix, cyclic definition, 순환 정의, 하스켈, haskell">
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-E9WZ6VXGHP"></script>
 <script>
@@ -265,7 +265,7 @@
 <p><code>mfix</code>로 <code>a -&gt; m a</code>함수를 감싸면, <code>m</code>은 한 번만 영향을 미치고, <code>m</code>이 없는 <code>a -&gt; a</code>를 재귀 돌려 <code>m (재귀 결과)</code>값을 반환합니다.</p>
 <p>처음 개념을 봤을 때는,</p>
 <blockquote>
-<p><strong>※ 잘못된 접근</strong> (아래는 틀린 내용입니다.)<br />
+<p><strong>※ 잘못된 접근</strong> - 아래는 틀린 내용입니다.<br />
 애초에 액션 <code>a -&gt; m a</code>는 고정점이 있을 수가 없습니다. <code>a</code>를 입력 받고, 출력으로 <code>m a</code>를 내뱉으니 있을 수가 없습니다. 그런데 모나드에서 처럼 <code>m a -&gt; m (m a)</code>로 보고, <code>join</code>이 존재한다면 고정점(고정점이라 우길 수 있는 것)을 찾을 수 있을 겁니다. (모나드에서 <code>a -&gt; m b</code> 액션에 <code>m a</code>를 넣어줘서 <code>m (m b)</code>가 나오면 <code>join</code>을 해서 <code>m</code>으로 맞춰 줬습니다.) <code>join</code>을 <code>μ</code>로 표기하면</p>
 <p><code>f(μf(μf(...)))</code> = <strong><em>f(μ</em></strong><code>f(μf(μf(...)))</code><strong><em>)</em></strong></p>
 <p>이런식으로 반복하게 될겁니다. 근데 이 때 <code>μ</code>가 계속 스택을 잡아 먹거나, 혹은 계속 인과관계가 있다면, 정보를 무한히 갖고 있어야 하니 의미 있는 일을 할 수 없을 겁니다. <code>μ</code>가 trivial한 일을 하는 거라 (<code>Reader</code>같은 것들) 마지막에 한 번만 해줘도 되는 것들이라면, 즉 <code>m a -&gt; m (m a)</code> 에서 <code>a -&gt; a</code>로만 무한 반복 시키고 <code>m</code>(<code>return</code>)을 나중에 한 번만 붙여도 의미가 달라지지 않는 것들만 <code>mfix</code>가 가능하다고 보고 있습니다.</p>
@@ -283,6 +283,7 @@
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>    mfix f <span class="ot">=</span> <span class="kw">let</span> a <span class="ot">=</span> f (unJust a) <span class="kw">in</span> a</span>
 <span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>             <span class="kw">where</span> unJust (<span class="dt">Just</span> x) <span class="ot">=</span> x</span>
 <span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>                   unJust <span class="dt">Nothing</span>  <span class="ot">=</span> errorWithoutStackTrace <span class="st">&quot;mfix Maybe: Nothing&quot;</span></span></code></pre></div>
+<p>무한한 미래를 참고하는데, “미래에도 절대 <code>Nothing</code>”이 없어야 <code>Just</code>라고 해야 할 것 같은데, 당장 필요한 것만 봐서 <code>Just</code>라고 하니, 이래도 되나 싶은 생각이 들긴 합니다만, 어쨌든 저렇게 구현되어 있습니다.</p>
 <p>무한에 재귀에 이펙트에… 머리를 복잡하게 하는 것들이 다 섞여 있는 주제인데, 이 게 읽기 편해지면 하스켈로 프로그래밍하는데 조금이라도 도움이 되긴 하겠지요?</p>
 <blockquote>
 <p>생각 스트레칭</p>
