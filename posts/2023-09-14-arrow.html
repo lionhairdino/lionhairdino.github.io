@@ -129,7 +129,7 @@
 <div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>\x <span class="ot">-&gt;</span> \y <span class="ot">-&gt;</span> x <span class="op">+</span> y</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>            <span class="op">^^^^^</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>            이 식에서 x를 쓸 수 있어야 편하게 구현할 수 있습니다<span class="op">.</span></span></code></pre></div>
-<p>함수를 그냥 합성하지 않고, 합성할 때마다 모나드의 바인드처럼 추가 정보를 잃어버리지 않게 차곡 차곡 챙기려면 어떻게 할까요? 순수 함수만 있는 동네에선 2튜플이 중요한 수단입니다. <code>(결과값, 추가 정보)</code> 형태로 추가 정보를 잃어버리지 않게 넣어 놓는 방법이 있습니다. 2튜플을 쓰지 않는다면, 별도의 프로덕트 타입을 만들어서 해결해도 되는데, 이미 준비되어 있는 가장 단순한 2튜플이 있으니, 이 걸 쓰면 됩니다.</p>
+<p>함수를 그냥 합성하지 않고, 합성할 때마다 모나드의 바인드처럼 추가 정보를 잃어버리지 않게 차곡 차곡 챙기려면 어떻게 할까요? 순수 함수만 있는 동네에선 2튜플이 중요한 수단입니다. <code>(결과값, 추가 정보)</code> 형태로 추가 정보를 잃어버리지 않게 넣어 놓는 방법이 있습니다. 2튜플을 쓰지 않는다면, 별도의 프로덕트 타입을 만들어서 해결해도 되는데, 이미 준비되어 있는 가장 단순한 2튜플이 있으니, 이 걸 쓰면 됩니다. 아래 의사 코드를 보겠습니다.</p>
 <pre><code>chain init {
   res1 = Arrow1 init
   res2 = Arrow2 res1 (혹은 init)
@@ -146,7 +146,7 @@
   return ((res1, res2), res3)
 }</code></pre>
 <p>또 Arrow를 추가한다면 <code>(((res1, res2), res3), res4)</code> 이렇게 계속 2튜플의 2튜플로 유지한다면, 각 개별 결과에 언제든 접근할 수 있는 “가능성”이 생깁니다. 콕 찝어 “가능성”이라 한 이유는, 이 걸 인간이 계속 관리하면서 쓰기엔 사실 가능성만 있을 뿐, 실용적으로 쓰기는 힘들 겁니다.</p>
-<p>그냥 함수와 함수를 <code>(.)</code>으로 합성하지 않고, <code>Arrow</code>로 래핑해서 합성하면, <code>Arrow</code>가 제공하는 컴비네이터들을 이용해 이 2튜플들을 프로그래머가 신경쓰지 않아도, 알아서 안보이게 잘 가지고 다니게 할 수 있습니다. Arrow의 컴비네이터 내부에서는 합성하려던 함수가 <code>a -&gt; b</code>이면, <code>(.)</code>을 쓰고, <code>a -&gt; m b</code>이면 <code>&gt;&gt;=</code>을 쓰면 됩니다.</p>
+<p>그냥 함수와 함수를 <code>(.)</code>으로 합성하지 않고, <code>Arrow</code>로 래핑해서 합성하면, <code>Arrow</code>가 제공하는 컴비네이터들을 이용해 이 2튜플들을 프로그래머가 신경쓰지 않아도, 알아서 안보이게 잘 가지고 다니게 할 수 있습니다. Arrow의 컴비네이터 내부에서는 합성하려던 함수가 <code>a -&gt; b</code>이면, <code>(.)</code>을 쓰고, <code>a -&gt; m b</code>이면 <code>&gt;&gt;</code>을 쓰면 됩니다.</p>
 <p>이제, 마지막으로 이렇게 2튜플의 2튜플로 만든, 어떻게 보면 우악스러워 보이는 <code>((((...)...)...)...)</code> 형태의 각 각에 접근하는 방법을 모나드의 <code>do</code>표기처럼 쉽게 해 주는 뭔가가 필요합니다.<br />
 <code>m1 &gt;&gt;= \r1 -&gt; m2 &gt;&gt;= \r2 -&gt; m3 &gt;&gt;= \r3 -&gt; m4...</code>로 쓰면 복잡하지만,</p>
 <pre><code>do

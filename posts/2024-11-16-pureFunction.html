@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko" lang="ko">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <title>lionhairdino - 순수 함수로 변수 모델링</title>
+
+        <meta name="description" content="입 출력에 명시되지 않은 것에는 접근 불가능한 순수 함수만 있는 하스켈에서, 어떻게 전역 변수 같은 상위 스코프의 정보들을 순수 함수로 모델링하는지 살펴 봤습니다." />
+        <meta property="og:description" content="입 출력에 명시되지 않은 것에는 접근 불가능한 순수 함수만 있는 하스켈에서, 어떻게 전역 변수 같은 상위 스코프의 정보들을 순수 함수로 모델링하는지 살펴 봤습니다." />
+
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <link rel="icon" href="https://lionhairdino.github.io/favicon.svg" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino16px.png" sizes="16x16" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino24px.png" sizes="24x24" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino32px.png" sizes="32x32" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino48px.png" sizes="48x48" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino57px.png" sizes="57x57" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino60px.png" sizes="60x60" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino64px.png" sizes="64x64" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino72px.png" sizes="72x72" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino76px.png" sizes="76x76" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino114px.png" sizes="114x114" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino120px.png" sizes="120x120" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino144px.png" sizes="144x144" />
+        <link rel="shortcut icon" href="../favicon.ico" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino152px.png" sizes="152x152" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino180px.png" sizes="180x180" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino192px.png" sizes="192x192" />
+        <link rel="manifest" href="../site.webmanifest" />
+        <link rel="mask-icon" href="https://lionhairdino.github.io/Lionhairdino_black.svg" color="#ff7500" />
+        <meta name="msapplication-TileImage" content="/images/favicon/Lionhairdino144px.png" />
+        <meta name="msapplication-TileColor" content="#ff7500" />
+        <meta name="theme-color" content="#ffffff" />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="순수 함수로 변수 모델링" />
+        <meta property="og:site_name" content="Lionhairdino" />
+        <meta property="og:url" content="https://lionhairdino.github.io/posts/2024-11-16-pureFunction.html" />
+
+        <meta property="og:image" content="https://lionhairdino.github.io/images/state400px.png" />
+
+      <meta name="keywords" content="하스켈, haskell, 순수, 비순수, 상태, 람다 함수, 컴비네이터, 고차 함수, 커링, 타입, Arrow, Pure function, 모나드">
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-E9WZ6VXGHP"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-E9WZ6VXGHP');
+</script>
+<script src="../script/copycode.js"></script>
+<script async src="https://cse.google.com/cse.js?cx=9c53b4915cbb2605c"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.11.1/tocbot.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.11.1/tocbot.css" />
+    </head>
+    <body>
+        <div id="header">
+            <div style="display:inline-block;margin-right:5px;padding-top: 5px;" id="logo">
+                <a href="../"><img style="width:30px;border:none" src="../images/favicon/Lionhairdino48px.png"></a>
+            </div>
+            <div style="display:inline-block;vertical-align: top;padding-top:5px;" id="navigation">
+                <a href="../">lionhairdino</a>
+                <a href="../about.html">about</a>
+                <!--<a href="/archive.html">archive</a>-->
+            </div>
+            <div style="display:inline-block;font-size:0.8em;vertical-align: top;">
+                <div style="display:inline-block;vertical-align: top;padding-top: 5px">사이트내 검색</div>
+                <div style="display:inline-block;width:180px;"> 
+                    <div class="gcse-searchbox-only"></div>
+                </div>
+            </div>
+            <div>
+                여기 글들은 일종의 질문입니다. 용어 선택도 학계, 업계에서 쓰는 걸로 되어 있지 않고, 틀린 내용이 있을 수도 있습니다.
+            </div>
+        </div>
+        <div class="js-toc-content">
+            <h1>순수 함수로 변수 모델링</h1>
+            <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+<div class="info">
+    Posted on November 16, 2024
+    
+</div>
+
+<p>대상: 처음 입문하는 분들이 볼 수 있는 안내서로 만들려 했는데, 몇 몇 부분에서 사전 지식이 좀 필요한 곳들이 있습니다. 아무래도, 하스켈 공부를 시작하고, 모나드, Arrow 문서들까지 봤는데, 찜찜함이 남은 분들이 봐야 적당할 것 같습니다.</p>
+<p>저는 함수형 프로그래밍(이하 함수형)으로 돈을 벌고(벌려고 하고) 있으니 프로페셔널이라고 할 수도 있지만, 함수형의 기반을 공부하는 건 취미(아마추어)에 가깝습니다. 아주 밑바닥의 기반 지식이 없어도 함수형을 하는데 문제가 있는 건 아닙니다만, 그저 개인적인 성향으로 궁금한 것들이 있어, 여기 저기 뒤지고 다니며, 상상하고, 정리하고 있습니다. 아는 동료들이 거의 없어 지식이 맞는지 검증할 방법이 마땅치 않습니다. 정식 교육을 통해 익힌 지식들이 아니라 검증되지 않은 제 <strong><em>상상</em></strong>이니 주의하며 보시기 바랍니다.</p>
+<p>이 글은 순수 함수에서 출발해서 함수형 입문에 필요한 용어, 개념들을 살펴보는 문서입니다.</p>
+<p style="font-size:1.5em; text-align: center; font-weight: bold;">
+함수형 프로그래밍을 공부할 때 난제의 시작은 순수 함수입니다.
+</p>
+<h2 id="순수-함수-참조-투명성-effect-action">순수 함수, 참조 투명성, Effect, Action</h2>
+<p>함수형 프로그래밍(이하 그냥 함수형)에서 함수는, 같은 입력으로 오늘 결과를 뽑든, 내일 결과를 뽑든, 몇 번을 실행하든 결과값은 달라지지 않습니다. 전역 변수나, 주변 어떤 상황에도 의존하지 않고, 오로지 입력에만 의존합니다. 언제든 입력을 안다면, 출력을 알 수 있어 <strong>참조 투명Referential Transparency</strong>하다라고 합니다.</p>
+<p>※ 완전한 학술적 정의는 아니지만, 대충 입력, 출력에 명시되지 않고 함수 동작에 영향을 미치는 모든 요소를 <a href="https://lionhairdino.github.io/posts/2022-09-03-effect.html"><strong>Effect</strong></a>라 부릅니다.</p>
+<p>과연 이런 제약을 지키고 프로그래밍이 가능할까 싶은, 너무 빡빡한 제약처럼 느껴집니다. Effect 없이 어떻게 실용적인 프로그램이 나올 수 있을까요? 실용 프로그램은 여러 상황에서 IO를 빼놓을 수 없으니 현실에서 쓰이는 프로그램을 만들려면 Effect는 반드시 필요합니다. (물론, 프로그램의 일부로 쓰일 라이브러리는 Effect가 없는 것들도 있을 수 있겠습니다만, 결국 결과를 눈으로 봐야한다면, 완성된 프로그램인데 Effect가 없을 순 없습니다.)</p>
+<p>여러 교재들에서, 혹은 함수형 홍보 문구에선, 함수형은 Effect가 없다고 말을 합니다. Effect 없이는 실용적인 프로그램을 만들지 못하는데, 무슨 말일까요? 컴파일된 바이너리까지 확장해서 생각하면 Effect가 없는 설계를 한다기 보다 Effect를 잘 분리하는 게 목적입니다. 분리를 잘해서 힘 닿는데까지 순수하게 처리하고(순수한 척 하고), 잘 분리된 <strong>비순수 부분은 런타임에게</strong> 넘겨버리면 됩니다. 프로그래머 입장에서 비순수 부분을 만나지 않는다면, 함수형은 순수하다고 말할 수 있겠습니다.</p>
+<p>참조 투명성을 지키면 무슨 좋은 일이 생겨, 이리도 빡빡한 기반을 만들고 시작했을까요?</p>
+<p>※ Effect가 없는 함수를 <strong>순수 함수</strong>라 하고, Effect가 있는 함수는 <strong>액션</strong>Action이라고 부르거나, 아예 함수란 이름 대신 프로시저Procedure라 부르기도 합니다.</p>
+<p>간단한 절차형 의사코드를 보겠습니다.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>funcPlus v </span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span> v <span class="op">+</span> v <span class="op">*</span> global</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>funcMinus v</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span> v <span class="op">-</span> v <span class="op">*</span> global </span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>main</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  global <span class="ot">=</span> <span class="fl">1.1</span> </span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">init</span> <span class="ot">=</span> <span class="dv">1</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  res <span class="ot">=</span> funcPlus <span class="fu">init</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  res <span class="ot">=</span> funcMinus res</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span> res </span></code></pre></div>
+<p><code>funcPlus</code>와 <code>funcMinus</code>에서 필요한 정보를 매개 변수로 모두 받지 않고, <code>global</code> 변수에 두고 접근하고 있습니다. 이 함수들은 입력으로 들어오지 않은 <code>global</code>에 의존하고 있습니다. 참조 투명하지 않고, 순수 함수가 아니고, Effect가 있으며, 액션이라고 부릅니다.</p>
+<h2 id="변수-상태">변수, 상태</h2>
+<p>함수형에선 전역 변수를 둘 수 없습니다. 필요한 정보는 모두 매개 변수로 받아야 합니다.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>funcPlus gparam v</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span> v <span class="op">+</span> v <span class="op">*</span> gparam</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>funcMinus gparam v</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span> v <span class="op">-</span> v <span class="op">*</span> gparam</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>main</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  global <span class="ot">=</span> <span class="fl">1.1</span> </span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">init</span> <span class="ot">=</span> <span class="dv">0</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  res <span class="ot">=</span> funcPlus global <span class="fu">init</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  res <span class="ot">=</span> funcMinus global res</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span> res </span></code></pre></div>
+<p>그리고, 함수형에선 <strong>변수</strong>에 대입해서 기억하는 방법이 존재하지 않습니다. 위와 같이 <code>res</code>에 대입해서 기억시킬 수 없습니다.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>main</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span> (funcMinus <span class="fl">1.1</span> (funcPlus <span class="fl">1.1</span> <span class="dv">0</span>))</span></code></pre></div>
+<p>위와 같이 함수 하나가 끝나면, 결과를 다음 함수가 바로 받아야 합니다.</p>
+<p>데이터에 어떤 작업을 하고, 변경된 데이터를 다음 작업이 받아 작업하고, 변경된 데이터를 또 다음 함수에 넘기고…<br />
+이렇게 보일 수 있지만, 초기값을 넣어 주기 전에, 즉 값이 아직 없는 상황을 보면,</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>\<span class="fu">init</span> global <span class="ot">-&gt;</span> <span class="fu">print</span> (funcMinus global (funcPlus global <span class="fu">init</span>))</span></code></pre></div>
+<p>비어 있는 정보가 잘 보이게 써 보면,</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>\_ _ <span class="ot">-&gt;</span> <span class="fu">print</span> (funcMinus _ (funcPlus _ _))</span></code></pre></div>
+<p><strong>함수들을 먼저 묶어Combine</strong> 길을 만들고 있습니다. 전역 변수를 쓰던 코드를, 별 거 아닌 것처럼 보이지만 거창하게도</p>
+<p style="font-size:1.5em; text-align: center; font-weight: bold;">
+Effect가 필요한 상황을 순수 함수만으로 모델링 했습니다.
+</p>
+<p>튜링 머신에선 <strong>상태</strong>가 있는데, 람다 산법에는 상태를 둘 데가 없습니다. 그런데, 어떻게 튜링 머신이 할 수 있는 일을 모두 람다 산법으로 할 수 있을까요? 정말 번거로워 보이지만, 위 예시처럼 <strong>모두 매개 변수로 받으면 됩니다.</strong> 하지만, 딱 봐도, 매 번 <code>global</code>을 넘기면서 프로그래밍하는 건 여간 번거로운 일이 아닌 게 보입니다. 계속 의존하는 정보가 늘어날 수록, 이론상은 가능할지 몰라도, 현실적으론 불가능에 가깝습니다.</p>
+<h2 id="람다-함수-클로저-고차-함수">람다 함수, 클로저, 고차 함수</h2>
+<p>람다 산법이 아니라, 프로그래밍쪽에선 람다 함수를 별 다른 설명 없이, 그냥 이름 없는 함수라 하고 넘어가는 문서들도 가끔 만납니다. 이름이 없으니, 나중에 다른 곳에서 못 부르는 함수겠거니 하고 넘어가는데, 쓰임새를 보면 꼭 짚고 넘어가야 하는 성질들이 있습니다.</p>
+<p>다음 처럼 <code>x</code>를 받으면, 값이 아니라 함수를 반환하도록 할 수 있습니다.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>\x <span class="ot">-&gt;</span> (\y <span class="ot">-&gt;</span> doSomething x y)</span></code></pre></div>
+<p><code>x</code>를 주면, 결과로 반환하는 함수인 <code>\y-&gt;...</code> 함수에서만 보면, 분명 입력으로 들어 오지 않은 <code>x</code>를 참조하고 있습니다. Effect가 없는 순수 함수여야 하는데, 이렇게 보면 <strong>순수하지 않은 듯 보일 수 있습니다.</strong> <code>\y-&gt;...</code> 함수를 얻으려면, 반드시 <code>x</code>를 넣어 줘야만 합니다. <code>x</code>가 들어 온 후에 받은 <code>\y-&gt;...</code> 함수 입장에서 <code>x</code>는 (캡처된) 상수입니다. 모양은 입력으로 들어 오지 않은 정보를 접근하는 것 같지만, <code>\y-&gt;...</code> 함수 안의 <code>x</code>는 외부 정보가 아니라, 이미 고정된(컨텍스트의 캡처된 값에 바인딩된) 값을 가지고 있습니다. (함수 코드 덩어리를 수정하진 않고, 어딘가Context에 <code>x</code>를 기억해(캡처해) 두고 필요할 때 가져옵니다. 컨텍스트와 컨텍스트를 참조하는 함수를 합쳐 <strong>클로저</strong>라 부릅니다. <code>\y -&gt;...</code>에서만 보면 <code>x</code>는 어떤 람다 헤드에도 묶이지binded 않아 자유Free 변수라고 부릅니다.)<br />
+모두 순수 하지만, 순수하지 않은 듯이 보이는 이 동작이, 바로 <strong>리얼 월드</strong>의 순수하지 않은 일을 해결할 힌트입니다!</p>
+<h2 id="컴비네이터combinator">컴비네이터Combinator</h2>
+<p>※ 람다 산법에서 자유 변수가 없는 람다 함수를 컴비네이터라 부르는데, 하스켈 교재들을 읽을 때는, 이름 그대로 함수나 어떤 타입의 값을 <strong>조립</strong>Combine할 수 있게 해 주는 함수를 컴비네이터라 부른다고 보는 게 편합니다. (자유 변수가 없으면, 컨텍스트와 상관 없이 독립되어 있기 때문에 “조립” 요소로 볼 수 있으니, 결국 같은 뜻처럼 보이기도 합니다.)<br />
+※ Combinatory logic 참고</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>\v gparam <span class="ot">-&gt;</span> v <span class="op">+</span> v <span class="op">*</span> gparam <span class="co">-- (가)</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>\v gparam <span class="ot">-&gt;</span> v <span class="op">-</span> v <span class="op">*</span> gparam <span class="co">-- (나)</span></span></code></pre></div>
+<p>이 렇게 두 함수를 정의하고, 두 함수를 <strong>조립</strong>하기 위해, 아래와 같은 컴비네이터를 정의해 보겠습니다.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>\f g <span class="ot">-&gt;</span> \v <span class="ot">-&gt;</span> g (f v) <span class="co">-- 늘 보던 함수 합성입니다.</span></span></code></pre></div>
+<p>※ 위와 같은 컴비네이터로 <code>f</code>와 <code>g</code>를 합성할 수 있다면, <code>f</code>와 <code>g</code>도 역시 컴비네이터라 부릅니다.</p>
+<p>이렇게만 정의하면, <code>gparam</code>을 넘길 방법이 없으니, <code>g</code>, <code>f</code>에 <code>gparam</code>을 넘겨 주게 하고,</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>\f g <span class="ot">-&gt;</span> \v <span class="ot">-&gt;</span> g gparam (f gparam v)</span></code></pre></div>
+<p>이제 자유 변수인 gparam을 람다 헤드에 걸어 주면,</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>\gparam <span class="ot">-&gt;</span> \f g <span class="ot">-&gt;</span> \v <span class="ot">-&gt;</span> g gparam (f gparam v)</span></code></pre></div>
+<p>마치 <code>\gparam</code>이 <strong>전역 변수 역할</strong>과 비슷해 보이지 않나요? <code>\gparam -&gt;</code> 아래에 있는 함수 <code>f</code>와 <code>g</code>는 <code>gparam</code>에 접근 가능합니다. <code>gparam</code> 값을 넣어 주면, 두 함수를 합성하며, 각 각의 함수에 <code>gparam</code>을 넣어 적용할 준비를 마친 <code>\f g -&gt;...</code> 함수를 반환합니다. 이 함수에 <code>(가)</code>와 <code>(나)</code>를 넣어주면 원하는 동작을 할 수 있습니다. <code>gparam</code>을 가진 함수들을 조립할 수 있는 새로운 컴비네이터를 정의해서 이들을 조립(합성)할 수 있게 됐습니다.</p>
+<p>전역 변수 없이, 참조 투명성을 지키며 원하는 동작을 하게는 만들었지만, <code>gparam</code>이 점점 늘어가면 계속 이런 방식으로 이어 나가기가 힘들거란 걸 어렵지 않게 예상할 수 있습니다.</p>
+<p>이제 <code>gparam</code>을 계속 넘기는 건 변함없지만, 신경쓰지 않게 만들어 보겠습니다.</p>
+<h2 id="아직-값이-되지-않은-함수">아직 값이 되지 않은 함수</h2>
+<p>대상을 바라보는 눈을 바꿔서 <code>funcPlus</code>와 <code>funcMinus</code>가 <strong>값을 반환하는 것이 아니라</strong>, <code>gparam</code>을 받으면 값이 될 함수, 즉 <code>gparam</code>을 받기 전에 할 수 있는 일은 모두 해 놓고, <code>gparam</code>을 받으면, 그 때서야 값이 되는 <strong>함수까지만 만들어 반환</strong> 하도록 바꿔 보겠습니다.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>\v <span class="ot">-&gt;</span> \gparam <span class="ot">-&gt;</span> v <span class="op">+</span> v <span class="op">*</span> gparam <span class="co">-- (다)</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>\v <span class="ot">-&gt;</span> \gparam <span class="ot">-&gt;</span> v <span class="op">-</span> v <span class="op">*</span> gparam <span class="co">-- (라)</span></span></code></pre></div>
+<p><code>v</code>를 넣어도, 값을 만들어reduce 반환하는 것이 아니라, <code>gparam</code>을 받아야 값이 되는 함수를 반환합니다.<br />
+이제 이 둘을 조립하는 컴비네이터를 정의해 보겠습니다.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>\f g <span class="ot">-&gt;</span> (\initV <span class="ot">-&gt;</span> (\gparam <span class="ot">-&gt;</span> g ((f initV) gparam) gparam))</span></code></pre></div>
+<p>조금 복잡해 보이지만, <code>f</code>의 결과에 <code>gparam</code>을 적용해서 <code>g</code>에 넘기고, 이렇게 해서 만들어진 함수에 또 <code>gparam</code>을 적용하고 있습니다.<br />
+위에 정의했던 컴비네이터와 거의 비슷하지만, 다음과 같은 차이가 있습니다.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- \gparam -&gt; (\f g -&gt; (\initV -&gt;    g gparam (f gparam initV)))</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>   \f g <span class="ot">-&gt;</span> (\initV <span class="ot">-&gt;</span> (\gparam <span class="ot">-&gt;</span>    g (f initV gparam) gparam)) <span class="co">-- (마)</span></span></code></pre></div>
+<p>인자를 받는 순서만 바꾸어 놓은 모양이고, 결과는 같습니다. <code>f</code>, <code>g</code>, <code>initV</code>를 받았다면, 마지막으로 <code>gparam</code>을 받아야만 값이 되는 상황입니다.</p>
+<h2 id="커링과-partial-application">커링과 Partial application</h2>
+<p>둘이 비슷해 보이지만 좀 다릅니다. 함수에게 일부 인자만 넘겨서, 일부 인자는 고정된 상태로 보는 게 Partial application이고, 커링은 고차 함수가 지원될 때, 함수가 <strong>하나의 인자만 받고</strong>, 나머지 인자를 받아야 하는 함수로 반환하도록 만드는 걸 말합니다.</p>
+<pre><code>\x y -&gt; x + y</code></pre>
+<p>를 커링하면,</p>
+<pre><code>\x -&gt; (y -&gt; x + y)</code></pre>
+<p><code>\y -&gt; x + y</code> 함수를 손에 쥐려면, <code>\x</code>로 값을 넣어 줘야 얻을 수 있으니, 만일 손에 이 함수를 들고 있다면, 이 함수는 <code>x</code>를 알고 있다는 얘기입니다. <strong><em>컨텍스트</em></strong>에 <code>x</code>값이 들어 있다고 말합니다.</p>
+<h2 id="타입">타입</h2>
+<p>타입은 컴파일러와 대화하기 위한 “언어” 역할을 합니다. 타입 레벨 프로그래밍까지 넘보려면 꽤 복잡한 성질들을 알아야 합니다. 당연히 전반적인(포멀한) 타입 설명을 하려는 건 아닙니다. 여기서는, 잘 말하지 않는 한 가지 성질만 보겠습니다.</p>
+<p>타입은 나중에 할 일을 표기하는 방법 중 하나로 볼 수 있습니다.(아직 같은 방식으로 얘기하는 문서는 못봤습니다. 저 혼자만의 상상입니다.) 뭔가 작업을 해야 하지만, 지금은 이름만 붙이고 넘어가고, 필요한 때가 오면 실행할 수 있는 장치 역할을 할 수 있습니다.</p>
+<ul>
+<li>위에 보면, <code>initV</code>를 넣어 주면 나중에 <code>gparam</code>을 받아야만 값이 되는 함수들 <code>(다)</code>와 <code>(라)</code>를</li>
+<li><code>(마)</code>컴비네이터를 써서 합성하면,</li>
+<li>결과 함수도 역시 <code>initV</code>를 받아서 값을 돌려주는 게 아니라, <code>gparam</code>을 받아야만 되는 함수를 결과값으로 돌려 주고 있습니다.</li>
+</ul>
+<p><code>gparam</code>을 받는 부분을 타입으로 감싸 놓고, 타입 안의 값이 필요하다면 반드시 <code>gparam</code>을 넣어야만 되도록 만듭니다.<br />
+하스켈로 표현하면 다음 정도 되지만,</p>
+<pre><code>data RequireG a = { runner :: gparam -&gt; a }</code></pre>
+<p>지금은 그냥 <code>gparam</code>을 넘기면 값이 되는 타입을 <code>RequireG</code>이라 이름 붙였다고 생각하겠습니다. 그리고 언젠가 값이 필요하다면 <code>gparam</code>을 넣어 주는 runner를 돌리면 됩니다.</p>
+<pre><code>f :: RequireG a
+g :: RequireG a
+(마) :: RequireG a -&gt; RequireG a -&gt; RequireG a</code></pre>
+<p><strong>컴비네이션!</strong> 만일 <code>RequireG</code> 함수가 몇 십 개, 몇 백 개가 있어도, 이들을 모두 <code>(마)</code>로 합성하면, 수면 밑에서는 엄청나게 많은 절차가 있더라도, 수면 위만 보면 하나의 <code>RequireG</code> 타입의 함수일 뿐입니다. <code>RequireG</code> 타입의 컴비네이션을 하나의 값처럼 쓰다가, 최종 값이 필요할 때가 되면, <code>runner</code>로 전역 변수 역할을 하는 값을 넣어주면 됩니다.</p>
+<p style="font-size:1.5em; text-align: center; font-weight: bold;">
+조각을 조립한 전체를 보면 순수하지만, 특정 조각의 입장에서 보면 비순수
+</p>
+<p>이제, 최종 주제로 들어갈 준비가 된 것 같습니다. 지금까지 이 부분을 얘기하기 위한 용어들을 간단하게 짚어 봤습니다. 이제 함수들을 조립하는 동안, 각 함수들의 결과들을 어떻게 상태(처럼)로 다룰 수 있는가를 살펴 보겠습니다.</p>
+<h2 id="상태">상태</h2>
+<p>상태가 없는 함수형에서 <strong><em>상태를 대신할 매커니즘이 필요합니다.</em></strong> 하스켈을 공부하면서 만나는 주제들 중, 입문자에게 난이도 높은 걸로 악명을 떨치는 것들이 이 것과 관련이 있는 것들이 많습니다. 순수 함수로 비순수한 작업을 “효과적으로 모델링”할 방법이 필요합니다.</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>funcPlus gparam v</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span> v <span class="op">+</span> v <span class="op">*</span> gparam</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>funcMinus gparam v</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span> v <span class="op">-</span> v <span class="op">*</span> gparam</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>main</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>  global <span class="ot">=</span> <span class="fl">1.1</span> </span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">init</span> <span class="ot">=</span> <span class="dv">0</span></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>  res1 <span class="ot">=</span> funcPlus global <span class="fu">init</span> <span class="co">-- f1</span></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>  res2 <span class="ot">=</span> funcMinus global res1 <span class="co">-- f2</span></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>  res3 <span class="ot">=</span> res1 <span class="op">+</span> res2 <span class="co">-- 각 각 함수의 결과에 따로 접근 합니다. </span></span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span> res3 </span></code></pre></div>
+<p><code>res3</code> 부분처럼 기존 묶었던 함수들의 각 각의 결과가 필요한 경우를 보겠습니다. 이 게 해결되지 않으면 실용 프로그램을 만들기가 정말 까다로워집니다.</p>
+<h3 id="람다-함수의-클로저를-이용하는-방법">람다 함수의 클로저를 이용하는 방법</h3>
+<p>함수형에선 변수가 없다고 하는데, 좀 삐딱하게 얘기하면 아닙니다. 한 가지 방법이 있습니다. 바로 <strong>람다 헤드</strong>에 걸어 두면 됩니다.</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>\<span class="fu">init</span> global <span class="ot">-&gt;</span> <span class="fu">print</span> (funcMinus global (funcPlus global <span class="fu">init</span>))</span></code></pre></div>
+<p>위에서 값을 바로 다음 함수에 넣어주던 모양을, 각 함수의 결과를 람다 헤드에 걸어 보겠습니다.</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>\<span class="fu">init</span> <span class="ot">-&gt;</span> (\res1 <span class="ot">-&gt;</span> (\res2 <span class="ot">-&gt;</span> (<span class="fu">print</span> res1 <span class="op">+</span> res2)) (funcMinus global res1)) (funcPlus global <span class="fu">init</span>))</span></code></pre></div>
+<p>보기 복잡하니 일단 <code>f1</code>, <code>f2</code> 로 바꿔 보겠습니다.</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co">--       ___________________________________________</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>\<span class="fu">init</span> <span class="ot">-&gt;</span> (\res1 <span class="ot">-&gt;</span> (\res2 <span class="ot">-&gt;</span> res1 <span class="op">+</span> res2) (f2 res1)) (f1 <span class="fu">init</span>)</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="co">--                 ^^^^^^^^^^^^^^^^^^^^^^           </span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="co">--                 여기서 res1에 접근 할 수 있는 걸 주목해 주세요.</span></span></code></pre></div>
+<p>여전히 복잡해 보입니다. 값에 함수를 적용하는 컴비네이터를 정의해 조금 더 보기 좋게 표현을 바꿔 보겠습니다.</p>
+<pre><code>(&gt;&gt;&gt;&gt;&gt;) v f = f v</code></pre>
+<p><strong>중위 연산자</strong>로 인자 두 개 사이에 연산자로 둘 수 있습니다. <code>v &gt;&gt;&gt;&gt;&gt; f</code>로 쓸 수 있습니다.</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>\<span class="fu">init</span> <span class="ot">-&gt;</span> (f1 <span class="fu">init</span>) <span class="op">&gt;&gt;&gt;&gt;&gt;</span> (\res1 <span class="ot">-&gt;</span> (f2 res1) <span class="op">&gt;&gt;&gt;&gt;&gt;</span> (\res2 <span class="ot">-&gt;</span> res1 <span class="op">+</span> res2))</span></code></pre></div>
+<p><code>(&gt;&gt;&gt;&gt;&gt;)</code>의 연산의 <strong>우선 순위</strong>를 오른쪽 결합으로 하면, 아래처럼 괄호를 생략할 수 있습니다.</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>\<span class="fu">init</span> <span class="ot">-&gt;</span> (f1 <span class="fu">init</span>) <span class="op">&gt;&gt;&gt;&gt;&gt;</span> \res1 <span class="ot">-&gt;</span> (f2 res1) <span class="op">&gt;&gt;&gt;&gt;&gt;</span> (\res2 <span class="ot">-&gt;</span> res1 <span class="op">+</span> res2)</span></code></pre></div>
+<p><strong>함수 적용</strong>이 <code>&gt;&gt;&gt;&gt;&gt;</code>보다 우선 순위가 높다고 두면, (람다 함수 정의 끝은 표현식 끝까지입니다.)</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>\<span class="fu">init</span> <span class="ot">-&gt;</span> f1 <span class="fu">init</span> <span class="op">&gt;&gt;&gt;&gt;&gt;</span> \res1 <span class="ot">-&gt;</span> f2 res1 <span class="op">&gt;&gt;&gt;&gt;&gt;</span> \res2 <span class="ot">-&gt;</span> res1 <span class="op">+</span> res2</span></code></pre></div>
+<p>하스켈은 슈거 문법으로 <code>do</code>를 정의해 두었습니다. 비슷하게 <code>&gt;&gt;&gt;&gt;&gt;</code>와 <code>\res -&gt;</code>의 슈거 문법 <code>dolike</code>를 정의해서 아래처럼 보이게 할 수 있습니다.</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>job <span class="fu">init</span> <span class="ot">=</span> dolike</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  res1 <span class="ot">&lt;-</span> f1 <span class="fu">init</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  res2 <span class="ot">&lt;-</span> f2 res1</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span> res1 <span class="op">+</span> res2</span></code></pre></div>
+<p><strong>각 함수들의 결과값에 따로 접근 가능한 상태로 컴비네이션</strong>을 만들 수 있게 되었고, 보기도 나쁘지 않습니다.<br />
+이 방식이 모나드 바인드가 쓰는 방식입니다. (모나드의 목적이란 말이 아니라, 모나드의 바인드가 액션의 개별 결과를 저장하는 방식을 말하고 있습니다. 모나드의 목적은 Side Effect를 다루는 것으로, 여기서는 해당 내용을 다루지 않습니다.) 하스켈에 do 표기법 포함 모나드를 도입한 사람은 <a href="https://en.wikipedia.org/wiki/Philip_Wadler">필립 와들러</a> 교수라 합니다. 어찌 이런 걸 생각해 냈을까요? 너무 익숙한 모양과 딱 맞아 떨어지니 감탄스럽습니다.
+(※ 처음 프로그래밍 이론에 모나드를 도입한 사람은 <a href="https://en.wikipedia.org/wiki/Eugenio_Moggi">유지니오 모기</a> 교수)</p>
+<p><span class="citation" data-cites="todo">@todo</span> 위 기능이 사용되면서 어떻게 Effect가 있는 액션들을 조립combine하는지 보이기</p>
+<h3 id="데이터-타입을-이용하는-방법">데이터 타입을 이용하는 방법</h3>
+<p>클로저 말고, 더 명시적으로 데이터를 끌고 다니는 컴비네이터를 설계할 수도 있습니다.</p>
+<p>몇 개의 함수를 컴바인할지 몰라, 결과값도 몇 개를 기억하고 있어야 할지 정해져 있지 않은 경우를 생각해 보겠습니다. <strong>데이터 수량이 정해지지 않은 경우를 표현하기 위한 방법</strong>이 뭐가 있을까요?<br />
+가장 먼저 떠오르는 걸로는 재귀 데이터 타입인 리스트가 있습니다.</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">List</span> a <span class="ot">=</span> <span class="dt">Null</span> <span class="op">|</span> <span class="dt">Cons</span> a (<span class="dt">List</span> a)</span></code></pre></div>
+<p>재귀 데이터 타입으로 리스트가 가장 만만해 보였는데, 더 만만한 타입이 있습니다.<br />
+2튜플을 살펴 보겠습니다. 튜플 자체는 재귀 데이터 타입은 아니고, 튜플속에 튜플을 넣는 모양으로 중첩 구조를 만들 수 있습니다. (꼭 튜플이 아니더라도 중첩을 만들 수 있는 구조면 뭐든 상관없지만, 이미 있는 것들 중 가장 간단한 구조는 튜플입니다.)</p>
+<ol type="1">
+<li><code>a</code>를 입력으로 주면 <code>f a</code>와, 이어지는 <code>g a</code>의 결과값을 모두 유지하려면,</li>
+<li><code>a</code>를 2튜플로 만듭니다. <code>(a,a)</code></li>
+<li>첫 번째 것에 <code>f</code>를 적용합니다. <code>(f a, a)</code></li>
+<li>두 번째 건에 <code>g</code>를 적용합니다. <code>(f a, g a)</code></li>
+<li><code>h</code>가 이어진다면 <code>(f a, (g a, h a))</code>로 만듭니다.</li>
+</ol>
+<p>이 방식이 Arrow가 사용하는 방식입니다.</p>
+<p><a href="https://lionhairdino.github.io/posts/2023-09-14-arrow.html">자세히 보기 - Arrow로 함수 컴비네이션</a></p>
+<h2 id="마무리">마무리</h2>
+<p>여러 천재들의 손을 거쳐 찾은 해결책들을, 바닥부터 아카데믹하게 이해하는 게 아니라, 실전 하스켈 코드를 보고 수긍할 정도의 눈을 갖는 게 목표입니다.</p>
+<p>여기서는 모나드와 Arrow 전체를 보려는 것이 아니라, 순수 함수로 인해 생긴 문제를 둘은 어떻게 해결하나 살펴 봤습니다. 컴비네이터들이 왜 그렇게 생겨 먹은 건지 이해하는데 조금은 도움이 됩니다. 난해한 컴비네이터를 만나 이해가 어려울 때, 위와 같은 동작을 하는 부분은 없나 살펴 보며 접근해 보는 것도 나쁘지 않겠습니다.</p>
+
+<div class="comment">
+<script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
+</script>
+</div>
+<div style="text-align:right">Github 계정이 없는 분은 메일로 보내주세요. lionhairdino at gmail.com </div>
+        </div>
+        <nav class="toc toc-right js-toc relative z-1 transition--300 absolute pa4 pt5 is-position-fixed"></nav>
+        <div id="footer">
+            © 2022 lionhairdino. All rights reserved. Generated by <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+        <script>
+            tocbot.init({
+                tocSelector: '.js-toc',
+                contentSelector: '.js-toc-content',
+                headingSelector: 'h2, h3',
+                hasInnerContainers: true,
+            });
+        </script>
+    </body>
+</html>
