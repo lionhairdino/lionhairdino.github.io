@@ -4,10 +4,10 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-        <title>lionhairdino - 순수 함수로 변수 모델링 (작성 중)</title>
+        <title>lionhairdino - Modeling Variables with Pure functions (En)</title>
 
-        <meta name="description" content="입 출력에 명시되지 않은 것에는 접근 불가능한 순수 함수만 있는 하스켈에서, 어떻게 전역 변수 같은 상위 스코프의 정보들을 순수 함수로 모델링하는지 살펴 봤습니다." />
-        <meta property="og:description" content="입 출력에 명시되지 않은 것에는 접근 불가능한 순수 함수만 있는 하스켈에서, 어떻게 전역 변수 같은 상위 스코프의 정보들을 순수 함수로 모델링하는지 살펴 봤습니다." />
+        <meta name="description" content="In Haskell, where only pure functions are allowed and there is no access to unspecified inputs or side effects, we explored how to model information from higher scopes, such as global variables, using pure functions." />
+        <meta property="og:description" content="In Haskell, where only pure functions are allowed and there is no access to unspecified inputs or side effects, we explored how to model information from higher scopes, such as global variables, using pure functions." />
 
         <link rel="stylesheet" type="text/css" href="../css/default.css" />
         <link rel="icon" href="https://lionhairdino.github.io/favicon.svg" />
@@ -33,13 +33,13 @@
         <meta name="msapplication-TileColor" content="#ff7500" />
         <meta name="theme-color" content="#ffffff" />
         <meta property="og:type" content="website" />
-        <meta property="og:title" content="순수 함수로 변수 모델링 (작성 중)" />
+        <meta property="og:title" content="Modeling Variables with Pure functions (En)" />
         <meta property="og:site_name" content="Lionhairdino" />
-        <meta property="og:url" content="https://lionhairdino.github.io/posts/2024-11-16-pureFunction.html" />
+        <meta property="og:url" content="https://lionhairdino.github.io/posts/2024-11-16-pureFunction_en.html" />
 
         <meta property="og:image" content="https://lionhairdino.github.io/images/state400px.png" />
 
-      <meta name="keywords" content="하스켈, haskell, 순수, 비순수, 상태, 람다 함수, 컴비네이터, 고차 함수, 커링, 타입, Arrow, Pure function, 모나드">
+      <meta name="keywords" content="haskell, pure, impure, State, Lambda, Combinator, Higher order, Currying, Type, Arrow, Pure function, Monad, Partial application, Effect, Realworld">
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-E9WZ6VXGHP"></script>
 <script>
@@ -75,27 +75,31 @@
             </div>
         </div>
         <div class="js-toc-content">
-            <h1>순수 함수로 변수 모델링 (작성 중)</h1>
+            <h1>Modeling Variables with Pure functions (En)</h1>
             <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
 <div class="info">
     Posted on November 16, 2024
     
 </div>
 
-<p>대상: 처음 입문하는 분들이 볼 수 있는 안내서로 만들려 했는데, 몇 몇 부분에서 사전 지식이 좀 필요한 곳들이 있습니다. 아무래도, 하스켈 공부를 시작하고, 모나드, Arrow 문서들까지 봤는데, 찜찜함이 남은 분들이 봐야 적당할 것 같습니다.</p>
-<p>저는 함수형 프로그래밍(이하 함수형)으로 돈을 벌고(벌려고 하고) 있으니 프로페셔널이라고 할 수도 있지만, 함수형의 기반을 공부하는 건 취미(아마추어)에 가깝습니다. 아주 밑바닥의 기반 지식이 없어도 함수형을 하는데 문제가 있는 건 아닙니다만, 그저 개인적인 성향으로 궁금한 것들이 있어, 여기 저기 뒤지고 다니며, 상상하고, 정리하고 있습니다. 아는 동료들이 거의 없어 지식이 맞는지 검증할 방법이 마땅치 않습니다. 정식 교육을 통해 익힌 지식들이 아니라 검증되지 않은 제 <strong><em>상상</em></strong>이니 주의하며 보시기 바랍니다.</p>
-<p>이 글은 순수 함수에서 출발해서 함수형 입문에 필요한 용어, 개념들을 살펴보는 문서입니다.</p>
+<p><a href="../posts/2024-11-16-pureFunction.html">Korean</a> | English<br />
+Target readers: I initially aimed to create a guide suitable for complete beginners, but there are sections that require some prior knowledge. It seems more appropriate for those who have started studying Haskell and still feel uneasy after exploring topics like Monad and Arrow.</p>
+<p>I work (or aim to work) professionally with functional programming (hereafter referred to as FP), so you could call me a profesional. However, studying the foundations of FP is more like a hobby (closer to being an amateur). While having a deep understanding of the foundational knowledge isn’t strictly necessary to work with FP, my personal curiosity drives me to explore, imagine, and organize these ideas as I dig into various sources.</p>
+<p>Since I have few peers to discuss these topics with, I lack reliable means to verify whether my understanding is correct. Please note that the knowledge presented here is based on my imaginings and not formally validated, so take it with caution.</p>
+<p>This post begins with pure functions and explores the terms and concepts necessary for getting started with functional programming.</p>
 <p style="font-size:1.5em; text-align: center; font-weight: bold;">
-함수형 프로그래밍을 공부할 때 난제의 시작은 순수 함수입니다.
+The starting point of challenges when studying functional programming is pure functions.
 </p>
-<h2 id="순수-함수-참조-투명성-effect-action">순수 함수, 참조 투명성, Effect, Action</h2>
-<p>함수형 프로그래밍(이하 그냥 함수형)에서 함수는, 같은 입력으로 오늘 결과를 뽑든, 내일 결과를 뽑든, 몇 번을 실행하든 결과값은 달라지지 않습니다. 전역 변수나, 주변 어떤 상황에도 의존하지 않고, 오로지 입력에만 의존합니다. 언제든 입력을 안다면, 출력을 알 수 있어 <strong>참조 투명Referential Transparency</strong>하다라고 합니다.</p>
-<p>※ 완전한 학술적 정의는 아니지만, 대충 입력, 출력에 명시되지 않고 함수 동작에 영향을 미치는 모든 요소를 <a href="https://lionhairdino.github.io/posts/2022-09-03-effect.html"><strong>Effect</strong></a>라 부릅니다.</p>
-<p>과연 이런 제약을 지키고 프로그래밍이 가능할까 싶은, 너무 빡빡한 제약처럼 느껴집니다. Effect 없이 어떻게 실용적인 프로그램이 나올 수 있을까요? 실용 프로그램은 여러 상황에서 IO를 빼놓을 수 없으니 현실에서 쓰이는 프로그램을 만들려면 Effect는 반드시 필요합니다. (물론, 프로그램의 일부로 쓰일 라이브러리는 Effect가 없는 것들도 있을 수 있겠습니다만, 결국 결과를 눈으로 봐야한다면, 완성된 프로그램인데 Effect가 없을 순 없습니다.)</p>
-<p>여러 교재들에서, 혹은 함수형 홍보 문구에선, 함수형은 Effect가 없다고 말을 합니다. Effect 없이는 실용적인 프로그램을 만들지 못하는데, 무슨 말일까요? 컴파일된 바이너리까지 확장해서 생각하면 Effect가 없는 설계를 한다기 보다 Effect를 잘 분리하는 게 목적입니다. 분리를 잘해서 힘 닿는데까지 순수하게 처리하고(순수한 척 하고), 잘 분리된 <strong>비순수 부분은 런타임에게</strong> 넘겨버리면 됩니다. 프로그래머 입장에서 비순수 부분을 만나지 않는다면, 함수형은 순수하다고 말할 수 있겠습니다.</p>
-<p>참조 투명성을 지키면 무슨 좋은 일이 생겨, 이리도 빡빡한 기반을 만들고 시작했을까요?</p>
-<p>※ Effect가 없는 함수를 <strong>순수 함수</strong>라 하고, Effect가 있는 함수는 <strong>액션</strong>Action이라고 부르거나, 아예 함수란 이름 대신 프로시저Procedure라 부르기도 합니다.</p>
-<p>간단한 절차형 의사코드를 보겠습니다.</p>
+<h2 id="pure-function-referential-transparency-effect-action">Pure function, Referential Transparency, Effect, Action</h2>
+<p>In FP, a function always produces the same output for the same input. Whether you rut it today, tomorrow, or multiple times, the result will not change. It does not rely on global variables or external states, depending solely on its input. As long as the input is known, the output can be determined. This property is known as referential transparency.</p>
+<p>※ Although not a complete academic definition, any element that influences the behavior of a function but is not explicitly defined in its input or output is often referred to as an <a href="https://lionhairdino.github.io/posts/2022-09-03-effect.html"><strong>Effect</strong></a>.</p>
+<p>Such restrictions may feel overly strict, making one wonder if programming within these constraints is even feasible. How can practical programs be created without relying on Effects? Real-world applications often involve IO operations that are indispensable. To build useful programs, Effects are necessary. (Of course, some libraries designed for use as part of a program may lack Effects, but if the program’s results need to be observed, a completed program without Effects is ultimately impossible.)</p>
+<p>Many textbooks and promotional materials claim that functional programming does not include Effects. But since practical programs inherently depend on Effects (especially for IO), what does this really mean? Rather than aiming for a design entirely without Effects, the goal is to effectively separate them.</p>
+<p>This means handling as much logic as possible in a “pure” way, even if it’s not entirely free of Effects, and delegating the well-isolated impure parts to the runtime system. Programmers focus on the pure logic without needing to directly deal with the impure sections. Thus, from their perspective, functional programming can still be described as “pure.”</p>
+<p>This separation approach aligns with concepts like monads in Haskell, where impure computations are encapsulated and managed explicitly, enabling programmers to reason about their code as though it were purely functional.</p>
+<p>Why follow referential transparency? What good comes from establishing such a strict foundation from the start?</p>
+<p>※ In FP, a function without Effects is called a <strong>pure function</strong>, while a function with Effects is often referred to as an <strong>action</strong> or, sometimes, a <strong>procedure</strong> instead of a function. This distinction highlights the difference between functions that only rely on their inputs to produce outputs and those that interact with external systems (such as performing IO operations or modifying state).</p>
+<p>I will show a simple procedural pseudocode.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>funcPlus v </span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span> v <span class="op">+</span> v <span class="op">*</span> global</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -108,9 +112,9 @@
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  res <span class="ot">=</span> funcPlus <span class="fu">init</span></span>
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  res <span class="ot">=</span> funcMinus res</span>
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span> res </span></code></pre></div>
-<p><code>funcPlus</code>와 <code>funcMinus</code>에서 필요한 정보를 매개 변수로 모두 받지 않고, <code>global</code> 변수에 두고 접근하고 있습니다. 이 함수들은 입력으로 들어오지 않은 <code>global</code>에 의존하고 있습니다. 참조 투명하지 않고, 순수 함수가 아니고, Effect가 있으며, 액션이라고 부릅니다.</p>
-<h2 id="변수-상태">변수, 상태</h2>
-<p>함수형에선 전역 변수를 둘 수 없습니다. 필요한 정보는 모두 매개 변수로 받아야 합니다.</p>
+<p>In <code>funcPlus</code> and <code>funcMinus</code>, the necessary information is not passed as parameters, but instead is stored in and accessed via a <code>global</code> variable. These functions depend on the <code>global</code> state, which is not provided as input. This means that they are not referentially transparent, not pure functions, they have effects, and they are considered actions.</p>
+<h2 id="variable-state">Variable, State</h2>
+<p>In FP, global variables are not allowed. All necessary information must be passed as parameters to functions.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>funcPlus gparam v</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span> v <span class="op">+</span> v <span class="op">*</span> gparam</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -123,81 +127,83 @@
 <span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  res <span class="ot">=</span> funcPlus global <span class="fu">init</span></span>
 <span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  res <span class="ot">=</span> funcMinus global res</span>
 <span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span> res </span></code></pre></div>
-<p>그리고, 함수형에선 <strong>변수</strong>에 대입해서 기억하는 방법이 존재하지 않습니다. 위와 같이 <code>res</code>에 대입해서 기억시킬 수 없습니다.</p>
+<p>In FP, there is no concept of variables that can store values through assignment. Unlike imperative programming, where you can assign a value to a variable like res, functional programming avoids mutating state. Instead, values are passed through functions as parameters and returned as results. Therefore, you cannot “remember” a value by assigning it to a variable; each computation is based solely on its inputs and produces outputs without altering any external state.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>main</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span> (funcMinus <span class="fl">1.1</span> (funcPlus <span class="fl">1.1</span> <span class="dv">0</span>))</span></code></pre></div>
-<p>위와 같이 함수 하나가 끝나면, 결과를 다음 함수가 바로 받아야 합니다.</p>
-<p>데이터에 어떤 작업을 하고, 변경된 데이터를 다음 작업이 받아 작업하고, 변경된 데이터를 또 다음 함수에 넘기고…<br />
-이렇게 보일 수 있지만, 초기값을 넣어 주기 전에, 즉 값이 아직 없는 상황을 보면,</p>
+<p>As in the example above, when one function finishes, its result must be immediately passed to the next function.</p>
+<p>Performing an operation on data, 
+passing the modified data to the next function for further processing,<br />
+and so on may seem like a series of sequential steps.</p>
+<p>However, if you consider the scenario before any initial value is provided - when the value does not yet exist - it reveals…</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>\<span class="fu">init</span> global <span class="ot">-&gt;</span> <span class="fu">print</span> (funcMinus global (funcPlus global <span class="fu">init</span>))</span></code></pre></div>
-<p>비어 있는 정보가 잘 보이게 써 보면,</p>
+<p>If we write it in a way that clearly shows the empty state of the information, it looks like this:</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>\_ _ <span class="ot">-&gt;</span> <span class="fu">print</span> (funcMinus _ (funcPlus _ _))</span></code></pre></div>
-<p><strong>함수들을 먼저 묶어Combine</strong> 길을 만들고 있습니다. 전역 변수를 쓰던 코드를, 별 거 아닌 것처럼 보이지만 거창하게도</p>
+The functions are first grouped together to create a pathway. What might seem like a minor change - converting a program that relied on global variables - has been transformed into a grand effort to
 <p style="font-size:1.5em; text-align: center; font-weight: bold;">
-Effect가 필요한 상황을 순수 함수만으로 모델링 했습니다.
+model it using only pure functions.
 </p>
-<p>튜링 머신에선 <strong>상태</strong>가 있는데, 람다 산법에는 상태를 둘 데가 없습니다. 그런데, 어떻게 튜링 머신이 할 수 있는 일을 모두 람다 산법으로 할 수 있을까요? 정말 번거로워 보이지만, 위 예시처럼 <strong>모두 매개 변수로 받으면 됩니다.</strong> 하지만, 딱 봐도, 매 번 <code>global</code>을 넘기면서 프로그래밍하는 건 여간 번거로운 일이 아닌 게 보입니다. 계속 의존하는 정보가 늘어날 수록, 이론상은 가능할지 몰라도, 현실적으론 불가능에 가깝습니다.</p>
-<h2 id="람다-함수-클로저-고차-함수">람다 함수, 클로저, 고차 함수</h2>
-<p><a href="https://lionhairdino.github.io/posts/2021-04-08-lambdaCalculus.html">람다 산법</a>이 아니라, 프로그래밍쪽에선 람다 함수를 별 다른 설명 없이, 그냥 이름 없는 함수라 하고 넘어가는 문서들도 가끔 만납니다. 이름이 없으니, 나중에 다른 곳에서 못 부르는 함수겠거니 하고 넘어가는데, 쓰임새를 보면 꼭 짚고 넘어가야 하는 성질들이 있습니다.</p>
-<p>다음 처럼 <code>x</code>를 받으면, 값이 아니라 함수를 반환하도록 할 수 있습니다.</p>
+<p>In a Turing machine, there is a concept of state, but in the lambda calculus, there’s no place to hold a state. Sho how can the lambda calculus do everything a Turing machine can? It seems extremely cumbersome, but as shown in the example above, everything can be passed as parameters. However, it’s obvious that programming by passing global every single time is quite tedious. As the amount of dependent information increases, while theoritically possible, it becomes almost impractical in reality.</p>
+<h2 id="lambda-functions-closures-higher-order-functions">Lambda Functions, Closures, Higher-Order Functions</h2>
+<p>Not “<a href="https://lionhairdino.github.io/posts/2021-04-08-lambdaCalculus.html">lambda calculus</a>”, but in programming, there are sometimes documents that refer to lambda functions simply as “anonymous functions” without further explanation. Since they don’t have a name, it’s easy to assume that they can’t be called elsewhere in the program. However, looking at their usage, there are important characteristics that need to be highlighted.</p>
+<p>You can make it so that when <code>x</code> is received, it returns a function instead of a value, like this.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>\x <span class="ot">-&gt;</span> (\y <span class="ot">-&gt;</span> doSomething x y)</span></code></pre></div>
-<p><code>x</code>를 주면, 결과로 반환하는 함수인 <code>\y-&gt;...</code> 함수에서만 보면, 분명 입력으로 들어 오지 않은 <code>x</code>를 참조하고 있습니다. Effect가 없는 순수 함수여야 하는데, 이렇게 보면 <strong>순수하지 않은 듯 보일 수 있습니다.</strong> <code>\y-&gt;...</code> 함수를 얻으려면, 반드시 <code>x</code>를 넣어 줘야만 합니다. <code>x</code>가 들어 온 후에 받은 <code>\y-&gt;...</code> 함수 입장에서 <code>x</code>는 (캡처된) 상수입니다. 모양은 입력으로 들어 오지 않은 정보를 접근하는 것 같지만, <code>\y-&gt;...</code> 함수 안의 <code>x</code>는 외부 정보가 아니라, 이미 고정된(컨텍스트의 캡처된 값에 바인딩된) 값을 가지고 있습니다. (함수 코드 덩어리를 수정하진 않고, 어딘가Context에 <code>x</code>를 기억해(캡처해) 두고 필요할 때 가져옵니다. 컨텍스트와 컨텍스트를 참조하는 함수를 합쳐 <strong>클로저</strong>라 부릅니다. <code>\y -&gt;...</code>에서만 보면 <code>x</code>는 어떤 람다 헤드에도 묶이지binded 않아 자유Free 변수라고 부릅니다.)<br />
-모두 순수 하지만, 순수하지 않은 듯이 보이는 이 동작이, 바로 <strong>리얼 월드</strong>의 순수하지 않은 일을 해결할 힌트입니다!</p>
-<h2 id="컴비네이터combinator">컴비네이터Combinator</h2>
-<p>※ 람다 산법에서 자유 변수가 없는 람다 함수를 컴비네이터라 부르는데, 하스켈 교재들을 읽을 때는, 이름 그대로 함수나 어떤 타입의 값을 <strong>조립</strong>Combine할 수 있게 해 주는 함수를 컴비네이터라 부른다고 보는 게 편합니다. (자유 변수가 없으면, 컨텍스트와 상관 없이 독립되어 있기 때문에 “조립” 요소로 볼 수 있으니, 결국 같은 뜻처럼 보이기도 합니다.)<br />
-※ Combinatory logic 참고</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>\v gparam <span class="ot">-&gt;</span> v <span class="op">+</span> v <span class="op">*</span> gparam <span class="co">-- (가)</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>\v gparam <span class="ot">-&gt;</span> v <span class="op">-</span> v <span class="op">*</span> gparam <span class="co">-- (나)</span></span></code></pre></div>
-<p>이 렇게 두 함수를 정의하고, 두 함수를 <strong>조립</strong>하기 위해, 아래와 같은 컴비네이터를 정의해 보겠습니다.</p>
+<p>When you provide <code>x</code>, the function <code>\y-&gt;...</code>, which returns a function, clearly references <code>x</code>, even though <code>x</code> wasn’t directly passed as an input. This might seem like it’s not a pure function, because it looks like the function is accessing information not supplied as input. However the function <code>\y-&gt;...</code> is pure in a certain sense. Once <code>x</code> is passed in, the <code>x</code> within the function is a <strong>captured constant</strong>. it seems like it’s accessing external information, but the <code>x</code> inside the function is actually a value that has already been fixed and bound to the context. This is done without modifying the function’s body; the value of <code>x</code> is captured in the context, and when needed, it’s retrieved from there. This combination of a context and a function that references it is called <strong>closure</strong>. Inside the <code>\y-&gt;...</code>, <code>x</code> is considered a free variable because it it not bound within the lambda’s head.<br />
+While this behavior may seem impure, it’s a hint for solving impure real-world tasks while still keeping the core functionalty pure!</p>
+<h2 id="combinator">Combinator</h2>
+<p>In lamb calculus, a lambda function without free variable is called a <strong>combinator</strong>. When reading Haskell textbooks, it’s more convenient to think of a combinator as a function that allows you to <strong>combine</strong> functions or values of a certain type. This make sense because, when a function has no free variables, it it independent of any context and can bd seen as a “combinable” element. In this sense, it essentially carries the same meaning.<br />
+※ Please refer to Combinatory logic</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>\v gparam <span class="ot">-&gt;</span> v <span class="op">+</span> v <span class="op">*</span> gparam <span class="co">-- (A)</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>\v gparam <span class="ot">-&gt;</span> v <span class="op">-</span> v <span class="op">*</span> gparam <span class="co">-- (B)</span></span></code></pre></div>
+<p>We will define the two functions and then define a combinator to combine them as follows.</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>\f g <span class="ot">-&gt;</span> \v <span class="ot">-&gt;</span> g (f v) <span class="co">-- 늘 보던 함수 합성입니다.</span></span></code></pre></div>
-<p>※ 위와 같은 컴비네이터로 <code>f</code>와 <code>g</code>를 합성할 수 있다면, <code>f</code>와 <code>g</code>도 역시 컴비네이터라 부릅니다.</p>
-<p>이렇게만 정의하면, <code>gparam</code>을 넘길 방법이 없으니, <code>g</code>, <code>f</code>에 <code>gparam</code>을 넘겨 주게 하고,</p>
+<p>※ If we can combine <code>f</code> and <code>g</code> using a combinator like the one above, then <code>f</code> and <code>g</code> are also called combinators.</p>
+<p>If we define it like this, there’s no way to pass <code>gparam</code>, so we need to make sure that both <code>g</code> and <code>f</code> receive <code>gparam</code> as an argment.</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>\f g <span class="ot">-&gt;</span> \v <span class="ot">-&gt;</span> g gparam (f gparam v)</span></code></pre></div>
-<p>이제 자유 변수인 <code>gparam</code>을 람다 헤드에 걸어 주면,</p>
+<p>Now, if we place the free variable <code>gparam</code> in the lambda head,</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>\gparam <span class="ot">-&gt;</span> \f g <span class="ot">-&gt;</span> \v <span class="ot">-&gt;</span> g gparam (f gparam v)</span></code></pre></div>
-<p>마치 <code>\gparam</code>이 <strong>전역 변수 역할</strong>과 비슷해 보이지 않나요? <code>\gparam -&gt;</code> 아래에 있는 함수 <code>f</code>와 <code>g</code>는 <code>gparam</code>에 접근 가능합니다. <code>gparam</code> 값을 넣어 주면, 두 함수를 합성하며, 각 각의 함수에 <code>gparam</code>을 넣어 적용할 준비를 마친 <code>\f g -&gt;...</code> 함수를 반환합니다. 이 함수에 <code>(가)</code>와 <code>(나)</code>를 넣어주면 원하는 동작을 할 수 있습니다. <code>gparam</code>을 가진 함수들을 조립할 수 있는 새로운 컴비네이터를 정의해서 이들을 조립(합성)할 수 있게 됐습니다.</p>
-<p>전역 변수 없이, 참조 투명성을 지키며 원하는 동작을 하게는 만들었지만, <code>gparam</code>이 점점 늘어가면 계속 이런 방식으로 이어 나가기가 힘들거란 걸 어렵지 않게 예상할 수 있습니다.</p>
-<p>이제 <code>gparam</code>을 계속 넘기는 건 변함없지만, 신경쓰지 않게 만들어 보겠습니다.</p>
-<h2 id="아직-값이-되지-않은-함수">아직 값이 되지 않은 함수</h2>
-<p>대상을 바라보는 눈을 바꿔서 <code>funcPlus</code>와 <code>funcMinus</code>가 <strong>값을 반환하는 것이 아니라</strong>, <code>gparam</code>을 받으면 값이 될 함수, 즉 <code>gparam</code>을 받기 전에 할 수 있는 일은 모두 해 놓고, <code>gparam</code>을 받으면, 그 때서야 값이 되는 <strong>함수까지만 만들어 반환</strong> 하도록 바꿔 보겠습니다.</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>\v <span class="ot">-&gt;</span> \gparam <span class="ot">-&gt;</span> v <span class="op">+</span> v <span class="op">*</span> gparam <span class="co">-- (다)</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>\v <span class="ot">-&gt;</span> \gparam <span class="ot">-&gt;</span> v <span class="op">-</span> v <span class="op">*</span> gparam <span class="co">-- (라)</span></span></code></pre></div>
-<p><code>v</code>를 넣어도, 값을 만들어reduce 반환하는 것이 아니라, <code>gparam</code>을 받아야 값이 되는 함수를 반환합니다.<br />
-이제 이 둘을 조립하는 컴비네이터를 정의해 보겠습니다.</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>\f g <span class="ot">-&gt;</span> (\initV <span class="ot">-&gt;</span> (\gparam <span class="ot">-&gt;</span> g ((f initV) gparam) gparam))</span></code></pre></div>
-<p>조금 복잡해 보이지만, <code>f</code>의 결과에 <code>gparam</code>을 적용해서 <code>g</code>에 넘기고, 이렇게 해서 만들어진 함수에 또 <code>gparam</code>을 적용하고 있습니다.<br />
-위에 정의했던 컴비네이터와 거의 비슷하지만, 다음과 같은 차이가 있습니다.</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- \gparam -&gt; (\f g -&gt; (\initV -&gt;    g gparam (f gparam initV)))</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>   \f g <span class="ot">-&gt;</span> (\initV <span class="ot">-&gt;</span> (\gparam <span class="ot">-&gt;</span>    g (f initV gparam) gparam)) <span class="co">-- (마)</span></span></code></pre></div>
-<p>인자를 받는 순서만 바꾸어 놓은 모양이고, 결과는 같습니다. <code>f</code>, <code>g</code>, <code>initV</code>를 받았다면, 마지막으로 <code>gparam</code>을 받아야만 값이 되는 상황입니다.</p>
-<h2 id="커링과-partial-application">커링과 Partial application</h2>
-<p>둘이 비슷해 보이지만 좀 다릅니다. 함수에게 일부 인자만 넘겨서, 일부 인자는 고정된 상태로 보는 게 Partial application이고, 커링은 고차 함수가 지원될 때, 함수가 <strong>하나의 인자만 받고</strong>, 나머지 인자를 받아야 하는 함수로 반환하도록 만드는 걸 말합니다.</p>
+<p>Doen’t <code>\gparam</code> seem similar to the role of a <strong>global variable</strong>? The functions <code>f</code> and <code>g</code> below <code>\gparam-&gt;</code> have access to <code>gparam</code>. Once we provide a value for <code>gparam</code>, it allows us to combine the two function, and it returns a <code>\f g-&gt;...</code> function that is ready to apply <code>gparam</code> to each of the functions. By passing <code>(A)</code> and <code>(B)</code> into this function, we can achieve the desired behavior. By defining a new combinator that can combine functions with <code>gparam</code>, we can now combine(compose) these functions.</p>
+<p>Although we’ve managed to achieve the desired behavior while maintaining referential transparency without using global variables, it’s easy to predict that as global informations continues to grow, it will become increasingly difficult to maintain this approach.</p>
+<p>Now, even though we still need to pass <code>gparam</code>, let’s try to make it so that we don’t have to worry about it anymore.</p>
+<h2 id="currying-and-partial-application">Currying and Partial application</h2>
+<p>They may seem similar, but they are actually different. Passing some arguments to a function while keeping others fixed is called <strong>Partial application</strong>, while <strong>Currying</strong> refers to a higher order function that takes <strong>one argument at a time</strong> and returns a function that accepts the remaining arguments.</p>
 <pre><code>\x y -&gt; x + y</code></pre>
-<p>를 커링하면,</p>
+<p>if we apply currying to the above,</p>
 <pre><code>\x -&gt; (y -&gt; x + y)</code></pre>
-<p><code>\y -&gt; x + y</code> 함수를 손에 쥐려면, <code>\x</code>로 값을 넣어 줘야 얻을 수 있으니, 만일 손에 이 함수를 들고 있다면, 이 함수는 <code>x</code>를 알고 있다는 얘기입니다. <strong><em>컨텍스트</em></strong>에 <code>x</code>값이 들어 있다고 말합니다.</p>
-<h2 id="타입">타입</h2>
-<p>타입은 컴파일러와 대화하기 위한 “언어” 역할을 합니다. 타입 레벨 프로그래밍까지 넘보려면 꽤 복잡한 성질들을 알아야 합니다. 당연히 전반적인(포멀한) 타입 설명을 하려는 건 아닙니다. 여기서는, 잘 말하지 않는 한 가지 성질만 보겠습니다.</p>
-<p>타입은 나중에 할 일을 표기하는 방법 중 하나로 볼 수 있습니다.(아직 같은 방식으로 얘기하는 문서는 못봤습니다. 저 혼자만의 상상입니다.) 뭔가 작업을 해야 하지만, 지금은 이름만 붙이고 넘어가고, 필요한 때가 오면 실행할 수 있는 장치 역할을 할 수 있습니다.</p>
+<p>To obtain the function <code>\y -&gt; x + y</code>, you need to provide a value for <code>x</code> by passing through <code>\x</code>. If you have this function in your hands, it means the function “knows” the value of <code>x</code>. This implies that the value of <code>x</code> is present in the <strong>context</strong>.</p>
+<h2 id="a-function-that-hasnt-yet-become-a-value">A function that hasn’t yet become a value</h2>
+<p>By shifting the perspective, let’s change <code>funcPlus</code> and <code>funcMinus</code> so that instead of <strong>returning a value</strong>, they <strong>become functions</strong> that take <code>gparam</code> as an argument and return value. In other words, they will perform all possible operations before receiving <code>gparam</code>, and only when <code>gparam</code> is provided will they return the final value. This will ensure that the returned entity is a <strong>function that becomes a value</strong> once <code>gparam</code> is received.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>\v <span class="ot">-&gt;</span> \gparam <span class="ot">-&gt;</span> v <span class="op">+</span> v <span class="op">*</span> gparam <span class="co">-- (C)</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>\v <span class="ot">-&gt;</span> \gparam <span class="ot">-&gt;</span> v <span class="op">-</span> v <span class="op">*</span> gparam <span class="co">-- (D)</span></span></code></pre></div>
+<p>Even if we insert <code>v</code>, it won’t immediately produce a value by reducing and returning it. instead, it will return a function that becomes a value only once <code>gparam</code> is provided.<br />
+Now, let’s define a combinator to combine(compose) these two.</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>\f g <span class="ot">-&gt;</span> (\initV <span class="ot">-&gt;</span> (\gparam <span class="ot">-&gt;</span> g ((f initV) gparam) gparam))</span></code></pre></div>
+<p>It may seem a bit complicated, but we are applying <code>gparam</code> to the result of <code>f</code>, passing it to <code>g</code>, and then applying <code>gparam</code> again to the function created in this way. This is alomost the same as the combinator we defined earlier, but with the following differences.</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- \gparam -&gt; (\f g -&gt; (\initV -&gt;    g gparam (f gparam initV)))</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>   \f g <span class="ot">-&gt;</span> (\initV <span class="ot">-&gt;</span> (\gparam <span class="ot">-&gt;</span>    g (f initV gparam) gparam)) <span class="co">-- (E)</span></span></code></pre></div>
+<p>It’s essentially just a rearrangement of the order in which the arguments are received, and the result is the same. if we have <code>f</code>, <code>g</code>, and <code>initV</code>, we still need to receive <code>gparam</code> at the end in order to produce the final value.</p>
+<h2 id="types">Types</h2>
+<p>Types serve as a “language” for communicating with the compiler. To delev into type-level programming, you need to understand some quite complex properties. Of course, we’re not aiming for a extensive (formal) explanation of types here. Instead, we’ll focus on one paricular property that is often not discussed.</p>
+<p>Types can be seen as one way of marking tasks that will be done later(I haven’t seen any documents that discuss this in the same way; it’s just my own imagination). They indicate that some work needs to be done, but for now, you just give it a name and move on. When the time comes, the task can be executed.</p>
 <ul>
-<li>위에 보면, <code>initV</code>를 넣어 주면 나중에 <code>gparam</code>을 받아야만 값이 되는 함수들 <code>(다)</code>와 <code>(라)</code>를</li>
-<li><code>(마)</code>컴비네이터를 써서 합성하면,</li>
-<li>결과 함수도 역시 <code>initV</code>를 받아서 값을 돌려주는 게 아니라, <code>gparam</code>을 받아야만 되는 함수를 결과값으로 돌려 주고 있습니다.</li>
+<li><p>As seen above, when you provide <code>initV</code>, the functions <code>(C)</code> and <code>(D)</code> will become functions that return a value only after receiving <code>gparam</code>.</p></li>
+<li><p>if you combine them using the <code>(E)</code> combinator,</p></li>
+<li><p>결과 함수도 역시 <code>initV</code>를 받아서 값을 돌려주는 게 아니라, <code>gparam</code>을 받아야만 되는 함수를 결과값으로 돌려 주고 있습니다.</p></li>
+<li><p>The resulting function also does not return a value when given initV; instead, it returns a function that requires <code>gparam</code> to produce a value.</p></li>
 </ul>
-<p><code>gparam</code>을 받는 부분을 타입으로 감싸 놓고, 타입 안의 값이 필요하다면 반드시 <code>gparam</code>을 넣어야만 되도록 만듭니다.<br />
-하스켈로 표현하면 다음 정도 되지만,</p>
+<p>In haskell, it can be expressed as follows:</p>
 <pre><code>data RequireG a = { runner :: gparam -&gt; a }</code></pre>
-<p>지금은 그냥 <code>gparam</code>을 넘기면 값이 되는 타입을 <code>RequireG</code>이라 이름 붙였다고 생각하겠습니다. 그리고 언젠가 값이 필요하다면 <code>gparam</code>을 넣어 주는 runner를 돌리면 됩니다.</p>
+<p>For now, let’s assume we’ve named the type that requires <code>gparam</code> to produce a value as <code>RequireG</code>. if we ever need the value, we can simply run a runner that provides <code>gparam</code>.</p>
 <pre><code>f :: RequireG a
 g :: RequireG a
 (마) :: RequireG a -&gt; RequireG a -&gt; RequireG a</code></pre>
-<p><strong>컴비네이션!</strong> 만일 <code>RequireG</code> 함수가 몇 십 개, 몇 백 개가 있어도, 이들을 모두 <code>(마)</code>로 합성하면, 수면 밑에서는 엄청나게 많은 절차가 있더라도, 수면 위만 보면 하나의 <code>RequireG</code> 타입의 함수일 뿐입니다. <code>RequireG</code> 타입의 컴비네이션을 하나의 값처럼 쓰다가, 최종 값이 필요할 때가 되면, <code>runner</code>로 전역 변수 역할을 하는 값을 넣어주면 됩니다.</p>
+<p>Combination! Even if there are tens or hundreds of <code>RequireG</code> functions, you can compose all of them using <code>(E)</code>. Beneath the surface, there might be an enormous number of processes, but from above the surface, it all appears as just a single function of type <code>RequireG</code>. You can use this combination of <code>RequireG</code> typed functions as a single value, and when the final value is needed, simply provide the global-like value to the <code>runner</code>.</p>
 <p style="font-size:1.5em; text-align: center; font-weight: bold;">
-조각을 조립한 전체를 보면 순수하지만, 특정 조각의 입장에서 보면 비순수
+The assembled whole is pure,<br />
+but from the perspective of certain pieces, it may appear impure.
 </p>
-<p>이제, 최종 주제로 들어갈 준비가 된 것 같습니다. 지금까지 이 부분을 얘기하기 위한 용어들을 간단하게 짚어 봤습니다. 이제 함수들을 조립하는 동안, 각 함수들의 결과들을 어떻게 상태(처럼)로 다룰 수 있는가를 살펴 보겠습니다.</p>
-<h2 id="상태">상태</h2>
-<p>상태가 없는 함수형에서 <strong><em>상태를 대신할 매커니즘이 필요합니다.</em></strong> 하스켈을 공부하면서 만나는 주제들 중, 입문자에게 난이도 높은 걸로 악명을 떨치는 것들이 이 것과 관련이 있는 것들이 많습니다. 순수 함수로 비순수한 작업을 “효과적으로 모델링”할 방법이 필요합니다.</p>
+<p>Now, it seems we’re ready to dive into the final topic. so far, we’ve briefly introduced the terminology needed to discuss this part. Next, we’ll explore how to handle the results of individual functions as if they were state while composing these functions.</p>
+<h2 id="state">State</h2>
+<p>In FP, where there is no state, <strong>a mechanism to replace state</strong> is essential. Many of the topics in Haskell that are notorisously difficult for beginners are often tied to this concepts. What we need is a way to “effectively model” impure tasks using pure functions.</p>
 <div class="sourceCode" id="cb18"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>funcPlus gparam v</span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span> v <span class="op">+</span> v <span class="op">*</span> gparam</span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -245,12 +251,11 @@ g :: RequireG a
 <p>몇 개의 함수를 컴바인할지 몰라, 결과값도 몇 개를 기억하고 있어야 할지 정해져 있지 않은 경우를 생각해 보겠습니다. <strong>데이터 수량이 정해지지 않은 경우를 표현하기 위한 방법</strong>이 뭐가 있을까요?<br />
 가장 먼저 떠오르는 걸로는 재귀 데이터 타입인 리스트가 있습니다.</p>
 <div class="sourceCode" id="cb27"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">List</span> a <span class="ot">=</span> <span class="dt">Null</span> <span class="op">|</span> <span class="dt">Cons</span> a (<span class="dt">List</span> a)</span></code></pre></div>
-<p>재귀 데이터 타입으로 리스트가 가장 만만해 보였는데(리스트로 해결해도 되지만), 더 만만한 타입이 있습니다.<br />
-</p>
-<p>2튜플을 살펴 보겠습니다. 튜플 자체는 재귀 데이터 타입은 아니고, 튜플속에 튜플을 넣는 모양으로 중첩 구조를 만들 수 있습니다. (꼭 튜플이 아니더라도 중첩을 만들 수 있는 구조면 뭐든 상관없지만, 이미 있는 것들 중 가장 간단한 구조는 튜플입니다.)</p>
+<p>재귀 데이터 타입으로 리스트가 가장 만만해 보였는데, 더 만만한 타입이 있습니다.<br />
+2튜플을 살펴 보겠습니다. 튜플 자체는 재귀 데이터 타입은 아니고, 튜플속에 튜플을 넣는 모양으로 중첩 구조를 만들 수 있습니다. (꼭 튜플이 아니더라도 중첩을 만들 수 있는 구조면 뭐든 상관없지만, 이미 있는 것들 중 가장 간단한 구조는 튜플입니다.)</p>
 <ol type="1">
 <li><code>a</code>를 입력으로 주면 <code>f a</code>와, 이어지는 <code>g a</code>의 결과값을 모두 유지하려면,</li>
-<li>입력 <code>a</code>를 2튜플로 만듭니다. <code>(a,a)</code></li>
+<li><code>a</code>를 2튜플로 만듭니다. <code>(a,a)</code></li>
 <li>첫 번째 것에 <code>f</code>를 적용합니다. <code>(f a, a)</code></li>
 <li>두 번째 건에 <code>g</code>를 적용합니다. <code>(f a, g a)</code></li>
 <li><code>h</code>가 이어진다면 <code>(f a, (g a, h a))</code>로 만듭니다.</li>

@@ -4,9 +4,9 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-        <title>lionhairdino - 확장 TypeInType (deprecated) (작성예정)</title>
+        <title>lionhairdino - 확장 MonoLocalBinds</title>
 
-        <meta name="description" content="lionhairdino - 확장 TypeInType (deprecated) (작성예정)" />
+        <meta name="description" content="lionhairdino - 확장 MonoLocalBinds" />
         <meta property="og:description" content="하스켈 함수형 프로그래밍" />
 
         <link rel="stylesheet" type="text/css" href="../css/default.css" />
@@ -33,13 +33,13 @@
         <meta name="msapplication-TileColor" content="#ff7500" />
         <meta name="theme-color" content="#ffffff" />
         <meta property="og:type" content="website" />
-        <meta property="og:title" content="확장 TypeInType (deprecated) (작성예정)" />
+        <meta property="og:title" content="확장 MonoLocalBinds" />
         <meta property="og:site_name" content="Lionhairdino" />
-        <meta property="og:url" content="https://lionhairdino.github.io/extensions/2023-01-05-TypeInType.html" />
+        <meta property="og:url" content="https://lionhairdino.github.io/extensions/2024-11-19-MonoLocalBinds.html" />
 
         <meta property="og:image" content="https://lionhairdino.github.io/images/state400px.png" />
 
-      <meta name="keywords" content="Type Level">
+      <meta name="keywords" content="Let 일반화, TypeFamilies, GADTs">
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-E9WZ6VXGHP"></script>
 <script>
@@ -75,17 +75,39 @@
             </div>
         </div>
         <div class="js-toc-content">
-            <h1>확장 TypeInType (deprecated) (작성예정)</h1>
+            <h1>확장 MonoLocalBinds</h1>
             <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
 <div class="info">
-    Posted on January  5, 2023
+    Posted on November 19, 2024
     
 </div>
 
-<p><a href="https://ghc.gitlab.haskell.org/ghc/doc/users_guide/exts/poly_kinds.html#overview-of-type-in-type">GHC 공식 가이드 - 6.4.12.2. Overview of Type-in-Type</a></p>
-<p>GHC 8부터는 카인드를 타입과 다른 레벨로 보는게 아니라, 카인드 폴리모픽을 확장해서 타입과 카인드도 하나의 타입으로 봅니다. (참고 지라르의 역설) GHC는 타입과 카인드를 구별하지 않습니다.</p>
-<p>타입 <code>Bool</code>과 카인드 레벨로 끌어올려진promoted 카인드 <code>Bool</code>은 동일한 것으로 본다는 얘기입니다. (여전히 값생성자는 다른 것으로 취급합니다.)</p>
-<p>(작성 중)</p>
+<p><a href="https://ghc.gitlab.haskell.org/ghc/doc/users_guide/exts/let_generalisation.html">GHC User Guide 6.12.2. Let-generalisation</a></p>
+<p>로컬 다형성 (※ 로컬은 문법적으로 탑레벨이 아닌 걸 말합니다.)<br />
+<code>let</code>이나 <code>where</code>로 정의한 로컬 함수의 폴리모픽 동작에 관한 확장입니다.</p>
+<p>설명보다 코드보는 게 이해가 더 빠릅니다.
+(<a href="https://www.haskell.org/ghc/blog/20100930-LetGeneralisationInGhc7.html">Let generalisation in GHC 7.0</a>에서 코드 발췌)</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ot">{-# LANGUAGE MonoLocalBinds #-}</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>f x <span class="ot">=</span> (g <span class="ch">'v'</span>, g <span class="dt">True</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">where</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>      g y <span class="ot">=</span> (x,y)</span></code></pre></div>
+<p><code>g</code>함수가 받는 <code>y</code>가 폴리모픽하면 될 것 같은데, 컴파일하면 다음과 같은 에러가 납니다.</p>
+<pre><code>    Couldn't match expected type `Char' with actual type `Bool'
+    In the first argument of `g', namely `True'
+    In the expression: g True
+    In the expression: (g 'v', g True)</code></pre>
+<p><code>g 'v'</code>를 만나면서, <code>g</code>를 <code>Char</code>를 받는 함수로 추론했는데, 두 번째 <code>g</code>를 실행할 때 <code>Bool</code>이 들어와 문제입니다. <code>g</code>가 일반화되지 않았다고 말합니다.</p>
+<p>가이드에 있는 설명</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ot">{-# LANGUAGE ScopedTypeVariables #-}</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="ot">f ::</span> <span class="kw">forall</span> a<span class="op">.</span> a <span class="ot">-&gt;</span> ((a, <span class="dt">Char</span>), (a, <span class="dt">Bool</span>))</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>f x <span class="ot">=</span> (g <span class="ch">'v'</span>, g <span class="dt">True</span>)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">where</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="ot">      g ::</span> <span class="kw">forall</span> b<span class="op">.</span> b <span class="ot">-&gt;</span> (a,b)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>      g y <span class="ot">=</span> (x,y)</span></code></pre></div>
+<p>별 쓸모는 없지만, 설명을 위해 <code>a</code>를 받으면, <code>((a,v), (a, True))</code> 튜플을 반환하는 함수입니다. <code>g</code>함수는 <code>v</code>글자와 <code>True</code>에 적용하는 폴리모픽 함수입니다. <code>g</code> 서명에 있는 <code>a</code>는, <code>g</code> 함수내에서 <code>x</code>가 쓰이고 있기 때문에, 모든 타입이 아니라 <code>x의 타입</code>이어야 합니다. 하지만, <code>g</code>는 <code>a</code>에는 모노모픽합니다.</p>
+<p>GHC 6.12에선 타입 서명을 써주지 않아도 <code>g</code>의 폴리모픽 타입을 추론해서 컴파일 되지만, <code>GADTs</code>나 타입 패밀리를 쓰면 컴파일이 되지 않습니다. 혹은 GHC 7.0을 쓰면 컴파일되지 않습니다.</p>
+<p><code>-XMonLocalBinds</code> 확장을 쓰면 탑 레벨이 아니고 로컬인 <code>let</code> <code>where</code> 바인딩은 일반화generalised되지 않습니다.</p>
 
 <div class="comment">
 <script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
