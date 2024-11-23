@@ -156,7 +156,7 @@ While this behavior may seem impure, it’s a hint for solving impure real-world
 <div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>\v gparam <span class="ot">-&gt;</span> v <span class="op">+</span> v <span class="op">*</span> gparam <span class="co">-- (A)</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>\v gparam <span class="ot">-&gt;</span> v <span class="op">-</span> v <span class="op">*</span> gparam <span class="co">-- (B)</span></span></code></pre></div>
 <p>We will define the two functions and then define a combinator to combine them as follows.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>\f g <span class="ot">-&gt;</span> \v <span class="ot">-&gt;</span> g (f v) <span class="co">-- 늘 보던 함수 합성입니다.</span></span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>\f g <span class="ot">-&gt;</span> \v <span class="ot">-&gt;</span> g (f v) <span class="co">-- it's the familiar concept of function composition.</span></span></code></pre></div>
 <p>※ If we can combine <code>f</code> and <code>g</code> using a combinator like the one above, then <code>f</code> and <code>g</code> are also called combinators.</p>
 <p>If we define it like this, there’s no way to pass <code>gparam</code>, so we need to make sure that both <code>g</code> and <code>f</code> receive <code>gparam</code> as an argment.</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>\f g <span class="ot">-&gt;</span> \v <span class="ot">-&gt;</span> g gparam (f gparam v)</span></code></pre></div>
@@ -186,10 +186,9 @@ Now, let’s define a combinator to combine(compose) these two.</p>
 <p>Types serve as a “language” for communicating with the compiler. To delev into type-level programming, you need to understand some quite complex properties. Of course, we’re not aiming for a extensive (formal) explanation of types here. Instead, we’ll focus on one paricular property that is often not discussed.</p>
 <p>Types can be seen as one way of marking tasks that will be done later(I haven’t seen any documents that discuss this in the same way; it’s just my own imagination). They indicate that some work needs to be done, but for now, you just give it a name and move on. When the time comes, the task can be executed.</p>
 <ul>
-<li><p>As seen above, when you provide <code>initV</code>, the functions <code>(C)</code> and <code>(D)</code> will become functions that return a value only after receiving <code>gparam</code>.</p></li>
-<li><p>if you combine them using the <code>(E)</code> combinator,</p></li>
-<li><p>결과 함수도 역시 <code>initV</code>를 받아서 값을 돌려주는 게 아니라, <code>gparam</code>을 받아야만 되는 함수를 결과값으로 돌려 주고 있습니다.</p></li>
-<li><p>The resulting function also does not return a value when given initV; instead, it returns a function that requires <code>gparam</code> to produce a value.</p></li>
+<li>As seen above, when you provide <code>initV</code>, the functions <code>(C)</code> and <code>(D)</code> will become functions that return a value only after receiving <code>gparam</code>.</li>
+<li>if you combine them using the <code>(E)</code> combinator,</li>
+<li>The resulting function also does not return a value when given initV; instead, it returns a function that requires <code>gparam</code> to produce a value.</li>
 </ul>
 <p>In haskell, it can be expressed as follows:</p>
 <pre><code>data RequireG a = { runner :: gparam -&gt; a }</code></pre>
@@ -216,57 +215,56 @@ but from the perspective of certain pieces, it may appear impure.
 <span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">init</span> <span class="ot">=</span> <span class="dv">0</span></span>
 <span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>  res1 <span class="ot">=</span> funcPlus global <span class="fu">init</span> <span class="co">-- f1</span></span>
 <span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>  res2 <span class="ot">=</span> funcMinus global res1 <span class="co">-- f2</span></span>
-<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>  res3 <span class="ot">=</span> res1 <span class="op">+</span> res2 <span class="co">-- 각 각 함수의 결과에 따로 접근 합니다. </span></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>  res3 <span class="ot">=</span> res1 <span class="op">+</span> res2 <span class="co">-- Each function's result is accessed separately. </span></span>
 <span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span> res3 </span></code></pre></div>
-<p><code>res3</code> 부분처럼 기존 묶었던 함수들의 각 각의 결과가 필요한 경우를 보겠습니다. 이 게 해결되지 않으면 실용 프로그램을 만들기가 정말 까다로워집니다.</p>
-<h3 id="람다-함수의-클로저를-이용하는-방법">람다 함수의 클로저를 이용하는 방법</h3>
-<p>함수형에선 변수가 없다고 하는데, 좀 삐딱하게 얘기하면 아닙니다. 한 가지 방법이 있습니다. 바로 <strong>람다 헤드</strong>에 걸어 두면 됩니다.</p>
+<p>Let’s look at cases where the individual results of the previously composed functions, like in the <code>res3</code> part, are needed. if this isn’t resolved, building practical programs becomes very challenging.
+### How to use closures in lambda functions
+In FP, it’s often said that there are no variables, but if we take a slightly different perspective, that’s not entirely true. There is one way to handle it: simply bind them in the <strong>lambda head</strong>.</p>
 <div class="sourceCode" id="cb19"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>\<span class="fu">init</span> global <span class="ot">-&gt;</span> <span class="fu">print</span> (funcMinus global (funcPlus global <span class="fu">init</span>))</span></code></pre></div>
-<p>위에서 값을 바로 다음 함수에 넣어주던 모양을, 각 함수의 결과를 람다 헤드에 걸어 보겠습니다.</p>
+<p>Let’s take the pattern where values were immediately passed to the next function and instead bind the results of each function in the lambda head.</p>
 <div class="sourceCode" id="cb20"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>\<span class="fu">init</span> <span class="ot">-&gt;</span> (\res1 <span class="ot">-&gt;</span> (\res2 <span class="ot">-&gt;</span> (<span class="fu">print</span> res1 <span class="op">+</span> res2)) (funcMinus global res1)) (funcPlus global <span class="fu">init</span>))</span></code></pre></div>
-<p>보기 복잡하니 일단 <code>f1</code>, <code>f2</code> 로 바꿔 보겠습니다.</p>
+<p>Let’s simplify the example by renaming the functions to <code>f1</code> and <code>f2</code> and capture their results in the lambda head.</p>
 <div class="sourceCode" id="cb21"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co">--       ___________________________________________</span></span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>\<span class="fu">init</span> <span class="ot">-&gt;</span> (\res1 <span class="ot">-&gt;</span> (\res2 <span class="ot">-&gt;</span> res1 <span class="op">+</span> res2) (f2 res1)) (f1 <span class="fu">init</span>)</span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="co">--                 ^^^^^^^^^^^^^^^^^^^^^^           </span></span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="co">--                 여기서 res1에 접근 할 수 있는 걸 주목해 주세요.</span></span></code></pre></div>
-<p>여전히 복잡해 보입니다. 값에 함수를 적용하는 컴비네이터를 정의해 조금 더 보기 좋게 표현을 바꿔 보겠습니다.</p>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="co">--                 Please note that you can access res1 here.</span></span></code></pre></div>
+<p>To make it clearer, we can define a combinator that applies a function to a value, makeing the code more readable and simplifying the function composition.</p>
 <pre><code>(&gt;&gt;&gt;&gt;&gt;) v f = f v</code></pre>
-<p><strong>중위 연산자</strong>로 인자 두 개 사이에 연산자로 둘 수 있습니다. <code>v &gt;&gt;&gt;&gt;&gt; f</code>로 쓸 수 있습니다.</p>
+<p>You can use an <strong>infix operator</strong> to place an operation between two arguments. it can be written a <code>v &gt;&gt;&gt;&gt;&gt; f</code>.</p>
 <div class="sourceCode" id="cb23"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>\<span class="fu">init</span> <span class="ot">-&gt;</span> (f1 <span class="fu">init</span>) <span class="op">&gt;&gt;&gt;&gt;&gt;</span> (\res1 <span class="ot">-&gt;</span> (f2 res1) <span class="op">&gt;&gt;&gt;&gt;&gt;</span> (\res2 <span class="ot">-&gt;</span> res1 <span class="op">+</span> res2))</span></code></pre></div>
-<p><code>(&gt;&gt;&gt;&gt;&gt;)</code>의 연산의 <strong>우선 순위</strong>를 오른쪽 결합으로 하면, 아래처럼 괄호를 생략할 수 있습니다.</p>
+<p>If the <strong>precedence</strong> of the <code>(&gt;&gt;&gt;&gt;&gt;)</code> operation is set to right-associative, you can omit the parentheses as shown below.</p>
 <div class="sourceCode" id="cb24"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>\<span class="fu">init</span> <span class="ot">-&gt;</span> (f1 <span class="fu">init</span>) <span class="op">&gt;&gt;&gt;&gt;&gt;</span> \res1 <span class="ot">-&gt;</span> (f2 res1) <span class="op">&gt;&gt;&gt;&gt;&gt;</span> (\res2 <span class="ot">-&gt;</span> res1 <span class="op">+</span> res2)</span></code></pre></div>
-<p><strong>함수 적용</strong>이 <code>&gt;&gt;&gt;&gt;&gt;</code>보다 우선 순위가 높다고 두면, (람다 함수 정의 끝은 표현식 끝까지입니다.)</p>
+<p>If <strong>function application</strong> has a higher precedence than <code>&gt;&gt;&gt;&gt;&gt;</code>, (the end of the lambda function definition corresponds to the end of the expression.)</p>
 <div class="sourceCode" id="cb25"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>\<span class="fu">init</span> <span class="ot">-&gt;</span> f1 <span class="fu">init</span> <span class="op">&gt;&gt;&gt;&gt;&gt;</span> \res1 <span class="ot">-&gt;</span> f2 res1 <span class="op">&gt;&gt;&gt;&gt;&gt;</span> \res2 <span class="ot">-&gt;</span> res1 <span class="op">+</span> res2</span></code></pre></div>
-<p>하스켈은 슈거 문법으로 <code>do</code>를 정의해 두었습니다. 비슷하게 <code>&gt;&gt;&gt;&gt;&gt;</code>와 <code>\res -&gt;</code>의 슈거 문법 <code>dolike</code>를 정의해서 아래처럼 보이게 할 수 있습니다.</p>
+<p>Haskell defines <code>do</code> as syntactic sugar. Similary, we can define a syntactic sugar for <code>&gt;&gt;&gt;&gt;&gt;</code> and <code>\res -&gt;</code>, called <code>dolike</code>, to make the code look like the exmple below.</p>
 <div class="sourceCode" id="cb26"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>job <span class="fu">init</span> <span class="ot">=</span> dolike</span>
 <span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  res1 <span class="ot">&lt;-</span> f1 <span class="fu">init</span></span>
 <span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  res2 <span class="ot">&lt;-</span> f2 res1</span>
 <span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span> res1 <span class="op">+</span> res2</span></code></pre></div>
-<p><strong>각 함수들의 결과값에 따로 접근 가능한 상태로 컴비네이션</strong>을 만들 수 있게 되었고, 보기도 나쁘지 않습니다.<br />
-이 방식이 모나드 바인드가 쓰는 방식입니다. (모나드의 목적이란 말이 아니라, 모나드의 바인드가 액션의 개별 결과를 저장하는 방식을 말하고 있습니다. 모나드의 목적은 Effect들을 다루는 것으로, 여기서는 Effect를 다루기 위한 동작 중 일부만 얘기하고 있습니다.) 하스켈에 do 표기법 포함 모나드를 도입한 사람은 <a href="https://en.wikipedia.org/wiki/Philip_Wadler">필립 와들러</a> 교수라 합니다. 어찌 이런 걸 생각해 냈을까요? 너무 익숙한 모양과 딱 맞아 떨어지니 감탄스럽습니다.
-(※ 처음 프로그래밍 이론에 모나드를 도입한 사람은 <a href="https://en.wikipedia.org/wiki/Eugenio_Moggi">유지니오 모기</a> 교수입니다.)</p>
-<p><span class="citation" data-cites="todo">@todo</span> 위에 살펴본 개념들을 모두 적용해서, 어떻게 gparam(Effect가 있는)을 받는 액션들을 조립combine하는지 보이려고 합니다만, 아직 정리가 덜 됐습니다. (2024.11)</p>
-<h3 id="데이터-타입을-이용하는-방법">데이터 타입을 이용하는 방법</h3>
-<p>클로저 말고, 더 명시적으로 데이터를 끌고 다니는 컴비네이터를 설계할 수도 있습니다.</p>
-<p>몇 개의 함수를 컴바인할지 몰라, 결과값도 몇 개를 기억하고 있어야 할지 정해져 있지 않은 경우를 생각해 보겠습니다. <strong>데이터 수량이 정해지지 않은 경우를 표현하기 위한 방법</strong>이 뭐가 있을까요?<br />
-가장 먼저 떠오르는 걸로는 재귀 데이터 타입인 리스트가 있습니다.</p>
+<p>We’ve now created a <strong>combination</strong> that allows us to access the results of each funtion separately, which is both conveninet and readable.<br />
+This approach is similar to the way <strong>monad binds</strong> work, where each action’s individual results are stored. It’s important to clarify that we’re discussing how the monad’s bind operation stores these results, not the purpose of the monad itself, which is to handle effects. Here, we’re only focusing on one aspect of handling effects.
+The Haskell <code>do</code> notation, including the use of monads, was introduced by <a href="https://en.wikipedia.org/wiki/Philip_Wadler">Philip Wadler</a>. It’s impressive how he was able to design such a system that feels so familiar and natural. The way it all fits together is truly remarkable.
+(※ The person who first introduced the concept of monads in programming theory was <a href="https://en.wikipedia.org/wiki/Eugenio_Moggi">Eugenio Moggi</a>.)</p>
+<p><span class="citation" data-cites="todo">@todo</span> I am trying to demonstrate how to combine actions that take <code>gparam</code>(with effects) by applying all the concepts we’ve discussed above, but I haven’t fully organized my thoughts yet. (November 2024)</p>
+<h3 id="the-method-of-using-data-types">The method of using data types</h3>
+<p>You can design a more explicit combinator that carries data around, rather than relying on closures.</p>
+<p>Let’s consider a case where we don’t know how many functions we need to combine, so we also don’t know how many result values need to be remembered. What’s good way to represent this <strong>uncertain quantity of date</strong>?<br />
+The first thing that comes to mind is the recursive data type, <strong>list</strong></p>
 <div class="sourceCode" id="cb27"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">List</span> a <span class="ot">=</span> <span class="dt">Null</span> <span class="op">|</span> <span class="dt">Cons</span> a (<span class="dt">List</span> a)</span></code></pre></div>
-<p>재귀 데이터 타입으로 리스트가 가장 만만해 보였는데, 더 만만한 타입이 있습니다.<br />
-2튜플을 살펴 보겠습니다. 튜플 자체는 재귀 데이터 타입은 아니고, 튜플속에 튜플을 넣는 모양으로 중첩 구조를 만들 수 있습니다. (꼭 튜플이 아니더라도 중첩을 만들 수 있는 구조면 뭐든 상관없지만, 이미 있는 것들 중 가장 간단한 구조는 튜플입니다.)</p>
-<ol type="1">
-<li><code>a</code>를 입력으로 주면 <code>f a</code>와, 이어지는 <code>g a</code>의 결과값을 모두 유지하려면,</li>
-<li><code>a</code>를 2튜플로 만듭니다. <code>(a,a)</code></li>
-<li>첫 번째 것에 <code>f</code>를 적용합니다. <code>(f a, a)</code></li>
-<li>두 번째 건에 <code>g</code>를 적용합니다. <code>(f a, g a)</code></li>
-<li><code>h</code>가 이어진다면 <code>(f a, (g a, h a))</code>로 만듭니다.</li>
-</ol>
-<p>이 방식이 Arrow가 사용하는 방식입니다.</p>
-<p><a href="https://lionhairdino.github.io/posts/2023-09-14-arrow.html">자세히 보기 - Arrow로 함수 컴비네이션</a></p>
-<h2 id="마무리">마무리</h2>
-<p>여러 천재들의 손을 거쳐 찾은 해결책들을, 바닥부터 아카데믹하게 이해하는 게 아니라, 실전 하스켈 코드를 보고 수긍할 정도의 눈을 갖는 게 목표입니다.</p>
-<p>여기서는 모나드와 Arrow 전체를 보려는 것이 아니라, 순수 함수로 인해 생긴 문제를 둘은 어떻게 해결하나 살펴 봤습니다. 전 이렇게 보는 게, 컴비네이터들이 왜 그렇게 생겨 먹은 건지 이해하는데 조금은 도움이 됐습니다. 난해한 컴비네이터를 만나 이해가 어려울 때, 위와 같은 동작을 하는 부분은 없나 살펴 보며 접근해 보는 것도 나쁘지 않겠습니다.</p>
-<p>아직 최종 목적지에 도달하지 못해, 용두사미 같은 글이지만 미리 오픈합니다. 콕 집어서 이런 내용으로 정리한 글이 없어, 어디가 틀렸는지, 관심 있는 분들과 대화가 열렸으면 좋겠습니다. (분명 절차형만 다루던 엔지니어가 부드럽게 들어갈 길이 있을 것이라 믿고, 혼자 뒤지는 중입니다.)</p>
+<p>While a recursive data type like a list seems like the most straightforward solution (and it can work), there’s an even simpler type available.</p>
+<p>Let’s look at 2-tuples. While a tuple itself is not a recursive data type, you can create a nested structure by placing tuples inside each othter. (Of course, it doen’t have to be tuples; any structure that allows nesting will work. However, among the existing structures, tuples and one of simplest.)</p>
+<p>If you want to maintain the results of both <code>f a</code> and the subsequent <code>g a</code> when given <code>a</code> as input,
+1. you can represent this with a 2-tuple <code>(a, a)</code>.
+1. First, apply <code>f</code> to the first element: <code>(f a, a)</code>
+1. Then, apply <code>g</code> to the second element: <code>(f a, g a)</code>
+1. If <code>h</code> follows, you can extend it like this: <code>(f a, (g a, h a))</code>.</p>
+<p>This approach is similar to the one used by Arrows.<br />
+<a href="https://lionhairdino.github.io/posts/2023-09-14-arrow.html">Function combination with Arrow</a></p>
+<h2 id="as-i-conclude-this-post">As I conclude this post…</h2>
+<p>The goal here is not to academically understand the solutions found by many brilliant minds, but to develop the ability to recognize and appreciate them by reading practical Haskell code.</p>
+<p>In this section, we did not aim to explore Monads or Arrows in their entirety, but instead looked at how they address the problems arising from pure functions. This perspective helped me understand why combinators are designed the way they are. When encountering complex combinators that are hard to grasp, it might be helpful to look for parts of the code that behave similarly to the examples dicussed above, and approach them this way.</p>
+<p>Although I have not yet reached my final destination, I am opening this up early. There isn’t an article that specifically organizes this kind of content, so I hope to spark conversations with those who are interested to see where I might be wrong. I firmly believe that there is a smoother path for engineers who have only dealt with imperative programming, and I am navigation it on my own for now.</p>
 
 <div class="comment">
 <script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
