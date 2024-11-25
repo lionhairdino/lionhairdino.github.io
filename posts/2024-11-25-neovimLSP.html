@@ -121,17 +121,19 @@
 <span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  <span class="kw">end</span><span class="op">,</span></span>
 <span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="op">})</span></span></code></pre></div>
 <p><a href="https://neovim.io/doc/user/lua.html#vim.fs.root()"><code>vim.fs.root({source},{marker})</code></a> 함수로 상대 경로를 따라 올라가며 루트 디렉토리를 찾습니다. 프로젝트의 루트임을 알 수있게 해주는 파일들을 지정합니다. 위에선 <code>setup.py</code>파일이나 <code>pyproject.toml</code>이 있는 폴더를 찾는다는 뜻입니다. 실행한 언어 서버와 소통을 담당할 클라이언트를 시작하고 현재 버퍼와 연결합니다.</p>
-<p>버퍼에 클라이언트가 연결되면, 네오빔이 자동으로 다음 작업을 합니다.
-- <code>tagfunc</code>: 정의로 점프 기능을 <code>&lt;C-]&gt;</code>같은 <code>tag command</code>로 할 수 있게 합니다.
-- <code>omnifunc</code>[^1]: 삽입 모드에서 <strong>옴니 모드 완성</strong>을 설정하고 활성화합니다. <code>&lt;C-x&gt;&lt;C-o&gt;</code> 키로 부를 수 있습니다.
+<p>버퍼에 클라이언트가 연결되면, 네오빔이 자동으로 다음 작업을 합니다.</p>
+<ul>
+<li><code>tagfunc</code>: 정의로 점프 기능을 <code>&lt;C-]&gt;</code>같은 <code>tag command</code>로 할 수 있게 합니다.</li>
+<li><code>omnifunc</code>[^1]: 삽입 모드에서 <strong>옴니 모드 완성</strong>을 설정하고 활성화합니다. <code>&lt;C-x&gt;&lt;C-o&gt;</code> 키로 부를 수 있습니다.
 [^1]: <code>:set omnifunc?</code>로 설정값을 확인 할 수 있습니다. <code>v:lua.vim.lsp.omnifunc</code> 값이 나오면 LSP 옴니 모드 완성이 활성화된 상태입니다.<br />
 단순한 텍스트 매칭으로 완성될 단어를 제안하는 일반 텍스트 완성과 다르게, 컨텍스트(어떤 형식의 파일인지, 현재 코드의 상태는 어떤지, 함수 호출 위치가 어디인지…)에 따라서 완성될 단어를 제안합니다.<br />
 (다양한 언어, 문맥을 지원한다고 해서 <code>Omni</code>가 붙었다고 하는데, <code>모두</code>를 뜻하는 <code>Omni</code>가 맞나 싶습니다.)<br />
-<a href="https://github.com/hrsh7th/nvim-cmp">nvim-cmp</a> 플러그인을 이용해서 여러 소스를 참고해서 제안하도록 할 수 있습니다.
-- <code>formatexpr</code>: <code>gq</code>로 LSP 포맷팅(들여쓰기, 줄바끔, 띄어쓰기…)을 활성화합니다. 디폴트로는 빈 값인데, 여기에 LSP 함수를 설정하면, <code>gq</code>로 이 함수가 실행되어 텍스트를 포맷팅합니다.
-- 노멀 모드에서 <code>k</code>키를 <code>vim.lsp.buf.hover()</code> 동작과 바인딩합니다.
-- <code>[d</code>, <code>]d</code> 키를 <code>vim.diagnostic.goto_prev()</code>와 <code>vim.diagnostic.goto_next()</code>에 바인딩합니다.
-- <code>&lt;C-W&gt;d</code>를 <code>vim.diagnostic.opel_float()</code>에 바인딩합니다.</p>
+<a href="https://github.com/hrsh7th/nvim-cmp">nvim-cmp</a> 플러그인을 이용해서 여러 소스를 참고해서 제안하도록 할 수 있습니다.</li>
+<li><code>formatexpr</code>: <code>gq</code>로 LSP 포맷팅(들여쓰기, 줄바끔, 띄어쓰기…)을 활성화합니다. 디폴트로는 빈 값인데, 여기에 LSP 함수를 설정하면, <code>gq</code>로 이 함수가 실행되어 텍스트를 포맷팅합니다.</li>
+<li>노멀 모드에서 <code>k</code>키를 <code>vim.lsp.buf.hover()</code> 동작과 바인딩합니다.</li>
+<li><code>[d</code>, <code>]d</code> 키를 <code>vim.diagnostic.goto_prev()</code>와 <code>vim.diagnostic.goto_next()</code>에 바인딩합니다.</li>
+<li><code>&lt;C-W&gt;d</code>를 <code>vim.diagnostic.opel_float()</code>에 바인딩합니다.</li>
+</ul>
 <p>위 설정들을 자동으로 하는데, 사용자화 하려면, <code>LspAttach</code>, <code>LspDetach</code> 자동실행명령어autocommand를 이용할 수 있습니다.</p>
 <p>위처럼 단지 <code>vim.lsp.start(...)</code> 해 주는 것만으로 단일 언어를 위한 LSP 설정을 마칠 수 있습니다만, 언어에 따라, 확장자 별로 위 작업을 모두 반복해서 하려면 꽤 성가신 반복 작업입니다. 보통 아래와 같이 플러그인들을 활용합니다.</p>
 <h2 id="플러그인-활용">플러그인 활용</h2>
