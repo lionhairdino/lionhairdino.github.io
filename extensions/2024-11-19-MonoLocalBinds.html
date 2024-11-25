@@ -65,7 +65,7 @@
                 <!--<a href="/archive.html">archive</a>-->
             </div>
             <div style="display:inline-block;font-size:0.8em;vertical-align: top;">
-                <div style="display:inline-block;vertical-align: top;padding-top: 5px">사이트내 검색</div>
+                <div style="display:inline-block;vertical-align: top;padding-top: 5px">검색</div>
                 <div style="display:inline-block;width:180px;"> 
                     <div class="gcse-searchbox-only"></div>
                 </div>
@@ -88,7 +88,7 @@
 <p><a href="https://ghc.gitlab.haskell.org/ghc/doc/users_guide/exts/let_generalisation.html">GHC User Guide 6.12.2. Let-generalisation</a></p>
 <p>로컬 다형성 (※ 로컬은 문법적으로 탑레벨이 아닌 걸 말합니다.)<br />
 <code>let</code>이나 <code>where</code>로 정의한 로컬 함수의 폴리모픽 동작에 관한 확장입니다.</p>
-<p>설명보다 코드보는 게 이해가 더 빠릅니다.
+<p>설명보다 코드를 보는 게 이해가 더 빠릅니다.
 (<a href="https://www.haskell.org/ghc/blog/20100930-LetGeneralisationInGhc7.html">Let generalisation in GHC 7.0</a>에서 코드 발췌)</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ot">{-# LANGUAGE MonoLocalBinds #-}</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>f x <span class="ot">=</span> (g <span class="ch">'v'</span>, g <span class="dt">True</span>)</span>
@@ -99,18 +99,42 @@
     In the first argument of `g', namely `True'
     In the expression: g True
     In the expression: (g 'v', g True)</code></pre>
-<p><code>g 'v'</code>를 만나면서, <code>g</code>를 <code>Char</code>를 받는 함수로 추론했는데, 두 번째 <code>g</code>를 실행할 때 <code>Bool</code>이 들어와 문제입니다. <code>g</code>가 일반화되지 않았다고 말합니다.</p>
+<p><code>g 'v'</code>를 만나면서, <code>g</code>를 <code>Char</code>를 받는 함수로 추론했는데, 두 번째 <code>g</code>를 실행할 때 <code>Bool</code>이 들어와 문제입니다. <code>g</code>가 일반화되지 않았다고 말합니다. <code>g</code>를 폴리모픽하게 둘 방법이 필요합니다.</p>
+<p>ML 스타일 언어들은 보통 let 바인딩 변수나 where 바인딩 변수들을 일반화합니다. 폴리모픽하다는 뜻입니다.</p>
+<p><code>TypeFamilies</code>나 <code>GADTs</code>를 쓰면 암시적으로 <code>MonoLocalBinds</code>이 켜집니다. <code>NoMonoLocalBinds</code>를 주어 끌 수 있습니다.</p>
+<p><code>MonoLocalBinds</code>일 때는 탑 레벨 바인딩은 일반화 됩니다. 로컬 바인딩은 일반화 되지 않습니다.</p>
+<p>프로그래머는 스타일상의 이유로 때때로 로컬 변수를 쓰지 않는, 탑 레벨 바인딩 같은 로컬 바인딩을 작성합니다. 이럴 때는 일반화 하는게 더 합당해 보입니다.</p>
+<p><code>MonoLocalBinds</code>를 켜면, 다음과 같은 상황에만 바인딩 그룹이 일반화 됩니다.
+- 탑 레벨 바인딩 그룹이거나
+- 자유free 변수 각 각이 닫혀있거나closed
+- 바인더들 중 부분 타입 서명을 가지고 있는 게 있을때. <code>MonoLocalBinds</code>가 켜져 있더라도, 부분 타입 서명 <code>f :: _</code> 추가는(또는 더 일반적으로 <code>f :: _ =&gt; _</code>) 바인딩 별로 GHC에게 let-일반화를 요청한다.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>g v <span class="ot">=</span> <span class="op">...</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    f1 x <span class="ot">=</span> x <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    f2 y <span class="ot">=</span> f1 (y <span class="op">*</span> <span class="dv">2</span>)</span></code></pre></div>
+<p><code>f1</code>은 자유 변수를 가지고 있습니다.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>f3 x <span class="ot">=</span> <span class="kw">let</span> g y <span class="ot">=</span> x <span class="op">+</span> y <span class="kw">in</span> <span class="op">...</span></span></code></pre></div>
+<p><code>x</code> 자유 변수는 람다-바인딩 되어 있으니, <code>g</code>는 닫혀있지 않습니다. 그래서, <code>g</code>의 바인딩은 일반화 되지 않습니다.</p>
+<p>좀 더 복잡한 규칙을 정했습니다.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ot">{-# LANGUAGE MonoLocalBinds #-}</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>f x <span class="ot">=</span> (k <span class="ch">'v'</span>, k <span class="dt">True</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">where</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>      h y <span class="ot">=</span> (y,y)  <span class="co">-- Note: x가 없습니다.</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>      k z <span class="ot">=</span> (h z, h z)</span></code></pre></div>
+<blockquote>
+<p>With -XMonoLocalBinds (the default), a binding without a type signature is generalised only if all its free variables are closed.</p>
+</blockquote>
 <p>가이드에 있는 설명</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ot">{-# LANGUAGE ScopedTypeVariables #-}</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="ot">f ::</span> <span class="kw">forall</span> a<span class="op">.</span> a <span class="ot">-&gt;</span> ((a, <span class="dt">Char</span>), (a, <span class="dt">Bool</span>))</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>f x <span class="ot">=</span> (g <span class="ch">'v'</span>, g <span class="dt">True</span>)</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">where</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="ot">      g ::</span> <span class="kw">forall</span> b<span class="op">.</span> b <span class="ot">-&gt;</span> (a,b)</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>      g y <span class="ot">=</span> (x,y)</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ot">{-# LANGUAGE ScopedTypeVariables #-}</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="ot">f ::</span> <span class="kw">forall</span> a<span class="op">.</span> a <span class="ot">-&gt;</span> ((a, <span class="dt">Char</span>), (a, <span class="dt">Bool</span>))</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>f x <span class="ot">=</span> (g <span class="ch">'v'</span>, g <span class="dt">True</span>)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">where</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="ot">      g ::</span> <span class="kw">forall</span> b<span class="op">.</span> b <span class="ot">-&gt;</span> (a,b)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>      g y <span class="ot">=</span> (x,y)</span></code></pre></div>
 <p>별 쓸모는 없지만, 설명을 위해 <code>a</code>를 받으면, <code>((a,v), (a, True))</code> 튜플을 반환하는 함수입니다. <code>g</code>함수는 <code>v</code>글자와 <code>True</code>에 적용하는 폴리모픽 함수입니다. <code>g</code> 서명에 있는 <code>a</code>는, <code>g</code> 함수내에서 <code>x</code>가 쓰이고 있기 때문에, 모든 타입이 아니라 <code>x의 타입</code>이어야 합니다. 하지만, <code>g</code>는 <code>a</code>에는 모노모픽합니다.</p>
 <p>GHC 6.12에선 타입 서명을 써주지 않아도 <code>g</code>의 폴리모픽 타입을 추론해서 컴파일 되지만, <code>GADTs</code>나 타입 패밀리를 쓰면 컴파일이 되지 않습니다. 혹은 GHC 7.0을 쓰면 컴파일되지 않습니다.</p>
-<p><code>-XMonLocalBinds</code> 확장을 쓰면 탑 레벨이 아니고 로컬인 <code>let</code> <code>where</code> 바인딩은 일반화generalised되지 않습니다.</p>
+<p><code>-XMonoLocalBinds</code> 확장을 쓰면 탑 레벨이 아니고 로컬인 <code>let</code> <code>where</code> 바인딩은 일반화generalised되지 않습니다.</p>
 
 <div class="comment">
 <script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>

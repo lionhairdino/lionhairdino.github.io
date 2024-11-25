@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko" lang="ko">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <title>lionhairdino - Neovim에서 LSP 설정 (빌트인)</title>
+
+        <meta name="description" content="네오빔 LSP 빌트인 클라이언트 설정할 때 쓰이는 플러그인들의 역할을 정리했습니다." />
+        <meta property="og:description" content="네오빔 LSP 빌트인 클라이언트 설정할 때 쓰이는 플러그인들의 역할을 정리했습니다." />
+
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <link rel="icon" href="https://lionhairdino.github.io/favicon.svg" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino16px.png" sizes="16x16" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino24px.png" sizes="24x24" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino32px.png" sizes="32x32" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino48px.png" sizes="48x48" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino57px.png" sizes="57x57" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino60px.png" sizes="60x60" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino64px.png" sizes="64x64" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino72px.png" sizes="72x72" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino76px.png" sizes="76x76" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino114px.png" sizes="114x114" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino120px.png" sizes="120x120" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino144px.png" sizes="144x144" />
+        <link rel="shortcut icon" href="../favicon.ico" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino152px.png" sizes="152x152" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino180px.png" sizes="180x180" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino192px.png" sizes="192x192" />
+        <link rel="manifest" href="../site.webmanifest" />
+        <link rel="mask-icon" href="https://lionhairdino.github.io/Lionhairdino_black.svg" color="#ff7500" />
+        <meta name="msapplication-TileImage" content="/images/favicon/Lionhairdino144px.png" />
+        <meta name="msapplication-TileColor" content="#ff7500" />
+        <meta name="theme-color" content="#ffffff" />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="Neovim에서 LSP 설정 (빌트인)" />
+        <meta property="og:site_name" content="Lionhairdino" />
+        <meta property="og:url" content="https://lionhairdino.github.io/posts/2024-11-25-neovimLSP.html" />
+
+        <meta property="og:image" content="https://lionhairdino.github.io/images/state400px.png" />
+
+      <meta name="keywords" content="Language Server Protocol, mason, lspconfig, mason-lspconfig, neovim, plugin, 네오빔, 플러그인">
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-E9WZ6VXGHP"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-E9WZ6VXGHP');
+</script>
+<script src="../script/copycode.js"></script>
+<script async src="https://cse.google.com/cse.js?cx=9c53b4915cbb2605c"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.11.1/tocbot.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.11.1/tocbot.css" />
+<meta name="fediverse:creator" content="@lionhairdino@mastodon.social">
+    </head>
+    <body>
+        <div id="header">
+            <div style="display:inline-block;margin-right:5px;padding-top: 5px;" id="logo">
+                <a href="../"><img style="width:30px;border:none" src="../images/favicon/Lionhairdino48px.png"></a>
+            </div>
+            <div style="display:inline-block;vertical-align: top;padding-top:5px;" id="navigation">
+                <a href="../">lionhairdino</a>
+                <a href="../about.html">about</a>
+                <!--<a href="/archive.html">archive</a>-->
+            </div>
+            <div style="display:inline-block;font-size:0.8em;vertical-align: top;">
+                <div style="display:inline-block;vertical-align: top;padding-top: 5px">검색</div>
+                <div style="display:inline-block;width:180px;"> 
+                    <div class="gcse-searchbox-only"></div>
+                </div>
+                <div style="display:inline-block;vertical-align: top;padding-top: 11px; padding-left: 10px;"><a rel="me" href="https://mastodon.social/@lionhairdino"><img style="width:20px;border:none" src="../images/mastodon.svg"></a></div>
+                <div style="display:inline-block;vertical-align: top;padding-top: 11px; padding-left: 2px;"><a href="https://lionhairdino.bsky.social"><img style="width:20px;border:none" src="../images/bluesky.svg"></a></div>
+                <div style="display:inline-block;vertical-align: top;padding-top: 11px; padding-left: 2px;"><a href="https://discordapp.com/users/lionhairdino#7687"><img style="width:20px;border:none" src="../images/discord.svg"></a></div>
+            </div>
+            <div>
+                여기 글들은 일종의 질문입니다. 용어 선택도 학계, 업계에서 쓰는 걸로 되어 있지 않고, 틀린 내용이 있을 수도 있습니다.
+            </div>
+        </div>
+        <div class="js-toc-content">
+            <h1>Neovim에서 LSP 설정 (빌트인)</h1>
+            <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+<div class="info">
+    Posted on November 25, 2024
+    
+</div>
+
+<p>Language Server Protocl 이라고 이미 프로토콜 이름에 Server가 들어가 있어서 살짝 혼란스러울 수 있습니다. 헛갈리지 않게 줄여서 LSP라 부르겠습니다. 네오빔은 LSP 서버와 내장 LSP 클라이언트가 소통할 수도 있고, <a href="https://github.com/neoclide/coc.nvim">CoC 플러그인</a>을 이용해 소통할 수도 있습니다. ※ 네오빔을 쓰시는 주변 분들을 보니, 이제(2024.11) CoC보다는 빌트인된 클라이언트를 많이 쓰시는 것 같긴 한데, CoC 플러그인 개발이 끊긴 건 아닙니다.</p>
+<p>LSP 서버는 소스 코드의 <strong>의미semantics를 분석</strong>해서</p>
+<ul>
+<li>정의로 점프 go-to-definition</li>
+<li>참조하는 곳 찾기 find reference</li>
+<li>자동 완성 completion</li>
+<li>이름 바꾸기 rename</li>
+<li>리팩토링 refactor</li>
+<li>호버링 hover(풍선 도움말?)</li>
+</ul>
+<p>등의 작업을 지원합니다.</p>
+<p>네오빔은 LSP클라이언트를 내장하고 있고, 언어에 맞는 각 서버들은 써드 파티를 이용합니다.</p>
+<h2 id="lsp-설정하는-방법">LSP 설정하는 방법</h2>
+<p>아래는 네오빔 도움말과, 각 플러그인들의 설명을 참고해서 정리했습니다.</p>
+<h3 id="수작업">수작업</h3>
+<ul>
+<li>써드파티의 LSP 서버 설치</li>
+<li><a href="https://neovim.io/doc/user/lsp.html#vim.lsp.start()"><code>:lua vim.lsp.start({config}, {opts})</code></a><br />
+새로 <strong>LSP (내장builtin) 클라이언트</strong>를 생성하고, 외부의 언어 서버를 시작합니다. 클라이언트를 생성하려는데, 이미 <code>name</code>, <code>root_dir</code>이 같은 클라이언트가 실행 중에 있으면 재사용합니다.</li>
+</ul>
+<div class="sourceCode" id="cb1"><pre class="sourceCode lua"><code class="sourceCode lua"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- 파일 타입에 따라 자동으로 실행될 이벤트 핸들러 FileType autocommand</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="va">vim</span><span class="op">.</span><span class="va">api</span><span class="op">.</span>nvim_create_autocmd<span class="op">(</span><span class="st">'FileType'</span><span class="op">,</span> <span class="op">{</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="va">pattern</span> <span class="op">=</span> <span class="st">'python'</span><span class="op">,</span>  <span class="co">-- 여기 예시는 파일 타입이 &quot;python&quot;일 때 실행한다는 뜻</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="va">callback</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">args</span><span class="op">)</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="va">vim</span><span class="op">.</span><span class="va">lsp</span><span class="op">.</span>start<span class="op">({</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>      <span class="va">name</span> <span class="op">=</span> <span class="st">'my-server-name'</span><span class="op">,</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>      <span class="va">cmd</span> <span class="op">=</span> <span class="op">{</span><span class="st">'언어 서버 실행명'</span><span class="op">,</span> <span class="st">'--option'</span><span class="op">,</span> <span class="st">'arg1'</span><span class="op">,</span> <span class="st">'arg2'</span><span class="op">},</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>      <span class="co">-- 전체 코드의 의미를 파싱해야 하니, 어디가 프로젝트 루트인가 알아야 합니다.</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>      <span class="va">root_dir</span> <span class="op">=</span> <span class="va">vim</span><span class="op">.</span><span class="va">fs</span><span class="op">.</span>root<span class="op">(</span><span class="va">args</span><span class="op">.</span><span class="va">buf</span><span class="op">,</span> <span class="op">{</span><span class="st">'setup.py'</span><span class="op">,</span> <span class="st">'pyproject.toml'</span><span class="op">}),</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>      <span class="co">-- on_attach = ... </span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>      <span class="co">-- LSP 클라이언트가 현재 버퍼와 붙을 때 실행할 작업을, 여기 핸들러에 지정</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>      <span class="co">-- 키 바인딩을 한다거나 다른 플러그인들과 연동 작업 같은 것들</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="op">})</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  <span class="kw">end</span><span class="op">,</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="op">})</span></span></code></pre></div>
+<p><a href="https://neovim.io/doc/user/lua.html#vim.fs.root()"><code>vim.fs.root({source},{marker})</code></a> 함수로 상대 경로를 따라 올라가며 루트 디렉토리를 찾습니다. 프로젝트의 루트임을 알 수있게 해주는 파일들을 지정합니다. 위에선 <code>setup.py</code>파일이나 <code>pyproject.toml</code>이 있는 폴더를 찾는다는 뜻입니다. 실행한 언어 서버와 소통을 담당할 클라이언트를 시작하고 현재 버퍼와 연결합니다.</p>
+<p>버퍼에 클라이언트가 연결되면, 네오빔이 자동으로 다음 작업을 합니다.
+- <code>tagfunc</code>: 정의로 점프 기능을 <code>&lt;C-]&gt;</code>같은 <code>tag command</code>로 할 수 있게 합니다.
+- <code>omnifunc</code>[^1]: 삽입 모드에서 <strong>옴니 모드 완성</strong>을 설정하고 활성화합니다. <code>&lt;C-x&gt;&lt;C-o&gt;</code> 키로 부를 수 있습니다.
+[^1]: <code>:set omnifunc?</code>로 설정값을 확인 할 수 있습니다. <code>v:lua.vim.lsp.omnifunc</code> 값이 나오면 LSP 옴니 모드 완성이 활성화된 상태입니다.<br />
+단순한 텍스트 매칭으로 완성될 단어를 제안하는 일반 텍스트 완성과 다르게, 컨텍스트(어떤 형식의 파일인지, 현재 코드의 상태는 어떤지, 함수 호출 위치가 어디인지…)에 따라서 완성될 단어를 제안합니다.<br />
+(다양한 언어, 문맥을 지원한다고 해서 <code>Omni</code>가 붙었다고 하는데, <code>모두</code>를 뜻하는 <code>Omni</code>가 맞나 싶습니다.)<br />
+<a href="https://github.com/hrsh7th/nvim-cmp">nvim-cmp</a> 플러그인을 이용해서 여러 소스를 참고해서 제안하도록 할 수 있습니다.
+- <code>formatexpr</code>: <code>gq</code>로 LSP 포맷팅(들여쓰기, 줄바끔, 띄어쓰기…)을 활성화합니다. 디폴트로는 빈 값인데, 여기에 LSP 함수를 설정하면, <code>gq</code>로 이 함수가 실행되어 텍스트를 포맷팅합니다.
+- 노멀 모드에서 <code>k</code>키를 <code>vim.lsp.buf.hover()</code> 동작과 바인딩합니다.
+- <code>[d</code>, <code>]d</code> 키를 <code>vim.diagnostic.goto_prev()</code>와 <code>vim.diagnostic.goto_next()</code>에 바인딩합니다.
+- <code>&lt;C-W&gt;d</code>를 <code>vim.diagnostic.opel_float()</code>에 바인딩합니다.</p>
+<p>위 설정들을 자동으로 하는데, 사용자화 하려면, <code>LspAttach</code>, <code>LspDetach</code> 자동실행명령어autocommand를 이용합니다.</p>
+<p>언어에 따라, 확장자 별로 위 작업을 모두 반복해서 해주면 되지만, 성가신 반복 작업입니다. 보통 아래와 같이 플러그인들을 활용합니다.</p>
+<h3 id="플러그인-활용">플러그인 활용</h3>
+<p><a href="https://github.com/williamboman/mason.nvim"><strong>mason.nvim</strong></a>:
+LSP 서버, DAP서버, 린터, 포맷터를 <strong>설치, 관리</strong>합니다. 패키지들은 네오빔 데이터 디렉토리(<code>:h standard-path</code>)에 설치됩니다. 실행 파일들은 <code>bin/</code> 한 곳에 심볼릭 링크를 만들어 두고, 이 경로를 네오빔의 <code>PATH</code>에 추가합니다.</p>
+<p><a href="https://github.com/neovim/nvim-lspconfig"><strong>lspconfig</strong></a>:
+다양한 LSP서버들의 기본적인 설정을 제공합니다.<br />
+예시) 하스켈의 LSP서버 hls를 위한 설정으로, 플러그인 설치 후 <a href="https://github.com/neovim/nvim-lspconfig/blob/master/lua/lspconfig/configs/hls.lua">nvim-lspconfig/lua/lspconfig/configs/hls.lua</a>를 보면, 다음과 같이 되어 있습니다. 위에서 본 <code>vim.lsp.start</code>에 넣어 줄 옵션들 값입니다. 특별한 동작을 한다기보다 <strong>언어별 설정값을 저장해 둔 데이터 셋트</strong>입니다.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode lua"><code class="sourceCode lua"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">local</span> <span class="va">util</span> <span class="op">=</span> <span class="fu">require</span> <span class="st">'lspconfig.util'</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="cf">return</span> <span class="op">{</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="va">default_config</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="va">cmd</span> <span class="op">=</span> <span class="op">{</span> <span class="st">'haskell-language-server-wrapper'</span><span class="op">,</span> <span class="st">'--lsp'</span> <span class="op">},</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="va">filetypes</span> <span class="op">=</span> <span class="op">{</span> <span class="st">'haskell'</span><span class="op">,</span> <span class="st">'lhaskell'</span> <span class="op">},</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="va">root_dir</span> <span class="op">=</span> <span class="va">util</span><span class="op">.</span>root_pattern<span class="op">(</span><span class="st">'hie.yaml'</span><span class="op">,</span> <span class="st">'stack.yaml'</span><span class="op">,</span> <span class="st">'cabal.project'</span><span class="op">,</span> <span class="st">'*.cabal'</span><span class="op">,</span> <span class="st">'package.yaml'</span><span class="op">),</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="va">single_file_support</span> <span class="op">=</span> <span class="kw">true</span><span class="op">,</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="va">settings</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>      <span class="va">haskell</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>        <span class="va">formattingProvider</span> <span class="op">=</span> <span class="st">'ormolu'</span><span class="op">,</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>        <span class="va">cabalFormattingProvider</span> <span class="op">=</span> <span class="st">'cabalfmt'</span><span class="op">,</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>      <span class="op">},</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    <span class="op">},</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>  <span class="op">},</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>  <span class="va">docs</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    <span class="va">description</span> <span class="op">=</span> <span class="vs">[[ ...</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="vs">}</span></span></code></pre></div>
+<p><a href="https://github.com/williamboman/mason-lspconfig.nvim"><strong>mason-lsconfig</strong></a>:
+<code>mason.nvim</code>과 <code>lspconfig</code>, 이 <strong>둘을 연결해 줄 브릿지</strong>입니다. 대충 위 플러그인 동작을 생각해 보면, <code>mason.nvim</code>으로 원하는 외부 서버를 설치하면, 해당 서버에 맞는 설정을 <code>lspconfig</code>가 넣어줘야 자동 LSP 환경 설정을 마칠 수 있습니다.</p>
+<p>※ <a href="https://github.com/j-hui/fidget.nvim">fidget.nvim</a>: 가끔 LSP 동작이 잘되는 것인가 의심스러울 때가 있습니다. 필수는 아니지만 이 플러그인을 설치하면 LSP 동작 상태를 실시간으로 볼 수 있습니다.</p>
+<p>※ 얼마 전(2024.10) <code>lua</code> LSP 서버의 이름이 바뀌면서 <code>lua_ls</code>란 이름과 <code>lua-language-server</code> 이름을 매핑해주는 작업을 여기서 해줬었습니다.</p>
+<h3 id="마무리">마무리</h3>
+<p>보통, 위 플러그인들 중 하나를 쓰는 게 아니라, <code>mason.nvim</code>, <code>lspconfig</code>, <code>mason-lspconfig</code>를 같이 설치해서 연동해서 씁니다. 한 두 개의 언어만 고정해서 쓴다면, 수작업으로 설졍해도 되지만, 여러 언어들 관련 설정을 하기에는 수작업은 많이 성가십니다.</p>
+
+<div class="comment">
+<script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
+</script>
+</div>
+<div style="text-align:right">Github 계정이 없는 분은 메일로 보내주세요. lionhairdino at gmail.com </div>
+        </div>
+        <nav class="toc toc-right js-toc relative z-1 transition--300 absolute pa4 pt5 is-position-fixed"></nav>
+        <div id="footer">
+            © 2022 lionhairdino. All rights reserved. Generated by <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+        <script>
+            tocbot.init({
+                tocSelector: '.js-toc',
+                contentSelector: '.js-toc-content',
+                headingSelector: 'h2, h3',
+                hasInnerContainers: true,
+            });
+        </script>
+    </body>
+</html>
