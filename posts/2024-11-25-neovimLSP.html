@@ -115,8 +115,8 @@
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>      <span class="co">-- 전체 코드의 의미를 파싱해야 하니, 어디가 프로젝트 루트인가 알아야 합니다.</span></span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>      <span class="va">root_dir</span> <span class="op">=</span> <span class="va">vim</span><span class="op">.</span><span class="va">fs</span><span class="op">.</span>root<span class="op">(</span><span class="va">args</span><span class="op">.</span><span class="va">buf</span><span class="op">,</span> <span class="op">{</span><span class="st">'setup.py'</span><span class="op">,</span> <span class="st">'pyproject.toml'</span><span class="op">}),</span></span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>      <span class="co">-- on_attach = ... </span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>      <span class="co">-- LSP 클라이언트가 현재 버퍼와 붙을 때 실행할 작업을, 여기 핸들러에 지정</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>      <span class="co">-- 키 바인딩을 한다거나 다른 플러그인들과 연동 작업 같은 것들</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>      <span class="co">-- LSP 클라이언트가 현재 버퍼와 붙을 때 실행할 작업을, 이 핸들러에 지정합니다.</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>      <span class="co">-- 키 바인딩을 한다거나 다른 플러그인들과 연동 작업 같은 것들 넣기에 적당합니다.</span></span>
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="op">})</span></span>
 <span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  <span class="kw">end</span><span class="op">,</span></span>
 <span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="op">})</span></span></code></pre></div>
@@ -124,11 +124,7 @@
 <p>버퍼에 클라이언트가 연결되면, 네오빔이 자동으로 다음 작업을 합니다.</p>
 <ul>
 <li><code>tagfunc</code>: 정의로 점프 기능을 <code>&lt;C-]&gt;</code>같은 <code>tag command</code>로 할 수 있게 합니다.</li>
-<li><code>omnifunc</code>: 삽입 모드에서 <strong>옴니 모드 완성</strong>을 설정하고 활성화합니다. <code>&lt;C-x&gt;&lt;C-o&gt;</code> 키로 부를 수 있습니다. [^1]
-[^1]: <code>:set omnifunc?</code>로 설정값을 확인 할 수 있습니다. <code>v:lua.vim.lsp.omnifunc</code> 값이 나오면 LSP 옴니 모드 완성이 활성화된 상태입니다.<br />
-단순한 텍스트 매칭으로 완성될 단어를 제안하는 일반 텍스트 완성과 다르게, 컨텍스트(어떤 형식의 파일인지, 현재 코드의 상태는 어떤지, 함수 호출 위치가 어디인지…)에 따라서 완성될 단어를 제안합니다.<br />
-(다양한 언어, 문맥을 지원한다고 해서 <code>Omni</code>가 붙었다고 하는데, <code>모두</code>를 뜻하는 <code>Omni</code>가 맞나 싶습니다.)<br />
-<a href="https://github.com/hrsh7th/nvim-cmp">nvim-cmp</a> 플러그인을 이용해서 여러 소스를 참고해서 제안하도록 할 수 있습니다.</li>
+<li><code>omnifunc</code>: 삽입 모드에서 <strong>옴니 모드 완성</strong>을 설정하고 활성화합니다. <code>&lt;C-x&gt;&lt;C-o&gt;</code> 키로 부를 수 있습니다. <a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></li>
 <li><code>formatexpr</code>: <code>gq</code>로 LSP 포맷팅(들여쓰기, 줄바끔, 띄어쓰기…)을 활성화합니다. 디폴트로는 빈 값인데, 여기에 LSP 함수를 설정하면, <code>gq</code>로 이 함수가 실행되어 텍스트를 포맷팅합니다.</li>
 <li>노멀 모드에서 <code>k</code>키를 <code>vim.lsp.buf.hover()</code> 동작과 바인딩합니다.</li>
 <li><code>[d</code>, <code>]d</code> 키를 <code>vim.diagnostic.goto_prev()</code>와 <code>vim.diagnostic.goto_next()</code>에 바인딩합니다.</li>
@@ -167,6 +163,15 @@ LSP 서버, DAP서버, 린터, 포맷터를 설치, 관리합니다. 패키지�
 <p>※ 얼마 전(2024.10) <code>lua</code> LSP 서버의 이름이 바뀌면서 <code>lua_ls</code>란 이름과 <code>lua-language-server</code> 이름을 매핑해주는 작업을 여기서 해줬었습니다.</p>
 <h2 id="마무리">마무리</h2>
 <p>보통, 위 플러그인들 중 하나를 쓰는 게 아니라, <code>mason.nvim</code>, <code>lspconfig</code>, <code>mason-lspconfig</code>를 같이 설치해서 연동해서 씁니다. 한 두 개의 언어만 고정해서 쓴다면, 수작업으로 설졍해도 되지만, 여러 언어들 관련 설정을 하기에는 수작업은 많이 성가십니다. 위 플러그인들을 이용해서 설정하다가 문제가 생기면, <a href="https://discord.gg/TwaYqgtQYf"> Vim.kr(한국 빔 사용자 모임) 디스코드 </a>로 오셔서 도움을 받으실 수 있습니다.</p>
+<section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes">
+<hr />
+<ol>
+<li id="fn1"><p><code>:set omnifunc?</code>로 설정값을 확인 할 수 있습니다. <code>v:lua.vim.lsp.omnifunc</code> 값이 나오면 LSP 옴니 모드 완성이 활성화된 상태입니다.<br />
+단순한 텍스트 매칭으로 완성될 단어를 제안하는 일반 텍스트 완성과 다르게, 컨텍스트(어떤 형식의 파일인지, 현재 코드의 상태는 어떤지, 함수 호출 위치가 어디인지…)에 따라서 완성될 단어를 제안합니다.<br />
+(다양한 언어, 문맥을 지원한다고 해서 <code>Omni</code>가 붙었다고 하는데, <code>모두</code>를 뜻하는 <code>Omni</code>가 맞나 싶습니다.)<br />
+<a href="https://github.com/hrsh7th/nvim-cmp">nvim-cmp</a> 플러그인을 이용해서 여러 소스를 참고해서 제안하도록 할 수 있습니다.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section>
 
 <div class="comment">
 <script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
