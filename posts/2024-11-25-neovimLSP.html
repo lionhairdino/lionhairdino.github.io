@@ -101,9 +101,9 @@
 (아래는 네오빔 도움말과, 각 플러그인들의 설명을 참고해서 정리했습니다.)</p>
 <h2 id="수작업">수작업</h2>
 <ul>
-<li>써드파티의 LSP 서버 설치</li>
+<li>직접 필요한 써드파티의 LSP 서버를 찾아 설치</li>
 <li><a href="https://neovim.io/doc/user/lsp.html#vim.lsp.start()"><code>:lua vim.lsp.start({config}, {opts})</code></a><br />
-새로 <strong>LSP (내장builtin) 클라이언트</strong>를 생성하고, <strong>외부의 언어 서버를 시작</strong>합니다. 클라이언트를 생성하려는데, 이미 <code>name</code>, <code>root_dir</code>이 같은 클라이언트가 실행 중에 있으면 재사용합니다.</li>
+새로 <strong>LSP (내장builtin) 클라이언트</strong>를 생성하고, <strong>외부 LSP 서버를 시작</strong>합니다. 클라이언트를 생성하려는데, 이미 <code>name</code>, <code>root_dir</code>이 같은 클라이언트가 실행 중에 있으면 재사용합니다.</li>
 </ul>
 <div class="sourceCode" id="cb1"><pre class="sourceCode lua"><code class="sourceCode lua"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- 파일 타입에 따라 자동으로 실행될 이벤트 핸들러 FileType autocommand</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="va">vim</span><span class="op">.</span><span class="va">api</span><span class="op">.</span>nvim_create_autocmd<span class="op">(</span><span class="st">'FileType'</span><span class="op">,</span> <span class="op">{</span></span>
@@ -154,14 +154,15 @@ LSP 서버, DAP서버, 린터, 포맷터를 설치, 관리합니다. 패키지�
 <span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>        <span class="va">cabalFormattingProvider</span> <span class="op">=</span> <span class="st">'cabalfmt'</span><span class="op">,</span></span>
 <span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>      <span class="op">},</span></span>
 <span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    <span class="op">},</span></span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>  <span class="op">},</span></span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>  <span class="va">docs</span> <span class="op">=</span> <span class="op">{</span></span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    <span class="va">description</span> <span class="op">=</span> <span class="vs">[[ ...</span></span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="vs">}</span></span></code></pre></div>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>  <span class="op">},</span></span></code></pre></div>
+<p><a href="https://github.com/neovim/nvim-lspconfig/blob/27008519562f16453813c19dcc6ee97f505e0b1c/lua/lspconfig/manager.lua#L131">nvim-lspconfig/lua/lspconfig/manager.lua</a> 에서</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode lua"><code class="sourceCode lua"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="dv">131</span> <span class="kw">local</span> <span class="va">client_id</span> <span class="op">=</span> <span class="va">lsp</span><span class="op">.</span>start<span class="op">(</span><span class="va">new_config</span><span class="op">,</span> <span class="op">{</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="op">...</span></span></code></pre></div>
+<p>LSP서버에 따라 적당한 옵션을 골라 <code>lsp.start</code>(<code>vim.lsp.start</code>)를 실행합니다.</p>
+<p>반드시 mason과 짝지어 돌리지 않아도 됩니다. 직접 외부 LSP서버를 설치하고, <code>require('lspconfig').pyright.setup({})</code>와 비슷한 코드로 개별 설정을 할 수도 있습니다.</p>
 <h3 id="mason-lspconfig">mason-lspconfig</h3>
 <p><a href="https://github.com/williamboman/mason-lspconfig.nvim"><strong>mason-lspconfig</strong></a>:
-<code>mason.nvim</code>과 <code>lspconfig</code>, 이 <strong>둘을 연결해 줄 브릿지</strong>입니다. 대충 위 플러그인들의 동작을 보면, <code>mason.nvim</code>으로 원하는 외부 서버를 설치하면, 해당 서버에 맞는 설정을 <code>lspconfig</code>가 넣어줘야 자동 LSP 환경 설정이 마무리 됩니다.</p>
+<code>mason.nvim</code>과 <code>lspconfig</code>, 이 <strong>둘을 연결해 줄 브릿지</strong>입니다. <code>mason.nvim</code>으로 원하는 외부 서버를 설치하면, 해당 서버에 맞는 설정을 <code>lspconfig</code>가 넣어줘야 자동 LSP 환경 설정이 마무리 됩니다. <code>mason.nvim</code>이 설치한 서버를 보고, <code>lspconfig</code>의 언어별 <code>setup {}</code>을 부르는 역할을 합니다.</p>
 <p>※ <a href="https://github.com/j-hui/fidget.nvim">fidget.nvim</a>: 가끔 LSP 동작이 잘되는 것인가 의심스러울 때가 있습니다. 필수는 아니지만 이 플러그인을 설치하면 LSP 동작 상태를 실시간으로 볼 수 있습니다.</p>
 <p>※ 얼마 전(2024.10) <code>lua</code> LSP 서버의 이름이 바뀌면서 <code>lua_ls</code>란 이름과 <code>lua-language-server</code> 이름을 매핑해주는 작업을 여기서 해줬었습니다.</p>
 <h2 id="마무리">마무리</h2>
