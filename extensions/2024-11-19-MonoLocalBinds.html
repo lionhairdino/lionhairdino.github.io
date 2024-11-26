@@ -4,9 +4,9 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-        <title>lionhairdino - 확장 MonoLocalBinds</title>
+        <title>lionhairdino - 확장 MonoLocalBinds (스케치 중)</title>
 
-        <meta name="description" content="lionhairdino - 확장 MonoLocalBinds" />
+        <meta name="description" content="lionhairdino - 확장 MonoLocalBinds (스케치 중)" />
         <meta property="og:description" content="하스켈 함수형 프로그래밍" />
 
         <link rel="stylesheet" type="text/css" href="../css/default.css" />
@@ -33,7 +33,7 @@
         <meta name="msapplication-TileColor" content="#ff7500" />
         <meta name="theme-color" content="#ffffff" />
         <meta property="og:type" content="website" />
-        <meta property="og:title" content="확장 MonoLocalBinds" />
+        <meta property="og:title" content="확장 MonoLocalBinds (스케치 중)" />
         <meta property="og:site_name" content="Lionhairdino" />
         <meta property="og:url" content="https://lionhairdino.github.io/extensions/2024-11-19-MonoLocalBinds.html" />
 
@@ -78,7 +78,7 @@
             </div>
         </div>
         <div class="js-toc-content">
-            <h1>확장 MonoLocalBinds</h1>
+            <h1>확장 MonoLocalBinds (스케치 중)</h1>
             <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
 <div class="info">
     Posted on November 19, 2024
@@ -87,7 +87,7 @@
 
 <p><a href="https://ghc.gitlab.haskell.org/ghc/doc/users_guide/exts/let_generalisation.html">GHC User Guide 6.12.2. Let-generalisation</a></p>
 <p>로컬 다형성 (※ 로컬은 문법적으로 탑레벨이 아닌 걸 말합니다.)<br />
-<code>let</code>이나 <code>where</code>로 정의한 로컬 함수의 폴리모픽 동작에 관한 확장입니다.</p>
+<code>let</code>이나 <code>where</code>로 정의한 로컬(let-bound 또는 where-bound) 함수의 폴리모픽 동작에 관한 확장입니다.</p>
 <p>설명보다 코드를 보는 게 이해가 더 빠릅니다.
 (<a href="https://www.haskell.org/ghc/blog/20100930-LetGeneralisationInGhc7.html">Let generalisation in GHC 7.0</a>에서 코드 발췌)</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ot">{-# LANGUAGE MonoLocalBinds #-}</span></span>
@@ -101,13 +101,13 @@
     In the expression: (g 'v', g True)</code></pre>
 <p><code>g 'v'</code>를 만나면서, <code>g</code>를 <code>Char</code>를 받는 함수로 추론했는데, 두 번째 <code>g</code>를 실행할 때 <code>Bool</code>이 들어와 문제입니다. <code>g</code>가 일반화되지 않았다고 말합니다. <code>g</code>를 폴리모픽하게 둘 방법이 필요합니다.</p>
 <p>ML 스타일 언어들은 보통 let 바인딩 변수나 where 바인딩 변수들을 일반화합니다. 폴리모픽하다는 뜻입니다.</p>
-<p><code>TypeFamilies</code>나 <code>GADTs</code>를 쓰면 암시적으로 <code>MonoLocalBinds</code>이 켜집니다. <code>NoMonoLocalBinds</code>를 주어 끌 수 있습니다.</p>
+<p><code>TypeFamilies</code>나 <code>GADTs</code>를 쓰면 암시적으로 <code>MonoLocalBinds</code>이 켜집니다. <code>NoMonoLocalBinds</code>를 이용해 끌 수 있습니다.</p>
 <p><code>MonoLocalBinds</code>일 때는 탑 레벨 바인딩은 일반화 됩니다. 로컬 바인딩은 일반화 되지 않습니다.</p>
 <p>프로그래머는 스타일상의 이유로 때때로 로컬 변수를 쓰지 않는, 탑 레벨 바인딩 같은 로컬 바인딩을 작성합니다. 이럴 때는 일반화 하는게 더 합당해 보입니다.</p>
 <p><code>MonoLocalBinds</code>를 켜면, 다음과 같은 상황에만 바인딩 그룹이 일반화 됩니다.
 - 탑 레벨 바인딩 그룹이거나
 - 자유free 변수 각 각이 닫혀있거나closed
-- 바인더들 중 부분 타입 서명을 가지고 있는 게 있을때. <code>MonoLocalBinds</code>가 켜져 있더라도, 부분 타입 서명 <code>f :: _</code> 추가는(또는 더 일반적으로 <code>f :: _ =&gt; _</code>) 바인딩 별로 GHC에게 let-일반화를 요청한다.</p>
+- 바인더들 중 부분 타입 서명을 가지고 있는 게 있을 때. <code>MonoLocalBinds</code>가 켜져 있더라도, 부분 타입 서명 <code>f :: _</code> 추가는(또는 더 일반적으로 <code>f :: _ =&gt; _</code>) 바인딩 별로 GHC에게 let-일반화를 요청한다.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>g v <span class="ot">=</span> <span class="op">...</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    f1 x <span class="ot">=</span> x <span class="op">+</span> <span class="dv">1</span></span>
