@@ -4,9 +4,9 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-        <title>lionhairdino - 확장 NullaryTypeClasses (지금은 MultiParamTypeClasses에 합쳐졌습니다.)</title>
+        <title>lionhairdino - 함수형 프로그래밍(스케치 중)</title>
 
-        <meta name="description" content="lionhairdino - 확장 NullaryTypeClasses (지금은 MultiParamTypeClasses에 합쳐졌습니다.)" />
+        <meta name="description" content="lionhairdino - 함수형 프로그래밍(스케치 중)" />
         <meta property="og:description" content="하스켈 함수형 프로그래밍" />
 
         <link rel="stylesheet" type="text/css" href="../css/default.css" />
@@ -33,13 +33,13 @@
         <meta name="msapplication-TileColor" content="#ff7500" />
         <meta name="theme-color" content="#ffffff" />
         <meta property="og:type" content="website" />
-        <meta property="og:title" content="확장 NullaryTypeClasses (지금은 MultiParamTypeClasses에 합쳐졌습니다.)" />
+        <meta property="og:title" content="함수형 프로그래밍(스케치 중)" />
         <meta property="og:site_name" content="Lionhairdino" />
-        <meta property="og:url" content="https://lionhairdino.github.io/extensions/2020-07-11-NullaryTypeClass.html" />
+        <meta property="og:url" content="https://lionhairdino.github.io/posts/2024-11-28-functional.html" />
 
         <meta property="og:image" content="https://lionhairdino.github.io/images/state400px.png" />
 
-      <meta name="keywords" content="NullaryTypeClasses, MultiParamTypeClasses, logger">
+
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-E9WZ6VXGHP"></script>
 <script>
@@ -78,34 +78,31 @@
             </div>
         </div>
         <div class="js-toc-content">
-            <h1>확장 NullaryTypeClasses (지금은 MultiParamTypeClasses에 합쳐졌습니다.)</h1>
+            <h1>함수형 프로그래밍(스케치 중)</h1>
             <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
 <div class="info">
-    Posted on July 11, 2020
+    Posted on November 28, 2024
     
 </div>
 
-<p>타입 매개 변수가 하나도 없는 타입 클래스를 만들려면 필요한 확장입니다.</p>
-<p>함수 컨텍스트에 클래스를 걸어두고, 함수에서 클래스에 있는 메소드를 사용하면 실제 메소드 구현체는 나중에 결정됩니다. 여러 개의 인스턴스 중 고르기 위한게 아니라, <em>선언과 정의를 분리하는 용도로</em> <em>타입 클래스 + 인스턴스</em>를 사용합니다. 분리 용도로만 쓰니 인스턴스를 여러 개 만들 필요가 없습니다. 인스턴스를 여러 개 만들 때는 타입 매개 변수에 따라 여러 개의 인스턴스들을 만들게 되는데, 매개 변수가 없기 때문에 <em>인스턴스를 여러 개 만들 수 없고, 단 하나만</em> 만들 수 있습니다.</p>
-<p>라이브러리 코드가 아래와 같다면</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ot">{-# LANGUAGE NullaryTypeClasses #-}</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- 이렇게 클래스를 만들어서 logMessage란 메소드를 선언해서</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">Logger</span> <span class="kw">where</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="ot">  logMessage ::</span> <span class="dt">String</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> ()</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co">-- 라이브러리 함수에서 사용합니다.</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="ot">someLibFunc ::</span> <span class="dt">Logger</span> <span class="ot">=&gt;</span> <span class="dt">IO</span> ()</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>someLibFunc <span class="ot">=</span> <span class="kw">do</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="op">...</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    logMessage <span class="st">&quot;Some Log&quot;</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="op">...</span></span></code></pre></div>
-<p>그럼 실제 logMessage의 구현체는 라이브러리를 쓰는 사용자가 다음처럼 인스턴스를 만들어 지정해 줄 수 있습니다.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Logger</span> <span class="kw">where</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    logMessage t <span class="ot">=</span> <span class="fu">putStrLn</span> t</span></code></pre></div>
-<p>라이브러리에 매개 변수가 하나도 없는 클래스가 보이면, <em>함수를 선언만해서 미리 쓸테니</em>, 실제 구현체는 사용자가 입 맛에 맞는 인스턴스를 만들어 넘기라는 얘기입니다.</p>
-<p>참고<br />
-<a href="https://downloads.haskell.org/ghc/latest/docs/users_guide/exts/nullary_type_classes.html?highlight=nullary">GHC User Guide - 6.8.6. Nullary type classes</a>
-<a href="https://ocharles.org.uk/posts/2014-12-10-nullary-type-classes.html">24 Days of GHC Extensions: Nullary Type Classes</a></p>
+<p>함수형 프로그래밍이 뭐라고 얘기하면 될까, 아직도 완벽하게 아는 건 아닙니다만, 힌트가 될만한 생각이 떠올라 글로 남깁니다. 저는 하스켈만 사용해 봤으니, 하스켈 기준으로만 얘기하겠습니다.</p>
+<h1 id="배열-map-foldreduce-filter-range">배열, Map, Fold(Reduce), Filter, Range</h1>
+<p>순수 함수들로, 주로 배열을 인자로 받으며 Map, Fold를 쓰는 스타일로 설명합니다. 틀린 말은 아니지만, 뭔가 조금 더 얘기해야만 할 것 같은 설명입니다. 혹, 아직 함수형 프로그래밍을 공부하기 전이라면 <a href>쏙쏙 들어오는 함수형 코딩 - 에릭 노먼드 지음, 김은민 옮김</a> 책이 볼만 합니다. 자바스크립트로 절차형 코드를 보여주고, 함수형으로 뜯어 고치는 걸 보여줍니다. 절차형에서 함수형으로 사고를 옮겨가는 시작점으로 꽤 적당해 보입니다.</p>
+<h1 id="람다-추상형-프로그래밍">람다 추상형 프로그래밍</h1>
+<p>하스켈은 람다 산법의 람다 추상abstraction과 너무 비슷합니다. 그냥 람다 산법형 프로그래밍이라고 해도 되지 않을까 정도로 비슷합니다. 하스켈을 공부하기 전에, 간단하게 람다 산법 초반 두 세 개 챕터를 보고, 용어와 개념을 익혀 둔다면, 하스켈 교재들을 읽는데 많은 도움이 됩니다.</p>
+<h1 id="펑터">펑터</h1>
+<p>비슷한 비슷한 대상이나 구조들의 관계(매핑)를 만들어 나가는 스타일. 가장 추상적인 설명이고, 함수형 프로그래밍이 뭔지 알고나서 들어야 이해할 수 있는 설명이라 생각합니다.</p>
+<h1 id="거대한-모노이드">거대한 모노이드</h1>
+<p>(저만의 상상입니다)
+함수를 조립해서 프로그램을 완성하는데, 이 과정에서 조립되는 함수들 자체가 모노이드입니다. 여기 글은 주로 이 것과 관련된 글입니다.</p>
+<p>스트림을 다루는 것으로 설명하곤 합니다. 데이터 흐름이 들어오면, <code>Map</code>이나 <code>Fold</code> 함수들로 데이터를 변경해서, 다음 함수에 넘겨 준다고 말합니다. 그러다 보니, 변경되는 값에 촛점이 맞춰지는 경우가 있는데, 데이터를 바꾸는 함수들을 어떻게 조립할 것인가를 들여다 보면 함수형 프로그래밍이 보입니다.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>1 + 1 + 1 ... </span></code></pre></div>
+<p>정수와 정수를 더하면 정수가 나옵니다. 대상 두 개에 연산을 적용하면 같은 타입의 대상이 나옵니다. 여기에 결합 법칙, 항등원을 만족하면 모노이드가 됩니다. 여기까지 얘기를 들으면, 대상이 <strong>같은 타입의 대상</strong>으로 결과가 나오는 게 중요해 보입니다. “그렇지, 대상이 같아야 결과에 또 다음 함수를 적용할 수 있지”하고 끄덕이게 됩니다. 하지만, 함수형 프로그래밍에서 입술이 부르트게 자주 나오는 모노이드는 같은 타입의 대상이 나오는 것보다는, <strong>같은 타입의 함수</strong>가 나오는 것에 관한 얘기라고 보는 게 더 적당합니다.</p>
+<p>매우 인포멀하지만, 다음과 비슷한 얘기입니다. (이항, 단항 연산으로 좀 다르게 보이지만, 무얼 얘기하는지 금방 눈에 들어 오는 것 같아 적어 두었습니다.)</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>1 ((+) ∘ (-) ∘ (*) ∘ (+) ∘ (*) ∘ ...) 1 </span></code></pre></div>
+<p><code>(+)</code>와 <code>(-)</code> 함수를 <code>∘</code>으로 결합해도, 똑 같은 입출력을 가진 함수가 나오는 것에 관한 얘기입니다.<br />
+위 쏙쏙 책에서 자바스크립트 예시 하나를 가져왔습니다.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode js"><code class="sourceCode javascript"></code></pre></div>
 
 <div class="comment">
 <script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
