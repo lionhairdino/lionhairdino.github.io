@@ -104,9 +104,9 @@
 <p><strong>flake.nix 기본 구성</strong><br />
 (모든 flake 파일의 구성이 아니라, <code>flake.nix</code>파일의 구성입니다.)</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="va">description</span> <span class="op">=</span> ...</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  inputs = ...</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  outputs =</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="va">description</span> <span class="op">=</span> ...<span class="op">;</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="va">inputs</span> <span class="op">=</span> ...<span class="op">;</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="va">outputs</span> <span class="op">=</span></span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span></span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>      <span class="va">lib</span> <span class="op">=</span>                  <span class="op">;</span><span class="co"># 공통 유틸리티들이 들어 있는, 스탠다드 라이브러리 같은 것</span></span>
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>      <span class="va">overlays</span> <span class="op">=</span>             <span class="op">;</span><span class="co"># Nixpkgs를 수정, 확장하기 위한 오버레이 정의</span></span>
@@ -124,9 +124,10 @@
 <span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>      <span class="va">darwinConfigurations</span> <span class="op">=</span> <span class="op">;</span><span class="co"># macOS 시스템 설정 정의</span></span>
 <span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>      <span class="va">templates</span> <span class="op">=</span>            <span class="op">;</span><span class="co"># 프로젝트를 생성할 수 있는 템플릿</span></span>
 <span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>                             ;<span class="co"># nix flake init에서 씁니다.</span></span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="er">}</span></span></code></pre></div>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>    <span class="op">};</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
 <p>설정 파일을 작성할 때 쓸 도구(<code>lib</code>)들을 준비하고, 기본 패키지에서 사용자 입맛에 맞게 바꾸거나 추가할 패키지(<code>overlays</code>)를 설정하고, 설치할 패키지(<code>packages</code>)를 정의합니다</p>
+<p>시스템을 영구적으로 변경하는 <code>sudo nixos-rebuild switch</code>에서만 이 파일을 읽어 들이는 게 아니라, <code>nix run</code>, <code>nix build</code>,… 등의 명령어들도 이 파일을 읽어 참조합니다.</p>
 <h1 id="flake의-모듈-시스템">Flake의 모듈 시스템</h1>
 <p><code>flake.nix</code>에서 불러 들일 모듈은 다음과 같은 구조를 가지고 있습니다. 아래 정의는 역시 Nix 언어의 <strong>함수 표현식</strong>입니다. <strong>모듈 시스템</strong>이 자동으로 값을 넣어주는, 선언 없이 사용 가능한, 몇 개의 매개 변수를 가지고 있습니다. (※ 함수라고, 사용자가 어디에 직접 적용하거나 그러진 않습니다. 함수형 언어에서 데이터와 관련 메소드들을 묶어서 가지고 다니기에 가장 적합한 구조는 함수입니다.)
 <a href="https://nixos.wiki/wiki/NixOS_modules">NixOS modules - NixOS Wiki</a></p>
@@ -152,7 +153,7 @@
 <span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 다른 모듈에서 불러 오기</span></span>
 <span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>  <span class="va">imports</span> <span class="op">=</span> <span class="op">[</span></span>
 <span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ...</span></span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>    <span class="ss">./xxx.nix</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>    <span class="ss">./xxx.nix</span> <span class="co"># 파일 경로만(절대, 상대 모두 가능) 써주면 됩니다.</span></span>
 <span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>  <span class="op">];</span></span>
 <span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>  <span class="va">options</span> <span class="op">=</span> <span class="op">{</span></span>
@@ -167,6 +168,7 @@
 <span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 다른 옵션 선언</span></span>
 <span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>  <span class="co"># ...</span></span>
 <span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<h3 id="매개-변수">매개 변수</h3>
 <p>※ 나중에 위 매개 변수에 값을 넘기는 건, 모듈 시스템이 알아서 합니다.</p>
 <ul>
 <li><code>lib</code>: nixpkg에 내장된 함수 라이브러리로, Nix 표현식을 위한 실용적인 함수들을 제공합니다.</li>
@@ -174,9 +176,12 @@
 <li><code>options</code>: 현재 환경에 있는 모든 모듈에 정의되어 있는 모든 옵션 집합</li>
 <li><code>pkgs</code>: 모든 nixpkgs 패키지와 유틸리티 함수를 갖고 있는 컬렉션,
 입문자는 기본 값으로 <code>nixpkgs.legacyPackages."${system}"</code>이 고정되어 있다고 생각해도 됩니다.</li>
-<li><code>modulePath</code>: 오직 NixOS에서만 유효한 매개 변수, <code>nixpkgs/nixos/modules</code>를 가리킵니다.</li>
+<li><code>modulePath</code>: NixOS에서만 유효한 매개 변수, NixOS의 모듈 디렉토리를 나타내며 <code>nixpkgs/nixos/modules</code>를 가리킵니다. <code>NIX_PATH</code> 환경 변수에서 가져옵니다.</li>
 </ul>
 <p>※ 기본값이 아닌 값을 서브 모듈에 넘길 때 <code>nixpkgs.lib.nixosSystem</code> 함수의 <code>specialArgs</code> 매개 변수를 이용하거나, <code>_module.args</code> 옵션을 이용합니다.</p>
+<h3 id="imports">imports</h3>
+<p>디폴트 모듈셋은 <code>nixos/modules/module-list.nix</code>에 정의되어 있고, 이들은 명시적으로 <code>imports</code>에 추가하지 않아도 됩니다.</p>
+<p>표현식들에서 자주 쓰이는 내장 함수 <code>import some.nix</code>는 <code>some.nix</code>파일에 있는 닉스 표현식을 로드하는 것으로 (<code>some.nix</code> 같은 파일들은 특별히 지정된 구조를 가질 필요는 없습니다.) <code>imports = [./module.nix]</code>와 혼동하지 마세요.</p>
 <h2 id="다른-flake-소스에서-소프트웨어-설치">다른 Flake 소스에서 소프트웨어 설치</h2>
 <p>nixpkgs가 아닌 다른 소스에서 설치 할 수 있습니다. (※ 보통 nixpkgs에 최신 버전이 아직 안 올라 왔을 경우 자주 씁니다.)</p>
 <p>코드들은 <a href="https://nixos-and-flakes.thiscute.world/nixos-with-flakes/nixos-flake-and-module-system#install-system-packages-from-other-flakes">NixOS &amp; Flakes Book</a>에서 발췌했습니다.</p>
@@ -479,8 +484,8 @@
 <span id="cb20-97"><a href="#cb20-97" aria-hidden="true" tabindex="-1"></a>        result' <span class="op">(</span>mkRustBin <span class="op">{}</span> nixpkgs.legacyPackages.$<span class="op">{</span><span class="va">system</span><span class="op">})</span></span>
 <span id="cb20-98"><a href="#cb20-98" aria-hidden="true" tabindex="-1"></a>        <span class="op">//</span> <span class="op">{</span> <span class="va">default</span> <span class="op">=</span> self.packages.$<span class="op">{</span><span class="va">system</span><span class="op">}</span>.rust<span class="op">;</span> <span class="op">}</span></span>
 <span id="cb20-99"><a href="#cb20-99" aria-hidden="true" tabindex="-1"></a>      <span class="op">);</span></span>
-<span id="cb20-100"><a href="#cb20-100" aria-hidden="true" tabindex="-1"></a>      <span class="co"># legacyPackage가 구버전 패키지를 뜻한다는데,</span></span>
-<span id="cb20-101"><a href="#cb20-101" aria-hidden="true" tabindex="-1"></a>      <span class="co"># 신버전은 뭐고, 구버전을 뭐지?</span></span>
+<span id="cb20-100"><a href="#cb20-100" aria-hidden="true" tabindex="-1"></a>      <span class="co"># todo: legacyPackage가 구버전 패키지를 뜻한다는데,</span></span>
+<span id="cb20-101"><a href="#cb20-101" aria-hidden="true" tabindex="-1"></a>      <span class="co"># 신버전은 뭐고, 구버전은 뭐지?</span></span>
 <span id="cb20-102"><a href="#cb20-102" aria-hidden="true" tabindex="-1"></a>    <span class="va">checks</span> <span class="op">=</span> forEachSystem <span class="op">(</span><span class="bu">import</span> <span class="ss">./tests</span> inputs<span class="op">);</span></span>
 <span id="cb20-103"><a href="#cb20-103" aria-hidden="true" tabindex="-1"></a>  <span class="op">};</span></span>
 <span id="cb20-104"><a href="#cb20-104" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
