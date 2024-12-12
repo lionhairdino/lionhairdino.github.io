@@ -88,7 +88,7 @@
 <p>※ Flake 영단어 뜻은 작고 얇은 <strong>조각</strong>을 의미합니다. 아침에 먹던 그 콘프레이크의 프레이크와 같은 뜻입니다.</p>
 <p>Nix 패키지 매니저 2.4부터 도입된, 아직은 실험적 기능이라 합니다만, 실험적인 것 치고는 너무 많은 곳에 쓰이고 있습니다. 어쨌든 공식적으론 여전히 실험적 특징이라 합니다.(2024.11 현재)</p>
 <p>Nix 만으로 각 종 설치, 환경을 완벽히 재현할 수 있으면 좋겠지만, 현재의 Nix는 어떤 패키지의 어떤 버전을 쓰고 있는지 명확히 선언하지 않고 있습니다. 예를 들어, 어떤 채널에 있는 패키지를 참조한다고 한다면, 해당 채널이 고정된 상태가 아니라면 항상 같은 패키지를 가져 온다고 보장할 수 없습니다. 이를 보완하기 위해, 의존성 검사에 필요한 정보들을 추가로 저장해야 나중에 재현 가능성reproduicibily을 높일 수 있습니다. 이를 위해, Nix에 새로운 기능으로 <strong>Flake</strong>를 도입했습니다.</p>
-<p>Flake는 의존성과 버전 정보를 <code>flake.lock</code> 파일에 저장합니다. Nixpkgs의 어떤 커밋을 쓰고 있는지 커밋 해시값까자 모두 기록합니다.</p>
+<p>Flake는 의존성과 버전 정보를 <code>flake.lock</code> 파일에 저장합니다. Nixpkgs 어떤 커밋을 쓰고 있는지 커밋 해시값까자 모두 기록합니다.</p>
 <p><code>flake.lock</code>에 <code>flake.nix</code>의 <code>input</code>에 써 준 모든 것들의 데이터 소스, 해시값, 버전을 기록합니다.</p>
 <p>Flake 기능을 도입하기 전에 쓰던 설정 파일인 <code>configuration.nix</code>도 <code>flake.nix</code>에서 모듈로 불러 옵니다.(<code>configuration.nix</code> 파일도 하나의 모듈 파일입니다.)</p>
 <p>※ 처음 볼 때 Flake를 여기 저기 쓰는데, 해석에 좀 혼란이 있었습니다. 마치 Nix라 하면, Nix OS인지, 패키지 매니저인지, 언어를 뜻하는 지 혼란스러웠던 것처럼요.</p>
@@ -131,7 +131,7 @@
 <h1 id="flake의-모듈-시스템">Flake의 모듈 시스템</h1>
 <p><code>flake.nix</code>에서 불러 들일 모듈은 다음과 같은 구조를 가지고 있습니다. 아래 정의는 역시 Nix 언어의 <strong>함수 표현식</strong>입니다. <strong>모듈 시스템</strong>이 자동으로 값을 넣어주는, 선언 없이 사용 가능한, 몇 개의 매개 변수를 가지고 있습니다. (※ 함수라고, 사용자가 어디에 직접 적용하거나 그러진 않습니다. 함수형 언어에서 데이터와 관련 메소드들을 묶어서 가지고 다니기에 가장 적합한 구조는 함수입니다.)
 <a href="https://nixos.wiki/wiki/NixOS_modules">NixOS modules - NixOS Wiki</a></p>
-<p><strong>Flake 모듈 파일의 기본 구성</strong></p>
+<p><code>flake.nix</code> 파일의 구성이 아니라 <strong>Flake 모듈 파일의 기본 구성</strong></p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="va">lib</span><span class="op">,</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="va">config</span><span class="op">,</span></span>

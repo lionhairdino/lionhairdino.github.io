@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko" lang="ko">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <title>lionhairdino - 순수 함수형 패키지 매니저 닉스Nix (스케치 중)</title>
+
+        <meta name="description" content="lionhairdino - 순수 함수형 패키지 매니저 닉스Nix (스케치 중)" />
+        <meta property="og:description" content="하스켈 함수형 프로그래밍" />
+
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <link rel="icon" href="https://lionhairdino.github.io/favicon.svg" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino16px.png" sizes="16x16" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino24px.png" sizes="24x24" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino32px.png" sizes="32x32" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino48px.png" sizes="48x48" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino57px.png" sizes="57x57" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino60px.png" sizes="60x60" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino64px.png" sizes="64x64" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino72px.png" sizes="72x72" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino76px.png" sizes="76x76" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino114px.png" sizes="114x114" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino120px.png" sizes="120x120" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino144px.png" sizes="144x144" />
+        <link rel="shortcut icon" href="../favicon.ico" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino152px.png" sizes="152x152" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino180px.png" sizes="180x180" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino192px.png" sizes="192x192" />
+        <link rel="manifest" href="../site.webmanifest" />
+        <link rel="mask-icon" href="https://lionhairdino.github.io/Lionhairdino_black.svg" color="#ff7500" />
+        <meta name="msapplication-TileImage" content="/images/favicon/Lionhairdino144px.png" />
+        <meta name="msapplication-TileColor" content="#ff7500" />
+        <meta name="theme-color" content="#ffffff" />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="순수 함수형 패키지 매니저 닉스Nix (스케치 중)" />
+        <meta property="og:site_name" content="Lionhairdino" />
+        <meta property="og:url" content="https://lionhairdino.github.io/posts/2024-12-12-nix.html" />
+
+        <meta property="og:image" content="https://lionhairdino.github.io/images/state400px.png" />
+
+      <meta name="keywords" content="Nix, Package Manager">
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-E9WZ6VXGHP"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-E9WZ6VXGHP');
+</script>
+<script src="../script/copycode.js"></script>
+<script async src="https://cse.google.com/cse.js?cx=9c53b4915cbb2605c"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.11.1/tocbot.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.11.1/tocbot.css" />
+<meta name="fediverse:creator" content="@lionhairdino@mastodon.social">
+    </head>
+    <body>
+        <div id="header">
+            <div style="display:inline-block;margin-right:5px;padding-top: 5px;" id="logo">
+                <a href="../"><img style="width:30px;border:none" src="../images/favicon/Lionhairdino48px.png"></a>
+            </div>
+            <div style="display:inline-block;vertical-align: top;padding-top:5px;" id="navigation">
+                <a href="../">lionhairdino</a>
+                <a href="../about.html">about</a>
+                <!--<a href="/archive.html">archive</a>-->
+            </div>
+            <div style="display:inline-block;font-size:0.8em;vertical-align: top;">
+                <div style="display:inline-block;vertical-align: top;padding-top: 5px"></div>
+                <div style="display:inline-block;width:180px;"> 
+                    <div class="gcse-searchbox-only"></div>
+                </div>
+                <div style="display:inline-block;vertical-align: top;padding-top: 11px; padding-left: 10px;"><a rel="me" href="https://mastodon.social/@lionhairdino"><img style="width:20px;border:none" src="../images/mastodon.svg"></a></div>
+                <div style="display:inline-block;vertical-align: top;padding-top: 11px; padding-left: 2px;"><a href="https://lionhairdino.bsky.social"><img style="width:20px;border:none" src="../images/bluesky.svg"></a></div>
+                <div style="display:inline-block;vertical-align: top;padding-top: 11px; padding-left: 2px;"><a href="https://discordapp.com/users/lionhairdino#7687"><img style="width:20px;border:none" src="../images/discord.svg"></a></div>
+            </div>
+            <div>
+                여기 글들은 일종의 질문입니다. 용어 선택도 학계, 업계에서 쓰는 걸로 되어 있지 않고, 틀린 내용이 있을 수도 있습니다.
+            </div>
+        </div>
+        <div class="js-toc-content">
+            <h1>순수 함수형 패키지 매니저 닉스Nix (스케치 중)</h1>
+            <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+<div class="info">
+    Posted on December 12, 2024
+    
+</div>
+
+<p>뒤로 미뤄 두던 Nix를, Reflex를 공부하면서 결국 만져야 되는 상황이 왔습니다. 국내에도 쓰는 분들이 점점 늘어나는 추세인듯 하나, 한글 자료는 많지 않습니다. 아래는 전혀 완성되지 않은 글입니다. 아직 필요한 부분들을 확인하고 있는 중입니다.</p>
+<p>닉스 패키지 매니저 설치부터 까다롭다. obelisk를 설치하며 nix가 어찌 저찌 설치된 것 같은데, nixpkgs를 못찾는다 해서 다시 multi-user 방식으로 설치했다.</p>
+<p><a href="https://nixos.org/manual/nix/stable/#transparent-sourcebinary-deployment" class="uri">https://nixos.org/manual/nix/stable/#transparent-sourcebinary-deployment</a></p>
+<p>패키지를 하스켈같은 순수 함수형 프로그래밍 언어에서의 값value처럼 취급한다. side-effect가 없는 함수로 빌드하고, 한 번 빌드된 이후에는 절대 변하지 않는다. Nix는 패키지를 Nix store(보통 /nix/store)에 저장한다. 각 패키지는 자신만의 고유 서브 디렉토리를 갖는다.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>/nix/store/b6gvzjyb2pg0kjfwrjmg1vfhh54ad73z-firefox-33.1/</span></code></pre></div>
+<p>패키지명 앞의 문자열은 모든 의존성 정보를 갖고 있는 해시값</p>
+<p><strong>전역 위치에 패키지</strong>를 설치하면, 개발하고 있는 앱에 이 패키지 의존성을 지정하지 않아도 개발자 머신에선 잘 돌아가고, 나중에 사용자는 안 돌아가는 사태가 발생한다. 이를 막기 위해 Nix는 패키지를 글로벌하게 설치하지 않는다.</p>
+<h2 id="garbage-collection">Garbage collection</h2>
+<div class="sourceCode" id="cb2"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>λ&gt; nix-env --uninstall firefox</span></code></pre></div>
+<p>설치 제거를 하면 바로 삭제하지 않는다. 롤백을 원할 수도 있고, 다른 사용자의 프로필에 있는 패키지일 수도 있다.</p>
+<p>사용하지 않는 패키지를 삭제하려면 Garbage collector를 돌린다.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>λ&gt; nix-collect-garbage</span></code></pre></div>
+<h2 id="함수형-패키지-언어">함수형 패키지 언어</h2>
+<p>Nix라고 부르는 것인지, Nix expression이라 부르는지 헛갈린다.</p>
+<h2 id="참조-투명한-소스바이너리-배치deployment">참조 투명한 소스/바이너리 배치deployment</h2>
+<p>Nix expression은 소스에서 어떻게 빌드할지 설명한다.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>λ&gt; nix-env --install --attr nixpkgs.firefox</span></code></pre></div>
+<p>(Nix store에 없다면 C라이브러와 컴파일러까지도 설치한다.) source deployment model이다. 가급적 소스에서 빌드하는 건 피하고, binary cache, pre-built 바이너리를 제공하는 웹서버들을 이용한다. 만일 /nix/store/b5lksdklsjfd…-firefox-33.1 을 빌드하라고 하면, 바로 소스에서 빌드하는 게 아니라, 우선 https://cache.nixos.org/b5lksdklsjfd…narinfo 파일이 있는지 체크하고, 있다면 pre-built 패키지를 가져오고, 없으면 빌드 단계로 들어간다.</p>
+<h2 id="nix-packages-collection">Nix Packages collection</h2>
+<p>수백 개의 유닉스 패키지를 포함한 Nix expression 많은 양의 Nix expression을 제공한다.</p>
+<h2 id="nix.conf">nix.conf</h2>
+<p>보통 <code>/etc/nix/nix.conf</code> 에서 찾을 수 있다.
+덮어 쓸 패키지들을 지정할 때는 <code>~/.config/nixpkgs/config.nix</code>를 쓴다.
+환경 변수 <code>NIX_CONF_DIR</code>로 전역 설정 파일을 바꿀 수 있다?
+<code>XDG_CONFIG_HOME</code>에서 사용자 설정 파일을 찾는다.
+대부분 시스템이
+<code>XDG_CONFIG_DIR</code>은 <code>/etc/xdg</code>
+<code>XDG_CONFIG_HOME</code>은 <code>$HOME/.config</code></p>
+<p>Nigpkgs 버전은 <code>nix-channels</code> 옵션으로 지정한다.
+설정 파일이 아니라, 환경 변수 <code>NIX_CONFIG</code>에 바로 설정을 넣어 놓을 수도 있는 것 같다.
+설정 파일은 한 줄에 name = value 하나 형태다.</p>
+<h2 id="빌드-환경-관리">빌드 환경 관리</h2>
+<div class="sourceCode" id="cb5"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>λ&gt; nix-shell '&lt;nixpkgs&gt;' --attr pan</span></code></pre></div>
+<p>위 명령어를 입력하면 nix shell 로 들어간다.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>[nix-shell]$ unpackPhase</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>[nix-shell]$ cd pan-*</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>[nix-shell]$ configurePhase</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>[nix-shell]$ buildPhase </span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>[nix-shell]$ ./pan/gui/pan</span></code></pre></div>
+<h2 id="이식성portability">이식성portability</h2>
+<p>리눅스와 macOS에서 돌아간다.</p>
+<h2 id="nixos">NixOS</h2>
+<p>Nix에 기반을 둔 리눅스 배포판이다. 패키지 매니징에만 Nix를 쓰는 게 아니라, 시스템 설정에도 쓴다. (ex. /etc 에 있는 설정 파일들 빌드할 때)
+Nix로 시스템을 관리하면, 시스템 자체를 이전 설정 상태로 편하게 롤백할 수 있다.</p>
+<p><a href="https://nix.dev/tutorials/first-steps/ad-hoc-shell-environments" class="uri">https://nix.dev/tutorials/first-steps/ad-hoc-shell-environments</a>
+# First steps
+## Ad hoc 쉘 환경</p>
+<pre><code>λ&gt; nix-shell -p 앱이름</code></pre>
+<p>닉스 환경으로 들어가며, 그 환경에만 앱을 설치한다.
+<code>Ctrl-d</code>로 빠져 나오면 앱을 설치하지 않은 상태가 된다.</p>
+<p>닉스쉘로 들어가지 않고, 현재 설치되어 있지 않은데, 간단히 실행해보려면</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>λ nix-shell -p cowsay --run &quot;cowsay Nix&quot;</span></code></pre></div>
+<p><code>--pure</code> 기존 시스템에 있는 환경을 최대한 안쓰게 할 때 쓰는 것 같다.
+<code>-I</code> 닉스패키지 지정</p>
+<p><code>nix-collect-garbage</code> 임시 닉스쉘에서 사용했던 패키지들 제거</p>
+<h2 id="재현-가능한-스크립트">재현 가능한 스크립트</h2>
+<p>닉스쉘을 shebang 인터프리터로 쓰기</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">#!/usr/bin/env nix-shell</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co">#! nix-shell -i bash --pure 파일의 나머지를 해석할 인터프리터</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co">#! nix-shell -p bash cacert curl jq python3Packages.xmljson 인터프리터 환경에서 제공하는 패키지 목록</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="co">#! nix-shell -I nixpkgs=https://github.com/NixOS/nixpkgs/archive/2a601aafdc5605a5133a2ca506a34a3a73377247.tar.gz</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="co"># -I 패키지 위치 명시적으로 지정</span></span></code></pre></div>
+<h2 id="선언적인-쉘-환경">선언적인 쉘 환경</h2>
+<p>환경이 활성화되면, 자동으로 bash 명령어 실행
+자동으로 환경 변수 지정
+버전 컨트롤에 환경 정의를 넣고, 다른 장비에서 불러서 적용한다.
+<code>shell.nix</code>파일을 만든다.
+대충 <code>apt install ...</code> 등을 쉘에서 단발적으로 실행하지 않고, 쉘 스크립트 파일에 모두 모아 놓는 거랑 비슷하다.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 명시적인 버전 지정</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="va">nixpkgs</span> <span class="op">=</span> <span class="bu">fetchTarball</span> <span class="st">&quot;https://github.com/NixOS/nixpkgs/tarball/nixos-23.11&quot;</span><span class="op">;</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># config, overlays를 이런식으로라도 지정해 놓으면, 전역값이 덮어 씌우거나 할 수 없다.</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="va">pkgs</span> <span class="op">=</span> <span class="bu">import</span> nixpkgs <span class="op">{</span> <span class="va">config</span> <span class="op">=</span> <span class="op">{};</span> <span class="va">overlays</span> <span class="op">=</span> <span class="op">[];</span> <span class="op">};</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="kw">in</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>pkgs.mkShell <span class="op">{</span> <span class="co"># 쉘 환경을 만들어내는 함수</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  <span class="va">packages</span> <span class="op">=</span> <span class="kw">with</span> pkgs<span class="op">;</span> <span class="op">[</span> <span class="co"># attribute라 부른다.</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    cowsay</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>    lolcat</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>  <span class="op">];</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>  <span class="va">GREETING</span> <span class="op">=</span> <span class="st">&quot;Hello, Nix!&quot;</span><span class="op">;</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 시작</span></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>  <span class="va">shellHook</span> <span class="op">=</span> <span class="st">'' </span></span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a><span class="st">    echo $GREETING | cowsay | lolcat</span></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a><span class="st">  ''</span><span class="op">;</span></span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p><code>mkShell</code>의 예시 중에, 패키지를 buildInputs나 nativeBuildInputs attribute에 추가하는 것도 있다.
+닉스쉘은 원래 “패키지 빌드 디버깅에 필요한 도구”를 가지고 있는 쉘 환경을 만들기 위해 나왔다. 처음 목적은 그랬지만, 지금은 임시 환경을 만드는 용도로도 사용한다.
+<code>nix-shell</code>을 실행하면, 현재 폴더에서 <code>shell.nix</code> 파일을 찾는다. <code>packages</code>에 써 놓은 것들을 <code>$PATH</code>에서 보이게 해 둔다. 닉스쉘을 켜둔 상태에서 <code>shell.nix</code> 파일을 수정해도 바로 반영되진 않는 것 같다. 닉스쉘을 껐다 켜면 반영된다.</p>
+<p>쉘 환경에 들어가기 직전에 실행하고 싶은 것들은 <code>shellHook</code>을 쓴다.</p>
+<h2 id="재현성을-높이기-위해-nixpkgs-고정pinning">재현성을 높이기 위해 Nixpkgs 고정pinning</h2>
+<div class="sourceCode" id="cb11"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="op">{</span> <span class="va">pkgs</span> <span class="op">?</span> <span class="bu">import</span> &lt;nixpkgs&gt; <span class="op">{}</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="op">}</span>:</span></code></pre></div>
+<p>닉스 패키지를 불러와서, 닉스 표현식을 실행하는 편리한 방법</p>
+<blockquote>
+<p>However, the resulting Nix expression is not fully reproducible</p>
+</blockquote>
+<p>아직 확실하진 않지만, 결과가 항상 같은 건 아닌가 보다.
+완벽하게 재현가능한 닉스 표현식을 만들려면, Nixpkgs의 버전을 고정해야 한다.</p>
+<h2 id="import는-예약어가-아니라-보통의-함수다">import는 예약어가 아니라 보통의 함수다</h2>
+<p>좀 특이한데, <code>import &lt;nixpkgs&gt;</code> 이 자체가 하나의 함수고, 이 함수에 <code>{...}</code> 인자를 넘기는 모양이다. 왜 이렇게 동작하냐면, <code>import</code>는 지정한 파일에서 닉스 표현식을 읽어와 반환한다. 이 반환값이 함수인 경우엔 보통의 함수처럼 인자를 취하는 모양이 된다.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>pkgs = <span class="bu">import</span> nixpkgs <span class="op">{</span> <span class="va">config</span> <span class="op">=</span> <span class="op">{};</span> <span class="va">overlays</span> <span class="op">=</span> <span class="op">[];</span> <span class="op">}</span>;</span></code></pre></div>
+<p><code>import nixpkgs</code> 함수는 인자로 <code>{ config, overlays }</code> 속성 집합을 받고 있다.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>pkgs.mkShell <span class="op">{</span> </span></code></pre></div>
+<p><code>mkShell</code>도 마찬가지다. 함수가 <code>{ ... }</code> 인자를 받는 모양이다.</p>
+<ul>
+<li>닉스 파일을 지정하지 않고, 경로만 적어주면 디폴트로 <code>default.nix</code> 파일을 읽어 온다.
+<code>import ./.</code>이라 써 주면, 현재 디렉토리에서 <code>default.nix</code>를 읽어 온다.</li>
+<li><code>import</code>는 빌트인 함수다. 대부분의 빌트인 함수는 <code>builtins</code>를 통해 접근하는데, <code>import</code>는 예외다.</li>
+</ul>
+<p><code>{ x, y }: x + y</code> 속성 <code>x</code>, <code>y</code>를 가지고 있는 집합을 인자로 받는 람다 함수다.</p>
+<h3 id="사용자와-상호-작용interactive해서-평가">사용자와 상호 작용interactive해서 평가</h3>
+<p>Lazy 평가 전략을 취한다. WHNF에 머물지 않고, 모두 평가된 걸로 보려면, repl에서 <code>:p</code>를 붙인다.
+<code>runHaskell</code>처럼 닉스 파일을 바로 실행하는 방법도 있다.
+<code>nix-instantiate --eval file.nix</code>
+닉스 파일을 지정하지 않으면 <code>default.nix</code>파일을 읽는다.</p>
+<h3 id="공백">공백</h3>
+<p>렉시컬 토큰을 구분하는 구분자. 인덴트나 줄바꿈은 따로 의미를 가지지 않는다.</p>
+<h3 id="이름name과-값value">이름name과 값value</h3>
+<p>Value는 닉스 언어의 프리미티브 데이터 타입, 리스트, 속성 집합, 함수가 될 수 있다.</p>
+<h3 id="재귀-속성-집합recursive-attribute-set">재귀 속성 집합Recursive attribute set</h3>
+<p><code>rec{ ...}</code></p>
+<h3 id="속성-접근">속성 접근</h3>
+<p>Attribute Set 이 튜플인 것 같다.</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="va">attrset</span> <span class="op">=</span> <span class="op">{</span> <span class="va">x</span> <span class="op">=</span> <span class="dv">1</span><span class="op">;</span> <span class="op">};</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="kw">in</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>attrset.x</span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="va">attrset</span> <span class="op">=</span> <span class="op">{</span> <span class="va">a</span> <span class="op">=</span> <span class="op">{</span> <span class="va">b</span> <span class="op">=</span> <span class="op">{</span> <span class="va">c</span> <span class="op">=</span> <span class="dv">1</span><span class="op">;};};};</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="kw">in</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>attrset.a.b.c</span></code></pre></div>
+<p>익숙하지 않은 모양이다. 아래와 같이 읽어 보자.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>attrset = <span class="op">{</span> <span class="va">a</span> <span class="op">=</span> &lt;thumb&gt; <span class="er">}</span>;</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>                <span class="op">{</span> <span class="va">b</span> <span class="op">=</span> &lt;thumb&gt; <span class="er">}</span>;</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>                      <span class="op">{</span> <span class="va">c</span> <span class="op">=</span> &lt;thumb&gt; <span class="er">}</span>;</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>                               <span class="dv">1</span></span></code></pre></div>
+<h3 id="with">with</h3>
+<div class="sourceCode" id="cb17"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="va">a</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">x</span> <span class="op">=</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>    <span class="va">y</span> <span class="op">=</span> <span class="dv">2</span><span class="op">;</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>    <span class="va">z</span> <span class="op">=</span> <span class="dv">3</span><span class="op">;</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  <span class="op">};</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="kw">in</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="kw">with</span> a<span class="op">;</span> <span class="op">[</span>x,y,z<span class="op">]</span> <span class="co"># [ a.x, a.y, a.z]</span></span></code></pre></div>
+<p><code>with</code>의 범위는 다음 다음 세미 콜론까지 - 이 것도 그다지 좋은 컨벤션을 도입한 것 같지 않다.</p>
+<h3 id="inherit">inherit</h3>
+<div class="sourceCode" id="cb18"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="va">x</span> <span class="op">=</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="va">y</span> <span class="op">=</span> <span class="dv">2</span><span class="op">;</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="kw">in</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>  <span class="kw">inherit</span> x y<span class="op">;</span> <span class="co"># x = x; y = y;</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">inherit</span> <span class="op">(</span>a<span class="op">)</span> x y<span class="op">;</span> <span class="co"># a.x = x; a.y = y;</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>같은 이름 쓰는 걸 줄여준다는데, 실제 실용 소스를 봐야 명확하겠다.</p>
+<h3 id="문자열-interpolation">문자열 interpolation</h3>
+<div class="sourceCode" id="cb20"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="va">name</span> <span class="op">=</span> <span class="st">&quot;Nix&quot;</span><span class="op">;</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="kw">in</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;hello </span><span class="sc">${</span>name<span class="sc">}</span><span class="st">&quot;</span></span></code></pre></div>
+<p><a href="https://nix.dev/manual/nix/2.18/language/derivations" class="uri">https://nix.dev/manual/nix/2.18/language/derivations</a>
+<a href="https://nix.dev/" class="uri">https://nix.dev/</a></p>
+<h1 id="닉스로-소프트웨어-패키징하기-nix-package-manager">닉스로 소프트웨어 패키징하기 Nix Package manager</h1>
+<div class="sourceCode" id="cb21"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="op">{</span> </span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="va">lib</span><span class="op">,</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="va">stdenv</span><span class="op">,</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  <span class="va">fetchzip</span><span class="op">,</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span>: <span class="co"># 람다 함수의 인자를 구분했던 콜론 </span></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>stdenv.mkDerivation <span class="op">{</span></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>  <span class="va">pname</span> <span class="op">=</span> <span class="st">&quot;hello&quot;</span><span class="op">;</span></span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>  <span class="va">version</span> <span class="op">=</span> <span class="st">&quot;2.12.1&quot;</span><span class="op">;</span></span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>  <span class="va">src</span> <span class="op">=</span> fetchzip <span class="op">{</span></span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>    <span class="va">url</span> <span class="op">=</span> <span class="st">&quot;https://ftp.gnu.org/gnu/hello/hello-2.12.1.tar.gz&quot;</span><span class="op">;</span></span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>    <span class="va">sha256</span> <span class="op">=</span> lib.fakeSha256<span class="op">;</span></span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>  <span class="op">};</span></span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="va">nixpkgs</span> <span class="op">=</span> <span class="bu">fetchTarball</span> <span class="st">&quot;https://github.com/NixOS/nixpkgs/tarball/nixos-22.11&quot;</span><span class="op">;</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="va">pkgs</span> <span class="op">=</span> <span class="bu">import</span> nixpkgs <span class="op">{</span> <span class="va">config</span> <span class="op">=</span> <span class="op">{};</span> <span class="va">overlays</span> <span class="op">=</span> <span class="op">[];</span> <span class="op">};</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="kw">in</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>  <span class="va">hello</span> <span class="op">=</span> pkgs.callPackage <span class="ss">./hello.nix</span> <span class="op">{</span> <span class="op">};</span> <span class="co"># pkgs의 속성을 뒤 이은 함수에게 자동으로 넘긴다.</span></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>Nix building instructions
+“마치 기계한테 이 설명서 따라해서 빌드해 줘”
+라고 할 때, 설명서를 derivation이라 한다.
+Nix(패키지 매니저)가 따라해서 빌드한 후 결과물이 생기는 걸 realised라 한다.</p>
+<p><code>Derivation</code>은 기계가 읽을 수 있는 빌드를 위한 레시피를 가지고 있는 특별한 파일.
+아래는 <code>hello world</code>를 출력하는 c를 빌드하는 방법을 적어 놓은 닉스 파일이다.</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>Derive([(&quot;out&quot;,&quot;/nix/store/1nq46fyv3629slgxnagqn2c01skp7xrq-hello-world&quot;,&quot;&quot;,&quot;&quot;)]</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>      ,[(&quot;/nix/store/60xqp516mkfhf31n6ycyvxppcknb2dwr-build-hello.drv&quot;,[&quot;out&quot;])]</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>      ,[&quot;/nix/store/wiviq2xyz0ylhl0qcgfgl9221nkvvxfj-hello.c&quot;]</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>      ,&quot;x86_64-linux&quot;</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>      ,&quot;/nix/store/r5lh8zg768swlm9hxxfrf9j8gwyadi72-build-hello&quot;</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>      ,[]</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>      ,[(&quot;builder&quot;,&quot;/nix/store/r5lh8zg768swlm9hxxfrf9j8gwyadi72-build-hello&quot;)</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>       ,(&quot;name&quot;,&quot;hello-world&quot;)</span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>       ,(&quot;out&quot;,&quot;/nix/store/1nq46fyv3629slgxnagqn2c01skp7xrq-hello-world&quot;)</span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>       ,(&quot;src&quot;,&quot;/nix/store/wiviq2xyz0ylhl0qcgfgl9221nkvvxfj-hello.c&quot;)</span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>       ,(&quot;system&quot;,&quot;x86_64-linux&quot;)</span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>       ]</span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>      )</span></code></pre></div>
+<p>해시 코드가 길게 있어 복잡하지만, 소스 path와 빌드 후 출력할 path, 빌드 스크립트, 메타데이터(프로젝트 이름, 플랫폼)를 가지고 있다.
+필요한 파일들은 /nix/store 에 다 때려 넣고, 독립된 샌드박스에서 빌드한다.
+당연히 위 복잡한 코드를 손으로 만들진 않는다.</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="op">{</span> <span class="va">pkgs</span> <span class="op">?</span> <span class="bu">import</span> &lt;nixpkgs&gt; <span class="op">{}</span> <span class="op">}</span>:</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="bu">derivation</span> <span class="op">{</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>  <span class="va">name</span> <span class="op">=</span> <span class="st">&quot;hello-world&quot;</span><span class="op">;</span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>  <span class="va">builder</span> <span class="op">=</span> pkgs.writeShellScript <span class="st">&quot;build-hello&quot;</span> <span class="st">''</span></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a><span class="st">    </span><span class="sc">${</span>pkgs.coreutils<span class="sc">}</span><span class="st">/bin/mkdir -p $out/bin</span></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a><span class="st">    </span><span class="sc">${</span>pkgs.gcc<span class="sc">}</span><span class="st">/bin/gcc $src -o $out/bin/hello -O2</span></span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a><span class="st">  ''</span><span class="op">;</span></span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>  <span class="va">src</span> <span class="op">=</span> <span class="ss">./hello.c</span><span class="op">;</span></span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>  <span class="va">system</span> <span class="op">=</span> <span class="bu">builtins</span>.currentSystem<span class="op">;</span></span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p><a href="https://nixos.org/manual/nix/stable/language/derivations.html" class="uri">https://nixos.org/manual/nix/stable/language/derivations.html</a></p>
+<p><code>import</code> 로드하고 파일에 있는 “닉스 표현식을 반환”한다.
+<code>&lt;nixpkgs&gt;</code> 닉스 파일 검색 경로. <code>$NIX_PATH</code> 환경 변수로 지정할 수 있다.</p>
+<p>전체가 아래같이 생긴 하나의 함수다.</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="op">{</span> 인자 <span class="op">}</span> : </span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>dervibation <span class="op">{</span> <span class="op">...</span> <span class="op">}</span></span></code></pre></div>
+<p><code>import &lt;nixpkgs&gt;</code>란 함수에 <code>{}</code>인자를 넘겨 평가한 결과값을 매개 변수 <code>pkgs</code>에 디폴트 값으로 바인딩해서 아래 함수 본문을 실행한다고 읽을 수 있겠다. 위 구문 전체가 하나의 함수니 어딘가에서 “호출”이라는 절차가 있어야 할 것 같은데…</p>
+<p><code>derivation</code>은 가장 중요한 빌트인 함수다. single derivation을 기술하기 위해 쓴다. 입력에서 derive 해서 출력을 만든다는 의미인가?
+<code>name</code> (<code>String</code>)
+derivation의 심볼릭 이름. 대응하는 <code>store derivation</code>의 <code>store path</code>에 추가되고, <code>ouput paths</code>에도 추가 된다?
+<code>system</code> (<code>String</code>)
+빌더 실행체executable?의 시스템 타입. <code>builtins.currentSystem</code>을 평가해서 현재 시스템 타입을 가져올 수 있다.
+<code>builder</code> (<code>Path</code> | <code>String</code>)
+빌드를 수행할 실행체 경로
+<code>nix   writeShellScript nixstore에저장할파일명 '' 파일 내용 ''</code>
+<code>''</code>이 파일 내용을 쿼트하는데 쓰인다. 특이한 걸 골랐네.
+<code>args</code> (<code>List</code> of <code>String</code>)
+<code>builder</code> 실행체에 넘길 인자
+<code>outputs</code> (<code>List</code> of <code>String</code>)
+Symbolic outputs of the derivation
+자꾸 심볼릭이 나온다. 본 내용이 아니라, 어딘가에 빌드 결과물을 넣어 두고, 이에 대한 심볼릭 링크를 거는 것일까?
+<code>nix   outputs = [ "lib" "dev" "doc"]</code>
+이렇게 잡아 두면, 예를 들어 <code>Audoconf-style</code> 패키지라면, 빌더는 아래 동작을 한다.
+<code>default   ./configure \   --libdir=$lib/lib \   --includedir=$dev/include \   --docdir=$doc/share/doc</code>
+<code>name</code>이 있으면,
+<code>nix   derivation {     name = "example";     outputs = [ "lib" "dev" "doc" "out" ];   }</code>
+<code>default   /nix/store/&lt;hash&gt;-example-lib   /nix/store/&lt;hash&gt;-example-dev   /nix/store/&lt;hash&gt;-example-doc   /nix/store/&lt;hash&gt;-example</code></p>
+<p>Nix Store에서 쓰이는 파일 시스템은 OS의 파일 시스템과 다르다. 파일 시스템의 추상으로 파일 시스템 오브젝트(File, Directory, Symbolic Link)로 이루어진 간단한 모델을 쓴다. 하드 링크나 소유 권한, 날짜 등의 메타 정보가 없다. 파일들이 가진 메타 정보는 크기와 <code>executable = true | false</code>만 있다.</p>
+<h2 id="nix-shell">nix-shell</h2>
+<p><code>nix shell</code>과 구별해야 한다.
+지정한 derivation의 의존성을 빌드한다. but not the derivation itself 무슨 말이지?
+필요한 것들이 준비된 쉘 환경을 제공하는 것 같다. derivation의 목적인 특정 앱을 빌드하는 게 아니라, 앱 빌드를 위한 환경만 빌드한다는 뜻 같다.</p>
+<p>패키지는 derivation으로 평가될? 닉스 언어의 함수다.</p>
+<h2 id="nix-build">nix-build</h2>
+<p>릴리즈 빌드를 한다면 최고의 툴이지만, incremental 빌드 시스템이 아니라서, 개발할 때는 좋지 않다. 한 곳만 변경해도 전체를 다시 재컴파일 해야 한다.</p>
+<p>출력되는 메시지를 보면, <code>configure</code>가 호출되고, Makefile을 만들어낸다.
+<code>stdenv</code>는 GNU Autoconf(자동으로 프로젝트 디렉토리 구조를 파악한다)를 기반으로 빌드한다.</p>
+<h2 id="derivation-만들기">Derivation 만들기</h2>
+<p><a href="https://nix.dev/tutorials/packaging-existing-software" class="uri">https://nix.dev/tutorials/packaging-existing-software</a></p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># hello.nix</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="va">stdenv</span><span class="op">,</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>  <span class="va">fetchzip</span><span class="op">,</span></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span>: <span class="co"># 인자 두 개를 받는 함수란 뜻이다.</span></span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>stdenv.mkDerivation <span class="op">{</span></span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>  <span class="va">pname</span> <span class="op">=</span> <span class="st">&quot;hello&quot;</span><span class="op">;</span></span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>  <span class="va">version</span> <span class="op">=</span> <span class="st">&quot;2.12.1&quot;</span><span class="op">;</span></span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>  <span class="va">src</span> <span class="op">=</span> fetchzip <span class="op">{</span></span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>    <span class="va">url</span> <span class="op">=</span> <span class="st">&quot;https://ftp.gnu.org/gnu/hello/hello-2.12.1.tar.gz&quot;</span><span class="op">;</span></span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>    <span class="va">sha256</span> <span class="op">=</span> <span class="st">&quot;&quot;</span><span class="op">;</span></span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a>  <span class="op">};</span></span>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb27"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># default.nix</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>  <span class="va">nixpkgs</span> <span class="op">=</span> <span class="bu">fetchTarball</span> <span class="st">&quot;https://github.com/NixOS/nixpkgs/tarball/nixos-22.11&quot;</span><span class="op">;</span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>  <span class="va">pkgs</span> <span class="op">=</span> <span class="bu">import</span> nixpkgs <span class="op">{</span> <span class="va">config</span> <span class="op">=</span> <span class="op">{};</span> <span class="va">overlays</span> <span class="op">=</span> <span class="op">[];</span> <span class="op">};</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a><span class="kw">in</span></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>  <span class="va">hello</span> <span class="op">=</span> pkgs.callPackage <span class="ss">./hello.nix</span> <span class="op">{</span> <span class="op">};</span></span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p><code>callPackage</code>가 hello.nix 파일이 돌려주는 “함수”가 필요로 하는 인자값 <code>stdenv</code>, <code>fetchzip</code>을 넣어 준다.</p>
+<p>…
+요약하면, 대충 위에처럼 놓고 <code>nix-build</code>를 돌리면 빌드 에러가 나는 이유들 (보통은 라이브러리가 없어서 나는 것 같다.)을 알려준다. 라이브러리가 없다면, <a href="http://search.nixos.org/packages" class="uri">http://search.nixos.org/packages</a> 에서 찾던가, <code>nix-locate</code>를 이용해서 찾아서 매개 변수를 만들고, <code>buildInputs = [ 필요한라이브러리1 필요한라이브러리2 ...]</code> 이렇게 써주고, <code>make install</code>이 없다면 <code>installPhase</code>를 만들어 설치 방법을 적어주고, 다시 <code>nix-build</code>를 돌려, 최종 성공하면 <code>result</code>란 폴더가 생긴다. 이 <code>result</code>는 닉스 store의 특정 버전의 심볼릭 링크다.</p>
+<h2 id="nix-env">nix-env</h2>
+<p>사용자 레벨에서 패키지를 설치할 수 있다. <code>nix-env</code>로 설치하면, 해당 사용자만 쓸 수 있다.</p>
+<p>패키지 검색 <code>nix search nixpkgs packagename</code>
+패키지 설치 <code>nix-env -iA packagename</code>
+설치 목록 <code>nix-env -q</code>
+패키지 제거 <code>nix-env -e packagename</code>
+패키지 업데이트 <code>nix-env -u</code></p>
+<h2 id="nix-overlay">nix-overlay</h2>
+<p>nixpkgs에 사용자 정의 패키지를 추가하는 방법
+<code>Overlay</code> 폴더를 추가하고, 여기에 <code>default.nix</code> 파일을 만들어 두면 <code>nix-shell</code>이나 <code>nix-build</code> 명령어를 실행할 때 Overlay를 참조합니다.</p>
+<p>Nixpkgs를 “확장”하거나 “변경”할 때 overlays를 사용한다.</p>
+<h2 id="nix-channels">Nix Channels</h2>
+<p>닉스 패키지는 여러 Nix 채널을 통해 배포된다.</p>
+<p>현재 채널 목록 <code>nix-channel --list</code>
+primary 채널 추가 <code>nix-channel --add https://nixos.org/channels/channel-name</code>
+또 다른 채널 추가 <code>nix-channel --add https://some.channel/url my-alias</code>
+채널 제거 <code>nix-channel --remove channel-alias</code>
+채널 업데이트 <code>nix-channel --update channel-alias</code>
+모든 채널 업데이트 <code>nix-channel --update</code></p>
+<h2 id="nix-store">Nix store</h2>
+<p>닉스가 빌드한 패키지들이 위치하는 곳. 읽기 전용이다. 보통 <code>/nix/store</code>.
+/nix/store/nawl092prjblbhvv16kxxbk6j9gkgcqm-git-2.14.1
+앱이름 앞에 해시는, 빌드할 때 써 먹은 모든 입력값(소스, 의존성 트리,컴파일 플래그 등)을 기반으로 만든 값이다.
+같은 버전을 여러 빌드에서 써먹으면, 한 번 설치된 것에 심볼릭 링크를 걸어서 쓰는 것 같다.</p>
+<h2 id="profiles">Profiles</h2>
+<p>닉스 스토어 항목들을 프로필에 심볼릭 링크를 건다? 이를 이용해서 롤백한다?
+<code>/nix/var/nix/profiles</code></p>
+<h2 id="닉스os는-리눅스">닉스OS는 리눅스?</h2>
+<p>닉스OS는 리눅스이긴 한데, 다른 리눅스에스 돌아가는 바이너리가 그대로 돌지 않는다.
+다른 곳에서 컴파일된 바이너리가 의존하는 라이브러들이나 실행 파일, 환경등이 현재 닉스OS에는 없는 상태다. 특정 환경을 끌어다 쓰게 각 종 라이브러리 버전들을 심볼릭 링크를 걸고 있을텐데, 어떤 버전을 쓰는지 알 수 없으니 돌아가지 않는 것 같다.</p>
+<p>처음 아래 오류를 만났을 때 의아했다. 쉘 스크립트가 아닌데, 왜 <code>bash:</code> 오류가 나는 걸까 했다.</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>[nix-shell:~/.local/bin]$ ./powermate </span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>bash: ./powermate: cannot execute: required file not found</span></code></pre></div>
+<p>친절한 메시지가 나왔다면 좋았을텐데, 의미를 제대로 전달하는 메시지는 아니다.
+<a href="https://blog.thalheim.io/2022/12/31/nix-ld-a-clean-solution-for-issues-with-pre-compiled-executables-on-nixos/" class="uri">https://blog.thalheim.io/2022/12/31/nix-ld-a-clean-solution-for-issues-with-pre-compiled-executables-on-nixos/</a></p>
+<p>리눅스가 바이너리를 실행하려면 쉘은 시스템에게 바이너리를 실행하라고 execve 시스템 콜을 한다.
+<code>strace -f ./powermate</code>로 무슨 일이 일어나고 있는지 들여다 볼 수 있다.
+<code>file ./powermate</code>로 실행 파일 정보를 자세히 볼 수 있다.</p>
+<p>대충 위 사이트를 요약하면, ELF실행 파일은 시스템과 소통하기 위한 라이브러리를 찾을 때 interpreter란 링크 로더를 쓰는데, 다른 리눅스에선 /lib64/ld-linux-x86-64.so.2(x86기반 64비트일 경우)에서 제공하는 걸 쓰는데, 닉스OS의 링크 로더link-loader는 특정 버전을 붙인 걸 쓴다.
+<a href="https://github.com/NixOS/patchelf">patchelf</a>로 어떤 버전을 쓰고 있는지 찾을 수 있다.</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>[jacoo@nixos:~/.local/bin]$ patchelf --print-interpreter ./powermate </span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>/lib64/ld-linux-x86-64.so.2</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>[jacoo@nixos:~/.local/bin]$ patchelf --print-interpreter /run/current-system/sw/bin/ls</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>/nix/store/p9ysh5rk109gyjj3cn6jr54znvvlahfl-glibc-2.38-66/lib/ld-linux-x86-64.so.2</span></code></pre></div>
+<p>닉스OS에서 돌아가는 바이너리들은 특정 버전(여기서도 스냅샷이라 부르는지는 아직 잘 모르겠지만, 스택의 스냅샷 같은 것)의 링크 로더(여기선 interpreter)을 쓴다.
+위 사이트에선 autoPatchelfHook에 관한 얘기를 하는데, 이는 명령어가 아니라, 닉스OS에서 쓰는 함수인 듯 하다. 이 걸 실행해서 패치하는 건 줄 알았는데, 그렇게 동작하는 명령어는 없다. 일단 넘어가자.</p>
+<p>nix-ld로 미리 버전 지정이 없는 것들에 대한 대비를 해놓는 방법이 있고,
+바이너리내에 <code>/usr/bin</code> 같이 경로가 하드 코딩되어 있는 것들을 해결하려면 envfs를 쓸 수 있다고 한다.</p>
+<h3 id="nix-ld">nix-ld</h3>
+<p>설정 파일에 아래를 넣으면 좀 더 친절한 에러 메시지가 나온다.
+<code>programs.nix-ld.enable = true;</code></p>
+<div class="sourceCode" id="cb30"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>[jacoo@nixos:~/.local/bin]$ ./powermate </span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>cannot execute ./powermate: You are trying to run an unpatched binary on nixos, but you have not configured NIX_LD or NIX_LD_x86_64-linux. See https://github.com/Mic92/nix-ld for more details</span></code></pre></div>
+<p>실행 파일이 어떤 라이브러리를 필요로 하는지 보는 방법
+<a href="https://unix.stackexchange.com/questions/522822/different-methods-to-run-a-non-nixos-executable-on-nixos" class="uri">https://unix.stackexchange.com/questions/522822/different-methods-to-run-a-non-nixos-executable-on-nixos</a></p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>[jacoo@nixos:~/.local/bin]$ ldd ./powermate </span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>	linux-vdso.so.1 (0x00007ffc41f6b000)</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>	libpulse.so.0 =&gt; not found</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>	libc.so.6 =&gt; /nix/store/p9ysh5rk109gyjj3cn6jr54znvvlahfl-glibc-2.38-66/lib/libc.so.6 (0x00007f2ed22f3000)</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>	/lib64/ld-linux-x86-64.so.2 =&gt; /nix/store/p9ysh5rk109gyjj3cn6jr54znvvlahfl-glibc-2.38-66/lib64/ld-linux-x86-64.so.2 (0x00007f2ed24e9000)</span></code></pre></div>
+<p>보통의 리눅스들이 쓰는 폴더에 /lib64/ld-linux-x86-64.so.2(이걸 shim레이어라고 부르고 있는 것 같은데…)를 설치하고, 실제 링크 로더는 환경 변수 NIX_LD를 써서 지정한다?</p>
+<div class="sourceCode" id="cb32"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>[jacoo@nixos:~/.local/bin]$ LD_LIBRARY_PATH=/nix/store/g84s3q2rqd93jawhk4fdrsm0z43qxhz6-libpulseaudio-16.1/lib/libpulse.so.0:$LD_LIBRARY_PATH ./powermate </span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>cannot execute ./powermate: You are trying to run an unpatched binary on nixos, but you have not configured NIX_LD or NIX_LD_x86_64-linux. See https://github.com/Mic92/nix-ld for more details</span></code></pre></div>
+<h3 id="nix-index">nix-index</h3>
+<p>커뮤니티에서 만든 nixpkgs를 위한 파일 데이터베이스
+특정 파일을 제공하는 패키지를 알려주는 툴.</p>
+<div class="sourceCode" id="cb33"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>[jacoo@nixos:~/.local/bin]$ nix-locate libpulse.so.0 --top-level</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>pulseaudioFull.out                                    0 s /nix/store/79y7fb33sm0xh2bmlbmklwxlbrnfm4fk-pulseaudio-16.1/lib/libpulse.so.0</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>pulseaudioFull.out                              408,920 x /nix/store/79y7fb33sm0xh2bmlbmklwxlbrnfm4fk-pulseaudio-16.1/lib/libpulse.so.0.24.2</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>pulseaudio.out                                        0 s /nix/store/zd4r977fl0rvqk8v60dxxarrc4i6k274-pulseaudio-16.1/lib/libpulse.so.0</span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>pulseaudio.out                                  408,920 x /nix/store/zd4r977fl0rvqk8v60dxxarrc4i6k274-pulseaudio-16.1/lib/libpulse.so.0.24.2</span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>libpulseaudio.out                                     0 s /nix/store/g84s3q2rqd93jawhk4fdrsm0z43qxhz6-libpulseaudio-16.1/lib/libpulse.so.0</span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>libpulseaudio.out                               408,920 x /nix/store/g84s3q2rqd93jawhk4fdrsm0z43qxhz6-libpulseaudio-16.1/lib/libpulse.so.0.24.2</span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>libpressureaudio.out                            151,792 x /nix/store/xv5xcs49ap0rpjz9xg6biiaw24pzbbcj-libpressureaudio-0.1.13/lib/libpulse.so.0</span>
+<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a>libcardiacarrest.out                             88,752 x /nix/store/2bg3lac9jh8akhlb055h1yvvh6f80ksj-libcardiacarrest-12.2.8/lib/libpulse.so.0</span>
+<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a>apulse.out                                      151,792 x /nix/store/h8hqmyfjxlpsf5lqpa29ihlfkk6pfivq-apulse-0.1.13/lib/apulse/libpulse.so.0</span></code></pre></div>
+<h3 id="nix-locate">nix-locate</h3>
+<p>특정 파일을 가지고 있는 패키지 찾기</p>
+<h3 id="닉스os-설정-파일">닉스OS 설정 파일</h3>
+<div class="sourceCode" id="cb34"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="op">{</span> <span class="va">config</span><span class="op">,</span> <span class="va">pkgs</span><span class="op">,</span> <span class="op">...</span> <span class="op">}</span>: <span class="co"># 인자 두 개를 받는 함수다. </span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="co"># 아래는 옵션=값 형태의 집합</span></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a><span class="op">{</span> <span class="va">services</span>.<span class="va">httpd</span>.<span class="va">enable</span> <span class="op">=</span> <span class="cn">true</span><span class="op">;</span> </span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>  <span class="va">services</span>.<span class="va">httpd</span>.<span class="va">adminAddr</span> <span class="op">=</span> <span class="st">&quot;alice@example.org&quot;</span><span class="op">;</span></span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>  <span class="va">services</span>.<span class="va">httpd</span>.<span class="va">virtualHosts</span>.<span class="va">localhost</span>.<span class="va">documentRoot</span> <span class="op">=</span> <span class="st">&quot;/webroot&quot;</span><span class="op">;</span></span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>그럼 누군가는 위 함수를 부른다는 거겠지? 위 함수에 config, pkgs 매개 변수에 인자를 넘기면, 인자 값에 따라 <code>{옵션=값}</code>을 돌려준다고 보면 되겠다.
+<code>pkgs</code>로 패키지셋이 넘어오는 것 같다. <code>nixpkgs</code>가 넘어 오겠지?</p>
+<h2 id="저널-로그-보는-방법">저널 로그 보는 방법</h2>
+<div class="sourceCode" id="cb35"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>journalctl -p 0..3 -x</span></code></pre></div>
+<p><code>systemd</code>는 <code>journal</code>이라는 바이너리로 로그를 저장한다.
+<code>-n</code> 최근 메시지 10개만
+<code>-n 5</code> 최근 메시지 5개만
+<code>-x</code> 상세 설명
+<code>-e</code> 마지막 메시지부터
+<code>-f</code> <code>tail -f</code>와 동일
+<code>-p</code> (emerg 0, alert, crit, err, warning, notice, info, debug 7) 우선 순위로 정렬?
+<code>--since 20240515 --until 20240516</code>
+<code>--since "-2hour" --until "10min"</code></p>
+<h2 id="갑자기-순간의-프리징이-보이거나-아니면-곧바로-gdm-로그인-상태로-가버린다.">갑자기 순간의 프리징이 보이거나, 아니면 곧바로 gdm 로그인 상태로 가버린다.</h2>
+<p>다시 로그인하면 작업은 모두 사라져 있다.
+저널 로그 확인하니, nouveau 드라이버가 의심간다.
+<a href="https://nixos.wiki/wiki/Nvidia" class="uri">https://nixos.wiki/wiki/Nvidia</a>
+2024-05-17 nvidia 오피셜 드라이브로 바꾸고 문제는 사라진 것 같다.</p>
+<h1 id="flatpak">flatpak</h1>
+<h1 id="nix-home-manager">Nix home-manager</h1>
+<p>시스템 상태를 선언적으로, 즉 configuration.nix 파일에 모두 모아둘 수 있다면, 현실적으로 configuration.nix 파일만 들고 다니면, 똑같은 시스템을 “재현”할 수 있다. 하지만, DB에 들어 있는 설정에 필요한 정보들은 닉스 패키지 매니저로 관리할 수 없고, 사용자 디렉토리에 있는 dotfiles들도 그렇다. 완벽하게, 한 큐에 재현가능한 메커니즘을 만들기는 어렵다.</p>
+<p>사용자 디렉토리는, 시스템과 별개인 사용자 데이터들이 모인 중요한 디렉토리다. 이 디렉토리를 시스템과 묶어서 특정 스냅샷으로 되돌리거나 하면 난리 날 것이다.</p>
+<p>이런 위험을 신경쓰지 않고, 사용자 디렉토리에서 “시스템 설정에 필요한 정보”만 따로 잘 컨트롤하기 위해 home-manager를 도입했다.</p>
+<p>튜토리얼에선, desktop environment 뿐만 아니라 development environment, compilation environment, cloud virtual machine, 컨테이너 이미지 구성 들도 관리한다고 표현하고 있다.
+이런 목적으로 NixOps, colmena 란 툴들 있는 것 같다.</p>
+<h4 id="기존-etcnixconfiguration.nix는-flake.nix의-모듈-정의를-따르고-있어-그대로-모듈로-불러오면-된다.">기존 /etc/nix/configuration.nix는 flake.nix의 모듈 정의를 따르고 있어, 그대로 모듈로 불러오면 된다.</h4>
+<p>Nixpkgs 모듈은 인자 5개를 받는다.
+<code>lib</code> : nixpkgs에 있는 빌트인 함수들을 모아 놓은 라이브러리
+<code>config</code> : 현재 환경에 있는 옵션 값 집합
+<code>options</code> : 현재 환경에 있는 모든 모듈에 정의되어 있는 모든 옵션 집합
+<code>pkgs</code> : 모든 nixpkgs 패키지를 포함하는 컬렉션과 유틸리티 함수
+초보 단계에선 디폴트값<code>nixpkgs.legacyPackages."${system}"</code>만 생각해도 된다.
+<code>modulesPath</code> : NixOS에서만 유효한 매개 변수, <code>nixpkgs/nixos/modules</code>를 가리킨다.
+NixOS가 생성한 hardware-configuration.nix 파일에 볼 수 있으며, 추가적인 NixOS 모듈을 import하기 위해 쓰인다.</p>
+<p>디폴트가 아닌 매개 변수를 서브 모듈에 넘기는passing 법
+<code>_module.args</code>
+<code>specialArgs</code></p>
+<p>닉스는 시스템 레벨의 설정을 다루지, 사용자 레벨의 설정은 다루지 않는다. 사용자 레벨의 설정을 다루려면 Home Manager 를 설치해야 한다.
+NixOS의 모듈로 Home Manager를 설치한다.</p>
+<p>NixOS 모듈로 설치할 것인가, Home Manager로 설치할 것인가?</p>
+<p>root로 작업할 일이 있다. - NixOS 모듈
+여러 사용자가 쓸 일이 있다. - NixOS 모듈
+NixOS, macOS, 다른 리눅스 배포판에서 모두 돌아가야 할 설정 - Home Manager</p>
+<div class="sourceCode" id="cb36"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>sudo nixos-rebuild switch --show-trace --print-build-logs --verbose</span></code></pre></div>
+<p>위 옵션으로 좀 더 자세한 빌드 오류를 확인할 수 있다.</p>
+<p>2024.5 현재 home-manager는 nixos-unstable에서 돌아간다고 한다.
+<a href="https://github.com/nix-community/home-manager/blob/44677a1c96810a8e8c4ffaeaad10c842402647c1/README.md#releases" class="uri">https://github.com/nix-community/home-manager/blob/44677a1c96810a8e8c4ffaeaad10c842402647c1/README.md#releases</a>
+<a href="https://discourse.nixos.org/t/home-manager-install-as-module-in-flake-users-option-and-home-manager-cli-not-available/45567" class="uri">https://discourse.nixos.org/t/home-manager-install-as-module-in-flake-users-option-and-home-manager-cli-not-available/45567</a></p>
+<p>Nix 모듈 시스템에서 의외의 동작이 눈에 띈다.
+&gt; For example, if program.packages = […] is defined in multiple modules, then imports will merge all program.packages defined in all Nix modules into one list. Attribute sets can also be merged correctly. The specific behavior can be explored by yourself.</p>
+<p>여러 모듈에서 <code>program.packages</code>를 정의하고, 모듈들을 import하면 흩어져 있는 <code>program.packages</code>값을 모두 모아 하나의 리스트로 만든다.
+<a href="https://nixos-and-flakes.thiscute.world/nixos-with-flakes/modularize-the-configuration" class="uri">https://nixos-and-flakes.thiscute.world/nixos-with-flakes/modularize-the-configuration</a>
+<code>program.packages</code>만 이런 동작을 하는 게 아니라, 설정 파일을 여러 개로 쪼개어 관리할 수 있도록, 동일 항목이 있을 경우 모두 merge하는 동작을 한다. 이 동작이 없다면, 설정을 어떻게 쪼갤까 생각해 보면, 당연한 필요한 동작이다. 하지만, 언어적인 입장에선 애매해 보이는 동작이다.</p>
+<h1 id="기존-배포판들과-비교">기존 배포판들과 비교</h1>
+<p><a href="https://wiki.nixos.org/wiki/Overview_of_the_NixOS_Linux_distribution" class="uri">https://wiki.nixos.org/wiki/Overview_of_the_NixOS_Linux_distribution</a>
+닉스OS는 Linux Standard Base 파일 시스템 구조를 따르지 않는다.</p>
+<p>LSB는</p>
+<p>|시스템 소프트웨어 | /{,usr}/{bin,lib,share} |
+|설정 파일 | /etc |
+|사용자 환경에서 쓸 바이너리 | /bin |
+|동적 라이브러리 | /lib, /usr/lib |</p>
+<p>닉스OS는 <code>/lib</code>, <code>/usr/lib</code>가 없다. 시스템 라이브러리, 바이너리, 커널, 펌웨어, 설정 파일 모두 Nix Store에 저장한다. 한 번 Nix Store에 저장되면 수정할 수 없다immutable. 새로운 버전은 다른 해시값으로 저장될 뿐, 기존 파일은 건드리지 않는다. <code>/bin</code>, <code>/usr/bin</code>에는 shebang라인을 가진 스크립트와 호환을 위해 <code>/bin/sh</code>, <code>/usr/bin/env</code>만 들어 있다. 사용자 환경은 Nix Store에 있는 것들을 심볼릭 링크를 걸어 만든다. 이 환경을 <code>profiles</code>라 부른다. <code>/nix/var/nix/profiles</code>에 저장된다. 사용자들은 모두 자신만의 <code>profile</code>을 가진다.</p>
+<p>이 구조를 써서 atomicity와 롤백을 지원할 수 있다.</p>
+<p>immutable한 Nix Store에 설정 파일 저장하는 걸 눈여겨 봐야 한다. 설정 파일을 “수정”할 수 없다는 뜻이다. 설정 파일은 실행판을 만들어내는 닉스 설정(클래식 환경에선 <code>/etc/nixos/configuration.nix</code>)에서만 가능하고, 이를 설정하고 빌드(<code>nixos-rebuild switch</code>)하면 바뀐 “수정 파일”을 새로 만들어서 Nix Store에 저장한다. 이전에 설정했던 환경으로 롤백이 가능한 이유다.</p>
+<p>이렇게 설정해서 “빌드”한 결과물을 generation이라 부른다. 롤백은 “이전 generation으로 돌아가기”라 말하면 되겠다.</p>
+<div class="sourceCode" id="cb37"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>$ nix-env --rollback</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>$ nixos-rebuild switch --rollback</span></code></pre></div>
+<p>이 전 generation은 부트 로더에서 고를 수도 있다.</p>
+<p>새로 generation을 만들어도 이 전 generation은 지워지지 않는다. 설정을 변경해서 빌드할 때마다 generation은 쌓이는데, 다음 명령으로 오래된 걸 삭제한다든지 하며 관리 한다.</p>
+<div class="sourceCode" id="cb38"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a># 30일 지난 것들 삭제</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>$ nix-collect-garbage --delete-older-than 30d</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a># 모두 삭제</span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>$ nix-collect-garbage -d</span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a># 목록</span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>$ nix-env --list-generations --profile /nix/var/nix/profiles/system</span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a># 특정 generation으로 스위칭</span>
+<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a>$ nix-env --profile /nix/var/nix/profiles/system --switch-generation 204</span>
+<span id="cb38-12"><a href="#cb38-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-13"><a href="#cb38-13" aria-hidden="true" tabindex="-1"></a># 특정 generation 삭제</span>
+<span id="cb38-14"><a href="#cb38-14" aria-hidden="true" tabindex="-1"></a>$ nix-env --profile /nix/var/nix/profiles/system --delete-generations 205 206</span></code></pre></div>
+<p><code>/etc/nixos/configuration.nix</code>의 <code>nix.gc</code> 옵션을 통해 자동 삭제automatic garbage collection를 지정할 수 있다.</p>
+<h1 id="최신-디스코드가-아니라-실행이-안되지만-nixpkgs에는-아직-최신판이-안-올라왔다">최신 디스코드가 아니라 실행이 안되지만, nixpkgs에는 아직 최신판이 안 올라왔다</h1>
+<p>nix-shell을 써서 임시로 설치하든가,
+nix-env로 사용자 환경에서만 설치하든가,
+overlays로 nixpkgs에 있는 discord를 덮어 씌우든가,</p>
+<h1 id="flakes가-활성화된-상태에서-default.nix만-있는-프로젝트-빌드">flakes가 활성화된 상태에서 default.nix만 있는 프로젝트 빌드</h1>
+<pre><code>nix build --no-flake -f default.nix
+nix build -f '&lt;nixpkgs&gt;' &lt;패키지명&gt;</code></pre>
+
+<div class="comment">
+<script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
+</script>
+</div>
+<div style="text-align:right">Github 계정이 없는 분은 메일로 보내주세요. lionhairdino at gmail.com </div>
+        </div>
+        <nav class="toc toc-right js-toc relative z-1 transition--300 absolute pa4 pt5 is-position-fixed"></nav>
+        <div id="footer">
+            © 2022 lionhairdino. All rights reserved. Generated by <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+        <script>
+            tocbot.init({
+                tocSelector: '.js-toc',
+                contentSelector: '.js-toc-content',
+                headingSelector: 'h2, h3',
+                hasInnerContainers: true,
+            });
+        </script>
+    </body>
+</html>
