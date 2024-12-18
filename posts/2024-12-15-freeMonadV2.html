@@ -114,10 +114,7 @@
 <p>Free 모나드는 최소한의 모나드 구조를 제공한다고 말합니다. 모나드는 <strong><em>펑터 구조를 가지고 있고</em></strong>, <code>join</code>(혹은 바인드<code>&gt;&gt;=</code>), <code>return</code>을 제공하고, 모나드 법칙을 따라야 모나드 구조가 완성 됩니다. 이런 것들을 다 정의하지 않아도, Free 구조에 펑터를 넣으면, 모나드 성질을 갖게 됩니다. 이렇게 얘기하면 마치 펑터의 성질에 따른 어떤 모나드가 될 것 같지만, 임의의 모나드 성질이 아니라 <strong>Free 모나드 성질</strong>만 갖습니다. Free 모나드 성질이 뭘까요? 이를 알아 보기 위해 Free 모나드가 어떤 이펙트를 다루는지 봐야 합니다. 그런데, 이펙트 생성은 펑터에서 이루어지고, 이렇게 생성된 이펙트를 합성할 때 모나드 구조가 개입할텐데, Free 모나드 설계는 철저하게 펑터의 구조에는 의존하지 않게 설계하고, 나중에 펑터를 받는 구조입니다. <strong><em>이펙트가 뭔지도 모르는데, 합성할 줄 아는 모나드가 필요합니다.</em></strong></p>
 <h2 id="어떻게-이펙트를-몰라도-합성할-수-있을까">어떻게 이펙트를 몰라도 합성할 수 있을까?</h2>
 <p>이펙트를 볼 땐, <code>&gt;&gt;=</code>보단 <code>join</code>이 좀 더 잘 보이니, <code>join</code>을 뜯어 보겠습니다.</p>
-<p>[^1] Reader 모나드의 join, <a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> State 모나드의 join, <a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> Maybe 모나드의 join
-[^1]: Reader 모나드의 join
-<code>haskell      join rra = Reader $ \r -&gt; runReader (runReader rra r) r</code>
-<code>rra</code>에 <code>r</code>을 넣어 주고 받은 결과값에 또 <code>r</code>을 넣어 주는 작업을, 바깥에서 보면 <code>r</code>을 한 번만 받는 작업으로 보이게 해 줍니다.</p>
+<p><a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> Reader 모나드의 join, <a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> State 모나드의 join, <a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a> Maybe 모나드의 join</p>
 <p>Free 모나드의 <code>join</code>도 어떤 이펙트 작업이 두 번 일어난 걸, 한 번만 하는 걸로 보이게 바꾸어 줄텐데, 처음 보면 잘 보이지 않습니다.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>join (<span class="dt">Pure</span> x)  <span class="ot">=</span> x</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>join (<span class="dt">Free</span> fx) <span class="ot">=</span> <span class="dt">Free</span> (<span class="fu">fmap</span> join fx)</span>
@@ -191,14 +188,17 @@ A. Free 모나드는, 한 겹 파고 들어갈 때마다 펑터의 <code>fmap</c
 <section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes">
 <hr />
 <ol>
-<li id="fn1"><p>State 모나드의 join
+<li id="fn1"><p>Reader 모나드의 join
+<code>haskell  join rra = Reader $ \r -&gt; runReader (runReader rra r) r</code>
+<code>rra</code>에 <code>r</code>을 넣어 주고 받은 결과값에 또 <code>r</code>을 넣어 주는 작업을, 바깥에서 보면 <code>r</code>을 한 번만 받는 작업으로 보이게 해 줍니다.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>State 모나드의 join
 <code>haskell  join st = State $ \s -&gt;               let (st', s') = runState st s                    (a, s'')  = runState st' s'                in  (a, s'')</code>
-<code>s</code>를 넣어주고 계산해서 바뀐 <code>s'</code>을 넣어 주는 작업을, 바깥에서 보면 <code>s</code>를 한 번만 받는 작업으로 보이게 해 줍니다.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn2"><p>Maybe 모나드의 join</p>
+<code>s</code>를 넣어주고 계산해서 바뀐 <code>s'</code>을 넣어 주는 작업을, 바깥에서 보면 <code>s</code>를 한 번만 받는 작업으로 보이게 해 줍니다.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn3"><p>Maybe 모나드의 join</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>join <span class="dt">Nothing</span> <span class="ot">=</span> <span class="dt">Nothing</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>join (<span class="dt">Just</span> <span class="dt">Nothing</span>) <span class="ot">=</span> <span class="dt">Nothing</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>join (<span class="dt">Just</span> (<span class="dt">Just</span> x)) <span class="ot">=</span> <span class="dt">Just</span> x</span></code></pre></div>
-<p><code>Just</code>인지, <code>Nothing</code>인지 판단하는 작업을 한 번만 하도록 바꿉니다.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<p><code>Just</code>인지, <code>Nothing</code>인지 판단하는 작업을 한 번만 하도록 바꿉니다.<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section>
 
