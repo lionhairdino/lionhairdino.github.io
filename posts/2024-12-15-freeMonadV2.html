@@ -116,12 +116,12 @@
 <p>이펙트를 볼 땐, <code>&gt;&gt;=</code>보단 <code>join</code>이 좀 더 잘 보이니, <code>join</code>을 뜯어 보겠습니다.</p>
 <p><a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> Reader 모나드의 join, <a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> State 모나드의 join, <a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a> Maybe 모나드의 join</p>
 <p>Free 모나드의 <code>join</code>도 어떤 이펙트 작업이 두 번 일어난 걸, 한 번만 하는 걸로 보이게 바꾸어 줄텐데, 뭘 하는지 잘 보이지 않습니다.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>join (<span class="dt">Pure</span> x)  <span class="ot">=</span> x</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>join (<span class="dt">Free</span> fx) <span class="ot">=</span> <span class="dt">Free</span> (<span class="fu">fmap</span> join fx)</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co">--                       |    |</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co">--                       |  Free의 join</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co">--                       | </span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co">--                    외부 펑터의 fmap</span></span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>join (<span class="dt">Pure</span> x)  <span class="ot">=</span> x</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>join (<span class="dt">Free</span> fx) <span class="ot">=</span> <span class="dt">Free</span> (<span class="fu">fmap</span> join fx)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co">--                       |    |</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co">--                       |  Free의 join</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co">--                       | </span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co">--                    외부 펑터의 fmap</span></span></code></pre></div>
 <p>몇 겹의 <code>Free</code>로 쌓여 있든, <code>Pure</code>가 나올 때까지 몇 단계든 들어가서 <code>x</code>만 남게 만듭니다. 각 단계마다 <strong><em>외부에서 받은 펑터의 fmap이 동작합니다.</em></strong> 여러 겹을 한 겹으로 만드는 동안 외부 펑터 <code>fmap</code>이 쌓여 있는 만큼 동작한다는 것 말고 특별한 작업은 없습니다. (만일, 펑터로 <code>Maybe</code>같이 계산을 끊어버리는 펑터가 들어가면 물론 <code>Pure</code>까지 도달하지 않을 수 있습니다.)</p>
 <p>보통의 모나드의 <code>join</code>은 <code>m (m a) -&gt; m a</code> 타입으로, 예를 들어 <code>join Just (Just (Just 1))</code>은 <code>Just (Just 1)</code>이 됩니다. 하지만, <code>Free</code>의 <code>join</code>은 마치, 세겹 이상 쌓여 있는, <code>Free(f (Free(f (Free(f (Pure r)))))</code> 같은 것들도 <code>Free(f (Pure r))</code>로 만들 것처럼 보입니다.</p>
 <p>샌드위치처럼 <code>Free</code>와 외부 펑터 <code>f</code>가 몇 겹으로 번갈아 있는 걸 <code>Free(f (Pure r))</code>로 만드는 것처럼 보이는데, <code>join (Pure x) = x</code>가 걸립니다. 마치 <code>Pure</code>가 사라지고 <code>Free(f r)</code>이 될 것만 같은 <code>join</code>의 동작입니다. 그러면, <code>Free</code> 구조가 망가지니 그러면 안될텐데요. (전 여기가 Free 모나드를 이해하는 힌트였습니다.)</p>
@@ -148,8 +148,8 @@
 <p>※ 참고 - <a href="https://lionhairdino.github.io/posts/2020-07-03-freeMonad.html">Free 모나드 패턴</a></p>
 <h2 id="리스트-모나드와-비슷">리스트 모나드와 비슷</h2>
 <p>Free 모나드와 리스트를 비교해 봅시다.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Free</span> f r <span class="ot">=</span> <span class="dt">Free</span> (f (<span class="dt">Free</span> f r)) <span class="op">|</span> <span class="dt">Pure</span> r</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">List</span>   a <span class="ot">=</span> <span class="dt">Cons</span>  a (<span class="dt">List</span>   a)  <span class="op">|</span> <span class="dt">Empty</span></span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Free</span> f r <span class="ot">=</span> <span class="dt">Free</span> (f (<span class="dt">Free</span> f r)) <span class="op">|</span> <span class="dt">Pure</span> r</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">List</span>   a <span class="ot">=</span> <span class="dt">Cons</span>  a (<span class="dt">List</span>   a)  <span class="op">|</span> <span class="dt">Empty</span></span></code></pre></div>
 <p>비슷한 듯 다른 듯 보입니다. 금방 눈에 보이는 건, 둘 다 재귀 구조이며, 끝을 나타내는 값 생성자가 있습니다. 리스트와 리스트를 <code>(&lt;&gt;)</code>를 이용해 붙이듯, Free 모나드의 <code>join</code>은 각 각 몇 겹으로 쌓인 Free값 둘을 이어 붙입니다. 다른 말로 하면, <code>[[1,2],[3,4]]</code>를 <code>[1,2,3,4]</code>로 평평flat하게 만드는 리스트 모나드의 동작이 아니라 <code>[1,2] &lt;&gt; [3,4]</code>를 <code>[1,2,3,4]</code>로 만드는 동작과 비슷합니다.</p>
 <p>Q. 그럼, Free 모나드가 필요한 곳에 그냥 리스트를 쓰면 되지 않을까요?<br />
 A. Free 모나드는, 한 겹 파고 들어갈 때마다 펑터의 <code>fmap</code>이 동작합니다. 예를 들어 <code>Maybe</code>를 넣었다면, 중간에 <code>Nothing</code>을 만나면 바로 끝나는 동작을 합니다.</p>
@@ -159,25 +159,25 @@ A. Free 모나드는, 한 겹 파고 들어갈 때마다 펑터의 <code>fmap</c
 <p><code>Free</code>값은 항상 <code>Pure</code>로 끝납니다. <code>Free(f (Pure r))</code>이거나, <code>Free(f (Free(f (Free (f (Pure r))))))</code>같은 모양입니다. 첫 번째에서 <code>r</code>에 또다시 <code>Free(f (Pure r))</code>을 넣어 준다면, Free(f (Pure <strong>(Free(f (Pure r)))</strong> ))이 됩니다. 여기에 <code>join</code>을 돌리면, <code>join (Pure x) = x</code> 구현에 따라 중간에 들어가 있는 <code>Pure</code>는 사라지고, <code>Free(f (Free(f (Pure r))))</code>이 됩니다.</p>
 <h3 id="리스트-펑터">리스트 펑터</h3>
 <p>Free 모나드 <code>Free f r</code>에서 <code>f</code>에 리스트 펑터를 넣어 주면 어떤 동작을 하는지 보겠습니다.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">List</span> a <span class="ot">=</span> <span class="dt">Cons</span> a (<span class="dt">List</span> a) <span class="op">|</span> <span class="dt">Empty</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="dt">Free</span> <span class="dt">List</span> a 의 값은</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="dt">Free</span> (<span class="dt">Empty</span>)</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="dt">Free</span> (<span class="dt">Cons</span> (<span class="dt">Pure</span> r))</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="dt">Free</span> (<span class="dt">Cons</span> (<span class="dt">Free</span> (<span class="dt">Empty</span>)))</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="dt">Free</span> (<span class="dt">Cons</span> (<span class="dt">Free</span> (<span class="dt">Cons</span> (<span class="dt">Pure</span> r))))</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="op">...</span></span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">List</span> a <span class="ot">=</span> <span class="dt">Cons</span> a (<span class="dt">List</span> a) <span class="op">|</span> <span class="dt">Empty</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="dt">Free</span> <span class="dt">List</span> a 의 값은</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="dt">Free</span> (<span class="dt">Empty</span>)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="dt">Free</span> (<span class="dt">Cons</span> (<span class="dt">Pure</span> r))</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="dt">Free</span> (<span class="dt">Cons</span> (<span class="dt">Free</span> (<span class="dt">Empty</span>)))</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="dt">Free</span> (<span class="dt">Cons</span> (<span class="dt">Free</span> (<span class="dt">Cons</span> (<span class="dt">Pure</span> r))))</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="op">...</span></span></code></pre></div>
 <p>이런 값들이 있는데, <code>Free (Cons (Pure r))</code>의 <code>r</code>에 <code>Free (Cons (Free (Cons Pure r)))</code>을 넣으면,<br />
 <code>Free (Cons (Pure (Free (Cons (Free (Cons Pure r))))))</code>이 되고 <code>join</code>을 돌리면<br />
 <code>Free (Cons (Free (Cons (Free (Cons Pure r)))))</code>이 됩니다.</p>
 <p>리스트 모나드처럼 이펙트를 합성하는 모습은 없습니다.</p>
 <h3 id="maybe-펑터">Maybe 펑터</h3>
-<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Maybe</span> a <span class="ot">=</span> <span class="dt">Just</span> a <span class="op">|</span> <span class="dt">Nothing</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="dt">Free</span> <span class="dt">Maybe</span> a의 값은</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="dt">Free</span> (<span class="dt">Nothing</span>)</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="dt">Free</span> (<span class="dt">Just</span> (<span class="dt">Pure</span> r))</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="dt">Free</span> (<span class="dt">Just</span> (<span class="dt">Free</span> (<span class="dt">Nothing</span>)))</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="dt">Free</span> (<span class="dt">Just</span> (<span class="dt">Free</span> (<span class="dt">Just</span> (<span class="dt">Pure</span> r))))</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="op">...</span></span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Maybe</span> a <span class="ot">=</span> <span class="dt">Just</span> a <span class="op">|</span> <span class="dt">Nothing</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="dt">Free</span> <span class="dt">Maybe</span> a의 값은</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="dt">Free</span> (<span class="dt">Nothing</span>)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="dt">Free</span> (<span class="dt">Just</span> (<span class="dt">Pure</span> r))</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="dt">Free</span> (<span class="dt">Just</span> (<span class="dt">Free</span> (<span class="dt">Nothing</span>)))</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="dt">Free</span> (<span class="dt">Just</span> (<span class="dt">Free</span> (<span class="dt">Just</span> (<span class="dt">Pure</span> r))))</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="op">...</span></span></code></pre></div>
 <p><code>Free (Just (Pure r))</code>에서 <code>r</code>에 <code>Free (Just (Free (Just (Pure r))))</code>을 넣으면,<br />
 <code>Free (Just (Pure (Free (Just (Free (Just (Pure r)))))))</code>이 되고 <code>join</code>을 돌리면<br />
 <code>Free (Just (Free (Just (Free (Just (Pure r))))))</code>이 됩니다.</p>
@@ -188,16 +188,19 @@ A. Free 모나드는, 한 겹 파고 들어갈 때마다 펑터의 <code>fmap</c
 <section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes">
 <hr />
 <ol>
-<li id="fn1"><p>Reader 모나드의 join
-<code>haskell  join rra = Reader $ \r -&gt; runReader (runReader rra r) r</code>
-<code>rra</code>에 <code>r</code>을 넣어 주고 받은 결과값에 또 <code>r</code>을 넣어 주는 작업을, 바깥에서 보면 <code>r</code>을 한 번만 받는 작업으로 보이게 해 줍니다.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn2"><p>State 모나드의 join
-<code>haskell  join st = State $ \s -&gt;               let (st', s') = runState st s                    (a, s'')  = runState st' s'                in  (a, s'')</code>
-<code>s</code>를 넣어주고 계산해서 바뀐 <code>s'</code>을 넣어 주는 작업을, 바깥에서 보면 <code>s</code>를 한 번만 받는 작업으로 보이게 해 줍니다.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn1"><p>Reader 모나드의 join</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>join rra <span class="ot">=</span> <span class="dt">Reader</span> <span class="op">$</span> \r <span class="ot">-&gt;</span> runReader (runReader rra r) r</span></code></pre></div>
+<p><code>rra</code>에 <code>r</code>을 넣어 주고 받은 결과값에 또 <code>r</code>을 넣어 주는 작업을, 바깥에서 보면 <code>r</code>을 한 번만 받는 작업으로 보이게 해 줍니다.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>State 모나드의 join</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>join st <span class="ot">=</span> <span class="dt">State</span> <span class="op">$</span> \s <span class="ot">-&gt;</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>             <span class="kw">let</span> (st', s') <span class="ot">=</span> runState st s </span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>                 (a, s'')  <span class="ot">=</span> runState st' s' </span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>             <span class="kw">in</span>  (a, s'')</span></code></pre></div>
+<p><code>s</code>를 넣어주고 계산해서 바뀐 <code>s'</code>을 넣어 주는 작업을, 바깥에서 보면 <code>s</code>를 한 번만 받는 작업으로 보이게 해 줍니다.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 <li id="fn3"><p>Maybe 모나드의 join</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>join <span class="dt">Nothing</span> <span class="ot">=</span> <span class="dt">Nothing</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>join (<span class="dt">Just</span> <span class="dt">Nothing</span>) <span class="ot">=</span> <span class="dt">Nothing</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>join (<span class="dt">Just</span> (<span class="dt">Just</span> x)) <span class="ot">=</span> <span class="dt">Just</span> x</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>join <span class="dt">Nothing</span> <span class="ot">=</span> <span class="dt">Nothing</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>join (<span class="dt">Just</span> <span class="dt">Nothing</span>) <span class="ot">=</span> <span class="dt">Nothing</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>join (<span class="dt">Just</span> (<span class="dt">Just</span> x)) <span class="ot">=</span> <span class="dt">Just</span> x</span></code></pre></div>
 <p><code>Just</code>인지, <code>Nothing</code>인지 판단하는 작업을 한 번만 하도록 바꿉니다.<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section>
