@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko" lang="ko">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <title>lionhairdino - Free 모나드</title>
+
+        <meta name="description" content="왜 이름이 프리 모나드이며, 프리 모나드는 어떤 이펙트를 합성하고 있는지 살펴 봤습니다." />
+        <meta property="og:description" content="왜 이름이 프리 모나드이며, 프리 모나드는 어떤 이펙트를 합성하고 있는지 살펴 봤습니다." />
+
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <link rel="icon" href="https://lionhairdino.github.io/favicon.svg" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino16px.png" sizes="16x16" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino24px.png" sizes="24x24" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino32px.png" sizes="32x32" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino48px.png" sizes="48x48" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino57px.png" sizes="57x57" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino60px.png" sizes="60x60" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino64px.png" sizes="64x64" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino72px.png" sizes="72x72" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino76px.png" sizes="76x76" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino114px.png" sizes="114x114" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino120px.png" sizes="120x120" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino144px.png" sizes="144x144" />
+        <link rel="shortcut icon" href="../favicon.ico" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino152px.png" sizes="152x152" />
+        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino180px.png" sizes="180x180" />
+        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino192px.png" sizes="192x192" />
+        <link rel="manifest" href="../site.webmanifest" />
+        <link rel="mask-icon" href="https://lionhairdino.github.io/Lionhairdino_black.svg" color="#ff7500" />
+        <meta name="msapplication-TileImage" content="/images/favicon/Lionhairdino144px.png" />
+        <meta name="msapplication-TileColor" content="#ff7500" />
+        <meta name="theme-color" content="#ffffff" />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="Free 모나드" />
+        <meta property="og:site_name" content="Lionhairdino" />
+        <meta property="og:url" content="https://lionhairdino.github.io/posts/2024-12-15-freeMonadV2.html" />
+
+        <meta property="og:image" content="https://lionhairdino.github.io/images/generalisedBinary.png" />
+
+      <meta name="keywords" content="프리 모나드, 이항 함수 일반화, 하스켈, 모나드">
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-E9WZ6VXGHP"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-E9WZ6VXGHP');
+</script>
+<script src="../script/copycode.js"></script>
+<script async src="https://cse.google.com/cse.js?cx=9c53b4915cbb2605c"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.11.1/tocbot.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.11.1/tocbot.css" />
+<meta name="fediverse:creator" content="@lionhairdino@mastodon.social">
+    </head>
+    <body>
+        <div id="header">
+            <div style="display:inline-block;margin-right:5px;padding-top: 5px;" id="logo">
+                <a href="../"><img style="width:30px;border:none" src="../images/favicon/Lionhairdino48px.png"></a>
+            </div>
+            <div style="display:inline-block;vertical-align: top;padding-top:5px;" id="navigation">
+                <a href="../">lionhairdino</a>
+                <a href="../about.html">about</a>
+                <!--<a href="/archive.html">archive</a>-->
+            </div>
+            <div style="display:inline-block;font-size:0.8em;vertical-align: top;">
+                <div style="display:inline-block;vertical-align: top;padding-top: 5px"></div>
+                <div style="display:inline-block;width:180px;"> 
+                    <div class="gcse-searchbox-only"></div>
+                </div>
+                <div style="display:inline-block;vertical-align: top;padding-top: 11px; padding-left: 10px;"><a rel="me" href="https://mastodon.social/@lionhairdino"><img style="width:20px;border:none" src="../images/mastodon.svg"></a></div>
+                <div style="display:inline-block;vertical-align: top;padding-top: 11px; padding-left: 2px;"><a href="https://lionhairdino.bsky.social"><img style="width:20px;border:none" src="../images/bluesky.svg"></a></div>
+                <div style="display:inline-block;vertical-align: top;padding-top: 11px; padding-left: 2px;"><a href="https://discordapp.com/users/lionhairdino#7687"><img style="width:20px;border:none" src="../images/discord.svg"></a></div>
+            </div>
+            <div>
+                여기 글들은 일종의 질문입니다. 용어 선택도 학계, 업계에서 쓰는 걸로 되어 있지 않고, 틀린 내용이 있을 수도 있습니다.
+            </div>
+        </div>
+        <div class="js-toc-content">
+            <h1>Free 모나드</h1>
+            <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+<div class="info">
+    Posted on December 15, 2024
+    
+</div>
+
+<p>하스켈을 공부하며, 모나드가 무엇인지 알고 있는 분들을 위한 글입니다.</p>
+<p><span class="citation" data-cites="todo">@todo</span>: 자유 모나드라 번역할까, 아니면 음차만 해서 프리 모나드라 할까?</p>
+<p>펑터가 정의되어 있다면, 여기에 모나드 법칙을 잘 따르게 <code>join</code>(혹은 <code>bind</code>)을 정의하고, <code>return</code>(혹은 <code>pure</code>)도 정의하면 모나드가 됩니다. 그런데, 달랑 펑터만 <code>Free</code> 구조에 넣으면, 모나드가 되게 할 수 있습니다. 그렇다고, 예를 들어 <code>Reader</code>의 <code>fmap</code>만 정의해서 펑터로 만들고, 여기에 넣는다고 <code>Reader</code> 모나드가 된다는 얘긴 아닙니다. 펑터가 반드시 하나의 모나드로만 구조가 확장되는 건 아닙니다. <code>join</code>과 <code>return</code>을 어떻게 정의하냐에 따라 여러가지 모나드가 나올 수 있습니다. 펑터를 넣으면, 펑터에 따라 어떤 모나드가 되는 게 아니라, <strong>Free 모나드가 됩니다.</strong></p>
+<p>위 설명만 보면, 마치 <strong>공짜</strong>로 얻어서 Free 모나드 같지만, 아래와 같은 뜻이라 합니다.</p>
+<blockquote>
+<p>여기서 Free는 <strong>공짜</strong> 맥주할 때 공짜가 아니라, 언론의 <strong>자유</strong>할 때 자유입니다.<br />
+– Free Software Foundation, What is Free Software?</p>
+</blockquote>
+<p>추상 대수학에서 <strong>자유</strong> 무엇이라 하면, 무엇이 되기 위한 최소한의 조건만 만족하는 구조를 뜻합니다. 필수적으로 필요한 조건 말고는 그 <strong>구조를 제한하는 다른 조건이 없다</strong>는 뜻이라고 합니다. 음, 그럼 자유 대신 최소Minimal, (혹은 기반Base?) 라는 말을 쓰는 건 어떤가 싶습니다. 어쨌든, 그냥 얻어지는, <strong>공짜</strong>로 얻어지는 무언가는 아니라는 뜻입니다.</p>
+<p>Free모나드 구조에 넣으면 <strong>공짜</strong>로 모나드가 되어서 Free모나드가 아니라, <strong>Free 모나드는 모나드가 되기 위한 최소한의 구조만 가진 모나드</strong>로, 모나드 성질을 갖기 위해서 꼭 필요한 조건, 동작이 아닌 것은 외부로 빼낸 모나드입니다. (<strong><em>Free 모나드 내부에 있는 펑터의 동작은 모나드가 되기 위한 최소한의 조건에 포함되지 않는다</em></strong>는 뜻으로 저는 이해하고 있습니다.) ※ 참고 - <a href="https://serokell.io/blog/introduction-to-free-monads">Introduction to Free Monads - Serokell</a></p>
+<h2 id="free-모나드-정의">Free 모나드 정의</h2>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- data Free f r = Free (f (Free f r)) | Pure r</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- 하스켈은 알아서 값 생성자와 타입 생성자를 구별하니 보통 위처럼 같게 쓰는데,</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- 여기서는 혼란을 줄이기 위해 값 생성자에 `V`를 붙여 명시하겠습니다.</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Free</span> f r <span class="ot">=</span> <span class="dt">FreeV</span> (f (<span class="dt">Free</span> f r)) <span class="op">|</span> <span class="dt">Pure</span> r</span></code></pre></div>
+<p>위와 같이 리스트랑 비슷해 보이는 재귀적인 구조를 준비합니다. 그리고, 위 구조에 대해서 아래와 같이 펑터 인스턴스를 정의하고,</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Functor</span> f <span class="ot">=&gt;</span> <span class="dt">Functor</span> (<span class="dt">Free</span> f) <span class="kw">where</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmap</span> fun (<span class="dt">Pure</span> x) <span class="ot">=</span> <span class="dt">Pure</span> (fun x)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmap</span> fun (<span class="dt">FreeV</span> g) <span class="ot">=</span> <span class="dt">FreeV</span> (<span class="fu">fmap</span> fun <span class="op">&lt;$&gt;</span> g) <span class="co">-- f의 &lt;$&gt;</span></span></code></pre></div>
+<p>모나드 인스턴스를 정의합니다.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> (<span class="dt">Functor</span> f) <span class="ot">=&gt;</span> <span class="dt">Monad</span> (<span class="dt">Free</span> f) <span class="kw">where</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span> a <span class="ot">=</span> <span class="dt">Pure</span> a</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    (<span class="dt">FreeV</span> x) <span class="op">&gt;&gt;=</span> g <span class="ot">=</span> <span class="dt">FreeV</span> (<span class="fu">fmap</span> (<span class="op">&gt;&gt;=</span> g) x)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    (<span class="dt">Pure</span> r) <span class="op">&gt;&gt;=</span> g <span class="ot">=</span> g r</span></code></pre></div>
+<p>준비는 끝났습니다. 이제 <code>Free f r</code>에서 <code>f</code> 자리에 펑터를 넣어 주면, “이 펑터는 모나드 속성을 가진다고” 얘기합니다. 예를 들어 <code>SomeFunctor</code>는 펑터 성질만 있고, <code>Free SomeFunctor</code>는 모나드란 뜻입니다.</p>
+<p>위 정의를 보면, 짧고 단순해 보이지만, 저는 무슨 암호문 같이 보입니다. 한참(몇 일이 아닙니다. 몇 년입니다. 이해했다 생각하고 사용할 줄도 알지만, 누구한테 설명하기엔 찜찜했습니다. 남한테 설명할 정도가 되어야 진짜 이해한 거라고 어디서 봤습니다.) 째려 보다가 나름 설명할 방법을 찾아 글을 남깁니다.</p>
+<p>Free 모나드는 최소한의 모나드 구조를 제공한다고 말합니다. 모나드는 <strong><em>펑터 구조를 가지고 있고</em></strong>, <code>join</code>(혹은 바인드<code>&gt;&gt;=</code>), <code>return</code>을 제공하고, 모나드 법칙을 따라야 모나드 구조가 완성 됩니다. 이런 것들을 다 정의하지 않아도, Free 구조에 펑터를 넣으면, 모나드 성질을 갖게 됩니다. 이렇게 얘기하면 마치 펑터의 성질에 따른 어떤 모나드가 될 것 같지만, 임의의 모나드 성질이 아니라 <strong>Free 모나드 성질</strong>만 갖습니다. Free 모나드 성질이 뭘까요? 이를 알아 보기 위해 Free 모나드가 어떤 이펙트를 다루는지 봐야 합니다. 그런데, 이펙트 생성은 펑터에서 이루어지고, 이렇게 생성된 이펙트를 합성할 때 모나드 구조가 개입할텐데, Free 모나드 설계는 철저하게 펑터의 구조에는 의존하지 않게 설계하고, 나중에 펑터를 받는 구조입니다. <strong><em>이펙트가 뭔지도 모르는데, 합성할 줄 아는 모나드가 필요합니다.</em></strong></p>
+<h2 id="어떻게-이펙트를-몰라도-합성할-수-있을까">어떻게 이펙트를 몰라도 합성할 수 있을까?</h2>
+<p>이펙트를 볼 땐, <code>&gt;&gt;=</code>보단 <code>join</code>이 좀 더 잘 보이니, <code>join</code>을 뜯어 보겠습니다.</p>
+<p>[^1] Reader 모나드의 join, <a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> State 모나드의 join, <a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> Maybe 모나드의 join
+[^1]: Reader 모나드의 join
+<code>haskell      join rra = Reader $ \r -&gt; runReader (runReader rra r) r</code>
+<code>rra</code>에 <code>r</code>을 넣어 주고 받은 결과값에 또 <code>r</code>을 넣어 주는 작업을, 바깥에서 보면 <code>r</code>을 한 번만 받는 작업으로 보이게 해 줍니다.</p>
+<p>Free 모나드의 <code>join</code>도 어떤 이펙트 작업이 두 번 일어난 걸, 한 번만 하는 걸로 보이게 바꾸어 줄텐데, 처음 보면 잘 보이지 않습니다.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>join (<span class="dt">Pure</span> x)  <span class="ot">=</span> x</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>join (<span class="dt">Free</span> fx) <span class="ot">=</span> <span class="dt">Free</span> (<span class="fu">fmap</span> join fx)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co">--                       |    |</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co">--                       |  Free의 join</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co">--                       | </span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co">--                    외부 펑터의 fmap</span></span></code></pre></div>
+<p>몇 겹의 <code>Free</code>로 쌓여 있든, <code>Pure</code>가 나올 때까지 몇 단계든 들어가서 <code>x</code>만 남게 만듭니다. 각 단계마다 <strong><em>외부에서 받은 펑터의 fmap이 동작합니다.</em></strong> 여러 겹을 한 겹으로 만드는 동안 외부 펑터 <code>fmap</code>이 쌓여 있는 만큼 동작한다는 것 말고 특별한 작업은 없습니다. (만일, 펑터로 <code>Maybe</code>같이 계산을 끊어버리는 펑터가 들어가면 물론 <code>Pure</code>까지 도달하지 않을 수 있습니다.)</p>
+<p>보통의 모나드의 <code>join</code>은 <code>m (m a) -&gt; m a</code> 타입으로, 예를 들어 <code>join Just (Just (Just 1))</code>은 <code>Just (Just 1)</code>이 됩니다. 하지만, <code>Free</code>의 <code>join</code>은 마치, 세겹 이상 쌓여 있는, <code>Free(f (Free(f (Free(f (Pure r)))))</code> 같은 것들도 <code>Free(f (Pure r))</code>로 만들 것처럼 보입니다.</p>
+<p>샌드위치처럼 <code>Free</code>와 외부 펑터 <code>f</code>가 몇 겹으로 번갈아 있는 걸 <code>Free(f (Pure r))</code>로 만드는 것처럼 보이는데, <code>join (Pure x) = x</code>가 걸립니다. 마치 <code>Pure</code>가 사라지고 <code>Free(f r)</code>이 될 것만 같은 <code>join</code>의 동작입니다. 그러면, <code>Free</code> 구조가 망가지니 그러면 안될텐데요. (전 여기가 Free 모나드를 이해하는 힌트였습니다.)</p>
+<p><strong>이제부터 상상입니다.</strong> 주의해서 보세요.</p>
+<figure>
+<img src="../images/generalisedBinary.png" alt="둘을 모으기만" />
+<figcaption aria-hidden="true">둘을 모으기만</figcaption>
+</figure>
+<p>모나드는 두 번의 이펙트를 모아서, 하나로 만든다고 얘기합니다. 마치 reduce가 바로 바로 일어나서 하나가 되는 느낌입니다만, <code>join</code>들을 유심히 살펴 보시면, <strong>첫 째, 둘을 모아서 외부에서 보면 하나처럼 보이게 만들고,</strong> 안에서는 밀가루 반죽 두 개를 뭉치는 것처럼 <strong>둘 째, 다시는 하나 하나로 돌아오지 못하게 합성</strong>하는 작업 둘로 나눌 수 있습니다. 그런데, 이 두 단계 중 둘을 모으는 첫 번째 단계는 <strong><em>합성하는 방법을 몰라도 할 수 있습니다.</em></strong> 다르게 얘기하면 이펙트 합성 방법을 몰라도, 즉 펑터의 동작은 나중에 받을거야 하고, 작업을 진행할 수 있습니다. ※ 참고 - <a href="https://lionhairdino.github.io/posts/2023-03-10-monoidalCategory.html#%EB%AA%A8%EB%85%B8%EC%9D%B4%EB%8B%AC-%EC%B9%B4%ED%85%8C%EA%B3%A0%EB%A6%AC">모노이드 이항 연산의 일반화</a></p>
+<blockquote>
+<p>“Free 모나드는 이펙트 둘을 모아 놓기만 하고, 합성까지는 하지 않습니다.”</p>
+</blockquote>
+<p><span class="citation" data-cites="todo">@todo</span>: 어디까지를 합성이라 볼까? 합성이란 낱말보다 더 적당한 말이 뭐가 있을까?</p>
+<p>이펙트는 모노이드이므로 이펙트 하나와, 다른 이펙트 하나를 합친다고 할 때, 이펙트 하나는 하나가 아닐 수 있습니다. <code>Free</code>타입의 구조를 유심히 보시면, 이펙트를 받아 리스트에 담아 두듯, 반복되는 <code>Free</code> 생성자 사이 사이에 꽂아서 보관만 합니다. <strong>모아 놓기만 합니다.</strong> <code>Free</code> 모나드의 <code>join</code>은</p>
+<p><code>Free(f (Free(f (Pure r))))</code>을 <code>Free(f (Pure r))</code>로 만드는 것이 아니라,<br />
+<code>Free(f (Free(f ...(Pure r))))</code>과 <code>Free(f (Free(f ...(Pure r))))</code>을 붙이는 게 목적입니다.</p>
+<p>※ 다른 문서들을 읽을 때, 값 생성자와 타입 생성자를 잘 구별해서 봐야 합니다. 위 <code>Free</code>는 모두 값 생성자입니다. <code>m (m a) -&gt; m a</code>가 보이도록 타입 생성자와 값 생성자가 구별 되게 바꾸면, <code>Free</code> 모나드의 <code>join</code>은 <code>FreeV f (FreeT f r)</code>을 받아 <code>FreeV f r</code>로 만드는 함수입니다.</p>
+<p>모아 놓은 이펙트들을 합치는 건 나중 일입니다.</p>
+<h2 id="어디다-쓰지">어디다 쓰지?</h2>
+<p>선언형으로(혹은 DSL로) 첫 번째 할 일이 (A,B,C)이고, 두 번째 할 일이 (D,E)라고 선언만 해 둔 걸 합쳐서 (A,B,C,D,E)로 만드는데 딱입니다. 이 작업 진행서같은 선언 목록만 읽어 들이며, 각 각의 작업이 어떤 일을 실제로 할지 해석하는 인터프리터를 따로 두고 싶을 때 유용하게 쓸 수 있습니다.</p>
+<blockquote>
+<p>선언과 인터프리터로 분리한다는 말은, 모노이드 이항 연산의 일반화와 같은 얘기입니다.</p>
+</blockquote>
+<p>※ 참고 - <a href="https://lionhairdino.github.io/posts/2020-07-03-freeMonad.html">Free 모나드 패턴</a></p>
+<h2 id="리스트-모나드와-비슷">리스트 모나드와 비슷</h2>
+<p>Free 모나드와 리스트를 비교해 봅시다.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Free</span> f r <span class="ot">=</span> <span class="dt">Free</span> (f (<span class="dt">Free</span> f r)) <span class="op">|</span> <span class="dt">Pure</span> r</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">List</span>   a <span class="ot">=</span> <span class="dt">Cons</span>  a (<span class="dt">List</span>   a)  <span class="op">|</span> <span class="dt">Empty</span></span></code></pre></div>
+<p>비슷한 듯 다른 듯 보입니다. 금방 눈에 보이는 건, 둘 다 재귀 구조이며, 끝을 나타내는 값 생성자가 있습니다. 리스트와 리스트를 <code>(&lt;&gt;)</code>를 이용해 붙이듯, Free 모나드의 <code>join</code>은 각 각 몇 겹으로 쌓인 Free값 둘을 이어 붙입니다. 다른 말로 하면, <code>[[1,2],[3,4]]</code>를 <code>[1,2,3,4]</code>로 평평flat하게 만드는 리스트 모나드의 동작이 아니라 <code>[1,2] &lt;&gt; [3,4]</code>를 <code>[1,2,3,4]</code>로 만드는 동작과 비슷합니다.</p>
+<p>Q. 그럼, Free 모나드가 필요한 곳에 그냥 리스트를 쓰면 되지 않을까요?<br />
+A. Free 모나드는, 한 겹 파고 들어갈 때마다 펑터의 <code>fmap</code>이 동작합니다. 예를 들어 <code>Maybe</code>를 넣었다면, 중간에 <code>Nothing</code>을 만나면 바로 끝나는 동작을 합니다.</p>
+<h2 id="외부-펑터들을-넣은-예시">외부 펑터들을 넣은 예시</h2>
+<p>실제 동작을 보면 <code>Free</code> 펑터의 동작이 잘 보이니, 예를 들어 보겠습니다.<br />
+머릿속에서 모나드 인스턴스는 지우고, 펑터만 구현되어 있는 리스트, Maybe를 Free 모나드에 넣어 보겠습니다.</p>
+<p><code>Free</code>값은 항상 <code>Pure</code>로 끝납니다. <code>Free(f (Pure r))</code>이거나, <code>Free(f (Free(f (Free (f (Pure r))))))</code>같은 모양입니다. 첫 번째에서 <code>r</code>에 또다시 <code>Free(f (Pure r))</code>을 넣어 준다면, Free(f (Pure <strong>(Free(f (Pure r)))</strong> ))이 됩니다. 여기에 <code>join</code>을 돌리면, <code>join (Pure x) = x</code> 구현에 따라 중간에 들어가 있는 <code>Pure</code>는 사라지고, <code>Free(f (Free(f (Pure r))))</code>이 됩니다.</p>
+<h3 id="리스트-펑터">리스트 펑터</h3>
+<p>Free 모나드 <code>Free f r</code>에서 <code>f</code>에 리스트 펑터를 넣어 주면 어떤 동작을 하는지 보겠습니다.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">List</span> a <span class="ot">=</span> <span class="dt">Cons</span> a (<span class="dt">List</span> a) <span class="op">|</span> <span class="dt">Empty</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="dt">Free</span> <span class="dt">List</span> a 의 값은</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="dt">Free</span> (<span class="dt">Empty</span>)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="dt">Free</span> (<span class="dt">Cons</span> (<span class="dt">Pure</span> r))</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="dt">Free</span> (<span class="dt">Cons</span> (<span class="dt">Free</span> (<span class="dt">Empty</span>)))</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="dt">Free</span> (<span class="dt">Cons</span> (<span class="dt">Free</span> (<span class="dt">Cons</span> (<span class="dt">Pure</span> r))))</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="op">...</span></span></code></pre></div>
+<p>이런 값들이 있는데, <code>Free (Cons (Pure r))</code>의 <code>r</code>에 <code>Free (Cons (Free (Cons Pure r)))</code>을 넣으면,<br />
+<code>Free (Cons (Pure (Free (Cons (Free (Cons Pure r))))))</code>이 되고 <code>join</code>을 돌리면<br />
+<code>Free (Cons (Free (Cons (Free (Cons Pure r)))))</code>이 됩니다.</p>
+<p>리스트 모나드처럼 이펙트를 합성하는 모습은 없습니다.</p>
+<h3 id="maybe-펑터">Maybe 펑터</h3>
+<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Maybe</span> a <span class="ot">=</span> <span class="dt">Just</span> a <span class="op">|</span> <span class="dt">Nothing</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="dt">Free</span> <span class="dt">Maybe</span> a의 값은</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="dt">Free</span> (<span class="dt">Nothing</span>)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="dt">Free</span> (<span class="dt">Just</span> (<span class="dt">Pure</span> r))</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="dt">Free</span> (<span class="dt">Just</span> (<span class="dt">Free</span> (<span class="dt">Nothing</span>)))</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="dt">Free</span> (<span class="dt">Just</span> (<span class="dt">Free</span> (<span class="dt">Just</span> (<span class="dt">Pure</span> r))))</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="op">...</span></span></code></pre></div>
+<p><code>Free (Just (Pure r))</code>에서 <code>r</code>에 <code>Free (Just (Free (Just (Pure r))))</code>을 넣으면,<br />
+<code>Free (Just (Pure (Free (Just (Free (Just (Pure r)))))))</code>이 되고 <code>join</code>을 돌리면<br />
+<code>Free (Just (Free (Just (Free (Just (Pure r))))))</code>이 됩니다.</p>
+<p><code>Maybe</code> 모나드처럼 이펙트를 합성하는 모습은 없습니다.</p>
+<section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes">
+<hr />
+<ol>
+<li id="fn1"><p>State 모나드의 join
+<code>haskell  join st = State $ \s -&gt;               let (st', s') = runState st s                    (a, s'')  = runState st' s'                in  (a, s'')</code>
+<code>s</code>를 넣어주고 계산해서 바뀐 <code>s'</code>을 넣어 주는 작업을, 바깥에서 보면 <code>s</code>를 한 번만 받는 작업으로 보이게 해 줍니다.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>Maybe 모나드의 join</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>join <span class="dt">Nothing</span> <span class="ot">=</span> <span class="dt">Nothing</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>join (<span class="dt">Just</span> <span class="dt">Nothing</span>) <span class="ot">=</span> <span class="dt">Nothing</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>join (<span class="dt">Just</span> (<span class="dt">Just</span> x)) <span class="ot">=</span> <span class="dt">Just</span> x</span></code></pre></div>
+<p><code>Just</code>인지, <code>Nothing</code>인지 판단하는 작업을 한 번만 하도록 바꿉니다.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section>
+
+<div class="comment">
+<script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
+</script>
+</div>
+<div style="text-align:right">Github 계정이 없는 분은 메일로 보내주세요. lionhairdino at gmail.com </div>
+        </div>
+        <nav class="toc toc-right js-toc relative z-1 transition--300 absolute pa4 pt5 is-position-fixed"></nav>
+        <div id="footer">
+            © 2022 lionhairdino. All rights reserved. Generated by <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+        <script>
+            tocbot.init({
+                tocSelector: '.js-toc',
+                contentSelector: '.js-toc-content',
+                headingSelector: 'h2, h3',
+                hasInnerContainers: true,
+            });
+        </script>
+    </body>
+</html>
