@@ -157,7 +157,7 @@ A. Free 모나드는, 한 겹 파고 들어갈 때마다 펑터의 <code>fmap</c
 <h2 id="외부-펑터들을-넣은-예시">외부 펑터들을 넣은 예시</h2>
 <p>실제 동작을 보면 <code>Free</code> 펑터의 동작이 잘 보이니, 예를 들어 보겠습니다.<br />
 머릿속에서 모나드 인스턴스는 지우고, 펑터만 구현되어 있는 리스트, Maybe를 Free 모나드에 넣어 보겠습니다.</p>
-<p><code>Free</code>값은 항상 <code>Pure</code>로 끝납니다. <code>Free(f (Pure r))</code>이거나, <code>Free(f (Free(f (Free (f (Pure r))))))</code>같은 모양입니다. 첫 번째에서 <code>r</code>에 또다시 <code>Free(f (Pure r))</code>을 넣어 준다면, Free(f (Pure <strong>(Free(f (Pure r)))</strong> ))이 됩니다. 여기에 <code>join</code>을 돌리면, <code>join (Pure x) = x</code> 구현에 따라 중간에 들어가 있는 <code>Pure</code>는 사라지고, <code>Free(f (Free(f (Pure r))))</code>이 됩니다.</p>
+<p><code>Free</code>값은 항상 <code>Pure</code>로 끝납니다. <code>Free(f (Pure r))</code>이거나, <code>Free(f (Free(f (Free (f (Pure r))))))</code>같은 모양입니다. 첫 번째에서 <code>r</code>에 또다시 <code>Free(f (Pure r))</code>을 넣어 준다면, Free(f ( <strong>Pure</strong> (Free(f (Pure r)))))이 됩니다. 여기에 <code>join</code>을 돌리면, <code>join (Pure x) = x</code> 구현에 따라 중간에 들어가 있는 <code>Pure</code>는 사라지고, <code>Free(f (Free(f (Pure r))))</code>이 됩니다.</p>
 <h3 id="리스트-펑터">리스트 펑터</h3>
 <p>Free 모나드 <code>Free f r</code>에서 <code>f</code>에 리스트 펑터를 넣어 주면 어떤 동작을 하는지 보겠습니다.</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">List</span> a <span class="ot">=</span> <span class="dt">Cons</span> a (<span class="dt">List</span> a) <span class="op">|</span> <span class="dt">Empty</span></span>
