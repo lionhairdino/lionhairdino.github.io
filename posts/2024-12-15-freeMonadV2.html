@@ -130,14 +130,14 @@
 <img src="../images/generalisedBinary.png" alt="둘을 모으기만" />
 <figcaption aria-hidden="true">둘을 모으기만</figcaption>
 </figure>
-<p>모나드는 두 번의 이펙트를 모아서, 하나로 만든다고 얘기합니다. 마치 reduce가 바로 바로 일어나서 하나가 되는 느낌입니다만, 다른 모나드의 <code>join</code>들을 유심히 살펴 보시면, <strong>첫 째, 둘을 모아서 외부에서 보면 하나처럼 보이게 만들고,</strong> 안에서는 밀가루 반죽 두 개를 뭉치는 것처럼 <strong>둘 째, 다시는 하나 하나로 돌아오지 못하게 합성</strong>하는 작업 둘로 나눌 수 있습니다. 그런데, 이 두 단계 중 둘을 모으는 첫 번째 단계는 <strong><em>합성하는 방법을 몰라도 할 수 있습니다.</em></strong> 다르게 얘기하면 이펙트 합성 방법을 몰라도, 즉 펑터의 동작은 나중에 받을거야 하고, 작업을 진행할 수 있습니다. ※ 참고 - <a href="https://lionhairdino.github.io/posts/2023-03-10-monoidalCategory.html#%EB%AA%A8%EB%85%B8%EC%9D%B4%EB%8B%AC-%EC%B9%B4%ED%85%8C%EA%B3%A0%EB%A6%AC">모노이드 이항 연산의 일반화</a></p>
+<p>모나드는 두 번의 이펙트를 모아서, 하나로 만든다고 얘기합니다. 마치 reduce가 바로 바로 일어나서 하나가 되는 느낌입니다만, 다른 모나드의 <code>join</code>들을 유심히 살펴 보시면, <strong>첫 째, 둘을 모아서 외부에서 보면 하나처럼 보이게 만들고,</strong> (밀가루 반죽 두 개를 뭉치듯이) <strong>둘 째, 다시는 하나 하나로 돌아오지 못하게 합성하는 작업</strong> 둘로 나눌 수 있습니다. 그런데, 이 두 단계 중 둘을 모으는 첫 번째 단계는 <strong><em>합성하는 방법을 몰라도 할 수 있습니다.</em></strong> 다르게 얘기하면 이펙트 합성 방법을 몰라도, 즉 펑터의 동작은 나중에 받을거야 하고, 작업을 진행할 수 있습니다. ※ 참고 - <a href="https://lionhairdino.github.io/posts/2023-03-10-monoidalCategory.html#%EB%AA%A8%EB%85%B8%EC%9D%B4%EB%8B%AC-%EC%B9%B4%ED%85%8C%EA%B3%A0%EB%A6%AC">모노이드 이항 연산의 일반화</a></p>
 <blockquote>
 <p>“Free 모나드는 이펙트 둘을 모아 놓기만 하고, 합성까지는 하지 않습니다.”</p>
 </blockquote>
 <p><span class="citation" data-cites="todo">@todo</span>: 어디까지를 합성이라 볼까? 합성이란 낱말보다 더 적당한 말이 뭐가 있을까?</p>
 <p>이펙트 하나와, 다른 이펙트 하나를 합친다고 할 때, 이펙트 하나는 진짜 하나가 아닌, 여러 개를 합쳐 놓은 하나 같은 것(모노이드)일 수 있습니다. <code>Free</code>타입의 구조를 유심히 보시면, 이펙트를 받아 리스트에 담아 두듯, 반복되는 <code>Free</code> 생성자 사이 사이에 꽂아서 보관만 합니다. <strong>즉, 모아 놓기만 합니다.</strong> <code>Free</code> 모나드의 <code>join</code>은</p>
 <p><code>Free(f (Free(f (Pure r))))</code>을 <code>Free(f (Pure r))</code>로 만드는 것이 아니라,<br />
-<code>Free(f (Free(f ...(Pure r))))</code>과 <code>Free(f (Free(f ...(Pure r))))</code>을 붙이는 게 목적입니다.</p>
+<code>Free(f (Free(f ...(Pure r))))</code>의 <code>r</code>에 <code>Free(f (Free(f ...(Pure r))))</code>을 넣어 붙이는 게 목적입니다.</p>
 <p>※ 다른 문서들을 읽을 때, 값 생성자와 타입 생성자를 잘 구별해서 봐야 합니다. 위 <code>Free</code>는 모두 값 생성자입니다. <code>m (m a) -&gt; m a</code>가 보이도록 타입 생성자와 값 생성자가 구별 되게 바꾸면, <code>Free</code> 모나드의 <code>join</code>은 <code>FreeV f (FreeT f r)</code>을 받아 <code>FreeV f r</code>로 만드는 함수입니다.</p>
 <p>모아 놓은 이펙트들을 합치는 건 나중 일입니다.</p>
 <h2 id="어디다-쓰지">어디다 쓰지?</h2>
@@ -183,7 +183,7 @@ A. Free 모나드는, 한 겹 파고 들어갈 때마다 펑터의 <code>fmap</c
 <code>Free (Just (Pure (Free (Just (Free (Just (Pure r)))))))</code>이 되고 <code>join</code>을 돌리면<br />
 <code>Free (Just (Free (Just (Free (Just (Pure r))))))</code>이 됩니다.</p>
 <p><code>Maybe</code> 모나드처럼 이펙트를 합성하는 모습은 없습니다.</p>
-<h2 id="결론">결론</h2>
+<h2 id="마치며">마치며</h2>
 <p>DSL을 만들 때, 더 퍼포먼스가 좋다는 <a href="https://lionhairdino.github.io/posts/2020-07-07-taglessFinal.html">tagless final</a> 같은 대안이 있긴 하지만, 나름 장단점이 있어 자주 쓰입니다. 그래서, 잊을만하면 어디선가 Free모나드를 만나곤 합니다. <a href="https://lionhairdino.github.io/posts/2020-07-03-freeMonad.html">Free 모나드 패턴</a>에 대해선 몇 년 전에 정리 해 뒀지만, Free 모나드 자체에 대해선 정리가 안되고 걸리적 거리는 부분이 있어 미루고 있었습니다. (신기하게도 하스켈은 모르고도 잘 쓰는 것들이 많습니다. 여러 자료들을 보면 저만 그런 건 아닌가 봅니다.) 몇 년 지나면서 모나드에 대해 지식이 조금 더 생겨 덤벼 봤습니다. Free 모나드가 왜 공짜 모나드가 아닌지 보는 것을 넘어, 모나드의 본질에 대한 생각을 넓히는데 도움이 되는 것 같습니다. 실용 프로그래밍에 모나드를 쓰는 건 그리 오래 걸리지 않지만, 모나드는 한 방에 완벽하게 알아 먹긴 힘든 놈 같습니다.</p>
 <p>제 글들에 지겹도록 반복해서 주의문을 달고 있는데, 늘 혼자 상상으로 풀어 나가니 이번에도 어쩔 수 없습니다. 틀린 내용이 있을 수 있습니다.</p>
 <section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes">
