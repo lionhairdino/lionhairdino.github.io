@@ -3,17 +3,17 @@ window.addEventListener("load", function(evnet) {
     var button = document.createElement('button');
     button.className = 'copy-code-button';
     button.type = 'button';
-    button.innerText = 'Copy';
+    button.innerText = 'cp';
 
     button.addEventListener('click', function () {
         navigator.clipboard.writeText(codeBlock.innerText).then(function () {
             button.blur();
 
-            button.innerText = 'Copied!';
+            button.innerText = 'copied!';
             button.style.backgroudColor = "lightblue";
 
             setTimeout(function () {
-                button.innerText = 'Copy';
+                button.innerText = 'cp';
             }, 2000);
         }, function (error) {
             button.innerText = 'Error';
