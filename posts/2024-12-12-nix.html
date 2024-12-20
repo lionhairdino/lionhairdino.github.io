@@ -85,7 +85,8 @@
     
 </div>
 
-<p>뒤로 미뤄 두던 Nix를, Reflex를 공부하면서 결국 만져야 되는 상황이 왔습니다. 국내에도 쓰는 분들이 점점 늘어나는 추세인듯 하나, 한글 자료는 많지 않습니다. 아래는 전혀 완성되지 않은 글입니다. 아직 필요한 부분들을 확인하고 있는 중입니다.</p>
+<p>뒤로 미뤄 두던 Nix를, Reflex를 공부하면서 결국 만져야 되는 상황이 왔습니다. 국내에도 쓰는 분들이 점점 늘어나는 추세인듯 하나, 한글 자료는 많지 않습니다. 아래는 전혀 완성되지 않은 글입니다. 아직 필요한 부분들을 확인하고 있는 중입니다. 아래는 순수하게 개인이 볼 노트인 상태로, 아직 다른 분들을 위해 정리하지 않았습니다. 주의해서 보세요.</p>
+<hr />
 <p>닉스 패키지 매니저 설치부터 까다롭다. obelisk를 설치하며 nix가 어찌 저찌 설치된 것 같은데, nixpkgs를 못찾는다 해서 다시 multi-user 방식으로 설치했다.</p>
 <p><a href="https://nixos.org/manual/nix/stable/#transparent-sourcebinary-deployment" class="uri">https://nixos.org/manual/nix/stable/#transparent-sourcebinary-deployment</a></p>
 <p>패키지를 하스켈같은 순수 함수형 프로그래밍 언어에서의 값value처럼 취급한다. side-effect가 없는 함수로 빌드하고, 한 번 빌드된 이후에는 절대 변하지 않는다. Nix는 패키지를 Nix store(보통 /nix/store)에 저장한다. 각 패키지는 자신만의 고유 서브 디렉토리를 갖는다.</p>
@@ -407,10 +408,10 @@ primary 채널 추가 <code>nix-channel --add https://nixos.org/channels/channel
 <code>file ./powermate</code>로 실행 파일 정보를 자세히 볼 수 있다.</p>
 <p>대충 위 사이트를 요약하면, ELF실행 파일은 시스템과 소통하기 위한 라이브러리를 찾을 때 interpreter란 링크 로더를 쓰는데, 다른 리눅스에선 /lib64/ld-linux-x86-64.so.2(x86기반 64비트일 경우)에서 제공하는 걸 쓰는데, 닉스OS의 링크 로더link-loader는 특정 버전을 붙인 걸 쓴다.
 <a href="https://github.com/NixOS/patchelf">patchelf</a>로 어떤 버전을 쓰고 있는지 찾을 수 있다.</p>
-<div class="sourceCode" id="cb29"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>[jacoo@nixos:~/.local/bin]$ patchelf --print-interpreter ./powermate </span>
+<div class="sourceCode" id="cb29"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>[lionhairdino@nixos:~/.local/bin]$ patchelf --print-interpreter ./powermate </span>
 <span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>/lib64/ld-linux-x86-64.so.2</span>
 <span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>[jacoo@nixos:~/.local/bin]$ patchelf --print-interpreter /run/current-system/sw/bin/ls</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>[lionhairdino@nixos:~/.local/bin]$ patchelf --print-interpreter /run/current-system/sw/bin/ls</span>
 <span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>/nix/store/p9ysh5rk109gyjj3cn6jr54znvvlahfl-glibc-2.38-66/lib/ld-linux-x86-64.so.2</span></code></pre></div>
 <p>닉스OS에서 돌아가는 바이너리들은 특정 버전(여기서도 스냅샷이라 부르는지는 아직 잘 모르겠지만, 스택의 스냅샷 같은 것)의 링크 로더(여기선 interpreter)을 쓴다.
 위 사이트에선 autoPatchelfHook에 관한 얘기를 하는데, 이는 명령어가 아니라, 닉스OS에서 쓰는 함수인 듯 하다. 이 걸 실행해서 패치하는 건 줄 알았는데, 그렇게 동작하는 명령어는 없다. 일단 넘어가자.</p>
@@ -419,22 +420,22 @@ primary 채널 추가 <code>nix-channel --add https://nixos.org/channels/channel
 <h3 id="nix-ld">nix-ld</h3>
 <p>설정 파일에 아래를 넣으면 좀 더 친절한 에러 메시지가 나온다.
 <code>programs.nix-ld.enable = true;</code></p>
-<div class="sourceCode" id="cb30"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>[jacoo@nixos:~/.local/bin]$ ./powermate </span>
+<div class="sourceCode" id="cb30"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>[lionhairdino@nixos:~/.local/bin]$ ./powermate </span>
 <span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>cannot execute ./powermate: You are trying to run an unpatched binary on nixos, but you have not configured NIX_LD or NIX_LD_x86_64-linux. See https://github.com/Mic92/nix-ld for more details</span></code></pre></div>
 <p>실행 파일이 어떤 라이브러리를 필요로 하는지 보는 방법
 <a href="https://unix.stackexchange.com/questions/522822/different-methods-to-run-a-non-nixos-executable-on-nixos" class="uri">https://unix.stackexchange.com/questions/522822/different-methods-to-run-a-non-nixos-executable-on-nixos</a></p>
-<div class="sourceCode" id="cb31"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>[jacoo@nixos:~/.local/bin]$ ldd ./powermate </span>
+<div class="sourceCode" id="cb31"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>[lionhairdino@nixos:~/.local/bin]$ ldd ./powermate </span>
 <span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>	linux-vdso.so.1 (0x00007ffc41f6b000)</span>
 <span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>	libpulse.so.0 =&gt; not found</span>
 <span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>	libc.so.6 =&gt; /nix/store/p9ysh5rk109gyjj3cn6jr54znvvlahfl-glibc-2.38-66/lib/libc.so.6 (0x00007f2ed22f3000)</span>
 <span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>	/lib64/ld-linux-x86-64.so.2 =&gt; /nix/store/p9ysh5rk109gyjj3cn6jr54znvvlahfl-glibc-2.38-66/lib64/ld-linux-x86-64.so.2 (0x00007f2ed24e9000)</span></code></pre></div>
 <p>보통의 리눅스들이 쓰는 폴더에 /lib64/ld-linux-x86-64.so.2(이걸 shim레이어라고 부르고 있는 것 같은데…)를 설치하고, 실제 링크 로더는 환경 변수 NIX_LD를 써서 지정한다?</p>
-<div class="sourceCode" id="cb32"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>[jacoo@nixos:~/.local/bin]$ LD_LIBRARY_PATH=/nix/store/g84s3q2rqd93jawhk4fdrsm0z43qxhz6-libpulseaudio-16.1/lib/libpulse.so.0:$LD_LIBRARY_PATH ./powermate </span>
+<div class="sourceCode" id="cb32"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>[lionhairdino@nixos:~/.local/bin]$ LD_LIBRARY_PATH=/nix/store/g84s3q2rqd93jawhk4fdrsm0z43qxhz6-libpulseaudio-16.1/lib/libpulse.so.0:$LD_LIBRARY_PATH ./powermate </span>
 <span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>cannot execute ./powermate: You are trying to run an unpatched binary on nixos, but you have not configured NIX_LD or NIX_LD_x86_64-linux. See https://github.com/Mic92/nix-ld for more details</span></code></pre></div>
 <h3 id="nix-index">nix-index</h3>
 <p>커뮤니티에서 만든 nixpkgs를 위한 파일 데이터베이스
 특정 파일을 제공하는 패키지를 알려주는 툴.</p>
-<div class="sourceCode" id="cb33"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>[jacoo@nixos:~/.local/bin]$ nix-locate libpulse.so.0 --top-level</span>
+<div class="sourceCode" id="cb33"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>[lionhairdino@nixos:~/.local/bin]$ nix-locate libpulse.so.0 --top-level</span>
 <span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>pulseaudioFull.out                                    0 s /nix/store/79y7fb33sm0xh2bmlbmklwxlbrnfm4fk-pulseaudio-16.1/lib/libpulse.so.0</span>
 <span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>pulseaudioFull.out                              408,920 x /nix/store/79y7fb33sm0xh2bmlbmklwxlbrnfm4fk-pulseaudio-16.1/lib/libpulse.so.0.24.2</span>
 <span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>pulseaudio.out                                        0 s /nix/store/zd4r977fl0rvqk8v60dxxarrc4i6k274-pulseaudio-16.1/lib/libpulse.so.0</span>
