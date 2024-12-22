@@ -101,7 +101,7 @@
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Functor</span> <span class="dt">Command</span> <span class="kw">where</span></span>
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmap</span> f (<span class="dt">Read</span> g) <span class="ot">=</span> <span class="dt">Read</span> (\s <span class="ot">-&gt;</span> f (g s))</span>
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmap</span> f (<span class="dt">Write</span> s a) <span class="ot">=</span> <span class="dt">Write</span> s (f a)</span></code></pre></div>
-<p><code>Command</code>가 <code>Cmd1 a</code>, <code>Cmd2 a</code> 같은 모양이면 그러려니 하는데, <code>Read</code>가 함수 <code>(String -&gt; a)</code>를 가지고 있습니다. 나중에 체이닝을 하다 보면 <code>a</code>에는 <code>Free</code>가 들어가기도[^1] 할텐데, 복잡해집니다.</p>
+<p><code>Command</code>가 <code>Cmd1 a</code>, <code>Cmd2 a</code> 같은 모양이면 그러려니 하는데, <code>Read</code>가 함수 <code>(String -&gt; a)</code>를 가지고 있습니다. 나중에 체이닝을 하다 보면 <code>a</code>에는 <code>Free</code>가 들어가기도<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> 할텐데, 복잡해집니다.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Free</span> (<span class="dt">Read</span> <span class="op">?</span> (<span class="dt">Pure</span> r))</span></code></pre></div>
 <p>지금부터 나중에 넣어 주는 펑터를 외부 펑터라 부르겠습니다. <code>Free</code> 모나드의 정의를 보면, <code>Free타입</code>값은 <code>Free (f (Pure r))</code>같이 <code>Pure r</code>로 끝나는 값입니다. 그럼 외부 펑터 <code>f</code>가 <code>Free</code>를 받을 수 있어야 합니다. 그런데 <code>Read</code>는 <code>String -&gt; a</code> 타입의 함수를 받아야만 합니다. 이러면 <code>Free타입</code>을 못 받는 것처럼 보일 수 있습니다. 값 생성자와 타입 생성자를 혼동하지 말아야 합니다. <code>Command a</code> 타입에 <code>Free타입</code>을 넣어 주면 <code>Read (String -&gt; Free타입)</code> 값이거나 <code>Write String Free타입</code> 값이 됩니다.</p>
 <p><code>Command a</code>에서 <code>a</code>의 역할이 뭘까요? <code>Free</code>에 넣어서 <code>Read</code>와 <code>Write</code>를 이어 붙인 모양을 보겠습니다. <code>Free (Read (String -&gt; Free타입))</code>과 <code>Free (Write String (Pure a))</code>을 붙이면 아래 모양이 나옵니다.</p>
@@ -176,8 +176,16 @@
 <span id="cb13-32"><a href="#cb13-32" aria-hidden="true" tabindex="-1"></a>    result <span class="ot">&lt;-</span> interpret exampleProgram</span>
 <span id="cb13-33"><a href="#cb13-33" aria-hidden="true" tabindex="-1"></a>    <span class="fu">putStrLn</span> <span class="op">$</span> <span class="st">&quot;final result: &quot;</span> <span class="op">++</span> result</span></code></pre></div>
 <p>명령어를 모아서 가지고만 있던 Free 모나드 체인을 인터프리터에 넘겨 <code>IO</code> 컨텍스트에서 해석하고 있습니다. <code>do</code>를 체이닝을 해놨으니, <a href="../posts/2024-11-16-pureFunction.html"><em>먼저 실행한 명령어들의 결과를 다음 명령어가 받을 수 있고</em></a>, 덤으로 코드 모양도 이뻐집니다.</p>
-<p><img src="../images/DSL.png" alt="나만의 DSL" />
-[^1]: 항상 들어가는 게 아니라, “들어 가기도”라고 표현했습니다. 컨텍스트를 유지한다는 말이 혼동될 때가 있습니다. 예를 들어 <code>Maybe</code> 바인드가 <code>Maybe Int</code> 타입에 적용하는 함수는 반드시 <code>Int -&gt; Maybe Int</code>가 아니라 <code>Int -&gt; Maybe String</code>처럼, 다음 이어지는 함수가 받는 타입과 같은 것을 가진 <code>Int -&gt; Maybe (어떤 타입)</code>이든 될 수 있습니다. <code>Free Command</code>는 <code>Free Command Int</code>이거나, <code>Free Command (Free 타입)</code>이거나, <code>Free Command String</code>등이 될 수 있다는 말입니다.</p>
+<figure>
+<img src="../images/DSL.png" alt="DSL" />
+<figcaption aria-hidden="true">DSL</figcaption>
+</figure>
+<section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes">
+<hr />
+<ol>
+<li id="fn1"><p>항상 들어가는 게 아니라, “들어 가기도”라고 표현했습니다. 컨텍스트를 유지한다는 말이 혼동될 때가 있습니다. 예를 들어 <code>Maybe</code> 바인드가 <code>Maybe Int</code> 타입에 적용하는 함수는 반드시 <code>Int -&gt; Maybe Int</code>가 아니라 <code>Int -&gt; Maybe String</code>처럼, 다음 이어지는 함수가 받는 타입과 같은 것을 가진 <code>Int -&gt; Maybe (어떤 타입)</code>이든 될 수 있습니다. <code>Free Command</code>는 <code>Free Command Int</code>이거나, <code>Free Command (Free 타입)</code>이거나, <code>Free Command String</code>등이 될 수 있다는 말입니다.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section>
 
 <div class="comment">
 <script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
