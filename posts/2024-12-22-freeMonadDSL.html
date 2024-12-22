@@ -37,7 +37,7 @@
         <meta property="og:site_name" content="Lionhairdino" />
         <meta property="og:url" content="https://lionhairdino.github.io/posts/2024-12-22-freeMonadDSL.html" />
 
-        <meta property="og:image" content="https://lionhairdino.github.io/images/state400px.png" />
+        <meta property="og:image" content="https://lionhairdino.github.io/images/DSL.png" />
 
       <meta name="keywords" content="Free 모나드, 프리 모나드, 자유 모나드, DSL, 하스켈, Haskell">
 <!-- Global site tag (gtag.js) - Google Analytics -->
@@ -85,8 +85,8 @@
     
 </div>
 
-<p>모나드와 Free 모나드를 알고 있는 분을 위한, Free 모나드 예시입니다. <a href="../posts/2024-12-15-freeMonadV2.html">Free 모나드</a> 글에서 이어지는 글입니다.</p>
-<h2 id="dsldomain-specific-language-예시">DSL(Domain Specific Language) 예시</h2>
+<p>모나드와 Free 모나드를 알고 있는 분을 위한, Free 모나드 DSL(Domain Specific Language) 예시입니다. <a href="../posts/2024-12-15-freeMonadV2.html">Free 모나드</a> 글에서 이어지는 글입니다.</p>
+<h2 id="명령어-정의">명령어 정의</h2>
 <p>먼저 DSL로 쓸 펑터를 정의합니다. 읽기와 쓰기 명령어만 가진 간단한 언어입니다.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ot">{-# LANGUAGE DeriveFunctor #-}</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -101,11 +101,12 @@
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Functor</span> <span class="dt">Command</span> <span class="kw">where</span></span>
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmap</span> f (<span class="dt">Read</span> g) <span class="ot">=</span> <span class="dt">Read</span> (\s <span class="ot">-&gt;</span> f (g s))</span>
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmap</span> f (<span class="dt">Write</span> s a) <span class="ot">=</span> <span class="dt">Write</span> s (f a)</span></code></pre></div>
-<p><code>Command</code>가 <code>Cmd1 a</code>, <code>Cmd2 a</code> 같은 모양이면 그러려니 하는데, <code>Read</code>가 함수 <code>(String -&gt; a)</code>를 가지고 있습니다. 나중에 체이닝을 하다 보면 <code>a</code>에는 <code>Free</code>가 들어가기도<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> 할텐데, 복잡해집니다.</p>
+<p><code>Command</code>가 <code>Cmd1 a</code>, <code>Cmd2 a</code> 같은 모양이면 그러려니 하는데, <code>Read</code>가 함수 <code>(String -&gt; a)</code>를 가지고 있습니다. 나중에 체이닝을 하다 보면 <code>a</code>에는 <code>Free</code>가 들어가기도[^1] 할텐데, 복잡해집니다.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Free</span> (<span class="dt">Read</span> <span class="op">?</span> (<span class="dt">Pure</span> r))</span></code></pre></div>
 <p>지금부터 나중에 넣어 주는 펑터를 외부 펑터라 부르겠습니다. <code>Free</code> 모나드의 정의를 보면, <code>Free타입</code>값은 <code>Free (f (Pure r))</code>같이 <code>Pure r</code>로 끝나는 값입니다. 그럼 외부 펑터 <code>f</code>가 <code>Free</code>를 받을 수 있어야 합니다. 그런데 <code>Read</code>는 <code>String -&gt; a</code> 타입의 함수를 받아야만 합니다. 이러면 <code>Free타입</code>을 못 받는 것처럼 보일 수 있습니다. 값 생성자와 타입 생성자를 혼동하지 말아야 합니다. <code>Command a</code> 타입에 <code>Free타입</code>을 넣어 주면 <code>Read (String -&gt; Free타입)</code> 값이거나 <code>Write String Free타입</code> 값이 됩니다.</p>
 <p><code>Command a</code>에서 <code>a</code>의 역할이 뭘까요? <code>Free</code>에 넣어서 <code>Read</code>와 <code>Write</code>를 이어 붙인 모양을 보겠습니다. <code>Free (Read (String -&gt; Free타입))</code>과 <code>Free (Write String (Pure a))</code>을 붙이면 아래 모양이 나옵니다.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Free</span> (<span class="dt">Read</span> (<span class="dt">String</span> <span class="ot">-&gt;</span> <span class="dt">Free</span> (<span class="dt">Write</span> <span class="dt">String</span> (<span class="dt">Pure</span> a)))) <span class="co">-- (가)</span></span></code></pre></div>
+<h2 id="해석기interpreter-정의">해석기interpreter 정의</h2>
 <p><code>a</code> 자리엔 다음 <code>Free</code>값이 들어 갑니다. 그래서 <code>a</code> 대신 <code>next</code>로 표현하기도 합니다. 위 한 줄은 <code>Read</code> 작업 후 <code>Write</code>를 하는 하나의 작은 프로그램입니다. 이를 해석하는 인터프리터를 보겠습니다. 3가지 패턴 매칭을 처리합니다.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ot">interpret ::</span> <span class="dt">Free</span> <span class="dt">Command</span> a <span class="ot">-&gt;</span> <span class="dt">IO</span> a</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>interpret (<span class="dt">Pure</span> a) <span class="ot">=</span> <span class="fu">return</span> a</span></code></pre></div>
@@ -117,26 +118,30 @@
 <p><code>Free타입</code>은 항상 <code>Pure r</code>로 끝나니,<br />
 오직 <code>Read</code> 한 번만 있는 프로그램은 <code>Free (Read (String -&gt; (Pure r)))</code><br />
 오직 <code>Write</code> 한 번만 있는 프로그램은 <code>Write</code>는 <code>Free (Write String (Pure r))</code><br />
-그렇다면, <code>Read</code> 후에 <code>Write</code> 하는 프로그램은?</p>
+</p>
+<h2 id="do-파워">Do 파워</h2>
+<p>그렇다면, <code>Read</code> 후에 <code>Write</code> 하는 프로그램은? <code>do</code>를 써서 아래같이 예쁘게 쓸 수 있습니다.</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ot">exampleProgram ::</span> <span class="dt">Free</span> <span class="dt">Command</span> ()</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>exampleProgram <span class="ot">=</span> <span class="kw">do</span> name <span class="ot">&lt;-</span> <span class="dt">Free</span> (<span class="dt">Read</span> <span class="op">?</span>) <span class="co">-- Free Command String </span></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>                    write name <span class="co">-- Free Command ()</span></span></code></pre></div>
-<p><code>?</code>에 뭘 써주면 될까요? 일단 최종 <code>String</code> 타입을 돌려줘야 하는데, 일단 가장 간단한 <code>\s -&gt; Pure s</code>를 넣어서 보겠습니다. 둘이 어떻게 연결되는지 뜯어 보겠습니다.</p>
+<p><code>?</code>에 뭘 써주면 될까요? 일단 최종 <code>String</code> 타입을 돌려줘야 하는데, 일단 가장 간단한 <code>\s -&gt; Pure s</code>를 넣어서 보겠습니다. 이쁘긴 한데, 왜 이렇게 할 수 있는 잘 안보이니, 둘이 어떻게 연결되는지 뜯어 보겠습니다. <span class="citation" data-cites="todo">@todo</span> <code>Read</code>가 함수를가지고 있는 이유 추가</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">do</span> name <span class="ot">&lt;-</span> <span class="dt">Free</span> (<span class="dt">Read</span> (\s <span class="ot">-&gt;</span> <span class="dt">Pure</span> s))</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>   write name</span></code></pre></div>
 <p><code>do</code>를 바인드가 보이게 디슈거 해보면,</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Free</span> (<span class="dt">Read</span> (\s <span class="ot">-&gt;</span> <span class="dt">Pure</span> s)) <span class="op">&gt;&gt;=</span> \name <span class="ot">-&gt;</span> <span class="dt">Write</span> name (<span class="dt">Pure</span> ())</span></code></pre></div>
 <p><code>Free</code>의 바인드<code>(Free x) &gt;&gt;= g = Free (fmap (&gt;&gt;= g) x)</code>를 넣어 풀어 보면,</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Free</span> (<span class="fu">fmap</span>   (<span class="op">&gt;&gt;=</span> (\name <span class="ot">-&gt;</span> <span class="dt">Free</span> (<span class="dt">Write</span> name (<span class="dt">Pure</span> ()))))   (<span class="dt">Read</span> (\s <span class="ot">-&gt;</span> <span class="dt">Pure</span> s))) <span class="co">-- Command의 fmap</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="dt">Free</span> (<span class="dt">Read</span> (\s <span class="ot">-&gt;</span> <span class="dt">Pure</span> s <span class="op">&gt;&gt;=</span> (\name <span class="ot">-&gt;</span> <span class="dt">Free</span> (<span class="dt">Write</span> name (<span class="dt">Pure</span> ())))    )) </span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- Command의 fmap</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="co">--      |</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="dt">Free</span> (<span class="fu">fmap</span>   (<span class="op">&gt;&gt;=</span> (\name <span class="ot">-&gt;</span> <span class="dt">Free</span> (<span class="dt">Write</span> name (<span class="dt">Pure</span> ()))))   (<span class="dt">Read</span> (\s <span class="ot">-&gt;</span> <span class="dt">Pure</span> s))) </span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="dt">Free</span> (<span class="dt">Read</span> (\s <span class="ot">-&gt;</span> <span class="dt">Pure</span> s <span class="op">&gt;&gt;=</span> (\name <span class="ot">-&gt;</span> <span class="dt">Free</span> (<span class="dt">Write</span> name (<span class="dt">Pure</span> ())))    )) </span></code></pre></div>
 <p><code>Pure s &gt;&gt;= (\name -&gt; Free (Write name (Pure ())))</code>는 바인드의 <code>(Pure r) &gt;&gt;= g = g r</code> 패턴 매칭에 의해 <code>Free (Write s (Pure ()))</code>이 됩니다.</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Free</span> (<span class="dt">Read</span> \s <span class="ot">-&gt;</span> <span class="dt">Free</span> (<span class="dt">Write</span> s (<span class="dt">Pure</span> ())))</span></code></pre></div>
 <p><code>Read</code>한 후 <code>Write</code>하는 프로그램이 위와 같이 표현되었습니다.</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>&gt; interpret (Free (Read \s -&gt; Free (Write s (Pure ()))))</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>lionhairdino</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>lionhairdino</span></code></pre></div>
-<p><code>lionhairdino</code>라 입력하면 <code>lionhairdino</code>라 출력하는 간단한 프로그램이 완성되었습니다. 여기까지 오는 길이 쉽지 않은데, 여기 도착했다고 끝이 아닙니다. 이제 <code>MonadFree</code>를 봐야 합니다… 하스켈, 어렵습니다. 분명 이런 방식으로 접근하는 것보다 더 나은 방법이 있을 거라 믿고 있는데, 현재까지 제가 이해하는 방식은 위와 같습니다.</p>
-<p>전체 코드</p>
+<p>텍스트를 입력하면 그대로 출력하는 간단한 프로그램이 완성되었습니다. 여기까지 오는 길이 쉽지 않은데, 여기 도착했다고 끝이 아닙니다. 이제 <a href="https://hackage.haskell.org/package/free-5.2/docs/Control-Monad-Free.html#t:MonadFree">MonadFree</a>를 봐야 합니다… 하스켈, 어렵습니다. 분명 이런 방식으로 접근하는 것보다 더 나은 방법이 있을 거라 믿고 있는데, 현재까지 제가 이해하는 방식은 위와 같습니다. 쓸 때마다 머릿속에 이런 내용들을 다 넣고 쓰는 게 아니라, 원리를 알고 나면, 세부 구현은 잠시 미루고 쓸 줄도 알아야 하는데, 모르는 구석이 조금이라도 남아 있으면 계속 뜯어 보게 됩니다. 권장할 만한 학습 방법은 아닌 것 같습니다.</p>
+<h2 id="전체-코드">전체 코드</h2>
 <div class="sourceCode" id="cb13"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="ot">{-# LANGUAGE DeriveFunctor #-}</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Control.Monad.Free</span></span>
@@ -170,12 +175,9 @@
 <span id="cb13-31"><a href="#cb13-31" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="kw">do</span></span>
 <span id="cb13-32"><a href="#cb13-32" aria-hidden="true" tabindex="-1"></a>    result <span class="ot">&lt;-</span> interpret exampleProgram</span>
 <span id="cb13-33"><a href="#cb13-33" aria-hidden="true" tabindex="-1"></a>    <span class="fu">putStrLn</span> <span class="op">$</span> <span class="st">&quot;final result: &quot;</span> <span class="op">++</span> result</span></code></pre></div>
-<section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes">
-<hr />
-<ol>
-<li id="fn1"><p>항상 들어가는 게 아니라, “들어 가기도”라고 표현했습니다. 컨텍스트를 유지한다는 말이 혼동될 때가 있습니다. 예를 들어 <code>Maybe</code> 바인드가 <code>Maybe Int</code> 타입에 적용하는 함수는 반드시 <code>Int -&gt; Maybe Int</code>가 아니라 <code>Int -&gt; Maybe String</code>처럼, 다음 이어지는 함수가 받는 타입과 같은 것을 가진 <code>Int -&gt; Maybe (어떤 타입)</code>이든 될 수 있습니다. <code>Free Command</code>는 <code>Free Command Int</code>이거나, <code>Free Command (Free 타입)</code>이거나, <code>Free Command String</code>등이 될 수 있다는 말입니다.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-</ol>
-</section>
+<p>명령어를 모아서 가지고만 있던 Free 모나드 체인을 인터프리터에 넘겨 <code>IO</code> 컨텍스트에서 해석하고 있습니다. <code>do</code>를 체이닝을 해놨으니, <a href="../posts/2024-11-16-pureFunction.html"><em>먼저 실행한 명령어들의 결과를 다음 명령어가 받을 수 있고</em></a>, 덤으로 코드 모양도 이뻐집니다.</p>
+<p><img src="../images/DSL.png" alt="나만의 DSL" />
+[^1]: 항상 들어가는 게 아니라, “들어 가기도”라고 표현했습니다. 컨텍스트를 유지한다는 말이 혼동될 때가 있습니다. 예를 들어 <code>Maybe</code> 바인드가 <code>Maybe Int</code> 타입에 적용하는 함수는 반드시 <code>Int -&gt; Maybe Int</code>가 아니라 <code>Int -&gt; Maybe String</code>처럼, 다음 이어지는 함수가 받는 타입과 같은 것을 가진 <code>Int -&gt; Maybe (어떤 타입)</code>이든 될 수 있습니다. <code>Free Command</code>는 <code>Free Command Int</code>이거나, <code>Free Command (Free 타입)</code>이거나, <code>Free Command String</code>등이 될 수 있다는 말입니다.</p>
 
 <div class="comment">
 <script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
