@@ -4,7 +4,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-        <title>lionhairdino - 하스켈을 공부하는데 모나드가 벽이 되지 않도록</title>
+        <title>lionhairdino - 하스켈을 공부하는데 모나드가 벽이 되지 않도록 v2024.12</title>
 
         <meta name="description" content="어떤 구조를 모나드라 부르는지 수학없이 풀어 봤습니다." />
         <meta property="og:description" content="어떤 구조를 모나드라 부르는지 수학없이 풀어 봤습니다." />
@@ -33,7 +33,7 @@
         <meta name="msapplication-TileColor" content="#ff7500" />
         <meta name="theme-color" content="#ffffff" />
         <meta property="og:type" content="website" />
-        <meta property="og:title" content="하스켈을 공부하는데 모나드가 벽이 되지 않도록" />
+        <meta property="og:title" content="하스켈을 공부하는데 모나드가 벽이 되지 않도록 v2024.12" />
         <meta property="og:site_name" content="Lionhairdino" />
         <meta property="og:url" content="https://lionhairdino.github.io/posts/2024-12-24-easyMonad.html" />
 
@@ -78,7 +78,7 @@
             </div>
         </div>
         <div class="js-toc-content">
-            <h1>하스켈을 공부하는데 모나드가 벽이 되지 않도록</h1>
+            <h1>하스켈을 공부하는데 모나드가 벽이 되지 않도록 v2024.12</h1>
             <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
 <div class="info">
     Posted on December 24, 2024
@@ -87,23 +87,23 @@
 
 <ul>
 <li><p>여기 저기서 함수형 프로그래밍을 익혀보라는 추천들을 듣고, 함수형 언어중 가장 “함수형”스러운 하스켈을 선택합니다. 그리곤 술술 읽어가다 모나드에 도달하면! 포기합니다. 하스켈에는 모나드 말고도, 번뜩이는 개념들이 많은데, 모나드 벽에 막혀서 찍어 먹어 보지도 못하고 돌아서야 합니다.</p></li>
-<li><p>모나드를 이해했다고 생각하는 선행자들은, 또 하나의 부리토를 만들어 낼까봐, 블로그에 모나드 관련 글을 올리지 못합니다.</p></li>
+<li><p>모나드를 이해했다고 생각하는 선행자들은, 또 하나의 부리토를 만들어 낼까봐, 블로그에 모나드 관련 글을 올리지 못합니다. 왜 내가 이해할만한 모나드 글은 없는 것인가?</p></li>
 <li><p>매우 수학적이고, 원론적인 설명이거나, 가장 껍데기에 관련된 설명이거나 둘 중 하나를 만나고 넘어가면, 여전히 찜찜함은 사라지지 않습니다.</p></li>
 <li><p>모나드가 어려운데, 처음부터 모나를 알 필요 없다고, 그냥 지나치자는 글을 보고, 위로를 받으며 진행해 보려 하지만, 얼마 못가 모나드가 또 길을 막습니다.</p></li>
 </ul>
-<p>처음 모나드를 보는 분이 아닌, 모나드에 한 번쯤, 다리 걸려 넘어져 봐서, 위 말들에 공감하는 분들을 위한 글입니다. 높은 확률로 또 하나의 <a href="https://byorgey.wordpress.com/2009/01/12/abstraction-intuition-and-the-monad-tutorial-fallacy/">부리토</a>가 나오겠지만, 계속 시도해 보겠습니다. 반복하다 보면, 언젠가 쓸만한 설명이 나오지 않을까요?</p>
-<p>아래는 전혀 하스켈 코드를 내보이지 않습니다. 하스켈스러운 코드가 보여도 그저 의사 코드일 뿐입니다.</p>
+<p>처음 모나드를 보는 분이 아닌, 모나드에 한 번쯤, 다리 걸려 넘어져 봐서, 위 말들에 공감하는 분들을 보면 좋을 <strong>생각 스트레칭</strong>을 위한 인문학스러운 글입니다. 높은 확률로 또 하나의 <a href="https://byorgey.wordpress.com/2009/01/12/abstraction-intuition-and-the-monad-tutorial-fallacy/">부리토</a>가 나오겠지만, 계속 시도해 보겠습니다. 반복하다 보면, 언젠가 쓸만한 설명이 나오지 않을까요?</p>
+<p>아래는 수학도 없고, 전혀 하스켈 코드를 내보이지도 않습니다. 하스켈스러운 코드가 보여도 그저 의사 코드일 뿐입니다.</p>
 <h2 id="조합">조합</h2>
 <p><code>1</code>에 <code>(+ 2)</code>를 적용하면 <code>1 (+ 2) = 3</code><br />
 위 결과 값에 다시 <code>(* 3)</code>을 적용하면 <code>3 (* 3) = 9</code><br />
-위 결과 값에 다시 <code>(- 4)</code>을 적용하면 <code>9 (- 4) = 5</code>
+위 결과 값에 다시 <code>(- 4)</code>을 적용하면 <code>9 (- 4) = 5</code><br />
 …</p>
 <p>위 작업을 보니, 함수들을 계속 적용하고 있습니다. 그럼 아래와 같이 뭉쳐서, <em>조합해서</em> 표현할 수 있습니다.<br />
 <code>1</code>에 <code>(- 4) ⋅ (* 3) ⋅ (+ 2)</code>를 적용 후 결과로 <code>5</code>를 받습니다.</p>
 <p>데이터에 순차적으로 연산을 적용하며, 바뀌는 데이터 상태를 끌고 다니던 것을,<br />
 <em>함수들만 먼저 모아 놓고</em>, 한 방에 적용하는 모양으로 바꿨습니다.</p>
 <h2 id="결합">결합</h2>
-<p>순서만 지킨다면 어떤 연산을 <em>먼저 묶어 적용</em>하든 같은 결과를 받을 수 있습니다.</p>
+<p><code>((+ 2) ⋅ (* 3)) ⋅ (- 4)</code>를 적용하거나, <code>(+ 2) ⋅ ((* 3) ⋅ (- 4))</code>를 적용하거나 같은 결과를 얻습니다. 순서만 지킨다면 어떤 연산을 <em>먼저 묶어 적용</em>하든 같은 결과를 받을 수 있습니다.</p>
 <h2 id="아무-일도-안함">아무 일도 안함</h2>
 <p>현재 모델링하는 시스템은, 모든 데이터는 항상 세 개의 함수를 적용해서 결과를 얻어(반드시 특정 가공 절차를 거친 후), 다음에 이용한다고 가정하겠습니다. 모든 수는 세 개의 함수를 적용하는데, 어떤 값은 두 개, 혹은 한 개, 아니면 아예 함수를 적용하지 않고 써야하는 값이 있는 경우도 있는 상태입니다. 이 값은 항상 “세 개의 함수를 적용하는 절차를 거치는 값”으로 어떻게 표현할까요? <em>아무 일도 안함</em> 함수가 있으면 됩니다.</p>
 <p>예를 들어 <code>2</code>를 변경 없이 그대로 쓰려면, <code>2</code>에 <code>아무 일도 안함</code> ⋅ <code>아무 일도 안함</code> ⋅ <code>아무 일도 안함</code>을 적용하면 됩니다.</p>
@@ -114,11 +114,11 @@
 <li><code>(+ 2) ⋅ (* 3)</code>하고 <code>(- 4)</code>를 적용하거나, <code>(+ 2)</code>하고, <code>(* 3) ⋅ (- 4)</code>를 적용하거나 같은 결과를 얻습니다.</li>
 </ol>
 <p>연산(함수)들이 위와 같은 조건을 만족하는 구조를, 이름부터 수학 냄새가 너무나는 <a href="../posts/2023-02-16-monoid.html">모노이드</a>라 부릅니다.<br />
-함수들이 모노이드 구조를 만족하면, 먼저 연산(함수)들을 마음대로 조합해 놨다가, 값에 적용할 수 있습니다.(값이 아니라, <em>연산(함수)들이 모노이드 구조</em>를 이루고 있음을 눈여겨 보세요) 하스켈의 모든 실행 프로그램은 모노이드 구조를 따르고 있는데, 여기서는 거창한 수학 이름보다는 동작에만 집중해서 보시고, 일단 “모노이드가 되면 편하구나”라고 믿고 넘어가겠습니다.</p>
+함수들이 모노이드 구조를 만족하면, 먼저 연산(함수)들을 마음대로 조합해 놨다가, 값에 적용할 수 있습니다.(값이 아니라, <strong><em>연산(함수)들이 모노이드 구조를 이루고 있음을 눈여겨 보세요</em></strong>) 하스켈의 모든 실행 프로그램은 모노이드 구조를 따르고 있는데, 여기서는 거창한 수학 이름보다는 동작에만 집중해서 보시고, 일단 “모노이드가 되면 편하구나” 정도 믿고 넘어가겠습니다.</p>
 <h2 id="with-effect">with Effect</h2>
-<p>이 번에는, 연산을 하면, 다음에 또 연산을 바로 적용할 수 있는 값만 나오지 않고, 무언가 추가적인 정보를 가진 결과가 나오는 경우를 보겠습니다. 예를 들어, 연산을 적용하면서, 연산 횟수를 기억한다든지, 더 이상 연산할 수 있는 값이 나오지 않는다든지, 어떤 연산을 하고 있는지 화면에 출력한다든지…하는 연산 이외의 어떤 작업이 일어나는 경우입니다. 값만 나오던 연산과 구별해서 다음처럼 표기하겠습니다. (추가적인 정보를 Effect라 부르겠습니다. 왜 Effect라 부르는지는 나중에 <a href="../posts/2022-09-03-effect.html">여기</a>를 참고하세요.)</p>
+<p>이 번에는, 연산을 하면, 다음에 또 연산을 바로 적용할 수 있는 값만 나오지 않고, 무언가 추가적인 정보를 가진 결과가 나오는 경우를 보겠습니다. 예를 들어, 연산을 적용하면서, 연산 횟수를 기억한다든지, 더 이상 연산할 수 없는 값이 나온다든지, 어떤 연산을 하고 있는지 화면에 출력한다든지…하는 연산 이외의 어떤 작업이 일어나는 경우입니다. 값만 나오던 연산과 구별해서 다음처럼 표기하겠습니다. (추가적인 정보를 Effect라 부르겠습니다. 왜 Effect라 부르는지는 나중에 <a href="../posts/2022-09-03-effect.html">여기</a>를 참고하세요.)</p>
 <p><code>(+ 2) with Effect</code>, <code>(* 3) with Effect</code>, <code>(+ 4) with Effect</code><br />
-(여기서 <code>with Effect</code>는, 모두 같은 동작을 합니다. 예를 들어, 횟수 기록을 한다면, 각 연산에 있는 <code>Effect</code>는 모두 같은 횟수 기록 동작을 합니다.)</p>
+(조합 중인 연산의 <code>with Effect</code>는, 모두 같은 동작을 대상으로 합니다. 예를 들어, 횟수 기록을 한다면, 조합 중인 각 연산에 있는 <code>Effect</code>는 모두 같은 횟수 기록 동작을 의미 합니다.)</p>
 <p><code>1</code>에 <code>(+ 2)</code>를 적용 후 나온 <code>3</code>에 <code>(* 3)</code>을 적용하면 좋겠는데,<br />
 <code>1</code>에 <code>(+ 2) with Effect</code>를 적용하면 <code>3 with Effect</code>가 나오고, 이를 숫자만 오길 기다리고 있는 <code>(* 3) with Effect</code>에 넣어 주지 못하는 상황입니다. <code>연산 with Effect</code>는 <code>⋅</code>을 써서 <code>(* 3) with Effect ⋅ (+ 2) with Effect</code> 처럼 묶어 놓을 수 없다는 얘기입니다. 다른 말로 하면, 모노이드로 만들지 못하니, 먼저 묶어 놨다가 적용하는 식으로 쓸 수 없습니다. 이렇게 되면 활용도가 훅 떨어집니다. 아래 해결책을 보기 전에, 먼저 해결책을 상상해 보시기 바랍니다.</p>
 <p>어떻게 하면 <code>(* 3) with Effect ⋅ (+ 2) with Effect</code> 처럼 쓸 수 있을까요?</p>
@@ -131,7 +131,8 @@
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>\<span class="fu">init</span> <span class="ot">-&gt;</span> </span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  result1 with <span class="dt">Effect1</span> <span class="ot">=</span> f <span class="fu">init</span> </span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  result2 with <span class="dt">Effect2</span> <span class="ot">=</span> g result1</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span> (result2 with (<span class="dt">Effect1</span>와 <span class="dt">Effect2</span> 합성))</span></code></pre></div>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span> (result2 with (<span class="dt">Effect1</span>와 <span class="dt">Effect2</span> 합성))</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co">--                      ---------join---------</span></span></code></pre></div>
 <p>점 점 부리토가 될 확률이 높아지고 있습니다만, 계속해 보겠습니다.</p>
 <p>위와 같은 <code>∘</code> 함수를 정의하면, 이제 다음처럼 쓸 수 있습니다.</p>
 <p><code>(* 3) with Effect ∘ (+ 2) with Effect</code></p>
@@ -139,19 +140,20 @@
 <p><code>(- 4) with Effect ∘ (* 3) with Effect ∘ (+ 2) with Effect</code></p>
 <p><code>⋅</code> 대신 새로 <code>∘</code>을 정의했습니다.</p>
 <h2 id="return">return</h2>
-<p>이제, 현재 시스템에 있는 값은 모두 세 개의 절차를 거치는데, 변경 없이 그대로 쓰기 위해 필요했던 <code>아무 일도 안함</code>의 동작을 보겠습니다.</p>
+<p>이제, 변경 없이 그대로 쓰기 위해 필요했던 <code>아무 일도 안함</code>의 동작을 보겠습니다.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>연산 ⋅ 아무 일도 안함 <span class="ot">=</span> 그대로 연산</span></code></pre></div>
 <p>위와 비슷하게</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>연산 with <span class="dt">Effect</span> ∘ (아무 일도 안함) <span class="ot">=</span> 그대로 연산 with <span class="dt">Effect</span></span></code></pre></div>
 <p>가 되어야 합니다. <code>∘</code>의 동작을 보면, 안에 있는 <code>Effect1</code>과 <code>Effect2</code> 합성은 <code>Effect</code> 두 개가 필요합니다. 하지만, <code>아무 일도 안함</code>은 <code>Effect</code>가 없는 상태입니다.
 <code>아무 일도 안함</code>을 <code>아무 일도 안함 with 기본 Effect</code>로 만들어 주는 <code>return</code>이란 함수를 정의할 수 있다면, 다음처럼 동작할 수 있습니다.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>연산 with <span class="dt">Effect</span> ∘ <span class="fu">return</span> (아무 일도 안함) <span class="ot">=</span> 그대로 연산 with <span class="dt">Effect</span></span></code></pre></div>
-<p><code>Effect</code>가 없었을 때와 마찬가지로 결합에 상관없이 같은 결과가 나옴을 확인할 수 있습니다. (<span class="citation" data-cites="todo">@todo</span> 이 건 설명이 좀 부족하긴 합니다.)</p>
+<p>결합같은 경우, 나중에 실제 코드로 정의해 보면, <code>Effect</code>가 없었을 때와 마찬가지로 결합에 상관없이 같은 결과가 나옴을 확인할 수 있습니다만 여기선 넘어 가겠습니다.</p>
 <h2 id="모나드">모나드</h2>
 <p><code>연산 with Effect</code>는 <code>⋅</code>와 <code>아무 일도 안함</code>으론 모노이드가 되지 못했지만,<br />
 <code>연산 with Effect</code>는 <code>∘</code>와 <code>return</code>이 있으면 모노이드가 됐습니다.</p>
-<p>모노이드가 되지 못하던 <code>연산 with Effect</code> 모양이 <code>∘</code>와 <code>return</code>으로 모노이드가 되는 구조를 <strong><em>모나드</em></strong>라 부릅니다.</p>
+<p><code>Effect</code>들은 <code>join</code>(<code>Effect</code>합성)을 이항 연산으로 <code>return</code>을 항등원으로 하는 모노이드가 됩니다. 이 모노이드 덕분에 모노이드가 되지 못하던 <code>연산 with Effect</code> 모양이 <code>∘</code>와 <code>return</code>으로 모노이드가 됩니다. 이런 구조를 <strong><em>모나드</em></strong>라 부릅니다.</p>
 <h2 id="마치며">마치며</h2>
+<p><code>연산 with Effect</code>는 <code>m a</code> 혹은 <code>a -&gt; m b</code>로 표현되고, <code>∘</code>은 <code>join</code> 혹은 바인드<code>&gt;&gt;=</code>, 혹은 <code>&gt;=&gt;</code>로 나타납니다. 어딘가 <code>Monad m =&gt; m</code> 같은 모양이 보인다면, 이 구조는 <code>Effect</code> 두 개를 눌러 담을 수 있는 구조를 가지고 있구나라고 떠올릴 수 있습니다. 예를 들어 <code>Reader</code> 모나드라 하면, “외부 스코프값을 넣어주는 작업을, 두 번 할 걸, 한 번만 하게 바꾸는 것이다”라고 읽을 수 있고, <code>Maybe</code> 모나드라 하면, <code>Just (Just a)</code>는 <code>Just a</code>로,</p>
 <p>어슴푸레 “<a href="../posts/2022-03-25-beforeMonad.html">엔도 펑터의 모노이드</a>”란 말이, 무슨 말일지 보일 것만 같지 않나요? 물론, 여기 설명으로 모나드를 완전히 이해하는 건 불가능합니다. “완전한” 이해를 돕는 글을 목표로 하지 않았습니다. 수학 얘기를 최대한 빼내고, 비전공자 업자들이 모나드로 가는 길에, 볼만한 글이 되는 게 목표입니다.</p>
 <p>이 번에도 새로운 부리토를 투척한 것 같은데, 포기하지 않고 2025년에 또 시도할 예정입니다.</p>
 <section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes">
