@@ -178,8 +178,9 @@
 <div class="sourceCode" id="cb16"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>join(T ⨂ return I) = join(return I ⨂ T)</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>join(T ⨂        T) = join(T        ⨂ T)</span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>                T  =  T</span></code></pre></div>
-<p>즉 이 시스템은 <code>join</code>과 <code>⨂</code> 조합이 이항 연산 역할을 하고, <code>return I</code>이 항등원 역할을 하는 모노이드가 됩니다.</p>
-<p>정리해서 말하면 1번 둘을 붙이는 작업<code>⨂</code>은 이미 되어 있는 시스템은 <code>join</code>, <code>return</code>이 있으면 모노이드가 됩니다.</p>
+<p>즉 이 시스템은 <code>join</code>과 <code>⨂</code> 조합이 이항 연산 역할을 하고, <code>return I</code>이 항등원 역할을 하는 모노이드가 됩니다.<br />
+(※ 제 생각엔 <code>\x y -&gt; join(x ⨂  y)</code>이 이항 함수 역할을 하고, <code>return I</code>가 항등원 역할을 한다고 말해야 할 것 같은데, <strong>바이펑터⨂ 가 디폴트인 세상</strong>에선, <code>T</code>, <code>join</code>, <code>return</code>이 모노이드 구조를 만들어낸다고 말하기도 하는 것 같습니다.)<br />
+정리해서 말하면 1번 둘을 붙이는 작업<code>⨂</code>은 이미 되어 있는 시스템은 <code>join</code>, <code>return</code>이 있으면 모노이드가 됩니다.</p>
 <p><code>⨂</code>로 모노이달 카테고리일 때, 오브젝트 중 <code>join</code>, <code>return</code> 이 있는 것은 모노이드가 됩니다.</p>
 <p>엔도펑터가 <code>펑터 합성 ⋅</code>으로 모노이달 카테고리일 때, 그 중 어떤 한 엔도펑터(ex. <code>Maybe</code>, <code>[]</code>, <code>Reader</code>, <code>Writer</code>…)가 <code>join</code>, <code>return</code>이 있으면 모노이드가 됩니다.<br />
 ※ 하스켈에서 <code>펑터 합성</code>은 보통 생략해서 <code>Maybe ⋅ Maybe</code>가 아닌 <code>Maybe (Maybe a)</code>로 보통 만납니다.</p>
@@ -229,7 +230,7 @@ Computation <code>·</code> Computation을 모노이드처럼 히스토리를 �
 <h2 id="궁금했던-의문들">궁금했던 의문들</h2>
 <blockquote>
 <p>Q. 이항binary이어야지 결합 법칙을 볼텐데, <code>join</code>은 단항unary이다.<br />
-A. 결합법칙은 어떤 작업(연산)을 어떤 것을 먼저 하느냐가 결과에 영향을 미치지 않는 걸 말합니다. 여기서는, 이항 연산의 작업을 둘로 나눠, “1번 둘을 붙이는 작업”은 이미 있는 상태에서, “2번 둘을 하나로 만드는 작업” 여러번이 순서에 상관 없이 같은 가를 보고 있습니다.</p>
+A. 결합법칙은 어떤 작업(연산)을 어떤 것을 먼저 하느냐가 결과에 영향을 미치지 않는 걸 말합니다. 여기서는, 이항 연산의 작업을 둘로 나눠, “1번 둘을 붙이는 작업”은 이미 있는 상태에서, “2번 둘을 하나로 만드는 작업” 여러번이 순서에 상관 없이 같은 가를 보고 있습니다. <code>join ( _ ⨂  _ )</code>는 이항 연산입니다. 만일, 기본으로 <code>⨂</code>이 되어 있는 곳에선 <code>join</code>을 붙여 결합 법칙을 본다고 이해하고 있습니다.</p>
 </blockquote>
 <blockquote>
 <p>Q. 그냥 <code>join</code>으로 모노이드가 되는 걸 설명하면 될텐데, 왜 굳이 모노이달 카테고리를 언급할까?<br />
