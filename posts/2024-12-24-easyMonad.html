@@ -155,12 +155,12 @@
 <p><code>연산 with Effect</code>는 <code>⋅</code>와 <code>아무 일도 안함</code>으론 모노이드가 되지 못했지만,<br />
 <code>연산 with Effect</code>는 <code>∘</code>와 <code>return</code>이 있으면 모노이드가 됐습니다.</p>
 <p>모노이드가 되지 못하던 <code>연산 with Effect</code> 모양이 (<code>join</code>을 갖고 있는 <code>∘</code>)과 <code>return</code>으로 모노이드가 됩니다. 이런 구조를 <strong><em>모나드</em></strong>라 부릅니다.</p>
-<p>조금 더 복잡하게 얘기하면, <code>Effect</code>가, <code>Effect</code> 두 번을 적용하는 동작과, 이를 하나로 만드는 <code>join</code>과, 기본 <code>Effect</code>를 만들어내는 <code>return</code>이 모노이드 구조를 만들어내고, 이로 인해 <code>연산 with Effect</code>가 모노이드 구조가 됩니다. 하스켈에서 얘기하면 펑터를 두 번 적용한 것을 <code>join</code>이 있어 한 번 적용하는 것으로 만들고, 이 <code>join</code>이 별다른 동작을 안하게 하는 <code>return</code>이 있으면 모나드라 부릅니다.</p>
+<p>조금 더 복잡하게 얘기하면, <code>Effect</code>가, <code>Effect</code> 두 번을 적용하는 동작(펑터 합성)과, 이를 하나로 만드는 <code>join</code>과, 기본 <code>Effect</code>를 만들어내는 <code>return</code>이 모노이드 구조를 만들어내고, 이 덕분에 <code>연산 with Effect</code>가 모노이드 구조가 됩니다. 하스켈에서 얘기하면 펑터를 두 번 적용한 것을 <code>join</code>이 있어 한 번 적용하는 것으로 만들고, 이 <code>join</code>이 별다른 동작을 안하게 하는 <code>return</code>이 있으면 모나드라 부릅니다.</p>
 <p>이제 <code>(a -&gt; m d)</code> 함수를 받는 곳에 <code>(c -&gt; m d) ∘ (b -&gt; m c) ∘ (a -&gt; m b)</code> 함수를 넘길 수 있게 됐습니다.</p>
 <h2 id="마치며">마치며</h2>
 <p>하스켈에서</p>
-<p><code>Effect</code>는 펑터 <code>m</code>,(<code>m</code>이 문법적으로 의미가 있는 건 아니고, 관습적으로 이펙트가 있는 구조에는 <code>m</code>을 붙입니다.)<br />
-<code>연산 with Effect</code>는 <code>a -&gt; m b</code>로 표현되고,<br />
+<p><code>Effect</code>는 펑터 <code>m</code>,(<code>m</code>이 문법적으로 의미가 있는 건 아니고, 관습적으로 이펙트가 있는 구조에 <code>m</code>을 붙입니다.)<br />
+<code>연산 with Effect</code>는 <code>m a</code>,<code>a -&gt; m b</code>로 표현되고,<br />
 <code>join</code>은 그대로 <code>join</code>,<br />
 <code>return</code>도 그대로 <code>return</code>,<br />
 <code>∘</code>은 바인드<code>&gt;&gt;=</code>, 혹은 <code>&gt;=&gt;</code>로 나타납니다.</p>
@@ -170,7 +170,8 @@
 <li><code>Maybe</code> 모나드라 하면, <code>Just (Just a)</code>는 <code>Just a</code>로, <code>Just (Nothing)</code>은 <code>Nothing</code>으로 해석해서 두 번 <code>Nothing</code>인지 봐야 할 걸, 한 번만 보게 바꿔 줍니다.</li>
 </ul>
 <p><code>join</code>, <code>return</code>을 정의할 수 있어야 모나드를 만들 수 있습니다.</p>
-<p>복잡한 내용을 좀 더 볼 마음이 생기신 분을 위해 덧 붙이면, <code>Effect</code>관련 처리는 <code>join</code>과 <code>return</code>이 알아서 모노이드로 만들어서, <code>a -&gt; m b</code> 함수들을 합성하는 동안 프로그래머가 신경 쓰지 않도록, 합성 체인 어디서나 필요할 때 갖다 쓸 수 있도록 컨텍스트에 담아 유지합니다. 모나드를 바인드<code>&gt;&gt;=</code>로 계속 엮을 때 하는 일입니다. <code>join</code>과 <code>&gt;&gt;=</code>의 차이는 <a href="../posts/2022-03-25-beforeMonad.html#하스켈에서-join-구현">여기</a>를 참조 하세요.</p>
+<p>위에서 아직 얘기 안했는데, 엄밀하게는 모노이드가 되기 위해 따라야 하는 법칙, 모나드가 되기 위해 따라야 하는 법칙들이 몇 개 있습니다. 이런 법칙들은 보통 하스켈의 문법으로 표현되진 않고, 프로그래머들이 “알아서 잘” 설계해야 하는 것들입니다. 여기 글이 이해가시면 추가로 찾아 보세요.</p>
+<p>복잡한 내용을 좀 더 볼 마음이 생기신 분을 위해 덧 붙이면, <code>Effect</code> 합성(펑터 합성)은 <code>join</code>과 <code>return</code>이 알아서 모노이드로 만들어서, <code>a -&gt; m b</code> 함수들을 합성하는 동안 프로그래머가 신경 쓰지 않도록, 합성 중인 체인에서 필요할 때 갖다 쓸 수 있도록 컨텍스트에 담아 유지합니다. 모나드를 바인드<code>&gt;&gt;=</code>로 계속 엮을 때 하는 일입니다. <code>join</code>과 <code>&gt;&gt;=</code>의 차이는 <a href="../posts/2022-03-25-beforeMonad.html#하스켈에서-join-구현">여기</a>를 참조 하세요.</p>
 <p>아직 펑터, 엔도 펑터에 관한 얘기는 안했지만, 어슴푸레 “<a href="../posts/2022-03-25-beforeMonad.html">엔도 펑터의 모노이드</a>”란 말이, 무슨 말일지 보일 것만 같지 않나요? 물론, 여기 설명으로 모나드를 완전히 이해하는 건 불가능합니다. 당연히 “완전한” 이해를 돕는 글을 목표로 하지 않습니다. 수학 얘기를 최대한 빼내고, 비전공자 업자들이 모나드로 가는 길에, 볼만한 글이 되는 게 목표입니다.</p>
 <p>이 번에도 새로운 부리토를 투척한 것 같습니다. 최대한 코드와 수학을 가리기 위해 <code>with Effect</code>를 써 봤는데, 오히려 혼란스러워진 것 같습니다. 계속 하스켈을 만지다 보면, 또 아는 것이 생길테니, 포기하지 않고 2025년 크리스마스에 또 시도해 보겠습니다.</p>
 <figure>
