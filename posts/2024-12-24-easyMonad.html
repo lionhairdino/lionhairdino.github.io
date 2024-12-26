@@ -158,7 +158,13 @@
 <p>조금 더 복잡하게 얘기하면, <code>Effect</code>가, <code>Effect</code> 두 번을 적용하는 동작과, 이를 하나로 만드는 <code>join</code>과, 기본 <code>Effect</code>를 만들어내는 <code>return</code>이 모노이드 구조를 만들어내고, 이로 인해 <code>연산 with Effect</code>가 모노이드 구조가 됩니다. 하스켈에서 얘기하면 펑터를 두 번 적용한 것을 <code>join</code>이 있어 한 번 적용하는 것으로 만들고, 이 <code>join</code>이 별다른 동작을 안하게 하는 <code>return</code>이 있으면 모나드라 부릅니다.</p>
 <p>이제 <code>(a -&gt; m d)</code> 함수를 받는 곳에 <code>(c -&gt; m d) ∘ (b -&gt; m c) ∘ (a -&gt; m b)</code> 함수를 넘길 수 있게 됐습니다.</p>
 <h2 id="마치며">마치며</h2>
-<p>하스켈에서 <code>Effect</code>는 펑터 <code>m</code>, <code>연산 with Effect</code>는 <code>a -&gt; m b</code>로 표현되고, <code>join</code>은 그대로 <code>join</code>, <code>return</code>도 그대로 <code>return</code>, <code>∘</code>은 바인드<code>&gt;&gt;=</code>, 혹은 <code>&gt;=&gt;</code>로 나타납니다. 어딘가 <code>Monad m =&gt; m</code> 같은 모양이 보인다면, 이 구조는 <code>Effect</code> 두 개를 눌러 담을 수 있는(합성할 수 있는) 구조를 가지고 있구나라고 떠올릴 수 있습니다. 예를 들어</p>
+<p>하스켈에서</p>
+<p><code>Effect</code>는 펑터 <code>m</code>,(<code>m</code>이 문법적으로 의미가 있는 건 아니고, 관습적으로 이펙트가 있는 구조에는 <code>m</code>을 붙입니다.)<br />
+<code>연산 with Effect</code>는 <code>a -&gt; m b</code>로 표현되고,<br />
+<code>join</code>은 그대로 <code>join</code>,<br />
+<code>return</code>도 그대로 <code>return</code>,<br />
+<code>∘</code>은 바인드<code>&gt;&gt;=</code>, 혹은 <code>&gt;=&gt;</code>로 나타납니다.</p>
+<p>어딘가 <code>Monad m =&gt; m</code> 같은 모양이 보인다면, 이 구조는 <code>Effect</code> 두 개를 눌러 담을 수 있는(합성할 수 있는) 구조를 가지고 있구나라고 떠올릴 수 있습니다. 예를 들어</p>
 <ul>
 <li><code>Reader</code> 모나드라 하면, “외부 스코프값을 넣어주는 작업을, 두 번 할 걸, 한 번만 하게 바꾸는 것이다”라고 읽을 수 있고,</li>
 <li><code>Maybe</code> 모나드라 하면, <code>Just (Just a)</code>는 <code>Just a</code>로, <code>Just (Nothing)</code>은 <code>Nothing</code>으로 해석해서 두 번 <code>Nothing</code>인지 봐야 할 걸, 한 번만 보게 바꿔 줍니다.</li>
@@ -174,7 +180,7 @@
 <section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes">
 <hr />
 <ol>
-<li id="fn1"><p>모노이드의 이항 함수, 항등원, 결합 법칙 입니다.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn1"><p>예상하셨겠지만, <code>⋅</code>, <code>∘</code>는 모노이드의 이항 함수, <code>아무 것도 안함</code>은 항등원, <code>⋅</code>, <code>∘</code>의 자유로운 결합은 결합 법칙 입니다.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section>
 
