@@ -97,35 +97,35 @@
 <p>※ 저는 함수형이 하도 어렵다가 친근하다가 해서, 가끔은 함수brother처럼 보입니다.</p>
 <h2 id="조합">조합</h2>
 <p><code>1</code>에 <code>(+ 2)</code>를 적용하면 <code>1 (+ 2) = 3</code><br />
-위 결과 값에 다시 <code>(* 3)</code>을 적용하면 <code>3 (* 3) = 9</code><br />
-위 결과 값에 다시 <code>(- 4)</code>을 적용하면 <code>9 (- 4) = 5</code><br />
+위 결과 값에 다시 <code>(+ 3)</code>을 적용하면 <code>3 (+ 3) = 6</code><br />
+위 결과 값에 다시 <code>(+ 4)</code>을 적용하면 <code>6 (+ 4) = 10</code><br />
 …</p>
 <p>위 작업을 보니, 함수들을 계속 적용하고 있습니다. 그럼 아래와 같이 뭉쳐서, <em>조합해서</em> 표현할 수 있습니다.<br />
-<code>1</code>에 <code>(- 4) ⋅ (* 3) ⋅ (+ 2)</code>를 적용 후 결과로 <code>5</code>를 받습니다.</p>
+<code>1</code>에 <code>(+ 4) ⋅ (+ 3) ⋅ (+ 2)</code>를 적용 후 결과로 <code>10</code>을 받습니다.</p>
 <p>데이터에 순차적으로 연산을 적용하며, 바뀌는 데이터 상태를 끌고 다니던 것을,<br />
 <em>함수들만 먼저 모아 놓고</em>, 한 방에 적용하는 모양으로 바꿨습니다.</p>
 <h2 id="결합">결합</h2>
-<p><code>((+ 2) ⋅ (* 3)) ⋅ (- 4)</code>를 적용하거나, <code>(+ 2) ⋅ ((* 3) ⋅ (- 4))</code>를 적용하거나 같은 결과를 얻습니다. 순서만 지킨다면 어떤 연산을 <em>먼저 묶어 적용</em>하든 같은 결과를 받을 수 있습니다. 위 연산들을 모듈이라고 하면, 어떤 조합의 모듈로 만들지 자유롭게 결정할 수 있습니다.</p>
+<p><code>((+ 2) ⋅ (+ 3)) ⋅ (+ 4)</code>를 적용하거나, <code>(+ 2) ⋅ ((+ 3) ⋅ (+ 4))</code>를 적용하거나 같은 결과를 얻습니다. 순서만 지킨다면 어떤 연산을 <em>먼저 묶어 적용</em>하든 같은 결과를 받을 수 있습니다. 위 연산들을 모듈이라고 하면, 어떤 조합의 모듈로 만들지 자유롭게 결정할 수 있습니다.</p>
 <h2 id="아무-일도-안함">아무 일도 안함</h2>
 <p>예를 들어, 현재 모델링하는 시스템은, 모든 데이터는 항상 세 개의 함수를 적용해서 결과를 얻어(반드시 특정 가공 절차를 거친 후), 다음에 이용한다고 가정하겠습니다. 모든 수는 항상 세 개의 함수를 적용하는데, 어떤 값은 두 개, 혹은 한 개, 아니면 아예 함수를 적용하지 않고 써야하는 값이 있는 경우도 있는 상태입니다. 이런 값은 “항상 세 개의 함수를 적용하는 절차를 거치는 값”으로 어떻게 표현할까요? <em>아무 일도 안함</em> 함수가 있으면 됩니다.</p>
 <p>예를 들어 <code>2</code>를 변경 없이 그대로 쓰려면, <code>2</code>에 <code>아무 일도 안함</code> ⋅ <code>아무 일도 안함</code> ⋅ <code>아무 일도 안함</code>이란 세 번의 절차를 적용하면 됩니다.</p>
 <p>위에 조건 세 가지를 얘기했는데, 정리하면<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>,</p>
 <ol type="1">
-<li><code>(+ 2)</code>, <code>(* 3)</code>, <code>(- 4)</code> 같은 함수들은 <code>⋅</code>을 이용해 계속 조합할 수 있고,</li>
+<li><code>(+ 2)</code>, <code>(+ 3)</code>, <code>(+ 4)</code> 같은 함수들은 <code>⋅</code>을 이용해 계속 조합할 수 있고,</li>
 <li><code>⋅</code>과 조합했을 때 <code>아무 일도 안함</code> 함수가 있고,</li>
-<li><code>(+ 2) ⋅ (* 3)</code>하고 <code>(- 4)</code>를 적용하거나, <code>(+ 2)</code>하고, <code>(* 3) ⋅ (- 4)</code>를 적용하거나 같은 결과를 얻습니다.</li>
+<li><code>(+ 2) ⋅ (+ 3)</code>하고 <code>(+ 4)</code>를 적용하거나, <code>(+ 2)</code>하고, <code>(+ 3) ⋅ (+ 4)</code>를 적용하거나 같은 결과를 얻습니다.</li>
 </ol>
 <p>연산(함수)들이 위와 같은 조건을 만족하는 구조를, 이름부터 수학 냄새가 너무나는 <a href="../posts/2023-02-16-monoid.html">모노이드</a>라 부릅니다.<br />
 함수들이 모노이드 구조를 만족하면, 먼저 연산(함수)들을 마음대로 조합해 놨다가, 값에 적용할 수 있습니다.(값이 아니라, <strong><em>연산(함수)들이 모노이드 구조를 이루고 있음을 눈여겨 보세요</em></strong>) 하스켈의 모든 실행 프로그램은 모노이드 구조를 따르고 있는데, 여기서는 거창한 수학 이름보다는 동작에만 집중해서 보시고, 일단 “모노이드가 되면 편하구나” 정도 믿고 넘어가겠습니다.</p>
 <p>모노이드가 되면 <code>(a -&gt; d)</code> 함수를 받는 곳에 <code>(c -&gt; d) ⋅ (b -&gt; c) ⋅ (a -&gt; b)</code> 함수를 넘길 수 있게 됩니다.</p>
 <h2 id="with-effect">with Effect</h2>
 <p>이 번에는, 연산을 하면, 다음에 또 연산을 바로 적용할 수 있는 값만 나오지 않고, 무언가 <em>추가적인 정보</em>를 가진 결과가 나오는 경우를 보겠습니다. 예를 들어, 연산을 적용하면서, 연산 횟수를 기억한다든지, 더 이상 연산할 수 없는 값이 나온다든지, 어떤 연산을 하고 있는지 화면에 출력한다든지…하는 연산 이외의 어떤 작업이 일어나는 경우입니다. 값만 나오던 연산과 구별해서 다음처럼 표기하겠습니다. (추가적인 정보를 Effect라 부르겠습니다. 왜 Effect라 부르는지는 나중에 <a href="../posts/2022-09-03-effect.html">여기</a>를 참고하세요.)</p>
-<p><code>(+ 2) with Effect</code>, <code>(* 3) with Effect</code>, <code>(+ 4) with Effect</code><br />
+<p><code>(+ 2) with Effect</code>, <code>(+ 3) with Effect</code>, <code>(+ 4) with Effect</code><br />
 (조합 중인 연산의 <code>with Effect</code>는, 모두 같은 동작을 대상으로 합니다. 예를 들어, 횟수 기록을 한다면, 조합 중인 각 연산에 있는 <code>Effect</code>는 모두 횟수 기록 동작을 의미 합니다.)</p>
-<p><code>1</code>에 <code>(+ 2)</code>를 적용 후 나온 <code>3</code>에 <code>(* 3)</code>을 적용하면 좋겠는데,<br />
-<code>1</code>에 <code>(+ 2) with Effect</code>를 적용하면 <code>3 with Effect</code>가 나오고, 이를 숫자만 오길 기다리고 있는 <code>(* 3) with Effect</code>에 넣어 주지 못하는 상황입니다. <code>연산 with Effect</code>는 <code>⋅</code>을 써서 <code>(* 3) with Effect ⋅ (+ 2) with Effect</code> 처럼 묶어 놓을 수 없다는 얘기입니다. 다른 말로 하면, 모노이드로 만들지 못하니, 먼저 묶어 놨다가 적용하는 식으로 쓸 수 없습니다. 이렇게 되면 활용도가 훅 떨어집니다. 아래 해결책을 보기 전에, 먼저 해결책을 상상해 보시기 바랍니다.</p>
-<p>어떻게 하면 <code>(* 3) with Effect ⋅ (+ 2) with Effect</code> 처럼 쓸 수 있을까요?</p>
-<p>누군가가 <code>with Effect</code>를 떼어내서 <code>Effect</code>는 <code>Effect</code>대로 계산을 하고, <code>(+ 2)</code>와 <code>(* 3)</code>를 조립하고, 나중에 <code>with Effect</code>를 다시 붙여주는 작업을 하면 됩니다. 함수를 조립하던 <code>⋅</code> 함수가 담당하면 딱인 작업입니다.</p>
+<p><code>1</code>에 <code>(+ 2)</code>를 적용 후 나온 <code>3</code>에 <code>(+ 3)</code>을 적용하면 좋겠는데,<br />
+<code>1</code>에 <code>(+ 2) with Effect</code>를 적용하면 <code>3 with Effect</code>가 나오고, 이를 숫자만 오길 기다리고 있는 <code>(+ 3) with Effect</code>에 넣어 주지 못하는 상황입니다. <code>연산 with Effect</code>는 <code>⋅</code>을 써서 <code>(+ 3) with Effect ⋅ (+ 2) with Effect</code> 처럼 묶어 놓을 수 없다는 얘기입니다. 다른 말로 하면, 모노이드로 만들지 못하니, 먼저 묶어 놨다가 적용하는 식으로 쓸 수 없습니다. 이렇게 되면 활용도가 훅 떨어집니다. 아래 해결책을 보기 전에, 먼저 해결책을 상상해 보시기 바랍니다.</p>
+<p>어떻게 하면 <code>(+ 3) with Effect ⋅ (+ 2) with Effect</code> 처럼 쓸 수 있을까요?</p>
+<p>누군가가 <code>with Effect</code>를 떼어내서 <code>Effect</code>는 <code>Effect</code>대로 계산을 하고, <code>(+ 2)</code>와 <code>(+ 3)</code>를 조립하고, 나중에 <code>with Effect</code>를 다시 붙여주는 작업을 하면 됩니다. 함수를 조립하던 <code>⋅</code> 함수가 담당하면 딱인 작업입니다.</p>
 <p><code>⋅</code>은 인자를 받아 첫 째 함수를 적용해서 결과값을 받은 후, 이 값을 두 번째 함수의 입력으로 주고, 결과를 받는 함수입니다.</p>
 <p><code>f ⋅ g = \x -&gt; g (f x)</code></p>
 <h2 id="join">join</h2>
@@ -138,9 +138,9 @@
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co">--                      ---------join---------</span></span></code></pre></div>
 <p>점 점 부리토가 될 확률이 높아지고 있습니다만, 계속해 보겠습니다.</p>
 <p>위와 같은 <code>∘</code> 함수를 정의하면, 이제 다음처럼 쓸 수 있습니다.</p>
-<p><code>(* 3) with Effect ∘ (+ 2) with Effect</code></p>
+<p><code>(+ 3) with Effect ∘ (+ 2) with Effect</code></p>
 <p>위 합성 함수의 결과도 여전히 <code>연산 with Effect</code>입니다. 다시 말해, 연속으로 다음처럼 쓸 수도 있습니다.</p>
-<p><code>(- 4) with Effect ∘ (* 3) with Effect ∘ (+ 2) with Effect</code></p>
+<p><code>(+ 4) with Effect ∘ (+ 3) with Effect ∘ (+ 2) with Effect</code></p>
 <p><code>⋅</code> 대신 새로 <code>∘</code>을 정의했습니다. <code>∘</code>의 정의를 잘 보시면, 함수를 적용하며 생기는 <code>Effect</code>들을 따로 모아 하나로 합치는 <code>join</code> 작업이 중요한 역할을 합니다.</p>
 <h2 id="return">return</h2>
 <p>이제, 변경 없이 그대로 쓰기 위해 필요했던 <code>아무 일도 안함</code>의 동작을 보겠습니다.</p>
