@@ -127,10 +127,10 @@
 <p>어떻게 하면 <code>(* 3) with Effect ⋅ (+ 2) with Effect</code> 처럼 쓸 수 있을까요?</p>
 <p>누군가가 <code>with Effect</code>를 떼어내서 <code>Effect</code>는 <code>Effect</code>대로 계산을 하고, <code>(+ 2)</code>와 <code>(* 3)</code>를 조립하고, 나중에 <code>with Effect</code>를 다시 붙여주는 작업을 하면 됩니다. 함수를 조립하던 <code>⋅</code> 함수가 담당하면 딱인 작업입니다.</p>
 <p><code>⋅</code>은 인자를 받아 첫 째 함수를 적용해서 결과값을 받은 후, 이 값을 두 번째 함수의 입력으로 주고, 결과를 받는 함수입니다.</p>
-<p><code>f ⋅ g = \x -&gt; g (f x)</code></p>
+<p><code>g ⋅ f = \x -&gt; g (f x)</code></p>
 <h2 id="join">join</h2>
 <p>위 함수가 <code>Effect</code>를 지원하게 바꿔 보면, (구별하기 위해 <code>⋅</code> 대신 <code>∘</code>를 쓰겠습니다. 의사 코드입니다.)</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>f ∘ g <span class="ot">=</span></span>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>g ∘ f <span class="ot">=</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>\<span class="fu">init</span> <span class="ot">-&gt;</span> </span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  result1 with <span class="dt">Effect1</span> <span class="ot">=</span> f <span class="fu">init</span> </span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  result2 with <span class="dt">Effect2</span> <span class="ot">=</span> g result1</span>
