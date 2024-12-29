@@ -138,17 +138,26 @@
 <p>마치 <code>if</code>문이 없는 것처럼 보이지만, <code>untilB</code>에서 이뤄지고 있습니다.</p>
 <blockquote>
 <p>절차형으로 위 동작을 표현하려면 어찌할지 생각해 봤습니다.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>if (마우스 버튼 클릭) then</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  if (마우스 버튼 릴리즈) then return b3</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  else return b2</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>else</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  return b1</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">if</span> (마우스 버튼 클릭) <span class="kw">then</span> </span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">if</span> (마우스 버튼 릴리즈) <span class="kw">then</span> <span class="fu">return</span> b3 </span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">else</span> <span class="fu">return</span> b2</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="kw">else</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span> b1</span></code></pre></div>
+<p>위처럼 표현하지 못합니다. 클릭과 릴리즈가 동시에 일어나지 않습니다. 어딘가에 클릭이 일어났다는 걸 기억을 해야만 합니다. 아니면, 반대 흐름으로 가는 방법이 있습니다.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">if</span> (마우스 버튼 릴리즈) </span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a> <span class="kw">then</span> b3</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a> <span class="kw">else</span> <span class="kw">if</span> (마우스 버튼 클릭)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>   <span class="kw">then</span> b2</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>   <span class="kw">else</span> b1</span></code></pre></div>
+<p>제일 나중에 일어날 이벤트부터 체크합니다. 저는 이런 사고 방식이 <strong><em>무언가 기억할 것이 (상태가) 필요할 때, 상태 없이 표현하는 방법이라 생각합니다.</em></strong></p>
 </blockquote>
 <p>절차형에 비해 생각이 걸리적 거리는 이유는 <code>버튼 클릭 -&gt; 버튼 릴리즈</code> 처럼 순서대로 가지 않고, 생각 흐름과 일치하지 않는 것처럼 보일 수도 있습니다. 하지만, <code>if</code>가 <code>untilB</code>에 숨은 것을 생각하고 보면 절차형과 그리 달라 보이지 않습니다. 잘 보면 <code>==&gt;</code>는 두 번째 인자로 <code>α -&gt; β</code> 함수를 받습니다. 여기서는 <code>Event () -&gt; b2 혹은 b3</code>이 됩니다. 의사 코드로 쓰면</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>b1 until 클릭 이벤트 </span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>         b2 until 릴리즈 이벤트 </span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>                  b3 </span></code></pre></div>
-<p>이런 느낌입니다. 이렇게 봐도 아직 편하진 않습니다.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>b1 until 클릭 이벤트 </span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>         b2 until 릴리즈 이벤트 </span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>                  b3 </span></code></pre></div>
+<p>이런 느낌입니다. 위 체인도 <code>릴리즈 이벤트</code>부터 체크하고 있습니다. 위 체인을 말로 풀면,</p>
+<p>“<code>릴리즈 이벤트</code>가 일어났다면 <code>b3</code>를 내보내고, 아니면 <code>b2</code>를 내보낼지 <code>b1</code>을 내보낼지 판단하기 위해 <code>클릭 이벤트</code>가 일어났는지 확인해라”</p>
+<p>뜻입니다. 이렇게 봐도 아직 편하진 않습니다.</p>
 <h2 id="push-or-pull">Push or Pull</h2>
 <blockquote>
 <p>어느 한 쪽에서 무슨 일이 일어났는지 아는 방법은</p>
@@ -175,11 +184,11 @@
 </ul>
 <p>이렇게 정의하면 샘플링 단위 시간에 상관없이 이벤트를 놓치지 않을 수 있습니다. 벡터 그래픽을 비트맵으로 만드는 것과 비슷한데, 너무 일찍 비트맵으로 만들어 버리면 데이터를 잃어버리는 양이 늘어 나듯이, 최대한 시각이 아닌, 시간, 즉 범위로 정보를 끌고 다녀야 합니다.</p>
 <p>샘플링에 상관없이 결과를 내려면, 확정된 하나의 값이 아닌, 최대한 <strong>범위</strong>로 정보를 들고 다녀야 합니다. 이렇게 하기 위해 논문에선, 시간을 집합론의 Order Theory로 정의하고 있습니다.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>1 ⊑ 2 ⊑ 3.5이상 ⊑ 4</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>1 ⊑ 2 ⊑ 3.5이상 ⊑ 4</span></code></pre></div>
 <p><code>3.5 이상</code>이면 <code>4</code>일지 더 큰 수일지 알지 못하지 않나 싶은데, 위 처럼 순서가 나오도록 다음과 같이 정의해 놨습니다.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>x ≤ y이상 if x ≤ y</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>x이상 ≤ y 는 undefined</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>x이상 ≤ y이상 undefined</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>x ≤ y이상 if x ≤ y</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>x이상 ≤ y 는 undefined</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>x이상 ≤ y이상 undefined</span></code></pre></div>
 <p>처음 볼 때 금방 이해가 안갔습니다. <code>x이상</code>,<code>y이상</code>을 하나의 수처럼 바라보긴 하는데, <code>x이상</code>이 <code>y</code>보다 작을지 클지는 모른다는 직관 그대로 <code>undeinfed</code>라 정의해놨습니다. denotational한 의미를 정의하는데 중요한 역할을 하는 정의라고 하는데, 천재적인 것 같기도 하고, 말장난 같기도 합니다. 어쨌든 시간의 <strong>크기</strong>보단 <strong>순서</strong>가 의미가 있다 정도로 넘어갔습니다.</p>
 <p><code>⊑</code>는 <strong>크기</strong>가 작다는 뜻이 아닙니다.(이름은 Square Image of or Equal To 라 부르는 기호입니다.) 순서상으로 먼저와 나중을 표현하는 기호입니다. <code>3.5</code>는 <code>4</code>보다 작지 않을지 몰라도 순서상으론 앞에 오도록 약속, 규칙을 정의합니다. 만일 샘플링을 <code>0.2초</code> 단위로 한다면 <code>3.5</code>는 <code>3.6</code>보다는 (작은 게 아니라) <strong>먼저</strong>라는 뜻입니다. “어떤 수 이상”이란 원소들은 자신이 속한 샘플링 구간을 넘지 않는다는 약속이니, 어떤 샘플링 단위에서도 정보를 잃어버리지 않는다로 이해하고 있습니다.</p>
 <p>현재 구현된 FRP 프레임워크들 중에 퍼포먼스도 잘 나오고, Continuous 시간도 이론대로 구현한, 두 마리 토끼를 다 잡은 프레임워크는 없다는 것 같습니다. 코널 엘리엇 교수의 여기 저기 글을 보면, FRP는 denotational하고, Continuous 시간을 표현, 구현해야 제대로 FRP라 할 수 있는데, 그런 의미에선 아직은 제대로 실용 가능한 퍼포먼스를 보이는 FRP프레임워크는 없다는 뜻입니다.</p>
