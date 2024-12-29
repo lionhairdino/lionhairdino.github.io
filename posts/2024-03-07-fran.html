@@ -4,7 +4,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-        <title>lionhairdino - FRAN - Functional Reactive ANimation (작성 중)</title>
+        <title>lionhairdino - FRAN - Functional Reactive ANimation (스케치 중)</title>
 
         <meta name="description" content="어딘가에서 FRAN 논문을 읽고 계신 분과, 의견을 나누기 위해 제 생각을 정리한 글입니다." />
         <meta property="og:description" content="어딘가에서 FRAN 논문을 읽고 계신 분과, 의견을 나누기 위해 제 생각을 정리한 글입니다." />
@@ -33,7 +33,7 @@
         <meta name="msapplication-TileColor" content="#ff7500" />
         <meta name="theme-color" content="#ffffff" />
         <meta property="og:type" content="website" />
-        <meta property="og:title" content="FRAN - Functional Reactive ANimation (작성 중)" />
+        <meta property="og:title" content="FRAN - Functional Reactive ANimation (스케치 중)" />
         <meta property="og:site_name" content="Lionhairdino" />
         <meta property="og:url" content="https://lionhairdino.github.io/posts/2024-03-07-fran.html" />
 
@@ -78,7 +78,7 @@
             </div>
         </div>
         <div class="js-toc-content">
-            <h1>FRAN - Functional Reactive ANimation (작성 중)</h1>
+            <h1>FRAN - Functional Reactive ANimation (스케치 중)</h1>
             <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
 <div class="info">
     Posted on March  7, 2024
@@ -120,10 +120,10 @@
 <p>마우스 버튼이 눌리기 전에, 위 체인의 결과는 <code>b1</code><br />
 마우스 버튼이 떼지기 전에, 위 체인의 결과는 <code>b2</code><br />
 마우스 버튼이 떼어진 후에, 위 체인의 결과는 <code>b3</code></p>
-<p>예를 들면 상태가 <code>b1</code>인데, 마우스 버튼을 누르면 <code>b2</code>가 되고, 그 후 버튼을 떼면 <code>b3</code>가 되는 동작을 모델링한 체인입니다. 어떻게 이렇게 해석되는지 하나 하나 뜯어 봤습니다.</p>
+<p>초기 상태가 <code>b1</code>인데, 마우스 버튼을 누르면 <code>b2</code>가 되고, 그 후 버튼을 떼면 <code>b3</code>가 되는 동작을 모델링한 체인입니다. 어떻게 이렇게 해석되는지 하나 하나 뜯어 봤습니다.</p>
 <p><code>-=&gt;</code>는 <code>Event α</code>와 값<code>β</code>를 받아 <code>Event β</code>를 돌려주고, (<code>Event</code>가 가지고 있는 <strong>값을 바꿔치는 작업</strong>을 합니다.)<br />
-<code>==&gt;</code>는 <code>Event α</code>와 함수<code>(α -&gt; β)</code>를 받아 <code>Event β</code>를 돌려 줍니다. (<code>Event</code>가 가지고 있는 값을 바뀌주는 <strong>함수를 받아 값을 변환하는 작업</strong>을 합니다. 폴리모픽으로 타입을 규정하고 있진 않지만, 위 사용례를 보면 <code>α</code>는 <code>Event</code>타입을 받고, 이 <code>Event</code>가 발생하면, 조건에 따라 <code>Behavior</code>를 결정해서 <code>β</code>로 내뱉는 함수가 주로 올 것 같습니다.)</p>
-<p><code>-=&gt;</code>와 <code>==&gt;</code>는 <code>Event</code> 컴비네이션을 만들어 내는 컴비네이터들로 최종 결과는 <code>Event</code>를 만들어 내는 함수들입니다.</p>
+<code>==&gt;</code>는 <code>Event α</code>와 함수<code>(α -&gt; β)</code>를 받아 <code>Event β</code>를 돌려 줍니다. (<code>Event</code>가 가지고 있는 값을 바뀌주는 <strong>함수를 받아 값을 변환하는 작업</strong>을 합니다. 폴리모픽으로 타입을 규정하고 있진 않지만, 위 사용례를 보면 <code>α</code>는 <code>Event</code>타입을 받고, 이 <code>Event</code>가 발생하면, 조건에 따라 <code>Behavior</code>를 결정해서 <code>β</code>로 내뱉는 함수가 올 것 같습니다.)</p>
+<p><code>-=&gt;</code>와 <code>==&gt;</code>는 <code>Event</code> 컴비네이션을 만들어 내는 컴비네이터들로 최종 결과로 <code>Event</code>를 만들어 내는 함수들입니다.</p>
 <p>매직같은, 번뜩이는 아이디어는 <code>λe.b2 untilB e -=&gt; b3</code> 부분입니다. <code>lbp t0</code>는 <code>Event ()</code>가 아니라 <code>Event (Event ())</code> 값을 만들어 냅니다. <code>e -=&gt; b3</code>는 안에 있는 <code>Event ()</code>의 값을 바꿔 놓는 역할을 합니다.</p>
 <p>순서를 가진 <code>Event</code>들은 <code>Event(Event(Event ...))</code> 모양으로 표현할 수 있습니다. 버튼 떼기는, 버튼 누르기 후 일어납니다. <code>Event(Event ())</code>로 표현하고 있습니다.</p>
 <p>아무도 일도 일어나지 않으면 <code>b1</code>,<br />
@@ -137,27 +137,35 @@
 </ol>
 <p>마치 <code>if</code>문이 없는 것처럼 보이지만, <code>untilB</code>에서 이뤄지고 있습니다.</p>
 <blockquote>
-<p>절차형으로 위 동작을 표현하려면 어찌할지 생각해 봤습니다.</p>
+<p>생각 스트레칭 - 절차형으로 위 동작을 표현하려면 어찌할지 생각해 봤습니다.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">if</span> (마우스 버튼 클릭) <span class="kw">then</span> </span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">if</span> (마우스 버튼 릴리즈) <span class="kw">then</span> <span class="fu">return</span> b3 </span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">else</span> <span class="fu">return</span> b2</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="kw">else</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span> b1</span></code></pre></div>
-<p>위처럼 표현하지 못합니다. 클릭과 릴리즈가 동시에 일어나지 않습니다. 어딘가에 클릭이 일어났다는 걸 기억을 해야만 합니다. 아니면, 반대 흐름으로 가는 방법이 있습니다.</p>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">if</span> (마우스 버튼 릴리즈) </span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">then</span> b3 </span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">else</span> b2</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="kw">else</span> b1</span></code></pre></div>
+<p>위처럼 표현하지 못합니다. <code>클릭</code>과 <code>릴리즈</code>가 동시에 일어나지 않습니다. 어딘가에 <code>클릭</code>이 일어났다는 걸 기억해야만 합니다. 아니면, 반대 흐름으로 가는 방법이 있습니다.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">if</span> (마우스 버튼 릴리즈) </span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a> <span class="kw">then</span> b3</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a> <span class="kw">else</span> <span class="kw">if</span> (마우스 버튼 클릭)</span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>   <span class="kw">then</span> b2</span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>   <span class="kw">else</span> b1</span></code></pre></div>
-<p>제일 나중에 일어날 이벤트부터 체크합니다. 저는 이런 사고 방식이 <strong><em>무언가 기억할 것이 (상태가) 필요할 때, 상태 없이 표현하는 방법이라 생각합니다.</em></strong></p>
+<p>제일 나중에 일어날 이벤트부터 체크합니다. 저는 이런 사고 방식이 <strong><em>무언가 기억할 것이 (상태가) 필요할 때, 상태 없이 표현하는 방법</em></strong>이라 생각합니다. 마치, 최종 일어날 일이 일어났다고 가정하면서 출발하는 것과 비슷합니다. 정보량으로 따지자면, <code>릴리즈 이벤트</code>를 체크 할 때는 <code>클릭 이벤트</code>가 일어났다는 가정이 포함되어 있습니다. 정보를 함수와 잘 merge한다면, 따로 상태를 둘 필요가 없어집니다.</p>
 </blockquote>
-<p>절차형에 비해 생각이 걸리적 거리는 이유는 <code>버튼 클릭 -&gt; 버튼 릴리즈</code> 처럼 순서대로 가지 않고, 생각 흐름과 일치하지 않는 것처럼 보일 수도 있습니다. 하지만, <code>if</code>가 <code>untilB</code>에 숨은 것을 생각하고 보면 절차형과 그리 달라 보이지 않습니다. 잘 보면 <code>==&gt;</code>는 두 번째 인자로 <code>α -&gt; β</code> 함수를 받습니다. 여기서는 <code>Event () -&gt; b2 혹은 b3</code>이 됩니다. 의사 코드로 쓰면</p>
+<p>생각이 걸리적 거리는 이유는 <code>버튼 클릭 -&gt; 버튼 릴리즈</code> 처럼 순서대로 가지 않아서입니다. 또 하나 <code>if</code>가 보이지 않아 흐름이 잘 안보입니다. <code>if</code>는 <code>untilB</code>에 숨어 있습니다. 잘 보면 <code>==&gt;</code>는 두 번째 인자로 <code>α -&gt; β</code> 함수를 받습니다. 여기서는 <code>Event () -&gt; b2 혹은 b3</code>이 됩니다. 의사 코드로 쓰면</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>b1 until 클릭 이벤트 </span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>         b2 until 릴리즈 이벤트 </span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>                  b3 </span></code></pre></div>
 <p>이런 느낌입니다. 위 체인도 <code>릴리즈 이벤트</code>부터 체크하고 있습니다. 위 체인을 말로 풀면,</p>
 <p>“<code>릴리즈 이벤트</code>가 일어났다면 <code>b3</code>를 내보내고, 아니면 <code>b2</code>를 내보낼지 <code>b1</code>을 내보낼지 판단하기 위해 <code>클릭 이벤트</code>가 일어났는지 확인해라”</p>
-<p>뜻입니다. 이렇게 봐도 아직 편하진 않습니다.</p>
+<p>뜻입니다. 뒤집혀진 이벤트 순서대로 코드를 만들어 내면,</p>
+<ol type="1">
+<li><code>릴리즈 이벤트</code>가 일어나지 않았다면 <em>고정된 값</em>이 아니라, 나중에 다른 이벤트에 따라 결정될테니, <code>Event (Event ...)</code></li>
+<li><code>안에 있는 이벤트</code>에 따라 최종 값이 결정되니, 아직은 모르는 값을 위해 자리만 차지하는 <code>()</code>를 가지고 있게 합니다. <code>Event (Event ())</code></li>
+<li><code>lbp t0 = b1 untilB ( Event (Event()) )</code>라 쓰면, 바깥 <code>Event</code>(<code>릴리즈 이벤트</code>)가 일어나서 받는 값은 <code>Event ()</code>로 값이 아직 확정되지 않았습니다.</li>
+<li><code>Event ()</code>를 넘기면 <code>untilB</code> 작업을 거쳐 값을 만들어내는 함수를 붙여야 합니다. <code>()</code>를 바꾸기 위해, 고정된 값을 바꿔치기하는 <code>-=&gt;</code>이 아니라, <code>==&gt;</code>로 <code>\e -&gt; b2 untilB e -=&gt; b3</code>를 넘깁니다.</li>
+<li><code>b1 untilB (lbp t0) ==&gt; \e -&gt; b2 untilB e -=&gt; b3</code></li>
+</ol>
+<p>이렇게 봐도 아직 편하진 않습니다. <strong>고정되지 않은 값은 함수로 표현된다</strong>를 염두하고 반복해서 읽어 보세요.</p>
 <h2 id="push-or-pull">Push or Pull</h2>
 <blockquote>
 <p>어느 한 쪽에서 무슨 일이 일어났는지 아는 방법은</p>
