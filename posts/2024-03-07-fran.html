@@ -121,20 +121,32 @@
 마우스 버튼이 떼지기 전에, 위 체인의 결과는 <code>b2</code><br />
 마우스 버튼이 떼어진 후에, 위 체인의 결과는 <code>b3</code></p>
 <p>초기 상태가 <code>b1</code>인데, 마우스 버튼을 누르면 <code>b2</code>가 되고, 그 후 버튼을 떼면 <code>b3</code>가 되는 동작을 모델링한 체인입니다.</p>
+<h2 id="상상">상상</h2>
 <p>※ 아래는 FRAN을 해석한다기 보다, 함수형 사고 훈련을 한다는 게 더 맞는 말이겠습니다.</p>
-<p>어떻게 컴비네이터들 조합으로 이렇게 표현되는지 잘 안보입니다.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>b1 untilB (lbp t0) <span class="op">==&gt;</span> λe<span class="op">.</span> b2 untilB e <span class="op">-=&gt;</span> b3</span></code></pre></div>
-<p><code>lbp t0</code>는 <code>Event (Event α)</code>로 <code>untilB</code>에 그대로 넘길 수 있는 타입이 아닙니다. <code>untilB</code>는 <code>Event (Behavior α)</code>를 받습니다. <code>==&gt;</code>으로 안에 있는 <code>Event</code>를 변환해야 합니다. 이어지는 <code>==&gt; λe. b2 untilB e -=&gt; b3</code>를 적용하면, <code>Event</code>는 <code>Behavior</code> <code>b2</code> 혹은 <code>b3</code>로 변환됩니다. 왜 이런 모양이 되게 컴비네이터를 설계했을까요?</p>
-<p>순서를 가진 <code>Event</code>들은 <code>Event(Event(Event ...))</code> 모양으로 표현할 수 있습니다. 버튼 떼기는, 버튼 누르기 후 일어납니다. <code>Event(Event ())</code>로 표현하고 있습니다.</p>
+<p><em>Event가 일어나면 변경되는 값</em>을 보통의 값과 구별없이 취급하는 걸 목표로 <strong>혼자 상상</strong>해 봤습니다.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>b1 untilB   (lbp t0) <span class="op">==&gt;</span> λe<span class="op">.</span> b2 untilB    e <span class="op">-=&gt;</span> b3</span></code></pre></div>
+<p><code>lbp t0</code>는 <code>Event (Event α)</code>로 <code>untilB</code>에 그대로 넘길 수 있는 타입이 아닙니다. <code>untilB</code>는 <code>Event (Behavior α)</code>를 받습니다. <code>==&gt;</code>으로 안에 있는 <code>Event</code>를 변환해야 합니다. 이어지는 <code>==&gt; λe. b2 untilB e -=&gt; b3</code>를 적용하면, <code>Event</code>는 <code>Behavior</code>타입 <code>b2</code> 혹은 <code>b3</code>로 변환됩니다. 왜 이런 모양이 되게 컴비네이터를 설계했을까요?</p>
+<p>보통의 값과 <code>Event</code>가 일어나면 값이 결정될 무언가를 같은 걸로 보기 위해, 이 세계의 모든 값은 <code>Event</code>가 일어난 후 값이 결정된다고 가정하겠습니다. <code>Event a</code>가 <code>Event</code>가 일어나면 <code>a</code>를 돌려주는 값이란 뜻입니다. 아무 일도 일어나지 않는 이벤트 <code>I</code>를 정의 하겠습니다. <code>I a</code>는 아무 일도 일어나지 않았을 때 <code>a</code>를 돌려줍니다. 그럼 <code>Event (I a)</code>라고 써도 <code>Event a</code>와 동일합니다. 두 개의 이벤트가 일어나야 값을 돌려준다면, <code>Event (Event a)</code>라고 쓸 수 있다고 금방 상상할 수 있습니다.</p>
+<p>순서를 가진 <code>Event</code>들은</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Event</span>(<span class="dt">Event</span>(<span class="dt">Event</span> <span class="op">...</span>))</span></code></pre></div>
+<p>모양으로 표현할 수 있습니다. 버튼 떼기는, 버튼 누르기 후 일어납니다. 논문에서는 <code>Event(Event ())</code>로 표현하고 있습니다.</p>
+<p><code>Event</code>는 <code>untilB</code>를 통해서만 값이 될 수 있습니다. 그런데, <code>Event (Event a)</code>는 <code>untilB</code>에 넣어 줄 수 없습니다. 안에 있는 값에 먼저 <code>untilB</code>를 적용해야만, 바깥 <code>Event</code>를 <code>untilB</code>에 넘겨 줄 수 있습니다. <code>fmap</code>으로 안에 있는 <code>Event</code>에 <code>untilB</code>를 적용할 수 있습니다. 인자 순서만 다를 뿐, <strong>==&gt;</strong> 의 동작은 <code>fmap</code>과 같습니다. 겹쳐진 이벤트를 처리할 수 있는 방법이 생겼습니다.</p>
+<p>안 쪽 <code>Event ()</code>에 <code>untilB</code>를 적용해서 값을 뽑아내면 <code>()</code>입니다. <code>-=&gt;</code>의 동작은 <code>==&gt; \_ -&gt; β</code> 동작과 비슷합니다. 그저 <code>Event</code>가 가진 값을 바꿔 놓는 역할을 합니다. 왜 애초에 <code>Event (Event b3)</code>로 <code>lbp</code>를 정의하지 않았을까요? 지금 추측하기엔, <code>lbp</code>를 다른데서도 쓰려면, 지금처럼 placeholder로 <code>()</code>를 쓰고, 나중에 <strong>-=&gt;</strong> 로 바꿔놓는 게 더 유연하기 때문이라 생각됩니다.</p>
 <p>아무도 일도 일어나지 않으면 <code>b1</code>,<br />
 바깥 <code>Event</code>까지만 일어났다면 <code>b2</code>,<br />
 안 쪽 <code>Event</code>까지 일어났다면 <code>b3</code>입니다.</p>
 <ol type="1">
 <li>마우스 버튼 푸쉬이 없었다면 <code>b1</code></li>
-<li>마우슨 버튼 푸쉬이 일어났다면, <code>Event(Event ())</code>중 안에 있는 <code>Event ()</code>를 <code>λe.b2 untilB e -=&gt; b3</code>에 넘겨 줍니다.</li>
+<li>마우슨 버튼 푸쉬이 일어났다면, 바로 <code>b2</code>로 결정하는 게 아니라, <code>Event(Event ())</code>중 안에 있는 <code>Event ()</code>를 <code>λe.b2 untilB e -=&gt; b3</code>에 넘겨 줍니다.</li>
 <li><code>e -=&gt; b3</code>로 이벤트<code>e</code>가 가지고 있는 <code>()</code>를 <code>b3</code>로 바꿉니다.</li>
 <li>그 후 <code>Event b3</code>가 아직 일어나지 않았다면, 첫 번째 <code>untilB</code>의 결과(전체 체인의 결과)가 <code>b1</code>대신 <code>b2</code>, 이벤트가 일어났다면 <code>b1</code>대신 <code>b3</code>가 됩니다.</li>
 </ol>
+<p>만일 위 의사 코드를 실행 코드로 본다면, 현재 상태가 <code>b2</code>면 바깥쪽 <code>Event</code>는 <code>untilB</code>를 실행하지 않고 바로 안 쪽 <code>Event</code>를 <code>untilB</code> 실행할 수 있어야 합니다.</p>
+<p>하스켈로 간단하게 구현한 예</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">Behavior</span> a <span class="ot">=</span> <span class="dt">Behavior</span> {<span class="ot"> runBehaviro ::</span> <span class="dt">StateT</span> <span class="dt">Time</span> (<span class="dt">Reader</span> ()) a }</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">Event</span> a <span class="ot">=</span> <span class="dt">Event</span> {<span class="ot"> runEvent ::</span> <span class="dt">StateT</span> <span class="dt">Time</span> (<span class="dt">Reader</span> ()) a }</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>작성 중<span class="op">...</span></span></code></pre></div>
 <h2 id="push-or-pull">Push or Pull</h2>
 <blockquote>
 <p>어느 한 쪽에서 무슨 일이 일어났는지 아는 방법은</p>
@@ -144,7 +156,7 @@
 </ul>
 <p>두 가지 방법뿐이 없습니다.</p>
 </blockquote>
-<p>일등급 시민으로 타입(<code>Event</code>,<code>Behavior</code>)을 설계하고 그냥 함수로 일반 값 다루듯이 하는 게 언뜻 이해가지 않았습니다. 아마도 옵저버블 패턴(리스너 패턴) 자체가 어떻게 함수형으로 구현되는지 너무 일찍 궁금해 해서 그런 듯 합니다. 위 <code>untilB</code> 체인은 프레임마다 계속 실행하는 걸로 생각하고 읽으면 됩니다. 리스너를 쓰지 않는다는 말이 아닙니다. 나중 외부 이벤트와 붙이게 되면, 리스너를 써야만 합니다. 논문에서 구현 전에 나오는 내용은 리스너와 붙이는 것을 대체하는 게 아닌, 리스너로 통지를 받은 후에 전파되는, 일종의 이벤트 네트워크를 표현하는 방식에 관한 얘깁니다.</p>
+<p>일등급 시민으로 타입(<code>Event</code>,<code>Behavior</code>)을 설계하고 그냥 함수로 일반 값 다루듯이 하는 게 언뜻 이해가지 않았습니다. 아마도 옵저버블 패턴(리스너 패턴) 자체가 어떻게 함수형으로 구현되는지 너무 일찍 궁금해 해서 그런 듯 합니다. 위 <code>untilB</code> 체인은 프레임(틱)마다 계속 실행하는 걸로 생각하고 읽으면 됩니다. 리스너를 쓰지 않는다는 말이 아닙니다. 나중 외부 이벤트와 붙이게 되면, 리스너를 써야만 합니다. 논문에서 구현 전에 나오는 내용은 리스너와 붙이는 것을 대체하는 게 아닌, 리스너로 통지를 받은 후에 전파되는, 일종의 이벤트 네트워크를 표현하는 방식에 관한 얘깁니다.</p>
 <p><code>Event</code> 타입은 특별한 동작이 있습니다. <code>Event</code>가 발생하기 전엔 코드가 진행되지 않게 막을, <strong><em>블록</em></strong>할 방법이 필요합니다. FRAN에선 바로 언급하지 않고 있지만, 저는 구현을 생각하며 쫓아가는 게 이해하기 편했습니다. 구현에선</p>
 <ul>
 <li><code>Event</code>값이 <code>Just</code>인지 <code>Nothing</code>인지 봐서, <code>Nothing</code>이면 더 이상 코드 진행을 하지 않고 끝내거나,</li>
@@ -161,11 +173,11 @@
 </ul>
 <p>이렇게 정의하면 샘플링 단위 시간에 상관없이 이벤트를 놓치지 않을 수 있습니다. 벡터 그래픽을 비트맵으로 만드는 것과 비슷한데, 너무 일찍 비트맵으로 만들어 버리면 데이터를 잃어버리는 양이 늘어 나듯이, 최대한 시각이 아닌, 시간, 즉 범위로 정보를 끌고 다녀야 합니다.</p>
 <p>샘플링에 상관없이 결과를 내려면, 확정된 하나의 값이 아닌, 최대한 <strong>범위</strong>로 정보를 들고 다녀야 합니다. 이렇게 하기 위해 논문에선, 시간을 집합론의 Order Theory로 정의하고 있습니다.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>1 ⊑ 2 ⊑ 3.5이상 ⊑ 4</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>1 ⊑ 2 ⊑ 3.5이상 ⊑ 4</span></code></pre></div>
 <p><code>3.5 이상</code>이면 <code>4</code>일지 더 큰 수일지 알지 못하지 않나 싶은데, 위 처럼 순서가 나오도록 다음과 같이 정의해 놨습니다.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>x ≤ y이상 if x ≤ y</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>x이상 ≤ y 는 undefined</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>x이상 ≤ y이상 undefined</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>x ≤ y이상 if x ≤ y</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>x이상 ≤ y 는 undefined</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>x이상 ≤ y이상 undefined</span></code></pre></div>
 <p>처음 볼 때 금방 이해가 안갔습니다. <code>x이상</code>,<code>y이상</code>을 하나의 수처럼 바라보긴 하는데, <code>x이상</code>이 <code>y</code>보다 작을지 클지는 모른다는 직관 그대로 <code>undeinfed</code>라 정의해놨습니다. denotational한 의미를 정의하는데 중요한 역할을 하는 정의라고 하는데, 천재적인 것 같기도 하고, 말장난 같기도 합니다. 어쨌든 시간의 <strong>크기</strong>보단 <strong>순서</strong>가 의미가 있다 정도로 넘어갔습니다.</p>
 <p><code>⊑</code>는 <strong>크기</strong>가 작다는 뜻이 아닙니다.(이름은 Square Image of or Equal To 라 부르는 기호입니다.) 순서상으로 먼저와 나중을 표현하는 기호입니다. <code>3.5</code>는 <code>4</code>보다 작지 않을지 몰라도 순서상으론 앞에 오도록 약속, 규칙을 정의합니다. 만일 샘플링을 <code>0.2초</code> 단위로 한다면 <code>3.5</code>는 <code>3.6</code>보다는 (작은 게 아니라) <strong>먼저</strong>라는 뜻입니다. “어떤 수 이상”이란 원소들은 자신이 속한 샘플링 구간을 넘지 않는다는 약속이니, 어떤 샘플링 단위에서도 정보를 잃어버리지 않는다로 이해하고 있습니다.</p>
 <p>현재 구현된 FRP 프레임워크들 중에 퍼포먼스도 잘 나오고, Continuous 시간도 이론대로 구현한, 두 마리 토끼를 다 잡은 프레임워크는 없다는 것 같습니다. 코널 엘리엇 교수의 여기 저기 글을 보면, FRP는 denotational하고, Continuous 시간을 표현, 구현해야 제대로 FRP라 할 수 있는데, 그런 의미에선 아직은 제대로 실용 가능한 퍼포먼스를 보이는 FRP프레임워크는 없다는 뜻입니다.</p>
