@@ -85,7 +85,7 @@
     
 </div>
 
-<p><a href="http://conal.net/papers/icfp97/">Functional Reactive Animation - Conal Elliott and Paul Hudak, 1997</a> 논문을 본 분들을 대상으로 삼는 글입니다. 무려 27년 전 글이지만, 아직도 많이 읽힌다고 하는데, 검색에는 딱히 걸려드는 한글 자료는 없습니다. 수많은 선행자들이 이해하고 넘어 갔을텐데 자료가 없는 게 아쉽습니다.</p>
+<p><a href="http://conal.net/papers/icfp97/">Functional Reactive Animation - Conal Elliott and Paul Hudak, 1997</a> 논문을 본 분들을 대상으로 삼는 글입니다. 무려 27년 전 글이지만, 아직도 많이 읽힌다고 하는데, 검색에는 딱히 걸려드는 한글 자료는 없습니다. 수많은 선행자들이 이해하고 넘어 갔을텐데 자료가 없어 아쉽습니다.</p>
 <h2 id="event와-behavior-컴비네이션">Event와 Behavior 컴비네이션</h2>
 <p>Reactive를 말로 풀어 설명하면, “이벤트Event가 일어나면 이런 저런 행동Behavior을 한다”입니다. 여기서 일단, <code>Event</code>와 <code>Behavior</code>를 떠올릴 수 있었을테고, 함수형으로 접근하기 위해 이들을 조합하는 방식으로 표현하기 위해 일등급 시민으로 만들고, 컴비네이터들을 설계했을 것이다란 일반적인 상상에서 시작해 보겠습니다.</p>
 <p>2.3 Semantics of Events 섹션에 External events 부분에 아래 예시가 나옵니다.</p>
@@ -108,8 +108,8 @@
 <p>※ 아래는 FRAN을 해석한다기 보다, 함수형 사고 훈련을 한다는 게 더 맞는 말이겠습니다.</p>
 <p><em>Event가 일어나면 변경되는 값(Event 값)</em>을 보통의 값과 구별없이 취급하는 걸 목표로 <strong>혼자 상상</strong>해 봤습니다. Event 값을 보통의 값으로 보는 게 아닌, 거꾸로 보통의 값을 Event 값으로 볼 수 있게 하면 둘이 같아졌다 해도 되지 않을까에서 출발합니다.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>b1 untilB   (lbp t0) <span class="op">==&gt;</span> λe<span class="op">.</span> b2 untilB    e <span class="op">-=&gt;</span> b3</span></code></pre></div>
-<p><code>lbp t0</code>는 <code>Event (Event α)</code>로 <code>untilB</code>에 그대로 넘길 수 있는 타입이 아닙니다. <code>untilB</code>는 <code>Event (Behavior α)</code>를 받습니다. <code>==&gt;</code>으로 안에 있는 <code>Event</code>를 변환해야 합니다. 이어지는 <code>==&gt; λe. b2 untilB e -=&gt; b3</code>를 적용하면, <code>Event</code>는 <code>Behavior</code>타입 <code>b2</code> 혹은 <code>b3</code>로 변환됩니다. 왜 이런 모양이 되게 컴비네이터를 설계했을까요?</p>
-<p><code>Event</code>가 일어나면 값이 결정될 무언가를 보통의 값과 같은 걸로 보기 위해, 이 세계의 모든 값은 <code>Event</code>가 일어난 후 값이 결정된다고 가정하겠습니다. <code>Event a</code>가 <code>Event</code>가 일어나면 <code>a</code>를 돌려주는 값이란 뜻입니다. 아무 일도 일어나지 않는 이벤트 <code>I</code>를 정의 하겠습니다. <code>I a</code>는 아무 일도 일어나지 않았을 때 <code>a</code>를 돌려줍니다. 그럼 <code>Event (I a)</code>라고 써도 <code>Event a</code>와 동일합니다. 두 개의 이벤트가 일어나야 값을 돌려준다면, <code>Event (Event a)</code>라고 쓸 수 있다고 금방 상상할 수 있습니다.</p>
+<p><code>lbp t0</code>는 <code>Event (Event α)</code>로 <code>untilB</code>에 그대로 넘길 수 있는 타입이 아닙니다. <code>untilB</code>는 <code>Event (Behavior α)</code>를 받습니다. <code>==&gt;</code>으로 안에 있는 <code>Event</code>를 변환해야 합니다. 이어지는 <code>==&gt; λe. b2 untilB e -=&gt; b3</code>를 적용하면, <code>Event</code>는 <code>Behavior</code>타입 <code>b2</code> 혹은 <code>b3</code>로 변환됩니다. 왜 이런 모양으로 컴비네이터를 설계했을까요?</p>
+<p><code>Event</code>가 일어나면 값이 결정될 무언가를, 보통의 값과 같은 것으로 보기 위해, 이 세계의 모든 값은 <code>Event</code>가 일어난 후 값이 결정된다고 가정하겠습니다. <code>Event a</code>가 <code>Event</code>가 일어나면 <code>a</code>를 돌려주는 값이란 뜻입니다. 아무 일도 일어나지 않는 이벤트 <code>I</code>를 정의 하겠습니다. <code>I a</code>는 아무 일도 일어나지 않았을 때 <code>a</code>를 돌려줍니다. 그럼 <code>Event (I a)</code>라고 써도 <code>Event a</code>와 동일합니다. 두 개의 이벤트가 일어나야 값을 돌려준다면, <code>Event (Event a)</code>라고 쓸 수 있다고 금방 상상할 수 있습니다.</p>
 <p>순서를 가진 <code>Event</code>들은</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Event</span>(<span class="dt">Event</span>(<span class="dt">Event</span> <span class="op">...</span>))</span></code></pre></div>
 <p>모양으로 표현할 수 있습니다. 버튼 떼기는, 버튼 누르기 후 일어납니다. 논문에서는 <code>Event(Event ())</code>로 표현하고 있습니다.</p>
@@ -124,8 +124,8 @@
 <li><code>e -=&gt; b3</code>로 이벤트<code>e</code>가 가지고 있는 <code>()</code>를 <code>b3</code>로 바꿉니다.</li>
 <li>그 후 <code>Event b3</code>가 아직 일어나지 않았다면, 첫 번째 <code>untilB</code>의 결과(전체 체인의 결과)가 <code>b1</code>대신 <code>b2</code>, 이벤트가 일어났다면 <code>b1</code>대신 <code>b3</code>가 됩니다.</li>
 </ol>
-<p>만일 위 의사 코드를 틱(프레임)마다 실행되는 코드로 본다면, 현재 상태가 <code>b2</code>면 바깥쪽 <code>Event</code>는 <code>untilB</code>를 실행하지 않고 바로 안 쪽 <code>Event</code>를 <code>untilB</code> 실행할 수 있어야 합니다.
-하스켈로 간단하게 구현한 예</p>
+<p>만일 위 의사 코드를 틱(프레임)마다 실행되는 코드로 본다면, 현재 상태가 <code>b2</code>면 바깥쪽 <code>Event</code>는 <code>untilB</code>를 실행하지 않고 바로 안 쪽 <code>Event</code>를 <code>untilB</code> 실행할 수 있어야 합니다.</p>
+<p>하스켈로 간단하게 구현한 예</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">module</span> <span class="dt">Main</span> <span class="kw">where</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Event</span> a <span class="ot">=</span> <span class="dt">Event</span> {<span class="ot"> occurrences ::</span> [(<span class="dt">Time</span>, a)] } <span class="kw">deriving</span> <span class="dt">Show</span></span>
@@ -178,6 +178,48 @@
 <span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a>        <span class="kw">let</span> pressed <span class="ot">=</span> isPressed mouseClicks t</span>
 <span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a>        <span class="fu">putStrLn</span> <span class="op">$</span> <span class="st">&quot;Time &quot;</span> <span class="op">++</span> <span class="fu">show</span> t <span class="op">++</span> <span class="st">&quot;s: &quot;</span> <span class="op">++</span> </span>
 <span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a>                  (<span class="kw">if</span> pressed <span class="kw">then</span> <span class="st">&quot;Pressed&quot;</span> <span class="kw">else</span> <span class="st">&quot;Released&quot;</span>)</span></code></pre></div>
+<p>여기까지 와도 어떻게 보통의 값처럼 쓸 수 있는지 시원하게 정리되지 않습니다.</p>
+<h2 id="펑터">펑터</h2>
+<p>https://qfpl.io/posts/reflex/basics/events/ 에 있는 FRP 라이브러리 Reflex의 예시 코드를 보겠습니다.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ot">flipColour ::</span> <span class="dt">Colour</span> <span class="ot">-&gt;</span> <span class="dt">Colour</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>flipColour <span class="dt">Red</span> <span class="ot">=</span> <span class="dt">Blue</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>flipColour <span class="dt">Blue</span> <span class="ot">=</span> <span class="dt">Red</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="ot">eOutput ::</span> <span class="dt">Event</span> t <span class="dt">Colour</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>eOutput <span class="ot">=</span> flipColour <span class="op">&lt;$&gt;</span> eInput</span></code></pre></div>
+<p><code>eInput</code>은 이벤트인데, 보통의 값처럼 쓰는 걸로 보입니다. 어떻게 이렇게 할 수 있을까요? 어찌됐든 <code>a</code>가 아니라 <code>Some a</code>이기 때문에 <code>a</code>에 접근하려면 절차가 필요합니다. <code>eOutput</code>도 이벤트입니다. <code>eOutput</code>에 값을 가져오는 절차를 실행할 때, 내부에 가진 <code>eInput</code>도 처리하게 하면 됩니다.</p>
+<p>펑터 절차를 한 번만 하는 게 아니라 내부에 있는 펑터들도 파고 들어가야 합니다. 말보다는 코드가 더 명확히 보입니다.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Event</span> t a <span class="ot">=</span> <span class="dt">Event</span> {<span class="ot"> trigger ::</span> <span class="dt">IO</span> (<span class="dt">Maybe</span> a) }</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Functor</span> (<span class="dt">Event</span> t) <span class="kw">where</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmap</span> f (<span class="dt">Event</span> action) <span class="ot">=</span> <span class="dt">Event</span> <span class="op">$</span> <span class="kw">do</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    result <span class="ot">&lt;-</span> action</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pure</span> (<span class="fu">fmap</span> f result) <span class="co">-- result 평터 타입의 fmap</span></span></code></pre></div>
+<p>이펙트가 있는 <code>action</code>을 실행해서 받은 값에, 한 번 더 펑터 <code>fmap</code>으로 들어가고 있습니다. 펑터가 내부에 또 다른 펑터를 가진 예를 들어보면,</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ot">eInput ::</span> <span class="dt">Event</span> t <span class="dt">Int</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>eInput <span class="ot">=</span> <span class="dt">Event</span> <span class="op">$</span> <span class="kw">do</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pure</span> (<span class="dt">Just</span> <span class="dv">42</span>)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="ot">eOutput ::</span> <span class="dt">Event</span> t <span class="dt">String</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>eOutput <span class="ot">=</span> <span class="fu">show</span> <span class="op">&lt;$&gt;</span> eInput <span class="co">-- eInput이 마치 일반 값처럼 보입니다.</span></span></code></pre></div>
+<p><code>Event</code>의 <code>fmap</code>은 <code>Event</code>를 뚫고 들어가, 내부 펑터(여기선 <code>Just</code>)도 뚫고 들어가게 구현되어 있습니다.</p>
+<blockquote>
+<p>Q. 일반 값처럼 쓸 수 있냐를 보는데, 왜 펑터로 함수를 적용하는 것을 보나요?<br />
+A. 값이 필요한 시점은 함수가 필요로 할 때 말고는 없습니다. 일반 값처럼 쓴다는 말은, 함수가 필요로 할 때, 프로그래머가 최대한 신경을 덜 쓰게 한다는 말입니다.</p>
+</blockquote>
+<p>어차피 나중에 아래같은 <code>runEvent</code>를 걸테니</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ot">runEvent ::</span> <span class="dt">Event</span> t a <span class="ot">-&gt;</span> <span class="dt">IO</span> ()</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>runEvent (<span class="dt">Event</span> action) <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  result <span class="ot">&lt;-</span> action</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">case</span> result <span class="kw">of</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Just</span> val <span class="ot">-&gt;</span> <span class="fu">putStrLn</span> <span class="op">$</span> <span class="st">&quot;Event값: &quot;</span> <span class="op">++</span> <span class="fu">show</span> val</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Nothing</span> <span class="ot">-&gt;</span> <span class="fu">pure</span> ()</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  runEvent eOutput</span></code></pre></div>
+<p>코드 동작이 일반 값과 같다는 얘기가 아니라, 프로그래머 입장에선 신경쓰는 정도가 일반 값과 다르지 않다는 얘기입니다. <code>eOutput</code>은 <code>eInput</code>을 기반으로 구현되어 있는데, <code>eInput</code>이 가진 값을 가져오는 것은 신경쓸 필요가 없어졌습니다. <code>Event</code>도 펑터니, <code>Event</code>가 안에 <code>Event</code>를 갖고 있게 해도 역시나 프로그래머가 신경 쓸 필요가 없게 됐습니다.</p>
+<p>특별한 얘기가 없습니다. 모두 평범한 펑터 타입에 관한 얘기입니다. <code>a</code>가 아니라 <code>Some a</code>는 언젠가 <code>Some</code>에 맞는 어떤 작업을 하겠다는 계산 약속입니다.</p>
 <h2 id="push-or-pull">Push or Pull</h2>
 <ul>
 <li>일이 일어난 쪽에서, 청자에게 알려 주든가,</li>
@@ -192,7 +234,7 @@
 </ul>
 <p>첫 번째 방법을 pull, 두 번째 방법을 push로 부르는 것 같습니다. push 방법은 바로 전체 체인의 결과가 바로 나오는 게 아니니, 체인 중간 중간 결과가 의미있게 드러난다면 가능할 것으로 보입니다. 어차피 <code>MVar</code>나 <code>IORef</code>를 써야하니, 이펙트에 의미를 잘 심으면 될 것으로 보입니다.</p>
 <h2 id="denotational">Denotational</h2>
-<p>수학으로 코드의 동작을 예측할 수 있어야 한다는데, 이 부분은 넘어가겠습닙다.</p>
+<p>수학으로 코드의 동작을 예측할 수 있어야 한다는데, 이 부분은 넘어가겠습니다.</p>
 <h2 id="시간-연속-continuous">시간 연속 Continuous</h2>
 <p>FRAN 논문의 2.1 Semantic Domains</p>
 <p>아래는 추측입니다.</p>
@@ -203,16 +245,63 @@
 </ul>
 <p>이렇게 정의하면 샘플링 단위 시간에 상관없이 이벤트를 놓치지 않을 수 있습니다. 벡터 그래픽을 비트맵으로 만드는 것과 비슷한데, 너무 일찍 비트맵으로 만들어 버리면 데이터를 잃어버리는 양이 늘어 나듯이, 최대한 시각이 아닌, 시간, 즉 범위로 정보를 끌고 다녀야 합니다.</p>
 <p>샘플링에 상관없이 결과를 내려면, 확정된 하나의 값이 아닌, 최대한 <strong>범위</strong>로 정보를 들고 다녀야 합니다. 이렇게 하기 위해 논문에선, 시간을 집합론의 Order Theory로 정의하고 있습니다.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>1 ⊑ 2 ⊑ 3.5이상 ⊑ 4</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>1 ⊑ 2 ⊑ 3.5이상 ⊑ 4</span></code></pre></div>
 <p><code>3.5 이상</code>이면 <code>4</code>일지 더 큰 수일지 알지 못하지 않나 싶은데, 위 처럼 순서가 나오도록 다음과 같이 정의해 놨습니다.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>x ≤ y이상 if x ≤ y</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>x이상 ≤ y 는 undefined</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>x이상 ≤ y이상 undefined</span></code></pre></div>
-<p>처음 볼 때 금방 이해가 안갔습니다. <code>x이상</code>,<code>y이상</code>을 하나의 수처럼 바라보긴 하는데, <code>x이상</code>이 <code>y</code>보다 작을지 클지는 모른다는 직관 그대로 <code>undeinfed</code>라 정의해놨습니다. denotational한 의미를 정의하는데 중요한 역할을 하는 정의라고 하는데, 천재적인 것 같기도 하고, 말장난 같기도 합니다. 어쨌든 시간의 <strong>크기</strong>보단 <strong>순서</strong>가 의미가 있다 정도로 넘어갔습니다.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>x ≤ y이상 if x ≤ y</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>x이상 ≤ y 는 undefined</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>x이상 ≤ y이상 undefined</span></code></pre></div>
+<p>처음 볼 때 금방 이해가 안갔습니다. <code>x이상</code>, <code>y이상</code>을 하나의 수처럼 바라보긴 하는데, <code>x이상</code>이 <code>y</code>보다 작을지 클지는 모른다는 직관 그대로 <code>undeinfed</code>라 정의해놨습니다. denotational한 의미를 정의하는데 중요한 역할을 하는 정의라고 하는데, 천재적인 것 같기도 하고, 말장난 같기도 합니다. 어쨌든 시간의 <strong>크기</strong>보단 <strong>순서</strong>가 의미가 있다 정도로 넘어갔습니다.</p>
 <p><code>⊑</code>는 <strong>크기</strong>가 작다는 뜻이 아닙니다.(이름은 Square Image of or Equal To 라 부르는 기호입니다.) 순서상으로 먼저와 나중을 표현하는 기호입니다. <code>3.5</code>는 <code>4</code>보다 작지 않을지 몰라도 순서상으론 앞에 오도록 약속, 규칙을 정의합니다. 만일 샘플링을 <code>0.2초</code> 단위로 한다면 <code>3.5</code>는 <code>3.6</code>보다는 (작은 게 아니라) <strong>먼저</strong>라는 뜻입니다. “어떤 수 이상”이란 원소들은 자신이 속한 샘플링 구간을 넘지 않는다는 약속이니, 어떤 샘플링 단위에서도 정보를 잃어버리지 않는다로 이해하고 있습니다.</p>
-<p>현재 구현된 FRP 프레임워크들 중에 퍼포먼스도 잘 나오고, Continuous 시간도 이론대로 구현한, 두 마리 토끼를 다 잡은 프레임워크는 없다는 것 같습니다. 코널 엘리엇 교수의 여기 저기 글을 보면, FRP는 denotational하고, Continuous 시간을 표현, 구현해야 제대로 FRP라 할 수 있는데, 그런 의미에선 아직은 제대로 실용 가능한 퍼포먼스를 보이는 FRP프레임워크는 없다는 뜻입니다.</p>
-<!--
-//-->
+<p>현재 구현된 FRP 프레임워크들 중에 퍼포먼스도 잘 나오고, Continuous 시간도 이론대로 구현한, 두 마리 토끼를 다 잡은 프레임워크는 없다는 것 같습니다. 코널 엘리엇 교수의 여기 저기 글을 보면, FRP는 denotational하고, Continuous 시간을 표현, 구현해야 제대로 FRP라 할 수 있는데, 그런 의미에선 아직은 제대로 실용 가능한 퍼포먼스를 보이는, 원론을 그대로 구현한 FRP프레임워크는 없다는 뜻입니다. 물론 적절한 선에서 타협한 실용 라이브러리들이 여럿 있습니다.</p>
+<h2 id="외부-이벤트와-연결-구현-예시">외부 이벤트와 연결 구현 예시</h2>
+<div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ot">{-# LANGUAGE RecursiveDo #-}</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Control.Monad.Fix</span> (<span class="dt">MonadFix</span>)</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Control.Monad</span> (forever)</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="co">-- Event 타입 정의</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">Event</span> a <span class="ot">=</span> <span class="dt">Event</span> {<span class="ot"> runEvent ::</span> <span class="dt">IO</span> (<span class="dt">Maybe</span> a) }</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="co">-- Event를 실행하고 결과를 반환하는 함수</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="ot">triggerEvent ::</span> <span class="dt">Show</span> a <span class="ot">=&gt;</span> <span class="dt">Event</span> a <span class="ot">-&gt;</span> <span class="dt">IO</span> ()</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>triggerEvent (<span class="dt">Event</span> action) <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>  result <span class="ot">&lt;-</span> action</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>  <span class="kw">case</span> result <span class="kw">of</span></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Just</span> val <span class="ot">-&gt;</span> <span class="fu">putStrLn</span> <span class="op">$</span> <span class="st">&quot;Event triggered with value: &quot;</span> <span class="op">++</span> <span class="fu">show</span> val</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Nothing</span>  <span class="ot">-&gt;</span> <span class="fu">putStrLn</span> <span class="st">&quot;No event occurred&quot;</span></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a><span class="co">-- 단순히 값을 가진 이벤트를 생성</span></span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a><span class="ot">pureEvent ::</span> a <span class="ot">-&gt;</span> <span class="dt">Event</span> a</span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>pureEvent val <span class="ot">=</span> <span class="dt">Event</span> <span class="op">$</span> <span class="fu">pure</span> (<span class="dt">Just</span> val)</span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a><span class="co">-- 입력 이벤트를 시뮬레이션</span></span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a><span class="ot">inputEvent ::</span> <span class="dt">Event</span> <span class="dt">Int</span></span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>inputEvent <span class="ot">=</span> <span class="dt">Event</span> <span class="op">$</span> <span class="kw">do</span></span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">putStrLn</span> <span class="st">&quot;Enter a number (or empty to skip):&quot;</span></span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a>  input <span class="ot">&lt;-</span> <span class="fu">getLine</span></span>
+<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a>  <span class="kw">if</span> <span class="fu">null</span> input</span>
+<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a>    <span class="kw">then</span> <span class="fu">pure</span> <span class="dt">Nothing</span></span>
+<span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a>    <span class="kw">else</span> <span class="fu">pure</span> (<span class="dt">Just</span> (<span class="fu">read</span> input))</span>
+<span id="cb12-29"><a href="#cb12-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-30"><a href="#cb12-30" aria-hidden="true" tabindex="-1"></a><span class="co">-- 이벤트 변환</span></span>
+<span id="cb12-31"><a href="#cb12-31" aria-hidden="true" tabindex="-1"></a><span class="ot">mapEvent ::</span> (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> <span class="dt">Event</span> a <span class="ot">-&gt;</span> <span class="dt">Event</span> b</span>
+<span id="cb12-32"><a href="#cb12-32" aria-hidden="true" tabindex="-1"></a>mapEvent f (<span class="dt">Event</span> action) <span class="ot">=</span> <span class="dt">Event</span> <span class="op">$</span> <span class="kw">do</span></span>
+<span id="cb12-33"><a href="#cb12-33" aria-hidden="true" tabindex="-1"></a>  result <span class="ot">&lt;-</span> action</span>
+<span id="cb12-34"><a href="#cb12-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pure</span> (<span class="fu">fmap</span> f result)</span>
+<span id="cb12-35"><a href="#cb12-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-36"><a href="#cb12-36" aria-hidden="true" tabindex="-1"></a><span class="co">-- 실행 루프</span></span>
+<span id="cb12-37"><a href="#cb12-37" aria-hidden="true" tabindex="-1"></a><span class="ot">eventLoop ::</span> <span class="dt">Show</span> a <span class="ot">=&gt;</span> [<span class="dt">Event</span> a] <span class="ot">-&gt;</span> <span class="dt">IO</span> ()</span>
+<span id="cb12-38"><a href="#cb12-38" aria-hidden="true" tabindex="-1"></a>eventLoop events <span class="ot">=</span> forever <span class="op">$</span> <span class="fu">mapM_</span> triggerEvent events</span>
+<span id="cb12-39"><a href="#cb12-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-40"><a href="#cb12-40" aria-hidden="true" tabindex="-1"></a><span class="co">-- 예제 실행</span></span>
+<span id="cb12-41"><a href="#cb12-41" aria-hidden="true" tabindex="-1"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span>
+<span id="cb12-42"><a href="#cb12-42" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb12-43"><a href="#cb12-43" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- 두 이벤트 정의</span></span>
+<span id="cb12-44"><a href="#cb12-44" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> e1 <span class="ot">=</span> inputEvent</span>
+<span id="cb12-45"><a href="#cb12-45" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> e2 <span class="ot">=</span> mapEvent (\x <span class="ot">-&gt;</span> x <span class="op">*</span> <span class="dv">2</span>) e1 <span class="co">-- 입력 값을 2배로 변환</span></span>
+<span id="cb12-46"><a href="#cb12-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-47"><a href="#cb12-47" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- 실행 루프</span></span>
+<span id="cb12-48"><a href="#cb12-48" aria-hidden="true" tabindex="-1"></a>  eventLoop [e1, e2]</span></code></pre></div>
 
 <div class="comment">
 <script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>

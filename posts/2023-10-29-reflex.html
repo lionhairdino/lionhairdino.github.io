@@ -150,11 +150,12 @@ DOM 위젯, 웹 소켓, XHR 요청을 만들기 위한 API를 제공합니다.</
 시간에 따라 변하는 값을 위한 컨테이너. 샘플링할 수는 있지만, 자신이 변한다고 외부에 알릴 방법은 없습니다.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Behavior</span> t a</span></code></pre></div>
 <p>모든 시간에 값이 존재해야 하는데, 만일 그렇지 않은 값을 <code>Behavior</code>로 모델링 한다면 <code>Behavior t (Maybe a)</code>를 써야 합니다. Behavior 값들은 <code>tag</code>나 <code>attach</code> 함수를 써서 Event로 태깅할 수 있습니다. 처음 생성할 때 <code>sample</code> 함수를 쓰면 위젯 안에서 샘플링될 수 있습니다.</p>
+<p>※ 태깅tagging - 이벤트가 발생하는 순간 Behavior의 값을 이벤트에 넣는 것.</p>
 <p><strong>Event</strong></p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Event</span> t a</span></code></pre></div>
-<p>버튼 클릭 <code>Event t ()</code><br />
-키 누름 <code>Event t Char</code></p>
-<p>다른 프레임워크에서 이벤트 네트워크라 부르는 걸, 여기선 이벤트-전파-그래프라 부르는 것 같습니다. 외부 값(외부 이벤트)을 이벤트-전파-그래프에 넣을 때는 <code>newTriggerEvent</code> IO 액션을 씁니다.</p>
+<p>예시) 버튼 클릭 <code>Event t ()</code>, 키 누름 <code>Event t Char</code></p>
+<p>실 구현말고, 의미적으론 <code>[(t, a)]</code>로 생각할 수 있습니다.</p>
+<p>다른 프레임워크에서 이벤트 네트워크라 부르는 걸, 여기선 이벤트-전파-그래프라 부릅니다. 외부 값(외부 이벤트)을 이벤트-전파-그래프에 넣을 때는 <code>newTriggerEvent</code> IO 액션을 씁니다.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ot">newTriggerEvent ::</span> <span class="dt">TriggerEvent</span> t m <span class="ot">=&gt;</span> m (<span class="dt">Event</span> t a, a <span class="ot">-&gt;</span> <span class="dt">IO</span> ())</span></code></pre></div>
 <p><strong>Dynamic</strong><br />
 Event와 Behavior를 튜플에 담아 둔 것</p>
