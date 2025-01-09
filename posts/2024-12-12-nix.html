@@ -85,63 +85,58 @@
     
 </div>
 
-<p>뒤로 미뤄 두던 Nix를, Reflex를 공부하면서 결국 만져야 되는 상황이 왔습니다. 국내에도 쓰는 분들이 점점 늘어나는 추세인듯 하나, 한글 자료는 많지 않습니다. 아래는 전혀 완성되지 않은 글입니다. 아직 필요한 부분들을 확인하고 있는 중입니다. 아래는 순수하게 개인이 볼 노트인 상태로, 아직 다른 분들을 위해 정리하지 않았습니다. 주의해서 보세요.</p>
-<p>닉스 패키지 매니저 설치부터 까다롭다. obelisk를 설치하며 nix가 어찌 저찌 설치된 것 같은데, nixpkgs를 못찾는다 해서 다시 multi-user 방식으로 설치했다.</p>
+<p>뒤로 미뤄 두던 Nix를 결국 만져야 되는 상황이 왔습니다. 국내에도 쓰는 분들이 점점 늘어나는 추세인듯 하나, 한글 자료는 많지 않습니다. 아래는 전혀 완성되지 않은 글입니다. 아직 필요한 부분들을 확인하고 있는 중입니다. 아래는 순수하게 개인이 볼 노트인 상태로, 아직 다른 분들을 위해 정리하지 않았습니다. 주의해서 보세요.</p>
+<p>닉스 패키지 매니저 설치부터 까다롭습니다. obelisk를 설치하며 nix가 어찌 저찌 설치된 것 같은데, nixpkgs를 못찾는다 해서 다시 multi-user 방식으로 설치했습니다.</p>
 <p><a href="https://nixos.org/manual/nix/stable/#transparent-sourcebinary-deployment" class="uri">https://nixos.org/manual/nix/stable/#transparent-sourcebinary-deployment</a></p>
-<p>패키지를 하스켈같은 순수 함수형 프로그래밍 언어에서의 값value처럼 취급한다. side-effect가 없는 함수로 빌드하고, 한 번 빌드된 이후에는 절대 변하지 않는다. Nix는 패키지를 Nix store(보통 /nix/store)에 저장한다. 각 패키지는 자신만의 고유 서브 디렉토리를 갖는다.</p>
+<p>Nix는 패키지를 하스켈같은 순수 함수형 프로그래밍 언어에서의 값value처럼 취급합니다. side-effect가 없는 함수로 빌드하고, 한 번 빌드된 이후에는 절대 변하지 않습니다. Nix는 패키지를 Nix store(보통 <code>/nix/store</code>)에 저장합니다. 각 패키지는 자신만의 고유 서브 디렉토리를 갖습니다.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>/nix/store/b6gvzjyb2pg0kjfwrjmg1vfhh54ad73z-firefox-33.1/</span></code></pre></div>
-<p>패키지명 앞의 문자열은 모든 의존성 정보를 갖고 있는 해시값</p>
-<p><strong>전역 위치에 패키지</strong>를 설치하면, 개발하고 있는 앱에 이 패키지 의존성을 지정하지 않아도 개발자 머신에선 잘 돌아가고, 나중에 사용자는 안 돌아가는 사태가 발생한다. 이를 막기 위해 Nix는 패키지를 글로벌하게 설치하지 않는다.</p>
+<p>패키지명 앞의 문자열은 의존성 정보에 쓰이는 고유 해시값입니다.</p>
+<p>만약 <strong>전역 위치에 패키지</strong>를 설치하면, 개발하고 있는 앱에서 이 패키지 의존성을 지정하지 않아도 개발자 머신에선 잘 돌아가고, 나중에 사용자는 안 돌아가는 사태가 발생합니다. 이를 막기 위해 패키지를 글로벌하게 설치하지 않습니다.</p>
 <h2 id="garbage-collection">Garbage collection</h2>
 <div class="sourceCode" id="cb2"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>λ&gt; nix-env --uninstall firefox</span></code></pre></div>
-<p>설치 제거를 하면 바로 삭제하지 않는다. 롤백을 원할 수도 있고, 다른 사용자의 프로필에 있는 패키지일 수도 있다.</p>
-<p>사용하지 않는 패키지를 삭제하려면 Garbage collector를 돌린다.</p>
+<p>설치 제거를 하면 바로 삭제하지 않습니다. 롤백을 원할 수도 있고, 다른 사용자의 프로필에 있는 패키지일 수도 있습니다.</p>
+<p>사용하지 않는 패키지를 삭제하려면 Garbage collector를 돌립니다.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>λ&gt; nix-collect-garbage</span></code></pre></div>
-<h2 id="함수형-패키지-언어">함수형 패키지 언어</h2>
-<p>Nix라고 부르는 것인지, Nix expression이라 부르는지 헛갈린다.</p>
 <h2 id="참조-투명한-소스바이너리-배치deployment">참조 투명한 소스/바이너리 배치deployment</h2>
-<p>Nix expression은 소스에서 어떻게 빌드할지 설명한다.</p>
+<p>Nix 표현식은 소스에서 어떻게 패키지를 빌드할지 설명합니다.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>λ&gt; nix-env --install --attr nixpkgs.firefox</span></code></pre></div>
-<p>(Nix store에 없다면 C라이브러와 컴파일러까지도 설치한다.) source deployment model이다. 가급적 소스에서 빌드하는 건 피하고, binary cache, pre-built 바이너리를 제공하는 웹서버들을 이용한다. 만일 /nix/store/b5lksdklsjfd…-firefox-33.1 을 빌드하라고 하면, 바로 소스에서 빌드하는 게 아니라, 우선 https://cache.nixos.org/b5lksdklsjfd…narinfo 파일이 있는지 체크하고, 있다면 pre-built 패키지를 가져오고, 없으면 빌드 단계로 들어간다.</p>
+<p>(Nix store에 없다면 C라이브러와 컴파일러까지도 설치합니다.) 소스 배포deployment 모델입니다만, 가급적 소스에서 빌드하는 건 피하고, binary cache, pre-built 바이너리를 제공하는 웹서버들을 이용합니다. 만일 <code>/nix/store/b5lksdklsjfd...-firefox-33.1</code>을 빌드하라고 하면, 바로 소스에서 빌드하는 게 아니라, 우선 https://cache.nixos.org/b5lksdklsjfd…narinfo 파일이 있는지 체크하고, 있다면 빌드된pre-built 패키지를 가져오고, 없으면 빌드 단계로 들어갑니다.</p>
 <h2 id="nix-packages-collection">Nix Packages collection</h2>
-<p>수백 개의 유닉스 패키지를 포함한 Nix expression 많은 양의 Nix expression을 제공한다.</p>
+<p>수백 개의 유닉스 패키지를 위한 많은 양의 Nix 표현식을 제공합니다.</p>
 <h2 id="nix.conf">nix.conf</h2>
-<p>보통 <code>/etc/nix/nix.conf</code> 에서 찾을 수 있다.<br />
-덮어 쓸 패키지들을 지정할 때는 <code>~/.config/nixpkgs/config.nix</code>를 쓴다.<br />
-환경 변수 <code>NIX_CONF_DIR</code>로 전역 설정 파일을 바꿀 수 있다?<br />
-<code>XDG_CONFIG_HOME</code>에서 사용자 설정 파일을 찾는다.<br />
-대부분 시스템이<br />
-<code>XDG_CONFIG_DIR</code>은 <code>/etc/xdg</code><br />
-<code>XDG_CONFIG_HOME</code>은 <code>$HOME/.config</code></p>
-<p>Nigpkgs 버전은 <code>nix-channels</code> 옵션으로 지정한다.<br />
-설정 파일이 아니라, 환경 변수 <code>NIX_CONFIG</code>에 바로 설정을 넣어 놓을 수도 있는 것 같다.<br />
-설정 파일은 한 줄에 name = value 하나 형태다.</p>
+<p>보통 <code>/etc/nix/nix.conf</code> 에서 찾을 수 있습니다.<br />
+시스템에 설치된 패키지를 덮어 쓸 때는 <code>~/.config/nixpkgs/config.nix</code>를 이용합니다.<br />
+환경 변수 <code>NIX_CONF_DIR</code>로 전역 설정 파일 위치를 지정할 수 있습니다.<br />
+<code>XDG_CONFIG_HOME</code>에서 사용자 설정 파일을 찾습니다.<br />
+대부분 시스템이 <code>XDG_CONFIG_DIR</code>은 <code>/etc/xdg</code>, <code>XDG_CONFIG_HOME</code>은 <code>$HOME/.config</code> 위치를 씁니다.</p>
+<p>Nigpkgs 버전은 <code>nix-channels</code> 옵션으로 지정합니다.<br />
+임시 설정을 위해선, 설정 파일을 안쓰고, 환경 변수 <code>NIX_CONFIG</code>에 바로 넣어 놓을 수도 있습니다.<br />
+설정 파일은 한 줄에 <code>name = value</code> 하나 형태입니다.</p>
 <h2 id="빌드-환경-관리">빌드 환경 관리</h2>
 <div class="sourceCode" id="cb5"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>λ&gt; nix-shell '&lt;nixpkgs&gt;' --attr pan</span></code></pre></div>
-<p>위 명령어를 입력하면 nix shell 로 들어간다.</p>
+<p>위 명령어를 입력하면 nix shell로 들어 갑니다.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>[nix-shell]$ unpackPhase</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>[nix-shell]$ cd pan-*</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>[nix-shell]$ configurePhase</span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>[nix-shell]$ buildPhase </span>
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>[nix-shell]$ ./pan/gui/pan</span></code></pre></div>
 <h2 id="이식성portability">이식성portability</h2>
-<p>리눅스와 macOS에서 돌아간다.</p>
+<p>리눅스와 macOS에서 돌아갑니다.</p>
 <h2 id="nixos">NixOS</h2>
-<p>Nix에 기반을 둔 리눅스 배포판이다. 패키지 매니징에만 Nix를 쓰는 게 아니라, 시스템 설정에도 쓴다. (ex. /etc 에 있는 설정 파일들 빌드할 때)
-Nix로 시스템을 관리하면, 시스템 자체를 이전 설정 상태로 편하게 롤백할 수 있다.</p>
-<p><a href="https://nix.dev/tutorials/first-steps/ad-hoc-shell-environments" class="uri">https://nix.dev/tutorials/first-steps/ad-hoc-shell-environments</a>
-# First steps
-## Ad hoc 쉘 환경</p>
+<p>시스템을 설정할 때, 커맨드라인 명령어를 쓴다든지, GUI 툴로 클릭하며 설정하지 않고, 모든 설정은 설정파일에 남기면, 이 설정 파일만 있다면 언제든지 동일한 환경을 만들 수 있을 겁니다.</p>
+<p>Nix를 기반으로 하는 리눅스 배포판입니다. 패키지 매니징에만 Nix를 쓰는 게 아니라, 시스템 설정에도 씁니다. (ex. <code>/etc</code>에 있는 설정 파일들 빌드할 때) Nix로 시스템을 관리하면, 시스템 자체를 어떤 시점의 설정 상태로 편하게 롤백할 수 있습니다.</p>
+<p><a href="https://nix.dev/tutorials/first-steps/ad-hoc-shell-environments" class="uri">https://nix.dev/tutorials/first-steps/ad-hoc-shell-environments</a></p>
+<h1 id="first-steps">First steps</h1>
+<h2 id="ad-hoc-쉘-환경">Ad hoc 쉘 환경</h2>
 <pre><code>λ&gt; nix-shell -p 앱이름</code></pre>
-<p>닉스 환경으로 들어가며, 그 환경에만 앱을 설치한다.
-<code>Ctrl-d</code>로 빠져 나오면 앱을 설치하지 않은 상태가 된다.</p>
+<p>닉스 쉘로 들어가며, 그 환경에만 앱을 설치합니다. <code>Ctrl-d</code>로 빠져 나오면 앱을 설치하지 않은 상태가 됩니다. 임시로 앱을 설치할 일이 있을 때 씁니다.</p>
 <p>닉스쉘로 들어가지 않고, 현재 설치되어 있지 않은데, 간단히 실행해보려면</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>λ nix-shell -p cowsay --run &quot;cowsay Nix&quot;</span></code></pre></div>
-<p><code>--pure</code> 기존 시스템에 있는 환경을 최대한 안쓰게 할 때 쓰는 것 같다.
+<p><code>--pure</code> 기존 시스템에 있는 환경을 최대한 안쓰게 할 때 씁니다. 예를 들어 <code>PATH</code>같은 환경 변수를 읽어오지 않기 때문에 시스템 디렉토리 <code>/usr/bin</code>이나 <code>/bin</code>등에 접근하지 않습니다.
 <code>-I</code> 닉스패키지 지정</p>
-<p><code>nix-collect-garbage</code> 임시 닉스쉘에서 사용했던 패키지들 제거</p>
+<p><code>nix-collect-garbage</code> 임시 닉스 쉘에서 사용했던 패키지들 제거합니다.</p>
 <h2 id="재현-가능한-스크립트">재현 가능한 스크립트</h2>
-<p>닉스쉘을 shebang 인터프리터로 쓰기</p>
+<p>닉스 쉘을 shebang 인터프리터로 쓰기</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">#!/usr/bin/env nix-shell</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co">#! nix-shell -i bash --pure 파일의 나머지를 해석할 인터프리터</span></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co">#! nix-shell -p bash cacert curl jq python3Packages.xmljson 인터프리터 환경에서 제공하는 패키지 목록</span></span>
@@ -368,16 +363,16 @@ Symbolic outputs of the derivation 자꾸 심볼릭이 나온다. 본 내용이 
 <p>…
 요약하면, 대충 위에처럼 놓고 <code>nix-build</code>를 돌리면 빌드 에러가 나는 이유들 (보통은 라이브러리가 없어서 나는 것 같다.)을 알려준다. 라이브러리가 없다면, <a href="http://search.nixos.org/packages" class="uri">http://search.nixos.org/packages</a> 에서 찾던가, <code>nix-locate</code>를 이용해서 찾아서 매개 변수를 만들고, <code>buildInputs = [ 필요한라이브러리1 필요한라이브러리2 ...]</code> 이렇게 써주고, <code>make install</code>이 없다면 <code>installPhase</code>를 만들어 설치 방법을 적어주고, 다시 <code>nix-build</code>를 돌려, 최종 성공하면 <code>result</code>란 폴더가 생긴다. 이 <code>result</code>는 닉스 store의 특정 버전의 심볼릭 링크다.</p>
 <h2 id="nix-env">nix-env</h2>
-<p>사용자 레벨에서 패키지를 설치할 수 있다. <code>nix-env</code>로 설치하면, 해당 사용자만 쓸 수 있다.</p>
-<p>패키지 검색 <code>nix search nixpkgs packagename</code>
-패키지 설치 <code>nix-env -iA packagename</code>
-설치 목록 <code>nix-env -q</code>
-패키지 제거 <code>nix-env -e packagename</code>
-패키지 업데이트 <code>nix-env -u</code></p>
+<p>사용자 레벨에서 패키지를 설치할 수 있습니다. <code>nix-env</code>로 설치하면, 해당 사용자만 쓸 수 있습니다.</p>
+<p>패키지 검색 <code>nix search nixpkgs packagename</code><br />
+패키지 설치 <code>nix-env -iA packagename</code><br />
+설치 목록 <code>nix-env -q</code><br />
+패키지 제거 <code>nix-env -e packagename</code><br />
+패키지 업데이트 <code>nix-env -u</code><br />
+</p>
 <h2 id="nix-overlay">nix-overlay</h2>
-<p>nixpkgs에 사용자 정의 패키지를 추가하는 방법
-<code>Overlay</code> 폴더를 추가하고, 여기에 <code>default.nix</code> 파일을 만들어 두면 <code>nix-shell</code>이나 <code>nix-build</code> 명령어를 실행할 때 Overlay를 참조합니다.</p>
-<p>Nixpkgs를 “확장”하거나 “변경”할 때 overlays를 사용한다.</p>
+<p>nixpkgs에 사용자 정의 패키지를 추가하는 방법입니다. <code>Overlay</code> 폴더를 추가하고, 여기에 <code>default.nix</code> 파일을 만들어 두면 <code>nix-shell</code>이나 <code>nix-build</code> 명령어를 실행할 때 <code>Overlay</code>를 참조합니다.</p>
+<p>Nixpkgs를 “확장”하거나 “변경”할 때 overlays를 사용합니다.</p>
 <h2 id="nix-channels">Nix Channels</h2>
 <p>닉스 패키지는 여러 Nix 채널을 통해 배포된다.</p>
 <p>현재 채널 목록 <code>nix-channel --list</code><br />
@@ -387,35 +382,30 @@ primary 채널 추가 <code>nix-channel --add https://nixos.org/channels/channel
 채널 업데이트 <code>nix-channel --update channel-alias</code><br />
 모든 채널 업데이트 <code>nix-channel --update</code></p>
 <h2 id="nix-store">Nix store</h2>
-<p>닉스가 빌드한 패키지들이 위치하는 곳. 읽기 전용이다. 보통 <code>/nix/store</code>.
-/nix/store/nawl092prjblbhvv16kxxbk6j9gkgcqm-git-2.14.1
-앱이름 앞에 해시는, 빌드할 때 써 먹은 모든 입력값(소스, 의존성 트리,컴파일 플래그 등)을 기반으로 만든 값이다.
-같은 버전을 여러 빌드에서 써먹으면, 한 번 설치된 것에 심볼릭 링크를 걸어서 쓰는 것 같다.</p>
+<p>닉스가 빌드한 패키지들이 위치하는 곳으로 읽기 전용입니다. 보통 <code>/nix/store</code>.<br />
+<code>/nix/store/nawl092prjblbhvv16kxxbk6j9gkgcqm-git-2.14.1</code> 이런 앱이름 앞의 해시는, 빌드할 때 써 먹은 모든 입력값(소스, 의존성 트리,컴파일 플래그 등)을 기반으로 만든 값입니다. 같은 버전을 여러 빌드에서 써먹으면, 한 번 설치된 것에 심볼릭 링크를 걸어서 씁니다.</p>
 <h2 id="profiles">Profiles</h2>
 <p>닉스 스토어 항목들을 프로필에 심볼릭 링크를 건다? 이를 이용해서 롤백한다?
 <code>/nix/var/nix/profiles</code></p>
-<h2 id="닉스os는-리눅스">닉스OS는 리눅스?</h2>
-<p>닉스OS는 리눅스이긴 한데, 다른 리눅스에스 돌아가는 바이너리가 그대로 돌지 않는다.
-다른 곳에서 컴파일된 바이너리가 의존하는 라이브러들이나 실행 파일, 환경등이 현재 닉스OS에는 없는 상태다. 특정 환경을 끌어다 쓰게 각 종 라이브러리 버전들을 심볼릭 링크를 걸고 있을텐데, 어떤 버전을 쓰는지 알 수 없으니 돌아가지 않는 것 같다.</p>
-<p>처음 아래 오류를 만났을 때 의아했다. 쉘 스크립트가 아닌데, 왜 <code>bash:</code> 오류가 나는 걸까 했다.</p>
+<h2 id="닉스os에서-리눅스-바이너리-사용하기">닉스OS에서 리눅스 바이너리 사용하기</h2>
+<p>닉스OS는 리눅스이긴 한데, 다른 리눅스에스 돌아가는 바이너리가 그대로 돌지 않습니다. 리눅스에서 컴파일된 바이너리가 의존하는 라이브러들이나 실행 파일, 환경 등이 현재 닉스OS에는 없는 상태입니다. 리눅스에 있는 일반적인 폴더 구조의 각 종 공유 라이브러리들을 쓰고 있을텐데, 닉스OS는 정확한 버전을 링크 걸지 않으면 돌아가지 않습니다.</p>
+<p>처음 아래 오류를 만났을 때 의아했다. 쉘 스크립트가 아닌데, 왜 <code>bash:</code> 오류가 나는지 의아했습니다.</p>
 <div class="sourceCode" id="cb28"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>[nix-shell:~/.local/bin]$ ./powermate </span>
 <span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>bash: ./powermate: cannot execute: required file not found</span></code></pre></div>
-<p>친절한 메시지가 나왔다면 좋았을텐데, 의미를 제대로 전달하는 메시지는 아니다.
+<p>친절한 메시지가 나왔다면 좋았을텐데, 의미를 제대로 전달하는 메시지는 아닙니다.
 <a href="https://blog.thalheim.io/2022/12/31/nix-ld-a-clean-solution-for-issues-with-pre-compiled-executables-on-nixos/" class="uri">https://blog.thalheim.io/2022/12/31/nix-ld-a-clean-solution-for-issues-with-pre-compiled-executables-on-nixos/</a></p>
-<p>리눅스가 바이너리를 실행하려면 쉘은 시스템에게 바이너리를 실행하라고 execve 시스템 콜을 한다.
-<code>strace -f ./powermate</code>로 무슨 일이 일어나고 있는지 들여다 볼 수 있다.
-<code>file ./powermate</code>로 실행 파일 정보를 자세히 볼 수 있다.</p>
-<p>대충 위 사이트를 요약하면, ELF실행 파일은 시스템과 소통하기 위한 라이브러리를 찾을 때 interpreter란 링크 로더를 쓰는데, 다른 리눅스에선 /lib64/ld-linux-x86-64.so.2(x86기반 64비트일 경우)에서 제공하는 걸 쓰는데, 닉스OS의 링크 로더link-loader는 특정 버전을 붙인 걸 쓴다.
-<a href="https://github.com/NixOS/patchelf">patchelf</a>로 어떤 버전을 쓰고 있는지 찾을 수 있다.</p>
+<p>리눅스가 바이너리를 실행하려면 쉘은 시스템에게 바이너리를 실행하라고 <code>execve</code> 시스템 콜을 합니다.</p>
+<p>※ <code>strace -f ./powermate</code>로 무슨 일이 일어나고 있는지 들여다 볼 수 있습니다.<br />
+※ <code>file ./powermate</code>로 실행 파일 정보를 자세히 볼 수 있습니다.</p>
+<p>위 사이트를 요약하면, ELF실행 파일은 시스템과 소통하기 위한 라이브러리를 찾을 때 interpreter란 링크 로더를 쓰는데, 다른 리눅스에선 <code>/lib64/ld-linux-x86-64.so.2</code>(x86기반 64비트일 경우)에서 제공하는 걸 쓰는데, 닉스OS의 링크 로더link-loader는 특정 버전을 붙인 걸 씁니다.</p>
+<p><a href="https://github.com/NixOS/patchelf">patchelf</a>로 어떤 버전을 쓰고 있는지 찾을 수 있습니다.</p>
 <div class="sourceCode" id="cb29"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>[lionhairdino@nixos:~/.local/bin]$ patchelf --print-interpreter ./powermate </span>
 <span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>/lib64/ld-linux-x86-64.so.2</span>
 <span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>[lionhairdino@nixos:~/.local/bin]$ patchelf --print-interpreter /run/current-system/sw/bin/ls</span>
 <span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>/nix/store/p9ysh5rk109gyjj3cn6jr54znvvlahfl-glibc-2.38-66/lib/ld-linux-x86-64.so.2</span></code></pre></div>
-<p>닉스OS에서 돌아가는 바이너리들은 특정 버전(여기서도 스냅샷이라 부르는지는 아직 잘 모르겠지만, 스택의 스냅샷 같은 것)의 링크 로더(여기선 interpreter)을 쓴다.
-위 사이트에선 autoPatchelfHook에 관한 얘기를 하는데, 이는 명령어가 아니라, 닉스OS에서 쓰는 함수인 듯 하다. 이 걸 실행해서 패치하는 건 줄 알았는데, 그렇게 동작하는 명령어는 없다. 일단 넘어가자.</p>
-<p>nix-ld로 미리 버전 지정이 없는 것들에 대한 대비를 해놓는 방법이 있고,
-바이너리내에 <code>/usr/bin</code> 같이 경로가 하드 코딩되어 있는 것들을 해결하려면 envfs를 쓸 수 있다고 한다.</p>
+<p>닉스OS에서 돌아가는 바이너리들은 특정 스냅샷 상태(보통 Nixpkgs의 특정 버전을 가리키는 것으로 stack의 스냅샷과 비슷합니다.)의 링크 로더(여기선 interpreter)을 씁니다. 예를 들어 일반적인 리눅스에선 <code>/lib64/ld-linux-x86-64.so.2</code> 인터프리터를 쓴다면, 닉스OS는 <code>/nix/store</code>에 있는 특정 버전의 스냅샷에 있는 인터프리터를 씁니다. 위 사이트에선 <code>autoPatchelfHook</code>에 관한 얘기를 하는데, 이는 명령어가 아니라, 닉스OS에서 쓰는 함수입니다. Nix의 빌드 환경에서 호출하는 것으로, 자동으로 링크 인터프리터와 동적 라이브러리 경로를 <code>/nix/store</code>의 버전을 가리키게 자동으로 패치해 줍니다. 쉡에서 직접 실행하는 명령어는 아닙니다.</p>
+<p><code>nix-ld</code>로 미리 버전 지정이 없는 것들에 대한 대비를 해놓는 방법이 있고, 바이너리내에 <code>/usr/bin</code> 같이 경로가 하드 코딩되어 있는 것들을 해결하려면 <code>envfs</code>를 쓸 수 있다고 합니다.</p>
 <h3 id="nix-ld">nix-ld</h3>
 <p>설정 파일에 아래를 넣으면 좀 더 친절한 에러 메시지가 나온다.
 <code>programs.nix-ld.enable = true;</code></p>
@@ -471,8 +461,8 @@ primary 채널 추가 <code>nix-channel --add https://nixos.org/channels/channel
 저널 로그 확인하니, nouveau 드라이버가 의심간다.
 <a href="https://nixos.wiki/wiki/Nvidia" class="uri">https://nixos.wiki/wiki/Nvidia</a>
 2024-05-17 nvidia 오피셜 드라이브로 바꾸고 문제는 사라진 것 같다.</p>
-<h1 id="flatpak">flatpak</h1>
-<h1 id="nix-home-manager">Nix home-manager</h1>
+<h2 id="flatpak">flatpak</h2>
+<h2 id="nix-home-manager">Nix home-manager</h2>
 <p>시스템 상태를 선언적으로, 즉 configuration.nix 파일에 모두 모아둘 수 있다면, 현실적으로 configuration.nix 파일만 들고 다니면, 똑같은 시스템을 “재현”할 수 있다. 하지만, DB에 들어 있는 설정에 필요한 정보들은 닉스 패키지 매니저로 관리할 수 없고, 사용자 디렉토리에 있는 dotfiles들도 그렇다. 완벽하게, 한 큐에 재현가능한 메커니즘을 만들기는 어렵다.</p>
 <p>사용자 디렉토리는, 시스템과 별개인 사용자 데이터들이 모인 중요한 디렉토리다. 이 디렉토리를 시스템과 묶어서 특정 스냅샷으로 되돌리거나 하면 난리 날 것이다.</p>
 <p>이런 위험을 신경쓰지 않고, 사용자 디렉토리에서 “시스템 설정에 필요한 정보”만 따로 잘 컨트롤하기 위해 home-manager를 도입했다.</p>
@@ -506,7 +496,7 @@ NixOS, macOS, 다른 리눅스 배포판에서 모두 돌아가야 할 설정 - 
 <p>여러 모듈에서 <code>program.packages</code>를 정의하고, 모듈들을 import하면 흩어져 있는 <code>program.packages</code>값을 모두 모아 하나의 리스트로 만든다.
 <a href="https://nixos-and-flakes.thiscute.world/nixos-with-flakes/modularize-the-configuration" class="uri">https://nixos-and-flakes.thiscute.world/nixos-with-flakes/modularize-the-configuration</a>
 <code>program.packages</code>만 이런 동작을 하는 게 아니라, 설정 파일을 여러 개로 쪼개어 관리할 수 있도록, 동일 항목이 있을 경우 모두 merge하는 동작을 한다. 이 동작이 없다면, 설정을 어떻게 쪼갤까 생각해 보면, 당연한 필요한 동작이다. 하지만, 언어적인 입장에선 애매해 보이는 동작이다.</p>
-<h1 id="기존-배포판들과-비교">기존 배포판들과 비교</h1>
+<h2 id="기존-배포판들과-비교">기존 배포판들과 비교</h2>
 <p><a href="https://wiki.nixos.org/wiki/Overview_of_the_NixOS_Linux_distribution" class="uri">https://wiki.nixos.org/wiki/Overview_of_the_NixOS_Linux_distribution</a>
 닉스OS는 Linux Standard Base 파일 시스템 구조를 따르지 않는다.</p>
 <p>LSB는</p>
@@ -537,11 +527,12 @@ NixOS, macOS, 다른 리눅스 배포판에서 모두 돌아가야 할 설정 - 
 <span id="cb38-13"><a href="#cb38-13" aria-hidden="true" tabindex="-1"></a># 특정 generation 삭제</span>
 <span id="cb38-14"><a href="#cb38-14" aria-hidden="true" tabindex="-1"></a>$ nix-env --profile /nix/var/nix/profiles/system --delete-generations 205 206</span></code></pre></div>
 <p><code>/etc/nixos/configuration.nix</code>의 <code>nix.gc</code> 옵션을 통해 자동 삭제automatic garbage collection를 지정할 수 있다.</p>
-<h1 id="최신-디스코드가-아니라-실행이-안되지만-nixpkgs에는-아직-최신판이-안-올라왔다">최신 디스코드가 아니라 실행이 안되지만, nixpkgs에는 아직 최신판이 안 올라왔다</h1>
-<p>nix-shell을 써서 임시로 설치하든가,
-nix-env로 사용자 환경에서만 설치하든가,
-overlays로 nixpkgs에 있는 discord를 덮어 씌우든가,</p>
-<h1 id="flakes가-활성화된-상태에서-default.nix만-있는-프로젝트-빌드">flakes가 활성화된 상태에서 default.nix만 있는 프로젝트 빌드</h1>
+<h2 id="최신-디스코드가-아직-nixpkgs에는-안-올라왔다">최신 디스코드가 아직 nixpkgs에는 안 올라왔다</h2>
+<p><code>nix-shell</code>을 써서 임시로 설치하든가,<br />
+<code>nix-env</code>로 사용자 환경에서만 설치하든가,<br />
+<code>overlays</code>로 <code>nixpkgs</code>에 있는 discord를 덮어 씌우든가 할 수 있다.</p>
+<h2 id="flakes가-활성화된-상태에서-default.nix만-있는-프로젝트-빌드">flakes가 활성화된 상태에서 default.nix만 있는 프로젝트 빌드</h2>
+<p>flakes가 활성화딘 상태인데, 찾은 패키지가 flakes는 제공하지 않고, <code>default.nix</code>만 제공할 경우</p>
 <pre><code>nix build --no-flake -f default.nix
 nix build -f '&lt;nixpkgs&gt;' &lt;패키지명&gt;</code></pre>
 

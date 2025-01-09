@@ -174,6 +174,38 @@
 <p>복잡한 내용을 좀 더 볼 마음이 생기신 분을 위해 덧 붙이면, <code>Effect</code> 합성(펑터 합성)은 <code>join</code>과 <code>return</code>이 알아서 모노이드로 만들어서, <code>a -&gt; m b</code> 함수들을 합성하는 동안 프로그래머가 신경 쓰지 않도록, 합성 중인 체인에서 필요할 때 갖다 쓸 수 있도록 컨텍스트에 담아 유지합니다. 모나드를 바인드<code>&gt;&gt;=</code>로 계속 엮을 때 하는 일입니다. <code>join</code>과 <code>&gt;&gt;=</code>의 차이는 <a href="../posts/2022-03-25-beforeMonad.html#하스켈에서-join-구현">여기</a>를 참조 하세요.</p>
 <p>아직 펑터, 엔도 펑터에 관한 얘기는 안했지만, 어슴푸레 “<a href="../posts/2022-03-25-beforeMonad.html">엔도 펑터의 모노이드</a>”란 말이, 무슨 말일지 보일 것만 같지 않나요? 물론, 여기 설명으로 모나드를 완전히 이해하는 건 불가능합니다. 당연히 “완전한” 이해를 돕는 글을 목표로 하지 않습니다. 수학 얘기를 최대한 빼내고, 비전공자 업자들이 모나드로 가는 길에, 볼만한 글이 되는 게 목표입니다.</p>
 <p>이 번에도 새로운 부리토를 투척한 것 같습니다. 최대한 코드와 수학을 가리기 위해 <code>with Effect</code>를 써 봤는데, 오히려 혼란스러워진 것 같습니다. 계속 하스켈을 만지다 보면, 또 아는 것이 생길테니, 포기하지 않고 2025년 크리스마스에 또 시도해 보겠습니다.</p>
+<h2 id="그래서-왜-모나드가-대단한-취급을-받지">그래서, 왜 모나드가 대단한 취급을 받지?</h2>
+<p>2025.1 추가<br />
+아래는 현재 글에서 이어지는 게 적당하지 않을 수 있습니다. 위에 있는 내용들을 이해한 후에, <code>Reader</code> 모나드를 만들면서 왜 모나드가 필요한가를 보기위해 추가해 놓은 설명인데, 그리 쉽게 풀어쓰지 못한 것 같습니다. 다른 자료들을 조금 더 보다가 돌아와서 보셔도 됩니다.</p>
+<p>위에 설명을 잘 보시면, Effect 처리는 사용자(프로그래머)가 딱히 신경 안쓰고 있습니다. <code>m</code>구조에 쓸 <code>&gt;&gt;=</code> 또는 <code>&gt;=&gt;</code> 또는 <code>join</code> 또는 <code>flatmap</code>, 그리고 <code>return</code> 또는 <code>pure</code> 등이 미리 준비되어 있고, 이를 <code>do</code> 표기법 같은 설탕 문법들과 섞어 쓰면 심지어 코드에 드러나지도 않습니다.</p>
+<h3 id="reader">Reader</h3>
+<p>예를 들어, 나중에 환경값 <code>env</code>를 받아야만 값이 되는 함수 <code>env -&gt; a</code>를 <code>Reader env a</code>라 정의하겠습니다. 위 설명을 그대로 적용하면,<br />
+<code>a -&gt; b</code> 함수와 <code>b -&gt; c</code> 함수를 조합하고 싶으면 <code>⋅</code>을 쓰면 되는데,<br />
+<code>a -&gt; Reader env b</code> 함수와 <code>b -&gt; Reader env c</code> 함수를 조합해야 되는 상황입니다.<br />
+<code>a</code>를 넘겨주면 <code>b</code>가 되면 편한데, <code>b</code>를 갖고 있긴 하지만, 추가로 <code>env</code>를 받아야만 <code>b</code>가 되는 함수를 돌려 줍니다.</p>
+<h3 id="join-1">join</h3>
+<p>먼저 <code>join</code>으로 접근해 보겠습니다.<br />
+“<code>env</code>를 받아야면 <code>a</code>가 되는 함수”를 값으로 보고, 이 값이 또 다시 <code>env</code>를 받아야만 되는 걸, <code>env</code>를 한 번만 받는 걸로 바꿀 수 있나 봐야 합니다. 타입으로 쓰면 <code>Reader env (Reader env a) -&gt; Reader env a</code>가 되도록 만들어야 합니다.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ot">join ::</span> <span class="dt">Reader</span> env (<span class="dt">Reader</span> env a) <span class="ot">-&gt;</span> <span class="dt">Reader</span> env a</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>join (<span class="dt">Reader</span> (<span class="dt">Reader</span> f)) <span class="ot">=</span> \env <span class="ot">-&gt;</span> (f env) env </span></code></pre></div>
+<p>바깥에서 <code>env</code>를 받아 안에 들어 있는 함수 <code>f</code>에 넣어 주면, 또 <code>env</code>를 받는 상태가 됩니다. 말로 풀면, <strong><em>env를 두 번 받아서 넣어 주는 것과, 한 번 받아서 두 번 써먹어도 차이가 없는 상태입니다.</em></strong> 말이 복잡합니다만, <code>∘</code> 까지 본 후 예시를 보면 좀 더 편하게 볼 수 있을 겁니다.</p>
+<h3 id="section">∘</h3>
+<p>이 번에는 <code>init -&gt; Reader env res1</code>와 <code>res1 -&gt; Reader env res2</code>를 조합해 보겠습니다.<br />
+<code>∘</code> 코드를 보기 전에, 안에 들어 있는 함수를 꺼내 올 수 있는 <code>runReader</code>를 넣어 타입 정의를 제대로 쓰면,</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">Reader</span> env a <span class="ot">=</span> { runReader (env <span class="ot">-&gt;</span> a) }</span></code></pre></div>
+<p>첫 번째 함수 <code>init -&gt; Reader env res1</code>에 <code>init</code>을 넣어 주면, <code>Reader env res1</code>이 되고, 여기에 <code>env</code>를 넣어 주면 <code>res1</code>이 됩니다. 아직은 복잡해 보이지만, 익숙해지면 지금은 모르는 <code>init</code>과 <code>env</code>를 외부에서 받도록 람다 헤드에 걸어 두면 됩니다.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>g ∘ f <span class="ot">=</span> \<span class="fu">init</span> <span class="ot">-&gt;</span> <span class="dt">Reader</span> <span class="op">$</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>            \env <span class="ot">-&gt;</span> runReader (g (   runReader (f <span class="fu">init</span>) env  )) env </span></code></pre></div>
+<p><code>runReader</code>가 보이게 다시 <code>join</code>을 구현하면,</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>join r <span class="ot">=</span> \env <span class="ot">-&gt;</span> runReader (runReader r env) env </span></code></pre></div>
+<p><code>∘</code>을 <code>join</code>을 써서 구현하려면, 펑터 <code>fmap</code>을 같이 쓰면 잘 보입니다.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fmap</span> f (<span class="dt">Reader</span> r) <span class="ot">=</span> <span class="dt">Reader</span> <span class="op">$</span> \env <span class="ot">-&gt;</span> f (r env)</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>g ∘ f <span class="ot">=</span> \env <span class="ot">-&gt;</span> join <span class="op">$</span> <span class="fu">fmap</span> g f <span class="op">$</span> env</span></code></pre></div>
+<h3 id="return-또는-pure">return 또는 pure</h3>
+<p><code>join</code>이나 <code>∘</code>이 준비 되었으니 이제 <code>return</code>을 준비 하면 됩니다.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">return</span> a <span class="ot">=</span> <span class="dt">Reader</span> <span class="op">$</span> \_ <span class="ot">-&gt;</span> a</span></code></pre></div>
+<p>이제 <code>join</code> 혹은 <code>∘</code>과 <code>return</code>을 이용해 조합을 할 수 있고, 지금 조합하는 함수는 모두 나중에 <code>env</code>를 받으면서 값이 됩니다. 조합하고 있는 함수들에 <code>env</code>를 넣어 주는 건 <code>∘</code>이 담당합니다. 마치 전역 상수처럼 <code>env</code>가 어디서 왔는지 신경쓰지 않고 쓰면 됩니다. 마치 물 밑에서 알아서 <code>env</code> 관련 작업을 하고 있고, 눈에는 <code>b -&gt; a ⋅ a -&gt; b</code>만 보이는 것처럼 됐습니다.</p>
+<p>순수 함수만 존재하면, 함수가 필요한 정보는 모두 인자를 통해 받아야만 해서, 매우 많은 인자가 필요하게 되고, 그 많은 인자를 매 번 넘기는 걸 신경쓰는 건 매우 까다롭습니다. 이 때, 일부 정보는 물밑에서 처리하게 하면, 겉으로는 우아해 보이는 척 할 수 있습니다. 그래서 우아해 보이려면 모나드는 필수입니다.</p>
 <figure>
 <img src="../images/effectAlgebra.png" alt="join" />
 <figcaption aria-hidden="true">join</figcaption>
