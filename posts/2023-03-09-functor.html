@@ -129,7 +129,7 @@
 <h2 id="컨테이너란-선입견에서-벗어나자">컨테이너란 선입견에서 벗어나자</h2>
 <p>펑터를 바라 볼 때, 컨테이너 비유로 바라보면 딱 맞아 떨어지는 경우들이 있습니다. 대표적으로 리스트 타입 같은 경우가 그렇습니다. 어떤 타입이 있고, 그 타입을 안에 담고 있는 리스트 타입과의 펑터를 예로 드는 경우가 많습니다. 제 생각은 이런 비유로 바라 보는 게, 펑터 다음 스텝(Applicatives functor, Monad)으로 갈 수록 조금씩 걸림돌이 됩니다. 컨테이너 메타포 없이 두 구조간의 매핑으로, 혹은 세세하게는 대상, 모피즘, 모피즘 합성을 다른 카테고리에 있는 것들과 매핑하는 걸 펑터로 기억하는 게 개인적으론 더 무리가 없었습니다.</p>
 <h2 id="하스켈에서-펑터-fmap">하스켈에서 펑터 fmap</h2>
-<p>아마도 functor mapping의 약자쯤 될 듯한데, 딱 관련 언급을 하는 자료는 못찾았습니다. 하스켈에서 펑터는 두 가지 작업을 합쳐 펑터를 표현합니다. (실제론, 펑터 규칙functor law을 만족하게끔 구현을 잘 해햐 하는데, 하스켈에서는 이 규칙을 따르는지는 컴파일러가 체크하는 건 아니고, 프로그래머가 잘 검증해야 합니다.</p>
+<p>아마도 functor mapping의 약자쯤 될 듯한데, 딱 관련 언급을 하는 자료는 못찾았습니다. 하스켈에서 펑터는 두 가지 작업을 합쳐 펑터를 표현합니다. (실제론, 펑터 규칙functor law을 만족하게끔 구현을 잘 해햐 하는데, 하스켈에서는 이 규칙을 따르는지는 컴파일러가 체크하는 건 아니고, 프로그래머가 잘 검증해야 합니다.)</p>
 <p><code>Int</code>를 <code>Maybe Int</code>와 매핑하는 걸 보면<br />
 (좀 더 풀어서 얘기하면, <code>Int</code>를 <code>Maybe</code>펑터를 이용해 <code>Maybe Int</code>에 매핑하는 걸 보면),<br />
 첫 째로 타입 생성자 <code>Maybe</code>로 <code>Int</code>를 매핑하고,<br />
@@ -144,8 +144,7 @@
 <p>펑터는 한 시스템을, 필요한 구조는 똑같이 갖고 있고, 전체 모양은 닮은 것들로 변환할 수 있는 도구입니다.</p>
 <p>같게 보는 건 아주 중요한 도구다란 상상에 깔려 있는 생각은, 수학은 무엇과 무엇이 같다, 혹은 같게 볼 수 있다는 데에서 여러 표현이 생겨난다는 것입니다. <code>x + 1</code> 과 <code>3</code>이 같다<code>=</code>에서 시작해서 <code>x</code>가 <code>2</code>인 것에 도달하는 것처럼요.</p>
 <h2 id="그-다음은">그 다음은?</h2>
-<p>두 펑터의 관계를 보는 예를 들어보겠습니다.<br />
-</p>
+<p>두 펑터의 관계를 보는 예를 들어보겠습니다.</p>
 <p>길이를 재는 자가 있는데, 눈금이 1cm로 촘촘한 자 <code>Dense</code>와, 눈금이 2cm로 듬성 듬성있는 자 <code>Sparse</code>가 있습니다. 우리가 필요한 정밀도가 2cm면 충분할 때는 <code>Sparse</code>로 재면 됩니다. <code>Dense</code>로 재면 3cm인데, <code>Sparse</code>로 재면 3cm는 잴 수가 없으니 큰 쪽 눈금을 읽는다고 정해서 4cm로 읽는 걸로 약속을 정하겠습니다. 어느 자로 쟀는지 표시하기 위해 <code>Int</code>에 타입 <code>Dense</code>, <code>Sparse</code>를 씌우면, 이 약속이 바로</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>펑터<span class="ot"> ::</span> <span class="dt">Int</span> <span class="op">-----&gt;</span> <span class="dt">Dense</span> <span class="dt">Int</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>펑터<span class="ot"> ::</span> <span class="dt">Int</span> <span class="op">-----&gt;</span> <span class="dt">Sparse</span> <span class="dt">Int</span></span></code></pre></div>
@@ -159,6 +158,89 @@
 <p>이 이야기는 모노이드, 모나드로 연결됩니다.</p>
 <p><code>Dense</code>도, <code>Sparse</code>도 <code>Int</code>를 담는 컨테이너로 읽는 분들도 있습니다. 저는 구조간 매핑으로 읽는 게 더 편합니다.</p>
 <p>다른 교재나 텍스트들을 그대로 번역하거나 옮겨온 것이 아닌 제 생각, 상상을 쓰는지라, 정답 지식이 아니라, 다른데서 볼 수 없었던 힌트를 얻는 정도 글이 됐으면 좋겠습니다.</p>
+<h2 id="실용에서-쓸-때-장점">실용에서 쓸 때 장점</h2>
+<p>2025.1 추가<br />
+(글을 짜임새 있게 쓰려면, 펑터로 설계하는 이유가 좀 더 명확하게 드러나는 설명이 먼저 들어가면 좋겠지만, 따로 글 쓰기 위한 고민을 한다기 보다, 그 때 그 때 생각이 나는 걸 옮기다보니, 지금 당장은 여러모로 부족한 글입니다.)</p>
+<p>하스켈에서 펑터의 힘은 대단합니다. 여기서는 이렇게 대단한 펑터의 전체 개념을 보자는 게 아니라, 어떤 대상을, 구조를 보존하는 비슷한 대상으로, 펑터로 매핑하게 되면 표현이 복잡해질텐데, 어떻게 이를 해결하는가를 보는 게 목표입니다.</p>
+<p><strong><em>“펑터 구조를 가진 값도, 마치 프리미티브 값처럼 보이게 하고 싶다.”</em></strong></p>
+<p>예를 집어 넣어 풀어서 얘기하면, <code>Some 1</code> 같은 펑터값도, <code>1</code>처럼 다루고 싶다는 뜻입니다.</p>
+<h3 id="겉모양">겉모양</h3>
+<p>여기서는 펑터 덕분에 코드 모양이 이뻐지는 것만 보겠습니다.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Some</span> a <span class="ot">=</span> <span class="dt">Some</span> a </span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">fmap</span> f (<span class="dt">Some</span> a) <span class="ot">=</span> <span class="dt">Some</span> (f a)</span></code></pre></div>
+<p>위와 같이, 특별히 하는 일 없는 가장 간단한 펑터를 정의했습니다. 아래와 같은 표현을 원한다고 가정하겠습니다.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span> <span class="op">+</span> <span class="dt">Some</span> <span class="dv">2</span></span></code></pre></div>
+<p><code>Some 2</code>를 그냥 <code>1</code>과 다름 없는 대상처럼 쓸 수 있으면 좋겠습니다. 하스켈에는 값에 함수를 적용할 때 <code>f a</code>,<code>f (a + a)</code>같이 쓰는 걸, <code>$</code> 연산자가 정의되어 있어, 괄호 없이 <code>f $ a</code>, <code>f $ a + a</code> 라고 쓸 수 있습니다.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>(<span class="dv">1</span> <span class="op">+</span>) <span class="op">$</span> <span class="dv">2</span></span></code></pre></div>
+<p>이와 비슷하게, 하스켈은 <code>fmap f v</code>를 중위 표현 <code>f &lt;$&gt; v</code>로 쓸 수 있게 <code>fmap</code>의 중위 연산자 <code>&lt;$&gt;</code>를 정의해 두었습니다.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>(<span class="dv">1</span> <span class="op">+</span>) <span class="op">&lt;$&gt;</span> <span class="dt">Some</span> <span class="dv">2</span></span></code></pre></div>
+<p>둘이 그럭 저럭 비슷해 보이지 않나요?</p>
+<p>이 번엔, 아래와 같이 인자가 하나 이상일 때는 어떻게 할까요?</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- 1 + 2 를 전위 형태로 쓰면</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>(<span class="op">+</span>) <span class="dv">1</span> <span class="dv">2</span> </span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- (Some 1) + (Some 2) 를 전위 형태로 쓰면</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>(<span class="op">+</span>) (<span class="dt">Some</span> <span class="dv">1</span>) (<span class="dt">Some</span> <span class="dv">2</span>)</span></code></pre></div>
+<p>이렇게 쓰면 좋은데, 이 건 펑터의 <code>fmap</code>(<code>&lt;$&gt;</code>) 만으론 해결하지 못하는 상황입니다. <code>+</code>를 <code>Some 1</code>에 적용하면, <code>Some (1+)</code>가 되어 적용할 함수도 <code>Some</code>안에 있게 됩니다. 이를 위해 아래 연산자를 정의합니다.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>(<span class="op">&lt;*&gt;</span>) (<span class="dt">Some</span> f) (<span class="dt">Some</span> a) <span class="ot">=</span> <span class="dt">Some</span> <span class="op">$</span> f a</span></code></pre></div>
+<p>이제 아래와 같이 쓸 수 있습니다. <code>($</code>는 Apply라 부르고, &lt;<span class="math inline">$&gt;는 Applicative Apply라 부릅니다.)
+```haskell
+((+) &lt;$</span>&gt; Some 1) &lt;*&gt; Some 2</p>
+<pre><code>괄호가 거슬립니다. 연산자 우선 순위를 잘 지정하면 괄호를 없앨 수 있습니다.
+```default
+ghci&gt; :info &lt;$&gt;
+(&lt;$&gt;) :: Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+infixl 4 &lt;$&gt;
+
+ghci&gt; :info &lt;*&gt;
+class Functor f =&gt; Applicative f where
+  (&lt;*&gt;) :: f (a -&gt; b) -&gt; f a -&gt; f b
+infixl 4 &lt;*&gt;</code></pre>
+<p><code>&lt;*&gt;</code> 메소드는 이미 Applicative 클래스의 인스턴스로 정의되어 있는데, 둘의 우선 순위를 보면, 둘 다 <code>infixl</code> 왼쪽 우선이며, 순위는 같습니다. 연속으로 두 연산자를 섞어서 쓰면, 특별히 괄호가 없어도 왼쪽 우선 결합이 된다는 얘기입니다. 그럼 최종 다음처럼 쓸 수 있습니다.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>(<span class="op">+</span>) <span class="op">&lt;$&gt;</span> <span class="dt">Some</span> <span class="dv">1</span> <span class="op">&lt;*&gt;</span> <span class="dt">Some</span> <span class="dv">2</span></span></code></pre></div>
+<p>이 정도면 <code>(+) 1 2</code>와 비슷해 보이지요? <code>&lt;*&gt;</code>가 정의되어 있는 구조는 따로 이름이 있습니다. <strong>Applicative Functor</strong>라 부릅니다.(<code>pure</code> 정의도 같이 가지고 있어야 합니다.)</p>
+<p>※ 모든 프리미티브 값들이 <code>Identity a</code>처럼 정의되어 있다 가정하면, <code>(+) 1 2</code>는<br />
+<code>(+) &lt;$&gt; Identity 1 &lt;*&gt; Identity 2</code>로 볼 수 있고, 이 경우만 특별히 <code>&lt;$&gt;</code>와 <code>&lt;*&gt;</code>, 그리고 <code>Identity</code>를 생략하고 <code>(+) 1 2</code>라고 쓴다고 상상할 수도 있습니다.</p>
+<p>전체 코드</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Some</span> a <span class="ot">=</span> <span class="dt">Some</span> a <span class="kw">deriving</span> <span class="dt">Show</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Functor</span> <span class="dt">Some</span> <span class="kw">where</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmap</span> f (<span class="dt">Some</span> a) <span class="ot">=</span> <span class="dt">Some</span> <span class="op">$</span> f a</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Applicative</span> <span class="dt">Some</span> <span class="kw">where</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  (<span class="op">&lt;*&gt;</span>) (<span class="dt">Some</span> f) (<span class="dt">Some</span> a) <span class="ot">=</span> <span class="dt">Some</span> <span class="op">$</span> f a</span></code></pre></div>
+<h3 id="나중에-작업이-필요하지만-당장은-평범한-값으로-취급하자">나중에 작업이 필요하지만, 당장은 평범한 값으로 취급하자</h3>
+<p>조금 더 복잡한 예시를 살펴 보겠습니다. 나중에 환율값을 받으면, 값으로 계산 될 <code>Dollar</code>란 타입을 정의해 보겠습니다. <code>Dollar c n</code>이라고만 가격을 붙여 놓으면, 외국인이 한국 들어와서 지불하는 돈은 <code>1200</code>원 일 때도 있고, <code>1400</code>원 일 때도 있고, 그 때 그 때 환율 <code>c</code>urrency에 따라 다르게 계산이 될 겁니다. 좀 억지스러운 예시지만, 1달러는 <code>d1 = \c -&gt; 1 * c</code>, 2달러는 <code>d2 = \c -&gt; 2 * c</code>, … 와 대응된다고 보겠습니다.</p>
+<p>전체 코드</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Dollar</span> c a <span class="ot">=</span> <span class="dt">Dollar</span> {<span class="ot"> runDollar ::</span> c <span class="ot">-&gt;</span> a }</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Functor</span> (<span class="dt">Dollar</span> c) <span class="kw">where</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmap</span> func (<span class="dt">Dollar</span> f) <span class="ot">=</span> <span class="dt">Dollar</span> <span class="op">$</span> func <span class="op">.</span> f</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Applicative</span> (<span class="dt">Dollar</span> c) <span class="kw">where</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  (<span class="op">&lt;*&gt;</span>) (<span class="dt">Dollar</span> func) (<span class="dt">Dollar</span> f) <span class="ot">=</span> <span class="dt">Dollar</span> <span class="op">$</span> \c <span class="ot">-&gt;</span> ((func c) <span class="op">.</span> f) c</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>d1 <span class="ot">=</span> \c <span class="ot">-&gt;</span> <span class="dv">1</span> <span class="op">*</span> c</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>d2 <span class="ot">=</span> \c <span class="ot">-&gt;</span> <span class="dv">2</span> <span class="op">*</span> c</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>d3 <span class="ot">=</span> \c <span class="ot">-&gt;</span> <span class="dv">3</span> <span class="op">*</span> c</span></code></pre></div>
+<p>※ 펑터와 Applicative 펑터의 인스턴스 정의를 보면, <code>c -&gt; a</code>에서 <code>a</code>에 함수를 적용하기 위해 <strong>함수 합성</strong>을 쓰고 있습니다. 함수 안으로 뚫고 들어가 안에 있는 <code>a</code>에 접근하는 방법은 따로 없습니다. <code>c -&gt; a</code>의 결과로 나올 <code>a</code>에 함수를 적용하는 방법뿐이 없습니다.</p>
+<p>값을 두 배로 올리기 위해 <code>(2 *) 1</code>로 쓰듯 <code>Dollar</code>를 쓰고 싶으면 펑터를 써서</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>(<span class="dv">2</span> <span class="op">*</span>) <span class="op">&lt;$&gt;</span> <span class="dt">Dollar</span> d1 </span></code></pre></div>
+<p>로 표현하면 되고, <code>1 + 2</code>와 비슷한 작업을 원하면 Applicative Functor를 써서</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>(<span class="op">+</span>) <span class="op">&lt;$&gt;</span> <span class="dt">Dollar</span> d1 <span class="op">&lt;*&gt;</span> <span class="dt">Dollar</span> d2</span></code></pre></div>
+<p>라 표현하면 됩니다. <code>1 (* 2) + 3 (* 4)</code>같은 복잡한 식은</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>(<span class="op">+</span>)   <span class="op">&lt;$&gt;</span>   ((<span class="op">*</span> <span class="dv">2</span>) <span class="op">&lt;$&gt;</span> <span class="dt">Dollar</span> d1)   <span class="op">&lt;*&gt;</span>   ((<span class="op">*</span> <span class="dv">4</span>) <span class="op">&lt;$&gt;</span> <span class="dt">Dollar</span> d3)</span></code></pre></div>
+<p>로 표현할 수 있습니다.</p>
+<p>눈여겨 봐야 할 것은, 이런 저런 복잡한 계산을 거친 후에도 최종 결과는 <code>Dollar</code> 타입입니다. <code>c</code>를 인자로 넘겨주기 전엔, 아직 값이 아닙니다. <strong><em>함수임에도 겉 코드 모양은 마치 보통의 값을 대하는 모양과 비슷합니다.</em></strong></p>
+<p>최종 환율 적용 값을 얻기 위해 <code>Dollar</code> 안에 들어 있는 함수를 빼내기 위해 <code>Dollar</code> 정의에 있는 <code>runDollar</code>를 이용합니다.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Dollar</span> a c <span class="ot">=</span> <span class="dt">Dollar</span> { runDollar (c <span class="ot">-&gt;</span> a) }</span></code></pre></div>
+<p>이제 복잡한 계산을 거쳐 나온 최종 <code>Dollar</code> 타입에 다음처럼 오늘의 환율(2025.1.11 약1,474원 - 너무 높네요)을 넣어주면, 몇 원인지 계산할 수 있습니다.</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>runDollar (</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  (<span class="op">+</span>)   <span class="op">&lt;$&gt;</span>   ((<span class="op">*</span> <span class="dv">2</span>) <span class="op">&lt;$&gt;</span> <span class="dt">Dollar</span> d1)   </span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>        <span class="op">&lt;*&gt;</span>   ((<span class="op">*</span> <span class="dv">4</span>) <span class="op">&lt;$&gt;</span> <span class="dt">Dollar</span> d3)</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>) <span class="dv">1474</span></span></code></pre></div>
+<p>현재 계산에 들어가 있는 모든 <code>Dollar</code> 타입은 전역 변수 (혹은 상수)를 참고해서 값을 계산하는 작업을 하고 있습니다.</p>
+<p>펑터 덕분에 복잡한 절차를 가지고 있을 수 있는 타입을 마치 프리미티브한 값처럼 다룰 수 있게 됐습니다. 하스켈을 공부한다면 위와 같은 모양을 매우 자주 보게 됩니다. 펑터 개념 전체에 대한 이야가기 아닙니다. 펑터가 왜 필요했고, 왜 그렇게 쓸 수 있는지 이해하는데 필요한, 힌트 일부를 줄 수 있는 글이 됐으면 좋겠습니다.</p>
+<p>복잡한 실 세계에서 바로 들어 올 정보들은 펑터로 가리고, 마치 순수한 값인 것처럼 로직을 설계할 수 있을 것만 같은 느낌이 들었다면, 성공입니다.</p>
 
 <div class="comment">
 <script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
