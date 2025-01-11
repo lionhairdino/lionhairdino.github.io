@@ -230,13 +230,13 @@
 <p>로 표현할 수 있습니다.</p>
 <p>눈여겨 봐야 할 것은, 이런 저런 복잡한 계산을 거친 후에도 최종 결과는 <code>Dollar</code> 타입입니다. <code>c</code>를 인자로 넘겨주기 전엔, 아직 값이 아닙니다. <strong><em>함수임에도 겉 코드 모양은 마치 보통의 값을 대하는 모양과 비슷합니다.</em></strong></p>
 <p>최종 환율 적용 값을 얻기 위해 <code>Dollar</code> 안에 들어 있는 함수를 빼내기 위해 <code>Dollar</code> 정의에 있는 <code>runDollar</code>를 이용합니다.</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Dollar</span> a c <span class="ot">=</span> <span class="dt">Dollar</span> { runDollar (c <span class="ot">-&gt;</span> a) }</span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Dollar</span> c a <span class="ot">=</span> <span class="dt">Dollar</span> {<span class="ot"> runDollar ::</span> c <span class="ot">-&gt;</span> a }</span></code></pre></div>
 <p>이제 복잡한 계산을 거쳐 나온 최종 <code>Dollar</code> 타입에 다음처럼 오늘의 환율(2025.1.11 약1,474원 - 너무 높네요)을 넣어주면, 몇 원인지 계산할 수 있습니다.</p>
 <div class="sourceCode" id="cb18"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>runDollar (</span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  (<span class="op">+</span>)   <span class="op">&lt;$&gt;</span>   ((<span class="op">*</span> <span class="dv">2</span>) <span class="op">&lt;$&gt;</span> <span class="dt">Dollar</span> d1)   </span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>        <span class="op">&lt;*&gt;</span>   ((<span class="op">*</span> <span class="dv">4</span>) <span class="op">&lt;$&gt;</span> <span class="dt">Dollar</span> d3)</span>
 <span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>) <span class="dv">1474</span></span></code></pre></div>
-<p>현재 계산에 들어가 있는 모든 <code>Dollar</code> 타입은 전역 변수 (혹은 상수)를 참고해서 값을 계산하는 작업을 하고 있습니다.</p>
+<p>현재 계산에 들어가 있는 모든 <code>Dollar</code> 타입은, 전역 변수 (혹은 상수)를 참고해서 값을 계산하는 작업을 하고 있습니다. 환율에 의존하는 값, 즉 함수를 보통의 값을 다룰 때와 비슷한 모양으로 다룰 수 있고, 환율을 모른 채로 모듈을 먼저 만들어 두었다가, 나중에 필요할 때 <code>run</code>할 수 있습니다.</p>
 <p>펑터 덕분에 복잡한 절차를 가지고 있을 수 있는 타입을 마치 프리미티브한 값처럼 다룰 수 있게 됐습니다. 하스켈을 공부한다면 위와 같은 모양을 매우 자주 보게 됩니다. 펑터 개념 전체에 대한 이야가기 아닙니다. 펑터가 왜 필요했고, 왜 그렇게 쓸 수 있는지 이해하는데 필요한, 힌트 일부를 줄 수 있는 글이 됐으면 좋겠습니다.</p>
 <p>복잡한 실 세계에서 바로 들어 올 정보들은 펑터로 가리고, 마치 순수한 값인 것처럼 로직을 설계할 수 있을 것만 같은 느낌이 들었다면, 성공입니다.</p>
 
