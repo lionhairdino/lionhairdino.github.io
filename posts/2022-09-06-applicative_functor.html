@@ -217,7 +217,7 @@ Functor, Applicatives, Monad를 하나의 계보에 올려 놓고,<br />
 등으로 표현하기도 하고,<br />
 “모나드가 꼭 있어야 되는 일이 아니고, Applicatives로 해결할 수도 있다”<br />
 등의 말이 종종 보입니다.</p>
-<p>물론, 하나의 타입이 Applicatives도, Monad도 구현되어 있다면, Applicatives가 할 수 있는 일은, Monad로 표현할 수 있긴 하나, 둘의 용도는 전혀 다른게 아닌가 합니다. 작업 체이닝을 할 때, Applicatives는 고정된 Effect 동작을 할 경우에 적합하고, Monad든 Effect가 변형되는 경우에 적합합니다. 그리고, 병렬로 동작해야 하는 경우 Monad 구현은 아예 없습니다. 이런 경우에는 Applicatives가 할 수 있는 일은 Monad가 다 할 수 있다고 말하는 게 맞지 않습니다.</p>
+<p>물론, 하나의 타입이 Applicatives도, Monad도 구현되어 있다면, Applicatives가 할 수 있는 일은, Monad로 표현할 수 있긴 하나, 둘의 용도는 전혀 다른게 아닌가 합니다. 작업 체이닝을 할 때, Applicatives는 고정된 Effect 동작을 할 경우에 적합하고, Monad는 Effect가 변형되는 경우에 적합합니다. 그리고, 병렬로 동작해야 하는 경우 Monad 구현은 아예 없습니다. 이런 경우에는 Applicatives가 할 수 있는 일은 Monad가 다 할 수 있다고 말하는 게 맞지 않습니다.</p>
 <p><a href="https://ghc.gitlab.haskell.org/ghc/doc/users_guide/exts/applicative_do.html">Applicative do-notation</a><br />
 <a href="https://www.staff.city.ac.uk/~ross/papers/Applicative.pdf">Functional Pearl. Applicative programming with effects - Conor Mcbride, Ross paterson</a><br />
 <a href="https://stackoverflow.com/questions/23342184/difference-between-monad-and-applicative-in-haskell">Difference between Monad and Applicative in Haskell(Stackoverflow)</a></p>
@@ -233,7 +233,7 @@ Functor, Applicatives, Monad를 하나의 계보에 올려 놓고,<br />
 <div class="sourceCode" id="cb16"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="ot">bind ::</span> m1 a <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> m2 b) <span class="ot">-&gt;</span> m3 b</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- (모두 똑같은 타입 `m`이지만 편의를 위해 숫자를 붙이겠습니다.)</span></span></code></pre></div>
 <p><code>bind</code>는 <code>m1 a</code>에서 <code>a</code>를 꺼내어 <code>f :: a -&gt; m2 b</code>를 적용하고, <code>m1</code>과 <code>m2</code>를 합처 <code>m3 b</code>를 반환합니다.<br />
-<code>f</code>의 서명을 보이는대로 해석하면 <code>m2</code>와 <code>b</code>는 <code>a</code>에 의존하고 있습니다. 그런데, *f 내부에서 a를 받아 (<code>\_ -&gt; ...</code> 로 받는 식으로 <code>m2</code>에 영향을 주지 않고 있다면) <code>m2</code>가 <code>return</code>이 만들었다든지 하는 trivial한 Effect만 가진다면, <code>bind</code>를 썼지만, 값이 Effect에 영향을 주지 않는 상태가 됩니다. <code>bind</code>를 썼기 때문에 반드시 값이 Effect에 영향을 미치고 있는 게 아니라, <code>f</code>가 어떤 동작을 하냐에 따라 다릅니다. Effect에 값이 영향을 미치면 안되는 Applicatives를 <code>bind</code>를 써서 구현할 수도 있다는 얘기입니다.</p>
+<code>f</code>의 서명을 보이는대로 해석하면 <code>m2</code>와 <code>b</code>는 <code>a</code>에 의존하고 있습니다. 그런데, <code>f</code> 내부에서 <code>a</code>를 받아 (<code>\_ -&gt; ...</code> 로 받는 식으로 <code>m2</code>에 영향을 주지 않고 있다면) <code>m2</code>가 <code>return</code>이 만들었다든지 하는 trivial한 Effect만 가진다면, <code>bind</code>를 썼지만, 값이 Effect에 영향을 주지 않는 상태가 됩니다. <code>bind</code>를 썼기 때문에 반드시 값이 Effect에 영향을 미치고 있는 게 아니라, <code>f</code>가 어떤 동작을 하냐에 따라 다릅니다. Effect에 값이 영향을 미치면 안되는 Applicatives를 <code>bind</code>를 써서 구현할 수도 있다는 얘기입니다.</p>
 <p>State 모나드에서 <code>bind</code>로 <code>&lt;*&gt;</code>를 구현하는 걸 살펴 보겠습니다.</p>
 <div class="sourceCode" id="cb17"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- State의 &lt;*&gt;</span></span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="dt">StateT</span> mf <span class="op">&lt;*&gt;</span> <span class="dt">StateT</span> mx <span class="ot">=</span> <span class="dt">StateT</span> <span class="op">$</span> \ s <span class="ot">-&gt;</span> <span class="kw">do</span></span>

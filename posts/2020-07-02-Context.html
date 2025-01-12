@@ -86,7 +86,7 @@
 </div>
 
 <h2 id="컨텍스트">컨텍스트</h2>
-<p>맥락같이 추상적인 말 말고, 실제 코드에서 드러나는 모양을 보면, <em>어떤 동작을 할 때 반드시 실행되는 코드</em>를 말합니다. 같은 타입의 동작을 여러번 연결 하면 여러 번 실행됩니다. 보통 효과가 극적으로 나타나는 건 이렇게 연결, 연결할 때입니다.</p>
+<p>맥락같이 추상적인 말 말고, 실제 코드에서 드러나는 모양을 보면, <em>어떤 동작을 할 때 반드시 실행되는 코드</em>를 말합니다. 같은 타입의 동작을 여러번 연결 하면 여러 번 실행됩니다. 보통 효과가 극적으로 나타나는 건 이렇게 연결, 연결할 때입니다. 타입과 잘 설계된 구조로 프로그래머 눈에 잘 안띄게 돌아가는 경우가 많습니다.</p>
 <h2 id="applicative-functor">Applicative functor</h2>
 <div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> (<span class="dt">Functor</span> f) <span class="ot">=&gt;</span> <span class="dt">Applicative</span> f <span class="kw">where</span>  </span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ot">    pure ::</span> a <span class="ot">-&gt;</span> f a   <span class="co">-- f는 펑크터이므로 * -&gt; * 카인드를 받는다.</span></span>
@@ -114,18 +114,16 @@
 <code>map</code>과 <code>traverse</code>의 차이가 뭘까요?<br />
 ※ 하스켈의 작명 센스는 프로그래머와 그리 친해보이지 않는다는 의견이 종종 보이는데, <code>traverse</code>도 단어 뜻(가로지르다. 횡단하다.)만 보고 언뜻 알기는 어려워 보입니다.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- Traversal Maybe 인스턴스의 traverse 정의</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">traverse</span> f (<span class="dt">Just</span> a) <span class="ot">=</span> <span class="dt">Just</span> <span class="op">&lt;$&gt;</span> f a <span class="co">-- 또는 pure (Just) &lt;*&gt; f a</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>                                   <span class="co">-- 들어 온 값이 Just a인지 살펴봤는데, </span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>                                   <span class="co">-- 뒤에 또 한번 f a가 Just인지 &lt;$&gt;로 살펴 봅니다.</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>                                   <span class="co">-- &lt;$&gt;는 fmap의 중위infix 표현입니다.</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="fu">traverse</span> f <span class="dt">Nothing</span> <span class="ot">=</span> <span class="fu">pure</span> <span class="dt">Nothing</span></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="co">-- map 정의</span></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="fu">map</span> f (<span class="dt">Just</span> a) <span class="ot">=</span> <span class="dt">Just</span> (f a)</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="fu">map</span> f <span class="dt">Nothing</span> <span class="ot">=</span> <span class="dt">Nothing</span></span></code></pre></div>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- &lt;$&gt;는 fmap의 중위infix 표현입니다.</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="fu">traverse</span> f (<span class="dt">Just</span> a) <span class="ot">=</span> <span class="dt">Just</span> <span class="op">&lt;$&gt;</span> f a <span class="co">-- 또는 pure (Just) &lt;*&gt; f a</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="fu">traverse</span> f <span class="dt">Nothing</span> <span class="ot">=</span> <span class="fu">pure</span> <span class="dt">Nothing</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co">-- map 정의</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="fu">map</span> f (<span class="dt">Just</span> a) <span class="ot">=</span> <span class="dt">Just</span> <span class="op">$</span> f a</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="fu">map</span> f <span class="dt">Nothing</span> <span class="ot">=</span> <span class="dt">Nothing</span></span></code></pre></div>
 <p>둘 다 펑크터 안의 값에 함수를 적용하는 역할을 합니다. 단, 적용할 때 <code>map</code>은 기본 함수 적용이고, <code>traverse</code>는 <code>&lt;*&gt;</code>로 함수를 적용합니다. 무슨 차이가 있을까요? 이제 컨텍스트 개념을 알게 됐으니 간단히 이렇게 얘기하면 됩니다.</p>
-<p>“<code>map</code>은 컨텍스트 없이 함수를 적용하고, <code>traverse</code>는 <code>applicative</code>의 컨텍스트를 발현 시키고 함수를 적용한다.”</p>
-<p><code>applicative</code> 컨텍스트로 돌아갈 코드는, 타입에 따라 정의한 인스턴스에 있는 <code>&lt;*&gt;</code>의 구현체입니다</p>
+<p>“<code>map</code>은 컨텍스트 없이 함수를 적용하고, <code>traverse</code>는 Applicative의 컨텍스트를 발현 시키고 함수를 적용한다.”</p>
+<p>Applicative 컨텍스트로 돌아갈 코드는, 타입에 따라 정의한 인스턴스에 있는 <code>&lt;*&gt;</code>의 구현체입니다</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Applicative</span> [] <span class="kw">where</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pure</span> x    <span class="ot">=</span> [x]</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    fs <span class="op">&lt;*&gt;</span> xs <span class="ot">=</span> [f x <span class="op">|</span> f <span class="ot">&lt;-</span> fs, x <span class="ot">&lt;-</span> xs]</span></code></pre></div>
@@ -147,7 +145,7 @@
 <span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="ot">liftA2 ::</span> (a <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> c) <span class="ot">-&gt;</span> f a <span class="ot">-&gt;</span> f b <span class="ot">-&gt;</span> f c</span>
 <span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>liftA2 f x <span class="ot">=</span> (<span class="op">&lt;*&gt;</span>) (<span class="fu">fmap</span> f x)</span></code></pre></div>
 <p>리스트에 있는 모든 엘리먼트에 <code>f</code>를 적용하도록 되어 있는데, 엘리먼트 하나에 적용 후 <code>(:)</code>로 나머지와 붙일 때 <code>&lt;*&gt;</code>가 동작하고 있습니다. <code>f</code>의 결과 타입이 가진 컨텍스트가 발현됩니다.</p>
-<p><code>liftA2</code>를 이용한 <code>Travserable</code> 리스트 인스턴스는 좀 복잡해 보이는데, <code>liftA2</code>를 따라가면 <code>fmap</code>이 나옵니다. 리스트용 <code>traverse</code>도 <code>fmap</code>으로 갈래 길을 만들고 있는 겁니다.</p>
+<p><code>liftA2</code>를 이용한 <code>Traversable</code> 리스트 인스턴스는 좀 복잡해 보이는데, <code>liftA2</code>를 따라가면 <code>fmap</code>이 나옵니다. 리스트용 <code>traverse</code>도 <code>fmap</code>으로 갈래 길을 만들고 있는 겁니다.</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="kw">let</span> evenFilter <span class="ot">=</span> (\a <span class="ot">-&gt;</span> <span class="kw">if</span> <span class="fu">even</span> a <span class="kw">then</span> <span class="dt">Just</span> (a<span class="op">*</span>a) <span class="kw">else</span> <span class="dt">Nothing</span>)</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="fu">map</span> evenFilter [<span class="dv">2</span>,<span class="dv">4</span>,<span class="dv">6</span>] <span class="co">-- [Just 4,Just 16,Just 36]</span></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="fu">map</span> evenFilter [<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>] <span class="co">-- [Nothing,Just 4,Nothing]</span></span>
@@ -158,11 +156,10 @@
 <div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Nothing</span> <span class="op">&lt;*&gt;</span> <span class="fu">traverse</span> f xs </span></code></pre></div>
 <p><code>Maybe</code>용 인스턴스의 <code>&lt;*&gt;</code> 정의대로 위 결과값은 오른 쪽 <code>traverse...</code> 를 실행할 필요 없이 그냥 <code>Nothing</code>입니다.</p>
 <p>그래서 <code>traverse</code>로 적용할 때는 하나라도 결과가 <code>Nothing</code>이면 전체 결과값이 <code>Nothing</code>입니다.</p>
-<p>조금 복잡하긴 한데, <em>“<code>&lt;*&gt;</code>로 적용한다”</em>란 말은 <em>“컨텍스트 코드를 동작시킨 후 적용하겠군”</em> 이라고 읽으면 됩니다. <code>evenFilter</code>를 먹인 후 값들을 묶어 “리스트로 만들려고 할 때 <code>Maybe</code>의 컨텍스트가 동작한다”가 <code>map</code>과는 다른 <code>traverse</code>의 동작입니다.</p>
-<p>단순 연결만 하려면 함수 컴포지션 <code>(.)</code>을 쓰면 되고, 컴포지션할 때 어떤 동작을 항상 하게 하려면 <code>(.)</code>를 새로 만들면 됩니다.<br />
-단순 인자를 넘길 땐 <code>(공백)</code>을 쓰면 되지만, 인자를 넘길 때 어떤 동작(펑크터에서 꺼낸다거나…)을 항상 하게 하려면 새로 만들면 됩니다.</p>
+<p>조금 복잡하긴 한데, *“&lt;<em>&gt;로 적용한다”</em>란 말은 <em>”컨텍스트 코드를 동작시킨 후 적용하겠군”</em> 이라고 읽으면 됩니다. <code>evenFilter</code>를 먹인 후 값들을 묶어”리스트로 만들려고 할 때 <code>Maybe</code>의 컨텍스트가 동작한다”가 <code>map</code>과는 다른 <code>traverse</code>의 동작입니다.</p>
+<p>단순 연결만 하려면 함수 컴포지션 <code>(.)</code>을 쓰면 되고, 컴포지션할 때 어떤 동작을 항상 하게 하려면 <code>(.)</code>를 새로 만들면 됩니다. 단순 인자를 넘길 땐 <code>(공백)</code>을 쓰면 되지만, 인자를 넘길 때 어떤 동작(펑크터에서 꺼낸다거나…)을 항상 하게 하려면 <code>apply</code>를 새로 만들면 됩니다.</p>
 <p>그리고, <code>map</code>은 펑크터가 하나 등장하고 <code>Traversable</code>엔 펑크터가 두 개가 등장합니다.</p>
-<p><em>당연한 얘긴데 <code>&lt;*&gt;</code>로 묶으면 <code>&lt;*&gt;</code>의 코드가 실행됩니다.</em></p>
+<p><em>당연한 얘긴데 &lt;</em>&gt;로 묶으면 &lt;<em>&gt;의 코드가 실행됩니다.</em></p>
 <p>2021.7.31 추가</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Control.Concurrent.STM</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -232,6 +229,25 @@
 2022.6 새로 올린 <a href="../posts/2022-09-06-applicative_functor.html">Applicative Functor와 Monad 차이</a>글을 참고하세요.</p>
 </blockquote>
 <p>모나드는 <a href="../posts/2022-03-25-beforeMonad.html">모나드, 같음</a> 글을 참고하세요.</p>
+<h2 id="traverse를-말로-설명하면">traverse를 말로 설명하면</h2>
+<p>2025.1 추가<br />
+Traversable 동작은 아는데, 직관적인 느낌이 덜 와, 좀 더 고민 중입니다.</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Just</span>  <span class="op">$</span>  [<span class="dv">1</span>]은 <span class="dt">Just</span> [<span class="dv">1</span>]이고,</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="dt">Just</span> <span class="op">&lt;$&gt;</span> [<span class="dv">1</span>]은 [<span class="dt">Just</span> <span class="dv">1</span>]입니다<span class="op">.</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="fu">fmap</span>     <span class="dt">Just</span> [<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>]은 [<span class="dt">Just</span> <span class="dv">1</span>, <span class="dt">Just</span> <span class="dv">2</span>, <span class="dt">Just3</span>]</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="fu">traverse</span> <span class="dt">Just</span> [<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>]은 <span class="dt">Just</span> [<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>]</span></code></pre></div>
+<p><code>map</code>은 원래 있던 펑터 구조 안에 있는 값에, 새로운 펑터 구조를 만들어내는 함수를 적용하면, 기존 펑터 구조 안에 새 펑터가 놓이게 됩니다. 반대로 <code>traverse</code>는 새 펑터안에 기존 펑터가 놓이게 됩니다. 하지만, <strong>기존 펑터 구조를 그대로 새 펑터 안으로 가져 가는 것이 아니라, 새 펑터 구조를 대상으로 다시 기존 펑터 구조를 만들어 냅니다.</strong> 쓰면서도 말이 어렵습니다. 기존 펑터를 <code>리스트</code>, 새 펑터를 <code>Maybe</code>로 해서 정리해 보면, <strong>리스트 구조를 그대로 Maybe 안으로 가져 가는 것이 아니라, 리스트 원소들을 대상으로 다시 Maybe 구조를 만들어 냅니다.</strong></p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">traverse</span> f (x<span class="op">:</span>xs) <span class="ot">=</span> (<span class="op">:</span>) <span class="op">&lt;$&gt;</span> f x <span class="op">&lt;*&gt;</span> <span class="fu">traverse</span> f xs </span></code></pre></div>
+<p>원소 하나 <code>x</code>를 꺼내 <code>Just</code>를 적용하면, 새로운 컨텍스트에 놓인 <code>Just x</code>가 만들어지고, 이 안에 있는 <code>x</code>에 <code>(:) ...</code>을 적용합니다. 만일 한 번이라도 <code>Nothing</code>을 만나면, 더 이상 진행하지 않고 결과값은 <code>Nothing</code>이 됩니다.<br />
+<code>&lt;$&gt;</code>와 <code>&lt;*&gt;</code>는 리스트 관련 인스턴스가 아니라 Applicative functor <code>f</code>의 <code>Functor</code>,<code>Traversable</code> 인스턴스에 있는 함수(메소드)들입니다. 리스트의 <code>Traversable</code> 인스턴스는 외부에서 받은 <code>f</code>를 원소 각 각에 <strong>적용</strong>하며, <code>f</code> 결과 타입의 <code>&lt;$&gt;</code>, <code>&lt;*&gt;</code>를 이용해서 <strong>다시 리스트를 만들어 냅니다.</strong></p>
+<p><strong><em>컨텍스트란 a값에 도달하려면 거쳐야 하는 절차입니다</em></strong>. 리스트 컨텍스트에 따라 각 원소들에 접근하며 새로운 컨텍스트를 만들어내고, 이 새로운 컨텍스트 안에서 다시 기존의 리스트 컨텍스트를 만들어 냅니다.</p>
+<p>리스트에 한정된 건 아니니, 좀 더 범용적으로 말을 바꾸면,</p>
+<p><strong><em>기존 컨텍스트에 있는 값에 새로운 컨텍스트를 만들어내는 함수를 적용하고, 새로 생긴 컨텍스트 안에서 다시 기존 컨텍스트를 만드는 작업을 합니다</em></strong></p>
+<p>아직 위에 정리한 문장들이 마음에 들지 않는다면, 명확히 필요한 때를 몰라서 그럴 수 있습니다. 트리나 리스트 같은 여러 원소를 가진 것들(Traversable 인스턴스)에는, <strong>함수를 적용하려면 각 각의 원소들에 모두 적용한다는 컨텍스트</strong>를 가지고 있습니다. 이런 컨텍스트 안에 있는 각 각의 원소들에 <code>Maybe</code>, <code>IO</code>, <code>STM</code> 같은 새로운 컨텍스트를 만들어내는 함수를 적용해서, <code>Maybe</code>, <code>IO</code>, <code>STM</code> 컨텍스트 안에서 다시 리스트를 만들어 냅니다.</p>
+<p><code>[1,2,3]</code>이라는 입력값을 가져와, 이들 각 각을 가져와서 출력하는 <code>IO</code>액션 리스트 <code>[print 1, print 2, print 3]</code>를 원할 수도 있고, <code>print 1</code>, <code>print 2</code>, <code>print 3</code> 각각의 IO액션이 동작하길 원할 수도 있습니다.</p>
+<p><code>[1,2,3]</code>이라는 입력값을 가져와 <code>evenFilter :: Int -&gt; Maybe Int</code>를 적용해서 <code>[Nothing, Just 2, Nothing]</code>이라는 결과를 만들길 원할 수도 있고, 하나라도 <code>Nothing</code>이면 전체 결과가 <code>Nothing</code>이고 그렇지 않고 <code>[2,4,6]</code> 입력값을 가져왔다면 <code>Just [2,4,6]</code>을 원할 수도 있습니다. 두 개의 컨텍스트가 어떻게 돌고 있는지 읽어 낼 줄 알아야 합니다.</p>
 
 <div class="comment">
 <script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
