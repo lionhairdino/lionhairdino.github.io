@@ -74,7 +74,7 @@
                 <div style="display:inline-block;vertical-align: top;padding-top: 11px; padding-left: 2px;"><a href="https://discordapp.com/users/lionhairdino#7687"><img style="width:20px;border:none" src="../images/discord.svg"></a></div>
             </div>
             <div>
-                여기 글들은 일종의 질문입니다. 용어 선택도 학계, 업계에서 쓰는 걸로 되어 있지 않고, 틀린 내용이 있을 수도 있습니다.
+                여기 글들은 일종의 질문입니다. 용어 선택도 학계, 업계에서 쓰는 걸로 되어 있지 않고, 틀린 내용이 있을 수도 있습니다. 처음 여기 글을 보시는 분은 <a href="warning.html">주의문</a>을 꼭 먼저 읽어 보세요.
             </div>
         </div>
         <div class="js-toc-content">
@@ -155,9 +155,11 @@ Effect Computation과 Effect를 합치는 작업이 있어야 모나드인데, <
 <p>2022-12-17 추가<br />
 모나드는 <code>m a, (a -&gt; m b)</code>에서 <code>m</code> 두 개가 있는 게 보이고,<br />
 Applicatives는 <code>f a, f (a -&gt; b)</code>에서 <code>f</code> 두 개가 있는 게 보입니다.<br />
-최종 <code>m a</code>나 <code>f a</code>로 되려면, 어떻게든 두 개를 하나로 만드는 작업이 있어야 합니다.<br />
+</p>
+<p>최종 <code>m a</code>나 <code>f a</code>로 되려면, 어떻게든 두 개를 하나로 만드는 작업이 있어야 합니다.<br />
 모나드는 <code>join</code>에서 <code>m (m a)</code>가 나타나지만, Applicatives는 <code>f (f a)</code>가 보이지 않는 것으로 알았습니다. 하지만 Applicatives도 effect 두 개를 하나로 만드는 작업은 필요합니다. 꼭, 모나드의 <code>join</code>과 같은 동작을 해야 하는 것은 아닙니다. 모나드 인스턴스가 없는 Applicatives 타입도 <code>f (f a) -&gt; f a</code> 동작은 있습니다.<br />
-<code>join</code>과 <code>return</code>만 있으면 모나드입니다. 모나드 인스턴스가 없는 Applicatives는 <code>join</code>이 없다는 얘기지만, <code>f (f a) -&gt; f a</code>가 없다는 얘긴 아닙니다. 또 하나, 모나드의 바인드로 구현한 <code>ap</code>가 <code>(&lt;*&gt;)</code>로 돈다고, <code>(&lt;*&gt;)</code>가 모나딕한 작업을 하는 건 아닙니다. 다시 말해, <code>join</code>이 돈다고 반드시 모나딕 작업을 하는 것도 아닙니다.</p>
+</p>
+<p><code>join</code>과 <code>return</code>만 있으면 모나드입니다. 모나드 인스턴스가 없는 Applicatives는 <code>join</code>이 없다는 얘기지만, <code>f (f a) -&gt; f a</code>가 없다는 얘긴 아닙니다. 또 하나, 모나드의 바인드로 구현한 <code>ap</code>가 <code>(&lt;*&gt;)</code>로 돈다고, <code>(&lt;*&gt;)</code>가 모나딕한 작업을 하는 건 아닙니다. 다시 말해, <code>join</code>이 돈다고 반드시 모나딕 작업을 하는 것도 아닙니다.</p>
 <p><code>join</code>이 이전 계산값에 의존해서 다음 Effect가 변형되는 걸 표현하면, 보통 <code>a</code>에 <code>a -&gt; m ...</code>을 적용하는 모양으로 나타납니다. (반드시 꼭 이 모양이란 건 아니고, Computation만 들어가 있으면 되니 <code>m a</code>, <code>a -&gt; m b</code>, <code>(a -&gt; m b) -&gt; m b</code>… 얼마든지 다른 모양이 가능합니다. 개념을 말한다고 봐주세요.) 그런데, <code>a</code>에 <code>\_ -&gt; ...</code>를 넣어주면, <code>join</code>을 썼지만, 딱히 이전 값에 의존하는 동작이 나오지 않을 수도 있습니다. <code>join</code> 구현은 단순히 절차만 열어두었을 뿐이지, 어떤 함수를 넣어주냐에 따라 모나딕할 수도, 아닐 수도 있습니다.</p>
 <p><code>Just (+1)</code>에서 <code>(+1)</code>을 꺼내 <code>1</code>에 적용하려면,</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fmap</span> (\f <span class="ot">-&gt;</span> f <span class="op">$</span> <span class="dv">1</span>) (<span class="dt">Just</span> (<span class="op">+</span><span class="dv">1</span>))</span></code></pre></div>
@@ -200,7 +202,7 @@ Applicatives는 <code>f a, f (a -&gt; b)</code>에서 <code>f</code> 두 개가 
 <span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> [(\x <span class="ot">-&gt;</span> <span class="fu">replicate</span> x <span class="dv">1</span>)] <span class="op">&lt;*&gt;</span> [<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>]</span>
 <span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>[[<span class="dv">1</span>],[<span class="dv">1</span>,<span class="dv">1</span>],[<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>]]</span></code></pre></div>
-<p>위와 비슷하지만, <code>join</code>이 동작해서 <code>[[]]</code>를 <code>[]</code>로 만듭니다.</p>
+<p>위와 비슷하지만, 모나드는 <code>join</code>이 동작해서 <code>[[]]</code>를 <code>[]</code>로 만듭니다.</p>
 <div class="sourceCode" id="cb15"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Monad</span> [] <span class="kw">where</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    xs <span class="op">&gt;&gt;=</span> k <span class="ot">=</span> <span class="kw">case</span> xs <span class="kw">of</span></span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>        [] <span class="ot">-&gt;</span> []</span>
@@ -210,11 +212,11 @@ Applicatives는 <code>f a, f (a -&gt; b)</code>에서 <code>f</code> 두 개가 
 <span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>]</span></code></pre></div>
 <p>둘이 거의 비슷해 보입니다만,</p>
 <div class="sourceCode" id="cb16"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>(f<span class="op">:</span>fs') <span class="ot">-&gt;</span> <span class="fu">fmap</span> f xs <span class="op">++</span> (fs' <span class="op">&lt;*&gt;</span> xs)</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>(x<span class="op">:</span>xs') <span class="ot">-&gt;</span>       k x <span class="op">++</span> (xs' <span class="op">&gt;&gt;=</span> k)</span></code></pre></div>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>(x<span class="op">:</span>xs') <span class="ot">-&gt;</span>      k x  <span class="op">++</span> (xs' <span class="op">&gt;&gt;=</span> k)</span></code></pre></div>
 <p><code>fmap f xs</code>는 <code>fmap</code>이 있으니, <code>xs</code> <strong><em>구조는 그대로 유지</em></strong>한 채로 <code>f</code>를 적용합니다.<br />
 <code>k x</code>는 <strong><em>새로운 리스트를 생성</em></strong>합니다.</p>
-<p>리스트의 경우는 “구조를 유지한 채로 함수를 각 각의 원소들에 적용”하는 것과, “하나씩 꺼내 함수를 적용하고 다시 리스트로 만드는 게” 거의 결과가 같아 차이점이 눈에 잘 안 띌수 있습니다.</p>
-<p>다 자세히 살펴 보겠습니다.</p>
+<p>리스트의 경우는 “구조를 유지한 채로 함수를 각 각의 원소들에 적용”하는 것과, “하나씩 꺼내 함수를 적용하고 다시 리스트로 만든 결과”가 거의 같아 차이점이 눈에 잘 안 띌 수 있습니다.</p>
+<p>더 자세히 살펴 보겠습니다.</p>
 <h3 id="applicative-apply의-동작">Applicative apply의 동작</h3>
 <div class="sourceCode" id="cb17"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>[(<span class="op">+</span><span class="dv">1</span>), (<span class="op">*</span><span class="dv">10</span>)] <span class="op">&lt;*&gt;</span> [<span class="dv">2</span>,<span class="dv">3</span>]</span></code></pre></div>
 <ol type="1">
@@ -238,7 +240,7 @@ Applicatives는 <code>f a, f (a -&gt; b)</code>에서 <code>f</code> 두 개가 
 정수 <code>1</code>에 함수를 적용해서 나온 값이 <code>[]</code>,<code>[2]</code>,<code>[2,3,...]</code>일 때는 이펙트가 있는 경우입니다.</p>
 <p>이렇게 이펙트가 있는 값이 되어버린 경우 그냥 정수를 받던 함수에 넣어 줄 수가 없고, <strong>이펙트를 이해하는 함수</strong>가 받아서 처리하게 됩니다. 이 함수는 정해지지 않은 개수의 원소를 받을 수 있어야 합니다. 보통 모나드는 <strong>이펙트 값이 변할 수 있고, 더 인포멀하게는 이펙트가 변할 수 있다고</strong> 말하기도 하는데, 리스트에서 이펙트가 변했다 하면 뭐가 변했다는 걸까요? 여기서는 타입들의 이펙트 자체는 당연히 고정이고, <strong>이펙트 구조</strong>가 바뀐다고 말하는 게 적당하지 않나 상상 중입니다.</p>
 <p><code>Maybe</code>로 예를 들면, “<code>Just</code>인지 <code>Nothing</code>인지 확인한다”는 컨텍스트(이펙트)는 변하지 않지만, <code>a -&gt; Maybe b</code> 모나드 바인드 함수 결과는 <code>Just 1</code>, <code>Just 2</code>, <code>Nothing</code> 같은 결과값을 가질 수 있습니다. 이 걸 <code>a</code>에 따라 <strong>이펙트가 변했다</strong>고 말합니다. 다시 말해 결과는 <code>a</code>에 따라 <code>Just</code> 생성자를 써서 생성한 값이거나, <code>Nothing</code> 생성자로 생성한 값일 수 있습니다. 반면, Applicative는 <code>&lt;*&gt;</code>를 적용한 결과는 <code>Just</code>였던 값은 여전히 <code>Just</code>고, <code>Nothing</code>이었던 값은 여전히 <code>Nothing</code>입니다. 이펙트는 바뀌지 않았다고 할 수 있습니다.</p>
-<p>다시 돌아와서 리스트를 보면, 리스트의 <strong>이펙트 값</strong>은 <code>[]</code>생성자나, <code>(:)</code> 생성자로 생성한 <code>[]</code>, <code>[1]</code>, <code>[2,3,...]</code>등의 모양으로 원소수가 고정되지 않은 값을 <strong>이펙트 값</strong>으로 갖고 있습니다. Applicative <code>&lt;*&gt;</code>도 모나드도 바인드도 <strong>이펙트 값</strong>은 바꾸지만, Applicative는 처음에 인자로 들어왔던 리스트의 구조, 즉 리스트의 원소수는 바꾸지 않는 반면, 모나드는 원소의 수를 바꿀 수 있습니다.</p>
+<p>다시 돌아와서 리스트를 보면, 리스트의 <strong>이펙트 값</strong>은 <code>[]</code>생성자나, <code>(:)</code> 생성자로 생성한 <code>[]</code>, <code>[1]</code>, <code>[2,3,...]</code>등의 모양으로 원소 수가 고정되지 않은 값을 <strong>이펙트 값</strong>으로 갖고 있습니다. Applicative <code>&lt;*&gt;</code>도 모나드도 바인드도 <strong>이펙트 값</strong>은 바꾸지만, Applicative는 처음에 인자로 들어왔던 리스트의 구조, 즉 리스트의 원소 수는 바꾸지 않는 반면, 모나드는 원소의 수를 바꿀 수 있습니다.</p>
 <p>위에 예시에서 Applicative는 <code>[2,3]</code>의 구조를 유지하기 때문에, 함수 하나를 적용한 결과는 반드시 구조가 유지된 <code>[x,x]</code> 형태만 가능합니다. 구현을 보면 <code>fmap</code>이 돌고 있으니, 구조를 건드리지 않는다는 걸 금방 알 수 있습니다. 반면, 바인드는 다시 구조를 생성하고 있기 때문에 그런 제약이 없습니다.</p>
 <div class="sourceCode" id="cb19"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>[<span class="dv">2</span>,<span class="dv">3</span>] <span class="op">&gt;&gt;=</span> \x <span class="ot">-&gt;</span> <span class="kw">if</span> <span class="fu">even</span> x <span class="kw">then</span> [x<span class="op">+</span><span class="dv">1</span>, x<span class="op">*</span><span class="dv">10</span>] <span class="kw">else</span> [x<span class="op">+</span><span class="dv">1</span>]</span></code></pre></div>
 <ol type="1">
