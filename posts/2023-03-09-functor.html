@@ -175,7 +175,7 @@
 <p>이와 비슷하게, 하스켈은 <code>fmap f v</code>를 중위 표현 <code>f &lt;$&gt; v</code>로 쓸 수 있게 <code>fmap</code>의 중위 연산자 <code>&lt;$&gt;</code>를 정의해 두었습니다.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>(<span class="dv">1</span> <span class="op">+</span>) <span class="op">&lt;$&gt;</span> <span class="dt">Some</span> <span class="dv">2</span></span></code></pre></div>
 <p>둘이 그럭 저럭 비슷해 보이지 않나요?</p>
-<p>이 번엔, 아래와 같이 인자가 하나 이상일 때는 어떻게 할까요?</p>
+<p>이 번엔, 아래와 같이 인자가 둘 이상일 때는 어떻게 할까요?</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- 1 + 2 를 전위 형태로 쓰면</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>(<span class="op">+</span>) <span class="dv">1</span> <span class="dv">2</span> </span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- (Some 1) + (Some 2) 를 전위 형태로 쓰면</span></span>
@@ -229,7 +229,7 @@
 <div class="sourceCode" id="cb16"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>(<span class="op">+</span>)   <span class="op">&lt;$&gt;</span>   ((<span class="op">*</span> <span class="dv">2</span>) <span class="op">&lt;$&gt;</span> <span class="dt">Dollar</span> d1)   <span class="op">&lt;*&gt;</span>   ((<span class="op">*</span> <span class="dv">4</span>) <span class="op">&lt;$&gt;</span> <span class="dt">Dollar</span> d3)</span></code></pre></div>
 <p>로 표현할 수 있습니다.</p>
 <p>눈여겨 봐야 할 것은, 이런 저런 복잡한 계산을 거친 후에도 최종 결과는 <code>Dollar</code> 타입입니다. <code>c</code>를 인자로 넘겨주기 전엔, 아직 값이 아닙니다. <strong><em>함수임에도 겉 코드 모양은 마치 보통의 값을 대하는 모양과 비슷합니다.</em></strong></p>
-<p>최종 환율 적용 값을 얻기 위해 <code>Dollar</code> 안에 들어 있는 함수를 빼내기 위해 <code>Dollar</code> 정의에 있는 <code>runDollar</code>를 이용합니다.</p>
+<p>최종 환율 적용 값을 얻기 위해 <code>Dollar</code> 안에 들어 있는 함수에 접근하기 위해 <code>Dollar</code> 정의에 있는 <code>runDollar</code>를 이용합니다.</p>
 <div class="sourceCode" id="cb17"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Dollar</span> c a <span class="ot">=</span> <span class="dt">Dollar</span> {<span class="ot"> runDollar ::</span> c <span class="ot">-&gt;</span> a }</span></code></pre></div>
 <p>이제 복잡한 계산을 거쳐 나온 최종 <code>Dollar</code> 타입에 다음처럼 오늘의 환율(2025.1.11 약1,474원 - 너무 높네요)을 넣어주면, 몇 원인지 계산할 수 있습니다.</p>
 <div class="sourceCode" id="cb18"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>runDollar (</span>
