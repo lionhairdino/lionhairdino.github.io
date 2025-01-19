@@ -239,6 +239,29 @@
 <p>현재 계산에 들어가 있는 모든 <code>Dollar</code> 타입은, 전역 변수 (혹은 상수)를 참고해서 값을 계산하는 작업을 하고 있습니다. 환율에 의존하는 값, 즉 함수를 보통의 값을 다룰 때와 비슷한 모양으로 다룰 수 있고, 환율을 모른 채로 모듈을 먼저 만들어 두었다가, 나중에 필요할 때 <code>run</code>할 수 있습니다.</p>
 <p>펑터 덕분에 복잡한 절차를 가지고 있을 수 있는 타입을 마치 프리미티브한 값처럼 다룰 수 있게 됐습니다. 하스켈을 공부한다면 위와 같은 모양을 매우 자주 보게 됩니다. 펑터 개념 전체에 대한 이야가기 아닙니다. 펑터가 왜 필요했고, 왜 그렇게 쓸 수 있는지 이해하는데 필요한, 힌트 일부를 줄 수 있는 글이 됐으면 좋겠습니다.</p>
 <p>복잡한 실 세계에서 바로 들어 올 정보들은 펑터로 가리고, 마치 순수한 값인 것처럼 로직을 설계할 수 있을 것만 같은 느낌이 들었다면, 성공입니다.</p>
+<p>2025.1 추가</p>
+<h2 id="펑터로-변환하면-다시는-원래로-못-돌아와">펑터로 변환하면, 다시는 원래로 못 돌아와</h2>
+<p>※ 아래 나오는 숫자들은 모두 <code>Int</code>라 가정하겠습니다.<br />
+저도 “펑터 안에있는 값을 <strong>꺼내</strong>”라는 표현을 자주 쓰긴 하는데, 사실 펑터 안의 값은 꺼내서 단독으로 둘 수 없습니다. 무슨 말이냐 하면, <code>Int</code>를 <code>Maybe Int</code>로 바꿨다면, 이는 다시 <code>Int</code>로 돌아올 수 없습니다. 이런 의미를 살린다면 <strong>꺼낸다</strong>라는 의미는 맞지 않습니다. <code>Maybe Int</code>에 <code>f :: Int -&gt; Int</code>를 적용한다는 건, <strong>안에 있는 값에 접근</strong>해서 <code>f</code>를 적용한다거나, 펑터로 변환한 함수는 펑터 세계로 가버리고 못 돌아 온다는 상상이 더 어울립니다.</p>
+<p>함수를 현재 세계에 두고, 펑터 세계에 있는 값을 가져오는 것이 아니라,<br />
+함수를 펑터 세계로 보내버린다가 맞는 은유입니다.</p>
+<p><code>Just 1</code>에서 <code>1</code>을 꺼내올 수 있지 않냐라고 물을 수 있습니다. <strong><em>“항상 값에 접근할 때는 Nothing인지 검사해”라는 컨텍스트</em></strong>에 놓여 있는 <code>1</code>과 그냥 <code>1</code>은 같지 않습니다. 예를 들면 <code>Just 1</code>에서 <code>1</code>을 꺼내오는 장치를 만들었다면, 이 장치는 <code>Nothing</code>을 넣어 주면 먹통이 됩니다. 마치 이 장치는</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="ot">getJustVal ::</span> <span class="dt">Maybe</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>getJustVal (<span class="dt">Just</span> n) <span class="ot">=</span> n</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="co">--getJustVal Nothing = ?</span></span></code></pre></div>
+<p><code>Nothing</code> 패턴 매칭을 구현하지 않은 장치와 같습니다. 그럼, <code>Nothing</code> 패턴 매칭도 하면 되지 않냐라고 물을 수 있습니다. 만일 <code>Nothing</code> 처리를 구현한다면, 결과값은 <code>n</code>이거나 <code>Nothing</code>을 표시하는 어떤 값이 될 수 있어야만 합니다. 다시 말해, 또 다시 <code>Maybe</code> 컨텍스트에 놓이게 됩니다.</p>
+<p>그럼, <code>Just 1</code>이 가진 <code>1</code>이라는 정보를 어떻게 써먹지?</p>
+<p><code>Maybe</code> 컨텍스트 안에서 써먹으면 됩니다. 다시 <code>Int</code>로 돌아오는 것이 아닌 <code>Maybe</code> 동네에서 놀면 됩니다.</p>
+<p>함수들을 <code>fmap</code>으로 <code>Maybe</code>동네로 보내 실행했다 치고, 그래도 최종 결과로 어떻게든 <code>Int</code>를 받아내고 싶다는 생각이 들 수 있습니다. 예를 들어 화면에 <code>Int</code> 결과를 출력하고 싶다라고 생각할 수 있습니다. <code>print</code> 함수도 <code>Maybe</code>동네로 보내버리면 됩니다. 값이 의미를 갖는 순간은 함수와 만날 때로 (눈으로 본다는 것도 어떤 함수가 돈다는 얘기입니다.), 이 함수들을 모두 컨텍스트로 보내 해결합니다.</p>
+<p>끝으로 구체적 예를 들어 보겠습니다.</p>
+<p><code>Just 1</code>과 <code>2</code>를 더하고 싶다.</p>
+<p>이렇게 <code>Maybe Int</code>와 <code>Int</code>를 더하고 싶다고 생각할 수 있습니다.</p>
+<p><code>fmap</code>을 이용해 <code>(+2)</code>함수를 <code>Maybe</code>동네로 보낸다고 보거나,</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fmap</span> (<span class="op">+</span><span class="dv">2</span>) (<span class="dt">Just</span> <span class="dv">1</span>)</span></code></pre></div>
+<p><code>(+)</code>를 <code>Maybe</code>동네로 보내고, <code>2</code>도 <code>Maybe</code> 동네로 보내서 해결한다고 볼 수 있습니다.</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>(<span class="op">+</span>) <span class="op">&lt;$&gt;</span> <span class="dt">Just</span> <span class="dv">1</span> <span class="op">&lt;*&gt;</span> <span class="fu">pure</span> <span class="dv">2</span></span></code></pre></div>
+<p>열심히 고민해서 작성한 글이긴 하지만, 처음 개념을 보는 분들이 이해하가 편하진 않을 것 같습니다. 좀 더 선명하게 설명할 방법이 떠오르면 또 추가하도록 하겠습니다. 여튼, 알수록</p>
+<p><strong><em>펑터는 대단한 개념입니다.</em></strong></p>
 
 <div class="comment">
 <script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
