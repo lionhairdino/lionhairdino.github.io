@@ -687,41 +687,40 @@ A. <code>(&gt;&gt;&gt;)</code>를 “자유”롭게 만들 수 있는 건 아�
 <span id="cb83-26"><a href="#cb83-26" aria-hidden="true" tabindex="-1"></a><span class="ot">  (+++) ::</span> arr a b <span class="ot">-&gt;</span> arr c d <span class="ot">-&gt;</span> arr (<span class="dt">Either</span> a c) (<span class="dt">Either</span> b d) </span>
 <span id="cb83-27"><a href="#cb83-27" aria-hidden="true" tabindex="-1"></a>  f <span class="op">+++</span> g <span class="ot">=</span> left f <span class="op">&gt;&gt;&gt;</span> right g</span>
 <span id="cb83-28"><a href="#cb83-28" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb83-29"><a href="#cb83-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb83-30"><a href="#cb83-30" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Arrow</span> (<span class="ot">-&gt;</span>) <span class="kw">where</span></span>
-<span id="cb83-31"><a href="#cb83-31" aria-hidden="true" tabindex="-1"></a>  arr <span class="ot">=</span> <span class="fu">id</span></span>
-<span id="cb83-32"><a href="#cb83-32" aria-hidden="true" tabindex="-1"></a>  (<span class="op">&gt;&gt;&gt;</span>) <span class="ot">=</span> <span class="fu">flip</span> (<span class="op">.</span>)</span>
-<span id="cb83-33"><a href="#cb83-33" aria-hidden="true" tabindex="-1"></a>  (f <span class="op">&amp;&amp;&amp;</span> g) a <span class="ot">=</span> (f a, g a)</span>
-<span id="cb83-34"><a href="#cb83-34" aria-hidden="true" tabindex="-1"></a>  first f (a,c) <span class="ot">=</span>  (f a,c) </span>
-<span id="cb83-35"><a href="#cb83-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb83-36"><a href="#cb83-36" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">SF</span> a b <span class="ot">=</span> <span class="dt">SF</span> {<span class="ot"> runSF ::</span> [a] <span class="ot">-&gt;</span> [b] }</span>
-<span id="cb83-37"><a href="#cb83-37" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb83-38"><a href="#cb83-38" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Arrow</span> <span class="dt">SF</span> <span class="kw">where</span></span>
-<span id="cb83-39"><a href="#cb83-39" aria-hidden="true" tabindex="-1"></a>  arr f <span class="ot">=</span> <span class="dt">SF</span> (<span class="fu">map</span> f)</span>
-<span id="cb83-40"><a href="#cb83-40" aria-hidden="true" tabindex="-1"></a>  <span class="dt">SF</span> f <span class="op">&gt;&gt;&gt;</span> <span class="dt">SF</span> g <span class="ot">=</span> <span class="dt">SF</span> (f <span class="op">&gt;&gt;&gt;</span> g)</span>
-<span id="cb83-41"><a href="#cb83-41" aria-hidden="true" tabindex="-1"></a>  <span class="dt">SF</span> f <span class="op">&amp;&amp;&amp;</span> <span class="dt">SF</span> g <span class="ot">=</span> <span class="dt">SF</span> (f <span class="op">&amp;&amp;&amp;</span> g <span class="op">&gt;&gt;&gt;</span> <span class="fu">uncurry</span> <span class="fu">zip</span>)</span>
-<span id="cb83-42"><a href="#cb83-42" aria-hidden="true" tabindex="-1"></a>  first (<span class="dt">SF</span> f) <span class="ot">=</span> <span class="dt">SF</span> (<span class="fu">unzip</span> <span class="op">&gt;&gt;&gt;</span> first f <span class="op">&gt;&gt;&gt;</span> <span class="fu">uncurry</span> <span class="fu">zip</span>)</span>
-<span id="cb83-43"><a href="#cb83-43" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb83-44"><a href="#cb83-44" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">ArrowChoice</span> (<span class="ot">-&gt;</span>) <span class="kw">where</span></span>
-<span id="cb83-45"><a href="#cb83-45" aria-hidden="true" tabindex="-1"></a>  left f (<span class="dt">Left</span> a) <span class="ot">=</span> <span class="dt">Left</span> (f a)</span>
-<span id="cb83-46"><a href="#cb83-46" aria-hidden="true" tabindex="-1"></a>  left f (<span class="dt">Right</span> b) <span class="ot">=</span> <span class="dt">Right</span> b</span>
-<span id="cb83-47"><a href="#cb83-47" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb83-48"><a href="#cb83-48" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">ArrowChoice</span> <span class="dt">SF</span> <span class="kw">where</span></span>
-<span id="cb83-49"><a href="#cb83-49" aria-hidden="true" tabindex="-1"></a>  left (<span class="dt">SF</span> f) <span class="ot">=</span> <span class="dt">SF</span> (\xs <span class="ot">-&gt;</span> combine xs (f [y <span class="op">|</span> <span class="dt">Left</span> y <span class="ot">&lt;-</span> xs]))</span>
-<span id="cb83-50"><a href="#cb83-50" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb83-51"><a href="#cb83-51" aria-hidden="true" tabindex="-1"></a><span class="co">-- 주의: Left (y:xs) 가 아니라, 첫 원소가 Left y</span></span>
-<span id="cb83-52"><a href="#cb83-52" aria-hidden="true" tabindex="-1"></a>combine (<span class="dt">Left</span> y<span class="op">:</span>xs) (z<span class="op">:</span>zs) <span class="ot">=</span> <span class="dt">Left</span> z<span class="op">:</span> combine xs zs</span>
-<span id="cb83-53"><a href="#cb83-53" aria-hidden="true" tabindex="-1"></a>combine (<span class="dt">Right</span> y<span class="op">:</span>xs) zs <span class="ot">=</span> <span class="dt">Right</span> y<span class="op">:</span> combine xs zs</span>
-<span id="cb83-54"><a href="#cb83-54" aria-hidden="true" tabindex="-1"></a>combine [] zs <span class="ot">=</span> []</span>
-<span id="cb83-55"><a href="#cb83-55" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb83-56"><a href="#cb83-56" aria-hidden="true" tabindex="-1"></a><span class="ot">listcase ::</span> [a] <span class="ot">-&gt;</span> <span class="dt">Either</span> () (a,[a])</span>
-<span id="cb83-57"><a href="#cb83-57" aria-hidden="true" tabindex="-1"></a>listcase [] <span class="ot">=</span> <span class="dt">Left</span> ()</span>
-<span id="cb83-58"><a href="#cb83-58" aria-hidden="true" tabindex="-1"></a>listcase (x<span class="op">:</span>xs) <span class="ot">=</span> <span class="dt">Right</span> (x, xs)</span>
-<span id="cb83-59"><a href="#cb83-59" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb83-60"><a href="#cb83-60" aria-hidden="true" tabindex="-1"></a>mapA f <span class="ot">=</span> arr listcase <span class="op">&gt;&gt;&gt;</span> </span>
-<span id="cb83-61"><a href="#cb83-61" aria-hidden="true" tabindex="-1"></a>         (arr (<span class="fu">const</span> []) <span class="op">|||</span> (f <span class="op">***</span> mapA f <span class="op">&gt;&gt;&gt;</span> arr (<span class="fu">uncurry</span> (<span class="op">:</span>))))</span>
-<span id="cb83-62"><a href="#cb83-62" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb83-63"><a href="#cb83-63" aria-hidden="true" tabindex="-1"></a>delay x <span class="ot">=</span> <span class="dt">SF</span> (<span class="fu">init</span> <span class="op">.</span> (x<span class="op">:</span>))</span></code></pre></div>
+<span id="cb83-29"><a href="#cb83-29" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Arrow</span> (<span class="ot">-&gt;</span>) <span class="kw">where</span></span>
+<span id="cb83-30"><a href="#cb83-30" aria-hidden="true" tabindex="-1"></a>  arr <span class="ot">=</span> <span class="fu">id</span></span>
+<span id="cb83-31"><a href="#cb83-31" aria-hidden="true" tabindex="-1"></a>  (<span class="op">&gt;&gt;&gt;</span>) <span class="ot">=</span> <span class="fu">flip</span> (<span class="op">.</span>)</span>
+<span id="cb83-32"><a href="#cb83-32" aria-hidden="true" tabindex="-1"></a>  (f <span class="op">&amp;&amp;&amp;</span> g) a <span class="ot">=</span> (f a, g a)</span>
+<span id="cb83-33"><a href="#cb83-33" aria-hidden="true" tabindex="-1"></a>  first f (a,c) <span class="ot">=</span>  (f a,c) </span>
+<span id="cb83-34"><a href="#cb83-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb83-35"><a href="#cb83-35" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">SF</span> a b <span class="ot">=</span> <span class="dt">SF</span> {<span class="ot"> runSF ::</span> [a] <span class="ot">-&gt;</span> [b] }</span>
+<span id="cb83-36"><a href="#cb83-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb83-37"><a href="#cb83-37" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Arrow</span> <span class="dt">SF</span> <span class="kw">where</span></span>
+<span id="cb83-38"><a href="#cb83-38" aria-hidden="true" tabindex="-1"></a>  arr f <span class="ot">=</span> <span class="dt">SF</span> (<span class="fu">map</span> f)</span>
+<span id="cb83-39"><a href="#cb83-39" aria-hidden="true" tabindex="-1"></a>  <span class="dt">SF</span> f <span class="op">&gt;&gt;&gt;</span> <span class="dt">SF</span> g <span class="ot">=</span> <span class="dt">SF</span> (f <span class="op">&gt;&gt;&gt;</span> g)</span>
+<span id="cb83-40"><a href="#cb83-40" aria-hidden="true" tabindex="-1"></a>  <span class="dt">SF</span> f <span class="op">&amp;&amp;&amp;</span> <span class="dt">SF</span> g <span class="ot">=</span> <span class="dt">SF</span> (f <span class="op">&amp;&amp;&amp;</span> g <span class="op">&gt;&gt;&gt;</span> <span class="fu">uncurry</span> <span class="fu">zip</span>)</span>
+<span id="cb83-41"><a href="#cb83-41" aria-hidden="true" tabindex="-1"></a>  first (<span class="dt">SF</span> f) <span class="ot">=</span> <span class="dt">SF</span> (<span class="fu">unzip</span> <span class="op">&gt;&gt;&gt;</span> first f <span class="op">&gt;&gt;&gt;</span> <span class="fu">uncurry</span> <span class="fu">zip</span>)</span>
+<span id="cb83-42"><a href="#cb83-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb83-43"><a href="#cb83-43" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">ArrowChoice</span> (<span class="ot">-&gt;</span>) <span class="kw">where</span></span>
+<span id="cb83-44"><a href="#cb83-44" aria-hidden="true" tabindex="-1"></a>  left f (<span class="dt">Left</span> a) <span class="ot">=</span> <span class="dt">Left</span> (f a)</span>
+<span id="cb83-45"><a href="#cb83-45" aria-hidden="true" tabindex="-1"></a>  left f (<span class="dt">Right</span> b) <span class="ot">=</span> <span class="dt">Right</span> b</span>
+<span id="cb83-46"><a href="#cb83-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb83-47"><a href="#cb83-47" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">ArrowChoice</span> <span class="dt">SF</span> <span class="kw">where</span></span>
+<span id="cb83-48"><a href="#cb83-48" aria-hidden="true" tabindex="-1"></a>  left (<span class="dt">SF</span> f) <span class="ot">=</span> <span class="dt">SF</span> (\xs <span class="ot">-&gt;</span> combine xs (f [y <span class="op">|</span> <span class="dt">Left</span> y <span class="ot">&lt;-</span> xs]))</span>
+<span id="cb83-49"><a href="#cb83-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb83-50"><a href="#cb83-50" aria-hidden="true" tabindex="-1"></a><span class="co">-- 주의: Left (y:xs) 가 아니라, 첫 원소가 Left y</span></span>
+<span id="cb83-51"><a href="#cb83-51" aria-hidden="true" tabindex="-1"></a>combine (<span class="dt">Left</span> y<span class="op">:</span>xs) (z<span class="op">:</span>zs) <span class="ot">=</span> <span class="dt">Left</span> z<span class="op">:</span> combine xs zs</span>
+<span id="cb83-52"><a href="#cb83-52" aria-hidden="true" tabindex="-1"></a>combine (<span class="dt">Right</span> y<span class="op">:</span>xs) zs <span class="ot">=</span> <span class="dt">Right</span> y<span class="op">:</span> combine xs zs</span>
+<span id="cb83-53"><a href="#cb83-53" aria-hidden="true" tabindex="-1"></a>combine [] zs <span class="ot">=</span> []</span>
+<span id="cb83-54"><a href="#cb83-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb83-55"><a href="#cb83-55" aria-hidden="true" tabindex="-1"></a><span class="ot">listcase ::</span> [a] <span class="ot">-&gt;</span> <span class="dt">Either</span> () (a,[a])</span>
+<span id="cb83-56"><a href="#cb83-56" aria-hidden="true" tabindex="-1"></a>listcase [] <span class="ot">=</span> <span class="dt">Left</span> ()</span>
+<span id="cb83-57"><a href="#cb83-57" aria-hidden="true" tabindex="-1"></a>listcase (x<span class="op">:</span>xs) <span class="ot">=</span> <span class="dt">Right</span> (x, xs)</span>
+<span id="cb83-58"><a href="#cb83-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb83-59"><a href="#cb83-59" aria-hidden="true" tabindex="-1"></a>mapA f <span class="ot">=</span> arr listcase <span class="op">&gt;&gt;&gt;</span> </span>
+<span id="cb83-60"><a href="#cb83-60" aria-hidden="true" tabindex="-1"></a>         (arr (<span class="fu">const</span> []) <span class="op">|||</span> (f <span class="op">***</span> mapA f <span class="op">&gt;&gt;&gt;</span> arr (<span class="fu">uncurry</span> (<span class="op">:</span>))))</span>
+<span id="cb83-61"><a href="#cb83-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb83-62"><a href="#cb83-62" aria-hidden="true" tabindex="-1"></a>delay x <span class="ot">=</span> <span class="dt">SF</span> (<span class="fu">init</span> <span class="op">.</span> (x<span class="op">:</span>))</span></code></pre></div>
 <h2 id="arrow-클래스">Arrow 클래스</h2>
 <p>모든 인스턴스가 Arrow 인터페이스를 다 구현할 수 있는 건 아니라서, 여러 클래스로 나뉘어져 있습니다.</p>
 
