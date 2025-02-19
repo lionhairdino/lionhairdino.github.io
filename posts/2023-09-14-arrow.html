@@ -105,6 +105,11 @@
 </ul>
 <p><a href="https://www.cse.chalmers.se/~rjmh/afp-arrows.pdf">Programming with Arrows - John hughes</a><br />
 위 텍스트를 읽으면서 가졌던 의문들과 알게된 답을 같이 적었습니다.</p>
+<ul>
+<li>모나드의 일반화? Arrow에 <code>join</code>이 있나?</li>
+<li><code>Arrow &gt;&gt;&gt; Arrow &gt;&gt;&gt; Arrow</code> 이런 식이면, 동적인 Arrow는?</li>
+<li>Arrow는 클로저를 안 쓰는데, 체인에서 각 단계의 결과를 개 별 접근하려면?</li>
+</ul>
 <h2 id="생각-스트레칭">생각 스트레칭</h2>
 <h3 id="타입이-할-수-있는-일검증-안된-혼자-상상입니다.">타입이 할 수 있는 일(검증 안된 혼자 상상입니다.)</h3>
 <p>수학이 강한 분들은, 아래 같은 얘기를 별로 안 좋아하는 경우가 있습니다. 너무 “인문학”스럽게 접근하는 걸로 보이나 봅니다. 전, 논리적으로 딱 맞아 떨어져도, 아래 같은 이해를 하지 못하면 현실을 모델링할 때 써먹질 못합니다. 여하튼, 그다지 환영 받는 얘기는 아니니, 적당히 한 귀로 흘리시면서 보세요.</p>
@@ -267,7 +272,7 @@
 <p>※ 모나드는 3개의 법칙만 있지만, Arrow는 20개가 있습니다. 여기에 Paterson이 추가한 것까지 합치면 27개입니다. 텍스트에서도 너무 정교한 설명말고 사용법 위주로 설명한다고 되어 있습니다.</p>
 <blockquote>
 <p><span class="citation" data-cites="재경">@재경</span> 님의 예시
-<span class="citation" data-cites="todo">@todo</span> 정리 중에 있습니다.</p>
+<span class="citation" data-cites="todo">@todo</span> 정리 중에 있습니다. 2025.2. 아직도 예시 중에 이해 못한 부분이 있습니다.</p>
 </blockquote>
 <h2 id="applicatives와-arrow-비교">Applicatives와 Arrow 비교</h2>
 <p><span class="citation" data-cites="todo">@todo</span></p>
@@ -721,8 +726,47 @@ A. <code>(&gt;&gt;&gt;)</code>를 “자유”롭게 만들 수 있는 건 아�
 <span id="cb83-60"><a href="#cb83-60" aria-hidden="true" tabindex="-1"></a>         (arr (<span class="fu">const</span> []) <span class="op">|||</span> (f <span class="op">***</span> mapA f <span class="op">&gt;&gt;&gt;</span> arr (<span class="fu">uncurry</span> (<span class="op">:</span>))))</span>
 <span id="cb83-61"><a href="#cb83-61" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb83-62"><a href="#cb83-62" aria-hidden="true" tabindex="-1"></a>delay x <span class="ot">=</span> <span class="dt">SF</span> (<span class="fu">init</span> <span class="op">.</span> (x<span class="op">:</span>))</span></code></pre></div>
-<h2 id="arrow-클래스">Arrow 클래스</h2>
-<p>모든 인스턴스가 Arrow 인터페이스를 다 구현할 수 있는 건 아니라서, 여러 클래스로 나뉘어져 있습니다.</p>
+<h2 id="고차-arrow">고차 Arrow</h2>
+<p>다른 Arrow를 입력으로 받는 Arrow를, 위에서 언급한 컴비네이터들만으론 만들 수 없다고 합니다.
+Q. 왜 그럴까요? 그냥 <code>arr (arr a, b) c</code> 라는 Arrow가 있을 수 없다는 말일까요?<br />
+Arrow가 되려면, 최소한 <code>arr</code>과 <code>first</code>를 만들 수 있어야 합니다.</p>
+<div class="sourceCode" id="cb84"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb84-1"><a href="#cb84-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">Category</span> cat <span class="kw">where</span></span>
+<span id="cb84-2"><a href="#cb84-2" aria-hidden="true" tabindex="-1"></a><span class="ot">  id ::</span> cat a a</span>
+<span id="cb84-3"><a href="#cb84-3" aria-hidden="true" tabindex="-1"></a><span class="ot">  (.) ::</span> cat b c <span class="ot">-&gt;</span> cat a b <span class="ot">-&gt;</span> cat a c</span>
+<span id="cb84-4"><a href="#cb84-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb84-5"><a href="#cb84-5" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">Category</span> arr <span class="ot">=&gt;</span> <span class="dt">Arrow</span> arr <span class="kw">where</span></span>
+<span id="cb84-6"><a href="#cb84-6" aria-hidden="true" tabindex="-1"></a><span class="ot">  arr ::</span> (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> arr a b</span>
+<span id="cb84-7"><a href="#cb84-7" aria-hidden="true" tabindex="-1"></a><span class="ot">  first ::</span> a b c <span class="ot">-&gt;</span> a (b,d) (c,d)</span></code></pre></div>
+<p><code>arr</code>메소드는 <code>(a -&gt; b)</code>를 <code>((arr a' a) -&gt; b)</code>쯤 될 것 같고,<br />
+<code>first</code>메소드는 <code>a (a b' c') c -&gt; a ((a b' c'), d) (c,d)</code>쯤 될텐데,<br />
+이들이 프리미티브한 요소들인데, 이들을 정의할 수 없다는 얘기일까요?</p>
+<p>지금은 답을 먼저 알고 있으니, 답에서 들어가 보겠습니다. <code>app</code>이 어떤식으로 쓰이는지를 보면 보일지도 모릅니다.</p>
+<div class="sourceCode" id="cb85"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb85-1"><a href="#cb85-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">Arrow</span> arr <span class="ot">=&gt;</span>  <span class="dt">ArrowApply</span> arr <span class="kw">where</span></span>
+<span id="cb85-2"><a href="#cb85-2" aria-hidden="true" tabindex="-1"></a><span class="ot">  app ::</span> arr (arr a b, a) b</span>
+<span id="cb85-3"><a href="#cb85-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb85-4"><a href="#cb85-4" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">ArrowApply</span> (<span class="ot">-&gt;</span>) <span class="kw">where</span></span>
+<span id="cb85-5"><a href="#cb85-5" aria-hidden="true" tabindex="-1"></a>  app (f, x) <span class="ot">=</span> f x</span>
+<span id="cb85-6"><a href="#cb85-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb85-7"><a href="#cb85-7" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Monad</span> m <span class="ot">=&gt;</span> <span class="dt">ArrowApply</span> (<span class="dt">Kleisli</span> m) <span class="kw">where</span></span>
+<span id="cb85-8"><a href="#cb85-8" aria-hidden="true" tabindex="-1"></a>  app <span class="ot">=</span> <span class="dt">Kleisli</span> (\(<span class="dt">Kleisli</span> f, x) <span class="ot">-&gt;</span> f x)</span></code></pre></div>
+<p><code>app</code>정의의 안 쪽을 보면 <code>arr a b</code>와 <code>a</code>를 가지고 있습니다.</p>
+<p><code>app</code>을 가지고 있는 Arrow는 모나드로 동작할 수 있습니다.</p>
+<div class="sourceCode" id="cb86"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb86-1"><a href="#cb86-1" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">ArrowMonad</span> arr a <span class="ot">=</span> <span class="dt">ArrowMonad</span> (arr () a)</span>
+<span id="cb86-2"><a href="#cb86-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb86-3"><a href="#cb86-3" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">ArrowApply</span> a <span class="ot">=&gt;</span> <span class="dt">Monad</span> (<span class="dt">ArrowMonad</span> a) <span class="kw">where</span></span>
+<span id="cb86-4"><a href="#cb86-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span> x <span class="ot">=</span> <span class="dt">ArrowMonad</span> (arr (<span class="fu">const</span> x))</span>
+<span id="cb86-5"><a href="#cb86-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">ArrowMonad</span> m <span class="op">&gt;&gt;=</span> f <span class="ot">=</span></span>
+<span id="cb86-6"><a href="#cb86-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">ArrowMonad</span> (    m </span>
+<span id="cb86-7"><a href="#cb86-7" aria-hidden="true" tabindex="-1"></a>                <span class="op">&gt;&gt;&gt;</span> arr (\x <span class="ot">-&gt;</span> <span class="kw">let</span> <span class="dt">ArrowMonad</span> h <span class="ot">=</span> f x <span class="kw">in</span> (h, ()))</span>
+<span id="cb86-8"><a href="#cb86-8" aria-hidden="true" tabindex="-1"></a>                                   <span class="co">------------</span></span>
+<span id="cb86-9"><a href="#cb86-9" aria-hidden="true" tabindex="-1"></a><span class="co">--                                 패턴 매칭으로 ArrowMonad를 하나 벗기고 있다.</span></span>
+<span id="cb86-10"><a href="#cb86-10" aria-hidden="true" tabindex="-1"></a>                <span class="op">&gt;&gt;&gt;</span> app)</span></code></pre></div>
+<p><code>app</code>은 그저, <code>(함수, 인자)</code>를 받아 적용시켜주는 uncurry된 <code>$</code>처럼 보입니다. 이런 함수가 뭐 그리 대단한 일을 해낼까요?</p>
+<p>애로우를 <code>ArrowMonad</code>로 감싸고, <code>ArrowMonad</code>를 모나드 인스턴스로 만들고 있습니다. 아무 애로우나 다 되는 건 아니고, <code>ArrowApply</code> 인스턴스인 경우만 됩니다. 바인드<code>&gt;&gt;=</code>는 이펙트를 <code>join</code>하는 동작이 있어야 합니다. <code>ArrowMonad</code>의 이펙트는 무엇이고, 어떤 모양으로 <code>join</code> 동작을 하고 있을까요?</p>
+<p>모나드는 동적으로 이펙트를 <strong>생성</strong>하는 <code>a -&gt; m b</code>라는 액션이 있습니다. 위 코드에도 <strong>동적</strong>으로 이펙트를 만드는 동작이 들어가 있을 겁니다. <code>f x</code>부분이 새로 <code>ArrowMonad</code>를 만들어 내고 있습니다.</p>
+<p>모나드의 바인드는 두 개의 인자를 받습니다. 하나는 이미 존재하는 이펙트를 포함한 값과, 다른 하나는, 새로운 이펙트를 만들어내는 함수로 이루어져 있습니다. 이펙트가 있는 세계에 있는 값에, 새로운 이펙트를 만들어내는 함수를 적용하면 이펙트가 생기고, 이를 기존의 이펙트와 묶어 하나로 만들면, 또 다시 이 값에 새로운 액션을 적용할 수 있습니다.</p>
+<p>지금까지 정의한 컴비네이터들은 튜플을 이용해서 병렬 계산을 하거나, 선택적인 계산을 위한 것들이었습니다. 바인드는 <code>m a</code>와, <code>m a</code>의 <code>a</code>에 적용할 <code>a -&gt; m b</code>를 받아서 작업을 합니다. 애로우 바인드도 이와 비슷하게, 첫 번째 애로우가 가진 값에, 두 번째 애로우를 적용apply하는 모양이 나올 거라 예상할 수는 있지만, 시원하게 이해가 되진 않습니다.</p>
+<p>예를 들어 <code>runSF</code>같은 것으로 한 번에 Arrow가 만들어낸 체인을 실행시킬 때, Arrow 속에 들어 있는 Arrow를 자연스레 해석되게 하는 방법이 필요합니다. 안에 있는 Arrow를 꺼내어, 적용할 값과 튜플로 만들어 두면, <code>app</code>이 받아서 실행한다는 아이디어인 것 같습니다.</p>
 
 <div class="comment">
 <script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>

@@ -109,86 +109,165 @@
 </p>
 <h2 id="proc">proc</h2>
 <p>arrow 확장을 쓰는 표현에서 <code>proc</code>는 lambda abstraction에서 <code>lambda</code> 같은 역할을 합니다. <code>proc</code>는 함수가 아니라, 새로운 키워드입니다. proc 전체를 프로시저, 혹은 arrow abstraction이라 부릅니다.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a> \   x <span class="ot">-&gt;</span>      x<span class="op">+</span><span class="dv">1</span>    <span class="co">-- 람다식과 비교</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>proc x <span class="ot">-&gt;</span> f <span class="op">-&lt;</span> x<span class="op">+</span><span class="dv">1</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>          <span class="op">^^^^^^^^</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>          proc의 body부분을 명령어command라 부릅니다<span class="op">.</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>          (<span class="dt">Arrow</span>의 body는 expression이 아닙니다<span class="op">.</span>)</span></code></pre></div>
-<p><code>proc</code>는 <code>\</code> 람다같은 역할입니다.<br />
-<code>\x</code>가 람다식에서 쓸 묶인binding 변수를 나타내듯이,<br />
-<code>proc x</code>에서 <code>x</code>는 arrow 식에서 쓸 묶인 변수입니다.</p>
+<style type="text/css">
+.ansi2html-content { display: inline; white-space: pre-wrap; word-wrap: break-word; }
+.body_foreground { color: #AAAAAA; }
+.body_background { background-color: #000000; }
+.inv_foreground { color: #000000; }
+.inv_background { background-color: #AAAAAA; }
+.ansi1 { font-weight: bold; }
+.ansi30 { color: #000316; }
+.ansi31 { color: #aa0000; }
+.ansi33 { color: #aa5500; }
+.ansi34 { color: #0000aa; }
+.ansi35 { color: #E850A8; }
+.ansi36 { color: #00aaaa; }
+.ansi37 { color: #F5F1DE; }
+.ansi41 { background-color: #aa0000; }
+.ansi47 { background-color: #F5F1DE; }
+</style>
+<pre class="ansi2html-content">
+         <span class="ansi1 ansi37 ansi41"></span><span class="ansi1 ansi30 ansi47">command</span><span class="ansi1 ansi37 ansi41"></span>
+         ---------
+<span class="ansi1 ansi34">proc</span><span class="ansi1 ansi33"></span><span class="ansi1 ansi35"> x </span><span class="ansi1 ansi33"></span>-&gt;<span class="ansi1 ansi31"> f </span>-&lt;<span class="ansi1 ansi36"> x+1</span>
+  |  |    |     |
+  |  |    |   <span class="ansi1 ansi36">expression</span>
+  |  |  <span class="ansi1 ansi31">arrow</span>
+  | <span class="ansi1 ansi35">arrow variable</span>
+  |
+람다 함수의 <span class="ansi1 ansi34">람다 λ </span>와 비슷한 역할을 합니다.
+전체를 <span class="ansi1 ansi34">procedure</span> 또는 <span class="ansi1 ansi34">arrow abstraction</span>
+</pre>
+<p><code>\x</code>가 람다식에서 쓸 묶인binding 변수를 나타내듯이, <code>proc x</code>에서 <code>x</code>는 arrow 식에서 쓸 바인딩 변수입니다.</p>
 <p>Command는 기존에 없던 문법 구성 요소라 하는데, 자세한 설명은 없습니다. 컴비네이터들을 써서 Arrow를 구성하는construct 걸 표현할 때 쓰기 위해 새로 도입했다고 합니다. 가장 단순한 Command인 <code>f -&lt; exp</code>를 보면, <code>f $ v</code>같은 “arrow application”이라 생각할 수도 있습니다. 모양이나 구조가 그리 직관적으로 보이지 않긴 합니다.</p>
 <h2 id="section">-&lt;</h2>
-<p><code>-&lt;</code>는 식별자가 아니고, arrow 타입 식과 arrow의 입력으로 넘길 식에서 Command를 만들어내는 작업을 나타내는 심볼입니다. analogue of application for arrow라는데, 우리 말로는 뭐라하면 좋은 지 아직 모르겠습니다.</p>
+<p><code>-&lt;</code>는 식별자가 아니고, arrow 타입 식과 arrow의 입력으로 넘길 식에서 Command를 만들어내는 작업을 나타내는 심볼입니다. 함수를 인자에 적용하는 application 비슷한 동작입니다.</p>
 <p><code>proc x -&gt; f -&lt; x+1</code>는 확장없이 쓰면, 아래와 같습니다.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>arr (\x <span class="ot">-&gt;</span> x <span class="op">+</span> <span class="dv">1</span>) <span class="op">&gt;&gt;&gt;</span> f</span></code></pre></div>
-<div class="sourceCode" id="cb4"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>proc pat -&gt; a -&lt; e ----&gt; arr (\pat -&gt; e) &gt;&gt;&gt; a</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>arr (\x <span class="ot">-&gt;</span> x <span class="op">+</span> <span class="dv">1</span>) <span class="op">&gt;&gt;&gt;</span> f</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>proc pat -&gt; a -&lt; e ----&gt; arr (\pat -&gt; e) &gt;&gt;&gt; a</span></code></pre></div>
 <p><code>pat</code>같은 arrow-bound 변수는 <code>-&lt;</code> 왼쪽에서는 유효하지 않습니다.(not in scope)
 이 말은 람다식을 인자로 받는 컴비네이터로는 <code>proc</code>를 구현할 수 없다는 뜻입니다.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>proc (f, x) <span class="ot">-&gt;</span> f <span class="op">-&lt;</span> x</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>proc (f, x) <span class="ot">-&gt;</span> f <span class="op">-&lt;</span> x</span></code></pre></div>
 <p>이렇게는 못 씁니다. 확장을 안쓰고 표현하면 <code>arr (\(f, x) -&gt; x) &gt;&gt;&gt; f</code> 이렇게 되는데, <code>f</code>가 유효 범위 바깥에서 쓰이고 있습니다. 바깥에서 입력을 받아 오려면 <code>app</code>을 써야 합니다. (언제 이런 게 필요할까 생각해보면, <code>f</code>가 continuation인 경우가 떠오릅니다.)</p>
 <h2 id="app">-&lt;&lt;, app</h2>
 <p>아래 둘은 같은 표현입니다.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>proc (f,x) <span class="ot">-&gt;</span> app <span class="op">-&lt;</span>  (f,x)</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- arr (\(f,x) -&gt; (f,x)) &gt;&gt;&gt; app</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>proc (f,x) <span class="ot">-&gt;</span> f   <span class="op">-&lt;&lt;</span> x</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>proc (f,x) <span class="ot">-&gt;</span> app <span class="op">-&lt;</span>  (f,x)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- arr (\(f,x) -&gt; (f,x)) &gt;&gt;&gt; app</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>proc (f,x) <span class="ot">-&gt;</span> f   <span class="op">-&lt;&lt;</span> x</span></code></pre></div>
 <p><code>app :: arr (arr b c, b) c</code>은 입력으로 2튜플을 받고, c타입을 출력하는 함수를 가지고 있습니다. <code>app</code>의 <code>-&gt;</code> 인스턴스는 <code>app :: (b -&gt; c, b) -&gt;c</code></p>
 <p>아래 둘은 같은 표현입니다.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>proc x <span class="ot">-&gt;</span> f x <span class="op">-&lt;&lt;</span> x<span class="op">+</span><span class="dv">1</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>arr(\x <span class="ot">-&gt;</span> (f x, x<span class="op">+</span><span class="dv">1</span>)) <span class="op">&gt;&gt;&gt;</span> app</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>proc x <span class="ot">-&gt;</span> f x <span class="op">-&lt;&lt;</span> x<span class="op">+</span><span class="dv">1</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>arr(\x <span class="ot">-&gt;</span> (f x, x<span class="op">+</span><span class="dv">1</span>)) <span class="op">&gt;&gt;&gt;</span> app</span></code></pre></div>
 <p>마치 바운딩된 변수가 오른 쪽에만 나타나면 <code>&lt;</code>를 하나만 써서 <code>-&lt;</code>, 왼쪽 오른쪽 모두에 나타난다면, <code>&lt;</code>를 두 번 써서 <code>-&lt;&lt;</code>로 나타내는 것처럼 보입니다. 이런 모양을 고른 이유를 알면 기억하기 좋을텐데, 기호를 고른 이유를 말해주는 텍스트는 못봤습니다. 이 경우에 쓰이는 <code>arrow</code>는 <code>ArrowApply</code> 클래스 인스턴스여야 하며, 이런 <code>arrow</code>들은 모나드와 동일합니다. 보통은 이렇게 쓰는 것보단 모나드가 편하다고 합니다.</p>
 <h2 id="command를-위한-do표기법">command를 위한 do표기법</h2>
-<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>proc x <span class="ot">-&gt;</span> <span class="kw">do</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  y <span class="ot">&lt;-</span> f <span class="op">-&lt;</span> x<span class="op">+</span><span class="dv">1</span> </span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  g <span class="op">-&lt;</span> <span class="dv">2</span><span class="op">*</span>y</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> z <span class="ot">=</span> x<span class="op">+</span>y</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  t <span class="ot">&lt;-</span> h <span class="op">-&lt;</span> x<span class="op">*</span>z</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  returnA <span class="op">-&lt;</span> t<span class="op">+</span>z</span></code></pre></div>
-<ul>
-<li><code>y &lt;- f -&lt; x+1</code> arrow <code>f</code>에 <code>x+1</code>을 넣어 주고, 결과값을 <code>y</code>에 매치합니다.</li>
-<li><code>g -&lt; 2*y</code> arrow <code>g</code>에 <code>2*y</code>를 넣어 주고, 결과값은 무시합니다.</li>
-<li><code>let z = x+y</code> <code>x+y</code>를 <code>z</code>로 놓고,</li>
-<li><code>t &lt;- h -&lt; x*z</code> arrow <code>h</code>에 <code>x*z</code>를 넣어주고, 결과값을 <code>t</code>에 매치합니다.</li>
-<li><code>returnA -&lt; t+z</code> (<code>returnA</code>는 <a href="https://hackage.haskell.org/package/base-4.18.0.0/docs/Control-Arrow.html#v:returnA"><code>Control.Arrow</code></a>에 <code>id</code>로 정의되어 있습니다.)</li>
-</ul>
-<p>이 글을 쓰는 1차 목표가 위 코드를 아래같이 읽을 수 있는 지식을 얻는 거였습니다.</p>
-<ul>
-<li><p><code>arr (\x -&gt; (x, x)) &gt;&gt;&gt;</code>: x를 기억하기 위해 <code>x</code>를 duplicate합니다.</p></li>
-<li><p><code>first (arr (\x -&gt; x + 1) &gt;&gt;&gt; f) &gt;&gt;&gt;</code>: <code>(x, x)</code> 두 개중 앞에것만 <code>f</code> arrow를 적용합니다.</p></li>
-<li><p><code>arr (\ (y, x) -&gt; (y, (x, y))) &gt;&gt;&gt;</code>: <code>(y, (x, y))</code> 처음 받아 온 <code>x</code>와 <code>f</code>의 결과값 <code>y</code>를 모두 가지고 있는 2튜플을 준비해야 합니다. 2튜플의 두 번째가 <code>x</code>만 기억했던 것이 지금은 <code>(x, y)</code>를 가지고 있습니다. (※ 계속 결과값을 무시하지 않고 진행하면 <code>((x, y), z)</code>… 이런 식으로 2튜플 속에 2튜플로 계속 결과값들을 기억합니다.)</p>
-<p>(현재결과값, <strong><em>x</em></strong>) —- (현재결과값, <strong><em>(x, y)</em></strong>)</p></li>
-<li><p><code>arr snd</code>: <code>g</code>의 결과값을 무시하므로 <code>snd</code>로 (<del>현재결과값</del>, (x, y)) 두 번째 튜플을 가져옵니다.</p></li>
-<li><p><code>arr (\ (x,y) -&gt; let z = x+y in ((x,z), z)) &gt;&gt;&gt;</code>: 여긴 arrow 관련 동작은 없습니다.</p></li>
-<li><p><code>first (arr (\ (x, z) -&gt; x*z) &gt;&gt;&gt; h) &gt;&gt;&gt;</code>: 받은 2튜플의 첫 번째 <code>(x, z)</code>에만 <code>h</code> arrow를 적용</p></li>
-<li><p><code>arr (\ (t, z) -&gt; t+z) &gt;&gt;&gt;</code>: <code>(결과값, z)</code>를 <code>(t, z)</code>로 받아 <code>t+z</code></p></li>
-<li><p><code>returnA</code>: 최종 <code>t+z</code>를 반환</p></li>
-</ul>
+<pre class="ansi2html-content">
+printFile = <span class="ansi1 ansi34">proc</span><span class="ansi1 ansi35"> name </span>-&gt;
+  do <span class="ansi1 ansi33">s </span>&lt;-<span class="ansi1 ansi31"> Kleisli readFile </span>-&lt;<span class="ansi1 ansi36"> name</span>
+     <span class="ansi1 ansi31">Kleisli print </span>-&lt;<span class="ansi1 ansi36"> s</span>
+</pre>
+<p>모나드의 <code>do</code>와 비슷하게, 체인에서 다음 작업에게 넘겨 줄 결과를 바인딩할 수 있습니다.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>proc x <span class="ot">-&gt;</span> <span class="kw">do</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  y <span class="ot">&lt;-</span> f <span class="op">-&lt;</span> x<span class="op">+</span><span class="dv">1</span> </span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  g <span class="op">-&lt;</span> <span class="dv">2</span><span class="op">*</span>y</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> z <span class="ot">=</span> x<span class="op">+</span>y</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  t <span class="ot">&lt;-</span> h <span class="op">-&lt;</span> x<span class="op">*</span>z</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  returnA <span class="op">-&lt;</span> t<span class="op">+</span>z</span></code></pre></div>
+<table>
+<colgroup>
+<col style="width: 26%" />
+<col style="width: 73%" />
+</colgroup>
+<tbody>
+<tr>
+<td><code>y &lt;- f -&lt; x+1</code></td>
+<td>arrow <code>f</code>에 <code>x+1</code>을 넣어 주고, 결과값을 <code>y</code>에 매치합니다.</td>
+</tr>
+<tr>
+<td><code>g -&lt; 2*y</code></td>
+<td>arrow <code>g</code>에 <code>2*y</code>를 넣어 주고, 결과값은 무시합니다.</td>
+</tr>
+<tr>
+<td><code>let z = x+y</code></td>
+<td><code>x+y</code>를 <code>z</code>로 놓고,</td>
+</tr>
+<tr>
+<td><code>t &lt;- h -&lt; x*z</code></td>
+<td>arrow <code>h</code>에 <code>x*z</code>를 넣어주고, 결과값을 <code>t</code>에 매치합니다.</td>
+</tr>
+<tr>
+<td><code>returnA -&lt; t+z</code></td>
+<td>(<code>returnA</code>는 <a href="https://hackage.haskell.org/package/base-4.18.0.0/docs/Control-Arrow.html#v:returnA">Control.Arrow</a>에 <code>id</code>로 정의되어 있습니다.)</td>
+</tr>
+</tbody>
+</table>
+<p>이 글을 쓰는 1차 목표가 위 코드를 아래같이 읽을 수 있는 지식을 얻기였습니다.</p>
+<table>
+<colgroup>
+<col style="width: 43%" />
+<col style="width: 56%" />
+</colgroup>
+<tbody>
+<tr>
+<td><code>arr (\x -&gt; (x, x)) &gt;&gt;&gt;</code></td>
+<td><code>x</code>를 두 함수에 넣어 주기 위해 복사duplicate합니다.</td>
+</tr>
+<tr>
+<td><code>first (arr (\x -&gt; x + 1) &gt;&gt;&gt; f) &gt;&gt;&gt;</code></td>
+<td><code>(x, x)</code> 두 개중 앞에것만 <code>f</code> arrow를 적용합니다.</td>
+</tr>
+<tr>
+<td><code>arr (\ (y, x) -&gt; (y, (x, y))) &gt;&gt;&gt;</code></td>
+<td><code>(y, (x, y))</code> 처음 받아 온 <code>x</code>와 <code>f</code>의 결과값 <code>y</code>를 모두 가지고 있는 2튜플을 준비해야 합니다. 2튜플의 두 번째가 <code>x</code>만 기억했던 것이 지금은 <code>(x, y)</code>를 가지고 있습니다. (※ 계속 결과값을 무시하지 않고 진행하면 <code>((x, y), z)</code>… 이런 식으로 2튜플 속에 2튜플로 계속 결과값들을 기억합니다.)<br />
+(현재결과값, <strong><em>x</em></strong>) —- (현재결과값, <strong><em>(x, y)</em></strong>)</td>
+</tr>
+<tr>
+<td><code>arr snd</code></td>
+<td><code>g</code>의 결과값을 무시하므로 <code>snd</code>로 <code>(현재 결과값, (x, y))</code>에서 두 번째 튜플을 가져옵니다.</td>
+</tr>
+<tr>
+<td><code>arr (\ (x,y) -&gt; let z = x+y in ((x,z), z)) &gt;&gt;&gt;</code></td>
+<td>여긴 arrow 관련 동작은 없습니다.</td>
+</tr>
+<tr>
+<td><code>first (arr (\ (x, z) -&gt; x*z) &gt;&gt;&gt; h) &gt;&gt;&gt;</code></td>
+<td>받은 2튜플의 첫 번째 <code>(x, z)</code>에만 <code>h</code> arrow를 적용</td>
+</tr>
+<tr>
+<td><code>arr (\ (t, z) -&gt; t+z) &gt;&gt;&gt;</code></td>
+<td><code>(결과값, z)</code>를 <code>(t, z)</code>로 받아 <code>t+z</code></td>
+</tr>
+<tr>
+<td><code>returnA</code></td>
+<td>최종 <code>t+z</code>를 반환</td>
+</tr>
+</tbody>
+</table>
 <p>처음 봤을 때는, 조금 귀찮지만 확장 없이 써도 되겠다 생각했는데, 위를 보면 도저히 확장없이 <code>arrow</code>를 쓰는 건 어려울 것 같습니다. 필요한 값들을 잃어버리지 않도록, <strong><em>일일이 2튜플속에 2튜플…</em></strong>을 만들면서 진행해야 합니다. 이렇게 쓰는 사람이 있을까 싶은데요.</p>
 <h2 id="rec">rec</h2>
 <p><code>rec</code> 키워드를 써서 상호 재귀 바인딩을 구현하는 것도 가능합니다.</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ot">counter ::</span> <span class="dt">ArrowCircuit</span> a <span class="ot">=&gt;</span> a <span class="dt">Bool</span> <span class="dt">Int</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>counter <span class="ot">=</span> proc reset <span class="ot">-&gt;</span> <span class="kw">do</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>        rec     output <span class="ot">&lt;-</span> returnA <span class="op">-&lt;</span> <span class="kw">if</span> reset <span class="kw">then</span> <span class="dv">0</span> <span class="kw">else</span> next <span class="co">-- output은 next에 의존</span></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>                next <span class="ot">&lt;-</span> delay <span class="dv">0</span> <span class="op">-&lt;</span> output<span class="op">+</span><span class="dv">1</span>                    <span class="co">-- next는 output에 의존</span></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>        returnA <span class="op">-&lt;</span> output</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ot">counter ::</span> <span class="dt">ArrowCircuit</span> a <span class="ot">=&gt;</span> a <span class="dt">Bool</span> <span class="dt">Int</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>counter <span class="ot">=</span> proc reset <span class="ot">-&gt;</span> <span class="kw">do</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>        rec     output <span class="ot">&lt;-</span> returnA <span class="op">-&lt;</span> <span class="kw">if</span> reset <span class="kw">then</span> <span class="dv">0</span> <span class="kw">else</span> next <span class="co">-- output은 next에 의존</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>                next <span class="ot">&lt;-</span> delay <span class="dv">0</span> <span class="op">-&lt;</span> output<span class="op">+</span><span class="dv">1</span>                    <span class="co">-- next는 output에 의존</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>        returnA <span class="op">-&lt;</span> output</span></code></pre></div>
 <p><code>output</code>과 <code>next</code>가 서로 물고 물려 있는 상호 재귀가 딱 봐도 불편합니다.</p>
-<p><code>rec</code>는 <code>ArrowLoop</code>의 <code>loop</code> 함수로 구현되어 있습니다.</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">Arrow</span> a <span class="ot">=&gt;</span> <span class="dt">ArrowLoop</span> a <span class="kw">where</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="ot">        loop ::</span> a (b,d) (c,d) <span class="ot">-&gt;</span> a b c</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>                <span class="op">^^^^^^^^^^^^^</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>               매개 변수는 하나</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">ArrowLoop</span> (<span class="ot">-&gt;</span>) <span class="kw">where</span></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>        loop f b <span class="ot">=</span> <span class="kw">let</span> (c,d) <span class="ot">=</span> f (b,d) <span class="kw">in</span> c</span></code></pre></div>
-<p><code>loop</code>는 어찌 됐건 인자 하나만 받습니다. 그런데 <code>(-&gt;)</code>의 <code>ArrowLoop</code> 인스턴스 정의는 <code>loop f b</code> 로 인자 두 개를 받고 있습니다.<br />
-이유는 <code>(-&gt;)</code>에 있습니다. <code>a</code>자리에 <code>(-&gt;)</code>를 넣어 보겠습니다.</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ot">loop ::</span> ((b,d) <span class="ot">-&gt;</span> (c,d)) <span class="ot">-&gt;</span> (b <span class="ot">-&gt;</span> c)</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="ot">loop ::</span> ((b,d) <span class="ot">-&gt;</span> (c,d)) <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> c</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co">--      ^^^^^^^^^^^^^^^^   ^^^</span></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co">--             f            b</span></span></code></pre></div>
-<p><code>f</code>는 <code>(b,d)</code>를 받아서 <code>(c,d)</code>를 돌려주는 함수입니다. 최종 결과는 여기에서 <code>c</code>만 가져 갑니다. 이게 어째서 loop일까요? (※ <a href="../posts/2020-07-07-fix.html">Fix 함수</a>, <a href="../posts/2023-01-12-monadfix.html">MonadFix</a> 참고)</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> ( ,d) <span class="ot">=</span> f ( , d)</span></code></pre></div>
-<p><code>f</code>는 <code>(b,d)</code>를 받아야 하는데, <code>b</code>는 인자로 받았는데, <code>d</code>는 어디서 왔을까요?</p>
+<p><code>rec</code>는 <code>ArrowLoop</code> 클래스의 <code>loop</code> 메소드로 구현되어 있습니다.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">Arrow</span> a <span class="ot">=&gt;</span> <span class="dt">ArrowLoop</span> a <span class="kw">where</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="ot">        loop ::</span> a (b,d) (c,d) <span class="ot">-&gt;</span> a b c</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>                <span class="op">^^^^^^^^^^^^^</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>                매개 변수는 하나</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">ArrowLoop</span> (<span class="ot">-&gt;</span>) <span class="kw">where</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>        loop f b <span class="ot">=</span> <span class="kw">let</span> (c,d) <span class="ot">=</span> f (b,d) <span class="kw">in</span> c</span></code></pre></div>
+<p><code>loop</code>는 어찌 됐건 인자 하나만 받습니다. 그런데 <code>(-&gt;)</code>의 <code>ArrowLoop</code> 인스턴스 정의는 <code>loop f b</code> 로 인자 두 개를 받고 있습니다. 이유는 <code>(-&gt;)</code>에 있습니다. <code>a</code>자리에 <code>(-&gt;)</code>를 넣어 보겠습니다.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ot">loop ::</span> ((b,d) <span class="ot">-&gt;</span> (c,d)) <span class="ot">-&gt;</span> (b <span class="ot">-&gt;</span> c)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="ot">loop ::</span> ((b,d) <span class="ot">-&gt;</span> (c,d)) <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> c</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co">--      ^^^^^^^^^^^^^^^^   ^^^</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co">--             f            b</span></span></code></pre></div>
+<p><code>f</code>는 <code>(b,d)</code>를 받아서 <code>(c,d)</code>를 돌려주는 함수입니다. 최종 결과는 여기에서 <code>c</code>만 가져 갑니다. 이게 어째서 loop일까요? (※ <a href="../posts/2020-07-07-fix.html">Fix 함수</a>, <a href="../posts/2023-01-12-monadfix.html">MonadFix</a> 참고)<br />
+※ <code>let x = 1 : x</code>을 떠올려 보세요. <code>1 : 1 : 1 : ...</code></p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> ( ,d) <span class="ot">=</span> f ( , d)</span></code></pre></div>
+<p><code>f</code>는 <code>(b,d)</code>를 받아야 하는데, <code>b</code>는 인자로 받았는데, <code>d</code>는 어디서 왔을까요? 아래와 같이 상상해 봤습니다.</p>
 <pre><code>d = snd(f (b, d))
 d = snd(f (b, snd(f(b, d))))
 d = snd(f (b, snd(f(b, snd(f (b, d))))))
@@ -197,23 +276,41 @@ d = snd(f (b, snd(f(b, snd(f (b, d))))))
 <a href="https://stackoverflow.com/questions/9856342/how-does-this-definition-of-arrowloop-loop-work">How does this definition of ArrowLoop.loop work?</a> 여기 첫 번째 답변의 코드를 가져와서 보겠습니다.</p>
 <pre><code>powers = loop $ \(x,l) -&gt; (l, x:map (*x) l)</code></pre>
 <h2 id="ifthenelse">if…then…else</h2>
-<div class="sourceCode" id="cb15"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>arr (\x <span class="ot">-&gt;</span> <span class="kw">if</span> p x <span class="kw">then</span> <span class="dt">Left</span> x <span class="kw">else</span> <span class="dt">Right</span> x) <span class="op">&gt;&gt;&gt;</span> f <span class="op">|||</span> g</span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>arr (\x <span class="ot">-&gt;</span> <span class="kw">if</span> p x <span class="kw">then</span> <span class="dt">Left</span> x <span class="kw">else</span> <span class="dt">Right</span> x) <span class="op">&gt;&gt;&gt;</span> f <span class="op">|||</span> g</span></code></pre></div>
 <p>확장을 쓰면 다음처럼 표현할 수 있습니다.</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>proc x <span class="ot">-&gt;</span> <span class="kw">if</span> p x <span class="kw">then</span> f <span class="op">-&lt;</span> x <span class="kw">else</span> g <span class="op">-&lt;</span> x</span></code></pre></div>
+<pre class="ansi2html-content">
+<span class="ansi1 ansi34">proc</span><span class="ansi1 ansi35"> x </span>-&gt;<span class="ansi1 ansi34"> if </span><span class="ansi1 ansi31">p</span> x<span class="ansi1 ansi34"> then </span><span class="ansi1 ansi31">f</span> -&lt;<span class="ansi1 ansi36"> x</span><span class="ansi1 ansi34"> else </span><span class="ansi1 ansi31">g</span> -&lt;<span class="ansi1 ansi36"> x</span>
+</pre>
 <p>여기서 쓰인 <code>if...then...else</code> 는 일반 <code>if</code>문이 아니라, <code>proc</code> 안에서 쓰는 conditional command라 부르고, 다음 처럼 번역됩니다.</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>proc pat <span class="ot">-&gt;</span> <span class="kw">if</span> e <span class="kw">then</span> c1 <span class="kw">else</span> c2</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="op">-----&gt;</span></span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>arr (\pat <span class="ot">-&gt;</span> <span class="kw">if</span> e <span class="kw">then</span> <span class="dt">Left</span> pat <span class="kw">else</span> <span class="dt">Right</span> pat) <span class="op">&gt;&gt;&gt;</span> (proc pat <span class="ot">-&gt;</span> c1 <span class="op">|||</span> proc pat <span class="ot">-&gt;</span> c2)</span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>proc pat <span class="ot">-&gt;</span> <span class="kw">if</span> e <span class="kw">then</span> c1 <span class="kw">else</span> c2</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="op">-----&gt;</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>arr (\pat <span class="ot">-&gt;</span> <span class="kw">if</span> e <span class="kw">then</span> <span class="dt">Left</span> pat <span class="kw">else</span> <span class="dt">Right</span> pat) <span class="op">&gt;&gt;&gt;</span> (proc pat <span class="ot">-&gt;</span> c1 <span class="op">|||</span> proc pat <span class="ot">-&gt;</span> c2)</span></code></pre></div>
 <h2 id="case">case</h2>
-<div class="sourceCode" id="cb18"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>mapA f <span class="ot">=</span> arr listcase <span class="op">&gt;&gt;&gt;</span></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>         arr (<span class="fu">const</span> []) <span class="op">|||</span> (f <span class="op">***</span> mapA f <span class="op">&gt;&gt;&gt;</span> arr (<span class="fu">uncurry</span> (<span class="op">:</span>)))</span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span> listcase [] <span class="ot">=</span> <span class="dt">Left</span> ()</span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>        listcase (x<span class="op">:</span>xs) <span class="ot">=</span> <span class="dt">Right</span> (x,s)</span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="co">--확장을 쓰면--&gt;</span></span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>mapA f <span class="ot">=</span> proc xs <span class="ot">-&gt;</span></span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>  <span class="kw">case</span> xs <span class="kw">of</span></span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>    [] <span class="ot">-&gt;</span> returnA <span class="op">-&lt;</span> []</span>
-<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>    x<span class="op">:</span>xs' <span class="ot">-&gt;</span> (f <span class="op">***</span> mapA f <span class="op">&gt;&gt;&gt;</span> <span class="fu">uncurry</span> (<span class="op">:</span>)) <span class="op">-&lt;</span> (x, xs')</span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>mapA f <span class="ot">=</span> arr listcase <span class="op">&gt;&gt;&gt;</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>         arr (<span class="fu">const</span> []) <span class="op">|||</span> (f <span class="op">***</span> mapA f <span class="op">&gt;&gt;&gt;</span> arr (<span class="fu">uncurry</span> (<span class="op">:</span>)))</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span> listcase [] <span class="ot">=</span> <span class="dt">Left</span> ()</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>        listcase (x<span class="op">:</span>xs) <span class="ot">=</span> <span class="dt">Right</span> (x,s)</span></code></pre></div>
+<p>확장을 쓰면</p>
+<pre class="ansi2html-content">
+mapA f = <span class="ansi1 ansi34">proc</span><span class="ansi1 ansi35"> xs </span>-&gt;
+  <span class="ansi1 ansi34">case </span><span class="ansi1 ansi35">xs</span><span class="ansi1 ansi34"> of</span>
+    <span class="ansi1 ansi35">[] </span>-&gt; <span class="ansi1 ansi31">returnA</span> -&lt;<span class="ansi1 ansi36"> []</span>
+    <span class="ansi1 ansi35">x:xs' </span>-&gt; <span class="ansi1 ansi31">(f *** mapA f &gt;&gt;&gt; uncurry (:))</span> -&lt;<span class="ansi1 ansi36"> (x, xs')</span>
+</pre>
+<h2 id="중간-단계-값-접근">중간 단계 값 접근</h2>
+<p>모나드는 클로저를 이용해 체인 중간 단계 값들을 기억하는데, Arrow는 튜플을 이용합니다.</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>proc x <span class="ot">-&gt;</span> <span class="kw">do</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  a <span class="ot">&lt;-</span> arr(\x <span class="ot">-&gt;</span> x <span class="op">+</span> <span class="dv">100</span>) <span class="op">-&lt;</span> x<span class="op">+</span><span class="dv">1</span> </span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  b <span class="ot">&lt;-</span> arr(\x <span class="ot">-&gt;</span> x <span class="op">+</span> <span class="dv">200</span>) <span class="op">-&lt;</span> x<span class="op">+</span><span class="dv">2</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  c <span class="ot">&lt;-</span> arr(\x <span class="ot">-&gt;</span> x <span class="op">+</span> <span class="dv">200</span>) <span class="op">-&lt;</span> x<span class="op">+</span><span class="dv">2</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  returnA <span class="op">-&lt;</span> a <span class="op">+</span> b <span class="op">+</span> c</span></code></pre></div>
+<p><code>proc</code> 없이 쓰면,</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="ot">x ::</span> <span class="dt">Arrow</span> arr <span class="ot">=&gt;</span> arr <span class="dt">Int</span> <span class="dt">Int</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>x <span class="ot">=</span> (arr (<span class="op">+</span><span class="dv">1</span>) <span class="op">&gt;&gt;&gt;</span> arr (<span class="op">+</span><span class="dv">100</span>)) </span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">&amp;&amp;&amp;</span> (arr (<span class="op">+</span><span class="dv">2</span>) <span class="op">&gt;&gt;&gt;</span> arr (<span class="op">+</span><span class="dv">200</span>)) </span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">&amp;&amp;&amp;</span> (arr (<span class="op">+</span><span class="dv">2</span>) <span class="op">&gt;&gt;&gt;</span> arr (<span class="op">+</span><span class="dv">200</span>)) </span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">&gt;&gt;&gt;</span> arr (\(a, (b, c)) <span class="ot">-&gt;</span> a <span class="op">+</span> b <span class="op">+</span> c)</span></code></pre></div>
+<p>보시다시피 <code>&amp;&amp;&amp;</code>으로 계속 튜플로 만들어 갑니다.</p>
 <p>…작성 중</p>
 
 <div class="comment">
