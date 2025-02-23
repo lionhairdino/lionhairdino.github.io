@@ -1,95 +1,116 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko" lang="ko">
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-        <title>lionhairdino - ST 모나드 - forall의 강력함</title>
+<head>
+  <script>
+    (function () {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'dark') {
+        document.documentElement.classList.add('dark-mode');
+        console.log(savedTheme);
+      }
+    })();
+  </script>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>lionhairdino - ST 모나드 - forall의 강력함</title>
+  
+  <meta name="description" content="lionhairdino - ST 모나드 - forall의 강력함" />
+  <meta property="og:description" content="하스켈 함수형 프로그래밍" />
+  
+  <link rel="stylesheet" type="text/css" href="../css/default.css" />
+  <link rel="icon" href="https://lionhairdino.github.io/favicon.svg" />
+  <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino16px.png" sizes="16x16" />
+  <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino24px.png" sizes="24x24" />
+  <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino32px.png" sizes="32x32" />
+  <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino48px.png" sizes="48x48" />
+  <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino57px.png" sizes="57x57" />
+  <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino60px.png" sizes="60x60" />
+  <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino64px.png" sizes="64x64" />
+  <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino72px.png" sizes="72x72" />
+  <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino76px.png" sizes="76x76" />
+  <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino114px.png" sizes="114x114" />
+  <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino120px.png" sizes="120x120" />
+  <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino144px.png" sizes="144x144" />
+  <link rel="shortcut icon" href="../favicon.ico" />
+  <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino152px.png" sizes="152x152" />
+  <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino180px.png" sizes="180x180" />
+  <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino192px.png" sizes="192x192" />
+  <link rel="manifest" href="../site.webmanifest" />
+  <link rel="mask-icon" href="https://lionhairdino.github.io/Lionhairdino_black.svg" color="#ff7500" />
+  <meta name="msapplication-TileImage" content="/images/favicon/Lionhairdino144px.png" />
+  <meta name="msapplication-TileColor" content="#ff7500" />
+  <meta name="theme-color" content="#ffffff" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="ST 모나드 - forall의 강력함" />
+  <meta property="og:site_name" content="Lionhairdino" />
+  <meta property="og:url" content="https://lionhairdino.github.io/posts/2022-12-12-stmonad.html" />
+  
+  <meta property="og:image" content="https://lionhairdino.github.io/images/state400px.png" />
+  
+  
+  <meta name="keywords" content="ST Monad, forall, RankN, Rank2, RankNType, 타입 체커, Mutation, haskell, 하스켈, 함수형, Functional">
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-E9WZ6VXGHP"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-E9WZ6VXGHP');
+  </script>
+  <script src="../script/copycode.js"></script>
 
-        <meta name="description" content="lionhairdino - ST 모나드 - forall의 강력함" />
-        <meta property="og:description" content="하스켈 함수형 프로그래밍" />
+  <script src="../script/darkmode.js"></script>
+  <script async src="https://cse.google.com/cse.js?cx=9c53b4915cbb2605c"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.11.1/tocbot.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.11.1/tocbot.css" />
+  <meta name="fediverse:creator" content="@lionhairdino@mastodon.social" />
+  <link rel="alternate" type="application/rss+xml" title="상상 하스켈 - Lionhairdino" href="rss.xml" />
+</head>
 
-        <link rel="stylesheet" type="text/css" href="../css/default.css" />
-        <link rel="icon" href="https://lionhairdino.github.io/favicon.svg" />
-        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino16px.png" sizes="16x16" />
-        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino24px.png" sizes="24x24" />
-        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino32px.png" sizes="32x32" />
-        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino48px.png" sizes="48x48" />
-        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino57px.png" sizes="57x57" />
-        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino60px.png" sizes="60x60" />
-        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino64px.png" sizes="64x64" />
-        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino72px.png" sizes="72x72" />
-        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino76px.png" sizes="76x76" />
-        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino114px.png" sizes="114x114" />
-        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino120px.png" sizes="120x120" />
-        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino144px.png" sizes="144x144" />
-        <link rel="shortcut icon" href="../favicon.ico" />
-        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino152px.png" sizes="152x152" />
-        <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino180px.png" sizes="180x180" />
-        <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino192px.png" sizes="192x192" />
-        <link rel="manifest" href="../site.webmanifest" />
-        <link rel="mask-icon" href="https://lionhairdino.github.io/Lionhairdino_black.svg" color="#ff7500" />
-        <meta name="msapplication-TileImage" content="/images/favicon/Lionhairdino144px.png" />
-        <meta name="msapplication-TileColor" content="#ff7500" />
-        <meta name="theme-color" content="#ffffff" />
-        <meta property="og:type" content="website" />
-        <meta property="og:title" content="ST 모나드 - forall의 강력함" />
-        <meta property="og:site_name" content="Lionhairdino" />
-        <meta property="og:url" content="https://lionhairdino.github.io/posts/2022-12-12-stmonad.html" />
-
-        <meta property="og:image" content="https://lionhairdino.github.io/images/state400px.png" />
-
-      <meta name="keywords" content="ST Monad, forall, RankN, Rank2, RankNType, 타입 체커, Mutation, haskell, 하스켈, 함수형, Functional">
-<!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-E9WZ6VXGHP"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-E9WZ6VXGHP');
-</script>
-<script src="../script/copycode.js"></script>
-
-<script src="../script/darkmode.js"></script>
-<script async src="https://cse.google.com/cse.js?cx=9c53b4915cbb2605c"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.11.1/tocbot.min.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.11.1/tocbot.css" />
-<meta name="fediverse:creator" content="@lionhairdino@mastodon.social" />
-<link rel="alternate" type="application/rss+xml" title="상상 하스켈 - Lionhairdino" href="rss.xml" />
-    </head>
-    <body class="dark-mode" onload="document.body.className = localStorage.getItem('theme') === 'dark' ? 'dark-mode' : ''">
-        <div id="header">
-            <div style="display:inline-block;margin-right:5px;padding-top: 5px;" id="logo">
-                <a href="../"><img style="width:30px;border:none" src="../images/favicon/Lionhairdino48px.png"></a>
-            </div>
-            <div style="display:inline-block;vertical-align: top;padding-top:5px;" id="navigation">
-                <a href="../">lionhairdino</a>
-                <a href="../about.html">about</a>
-                <!--<a href="/archive.html">archive</a>-->
-            </div>
-            <div style="display:inline-block;font-size:0.8em;vertical-align: top;">
-                <div style="display:inline-block;vertical-align: top;padding-top: 5px"></div>
-                <div style="display:inline-block;vertical-align: top;padding-top: 11px; padding-left: 10px;"><a rel="me" href="https://mastodon.social/@lionhairdino"><img style="width:20px;border:none" src="../images/mastodon.svg"></a></div>
-                <div style="display:inline-block;vertical-align: top;padding-top: 11px; padding-left: 2px;"><a href="https://lionhairdino.bsky.social"><img style="width:18px;border:none" src="../images/bluesky.svg"></a></div>
-                <div style="display:inline-block;vertical-align: top;padding-top: 11px; padding-left: 2px;"><a href="https://discordapp.com/users/lionhairdino#7687"><img style="width:20px;border:none" src="../images/discord.svg"></a></div>
-                <div style="display:inline-block;vertical-align: top;padding-top: 11px; padding-left: 2px;"><a href="https://x.com/lionhairdino"><img style="width:15px;border:none" src="../images/X.svg"></a></div>
-                <div style="display:inline-block;vertical-align: top;padding-top: 11px; padding-left: 2px;"><a href="https://linkedin.com/in/lionhairdino-l-baaa54244"><img style="width:20px;border:none" src="../images/linkedin.svg"></a></div>
-                <div style="display:inline-block;vertical-align: top;padding-top: 11px; padding-left: 2px;"><a href="https://github.com/lionhairdino"><img style="width:20px;border:none" src="../images/github.svg"></a></div>
-                <div style="display:inline-block;vertical-align: top;padding-top: 11px; padding-left: 2px;"><a href="https://www.threads.net/@linohairdino"><img style="width:20px;border:none" src="../images/threads.svg"></a></div>
-            </div>
-            <div>
-                <div style="display:inline-block;width:180px;"> 
-                    <div class="gcse-searchbox-only"></div>
-                <div><button id="theme-toggle">다크 모드</button></div>
-                </div>
-            </div>
-            <div>
-                여기 글들은 일종의 질문입니다. 용어 선택도 학계, 업계에서 쓰는 걸로 되어 있지 않고, 틀린 내용이 있을 수도 있습니다. 여기 글을 처음 읽는 분은, 먼저 <a href="warning.html">주의문</a>을 꼭 읽어보세요.
-            </div>
-        </div>
-        <div class="js-toc-content">
-            <h1>ST 모나드 - forall의 강력함</h1>
-            <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+<body>
+  <div id="header">
+    <div style="display:inline-block;margin-right:5px;padding-top: 5px;" id="logo">
+      <a href="../"><img style="width:30px;border:none" src="../images/favicon/Lionhairdino48px.png"></a>
+    </div>
+    <div style="display:inline-block;vertical-align: top;padding-top:5px;" id="navigation">
+      <a href="../">lionhairdino</a>
+      <a href="../about.html">about</a>
+      <!--<a href="/archive.html">archive</a>-->
+    </div>
+    <div style="display:inline-block;font-size:0.8em;vertical-align: top;">
+      <div style="display:inline-block;vertical-align: top;padding-top: 5px"></div>
+      <div style="display:inline-block;vertical-align: top;padding-top: 11px; padding-left: 10px;"><a rel="me" href="https://mastodon.social/@lionhairdino"><img style="width:20px;border:none" src="../images/mastodon.svg"></a></div>
+      <div style="display:inline-block;vertical-align: top;padding-top: 11px; padding-left: 2px;"><a href="https://lionhairdino.bsky.social"><img style="width:18px;border:none" src="../images/bluesky.svg"></a>
+      </div>
+      <div style="display:inline-block;vertical-align: top;padding-top: 11px; padding-left: 2px;"><a href="https://discordapp.com/users/lionhairdino#7687"><img style="width:20px;border:none" src="../images/discord.svg"></a></div>
+      <div style="display:inline-block;vertical-align: top;padding-top: 11px; padding-left: 2px;"><a href="https://x.com/lionhairdino"><img style="width:15px;border:none" src="../images/X.svg"></a></div>
+      <div style="display:inline-block;vertical-align: top;padding-top: 11px; padding-left: 2px;"><a href="https://linkedin.com/in/lionhairdino-l-baaa54244"><img style="width:20px;border:none" src="../images/linkedin.svg"></a></div>
+      <div style="display:inline-block;vertical-align: top;padding-top: 11px; padding-left: 2px;"><a href="https://github.com/lionhairdino"><img style="width:20px;border:none" src="../images/github.svg"></a></div>
+      <div style="display:inline-block;vertical-align: top;padding-top: 11px; padding-left: 2px;"><a href="https://www.threads.net/@linohairdino"><img style="width:20px;border:none" src="../images/threads.svg"></a></div>
+    </div>
+    <div>
+      <div style="display:inline-block;width:180px;">
+        <div class="gcse-searchbox-only"></div>
+        <div><button id="theme-toggle">
+            <script>
+              const savedTheme = localStorage.getItem('theme');
+              if (savedTheme === 'dark')
+                document.write("LIGHT");
+              else
+                document.write("DARK");
+            </script>
+          </button></div>
+      </div>
+    </div>
+    <div>
+      여기 글들은 일종의 질문입니다. 용어 선택도 학계, 업계에서 쓰는 걸로 되어 있지 않고, 틀린 내용이 있을 수도 있습니다. 여기 글을 처음 읽는 분은, 먼저 <a href="warning.html">주의문</a>을 꼭 읽어보세요.
+    </div>
+  </div>
+  <div class="js-toc-content">
+    <h1>ST 모나드 - forall의 강력함</h1>
+    <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
 <div class="info">
     Posted on December 12, 2022
     
@@ -172,18 +193,19 @@ Mutation이 위험한 이유가 뭘까요? 한 쓰레드가 Mutation이 가능�
 </script>
 </div>
 <div style="text-align:right">Github 계정이 없는 분은 메일로 보내주세요. lionhairdino at gmail.com </div>
-        </div>
-        <nav class="toc toc-right js-toc relative z-1 transition--300 absolute pa4 pt5 is-position-fixed"></nav>
-        <div id="footer">
-            © 2022 lionhairdino. All rights reserved. Generated by <a href="http://jaspervdj.be/hakyll">Hakyll</a>
-        </div>
-        <script>
-            tocbot.init({
-                tocSelector: '.js-toc',
-                contentSelector: '.js-toc-content',
-                headingSelector: 'h2, h3',
-                hasInnerContainers: true,
-            });
-        </script>
-    </body>
+  </div>
+  <nav class="toc toc-right js-toc relative z-1 transition--300 absolute pa4 pt5 is-position-fixed"></nav>
+  <div id="footer">
+    © 2022 lionhairdino. All rights reserved. Generated by <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+  </div>
+  <script>
+    tocbot.init({
+      tocSelector: '.js-toc',
+      contentSelector: '.js-toc-content',
+      headingSelector: 'h2, h3',
+      hasInnerContainers: true,
+    });
+  </script>
+</body>
+
 </html>
