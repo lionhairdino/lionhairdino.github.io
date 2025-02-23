@@ -10,6 +10,36 @@
         console.log(savedTheme);
       }
     })();
+
+    function loadUtterances() {
+      const savedTheme = localStorage.getItem('theme') || 'light';
+      const themeValue = savedTheme === 'dark' ? 'github-dark' : 'github-light';
+
+      const script = document.createElement('script');
+      script.src = 'https://utteranc.es/client.js';
+      script.setAttribute('repo', 'lionhairdino/lionhairdino.github.io');
+      script.setAttribute('issue-term', 'url');
+      script.setAttribute('theme', themeValue); // 동적으로 테마 설정
+      script.setAttribute('crossorigin', 'anonymous');
+      script.async = true;
+
+      document.body.appendChild(script);
+    };
+
+    function updateUtterancesTheme() {
+      const savedTheme = localStorage.getItem('theme') || 'light';
+      const themeValue = savedTheme === 'dark' ? 'github-dark' : 'github-light';
+
+      // Utterances iframe에 메시지 전송
+      const utterances = document.querySelector('.utterances iframe');
+      if (utterances) {
+        utterances.contentWindow.postMessage(
+          {type: 'set-theme', theme: themeValue},
+          'https://utteranc.es'
+        );
+      }
+    }
+
   </script>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -97,9 +127,9 @@
             <script>
               const savedTheme = localStorage.getItem('theme');
               if (savedTheme === 'dark')
-                document.write("LIGHT");
+                document.write("☉");
               else
-                document.write("DARK");
+                document.write("☾");
             </script>
           </button></div>
       </div>
@@ -135,10 +165,12 @@
 <code>a %1 -&gt; b</code> 이렇게 쓰면 <code>a</code>를 한 번만 쓰는 <code>a -&gt; b</code> 타입 리니어 함수란 뜻입니다.</p>
 
 <div class="comment">
-<script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
-</script>
+  <script>
+    document.addEventListener('DOMContentLoaded', loadUtterances, { once: true });
+  </script>
 </div>
 <div style="text-align:right">Github 계정이 없는 분은 메일로 보내주세요. lionhairdino at gmail.com </div>
+
   </div>
   <nav class="toc toc-right js-toc relative z-1 transition--300 absolute pa4 pt5 is-position-fixed"></nav>
   <div id="footer">

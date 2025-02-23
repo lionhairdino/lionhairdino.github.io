@@ -10,6 +10,36 @@
         console.log(savedTheme);
       }
     })();
+
+    function loadUtterances() {
+      const savedTheme = localStorage.getItem('theme') || 'light';
+      const themeValue = savedTheme === 'dark' ? 'github-dark' : 'github-light';
+
+      const script = document.createElement('script');
+      script.src = 'https://utteranc.es/client.js';
+      script.setAttribute('repo', 'lionhairdino/lionhairdino.github.io');
+      script.setAttribute('issue-term', 'url');
+      script.setAttribute('theme', themeValue); // 동적으로 테마 설정
+      script.setAttribute('crossorigin', 'anonymous');
+      script.async = true;
+
+      document.body.appendChild(script);
+    };
+
+    function updateUtterancesTheme() {
+      const savedTheme = localStorage.getItem('theme') || 'light';
+      const themeValue = savedTheme === 'dark' ? 'github-dark' : 'github-light';
+
+      // Utterances iframe에 메시지 전송
+      const utterances = document.querySelector('.utterances iframe');
+      if (utterances) {
+        utterances.contentWindow.postMessage(
+          {type: 'set-theme', theme: themeValue},
+          'https://utteranc.es'
+        );
+      }
+    }
+
   </script>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -97,9 +127,9 @@
             <script>
               const savedTheme = localStorage.getItem('theme');
               if (savedTheme === 'dark')
-                document.write("LIGHT");
+                document.write("☉");
               else
-                document.write("DARK");
+                document.write("☾");
             </script>
           </button></div>
       </div>
@@ -160,10 +190,12 @@
 <p>Free 변수와 람다 변수의 바인딩이란 개념은, 마치 절차형에서 로컬 변수나 상위 스코프 변수를 정의해서 메모리로 쓰는 것과 비슷합니다. 함수와 함수를 합성compose하며 필요한 정보지만 아직 알 수 없는 것들은, 그냥 <code>free_v1</code>, <code>free_v2</code>…등으로 표시하고 넘어가며 설계합니다. 그리고, 나중에 <code>\free_v1-&gt;</code>, <code>\free_v2 -&gt;</code> …와 바인딩하면 됩니다. 람다 함수를 품고 품게 설계된 함수 합성 뭉치 어디에서든, Free변수를 필요한만큼 쓰고 나중에 람다 헤드와 바인딩해버리면 됩니다.</p>
 
 <div class="comment">
-<script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
-</script>
+  <script>
+    document.addEventListener('DOMContentLoaded', loadUtterances, { once: true });
+  </script>
 </div>
 <div style="text-align:right">Github 계정이 없는 분은 메일로 보내주세요. lionhairdino at gmail.com </div>
+
   </div>
   <nav class="toc toc-right js-toc relative z-1 transition--300 absolute pa4 pt5 is-position-fixed"></nav>
   <div id="footer">

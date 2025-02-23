@@ -10,6 +10,36 @@
         console.log(savedTheme);
       }
     })();
+
+    function loadUtterances() {
+      const savedTheme = localStorage.getItem('theme') || 'light';
+      const themeValue = savedTheme === 'dark' ? 'github-dark' : 'github-light';
+
+      const script = document.createElement('script');
+      script.src = 'https://utteranc.es/client.js';
+      script.setAttribute('repo', 'lionhairdino/lionhairdino.github.io');
+      script.setAttribute('issue-term', 'url');
+      script.setAttribute('theme', themeValue); // 동적으로 테마 설정
+      script.setAttribute('crossorigin', 'anonymous');
+      script.async = true;
+
+      document.body.appendChild(script);
+    };
+
+    function updateUtterancesTheme() {
+      const savedTheme = localStorage.getItem('theme') || 'light';
+      const themeValue = savedTheme === 'dark' ? 'github-dark' : 'github-light';
+
+      // Utterances iframe에 메시지 전송
+      const utterances = document.querySelector('.utterances iframe');
+      if (utterances) {
+        utterances.contentWindow.postMessage(
+          {type: 'set-theme', theme: themeValue},
+          'https://utteranc.es'
+        );
+      }
+    }
+
   </script>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -97,9 +127,9 @@
             <script>
               const savedTheme = localStorage.getItem('theme');
               if (savedTheme === 'dark')
-                document.write("LIGHT");
+                document.write("☉");
               else
-                document.write("DARK");
+                document.write("☾");
             </script>
           </button></div>
       </div>
@@ -219,10 +249,12 @@
 <p>다시 말하지만, 각 개념들의 근본이 되는 생각에 관한 얘기가 아닙니다. 공통적으로 쓰이는 작은 도구에 관한 얘기입니다. 얼핏 하나의 개념인 걸 잘 쪼개서 보면, 추상화나 일반화가 가능하다든지하는 다른 무언가가 보일 수도 있겠다는… 뭐 그런 얘기입니다. 각 개념들의 증명을 시작할 때, 이런 도구를 쓸 것이다를 알면, 증명을 읽을 때 조금은 도움이 되지 않을까요? 이런 도구들이 몸에 밴다면, 하스켈로 현실을 모델링할 때 써먹을 수 있지 않을까요?</p>
 
 <div class="comment">
-<script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
-</script>
+  <script>
+    document.addEventListener('DOMContentLoaded', loadUtterances, { once: true });
+  </script>
 </div>
 <div style="text-align:right">Github 계정이 없는 분은 메일로 보내주세요. lionhairdino at gmail.com </div>
+
   </div>
   <nav class="toc toc-right js-toc relative z-1 transition--300 absolute pa4 pt5 is-position-fixed"></nav>
   <div id="footer">

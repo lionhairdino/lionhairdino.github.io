@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (savedTheme === 'dark') {
     document.documentElement.classList.add('dark-mode');
-    toggleButton.textContent = 'LIGHT';
+    toggleButton.textContent = '☉';
   }
 
   toggleButton.addEventListener('click', () => {
@@ -12,10 +12,12 @@ document.addEventListener('DOMContentLoaded', () => {
     elem.toggle('dark-mode');
     if (elem.contains('dark-mode')) {
       localStorage.setItem('theme', 'dark');
-      toggleButton.textContent = 'LIGHT';
+      toggleButton.textContent = '☉';
+      updateUtterancesTheme();
     } else {
       localStorage.setItem('theme', 'light');
-      toggleButton.textContent = 'DARK';
+      toggleButton.textContent = '☾';
+      updateUtterancesTheme();
     }
   });
 });

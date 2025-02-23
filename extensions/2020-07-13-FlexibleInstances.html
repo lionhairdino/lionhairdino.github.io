@@ -10,6 +10,36 @@
         console.log(savedTheme);
       }
     })();
+
+    function loadUtterances() {
+      const savedTheme = localStorage.getItem('theme') || 'light';
+      const themeValue = savedTheme === 'dark' ? 'github-dark' : 'github-light';
+
+      const script = document.createElement('script');
+      script.src = 'https://utteranc.es/client.js';
+      script.setAttribute('repo', 'lionhairdino/lionhairdino.github.io');
+      script.setAttribute('issue-term', 'url');
+      script.setAttribute('theme', themeValue); // 동적으로 테마 설정
+      script.setAttribute('crossorigin', 'anonymous');
+      script.async = true;
+
+      document.body.appendChild(script);
+    };
+
+    function updateUtterancesTheme() {
+      const savedTheme = localStorage.getItem('theme') || 'light';
+      const themeValue = savedTheme === 'dark' ? 'github-dark' : 'github-light';
+
+      // Utterances iframe에 메시지 전송
+      const utterances = document.querySelector('.utterances iframe');
+      if (utterances) {
+        utterances.contentWindow.postMessage(
+          {type: 'set-theme', theme: themeValue},
+          'https://utteranc.es'
+        );
+      }
+    }
+
   </script>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -97,9 +127,9 @@
             <script>
               const savedTheme = localStorage.getItem('theme');
               if (savedTheme === 'dark')
-                document.write("LIGHT");
+                document.write("☉");
               else
-                document.write("DARK");
+                document.write("☾");
             </script>
           </button></div>
       </div>
@@ -164,10 +194,12 @@ Haskell98에서 이렇게 제약을 해두었다고 하는데 왜 그럴까요?<
 <p>이게 처음에는 좀 혼란스러운 부분입니다. SomeConfig로 추론했다면 GHC가 알아서 나중에 타입 매칭을 해서 SoneConfig가 아닌게 들어오면 에러를 내면 좋은데, “이 함수는 SomeConfig 타입을 쓰는데, 나중에 다른게 들어오면 안되잖아, 그러니 네가 확실하게 통과 절차를 만들어 둬.”라고 미리 강요합니다. 아직 관련 설명은 보지 못했지만, 간단하게 다음과 같은 경우를 생각해 보면 이유를 추측할 수 있습니다. somefunc를 다른 부품(함수)과 조립할 때, <em>타입 서명만 보면서 하려면 타입 서명에 필요한 조건은 모두 적어놔야만 합니다.</em></p>
 
 <div class="comment">
-<script src="https://utteranc.es/client.js" repo="lionhairdino/lionhairdino.github.io" issue-term="url" theme="github-light" crossorigin="anonymous" async>
-</script>
+  <script>
+    document.addEventListener('DOMContentLoaded', loadUtterances, { once: true });
+  </script>
 </div>
 <div style="text-align:right">Github 계정이 없는 분은 메일로 보내주세요. lionhairdino at gmail.com </div>
+
   </div>
   <nav class="toc toc-right js-toc relative z-1 transition--300 absolute pa4 pt5 is-position-fixed"></nav>
   <div id="footer">
