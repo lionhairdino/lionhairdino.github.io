@@ -147,7 +147,17 @@
 </div>
 
 <p>Applicative Functor 또는 줄여서 Applicatives라 부릅니다.<br />
-Applicatives의 기본 개념은 <a href="http://learnyouahaskell.com/functors-applicative-functors-and-monoids">learnyouahaskell</a>를 참고해 주시고, 여기서는 Applicatives와 Monad의 다른 점을 주로 보겠습니다.</p>
+</p>
+<p>2025.2.25 추가<br />
+&gt; 왜 이름이 Applicative Functor일까?
+&gt; <code>Maybe</code>를 예를 들면, <code>(a -&gt; b)</code>함수를 <code>Maybe</code> 안에 있는 <code>a</code>에 접근할 수 있게 해주는 <code>fmap</code>을 가지고 있는 구조를 펑터라 하고, <code>Maybe a</code>를 <code>Maybe</code> 안에 있는 <code>(a -&gt; b)</code>를 만날 수 있게 해주는 <code>&lt;*&gt;</code>를 가진 구조를 Applictives라 합니다.<br />
+&gt; 지금부터 상상입니다. 함수, 값, 그리고 적용까지 따로 분리해서 보겠습니다. 함수에 값을 넣어주면 당연히 적용이되는 것인데, 이 적용이란 절차를 따로 떼어 보면,<br />
+&gt; <code>f a -&gt; f b, f a, $</code> “적용 <code>$</code>”이란 동작은 원래 있던 걸 그대로 쓰고 있습니다.<br />
+&gt; <code>f (a -&gt; b), f a, &lt;*&gt;</code> 기존 적용 <code>$</code>과는 다른 “적용<code>&lt;*&gt;</code>”을 정의해서 해결합니다.<br />
+&gt; 적용까지 새로 구현한 걸 가지고 있는, 즉, <code>f</code>타입에 특화 되어 있는 <code>apply</code>를 가진 펑터입니다.
+&gt;
+&gt; 모든 값을 <code>Identity</code> 펑터 값으로 본다면, “적용apply”을 일반화한 게 <code>&lt;*&gt;</code>입니다.</p>
+<p>Applicatives의 기본 개념은 <a href="http://learnyouahaskell.com/functors-applicative-functors-and-monoids">learnyouahaskell</a>를 참고해 주시고, 여기서는 Applicatives와 Monad의 다른 점을 주로 보겠습니다.</p>
 <blockquote>
 <h4 id="아직-결정되지-않은-effect">아직 결정되지 않은 Effect</h4>
 <p>2022-12-18 추가<br />

@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko" lang="ko">
+
+<head>
+  <script>
+    (function () {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'dark') {
+        document.documentElement.classList.add('dark-mode');
+      }
+    })();
+
+    function loadUtterances() {
+      const savedTheme = localStorage.getItem('theme');
+      const themeValue = savedTheme === 'dark' ? 'github-dark' : 'github-light';
+
+      console.log("theme");
+      console.log(themeValue);
+      const script = document.createElement('script');
+      script.src = 'https://utteranc.es/client.js';
+      script.setAttribute('repo', 'lionhairdino/lionhairdino.github.io');
+      script.setAttribute('issue-term', 'url');
+      script.setAttribute('theme', themeValue);
+      script.setAttribute('crossorigin', 'anonymous');
+      script.async = true;
+      document.body.appendChild(script);
+    };
+
+    function updateUtterancesTheme() {
+      const savedTheme = localStorage.getItem('theme');
+      const themeValue = savedTheme === 'dark' ? 'github-dark' : 'github-light';
+
+      // Utterances iframe에 메시지 전송
+      const utterances = document.querySelector('.utterances iframe');
+      if (utterances) {
+        utterances.contentWindow.postMessage(
+          {type: 'set-theme', theme: themeValue},
+          'https://utteranc.es'
+        );
+      }
+    }
+
+  </script>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>lionhairdino - Core 언어 둘러 보기 (작성 중)</title>
+  
+  <meta name="description" content="클래스의 인스턴스를 추론하는 과정을 살펴봤습니다." />
+  <meta property="og:description" content="클래스의 인스턴스를 추론하는 과정을 살펴봤습니다." />
+  
+  <link rel="stylesheet" type="text/css" href="../css/default.css" />
+  <link rel="icon" href="https://lionhairdino.github.io/favicon.svg" />
+  <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino16px.png" sizes="16x16" />
+  <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino24px.png" sizes="24x24" />
+  <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino32px.png" sizes="32x32" />
+  <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino48px.png" sizes="48x48" />
+  <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino57px.png" sizes="57x57" />
+  <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino60px.png" sizes="60x60" />
+  <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino64px.png" sizes="64x64" />
+  <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino72px.png" sizes="72x72" />
+  <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino76px.png" sizes="76x76" />
+  <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino114px.png" sizes="114x114" />
+  <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino120px.png" sizes="120x120" />
+  <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino144px.png" sizes="144x144" />
+  <link rel="shortcut icon" href="../favicon.ico" />
+  <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino152px.png" sizes="152x152" />
+  <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino180px.png" sizes="180x180" />
+  <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino192px.png" sizes="192x192" />
+  <link rel="manifest" href="../site.webmanifest" />
+  <link rel="mask-icon" href="https://lionhairdino.github.io/Lionhairdino_black.svg" color="#ff7500" />
+  <meta name="msapplication-TileImage" content="/images/favicon/Lionhairdino144px.png" />
+  <meta name="msapplication-TileColor" content="#ff7500" />
+  <meta name="theme-color" content="#ffffff" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Core 언어 둘러 보기 (작성 중)" />
+  <meta property="og:site_name" content="Lionhairdino" />
+  <meta property="og:url" content="https://lionhairdino.github.io/posts/2025-02-28-coreLanguage.html" />
+  
+  <meta property="og:image" content="https://lionhairdino.github.io/images/state400px.png" />
+  
+  
+  <meta name="keywords" content="함수형, 하스켈, haskell, 타입 추론, type inference, Core, elaboration, unification, equality, constraint">
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-E9WZ6VXGHP"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-E9WZ6VXGHP');
+  </script>
+  <script src="../script/copycode.js"></script>
+
+  <script src="../script/darkmode.js"></script>
+  <script async src="https://cse.google.com/cse.js?cx=9c53b4915cbb2605c"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.11.1/tocbot.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.11.1/tocbot.css" />
+  <meta name="fediverse:creator" content="@lionhairdino@mastodon.social" />
+  <link rel="alternate" type="application/rss+xml" title="상상 하스켈 - Lionhairdino" href="rss.xml" />
+</head>
+
+<body>
+  <div id="header">
+    <div style="display:inline-block;margin-right:5px;padding-top: 5px;" id="logo">
+      <a href="../"><img style="width:30px;border:none" src="../images/favicon/Lionhairdino48px.png"></a>
+    </div>
+    <div style="display:inline-block;vertical-align: top;padding-top:5px;" id="navigation">
+      <a href="../">lionhairdino</a>
+      <a href="../about.html">about</a>
+      <!--<a href="/archive.html">archive</a>-->
+    </div>
+    <div style="display:inline-block;font-size:0.8em;vertical-align: top;">
+      <div style="display:inline-block;vertical-align: top;padding-top: 5px"></div>
+      <div style="display:inline-block;vertical-align: top;padding-top: 11px; padding-left: 10px;"><a rel="me" href="https://mastodon.social/@lionhairdino"><img style="width:20px;border:none" src="../images/mastodon.svg"></a></div>
+      <div style="display:inline-block;vertical-align: top;padding-top: 11px; padding-left: 2px;"><a href="https://lionhairdino.bsky.social"><img style="width:18px;border:none" src="../images/bluesky.svg"></a>
+      </div>
+      <div style="display:inline-block;vertical-align: top;padding-top: 11px; padding-left: 2px;"><a href="https://discordapp.com/users/lionhairdino#7687"><img style="width:20px;border:none" src="../images/discord.svg"></a></div>
+      <div style="display:inline-block;vertical-align: top;padding-top: 11px; padding-left: 2px;"><a href="https://x.com/lionhairdino"><img style="width:15px;border:none" src="../images/X.svg"></a></div>
+      <div style="display:inline-block;vertical-align: top;padding-top: 11px; padding-left: 2px;"><a href="https://linkedin.com/in/lionhairdino-l-baaa54244"><img style="width:20px;border:none" src="../images/linkedin.svg"></a></div>
+      <div style="display:inline-block;vertical-align: top;padding-top: 11px; padding-left: 2px;"><a href="https://github.com/lionhairdino"><img style="width:20px;border:none" src="../images/github.svg"></a></div>
+      <div style="display:inline-block;vertical-align: top;padding-top: 11px; padding-left: 2px;"><a href="https://www.threads.net/@linohairdino"><img style="width:20px;border:none" src="../images/threads.svg"></a></div>
+    </div>
+    <div>
+      <div style="display:inline-block;width:180px;">
+        <div class="gcse-searchbox-only"></div>
+        <div><button id="theme-toggle">
+            <script>
+              const savedTheme = localStorage.getItem('theme');
+              if (savedTheme === 'dark')
+                document.write("☉");
+              else
+                document.write("☾");
+            </script>
+          </button></div>
+      </div>
+    </div>
+    <div>
+      여기 글들은 일종의 질문입니다. 용어 선택도 학계, 업계에서 쓰는 걸로 되어 있지 않고, 틀린 내용이 있을 수도 있습니다. 여기 글을 처음 읽는 분은, 먼저 <a href="warning.html">주의문</a>을 꼭 읽어보세요.
+    </div>
+  </div>
+  <div class="js-toc-content">
+    <h1>Core 언어 둘러 보기 (작성 중)</h1>
+    <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+<div class="info">
+    Posted on February 28, 2025
+    
+</div>
+
+<p>※ 아래 GHCi에 실행 예시들은 <code>:set -ddump-simple</code> 옵션을 준 상태입니다.<br />
+<code>:set -fprint-typechecker-elaboration</code><br />
+<code>:set -ddumpt-types</code></p>
+<p>타입 추론 단계를 보여 주긴 하지만, “왜” 그렇게 추론했는지까진 알려 주진 않습니다.</p>
+<h3 id="elaborate">elaborate</h3>
+<p>타입을 추론해서, 명확한 타입들을 붙여 나가는 작업을 말하며, 타입이 명시화 된 Core 언어 코드를 elabrated 됐다고 말합니다. 번역한다면, “명시화” 정도 될 것 같습니다.</p>
+<h3 id="unification-variable">unification variable</h3>
+<p><code>f(X, 1) = f(2, Y)</code>일 때, 이 식이 성립하게 하려면 <code>X = 2</code>, <code>Y = 1</code>로 unification한다고 말합니다. 이 때, <code>X</code>,<code>Y</code>를 unification variable이라 부릅니다. 번역하면, 일치화 정도 될 것 같습니다.</p>
+<h3 id="equality-constraint">equality constraint</h3>
+<div class="sourceCode" id="cb1"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>a ~ b</span></code></pre></div>
+<p><code>a</code>와 <code>b</code>가 같은 타입이어야 한다는 제약입니다.</p>
+<p>※ 참고 <a href="https://lionhairdino.github.io/posts/2020-07-14-TypeEqualityConstraint.html">Type equality constraint “~”</a></p>
+<h2 id="ghc가-컴파일-과정-중-생성하는-변수">GHC가 컴파일 과정 중 생성하는 변수</h2>
+<p>특별한 이유가 있는 것 같진 않고, 구분을 위해 아래 접두어를 붙이는 걸로 보입니다.</p>
+<p><code>#f</code> : 타입 클래스 인스턴스 딕셔너리<br />
+<code>#d</code> : 타입 클래스 제약constraint<br />
+<code>#c</code> : 클래스 메소드</p>
+<p>GHC는 클래스의 여러 인스턴스들 중에 적합한 인스턴스를 선택해서 해당 인스턴스에 있는 메소드를 사용합니다. 인스턴스를 딕셔너리 구조로 만들고, Core 언어에선 타입에 맞는 딕셔너리를 함수에 인자로 넙깁니다. 이때 딕셔너리들엔 <code>#</code>을 붙입니다. 예를 들어, <code>#fOrdInt</code>라 하면, <code>Ord</code>클래스 인스턴스 중 <code>Int</code> 인스턴스를 가리킵니다.</p>
+<p>가장 단순한 추론 과정을 보겠습니다.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ot">{-# LANGUAGE NoImplicitPrelude #-}</span> </span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- 하스켈의 표준 라이브러리라 할 수 있는 Prelude를 쓰려면 명시하겠다는 뜻입니다.</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">Ord</span> a <span class="kw">where</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="ot">  compare ::</span> a <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Bool</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Ord</span> <span class="dt">Int</span> <span class="kw">where</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">compare</span> x y <span class="ot">=</span> x <span class="op">&lt;=</span> y</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="ot">foo ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Bool</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>foo <span class="ot">=</span> <span class="fu">compare</span></span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>λ<span class="op">&gt;</span> <span class="op">:</span>t foo</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ot">foo ::</span> <span class="dt">GHC.Types.Int</span> <span class="ot">-&gt;</span> <span class="dt">GHC.Types.Int</span> <span class="ot">-&gt;</span> <span class="dt">GHC.Types.Bool</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>λ<span class="op">&gt;</span> foo <span class="dv">1</span> <span class="dv">1</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="op">====================</span> <span class="dt">Simplified</span> expression <span class="op">====================</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> {</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="ot">  it_a1wP ::</span> <span class="dt">GHC.Types.Bool</span> <span class="co">-- 결과 저장을 위한 변수</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  [<span class="dt">LclId</span>, <span class="co">-- it_a1wP의 속성을 [...] 안에 써줍니다. LclId는 지역 변수란 뜻</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>   <span class="dt">Unf</span><span class="ot">=</span><span class="dt">Unf</span>{<span class="dt">Src</span><span class="op">=&lt;</span>vanilla<span class="op">&gt;</span>, <span class="dt">TopLvl</span><span class="ot">=</span><span class="dt">False</span>, <span class="co">-- 최적화 관련 속성. </span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>           <span class="dt">Value</span><span class="ot">=</span><span class="dt">False</span>, <span class="dt">ConLike</span><span class="ot">=</span><span class="dt">False</span>, <span class="dt">WorkFree</span><span class="ot">=</span><span class="dt">False</span>, <span class="dt">Expandable</span><span class="ot">=</span><span class="dt">False</span>,</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>           <span class="dt">Guidance</span><span class="ot">=</span><span class="dt">IF_ARGS</span> [] <span class="dv">50</span> <span class="dv">0</span>}]</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  it_a1wP <span class="ot">=</span> Ghci5.foo (<span class="dt">GHC.Types.I</span><span class="op">#</span> <span class="dv">1</span><span class="op">#</span>) (<span class="dt">GHC.Types.I</span><span class="op">#</span> <span class="dv">1</span><span class="op">#</span>) } <span class="kw">in</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>GHC.Base.thenIO <span class="co">-- IO a -&gt; IO b -&gt; IO b 첫 번째 IO작업이 끌나고, 다음 IO작업 실행을 의미</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  <span class="op">@</span>() <span class="co">-- 타입을 명시하지 않거나, 타입을 무시하는 의미</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>  <span class="op">@</span>[<span class="dt">GHC.Types.Any</span>] <span class="co">-- 리스트 타입 Any</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>  (System.IO.print <span class="op">@</span><span class="dt">GHC.Types.Bool</span> <span class="op">GHC.Show.$</span>fShowBool it_a1wP)</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>  (GHC.Base.returnIO</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>     <span class="op">@</span>[<span class="dt">GHC.Types.Any</span>]</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>     (<span class="op">GHC.Types.:</span> <span class="co">-- 리스트의 Con을 뜻하는 (:))</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>        <span class="op">@</span><span class="dt">GHC.Types.Any</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>        (<span class="kw">case</span> Unsafe.Coerce.unsafeEqualityProof</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>                <span class="op">@</span>(<span class="op">*</span>) <span class="op">@</span><span class="dt">GHC.Types.Any</span> <span class="op">@</span><span class="dt">GHC.Types.Bool</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>         <span class="kw">of</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>         { <span class="dt">Unsafe.Coerce.UnsafeRefl</span> v2_aoH <span class="ot">-&gt;</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>         it_a1wP <span class="ot">`cast`</span> (<span class="dt">Sub</span><span class="ot"> v2_aoH ::</span> <span class="dt">GHC.Types.Bool</span> <span class="op">~</span><span class="dt">R</span><span class="op">#</span> <span class="dt">GHC.Types.Any</span>)</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>         })</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>        (<span class="dt">GHC.Types</span><span class="op">.</span>[] <span class="op">@</span><span class="dt">GHC.Types.Any</span>)))</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a><span class="dt">True</span></span></code></pre></div>
+<h3 id="core에서-함수가-받는-인자">Core에서 함수가 받는 인자</h3>
+<p>다형성이 있는 인자나 출력을 가진 함수라면, 함수가 현재 어떤 타입에서 작동해야 하는지, 어떤 인스턴스 딕셔너리를 써야 하는지등의 정보가 필요한데, Core에선 이들 정보 모두가 인자로 표시 됩니다. 클래스 제약도 마찬가지로 인자로 표시됩니다.<br />
+GHCi에서 작동한 <code>print</code>는 <code>it_a1wP</code>를 출력하는데, 값을 타입은 <code>@GHC.Types.Bool</code> 타입이고, <code>Show</code>클래스의 인스턴스 <code>GHC.Show.$fShowBool</code>를 쓰겠다는 뜻입니다.</p>
+<h3 id="section">@</h3>
+<p><code>@</code> 타입 적용Type application, 타입 지정 효과가 납니다. 다형성이 있는 변수에 <code>@</code>를 붙이면 하나의 타입으로 고정합니다.</p>
+<h3 id="it">it</h3>
+<p>GHCi에서 방금 평가한 표현식을 가리킬 때 씁니다.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>λ&gt; 42</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>42</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>λ&gt; it + 1</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>43</span></code></pre></div>
+<p>Core 언어에서 이 <code>it</code>에 바인딩하는 변수가 <code>it_aFo</code>입니다. <code>_aFo</code>는 유일한 이름을 붙이기 위해 붙이는 변수명입니다.</p>
+<h3 id="프리미티브-타입">프리미티브 타입</h3>
+<p><code>I#</code>, <code>1#</code> 같은 것들은 프리미티브 타입을 뜻합니다. 하스켈의 일반적인 정수 <code>Int</code>, <code>Integer</code>는 boxed 타입이지만, <code>#</code>이 붙은 타입들은 unboxed 원시 타입입니다.<br />
+<code>1#</code>: <code>Int#</code> 타입의 리터럴 값 <code>1</code></p>
+<h3 id="해석">해석</h3>
+<p>복잡하니 위 소스에서 <code>GHC.Types.</code>, <code>GHC.Base.</code>, <code>GHC.Show</code>, <code>Ghci5.</code>를 지우고 읽으면</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> {</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ot">  it_a1wP ::</span> <span class="dt">Bool</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  [<span class="dt">LclId</span>,<span class="op">...</span> 최적화]</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  it_a1wP <span class="ot">=</span> foo (<span class="dt">I</span><span class="op">#</span> <span class="dv">1</span><span class="op">#</span>) (<span class="dt">I</span><span class="op">#</span> <span class="dv">1</span><span class="op">#</span>) } <span class="kw">in</span> </span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- 위 구문은 여기서 끝나고, 아래는 GHCi에서 출력에 관한 동작입니다.</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>thenIO <span class="co">-- &lt;--- 함수 </span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="op">@</span>() </span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="op">@</span>[<span class="dt">Any</span>] </span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  (System.IO.print <span class="op">@</span><span class="dt">Bool</span> <span class="op">$</span>fShowBool it_a1wP) <span class="co">-- &lt;--- 함수</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  (returnIO <span class="co">-- &lt;--- 함수</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>     <span class="op">@</span>[<span class="dt">Any</span>]</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>     (<span class="op">:</span> </span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>        <span class="op">@</span><span class="dt">Any</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>        (<span class="kw">case</span> Unsafe.Coerce.unsafeEqualityProof</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>                <span class="op">@</span>(<span class="op">*</span>) <span class="op">@</span><span class="dt">Any</span> <span class="op">@</span><span class="dt">Bool</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>         <span class="kw">of</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>         { <span class="dt">Unsafe.Coerce.UnsafeRefl</span> v2_aoH <span class="ot">-&gt;</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>         it_a1wP <span class="ot">`cast`</span> (<span class="dt">Sub</span><span class="ot"> v2_aoH ::</span> <span class="dt">Bool</span> <span class="op">~</span><span class="dt">R</span><span class="op">#</span> <span class="dt">Any</span>)</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>         })</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>        ([] <span class="op">@</span><span class="dt">Any</span>)))</span></code></pre></div>
+<h2 id="arr-메소드를-위한-인스턴스를-찾는-동작">arr 메소드를 위한 인스턴스를 찾는 동작</h2>
+<p><code>arr (const 42)</code>의 타입은 <code>a b c</code>입니다. <code>-&gt;</code>타입이 아닙니다. 다시 말해 인자를 받을 수 있는 함수가 아닙니다. 그런데 <code>()</code>를 바로 넣어 주면, 알아서 <code>Arrow</code>의 <code>-&gt;</code>인스턴스에 있는 <code>arr</code>로 추론하고, <code>const 42 ()</code>의 결과를 출력합니다. 위에 <code>compare</code>가 <code>Int</code> 인자 타입을 보고, 인스턴스를 추론하는 것과 조금 다른 절차가 있는 듯이 보였습니다.</p>
+<p>이 글은 <code>arr</code> 메소드를 어째서 <code>Arrow</code>의 <code>-&gt;</code> 인스턴스에 있는 메소드를 골라오는 것인가에서 시작했습니다.</p>
+<p>인자를 주는 모양 때문에 <code>Arrow</code>의 <code>(-&gt;)</code>의 인스턴스를 찾아 온 것일까요? 그렇다면, <code>pure ()</code> 같은 경우도, <code>Applicative</code> 클래스의 <code>(-&gt;)</code>인스턴스로 추론 될까요?<br />
+(※ 마치 GHCi에서 <code>Num</code>클래스의 디폴트 인스턴스로 <code>Integer</code>를 지정해서 쓰는 것처럼 <code>Arrow</code> 클래스도 디폴트 인스턴스 지정이 있는 건가 했는데, 그 건 아니었습니다.)</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>λ&gt; arr (const 42) ()</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>42</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>λ&gt; :t arr (const 42)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>arr (const 42) :: (Arrow a, GHC.Num.Num c) =&gt; a b c</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>λ&gt; :t arr (const 42) ()</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>arr (const 42) () :: GHC.Num.Num t =&gt; t</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="op">====================</span> <span class="dt">Simplified</span> expression <span class="op">====================</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> {</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="ot">  it_aFo ::</span> <span class="kw">forall</span> {t}<span class="op">.</span> <span class="dt">GHC.Num.Num</span> t <span class="ot">=&gt;</span> t </span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  [<span class="dt">LclId</span>, </span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>   <span class="dt">Arity</span><span class="ot">=</span><span class="dv">1</span>, <span class="co">--하나의 인자, Num t =&gt; 딕셔너리를 받는다.</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>   <span class="dt">Unf</span> <span class="op">:</span> </span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>   <span class="dt">Unf</span><span class="ot">=</span><span class="dt">Unf</span>{<span class="dt">Src</span><span class="op">=&lt;</span>vanilla<span class="op">&gt;</span>, <span class="dt">TopLvl</span><span class="ot">=</span><span class="dt">False</span>,</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>           <span class="dt">Value</span><span class="ot">=</span><span class="dt">True</span>, <span class="dt">ConLike</span><span class="ot">=</span><span class="dt">True</span>, <span class="dt">WorkFree</span><span class="ot">=</span><span class="dt">True</span>, <span class="dt">Expandable</span><span class="ot">=</span><span class="dt">True</span>,</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>           <span class="dt">Guidance</span><span class="ot">=</span><span class="dt">IF_ARGS</span> [<span class="dv">30</span>] <span class="dv">100</span> <span class="dv">0</span>}]</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>  it_aFo </span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    <span class="ot">=</span> \ (<span class="op">@</span>t_aWv) (<span class="op">$</span><span class="ot">dNum_aWP ::</span> <span class="dt">GHC.Num.Num</span> t_aWv) <span class="ot">-&gt;</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>        Control.Arrow.arr</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>          <span class="op">@</span>(<span class="ot">-&gt;</span>) <span class="co">-- (-&gt;) 타입 적용</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>          <span class="op">Control.Arrow.$</span>fArrowFUN <span class="co">-- `Arrow`클래스의 `Fun` 딕셔너리</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>          <span class="op">@</span>()</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>          <span class="op">@</span>t_aWv</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>          (GHC.Base.const</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>             <span class="op">@</span>t_aWv</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>             <span class="op">@</span>()</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>             (GHC.Num.fromInteger <span class="op">@</span>t_aWv <span class="op">$</span>dNum_aWP (<span class="dt">GHC.Num.Integer.IS</span> <span class="dv">42</span><span class="op">#</span>)))</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>          <span class="dt">GHC.Tuple.Prim</span><span class="op">.</span>() } <span class="kw">in</span></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>          <span class="op">...</span></span></code></pre></div>
+<pre><code>λ&gt; pure ()
+
+λ&gt; :t pure
+pure :: Applicative f =&gt; a -&gt; f a
+
+λ&gt; :t pure ()
+pure () :: Applicative f =&gt; f ()</code></pre>
+<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="op">====================</span> <span class="dt">Simplified</span> expression <span class="op">====================</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>GHC.Base.bindIO</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="op">@</span>()</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="op">@</span>[<span class="dt">GHC.Types.Any</span>]</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  (GHC.GHCi.ghciStepIO</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>     <span class="op">@</span><span class="dt">GHC.Types.IO</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>     <span class="op">GHC.GHCi.$</span>fGHCiSandboxIOIO</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>     <span class="op">@</span>()</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>     (GHC.Base.pure</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>        <span class="op">@</span><span class="dt">GHC.Types.IO</span> <span class="op">GHC.Base.$</span>fApplicativeIO <span class="op">@</span>() <span class="dt">GHC.Tuple.Prim</span><span class="op">.</span>()))</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>  (\ (<span class="ot">it_aXZ ::</span> ()) <span class="ot">-&gt;</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>     GHC.Base.returnIO</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>       <span class="op">@</span>[<span class="dt">GHC.Types.Any</span>]</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>       (<span class="op">GHC.Types.:</span></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>          <span class="op">@</span><span class="dt">GHC.Types.Any</span></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>          (<span class="kw">case</span> Unsafe.Coerce.unsafeEqualityProof <span class="op">@</span>(<span class="op">*</span>) <span class="op">@</span><span class="dt">GHC.Types.Any</span> <span class="op">@</span>() <span class="kw">of</span></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>           { <span class="dt">Unsafe.Coerce.UnsafeRefl</span> v2_aoH <span class="ot">-&gt;</span></span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>           it_aXZ <span class="ot">`cast`</span> (<span class="dt">Sub</span><span class="ot"> v2_aoH ::</span> () <span class="op">~</span><span class="dt">R</span><span class="op">#</span> <span class="dt">GHC.Types.Any</span>)</span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>           })</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>          (<span class="dt">GHC.Types</span><span class="op">.</span>[] <span class="op">@</span><span class="dt">GHC.Types.Any</span>)))</span></code></pre></div>
+<p><code>arr (const 42)</code>가 <strong>()를 받으려면</strong> <code>arr</code>의 결과가 <code>(-&gt;)</code>타입이어야 하니, <code>(-&gt;)</code>인스턴스의 <code>arr</code>이 적당한 후보다?<br />
+<code>pure ()</code>는 <code>pure</code>가 <strong>()를 받으려면</strong> <code>pure</code>의 결과가 <code>(-&gt;)</code>타입이어야 하니 <code>(-&gt;)</code>의 인스턴스로 추론될 것 같지만, <code>Applicative</code>의 <code>IO</code>인스턴스의 <code>pure</code>로 추론됩니다.</p>
+<p><code>arr (const 42) :: Arrow a =&gt; a b Int</code>에 <code>()</code>를 적용하려면, <code>arr</code>의 결과 타입 <code>a b Int</code>가 <code>() -&gt; Int</code>가 되어야 합니다. <code>(-&gt;)</code> 타입을 다른 타입과 다름 없는 타이처럼 보이게 <code>type Func = (-&gt;)</code>로 두면, <code>Func () Int</code> 타입이 되어야 한다고 말할 수 있습니다. <strong>arr의 결과 타입이 Func인 인스턴스를 고르면</strong>, Arrow의 <code>Func</code> 인스턴스에 있는 <code>arr</code>로 추론합니다.</p>
+<p><code>pure :: Applicative f =&gt; a -&gt; f a</code>에 <code>()</code>를 적용하려면, <code>a -&gt; f a</code>가 <code>() -&gt; f a</code>가 되어야 하고, 아직 <code>f</code>에 대한 제약은 없습니다. <code>f</code>는 필요할 때가 되면 찾을 겁니다. Applicative의 모든 인스턴스에 있는 <code>pure</code>는 다 <code>(-&gt;) a (f a)</code>타입이니, <strong>현재 단서로는 더 이상 추론할 수 없습니다.</strong></p>
+<p><code>arr</code>의 경우엔, 인자를 받을 수 있는 <code>-&gt;</code>여야 한다는 추론 단서로 인해 <code>a</code>가 <code>(-&gt;)</code>이 되어야 한다는 것까지 추론 되었지만, <code>pure</code>의 경우엔 인자를 받을 수 있어야 된다는 것 만으론 <code>f</code>를 추론하지 못했습니다. <code>pure ()</code>가 쓰이는 컨텍스트를 보고 최종 <code>f</code>를 결정하게 됩니다. GHCi의 인터랙션 환경은 <code>IO</code>이므로, 결국 <code>f</code>를 <code>IO</code>로 추론합니다.</p>
+<p>위 설명에, 타입 체크, 타입 추론, instance resolution과 type defaulting까지 다 섞어서 인포멀하게 말고 있습니다. 포멀하게 말하는 능력을 키워야 하는데 쉽지 않습니다.</p>
+<p><span class="citation" data-cites="jhhuh님이">@jhhuh님이</span> 아래 영상을 추천해 주시고, equality constraint를 쌓아 뒀다가 추론한다고 조언해 주셨습니다.<br />
+<a href="https://www.youtube.com/watch?v=x3evzO8O9e8">Simon Peyton Jones how GHC type inference engine actually works</a></p>
+
+<div class="comment">
+  <script>
+    document.addEventListener('DOMContentLoaded', loadUtterances, { once: true });
+  </script>
+</div>
+<div style="text-align:right">Github 계정이 없는 분은 메일로 보내주세요. lionhairdino at gmail.com </div>
+
+  </div>
+  <nav class="toc toc-right js-toc relative z-1 transition--300 absolute pa4 pt5 is-position-fixed"></nav>
+  <div id="footer">
+    © 2022 lionhairdino. All rights reserved. Generated by <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+  </div>
+  <script>
+    tocbot.init({
+      tocSelector: '.js-toc',
+      contentSelector: '.js-toc-content',
+      headingSelector: 'h2, h3',
+      hasInnerContainers: true,
+    });
+  </script>
+</body>
+
+</html>
