@@ -311,7 +311,7 @@ pure () :: Applicative f =&gt; f ()</code></pre>
 <p><code>pure :: Applicative f =&gt; a -&gt; f a</code>에 <code>()</code>를 적용하려면, <code>a -&gt; f a</code>가 <code>() -&gt; f a</code>가 되어야 하고, 아직 <code>f</code>에 대한 제약은 없습니다. <code>f</code>는 필요할 때가 되면 찾을 겁니다. Applicative의 모든 인스턴스에 있는 <code>pure</code>는 다 <code>(-&gt;) a (f a)</code>타입이니, <strong>현재 단서로는 더 이상 추론할 수 없습니다.</strong></p>
 <p><code>arr</code>의 경우엔, 인자를 받을 수 있는 <code>-&gt;</code>여야 한다는 추론 단서로 인해 <code>a</code>가 <code>(-&gt;)</code>이 되어야 한다는 것까지 추론 되었지만, <code>pure</code>의 경우엔 인자를 받을 수 있어야 된다는 것 만으론 <code>f</code>를 추론하지 못했습니다. <code>pure ()</code>가 쓰이는 컨텍스트를 보고 최종 <code>f</code>를 결정하게 됩니다. GHCi의 인터랙션 환경은 <code>IO</code>이므로, 결국 <code>f</code>를 <code>IO</code>로 추론합니다.</p>
 <p>위 설명에, 타입 체크, 타입 추론, instance resolution과 type defaulting까지 다 섞어서 인포멀하게 말고 있습니다. 포멀하게 말하는 능력을 키워야 하는데 쉽지 않습니다.</p>
-<p><span class="citation" data-cites="jhhuh님이">@jhhuh님이</span> 아래 영상을 추천해 주시고, equality constraint를 쌓아 뒀다가 추론한다고 조언해 주셨습니다.<br />
+<p>※ <span class="citation" data-cites="jhhuh님이">@jhhuh님이</span> 아래 영상을 추천해 주시고, equality constraint를 쌓아 뒀다가 추론한다고 조언해 주셨습니다. 감사합니다.<br />
 <a href="https://www.youtube.com/watch?v=x3evzO8O9e8">Simon Peyton Jones how GHC type inference engine actually works</a></p>
 
 <div class="comment">
