@@ -244,7 +244,7 @@ GHCi에서 작동한 <code>print</code>는 <code>it_a1wP</code>를 출력하는�
 <span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>         })</span>
 <span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>        ([] <span class="op">@</span><span class="dt">Any</span>)))</span></code></pre></div>
 <h2 id="arr-메소드를-위한-인스턴스를-찾는-동작">arr 메소드를 위한 인스턴스를 찾는 동작</h2>
-<p><code>arr (const 42)</code>의 타입은 <code>a b c</code>입니다. <code>-&gt;</code>타입이 아닙니다. 다시 말해 인자를 받을 수 있는 함수가 아닙니다. 그런데 <code>()</code>를 바로 넣어 주면, 알아서 <code>Arrow</code>의 <code>-&gt;</code>인스턴스에 있는 <code>arr</code>로 추론하고, <code>const 42 ()</code>의 결과를 출력합니다. 위에 <code>compare</code>가 <code>Int</code> 인자 타입을 보고, 인스턴스를 추론하는 것과 조금 다른 절차가 있는 듯이 보였습니다.</p>
+<p><code>arr (const 42)</code>의 타입은 <code>a b c</code>입니다. <code>-&gt;</code>타입이 아닙니다. 다시 말해 인자를 받을 수 있는 함수가 아닙니다. 그런데 <code>()</code>를 바로 넣어 주면, 알아서 <code>Arrow</code>의 <code>-&gt;</code>인스턴스에 있는 <code>arr</code>로 추론하고, <code>const 42 ()</code>의 결과를 출력합니다. 위의 <code>compare</code>가 <code>Int</code> 인자 타입을 보고, 인스턴스를 추론하는 것과 조금 다른 절차가 있는 듯이 보였습니다.</p>
 <p>이 글은 <code>arr</code> 메소드를 어째서 <code>Arrow</code>의 <code>-&gt;</code> 인스턴스에 있는 메소드를 골라오는 것인가에서 시작했습니다.</p>
 <p>인자를 주는 모양 때문에 <code>Arrow</code>의 <code>(-&gt;)</code>의 인스턴스를 찾아 온 것일까요? 그렇다면, <code>pure ()</code> 같은 경우도, <code>Applicative</code> 클래스의 <code>(-&gt;)</code>인스턴스로 추론 될까요?<br />
 (※ 마치 GHCi에서 <code>Num</code>클래스의 디폴트 인스턴스로 <code>Integer</code>를 지정해서 쓰는 것처럼 <code>Arrow</code> 클래스도 디폴트 인스턴스 지정이 있는 건가 했는데, 그 건 아니었습니다.)</p>
@@ -312,7 +312,8 @@ pure () :: Applicative f =&gt; f ()</code></pre>
 <p><code>arr</code>의 경우엔, 인자를 받을 수 있는 <code>-&gt;</code>여야 한다는 추론 단서로 인해 <code>a</code>가 <code>(-&gt;)</code>이 되어야 한다는 것까지 추론 되었지만, <code>pure</code>의 경우엔 인자를 받을 수 있어야 된다는 것 만으론 <code>f</code>를 추론하지 못했습니다. <code>pure ()</code>가 쓰이는 컨텍스트를 보고 최종 <code>f</code>를 결정하게 됩니다. GHCi의 인터랙션 환경은 <code>IO</code>이므로, 결국 <code>f</code>를 <code>IO</code>로 추론합니다.</p>
 <p>위 설명에, 타입 체크, 타입 추론, instance resolution과 type defaulting까지 다 섞어서 인포멀하게 말고 있습니다. 포멀하게 말하는 능력을 키워야 하는데 쉽지 않습니다.</p>
 <p>※ <span class="citation" data-cites="jhhuh님이">@jhhuh님이</span> 아래 영상을 추천해 주시고, equality constraint를 쌓아 뒀다가 추론한다고 조언해 주셨습니다. 감사합니다.<br />
-<a href="https://www.youtube.com/watch?v=x3evzO8O9e8">Simon Peyton Jones how GHC type inference engine actually works</a></p>
+<a href="https://www.youtube.com/watch?v=x3evzO8O9e8">Simon Peyton Jones how GHC type inference engine actually works</a><br />
+위 영상에 쓰인 <a href="https://drive.google.com/file/d/1NRkP0hz-0Yo49Rto70b2nUwxjPiGD9Ci/view">슬라이드</a></p>
 
 <div class="comment">
   <script>
