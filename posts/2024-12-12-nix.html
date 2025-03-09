@@ -332,7 +332,24 @@
 <span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>  <span class="va">hello</span> <span class="op">=</span> pkgs.callPackage <span class="ss">./hello.nix</span> <span class="op">{</span> <span class="op">};</span> <span class="co"># pkgs의 속성을 뒤 이은 함수에게 자동으로 넘긴다.</span></span>
 <span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
 <p>Nix building instructions<br />
-“마치 기계한테 이 설명서 따라해서 빌드해 줘” 라고 할 때, 설명서를 derivation이라 한다. Nix(패키지 매니저)가 따라해서 빌드한 후 결과물이 생기는 걸 realised라 한다.</p>
+“마치 기계한테 이 설명서 따라해서 빌드해 줘” 라고 할 때, 설명서를 derivation이라 한다. Nix(패키지 매니저)가 따라해서 빌드한 후 <code>nix/store</code>에 결과물이 생기는 걸 realised라 한다.</p>
+<blockquote>
+<p><span class="citation" data-cites="jhhuh님의">@jhhuh님의</span> 설명을 옮깁니다.</p>
+<ul>
+<li>수학에서 말하는 derivation은 아닙니다. 닉스에서 특별히 취급되는 데이터 타입입니다. (기본적으로는 그냥 <code>type = "derivation"</code>이 포함된 <code>attrset</code>입니다.)<br />
+</li>
+<li>빌트인 명령어 <code>derivation</code>으로 만들 수 있고 “realize”를 하면 nix store상에 <code>".drv"</code> 파일이 (이것도 derivation이라고 부릅니다.) 생성되는데 빌드를 위한 모든 정보가 담긴 빽빽한 플레인 텍스트파일입니다.<br />
+</li>
+<li>derivation을 “build”하게 되면 nix store에 <code>outpath</code> (이름에 derivation정보로 부터 도출된 해쉬값이 prefix된 디렉토리 혹은 파일)이 nix store에 생성됩니다.</li>
+</ul>
+<p>정리하면,</p>
+<ul>
+<li>data type으로서의 derivation</li>
+<li>builtin 명령 중 하나</li>
+<li>파일 시스템 상의 <code>".drv"</code> 파일</li>
+</ul>
+<p>이 중 하나를 말하는 건데, 그냥 간단히 derivation은 닉스가 빌드할 수 있는 무언가라고 할 수 있겠습니다.</p>
+</blockquote>
 <p><code>Derivation</code>은 기계가 읽을 수 있는 빌드를 위한 레시피를 가지고 있는 특별한 파일. 아래는 <code>hello world</code>를 출력하는 c를 빌드하는 방법을 적어 놓은 닉스 파일이다.</p>
 <div class="sourceCode" id="cb23"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>Derive([(&quot;out&quot;,&quot;/nix/store/1nq46fyv3629slgxnagqn2c01skp7xrq-hello-world&quot;,&quot;&quot;,&quot;&quot;)]</span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>      ,[(&quot;/nix/store/60xqp516mkfhf31n6ycyvxppcknb2dwr-build-hello.drv&quot;,[&quot;out&quot;])]</span>
