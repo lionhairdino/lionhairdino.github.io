@@ -403,6 +403,10 @@ Nix에서 제공하는 패키지만 사용하고, 시스템 환경 변수나 글
 <div class="sourceCode" id="cb22"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>nix-env -iA hix -f https://github.com/input-output-hk/haskell.nix/tarball/master</span></code></pre></div>
 <p>최신 버전을 쓰려면</p>
 <div class="sourceCode" id="cb23"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>hix update</span></code></pre></div>
+<p><code>hix develop</code>, <code>hix flake</code>, <code>hix build</code>, <code>hix run</code> 등, <code>nix</code>를 쓰듯 쓰는 게 인상적이다. 분명 nix flake에 익숙하다면 장점이 될 것 같다.</p>
+<p>이들 명령은 <code>flake.nix</code>를 쓰지 않고, 닉스 버전과 동일하게 작동한다는데, 무슨 말이지? hix는 flake를 쓰는 것 아니었나?
+프로젝트 루트에 <code>flake.nix</code> 파일을 만들지 않아도, <code>flake.nix</code> 파일이 있을 때 <code>nix ***</code> 명령을 사용하듯 <code>hix ***</code>를 사용할 수 있다는 뜻이다. hix는 <code>.hix-flake/flake.nix</code> 에서 자동으로 관리하고, 사용자가 직접 관리할 필요가 없다. 직접 <code>flake.nix</code> 파일을 만들고 유지하고 싶지 않을 때 쓰기 좋다. (반면, haskell-flake는 프로젝트 루트에 <code>flake.nix</code> 파일을 직접 만들고 유지해야 한다.)</p>
+<p>hix는 <code>haskell.nix</code> 스타일을 쓰면서, 필요할 때 <code>.hix-flake/flake.nix</code> 내부에서 flakes를 관리한다.</p>
 <h2 id="haskell-support-for-nix">Haskell Support for Nix</h2>
 <p><a href="https://haskell4nix.readthedocs.io/">haskell4nix</a><br />
 Flake를 쓰지 않고, 하스켈 패키지를 닉스로 설치하는 방법<br />
@@ -505,6 +509,24 @@ Hackage에 등록되어 있는 모든 하스켈 패키지를 위한 빌드 지�
 <span id="cb27-28"><a href="#cb27-28" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span>;</span>
 <span id="cb27-29"><a href="#cb27-29" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 <p><code>nix run</code>으로 실행할 앱을 정의하고 있다. 여기서 앱은 Postgres 서버를 시작하는 간단한 쉘스크립트다. <code>nixpkgs</code>는 이런 스크립트를 위한 <code>writeShellApplication</code>이란 편리한 함수를 제공한다. <code>${script}</code>는 <code>nix/store</code>에서 앱이 저장된 위치를 뜻한다.</p>
+<p>※ pkg-config<br />
+라이브러리에 접근하는 표준 인터페이스 제공<br />
+<code>.pc</code>파일은 보통 <code>/usr/lib/pkgconfig</code> 또는 <code>/usr/lib64/pkgconfig</code>에 설치 된다. 만일 패키지가 <code>.pc</code> 파일 생성하는 설정이 없다면, 수동으로 만들어 등록할 수도 있다.</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>prefix=/usr</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>libdir=${prefix}/lib</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>includedir=${prefix}/include</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>Name: webkit2gtk-4.0 (필수) </span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>Description: WebKitGTK library (선택)</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>Version: 2.46.6 (필수)</span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>Libs: -L${libdir} -lwebkit2gtk-4.0 (필수)</span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>Cflags: -I${includedir}/webkitgtk-4.0 (필수)</span></code></pre></div>
+<p>잘 설치 되었는지 확인</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>&gt; pkg-config --modversion webkit2gtk-4.0</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>&gt; pkg-config --libs webkit2gtk-4.0</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>&gt; pkg-config --cflags webkit2gtk-4.0</span></code></pre></div>
+<p>※ WebkitGTK<br />
+Webkit 렌더링 엔진을 GTK(그래픽 툴킷)와 통합한 라이브러리로, 주로 리눅스에서 웹브라우저나 웹컨텐체를 쓰는 애플리케이션을 개발하는데 쓰인다. GTK 버전에 따른 변형이 있다.</p>
 <p><a href="https://nixos.wiki/wiki/Haskell">How to develop with Haskell and Nix</a><br />
 <a href="https://nixos.org/manual/nixpkgs/unstable/#haskell">nix 공식 문서의 하스켈 섹션</a></p>
 

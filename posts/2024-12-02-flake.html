@@ -44,10 +44,10 @@
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>lionhairdino - Nix의 Flake</title>
+  <title>lionhairdino - 닉스의 Flake</title>
   
-  <meta name="description" content="Nix의 Flake를 이용해서 특정 패키지를 덮어 쓰는 방법을 살펴 봤습니다." />
-  <meta property="og:description" content="Nix의 Flake를 이용해서 특정 패키지를 덮어 쓰는 방법을 살펴 봤습니다." />
+  <meta name="description" content="닉스의 Flake를 이용해서 특정 패키지를 덮어 쓰는 방법을 살펴 봤습니다." />
+  <meta property="og:description" content="닉스의 Flake를 이용해서 특정 패키지를 덮어 쓰는 방법을 살펴 봤습니다." />
   
   <link rel="stylesheet" type="text/css" href="../css/default.css" />
   <link rel="icon" href="https://lionhairdino.github.io/favicon.svg" />
@@ -73,7 +73,7 @@
   <meta name="msapplication-TileColor" content="#ff7500" />
   <meta name="theme-color" content="#ffffff" />
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="Nix의 Flake" />
+  <meta property="og:title" content="닉스의 Flake" />
   <meta property="og:site_name" content="Lionhairdino" />
   <meta property="og:url" content="https://lionhairdino.github.io/posts/2024-12-02-flake.html" />
   
@@ -139,7 +139,7 @@
     </div>
   </div>
   <div class="js-toc-content">
-    <h1>Nix의 Flake</h1>
+    <h1>닉스의 Flake</h1>
     <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
 <div class="info">
     Posted on December  2, 2024
@@ -147,12 +147,12 @@
 </div>
 
 <p>※ Flake 영단어 뜻은 작고 얇은 <strong>조각</strong>을 의미합니다. 아침에 먹던 그 콘프레이크의 프레이크와 같은 뜻입니다.</p>
-<p>Nix 패키지 매니저 2.4부터 도입된, 아직은 실험적 기능이라 합니다만, 실험적인 것 치고는 너무 많은 곳에 쓰이고 있습니다. 어쨌든 공식적으론 여전히 실험적 특징이라 합니다.(2024.11 현재)</p>
-<p>Nix 만으로 각 종 설치, 환경을 완벽히 재현할 수 있으면 좋겠지만, 현재의 Nix는 어떤 패키지의 어떤 버전을 쓰고 있는지 명확히 선언하지 않고 있습니다. 예를 들어, 어떤 채널에 있는 패키지를 참조한다고 한다면, 해당 채널이 고정된 상태가 아니라면 항상 같은 패키지를 가져 온다고 보장할 수 없습니다. 이를 보완하기 위해, 의존성 검사에 필요한 정보들을 추가로 저장해야 나중에 재현 가능성reproduicibily을 높일 수 있습니다. 이를 위해, Nix에 새로운 기능으로 <strong>Flake</strong>를 도입했습니다.</p>
+<p>닉스 패키지 매니저 2.4부터 도입된, 아직은 실험적 기능이라 합니다만, 실험적인 것 치고는 너무 많은 곳에 쓰이고 있습니다. 어쨌든 공식적으론 여전히 실험적 특징이라 합니다.(2024.11 현재)</p>
+<p>닉스 만으로 각 종 설치, 환경을 완벽히 재현할 수 있으면 좋겠지만, 현재의 닉스는 어떤 패키지의 어떤 버전을 쓰고 있는지 명확히 선언하지 않고 있습니다. 예를 들어, 어떤 채널에 있는 패키지를 참조한다고 한다면, 해당 채널이 고정된 상태가 아니라면 항상 같은 패키지를 가져 온다고 보장할 수 없습니다. 이를 보완하기 위해, 의존성 검사에 필요한 정보들을 추가로 저장해야 나중에 재현 가능성reproduicibily을 높일 수 있습니다. 이를 위해, 닉스에 새로운 기능으로 <strong>Flake</strong>를 도입했습니다.</p>
 <p>Flake는 의존성과 버전 정보를 <code>flake.lock</code> 파일에 저장합니다. Nixpkgs 어떤 커밋을 쓰고 있는지 커밋 해시값까자 모두 기록합니다.</p>
 <p><code>flake.lock</code>에 <code>flake.nix</code>의 <code>input</code>에 써 준 모든 것들의 데이터 소스, 해시값, 버전을 기록합니다.</p>
 <p>Flake 기능을 도입하기 전에 쓰던 설정 파일인 <code>configuration.nix</code>도 <code>flake.nix</code>에서 모듈로 불러 옵니다.(<code>configuration.nix</code> 파일도 하나의 모듈 파일입니다.)</p>
-<p>※ 처음 볼 때 Flake를 여기 저기 쓰는데, 해석에 좀 혼란이 있었습니다. 마치 Nix라 하면, Nix OS인지, 패키지 매니저인지, 언어를 뜻하는 지 혼란스러웠던 것처럼요.</p>
+<p>※ 처음 볼 때 Flake를 여기 저기 쓰는데, 해석에 좀 혼란이 있었습니다. 마치 닉스라 하면, 닉스 OS인지, 패키지 매니저인지, 언어를 뜻하는 지 혼란스러웠던 것처럼요.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>flake.nix 파일</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  |------------- 외부 모듈 flake 파일</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  |                     |------------- 외부 모듈 flake 파일 ...</span>
@@ -177,7 +177,7 @@
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="va">outputs</span> <span class="op">=</span></span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span></span>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>      <span class="va">lib</span> <span class="op">=</span>                  <span class="op">;</span><span class="co"># 공통 유틸리티들이 들어 있는, 스탠다드 라이브러리 같은 것</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>      <span class="va">overlays</span> <span class="op">=</span>             <span class="op">;</span><span class="co"># Nixpkgs를 수정, 확장하기 위한 오버레이 정의</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>      <span class="va">overlays</span> <span class="op">=</span>             <span class="op">;</span><span class="co"># 닉스pkgs를 수정, 확장하기 위한 오버레이 정의</span></span>
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>      <span class="va">packages</span> <span class="op">=</span>             <span class="op">;</span><span class="co"># default, x86_64-linux, aarch64-darwin...에 맞는 패키지 정의</span></span>
 <span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>                             ;<span class="co"># nix run 실행할 때 참조</span></span>
 <span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>      <span class="va">apps</span> <span class="op">=</span>                 <span class="op">;</span><span class="co"># nix run 으로 애플리케이션을 실행</span></span>
@@ -197,7 +197,7 @@
 <p>설정 파일을 작성할 때 쓸 도구(<code>lib</code>)들을 준비하고, 기본 패키지에서 사용자 입맛에 맞게 바꾸거나 추가할 패키지(<code>overlays</code>)를 설정하고, 설치할 패키지(<code>packages</code>)를 정의합니다</p>
 <p>시스템을 영구적으로 변경하는 <code>sudo nixos-rebuild switch</code>에서만 이 파일을 읽어 들이는 게 아니라, <code>nix run</code>, <code>nix build</code>,… 등의 명령어들도 이 파일을 읽어 참조합니다.</p>
 <h1 id="flake의-모듈-시스템">Flake의 모듈 시스템</h1>
-<p><code>flake.nix</code>에서 불러 들일 모듈은 다음과 같은 구조를 가지고 있습니다. 아래 정의는 역시 Nix 언어의 <strong>함수 표현식</strong>입니다. <strong>모듈 시스템</strong>이 자동으로 값을 넣어주는, 선언 없이 사용 가능한, 몇 개의 매개 변수를 가지고 있습니다. (※ 함수라고, 사용자가 어디에 직접 적용하거나 그러진 않습니다. 함수형 언어에서 데이터와 관련 메소드들을 묶어서 가지고 다니기에 가장 적합한 구조는 함수입니다.)
+<p><code>flake.nix</code>에서 불러 들일 모듈은 다음과 같은 구조를 가지고 있습니다. 아래 정의는 역시 닉스 언어의 <strong>함수 표현식</strong>입니다. <strong>모듈 시스템</strong>이 자동으로 값을 넣어주는, 선언 없이 사용 가능한, 몇 개의 매개 변수를 가지고 있습니다. (※ 함수라고, 사용자가 어디에 직접 적용하거나 그러진 않습니다. 함수형 언어에서 데이터와 관련 메소드들을 묶어서 가지고 다니기에 가장 적합한 구조는 함수입니다.)
 <a href="https://nixos.wiki/wiki/NixOS_modules">NixOS modules - NixOS Wiki</a></p>
 <p><code>flake.nix</code> 파일의 구성이 아니라 <strong>Flake 모듈 파일의 기본 구성</strong></p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
@@ -376,7 +376,7 @@
 <p><code>:e stdenv.mkDerivation</code>으로 매개 변수 목록을 뽑아 볼 수 있습니다.</p>
 <h3 id="overlays">overlays</h3>
 <p>디폴트 nixpkgs 인스턴스에서, <strong>전역적</strong>으로 derivations을 수정하기 위해 제공되는 기능입니다. 전역적이란 말이 무슨 말이냐 하면, <code>override</code>로 덮어 씌운 건 해당 패키지만 바뀌치기 하고, 다른 패키지가 해당 패키지를 참조하고 있다면, 그 때는 여전히 수정되지 않은 패키지를 참조합니다. 글로벌하게 바꾸려면 <code>overlays</code>를 씁니다.</p>
-<p>Flake를 쓰지 않는 Nix에서는 <code>~/.config/nixpkgs/overlays.nix</code> 또는 <code>~/.config/nixpkgs/overlays/*.nix</code> 파일들로 overlays를 구성할 수 있었지만, Flake는 재현 가능성을 위해 Git 저장소를 벗어나는 설정을 쓸 수 없습니다.</p>
+<p>Flake를 쓰지 않는 닉스에서는 <code>~/.config/nixpkgs/overlays.nix</code> 또는 <code>~/.config/nixpkgs/overlays/*.nix</code> 파일들로 overlays를 구성할 수 있었지만, Flake는 재현 가능성을 위해 Git 저장소를 벗어나는 설정을 쓸 수 없습니다.</p>
 <p>Home Manager와 NixOS는 <code>nixpkgs.overlays</code> 옵션을 가지고 있습니다.</p>
 <div class="sourceCode" id="cb17"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ./overlays/default.nix</span></span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span> <span class="va">config</span><span class="op">,</span> <span class="va">pkgs</span><span class="op">,</span> <span class="va">lib</span><span class="op">,</span> <span class="op">...</span> <span class="op">}</span>:</span>
@@ -613,6 +613,153 @@ Flake를 작성할 때, <code>flake.nix</code> 파일에 여러 필드를 정의
 <span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a>      <span class="op">};</span></span>
 <span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a>    <span class="op">};</span></span>
 <span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<h2 id="flake-y-닉스와-non-flake-닉스-비교">Flake-y 닉스와 Non-Flake 닉스 비교</h2>
+<h3 id="non-flake-닉스">Non-Flake 닉스</h3>
+<p><code>default.nix</code></p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="op">{</span> <span class="va">pkgs</span> <span class="op">?</span> <span class="bu">import</span> &lt;nixpkgs&gt; <span class="op">{}</span> <span class="op">}</span>:</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>pkgs.haskellPackages.callCabal2nix <span class="st">&quot;my-haskell-project&quot;</span> . <span class="op">{}</span></span></code></pre></div>
+<p><code>shell.nix</code></p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="op">{</span> <span class="va">pkgs</span> <span class="op">?</span> <span class="bu">import</span> &lt;nixpkgs&gt; <span class="op">{}</span> <span class="op">}</span>:</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>pkgs.mkShell <span class="op">{</span> <span class="co"># 개발 환경 정의</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>  <span class="va">buildInputs</span> <span class="op">=</span> <span class="op">[</span></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>    pkgs.haskell.compiler.ghc962</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>    pkgs.haskellPackages.cabal-install</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>  <span class="op">];</span></span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p><code>default.nix</code>는 패키지 빌드 역할을 하고, <code>shell.nix</code>는 <code>nix-shell</code>이 개발 환경을 불러올 때 쓰인다.</p>
+<h3 id="flake-y-닉스">Flake-y 닉스</h3>
+<p><code>flake.nix</code></p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  <span class="va">description</span> <span class="op">=</span> <span class="st">&quot;My Haskell project with Nix flakes&quot;</span><span class="op">;</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>  <span class="va">inputs</span> <span class="op">=</span> <span class="op">{</span> <span class="va">nixpkgs</span>.<span class="va">url</span> <span class="op">=</span> <span class="st">&quot;github:NixOS/nixpkgs/nixos-unstable&quot;</span><span class="op">;</span> <span class="op">};</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>  <span class="va">outputs</span> <span class="op">=</span> <span class="op">{</span> <span class="va">self</span><span class="op">,</span> <span class="va">nixpkgs</span> <span class="op">}</span>: </span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span></span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>    <span class="va">system</span> <span class="op">=</span> <span class="st">&quot;x86_64-linux&quot;</span><span class="op">;</span></span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>    <span class="va">pkgs</span> <span class="op">=</span> <span class="bu">import</span> nixpkgs <span class="op">{</span> <span class="kw">inherit</span> system<span class="op">;</span> <span class="op">};</span></span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>  <span class="kw">in</span> <span class="op">{</span></span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>    <span class="va">packages</span>.${<span class="va">system</span><span class="op">}</span>.default = pkgs.haskellPackages.callCabal2nix <span class="st">&quot;my-haskell-project&quot;</span> . <span class="op">{};</span></span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>    <span class="va">devShells</span>.${<span class="va">system</span><span class="op">}</span>.default = pkgs.mkShell <span class="op">{</span> <span class="co"># 개발 환경 정의</span></span>
+<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a>      <span class="va">buildInputs</span> <span class="op">=</span> <span class="op">[</span></span>
+<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a>        pkgs.haskell.compiler.ghc962</span>
+<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a>        pkgs.haskellPackages.cabal-install</span>
+<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a>      <span class="op">];</span></span>
+<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span>;</span>
+<span id="cb27-19"><a href="#cb27-19" aria-hidden="true" tabindex="-1"></a>  };</span>
+<span id="cb27-20"><a href="#cb27-20" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p><code>flake.nix</code> 하나로 패키지 빌드와 환경 설정을 모두 해결하고, <code>nix-shell</code> 대신 <code>nix develop</code>으로 개발 환경에 진입한다. <code>nix build</code>, <code>nix run</code>으로 빌드하고 실행한다. <code>nixos-unstable</code>로 명확히 채널을 지정하고 있다.</p>
+<p>Flake는 새로운 방식으로 스펙을 정의하는 속성attribute 파일을 해석하는 인터프리터를 닉스 패키지 매니저 시스템에 추가한 것으로 볼 수 있겠다. 명확하게 <code>inputs</code>에 외부 의존성을 두고, <code>outputs</code>가 <code>nix build</code>, <code>nix develop</code>과 연결된다고 볼 수 있다.</p>
+<table>
+<thead>
+<tr>
+<th>classic</th>
+<th>flake-y</th>
+<th>동작</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>nix-build</td>
+<td><strong>nix build</strong></td>
+<td>빌드</td>
+</tr>
+<tr>
+<td>nix-shell</td>
+<td><strong>nix develop</strong></td>
+<td>개발 환경 열기</td>
+</tr>
+<tr>
+<td>nix-env</td>
+<td><strong>nix profile</strong></td>
+<td>개인 계정에 패키지 추가</td>
+</tr>
+<tr>
+<td>nix-collect-garbage</td>
+<td><strong>nix flake prune</strong></td>
+<td>사용하지 않는 패키지 삭제</td>
+</tr>
+<tr>
+<td>nix-store</td>
+<td><strong>nix flake show</strong></td>
+<td></td>
+</tr>
+<tr>
+<td>nix-repl</td>
+<td><strong>nix eval</strong></td>
+<td></td>
+</tr>
+<tr>
+<td>nix run</td>
+<td><strong>nix run</strong></td>
+<td></td>
+</tr>
+<tr>
+<td>nix-channel</td>
+<td><strong>nix flake update</strong></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>Non-Flake 닉스에선 <code>buildPhase</code>, <code>configurePhase</code>, <code>installPhase</code> 등으로 빌드 과정을 제어했다.</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="op">{</span> <span class="va">stdenv</span><span class="op">,</span> <span class="va">fetchurl</span> <span class="op">}</span>:</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>stdenv.mkDerivation <span class="kw">rec</span> <span class="op">{</span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>  <span class="va">name</span> <span class="op">=</span> <span class="st">&quot;example-1.0&quot;</span><span class="op">;</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>  <span class="va">src</span> <span class="op">=</span> fetchurl <span class="op">{</span> <span class="va">url</span> <span class="op">=</span> <span class="st">&quot;http://example.com/example-1.0.tar.gz&quot;</span><span class="op">;</span> <span class="op">};</span></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>  <span class="va">buildPhase</span> <span class="op">=</span> <span class="st">''</span></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a><span class="st">    echo &quot;Building...&quot;</span></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a><span class="st">    # Custom build commands</span></span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a><span class="st">  ''</span><span class="op">;</span></span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>  <span class="va">configurePhase</span> <span class="op">=</span> <span class="st">''</span></span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a><span class="st">    echo &quot;Configuring...&quot;</span></span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a><span class="st">    # Custom configuration commands</span></span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a><span class="st">  ''</span><span class="op">;</span></span>
+<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a>  <span class="va">installPhase</span> <span class="op">=</span> <span class="st">''</span></span>
+<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a><span class="st">    echo &quot;Installing...&quot;</span></span>
+<span id="cb28-19"><a href="#cb28-19" aria-hidden="true" tabindex="-1"></a><span class="st">    # Custom install commands</span></span>
+<span id="cb28-20"><a href="#cb28-20" aria-hidden="true" tabindex="-1"></a><span class="st">  ''</span><span class="op">;</span></span>
+<span id="cb28-21"><a href="#cb28-21" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>Flake-y에서도 위 정의들을 <code>mkDerivation</code> 안에서 그대로 정의할 수 있다.</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  <span class="va">description</span> <span class="op">=</span> <span class="st">&quot;My Haskell project&quot;</span><span class="op">;</span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>  <span class="va">inputs</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>    <span class="va">nixpkgs</span>.<span class="va">url</span> <span class="op">=</span> <span class="st">&quot;github:NixOS/nixpkgs/nixos-unstable&quot;</span><span class="op">;</span></span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>  <span class="op">};</span></span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>  <span class="va">outputs</span> <span class="op">=</span> <span class="op">{</span> <span class="va">self</span><span class="op">,</span> <span class="va">nixpkgs</span> <span class="op">}</span>:</span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span></span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>    <span class="va">system</span> <span class="op">=</span> <span class="st">&quot;x86_64-linux&quot;</span><span class="op">;</span></span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>    <span class="va">pkgs</span> <span class="op">=</span> <span class="bu">import</span> nixpkgs <span class="op">{</span> <span class="kw">inherit</span> system<span class="op">;</span> <span class="op">};</span></span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a>  <span class="kw">in</span> <span class="op">{</span></span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a>    <span class="va">packages</span>.${<span class="va">system</span><span class="op">}</span>.default = pkgs.stdenv.mkDerivation <span class="op">{</span></span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a>      <span class="va">name</span> <span class="op">=</span> <span class="st">&quot;example-1.0&quot;</span><span class="op">;</span></span>
+<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a>      <span class="va">src</span> <span class="op">=</span> <span class="ss">./src</span><span class="op">;</span></span>
+<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-17"><a href="#cb29-17" aria-hidden="true" tabindex="-1"></a>      <span class="va">buildPhase</span> <span class="op">=</span> <span class="st">''</span></span>
+<span id="cb29-18"><a href="#cb29-18" aria-hidden="true" tabindex="-1"></a><span class="st">        echo &quot;Building...&quot;</span></span>
+<span id="cb29-19"><a href="#cb29-19" aria-hidden="true" tabindex="-1"></a><span class="st">        # Custom build commands here</span></span>
+<span id="cb29-20"><a href="#cb29-20" aria-hidden="true" tabindex="-1"></a><span class="st">      ''</span><span class="op">;</span></span>
+<span id="cb29-21"><a href="#cb29-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-22"><a href="#cb29-22" aria-hidden="true" tabindex="-1"></a>      <span class="va">configurePhase</span> <span class="op">=</span> <span class="st">''</span></span>
+<span id="cb29-23"><a href="#cb29-23" aria-hidden="true" tabindex="-1"></a><span class="st">        echo &quot;Configuring...&quot;</span></span>
+<span id="cb29-24"><a href="#cb29-24" aria-hidden="true" tabindex="-1"></a><span class="st">        # Custom configuration commands here</span></span>
+<span id="cb29-25"><a href="#cb29-25" aria-hidden="true" tabindex="-1"></a><span class="st">      ''</span><span class="op">;</span></span>
+<span id="cb29-26"><a href="#cb29-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-27"><a href="#cb29-27" aria-hidden="true" tabindex="-1"></a>      <span class="va">installPhase</span> <span class="op">=</span> <span class="st">''</span></span>
+<span id="cb29-28"><a href="#cb29-28" aria-hidden="true" tabindex="-1"></a><span class="st">        echo &quot;Installing...&quot;</span></span>
+<span id="cb29-29"><a href="#cb29-29" aria-hidden="true" tabindex="-1"></a><span class="st">        # Custom install commands here</span></span>
+<span id="cb29-30"><a href="#cb29-30" aria-hidden="true" tabindex="-1"></a><span class="st">      ''</span><span class="op">;</span></span>
+<span id="cb29-31"><a href="#cb29-31" aria-hidden="true" tabindex="-1"></a>    <span class="op">};</span></span>
+<span id="cb29-32"><a href="#cb29-32" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span>;</span>
+<span id="cb29-33"><a href="#cb29-33" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 <p>Nixpkgs Manual <a href="https://ryantm.github.io/nixpkgs/" class="uri">https://ryantm.github.io/nixpkgs/</a></p>
 
 <div class="comment">
