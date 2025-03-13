@@ -168,7 +168,7 @@
 <code>srcModfier</code></p></li>
 <li><p><strong>overrideCabal f drv</strong><br />
 기존 하스켈 패키지의 cabal 정의에 새로운 속성을 추가할 때 쓴다. 결과적으로 수정된 새로운 패키지를 생성한다.</p></li>
-<li><p><strong>callHackageDirect</strong>p
+<li><p><strong>callHackageDirect</strong><br />
 닉스에서 하스켈 패키지를 직접 가져오는 함수. 특별히 뭐를 하지 않고, 그냥 Hackage에서 다운로드 해서, 닉스 빌드 시스템에 통합시킨다. Hackage에 있는 정확한 버전을 고정. 하스켈에서 하지 않고, 닉스단에서 지정하는 방식이라 nix-stroe에 저장되니, 재다운로드를 덜 하게 된다.</p></li>
 <li><p><strong>doJailbreak</strong></p></li>
 <li><p><strong>dontCheck</strong>
@@ -176,6 +176,8 @@
 <li><p><strong>jailbreakUnbreak</strong>
 <code>cabal</code> 버전 제약만 제거한다.</p></li>
 </ul>
+<p>아래는 Reflex 공식 홈에 있는 <a href="https://reflex-frp.org/tutorial">예시</a>를 빌드하는 <code>haskell.nix</code>입니다.<br />
+※ 2025.3 master 브랜치가 아니라, <a href="https://github.com/obsidiansystems/calculator-tutorial/tree/enhance/ob-9.0.1">enhance/ob-9.0.1 브랜치</a>를 가져와서 빌드 성공했다.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="op">{</span> <span class="va">obelisk</span> <span class="op">?</span> <span class="bu">import</span> <span class="ss">./.obelisk/impl</span> <span class="op">{</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">system</span> <span class="op">=</span> <span class="bu">builtins</span>.currentSystem<span class="op">;</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">iosSdkVersion</span> <span class="op">=</span> <span class="st">&quot;10.2&quot;</span><span class="op">;</span></span>
@@ -228,7 +230,7 @@
 <span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>        <span class="va">ver</span> <span class="op">=</span> <span class="st">&quot;0.5.1&quot;</span><span class="op">;</span></span>
 <span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>        <span class="va">sha256</span> <span class="op">=</span> <span class="st">&quot;194g4f12xpvdp9yr16ngxx6w9kmpvilkivvag3drpc8cv15csp8l&quot;</span><span class="op">;</span></span>
 <span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span> <span class="op">{};</span></span>
-<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a>    <span class="co"># supre.frontend는 원래의 frontend 패키지 정의</span></span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a>    <span class="co"># super.frontend는 원래의 frontend 패키지 정의</span></span>
 <span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a>    <span class="co"># overrideCabal 기존 cabal 패키지의 속성을 수정할 때 사용하는 닉스 함수</span></span>
 <span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a>    <span class="co"># drv : 기존 패키지(super.frontend)의 속성</span></span>
 <span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a>    <span class="co"># drv.buildTools 속성을 수정하여 새로운 빌드 추가</span></span>
@@ -241,6 +243,7 @@
 <span id="cb2-63"><a href="#cb2-63" aria-hidden="true" tabindex="-1"></a>    <span class="op">});</span></span>
 <span id="cb2-64"><a href="#cb2-64" aria-hidden="true" tabindex="-1"></a>  <span class="op">};</span></span>
 <span id="cb2-65"><a href="#cb2-65" aria-hidden="true" tabindex="-1"></a><span class="op">})</span></span></code></pre></div>
+<p>※ <code>with obelisk;</code>라 하면, 다음 한 표현식 스코프안으로 <code>obelisk</code>가 가진 것들을 가져 온다.</p>
 <h2 id="super-simple-haskell-development-with-nix">Super-Simple Haskell Development with Nix</h2>
 <p><a href="https://github.com/mhwombat/nix-for-numbskulls/blob/78bcc186f79931c0e4a1e445e2f6b1f12f6d46be/Haskell/ss-haskell-dev.md">원문</a>
 많은 튜토리얼들이 niv, binary cache, flakes, Stack 등의 빌드툴을 쓰라하는데, 빌드 툴을 최소화 해보자.<br />
@@ -314,7 +317,8 @@ Nix에서 제공하는 패키지만 사용하고, 시스템 환경 변수나 글
 <p><code>nix flake clone</code> flake 소스를 로컬 디렉토리에 복사한다. <code>git clone</code>과 비슷.</p>
 <p><code>nix flake lock</code> (이전 <code>nix flake update</code>)</p>
 <h2 id="haskell.nix">haskell.nix</h2>
-<p><a href="https://input-output-hk.github.io/haskell.nix/index.html">haskell.nix</a> Cabal 프로젝트나 Stack 프로젝트를 Nix 코드로 자동 번역한다.</p>
+<p><a href="https://input-output-hk.github.io/haskell.nix/index.html">haskell.nix</a> Cabal 프로젝트나 Stack 프로젝트를 Nix 코드로 자동 번역한다. Nixpkgs의 haskellPackages를 쓰지 않는, 독립적인 패키지 관리시스템으로 <code>cabal-install</code>이나 <code>stack</code>과의 호환성에 중점을 두고 설계되었다.<br />
+※ 이 동네 특징인 것 같은데, 설정 파일 이름도 <code>haskell.nix</code>고, 이 <code>haskell.nix</code> 파일을 읽어 해석하는 Nix 모듈 이름도 <code>haskell.nix</code>라 부른다.</p>
 <blockquote>
 <p>Cyclic dependencies</p>
 <p>nixpkgs에 있는 하스켈 빌더는 패키지 레벨로 패키지를 드러낸다. 패키지들이 테스트와 라이브러리로 서로 의존하고 있는 상태면 닉스가 해결하지 못하는 순환cyclic 의존성이 생긴다. By exposing the components to nix as separate derivations this will only occur if you have mutually dependent components.</p>
@@ -337,18 +341,19 @@ Nix에서 제공하는 패키지만 사용하고, 시스템 환경 변수나 글
 <span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>                                              .-------------.</span>
 <span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>                                              | release.nix |</span>
 <span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>                                              '-------------'</span></code></pre></div>
-<p>nix-tools는 다음 하스켈 패키지들을 가지고 있다.<br />
-<code>cabal-to-nix</code>: 조건부 표현식을 유지retain?하는 <code>.cabal</code>을 <code>.nix</code>로 변환하는 트랜스포머.<br />
-<code>stack-to-nix</code>: <code>stack.yaml</code>을 <code>.nix</code>로 변환하는 트랜스포머. <code>stack.yaml</code>에 있는 표현식을 읽어 <code>haskell.nix</code>에 적합한 <code>pkgs.nix</code> 파일을 만든다.<br />
-<code>plan-to-nix</code>: <code>plan.json</code>을 <code>.nix</code>로 변환하는 트랜스포머. <code>plan.json</code>을 읽어 <code>pkgs.nix</code> 파일을 만든다.</p>
+<p><strong>nix-tools</strong>는 다음 하스켈 패키지들을 가지고 있다.<br />
+<strong>cabal-to-nix</strong>: 조건부 표현식을 유지retain?하며 <code>.cabal</code>을 <code>.nix</code>로 변환하는 트랜스포머.<br />
+※ 조건부 표현식 유지? - nix로 옮길 때 cabal에서 쓰던 조건부 표현식들이 사리지지 않는다는 뜻<br />
+<strong>stack-to-nix</strong>: <code>stack.yaml</code>을 <code>.nix</code>로 변환하는 트랜스포머. <code>stack.yaml</code>에 있는 표현식을 읽어 <code>haskell.nix</code>에 적합한 <code>pkgs.nix</code> 파일을 만든다.<br />
+<strong>plan-to-nix</strong>: <code>plan.json</code>을 <code>.nix</code>로 변환하는 트랜스포머. <code>plan.json</code>을 읽어 <code>pkgs.nix</code> 파일을 만든다.</p>
 <ul>
-<li>haskell.nix 하스켈 인프라를 위한 런타임 시스템이다.</li>
-<li>hackage.nix hackage에 있는 모든 cabal 표현식을 닉스 표현식으로 제공한다. hackage에 있는 패키지셋과 동기화하기 위해 주기적으로 업데이트 된다.</li>
-<li>stackage.nix 모든 stackage 스냅샷을 닉스 표현식으로 제공한다. haskage.nix에 의존</li>
+<li><code>haskell.nix</code> 하스켈 인프라를 위한 런타임 시스템이다.</li>
+<li><code>hackage.nix</code> hackage에 있는 모든 cabal 표현식을 닉스 표현식으로 제공한다. hackage에 있는 패키지셋과 동기화하기 위해 주기적으로 업데이트 된다.</li>
+<li><code>stackage.nix</code> 모든 stackage 스냅샷을 닉스 표현식으로 제공한다. haskage.nix에 의존</li>
 </ul>
 <p><strong>Niv</strong><br />
 닉스 프로젝트 의존성을 트래킹하는 명령줄 도구다. flake를 쓰려면 안봐도 된다고 한다. 일단 패스.</p>
-<p>stack.yaml과 cabal.project 기반 프로젝트와 작동한다.</p>
+<p><code>stack.yaml</code>과 <code>cabal.project</code> 기반 프로젝트와 작동한다.</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Niv 소스를 읽어들인다.</span></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="va">sources</span> <span class="op">=</span> <span class="bu">import</span> <span class="ss">./nix/sources.nix</span> <span class="op">{};</span></span>
@@ -528,7 +533,28 @@ Hackage에 등록되어 있는 모든 하스켈 패키지를 위한 빌드 지�
 <p>※ WebkitGTK<br />
 Webkit 렌더링 엔진을 GTK(그래픽 툴킷)와 통합한 라이브러리로, 주로 리눅스에서 웹브라우저나 웹컨텐체를 쓰는 애플리케이션을 개발하는데 쓰인다. GTK 버전에 따른 변형이 있다.</p>
 <p><a href="https://nixos.wiki/wiki/Haskell">How to develop with Haskell and Nix</a><br />
-<a href="https://nixos.org/manual/nixpkgs/unstable/#haskell">nix 공식 문서의 하스켈 섹션</a></p>
+</p>
+<h2 id="nixpkgs-공식-문서-하스켈-섹션">Nixpkgs 공식 문서 하스켈 섹션</h2>
+<p><a href="https://nixos.org/manual/nixpkgs/unstable/#haskell">하스켈 섹션</a><br />
+Nixpkgs의 하스켈 인프라는 첫 째, 하스켈 <strong>컴파일러</strong>와 <strong>빌드 도구</strong>, 그리고 하스켈 패키지를 만들기 위한 <strong>패키징</strong> 인프라를 제공하고, 둘 째, 빌드된prebuilt 하스켈 라이브러리를 가지고 있는 하스켈 <strong>개발 환경</strong>을 제공하는 것을 목표로 한다.</p>
+<h3 id="haskell-available-packages">가용한 패키지</h3>
+<p>컴파일러와 대부분의 빌드 툴은 탑레벨에 위치한다.</p>
+<ul>
+<li>ghc: GHC 디폴트 버전</li>
+<li>하스켈 전용 툴: <code>cabal-install</code>, <code>stack</code>, <code>hpack</code>, …</li>
+<li><code>nix</code>, <code>cachix</code></li>
+</ul>
+<p>haskellPackages : Hackage에 있는 모든 패키지들 자체가 아니라, 패키지를 빌드할 수 있는 명세derivation를 가지고 있다고 보면 된다.<br />
+haskellPackages에 있는 속성attribute 이름은 항상 Hackage에 있는 같은 이름과 대응된다. Hackage에는 Nix에서 쓰지 않는 글자(<code>+</code>,<code>.</code>,…)도 이름으로 쓸 수 있으니, 완전히 같지 않을 수 있다.
+Stackage에 있는 패키지일 경우, LTS스냅샷에 있는 버전을 디폴트 버전으로 갖고 있다.</p>
+<p>만일, <code>defaultGhcVersion = "ghc94"</code>라면, <code>haskellPackages = haskell.packages.ghc94</code>와 같다. <code>haskellPackages</code>는 디폴트 버전의 심볼릭 링크다.</p>
+<p><code>haskellPackages.foo</code>라 하면, 디폴트로 Hackage에 있는 것 중 최신 버전 <code>foo</code> 패키지를 뜻한다. Nixpkgs는 고정된 Hackage 스냅샷으로, 스냅샷을 뜰 시점의 최신 패키지다.</p>
+<p><code>haskell.packages.lts_22_11</code>처럼 Stackage 스냅샷을 지정해서, 해당 스냅샷에 들어있는 버전을 디폴트로 쓸 수 있다.</p>
+<p><code>haskellPackages.foo_x_y_z</code> 명시적인 버전 지정 <code>x.y.z</code>를, 닉스는 이름으로 <code>.</code>을 쓸 수 없으니, 언더바<code>_</code>로 바꾼다.</p>
+<p><code>cabal-install</code>을 써서 하스켈 패키지를 빌드할 때, 의존성을 푸는데, Hackage에 있는 모든 버전을 확인한 후, 조건에 맞는 적절한 버전을 선택하려는 시도를 한다. 반면, Nixpkgs는 이런 시도 없이, 단순히 입력값으로 패키지 목록을 받아서, 이들이 조건을 충족하는지만 본다. (버전 제약 조건을 우회하라면 <code>jailbreak</code>를 쓴다.)</p>
+<p><code>haskellPackages.mkDerivation</code>은 <code>stdenv.mkDerivation</code>의 래퍼다.</p>
+<p><code>stdenv.mkDerivation</code>은 닉스의 패키지 빌드를 위한 기본 함수다. 이 함수는 패키지 빌드, 설치, 테스트등의 단계를 정의한다. <code>haskellPackages.mkDerivation</code>은 기본 함수가 가진 <code>configurePhase</code>, <code>buildPhase</code>, <code>installPhase</code> 이외에 하스켈에 특화된 단계들을 가지고 있다. Cabal 라이브러리를 직접 사용하여 의존성을 해결하기 때문에 <code>cabal-install</code> 바이너리는 쓰이지 않는다.</p>
+<p>하스켈 프로젝트에선 <code>Setup.hs</code> 파일을 통해 빌드, 테스트, 설치등의 작업을 정의한다. <code>haskellPackages.mkDerivation</code>은 이를 직접 컴파일하고 실행해서 Haskell 프로젝트를 빌드한다.</p>
 
 <div class="comment">
   <script>
