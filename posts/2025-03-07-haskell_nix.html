@@ -414,13 +414,94 @@ Nix에서 제공하는 패키지만 사용하고, 시스템 환경 변수나 글
 <p>hix는 <code>haskell.nix</code> 스타일을 쓰면서, 필요할 때 <code>.hix-flake/flake.nix</code> 내부에서 flakes를 관리한다.</p>
 <h2 id="haskell-support-for-nix">Haskell Support for Nix</h2>
 <p><a href="https://haskell4nix.readthedocs.io/">haskell4nix</a><br />
-Flake를 쓰지 않고, 하스켈 패키지를 닉스로 설치하는 방법<br />
-Hackage에 등록되어 있는 모든 하스켈 패키지를 위한 빌드 지침instruction을 배포 중이다. 그런데, 닉스 패키지 검색을 하면, ghc, cabal-install, stack 말고는 나오는 게 없다. 하스켈 패키지는 너무 많아서 탑레벨 네임 스페이스에 등록되어 있지 않다. 탑레벨에 두면 검색이 너무 느려져서 haskellPackages 속성으로 분리되어 있다.</p>
+</p>
+<h3 id="flake를-쓰지-않고-하스켈-패키지를-닉스로-설치">Flake를 쓰지 않고, 하스켈 패키지를 닉스로 설치</h3>
+<p>Hackage에 등록되어 있는 모든 하스켈 패키지를 위한 빌드 지침instruction을 배포 중이다. 그런데, 닉스 패키지 검색을 하면, ghc, cabal-install, stack 말고는 나오는 게 없다. 하스켈 패키지는 너무 많아서 탑레벨 네임 스페이스에 등록되어 있지 않다. 탑레벨에 두면 검색이 너무 느려져서 haskellPackages 속성으로 분리되어 있다.</p>
+<p>기본적인 설치</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>nix-env -f &quot;&lt;nixpkgs&gt;&quot; -iA haskellPackages.Allure ...</span></code></pre></div>
+<p><code>-f</code>(<code>--file</code>): Nix 표현식 파일을 지정할 때. <code>&lt;nixpkgs&gt;</code>는 시스템에 설치된 Nixpkgs 경로<br />
+<code>-i</code>(<code>--install</code>): 설치<br />
+<code>-A</code>(<code>--attr</code>): 속성을 통해 패키지를 지정. <code>Allure</code>는, 패키지는 표현식으론 <code>haskellPackages</code>의 속성이다.<br />
+</p>
+<p><code>haskell-</code>로 시작하는 패키지는 라이브러리(와 실행 앱)를 제공하고, 그렇지 않은 패키지는 실행 파일을 제공한다. 예를 들어, <code>haskell-pandoc</code>은 라이브러리와 실행 애플리케이션을 같이 설치한다.</p>
+<p>NixOS라면 <code>-f "&lt;nixpkgs&gt;"</code>를 안쓰고, <code>nixos.</code>을 붙여 <code>nixos.haskellPackages</code>를 찾으라 하면 된다.</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>nix-env -qaP -A nixos.haskellPackages</span></code></pre></div>
+<p><code>-q</code>(<code>--query</code>): 현재 사용할 수 있는 패키지 조회(아무 옵션 없이 쓰면, 현재 사용자 환경에 설치된 패키ㅈ에서만 조회)<br />
+<code>-a</code>(<code>--available</code>): 설치되지 않은 패키지도 포함해서, 사용할 수 있는 모든 패키지<br />
+<code>-P</code>(<code>--attr-path</code>): 패키지의 속성 경로도 출력. 예를 들어 <code>lens</code> 라 출력하지 않고, <code>nixos.haskellPackages.lens</code>라 출력<br />
+<code>-A</code>: 지정 속성만 조회. 예를 들어 <code>-A nixos.haskellPackages</code>를 하면, <code>haskellPackages</code>아래 모든 속성(패키지)을 나열</p>
+<p>컴파일러와 해당 컴파일러로 컴파일한 패키지가 묶여 있다.<br />
+<code>haskellPackages</code>는 <code>haskell.packages.ghcXYZ</code>(<code>XYZ</code>는 Nixpkg에 있는 디폴트 버전)의 alias다.</p>
+<p>하스켈 패키지는 일반적으로 Hackage에 있는 릴리즈를 기반으로 생성되지만, Hackage는 패키지 빌드를 위한 소스 코드도 제공하므로, 필요에 따라 소스 코드를 직접 다운 받아 패키지를 설치할 수도 있다.</p>
+<h3 id="패키지-브랜치-설치하기">패키지 브랜치 설치하기</h3>
+<div class="sourceCode" id="cb26"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>my<span class="op">-</span>hledger<span class="op">-</span>lib = <span class="op">(</span>haskell.lib.overrideSrc haskellPackages.hledger<span class="op">-</span>lib <span class="op">{</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="va">src</span> <span class="op">=</span> <span class="ss">/home/aengelen/dev/hledger/hledger-lib</span><span class="op">;</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="op">})</span>;</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>my<span class="op">-</span>hledger = <span class="op">(</span>haskell.lib.overrideSrc haskellPackages.hledger <span class="op">{</span></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>  <span class="va">src</span> <span class="op">=</span> <span class="ss">/home/aengelen/dev/hledger/hledger</span><span class="op">;</span></span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a><span class="op">})</span>.override <span class="op">{</span></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>  <span class="va">hledger-lib</span> <span class="op">=</span> my<span class="op">-</span>hledger<span class="op">-</span>lib<span class="op">;</span></span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a><span class="op">}</span>;</span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>hledger<span class="op">-</span>web = haskell.lib.justStaticExecutables <span class="op">(</span></span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>    <span class="op">(</span>haskell.lib.overrideSrc haskellPackages.hledger<span class="op">-</span>web <span class="op">{</span></span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>      <span class="va">src</span> <span class="op">=</span> <span class="ss">/home/aengelen/dev/hledger/hledger-web</span><span class="op">;</span></span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>    <span class="op">})</span></span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>  .override <span class="op">{</span></span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a>    <span class="va">hledger</span> <span class="op">=</span> my<span class="op">-</span>hledger<span class="op">;</span>4ㄹ</span>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a>    <span class="va">hledger-lib</span> <span class="op">=</span> my<span class="op">-</span>hledger<span class="op">-</span>lib<span class="op">;</span></span>
+<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a>  <span class="op">})</span>;</span></code></pre></div>
+<h3 id="개발-환경-생성">개발 환경 생성</h3>
+<h4 id="컴파일러-설치">컴파일러 설치</h4>
+<div class="sourceCode" id="cb27"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>nix-env -f &quot;&lt;nixpkgs&gt;&quot; -iA haskellPackages.ghc haskellPackages.cabal-install</span></code></pre></div>
+<p>위 명령으론 설치된 바이너리들이 있는 폴더가 자동으로 <code>$PATH</code> 잡히지 않지만, 아래 명령은 자동으로 잡힌다.</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>nix-shell -p haskell.compiler.ghc784</span></code></pre></div>
+<p>Stack의 Nix 지원을 켜면, Stack이 내부적으로 <code>nix-shell</code>을 이용한다.</p>
+<p><code>nix-shell</code>로 만든 Nix 저장소 경로는 <code>nix-shell</code>이 종료되면, “alive”가 아닌 상태가 되어 <code>nix-collect-garbage</code>하면 사라져서 환경이 깨질 수 있다. 그럴 땐, <code>nix-shell</code>에서 <code>cabal-configure</code>를 다시 실행하면 된다.</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>nix-shell -p haskell.compiler.ghc784 --command &quot;cabal configure&quot;</span></code></pre></div>
+<p>configure phase는 GHC를 비롯한 모든 필요한 툴의 절대 경로(<code>/nix/store</code>아래 경로)를 <code>dist/</code> 디렉토리 안의 빌드 설정에 기록한다. <code>dist/</code> 디렉토리는 빌드 과정에서 생성되는 다양한 파일들(설정 파일, 컴파일된 오브젝트 파일, 라이브러리, 실행 파일)이 저장된다. 절대 경로가 저장되는 파일은, <code>dist/setup-config</code>, <code>dist/build/*</code> 등에 키-값 쌍같은 구조로 저장된다.</p>
+<h4 id="컴파일러와-라이브러리-설치">컴파일러와 라이브러리 설치</h4>
+<p>기본적으로 GHC는 자신의 <code>lib</code>디렉토리에 모든 라이브러리가 설치될 것이라 가정한다. 이 방식은 전통적인 Unix 계열 시스템에선 문제 없지만, 닉스에선 작동하지 않는다. 닉스에서 GHC의 저장 경로는 한 번 빌드되면 불변이다. 추가로 라이브러리를 해당 경로에 넣을 수 없다. GHC는 자신의 코어 라이브러리 <code>base</code>, <code>containers</code>, <code>Cabal</code>등을 제외한 다른 라이브러리는 어디있는지 모르게 된다. GHC가 추가 라이브러리들이 어디 있는지 알게 하려면 특별 빌드 함수인 <code>ghcWithPackages</code> 함수로 빌드해야 한다. 이 함수는 “<strong>하스켈 패키지의 속성 집합을 패키지 리스트에 매핑하는 함수</strong>”를 인자로 받는다. 예를 들어 <code>ghcWithPackages (pkgs: [pkgs.mtl])</code> 표현식은 <code>mtl</code> 라이브러리를 가진 GHC 복제 패키지를 생성한다. GHC 복제는 기존에 코어만 가지고 있던 GHC 패키지들을 alias로 가지고 있다.</p>
+<p>새로운 프로젝트마다, 프로젝트가 필요한 라이브러리들이 추가된 GHC복제 패키지를 각 각 가지고 있다.</p>
+<p>현재 닉스쉘에 등록된 패키지를 보려면</p>
+<div class="sourceCode" id="cb30"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>[nix-shell:~]$ ghc-pkg list mtl</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>/nix/store/zy79...-ghc-7.10.2/lib/ghc-7.10.2/package.conf.d: mtl-2.2.1</span></code></pre></div>
+<p><code>ghcWithPackages</code> 함수로 override해서, 사용자들은 자신만의 원하는 환경을 만들 수있다. 다음 코드 조각snippet을 <code>~/.config/nixpkgs/config.nix</code>에 추가하고,</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  <span class="va">packageOverrides</span> <span class="op">=</span> <span class="va">super</span> <span class="op">:</span> <span class="kw">let</span> <span class="va">self</span> <span class="op">=</span> super.pkgs<span class="op">;</span> <span class="kw">in</span></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>  <span class="op">{</span></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>    <span class="va">myHaskellEnv</span> <span class="op">=</span> self.haskell.packages.ghc7102.ghcWithPackages</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>                     <span class="op">(</span><span class="va">haskellPackages</span><span class="op">:</span> <span class="kw">with</span> haskellPackages<span class="op">;</span> <span class="op">[</span></span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>                       <span class="co"># 라이브러리</span></span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>                       arrows async cgi criterion</span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>                       <span class="co"># tools</span></span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>                       cabal-install haskintex</span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>                     <span class="op">]);</span></span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a><span class="er">}</span></span></code></pre></div>
+<p><code>nix-env -f "&lt;nixpkgs&gt;" -iA myHaskellEnv</code>로 컴파일러와 환경을 같이 준비할 수 있다.</p>
+<p>위 표현식으로 닉스가 생성한 <code>ghc</code> 프로그램은, 사실 새로운 <code>lib</code> 디렉토리를 쓰도록 지정한 <strong>실제 GHC의 래핑 스크립트</strong>다.</p>
+<div class="sourceCode" id="cb32"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>&gt; cat $(type -p ghc)</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>#! /nix/sotre/xlxj...-bash-4.3-p33/bin/bash -e</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>export NIX_GHC=/nix/store/19sm...-ghc-7.10.2/bin/ghc</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>export NIX_GHCPKG=/nix/sotre/19sm...-ghc-7.10.2/bin/ghc-pkg</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>export NIX_GHC_DOCDIR=/nix/store/19sm...-ghc-7.10.2/share/doc/ghc/html</span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>export NIX_GHC_LIBDIR=/nix/store/19sm...-ghc-7.10.2/lib/ghc-7.10.2</span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>exec /nix/store/j50p...-ghc-7.10.2/bin/ghc &quot;-B$NIX_GHC_LIBDIR&quot; &quot;$@&quot;</span></code></pre></div>
+<p>※ <code>type -p</code> <code>type 명령어</code>는 명령어가 어떻게 해석되는지(alias, 함수, 내장 명령어, 파일 …) 알려 준다. <code>-p</code>를 주면 파일 경로만 출력한다.<br />
+※ <code>-B</code> GHC의 라이브러리 경로를 지정, <code>$@</code> 쉘스크립트에 전달 된 모든 인수를 뜻한다.</p>
+<h4 id="컴파일러와-라이브러리-그리고-후글-문서-인덱스-설치">컴파일러와 라이브러리, 그리고 후글, 문서 인덱스 설치</h4>
+<h4 id="haskell-language-server-설치">haskell-language-server 설치</h4>
+<h4 id="닉스쉘에서-haskell-language-server가-ghc-찾기">닉스쉘에서 haskell-language-server가 GHC 찾기</h4>
+<h4 id="stack으로-하스켈-프로젝트-빌드">stack으로 하스켈 프로젝트 빌드</h4>
+<h4 id="닉스쉘을-위한-ad-hoc-환경">닉스쉘을 위한 ad hoc 환경</h4>
+<h3 id="특정-프로젝트만을-위한-하스켈-패키지">특정 프로젝트만을 위한 하스켈 패키지</h3>
+<h4 id="stand-alone-프로젝트-빌드">stand-alone 프로젝트 빌드</h4>
+<h4 id="서로-의존하는-프로젝트-빌드">서로 의존하는 프로젝트 빌드</h4>
 <h2 id="haskell-flake">haskell-flake</h2>
 <p><a href="https://github.com/srid/haskell-flake">srid/haskell-flake</a><br />
 <a href="https://flake.parts/">flake-parts</a> 모듈로 셋업한다. Cabal만 지원한다.(Stack은 지원하지 않는 것 같다.) 프로젝트 탑레벨에 <code>.cabal</code>이나 <code>cabal.xproject</code>가 있어야만 한다.</p>
-<div class="sourceCode" id="cb24"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>&gt; mkdir example &amp;&amp; cd ./example</span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>&gt; nix flake init -t github:srid/haskell-flake#example</span></code></pre></div>
+<div class="sourceCode" id="cb33"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>&gt; mkdir example &amp;&amp; cd ./example</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>&gt; nix flake init -t github:srid/haskell-flake#example</span></code></pre></div>
 <h2 id="하스켈-프로젝트-닉스화nixifying">하스켈 프로젝트 닉스화Nixifying</h2>
 <p>아래는 <a href="https://nixos.asia/en/haskell">nixos.asia</a> 페이지를 정리한 노트이다.</p>
 <h3 id="프로젝트-닉스화">프로젝트 닉스화</h3>
@@ -429,15 +510,15 @@ Hackage에 등록되어 있는 모든 하스켈 패키지를 위한 빌드 지�
 <code>cabal2nix</code>를 써서 <code>.cabal</code> 파일을 읽어들여 Nix derivation으로 만든다.</p>
 <p>※ 뜬금없이 예시를 따라하다 <code>nix repl</code> 멀티라인에서 막혔다.<br />
 원문 예시 중 <code>repl</code>에서 멀티라인 입력이 필요한 부분이 있는데, 원문을 따라하면 입력이 되지 않는다. repl은 구문이 끝났는지, 안 끝났는지 추론해서 결정한다. 예전엔 <code>extend</code>함수로 끝난 첫 줄이, 아직 덜 끝난 걸로 인식했었나 본데, 지금은 그렇지 않다. <code>extend</code> 뒤에 아직 구문이 끝나지 않았다는 표시로 <code>(</code>를 써준다.</p>
-<div class="sourceCode" id="cb25"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>nix-repl&gt; myHaskellPackages = pkgs.haskellPackages.extend </span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>    (self: super: {</span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>       shower = self.callCabal2nix &quot;shower&quot; </span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>         (pkgs.fetchgit { </span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>            url = &quot;https://github.com/monadfix/shower.git&quot;;</span>
-<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>            rev = &quot;2d71ea1&quot;; </span>
-<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>            sha256 = &quot;sha256-vEck97PptccrMX47uFGjoBVSe4sQqNEsclZOYfEMTns=&quot;; </span>
-<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>         }) {}; </span>
-<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>    })</span></code></pre></div>
+<div class="sourceCode" id="cb34"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>nix-repl&gt; myHaskellPackages = pkgs.haskellPackages.extend </span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>    (self: super: {</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>       shower = self.callCabal2nix &quot;shower&quot; </span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>         (pkgs.fetchgit { </span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>            url = &quot;https://github.com/monadfix/shower.git&quot;;</span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>            rev = &quot;2d71ea1&quot;; </span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>            sha256 = &quot;sha256-vEck97PptccrMX47uFGjoBVSe4sQqNEsclZOYfEMTns=&quot;; </span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>         }) {}; </span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a>    })</span></code></pre></div>
 <p><code>extend</code>함수가 인자로 <code>self: super: { ... }</code> 람다 함수를 받고 있다. <code>super</code>에는 확장되기 이전의 패키지 집합이 들어가고, <code>self</code>는 확장된 이후의 패키지 집합이 들어간다. (아마도 이렇게 되려면 fix 패턴을 쓰고 있겠지?)<br />
 </p>
 <ul>
@@ -450,31 +531,31 @@ Hackage에 등록되어 있는 모든 하스켈 패키지를 위한 빌드 지�
 <p><code>nix develop</code>을 실행하면, <code>flake.nix</code>의 <code>outputs</code>에 있는 <code>devShell</code> 설정을 지침으로 삼아 쉘을 준비한다.</p>
 <p>빌드가 아니라 개발이 목표일 때.<br />
 어차피 두 경우 모두 필요한 라이브러리는 같은게 아닐까 싶지만, 개발 쉘에는 <code>ghcid</code>같은 도구나, 테스트 프레임워크, LSP서버, 디버깅 도구 같은 것들이 추가로 필요하다.</p>
-<div class="sourceCode" id="cb26"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="va">inputs</span> <span class="op">=</span> <span class="op">{</span></span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">nixpkgs</span>.<span class="va">url</span> <span class="op">=</span> <span class="st">&quot;github:NixOS/nixpkgs/nixpkgs-unstable&quot;</span><span class="op">;</span></span>
-<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>  <span class="op">};</span></span>
-<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>  <span class="va">outputs</span> <span class="op">=</span> <span class="op">{</span> <span class="va">self</span><span class="op">,</span> <span class="va">nixpkgs</span> <span class="op">}</span>:</span>
-<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span></span>
-<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>      <span class="va">system</span> <span class="op">=</span> <span class="st">&quot;aarch64-darwin&quot;</span><span class="op">;</span></span>
-<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>      <span class="va">pkgs</span> <span class="op">=</span> nixpkgs.legacyPackages.$<span class="op">{</span><span class="va">system</span><span class="op">};</span></span>
-<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>      <span class="va">overlay</span> <span class="op">=</span> <span class="va">final</span><span class="op">:</span> <span class="va">prev</span><span class="op">:</span> <span class="op">{</span></span>
-<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>        <span class="va">todo-app</span> <span class="op">=</span> final.callCabal2nix <span class="st">&quot;todo-app&quot;</span> <span class="ss">./.</span> <span class="op">{</span> <span class="op">};</span></span>
-<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>      <span class="op">};</span></span>
-<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>      <span class="va">myHaskellPackages</span> <span class="op">=</span> pkgs.haskellPackages.extend.overlay<span class="op">;</span></span>
-<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>    <span class="kw">in</span></span>
-<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span></span>
-<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a>      <span class="va">devShells</span>.${<span class="va">system</span><span class="op">}</span>.default = myHaskellPackages.shellFor <span class="op">{</span></span>
-<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a>        <span class="va">packages</span> <span class="op">=</span> <span class="va">p</span> <span class="op">:</span> <span class="op">[</span></span>
-<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a>          p.todo-app</span>
-<span id="cb26-18"><a href="#cb26-18" aria-hidden="true" tabindex="-1"></a>        <span class="op">]</span>:</span>
-<span id="cb26-19"><a href="#cb26-19" aria-hidden="true" tabindex="-1"></a>        nativeBuildInputs = <span class="kw">with</span> myHaskellPackages<span class="op">;</span> <span class="op">[</span></span>
-<span id="cb26-20"><a href="#cb26-20" aria-hidden="true" tabindex="-1"></a>          ghcid</span>
-<span id="cb26-21"><a href="#cb26-21" aria-hidden="true" tabindex="-1"></a>          cabal-install</span>
-<span id="cb26-22"><a href="#cb26-22" aria-hidden="true" tabindex="-1"></a>        <span class="op">]</span></span>
-<span id="cb26-23"><a href="#cb26-23" aria-hidden="true" tabindex="-1"></a>      <span class="er">}</span></span>
-<span id="cb26-24"><a href="#cb26-24" aria-hidden="true" tabindex="-1"></a>    <span class="er">}</span></span>
-<span id="cb26-25"><a href="#cb26-25" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb35"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  <span class="va">inputs</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">nixpkgs</span>.<span class="va">url</span> <span class="op">=</span> <span class="st">&quot;github:NixOS/nixpkgs/nixpkgs-unstable&quot;</span><span class="op">;</span></span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>  <span class="op">};</span></span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>  <span class="va">outputs</span> <span class="op">=</span> <span class="op">{</span> <span class="va">self</span><span class="op">,</span> <span class="va">nixpkgs</span> <span class="op">}</span>:</span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span></span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>      <span class="va">system</span> <span class="op">=</span> <span class="st">&quot;aarch64-darwin&quot;</span><span class="op">;</span></span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>      <span class="va">pkgs</span> <span class="op">=</span> nixpkgs.legacyPackages.$<span class="op">{</span><span class="va">system</span><span class="op">};</span></span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>      <span class="va">overlay</span> <span class="op">=</span> <span class="va">final</span><span class="op">:</span> <span class="va">prev</span><span class="op">:</span> <span class="op">{</span></span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a>        <span class="va">todo-app</span> <span class="op">=</span> final.callCabal2nix <span class="st">&quot;todo-app&quot;</span> <span class="ss">./.</span> <span class="op">{</span> <span class="op">};</span></span>
+<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a>      <span class="op">};</span></span>
+<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a>      <span class="va">myHaskellPackages</span> <span class="op">=</span> pkgs.haskellPackages.extend.overlay<span class="op">;</span></span>
+<span id="cb35-13"><a href="#cb35-13" aria-hidden="true" tabindex="-1"></a>    <span class="kw">in</span></span>
+<span id="cb35-14"><a href="#cb35-14" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span></span>
+<span id="cb35-15"><a href="#cb35-15" aria-hidden="true" tabindex="-1"></a>      <span class="va">devShells</span>.${<span class="va">system</span><span class="op">}</span>.default = myHaskellPackages.shellFor <span class="op">{</span></span>
+<span id="cb35-16"><a href="#cb35-16" aria-hidden="true" tabindex="-1"></a>        <span class="va">packages</span> <span class="op">=</span> <span class="va">p</span> <span class="op">:</span> <span class="op">[</span></span>
+<span id="cb35-17"><a href="#cb35-17" aria-hidden="true" tabindex="-1"></a>          p.todo-app</span>
+<span id="cb35-18"><a href="#cb35-18" aria-hidden="true" tabindex="-1"></a>        <span class="op">]</span>:</span>
+<span id="cb35-19"><a href="#cb35-19" aria-hidden="true" tabindex="-1"></a>        nativeBuildInputs = <span class="kw">with</span> myHaskellPackages<span class="op">;</span> <span class="op">[</span></span>
+<span id="cb35-20"><a href="#cb35-20" aria-hidden="true" tabindex="-1"></a>          ghcid</span>
+<span id="cb35-21"><a href="#cb35-21" aria-hidden="true" tabindex="-1"></a>          cabal-install</span>
+<span id="cb35-22"><a href="#cb35-22" aria-hidden="true" tabindex="-1"></a>        <span class="op">]</span></span>
+<span id="cb35-23"><a href="#cb35-23" aria-hidden="true" tabindex="-1"></a>      <span class="er">}</span></span>
+<span id="cb35-24"><a href="#cb35-24" aria-hidden="true" tabindex="-1"></a>    <span class="er">}</span></span>
+<span id="cb35-25"><a href="#cb35-25" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 <p><strong>mkShell 함수</strong> 언어와 무관하게 쓴다.<br />
 <strong>shellFor</strong> 하스켈만을 위한 함수. mkShell위에 만든 abstraction이라 한다.<br />
 모든 하스켈 패키지는 <code>shellFor</code>를 expose한다. Haskell package로 구성된configured GHC 패키지셋을 가진 <code>devShell</code>을 반환한다.<br />
@@ -484,52 +565,52 @@ Hackage에 등록되어 있는 모든 하스켈 패키지를 위한 빌드 지�
 <code>nativeBuildInputs</code> : <code>devShell</code>의 <code>PATH</code>에서 사용 가능하도록 제공할 프로그램을 의미</p>
 <h3 id="외부-의존성-닉스화">외부 의존성 닉스화</h3>
 <p>전역 시스템을 건드리지 않고, 현재 프로젝트 환경에서만 쓸 외부 의존성을 준비해보자.</p>
-<div class="sourceCode" id="cb27"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  <span class="va">inputs</span> <span class="op">=</span> <span class="op">{</span></span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">nixpkgs</span>.<span class="va">url</span> <span class="op">=</span> <span class="st">&quot;github:NixOS/nixpkgs/nixpkgs-unstable&quot;</span><span class="op">;</span></span>
-<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>  <span class="op">};</span></span>
-<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>  <span class="va">outputs</span> <span class="op">=</span> <span class="op">{</span> <span class="va">self</span><span class="op">,</span> <span class="va">nixpkgs</span> <span class="op">}</span>:</span>
-<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span></span>
-<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>      <span class="va">system</span> <span class="op">=</span> <span class="st">&quot;aarch64-darwin&quot;</span><span class="op">;</span></span>
-<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>      <span class="va">pkgs</span> <span class="op">=</span> nixpkgs.legacyPackages.$<span class="op">{</span><span class="va">system</span><span class="op">};</span></span>
-<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">in</span></span>
-<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span></span>
-<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>      <span class="va">apps</span>.${<span class="va">system</span><span class="op">}</span>.postgress = <span class="op">{</span></span>
-<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>        <span class="va">type</span> <span class="op">=</span> <span class="st">&quot;app&quot;</span><span class="op">;</span></span>
-<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>        <span class="va">program</span> <span class="op">=</span></span>
-<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a>          <span class="kw">let</span></span>
-<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a>            <span class="va">script</span> <span class="op">=</span> pkgs.writeShellApplication <span class="op">{</span></span>
-<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a>              <span class="va">name</span> <span class="op">=</span> <span class="st">&quot;pg_start&quot;</span><span class="op">;</span></span>
-<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a>              <span class="va">runtimeInputs</span> <span class="op">=</span> <span class="op">[</span> pkgs.postgresql <span class="op">];</span></span>
-<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a>              <span class="va">text</span> <span class="op">=</span></span>
-<span id="cb27-19"><a href="#cb27-19" aria-hidden="true" tabindex="-1"></a>              <span class="st">''</span></span>
-<span id="cb27-20"><a href="#cb27-20" aria-hidden="true" tabindex="-1"></a><span class="st">                # 현재 프로젝트 dir를 저장소로 데이터베이스 초기화</span></span>
-<span id="cb27-21"><a href="#cb27-21" aria-hidden="true" tabindex="-1"></a><span class="st">                [ ! -d &quot;./data/db&quot; ] &amp;&amp; initdb --no-locale -D ./data/db</span></span>
-<span id="cb27-22"><a href="#cb27-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-23"><a href="#cb27-23" aria-hidden="true" tabindex="-1"></a><span class="st">                postgres -D ./data/db -k &quot;$PWD&quot;/data</span></span>
-<span id="cb27-24"><a href="#cb27-24" aria-hidden="true" tabindex="-1"></a><span class="st">              ''</span><span class="op">;</span></span>
-<span id="cb27-25"><a href="#cb27-25" aria-hidden="true" tabindex="-1"></a>            <span class="op">};</span></span>
-<span id="cb27-26"><a href="#cb27-26" aria-hidden="true" tabindex="-1"></a>          <span class="kw">in</span> <span class="st">&quot;</span><span class="sc">${</span>script<span class="sc">}</span><span class="st">/bin/pg_start&quot;</span><span class="op">;</span></span>
-<span id="cb27-27"><a href="#cb27-27" aria-hidden="true" tabindex="-1"></a>      <span class="op">};</span></span>
-<span id="cb27-28"><a href="#cb27-28" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span>;</span>
-<span id="cb27-29"><a href="#cb27-29" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb36"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>  <span class="va">inputs</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">nixpkgs</span>.<span class="va">url</span> <span class="op">=</span> <span class="st">&quot;github:NixOS/nixpkgs/nixpkgs-unstable&quot;</span><span class="op">;</span></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>  <span class="op">};</span></span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>  <span class="va">outputs</span> <span class="op">=</span> <span class="op">{</span> <span class="va">self</span><span class="op">,</span> <span class="va">nixpkgs</span> <span class="op">}</span>:</span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span></span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>      <span class="va">system</span> <span class="op">=</span> <span class="st">&quot;aarch64-darwin&quot;</span><span class="op">;</span></span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>      <span class="va">pkgs</span> <span class="op">=</span> nixpkgs.legacyPackages.$<span class="op">{</span><span class="va">system</span><span class="op">};</span></span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">in</span></span>
+<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span></span>
+<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a>      <span class="va">apps</span>.${<span class="va">system</span><span class="op">}</span>.postgress = <span class="op">{</span></span>
+<span id="cb36-12"><a href="#cb36-12" aria-hidden="true" tabindex="-1"></a>        <span class="va">type</span> <span class="op">=</span> <span class="st">&quot;app&quot;</span><span class="op">;</span></span>
+<span id="cb36-13"><a href="#cb36-13" aria-hidden="true" tabindex="-1"></a>        <span class="va">program</span> <span class="op">=</span></span>
+<span id="cb36-14"><a href="#cb36-14" aria-hidden="true" tabindex="-1"></a>          <span class="kw">let</span></span>
+<span id="cb36-15"><a href="#cb36-15" aria-hidden="true" tabindex="-1"></a>            <span class="va">script</span> <span class="op">=</span> pkgs.writeShellApplication <span class="op">{</span></span>
+<span id="cb36-16"><a href="#cb36-16" aria-hidden="true" tabindex="-1"></a>              <span class="va">name</span> <span class="op">=</span> <span class="st">&quot;pg_start&quot;</span><span class="op">;</span></span>
+<span id="cb36-17"><a href="#cb36-17" aria-hidden="true" tabindex="-1"></a>              <span class="va">runtimeInputs</span> <span class="op">=</span> <span class="op">[</span> pkgs.postgresql <span class="op">];</span></span>
+<span id="cb36-18"><a href="#cb36-18" aria-hidden="true" tabindex="-1"></a>              <span class="va">text</span> <span class="op">=</span></span>
+<span id="cb36-19"><a href="#cb36-19" aria-hidden="true" tabindex="-1"></a>              <span class="st">''</span></span>
+<span id="cb36-20"><a href="#cb36-20" aria-hidden="true" tabindex="-1"></a><span class="st">                # 현재 프로젝트 dir를 저장소로 데이터베이스 초기화</span></span>
+<span id="cb36-21"><a href="#cb36-21" aria-hidden="true" tabindex="-1"></a><span class="st">                [ ! -d &quot;./data/db&quot; ] &amp;&amp; initdb --no-locale -D ./data/db</span></span>
+<span id="cb36-22"><a href="#cb36-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-23"><a href="#cb36-23" aria-hidden="true" tabindex="-1"></a><span class="st">                postgres -D ./data/db -k &quot;$PWD&quot;/data</span></span>
+<span id="cb36-24"><a href="#cb36-24" aria-hidden="true" tabindex="-1"></a><span class="st">              ''</span><span class="op">;</span></span>
+<span id="cb36-25"><a href="#cb36-25" aria-hidden="true" tabindex="-1"></a>            <span class="op">};</span></span>
+<span id="cb36-26"><a href="#cb36-26" aria-hidden="true" tabindex="-1"></a>          <span class="kw">in</span> <span class="st">&quot;</span><span class="sc">${</span>script<span class="sc">}</span><span class="st">/bin/pg_start&quot;</span><span class="op">;</span></span>
+<span id="cb36-27"><a href="#cb36-27" aria-hidden="true" tabindex="-1"></a>      <span class="op">};</span></span>
+<span id="cb36-28"><a href="#cb36-28" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span>;</span>
+<span id="cb36-29"><a href="#cb36-29" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 <p><code>nix run</code>으로 실행할 앱을 정의하고 있다. 여기서 앱은 Postgres 서버를 시작하는 간단한 쉘스크립트다. <code>nixpkgs</code>는 이런 스크립트를 위한 <code>writeShellApplication</code>이란 편리한 함수를 제공한다. <code>${script}</code>는 <code>nix/store</code>에서 앱이 저장된 위치를 뜻한다.</p>
 <p>※ pkg-config<br />
 라이브러리에 접근하는 표준 인터페이스 제공<br />
 <code>.pc</code>파일은 보통 <code>/usr/lib/pkgconfig</code> 또는 <code>/usr/lib64/pkgconfig</code>에 설치 된다. 만일 패키지가 <code>.pc</code> 파일 생성하는 설정이 없다면, 수동으로 만들어 등록할 수도 있다.</p>
-<div class="sourceCode" id="cb28"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>prefix=/usr</span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>libdir=${prefix}/lib</span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>includedir=${prefix}/include</span>
-<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>Name: webkit2gtk-4.0 (필수) </span>
-<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>Description: WebKitGTK library (선택)</span>
-<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>Version: 2.46.6 (필수)</span>
-<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>Libs: -L${libdir} -lwebkit2gtk-4.0 (필수)</span>
-<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>Cflags: -I${includedir}/webkitgtk-4.0 (필수)</span></code></pre></div>
+<div class="sourceCode" id="cb37"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>prefix=/usr</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>libdir=${prefix}/lib</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>includedir=${prefix}/include</span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>Name: webkit2gtk-4.0 (필수) </span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>Description: WebKitGTK library (선택)</span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>Version: 2.46.6 (필수)</span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>Libs: -L${libdir} -lwebkit2gtk-4.0 (필수)</span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>Cflags: -I${includedir}/webkitgtk-4.0 (필수)</span></code></pre></div>
 <p>잘 설치 되었는지 확인</p>
-<div class="sourceCode" id="cb29"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>&gt; pkg-config --modversion webkit2gtk-4.0</span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>&gt; pkg-config --libs webkit2gtk-4.0</span>
-<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>&gt; pkg-config --cflags webkit2gtk-4.0</span></code></pre></div>
+<div class="sourceCode" id="cb38"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>&gt; pkg-config --modversion webkit2gtk-4.0</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>&gt; pkg-config --libs webkit2gtk-4.0</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>&gt; pkg-config --cflags webkit2gtk-4.0</span></code></pre></div>
 <p>※ WebkitGTK<br />
 Webkit 렌더링 엔진을 GTK(그래픽 툴킷)와 통합한 라이브러리로, 주로 리눅스에서 웹브라우저나 웹컨텐체를 쓰는 애플리케이션을 개발하는데 쓰인다. GTK 버전에 따른 변형이 있다.</p>
 <p><a href="https://nixos.wiki/wiki/Haskell">How to develop with Haskell and Nix</a><br />
