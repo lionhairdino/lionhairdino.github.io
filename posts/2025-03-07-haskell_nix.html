@@ -154,7 +154,7 @@
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>&gt; cabal2nix --shell . &gt; shell.nix</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>&gt; nix-shell --command 'cabal configure'</span></code></pre></div>
 <p><strong>cabal2nix</strong>
-프로젝트 <code>.cabal</code> 파일에서 의존성 정보를 가져오고, <code>nixpkgs</code> <code>haskellPackages</code> 컬렉션에서 원하는 것들을 가져오며 의존성을 풀어갑니다.</p>
+프로젝트 <code>.cabal</code> 파일에서 의존성 정보를 가져오고, <code>nixpkgs</code>가 가진 <code>haskellPackages</code> 컬렉션에서 원하는 것들을 가져오며 의존성을 풀어갑니다.</p>
 <h3 id="nixpkgs-바로-아래-있는-툴">nixpkgs 바로 아래 있는 툴</h3>
 <p>하스켈만을 위한 툴 <code>ghc</code>,<code>cabal-install</code>, <code>stack</code>, <code>hpack</code>, <code>niv</code>, <code>cachix</code>, …<br />
 위 툴들은 특별히 설치하지 않아도 <code>nixpkgs</code> 탑레벨에서 제공 된다.</p>
@@ -169,7 +169,7 @@
 <li><p><strong>overrideCabal f drv</strong><br />
 기존 하스켈 패키지의 cabal 정의에 새로운 속성을 추가할 때 쓴다. 결과적으로 수정된 새로운 패키지를 생성한다.</p></li>
 <li><p><strong>callHackageDirect</strong><br />
-닉스에서 하스켈 패키지를 직접 가져오는 함수. 특별히 뭐를 하지 않고, 그냥 Hackage에서 다운로드 해서, 닉스 빌드 시스템에 통합시킨다. Hackage에 있는 정확한 버전을 고정. 하스켈에서 하지 않고, 닉스단에서 지정하는 방식이라 nix-stroe에 저장되니, 재다운로드를 덜 하게 된다.</p></li>
+닉스에서 하스켈 패키지를 직접 가져오는 함수. 특별히 뭔가를 하지 않고, 그냥 Hackage에서 다운로드 해서, 닉스 빌드 시스템에 통합시킨다. Hackage에 있는 정확한 버전을 고정. 하스켈에서 하지 않고, 닉스단에서 지정하는 방식이라 nix-stroe에 저장되니, 재다운로드를 덜 하게 된다.</p></li>
 <li><p><strong>doJailbreak</strong></p></li>
 <li><p><strong>dontCheck</strong>
 테스트를 통과하지 못해 빌드를 실패할 경우, 테스트를 건너 띄게 할 수 있다.</p></li>
@@ -246,7 +246,7 @@
 <p>※ <code>with obelisk;</code>라 하면, 다음 한 표현식 스코프안으로 <code>obelisk</code>가 가진 것들을 가져 온다.</p>
 <h2 id="super-simple-haskell-development-with-nix">Super-Simple Haskell Development with Nix</h2>
 <p><a href="https://github.com/mhwombat/nix-for-numbskulls/blob/78bcc186f79931c0e4a1e445e2f6b1f12f6d46be/Haskell/ss-haskell-dev.md">원문</a>
-많은 튜토리얼들이 niv, binary cache, flakes, Stack 등의 빌드툴을 쓰라하는데, 빌드 툴을 최소화 해보자.<br />
+많은 튜토리얼들이 niv, binary cache, flakes, Stack 등의 툴을 쓰라하는데, 빌드 툴을 최소화 해보자.<br />
 <code>default.nix</code>를 아래와 같이 작성한다.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="va">pkgs</span> <span class="op">=</span> <span class="bu">import</span> &lt;nixpkgs&gt; <span class="op">{</span> <span class="op">};</span></span>
@@ -257,9 +257,9 @@
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>      <span class="va">grid</span> <span class="op">=</span> <span class="ss">../grid</span><span class="op">;</span> <span class="co"># haskellPackages에 있는 grid 오버라이드</span></span>
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="op">};</span></span>
 <span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span></code></pre></div>
-<p>※ TODO <code>./</code>와 <code>./.</code>는 둘 다 현재 디렉토리를 뜻하고, 대부분의 경우 차이가 없다고 하는데? 아직 어떤 차이점이 있는지 모른다.<br />
+<p>※ TODO <code>./</code>와 <code>./.</code>는 둘 다 현재 디렉토리를 뜻하고, 대부분의 경우 차이가 없다고 하긴 하는데? 아직 어떤 차이점이 있는지 모른다.<br />
 </p>
-<p><code>default.nix</code> 파일에, 쉘에 들어갔을 때 쓸 패키지들의 버전을 지정할 수도 있고, <code>cabal.project</code>에 지정할 수도 있다. <code>cabal.project</code>를 안 쓰고, <code>default.nix</code>에 버전을 지정하면, 간단히 쉘을 빠져 나왔다 다시 들어가면 된다.</p>
+<p><code>default.nix</code> 파일에, 쉘에 들어갔을 때 쓸 패키지들의 버전을 지정할 수도 있고, <code>cabal.project</code>에 지정할 수도 있다. 필요한 버전을 수정할 때 <code>cabal.project</code>에 안 쓰고, <code>default.nix</code>에 버전을 지정하면, 간단히 쉘을 빠져 나왔다 다시 들어가기만 하면, 새 버전으로 준비된 쉘로 들어 간다.</p>
 <ul>
 <li><code>nix-build</code>를 실행</li>
 <li><code>nix-shell</code>을 실행. 모든 의존성이 유효한 상태의 쉘에 들어가고, <code>cabal</code> 명령어들을 쓸 수 있다.</li>
@@ -319,6 +319,8 @@ Nix에서 제공하는 패키지만 사용하고, 시스템 환경 변수나 글
 <h2 id="haskell.nix">haskell.nix</h2>
 <p><a href="https://input-output-hk.github.io/haskell.nix/index.html">haskell.nix</a> Cabal 프로젝트나 Stack 프로젝트를 Nix 코드로 자동 번역한다. Nixpkgs의 haskellPackages를 쓰지 않는, 독립적인 패키지 관리시스템으로 <code>cabal-install</code>이나 <code>stack</code>과의 호환성에 중점을 두고 설계되었다.<br />
 ※ 이 동네 특징인 것 같은데, 설정 파일 이름도 <code>haskell.nix</code>고, 이 <code>haskell.nix</code> 파일을 읽어 해석하는 Nix 모듈 이름도 <code>haskell.nix</code>라 부른다.</p>
+<p>※ <a href="https://hackage.haskell.org/package/cabal-install">cabal-install</a><br />
+<code>cabal</code> 명령줄 프로그램을 가지고 있는 패키지. cabal이라 하면, cabal 스펙, cabal 라이브러리, cabal 도구(명령줄 프로그램 cabal)을 모두 의미할 수 있지만, 보통 cabal이라 하면, 도구 cabal을 의미하는 경우가 많다.</p>
 <blockquote>
 <p>Cyclic dependencies</p>
 <p>nixpkgs에 있는 하스켈 빌더는 패키지 레벨로 패키지를 드러낸다. 패키지들이 테스트와 라이브러리로 서로 의존하고 있는 상태면 닉스가 해결하지 못하는 순환cyclic 의존성이 생긴다. By exposing the components to nix as separate derivations this will only occur if you have mutually dependent components.</p>
@@ -353,7 +355,7 @@ Nix에서 제공하는 패키지만 사용하고, 시스템 환경 변수나 글
 </ul>
 <p><strong>Niv</strong><br />
 닉스 프로젝트 의존성을 트래킹하는 명령줄 도구다. flake를 쓰려면 안봐도 된다고 한다. 일단 패스.</p>
-<p><code>stack.yaml</code>과 <code>cabal.project</code> 기반 프로젝트와 작동한다.</p>
+<p>haskell.nix는 <code>stack.yaml</code>과 <code>cabal.project</code> 기반 프로젝트 모두에 작동한다.</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Niv 소스를 읽어들인다.</span></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="va">sources</span> <span class="op">=</span> <span class="bu">import</span> <span class="ss">./nix/sources.nix</span> <span class="op">{};</span></span>
