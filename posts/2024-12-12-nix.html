@@ -185,20 +185,23 @@
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="va">name</span> <span class="op">=</span> <span class="st">&quot;morning&quot;</span><span class="op">;</span></span>
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="va">src</span> <span class="op">=</span> <span class="ss">./morning.c</span><span class="op">;</span></span>
 <span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="va">buildInputs</span> <span class="op">=</span> <span class="op">[</span> hello <span class="op">];</span> <span class="co"># hello 패키지를 의존성으로 추가합니다.</span></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="va">buildPhase</span> <span class="op">=</span> <span class="st">''</span></span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="st">    </span><span class="sc">${</span>pkgs.gcc<span class="sc">}</span><span class="st">/bin/gcc -o morning morning.c -L</span><span class="sc">${</span>hello<span class="sc">}</span><span class="st">/bin -lhello</span></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="st">  ''</span><span class="op">;</span></span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  <span class="va">installPhase</span> <span class="op">=</span> <span class="st">''</span></span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="st">    mkdir -p $out/bin</span></span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="st">    cp morning $out/bin</span></span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="st">  ''</span><span class="op">;</span></span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
-<p><code>(가)</code>는 <code>hello</code> 디렉토리의 <code>default.nix</code>를 불러옵니다. 즉 <code>hello</code>의 derivation을 불러 옵니다. (<code>morning</code>이 현재 쓰고 있는 nixpkgs를 인자로 전달하고 있습니다. <code>default.nix</code>가 하나의 함수이니, 인자로 전달하는 것으로 관련 체인에 있는 모든 함수들이(derivation들이) 같은 정보를 가질 수 있습니다. 이 것도 함수형 표현의 장점 중 하나겠습니다.)</p>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 위와 아래 hello모두 derivation을 이용해 빌드한 결과물을 가리키고</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 닉스 저장소에 설치된 hello 파일 풀주소로 인식된다고 보면 됩니다.</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  <span class="co"># buildInputs은 닉스 저장소에 있는 패키지만 지정하고, 다른 의존성은 별도로 관리해야 합니다.</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  <span class="va">buildPhase</span> <span class="op">=</span> <span class="st">''</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="st">    </span><span class="sc">${</span>pkgs.gcc<span class="sc">}</span><span class="st">/bin/gcc -o morning morning.c -L</span><span class="sc">${</span>hello<span class="sc">}</span><span class="st">/bin -lhello</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="st">  ''</span><span class="op">;</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>  <span class="va">installPhase</span> <span class="op">=</span> <span class="st">''</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="st">    mkdir -p $out/bin</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="st">    cp morning $out/bin</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="st">  ''</span><span class="op">;</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p><code>(가)</code>는 <code>hello</code> 디렉토리의 <code>default.nix</code>를 불러옵니다. 즉 <code>hello</code>의 derivation 생성 표현식을 불러 옵니다. (<code>morning</code>이 현재 쓰고 있는 nixpkgs를 인자로 전달하고 있습니다. <code>default.nix</code>가 하나의 함수이니, 인자로 전달하는 것으로 관련 체인에 있는 모든 함수들이(derivation들이) 같은 정보를 가질 수 있습니다. 이 것도 함수형 표현의 장점 중 하나겠습니다.)</p>
 <blockquote>
 <p>Q. 함수의 합성으로 “선언들의 조합”이 표현된다 했는데, 위에는 함수 합성이 안보이지 않나?<br />
-A. <code>let ~ in</code> 구문은 함수 합성의 슈가 문법으로 볼 수 있습니다. (상상, 검증 필요) 하스켈의 경우를 보면 <code>let</code> 구문을 컴파일한 중간 언어 Core 결과물은 람다 함수 합성으로 표현이 바뀌어 있습니다.</p>
+A. <code>let ~ in</code> 구문은 함수 합성의 슈가 문법으로 볼 수 있습니다. (상상, 검증 필요) 하스켈의 경우를 보면 <code>let</code> 구문을 컴파일한 중간 언어 Core 결과물은 람다 함수 합성으로 표현이 바뀌어 있습니다. 닉스는 strict 언어고 단순 바인딩일 뿐 실제로 변환이 일어나는 건 아닙니다.</p>
 </blockquote>
-<p><code>default.nix</code>도, <code>mkDerivation</code>도 이펙트가 없는 순수 함수입니다. 기존에 있던 프로젝트가 빌드할 때 환경 변수를 통해 정보를 받는 걸, 닉스 빌드로 변환할 때, 필요한 정보를 <strong>명시</strong>부터 하게 하고, 이를 <strong>임시로 환경 변수로 잡는 방법</strong>을 써서라도 순수한 모양으로 바꿉니다.</p>
+<p><code>default.nix</code>도, <code>mkDerivation</code>도 이펙트가 없는 순수 함수입니다. (사실, 사용자에게 드러나는 부분은 순수한 모양이지만, 내부 빌드 과정에서 외부와 상호 작용하는 부분이 있다고 합니다.) 기존에 있던 프로젝트가 빌드할 때 환경 변수를 통해 정보를 받는 걸, 닉스 빌드로 변환할 때, 필요한 정보를 <strong>명시</strong>부터 하게 하고, 이를 <strong>임시로 환경 변수로 잡는 방법</strong>을 써서라도 순수한 모양으로 바꿉니다. ※ <code>mkDerivation</code>을 실행하면, <code>.drv</code> 파일을 만들고, 닉스 저장소에 저장합니다. 이 후 <code>nix build</code>나, <code>nix-env</code>로 실제 빌드해서 파일을 만듭니다.</p>
 <p>특징을 더 잘표현 하려면, 선언형이란 말보다 <strong><em>조합형</em></strong>이란 말이 더 적합할 수도 있겠습니다. 어디까지나 개인적인 생각입니다.</p>
 <h2 id="닉스-패키지-매니저-설치">닉스 패키지 매니저 설치</h2>
 <p>닉스 패키지 매니저 설치부터 까다롭습니다. obelisk를 설치하며 nix가 어찌 저찌 설치된 것 같은데, nixpkgs를 못찾는다 해서 다시 multi-user 방식으로 설치했습니다.</p>
@@ -386,7 +389,7 @@ A. <code>let ~ in</code> 구문은 함수 합성의 슈가 문법으로 볼 수 
 <span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>  <span class="va">hello</span> <span class="op">=</span> pkgs.callPackage <span class="ss">./hello.nix</span> <span class="op">{</span> <span class="op">};</span> <span class="co"># pkgs의 속성을 뒤 이은 함수에게 자동으로 넘긴다.</span></span>
 <span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
 <p>Nix building instructions<br />
-“마치 기계한테 이 설명서 따라해서 빌드해 줘” 라고 할 때, 설명서를 derivation이라 한다. Nix(패키지 매니저)가 따라해서 빌드한 후 <code>nix/store</code>에 결과물이 생기는 걸 realised라 한다.</p>
+“마치 기계한테 이 설명서 따라해서 빌드해 줘” 라고 할 때, 설명서를 derivation이라 한다. Nix(패키지 매니저)가 derivation 해석해서 빌드한 후 <code>nix/store</code>에 결과물이 생기는 걸 realised라 한다. 위와 같은 닉스 소스들은 <code>mkDerivation</code>같은 함수를 가지고 있고, 닉스가 이 표현식을 평가해서 derivation을 만든다.</p>
 <blockquote>
 <p><span class="citation" data-cites="jhhuh님의">@jhhuh님의</span> 설명을 옮깁니다.</p>
 <ul>
@@ -404,6 +407,7 @@ A. <code>let ~ in</code> 구문은 함수 합성의 슈가 문법으로 볼 수 
 </ul>
 <p>이 중 하나를 말하는 건데, 그냥 간단히 derivation은 닉스가 빌드할 수 있는 무언가라고 할 수 있겠습니다.</p>
 </blockquote>
+<p>※ <code>.drv</code>는 <code>nix/store</code> 아래 임시 폴더에, 빌드 과정 중 임시로 파일로 생성된 후, 빌드가 끝나면 지워집니다. <code>nixpkgs</code>가 가지고 있는 건 derivation이 아니라, derivation을 생성할 수 있는 닉스 표현식 (<code>default.nix</code>같은 것들)을 가지고 있습니다.</p>
 <p><code>Derivation</code>은 기계가 읽을 수 있는 빌드를 위한 레시피를 가지고 있는 특별한 파일. 아래는 <code>hello world</code>를 출력하는 c를 빌드하는 방법을 적어 놓은 닉스 파일이다.</p>
 <div class="sourceCode" id="cb26"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>Derive([(&quot;out&quot;,&quot;/nix/store/1nq46fyv3629slgxnagqn2c01skp7xrq-hello-world&quot;,&quot;&quot;,&quot;&quot;)]</span>
 <span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>      ,[(&quot;/nix/store/60xqp516mkfhf31n6ycyvxppcknb2dwr-build-hello.drv&quot;,[&quot;out&quot;])]</span>
@@ -667,6 +671,113 @@ NixOS, macOS, 다른 리눅스 배포판에서 모두 돌아가야 할 설정 - 
 <p>flakes가 활성화된 상태인데, 찾은 패키지가 flakes는 제공하지 않고, <code>default.nix</code>만 제공할 경우</p>
 <pre><code>nix build --no-flake -f default.nix
 nix build -f '&lt;nixpkgs&gt;' &lt;패키지명&gt;</code></pre>
+<h1 id="실제-.drv-모양">실제 .drv 모양</h1>
+<h1 id="닉스-모형-코드">닉스 모형 코드</h1>
+<p>아래는 닉스 동작을 가늠해 볼 수 있는 초단순 모형 코드입니다. (검증 필요)</p>
+<pre><code>├── remoteGit           패키지 제공 저장소 모형
+│   ├── hello
+│   │   ├── hello.c
+│   │   └── hello.h
+│   └── morning
+│       └── morning.c
+├── store               토이닉스 저장소
+│   ├── hello
+│   │   ├── hello.c
+│   │   ├── hello.h
+│   │   ├── hello.o
+│   │   └── libhello.a
+│   └── morning
+│       ├── morning
+│       └── morning.c
+└── toynix.hs</code></pre>
+<div class="sourceCode" id="cb44"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="ot">{-# LANGUAGE RecordWildCards #-}</span></span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a><span class="kw">module</span> <span class="dt">Main</span> <span class="kw">where</span></span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">System.Directory</span></span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">System.Process</span></span>
+<span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">System.IO</span></span>
+<span id="cb44-8"><a href="#cb44-8" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Data.Map</span> (<span class="dt">Map</span>, empty, insert, lookup)</span>
+<span id="cb44-9"><a href="#cb44-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-10"><a href="#cb44-10" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Derivation</span> <span class="ot">=</span> <span class="dt">Derivation</span> {</span>
+<span id="cb44-11"><a href="#cb44-11" aria-hidden="true" tabindex="-1"></a><span class="ot">  name ::</span> <span class="dt">String</span>,</span>
+<span id="cb44-12"><a href="#cb44-12" aria-hidden="true" tabindex="-1"></a><span class="ot">  source ::</span> <span class="dt">String</span>,</span>
+<span id="cb44-13"><a href="#cb44-13" aria-hidden="true" tabindex="-1"></a><span class="ot">  buildInputs ::</span> [<span class="dt">Derivation</span>], </span>
+<span id="cb44-14"><a href="#cb44-14" aria-hidden="true" tabindex="-1"></a><span class="ot">  buildFunc ::</span> <span class="dt">FilePath</span> <span class="ot">-&gt;</span> [<span class="dt">FilePath</span>] <span class="ot">-&gt;</span> <span class="dt">IO</span> <span class="dt">FilePath</span>,</span>
+<span id="cb44-15"><a href="#cb44-15" aria-hidden="true" tabindex="-1"></a><span class="ot">  outputPath ::</span> <span class="dt">Maybe</span> <span class="dt">FilePath</span></span>
+<span id="cb44-16"><a href="#cb44-16" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb44-17"><a href="#cb44-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-18"><a href="#cb44-18" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">NixStore</span> <span class="ot">=</span> <span class="dt">NixStore</span> {</span>
+<span id="cb44-19"><a href="#cb44-19" aria-hidden="true" tabindex="-1"></a><span class="ot">  store ::</span> <span class="dt">Map</span> <span class="dt">String</span> <span class="dt">FilePath</span></span>
+<span id="cb44-20"><a href="#cb44-20" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb44-21"><a href="#cb44-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-22"><a href="#cb44-22" aria-hidden="true" tabindex="-1"></a><span class="ot">build ::</span> <span class="dt">NixStore</span> <span class="ot">-&gt;</span> <span class="dt">Derivation</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> <span class="dt">NixStore</span></span>
+<span id="cb44-23"><a href="#cb44-23" aria-hidden="true" tabindex="-1"></a>build nixStore derivation <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb44-24"><a href="#cb44-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">putStrLn</span> <span class="op">$</span> <span class="st">&quot;Building &quot;</span> <span class="op">++</span> name derivation <span class="op">++</span> <span class="st">&quot;...&quot;</span></span>
+<span id="cb44-25"><a href="#cb44-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-26"><a href="#cb44-26" aria-hidden="true" tabindex="-1"></a>  buildInputsPath <span class="ot">&lt;-</span> <span class="fu">mapM</span> (\dep <span class="ot">-&gt;</span> <span class="kw">case</span> outputPath dep <span class="kw">of</span></span>
+<span id="cb44-27"><a href="#cb44-27" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Just</span> path <span class="ot">-&gt;</span> <span class="fu">return</span> path</span>
+<span id="cb44-28"><a href="#cb44-28" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Nothing</span> <span class="ot">-&gt;</span> <span class="kw">do</span> <span class="co">-- 아직 빌드하지 않았다면</span></span>
+<span id="cb44-29"><a href="#cb44-29" aria-hidden="true" tabindex="-1"></a>      nixStore' <span class="ot">&lt;-</span> build nixStore dep</span>
+<span id="cb44-30"><a href="#cb44-30" aria-hidden="true" tabindex="-1"></a>      <span class="kw">case</span> Data.Map.lookup (name dep) (store nixStore') <span class="kw">of</span></span>
+<span id="cb44-31"><a href="#cb44-31" aria-hidden="true" tabindex="-1"></a>        <span class="dt">Just</span> path <span class="ot">-&gt;</span> <span class="fu">return</span> path</span>
+<span id="cb44-32"><a href="#cb44-32" aria-hidden="true" tabindex="-1"></a>        <span class="dt">Nothing</span> <span class="ot">-&gt;</span> <span class="fu">error</span> <span class="op">$</span> <span class="st">&quot;Dependency &quot;</span> <span class="op">++</span> name dep <span class="op">++</span> <span class="st">&quot; not found in store&quot;</span></span>
+<span id="cb44-33"><a href="#cb44-33" aria-hidden="true" tabindex="-1"></a>    ) (buildInputs derivation)</span>
+<span id="cb44-34"><a href="#cb44-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-35"><a href="#cb44-35" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> buildDir <span class="ot">=</span> <span class="st">&quot;store/&quot;</span> <span class="op">++</span> name derivation <span class="co">-- store/hello</span></span>
+<span id="cb44-36"><a href="#cb44-36" aria-hidden="true" tabindex="-1"></a>  createDirectoryIfMissing <span class="dt">True</span> buildDir</span>
+<span id="cb44-37"><a href="#cb44-37" aria-hidden="true" tabindex="-1"></a>  outputPath' <span class="ot">&lt;-</span> (buildFunc derivation) buildDir buildInputsPath</span>
+<span id="cb44-38"><a href="#cb44-38" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> store' <span class="ot">=</span> Data.Map.insert (name derivation) outputPath' (store nixStore)</span>
+<span id="cb44-39"><a href="#cb44-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">putStrLn</span> <span class="op">$</span> (name derivation) <span class="op">++</span> <span class="st">&quot; built at &quot;</span> <span class="op">++</span> outputPath'</span>
+<span id="cb44-40"><a href="#cb44-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span> <span class="dt">NixStore</span> { store <span class="ot">=</span> store' }</span>
+<span id="cb44-41"><a href="#cb44-41" aria-hidden="true" tabindex="-1"></a>     </span>
+<span id="cb44-42"><a href="#cb44-42" aria-hidden="true" tabindex="-1"></a><span class="ot">runNix ::</span> <span class="dt">NixStore</span> <span class="ot">-&gt;</span> <span class="dt">Derivation</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> ()</span>
+<span id="cb44-43"><a href="#cb44-43" aria-hidden="true" tabindex="-1"></a>runNix nixStore derivation <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb44-44"><a href="#cb44-44" aria-hidden="true" tabindex="-1"></a>  nixStore' <span class="ot">&lt;-</span> build nixStore derivation</span>
+<span id="cb44-45"><a href="#cb44-45" aria-hidden="true" tabindex="-1"></a>  <span class="kw">case</span> Data.Map.lookup (name derivation) (store nixStore') <span class="kw">of</span></span>
+<span id="cb44-46"><a href="#cb44-46" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Just</span> path <span class="ot">-&gt;</span> <span class="fu">putStrLn</span> <span class="op">$</span> name derivation <span class="op">++</span> <span class="st">&quot;: &quot;</span> <span class="op">++</span> path</span>
+<span id="cb44-47"><a href="#cb44-47" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Nothing</span> <span class="ot">-&gt;</span> <span class="fu">error</span> <span class="op">$</span> <span class="st">&quot;Derivation &quot;</span> <span class="op">++</span> name derivation <span class="op">++</span> <span class="st">&quot;not found in store&quot;</span></span>
+<span id="cb44-48"><a href="#cb44-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-49"><a href="#cb44-49" aria-hidden="true" tabindex="-1"></a><span class="ot">buildHello ::</span> <span class="dt">FilePath</span> <span class="ot">-&gt;</span> [<span class="dt">FilePath</span>] <span class="ot">-&gt;</span> <span class="dt">IO</span> <span class="dt">FilePath</span></span>
+<span id="cb44-50"><a href="#cb44-50" aria-hidden="true" tabindex="-1"></a>buildHello buildDir _ <span class="ot">=</span> <span class="kw">do</span> <span class="co">-- 어딘가에서 소스를 가져오는 것을 모형화</span></span>
+<span id="cb44-51"><a href="#cb44-51" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> remote <span class="ot">=</span> <span class="st">&quot;remoteGit/hello/&quot;</span></span>
+<span id="cb44-52"><a href="#cb44-52" aria-hidden="true" tabindex="-1"></a>  copyFile (remote <span class="op">++</span> <span class="st">&quot;/hello.c&quot;</span>) (buildDir <span class="op">++</span> <span class="st">&quot;/hello.c&quot;</span>)</span>
+<span id="cb44-53"><a href="#cb44-53" aria-hidden="true" tabindex="-1"></a>  copyFile (remote <span class="op">++</span> <span class="st">&quot;/hello.h&quot;</span>) (buildDir <span class="op">++</span> <span class="st">&quot;/hello.h&quot;</span>)</span>
+<span id="cb44-54"><a href="#cb44-54" aria-hidden="true" tabindex="-1"></a>  system <span class="op">$</span> <span class="st">&quot;gcc -c -o &quot;</span> <span class="op">++</span> buildDir <span class="op">++</span> <span class="st">&quot;/hello.o &quot;</span> <span class="op">++</span> buildDir <span class="op">++</span> <span class="st">&quot;/hello.c&quot;</span></span>
+<span id="cb44-55"><a href="#cb44-55" aria-hidden="true" tabindex="-1"></a>  system <span class="op">$</span> <span class="st">&quot;ar rcs &quot;</span> <span class="op">++</span> buildDir <span class="op">++</span> <span class="st">&quot;/libhello.a &quot;</span> <span class="op">++</span> buildDir <span class="op">++</span> <span class="st">&quot;/hello.o&quot;</span></span>
+<span id="cb44-56"><a href="#cb44-56" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span> <span class="op">$</span> buildDir <span class="op">++</span> <span class="st">&quot;/libhello.a&quot;</span></span>
+<span id="cb44-57"><a href="#cb44-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-58"><a href="#cb44-58" aria-hidden="true" tabindex="-1"></a><span class="ot">buildMorning ::</span> <span class="dt">FilePath</span> <span class="ot">-&gt;</span> [<span class="dt">FilePath</span>] <span class="ot">-&gt;</span> <span class="dt">IO</span> <span class="dt">FilePath</span></span>
+<span id="cb44-59"><a href="#cb44-59" aria-hidden="true" tabindex="-1"></a>buildMorning buildDir [helloPath] <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb44-60"><a href="#cb44-60" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> remote <span class="ot">=</span> <span class="st">&quot;remoteGit/morning/&quot;</span></span>
+<span id="cb44-61"><a href="#cb44-61" aria-hidden="true" tabindex="-1"></a>      helloOutputDir <span class="ot">=</span> <span class="fu">init</span> <span class="op">$</span> <span class="fu">reverse</span> <span class="op">$</span> <span class="fu">dropWhile</span> (<span class="op">/=</span> <span class="ch">'/'</span>) <span class="op">$</span> <span class="fu">reverse</span> helloPath</span>
+<span id="cb44-62"><a href="#cb44-62" aria-hidden="true" tabindex="-1"></a>  copyFile (remote <span class="op">++</span> <span class="st">&quot;/morning.c&quot;</span>) (buildDir <span class="op">++</span> <span class="st">&quot;/morning.c&quot;</span>)</span>
+<span id="cb44-63"><a href="#cb44-63" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> gcc <span class="ot">=</span> <span class="st">&quot;gcc -o &quot;</span> <span class="op">++</span> buildDir <span class="op">++</span> <span class="st">&quot;/morning &quot;</span> </span>
+<span id="cb44-64"><a href="#cb44-64" aria-hidden="true" tabindex="-1"></a>                     <span class="op">++</span> buildDir <span class="op">++</span> <span class="st">&quot;/morning.c &quot;</span> </span>
+<span id="cb44-65"><a href="#cb44-65" aria-hidden="true" tabindex="-1"></a>                     <span class="op">++</span> <span class="st">&quot;-L&quot;</span> <span class="op">++</span> helloOutputDir <span class="op">++</span> <span class="st">&quot; -lhello &quot;</span></span>
+<span id="cb44-66"><a href="#cb44-66" aria-hidden="true" tabindex="-1"></a>                     <span class="op">++</span> <span class="st">&quot;-I&quot;</span> <span class="op">++</span> helloOutputDir</span>
+<span id="cb44-67"><a href="#cb44-67" aria-hidden="true" tabindex="-1"></a>  <span class="fu">putStrLn</span> gcc</span>
+<span id="cb44-68"><a href="#cb44-68" aria-hidden="true" tabindex="-1"></a>  system gcc</span>
+<span id="cb44-69"><a href="#cb44-69" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span> <span class="op">$</span> buildDir <span class="op">++</span> <span class="st">&quot;/morning&quot;</span></span>
+<span id="cb44-70"><a href="#cb44-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-71"><a href="#cb44-71" aria-hidden="true" tabindex="-1"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span>
+<span id="cb44-72"><a href="#cb44-72" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb44-73"><a href="#cb44-73" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> helloDerivation <span class="ot">=</span> <span class="dt">Derivation</span> { <span class="co">-- hello 패키지의 default.nix가 생성할 drv모형 </span></span>
+<span id="cb44-74"><a href="#cb44-74" aria-hidden="true" tabindex="-1"></a>        name <span class="ot">=</span> <span class="st">&quot;hello&quot;</span>,</span>
+<span id="cb44-75"><a href="#cb44-75" aria-hidden="true" tabindex="-1"></a>        source <span class="ot">=</span> <span class="st">&quot;hello.c&quot;</span>,</span>
+<span id="cb44-76"><a href="#cb44-76" aria-hidden="true" tabindex="-1"></a>        buildInputs <span class="ot">=</span> [],</span>
+<span id="cb44-77"><a href="#cb44-77" aria-hidden="true" tabindex="-1"></a>        buildFunc <span class="ot">=</span> buildHello, <span class="co">-- buildPhase 모형</span></span>
+<span id="cb44-78"><a href="#cb44-78" aria-hidden="true" tabindex="-1"></a>        outputPath <span class="ot">=</span> <span class="dt">Nothing</span></span>
+<span id="cb44-79"><a href="#cb44-79" aria-hidden="true" tabindex="-1"></a>      }</span>
+<span id="cb44-80"><a href="#cb44-80" aria-hidden="true" tabindex="-1"></a>      morningDerivation <span class="ot">=</span> <span class="dt">Derivation</span> { <span class="co">-- morning 패키지의 default.nix가 생성할 drv모형 </span></span>
+<span id="cb44-81"><a href="#cb44-81" aria-hidden="true" tabindex="-1"></a>        name <span class="ot">=</span> <span class="st">&quot;morning&quot;</span>,</span>
+<span id="cb44-82"><a href="#cb44-82" aria-hidden="true" tabindex="-1"></a>        source <span class="ot">=</span> <span class="st">&quot;morning.c&quot;</span>,</span>
+<span id="cb44-83"><a href="#cb44-83" aria-hidden="true" tabindex="-1"></a>        buildInputs <span class="ot">=</span> [helloDerivation], <span class="co">-- hello 라이브러리 의존</span></span>
+<span id="cb44-84"><a href="#cb44-84" aria-hidden="true" tabindex="-1"></a>        buildFunc <span class="ot">=</span> buildMorning, <span class="co">-- buildPhase 모형</span></span>
+<span id="cb44-85"><a href="#cb44-85" aria-hidden="true" tabindex="-1"></a>        outputPath <span class="ot">=</span> <span class="dt">Nothing</span></span>
+<span id="cb44-86"><a href="#cb44-86" aria-hidden="true" tabindex="-1"></a>      }</span>
+<span id="cb44-87"><a href="#cb44-87" aria-hidden="true" tabindex="-1"></a>      nixStore <span class="ot">=</span> <span class="dt">NixStore</span>{ store <span class="ot">=</span> Data.Map.empty }</span>
+<span id="cb44-88"><a href="#cb44-88" aria-hidden="true" tabindex="-1"></a>  runNix nixStore morningDerivation <span class="co">-- 빌드 명령</span></span></code></pre></div>
 
 <div class="comment">
   <script>
