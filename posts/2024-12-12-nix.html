@@ -224,7 +224,7 @@ A. <code>let ~ in</code> 구문은 함수 합성의 슈가 문법으로 볼 수 
 <div class="sourceCode" id="cb7"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>λ&gt; nix-env --install --attr nixpkgs.firefox</span></code></pre></div>
 <p>(Nix store에 없다면 C라이브러와 컴파일러까지도 설치할 수 있습니다.) (패키지를 컴파일된 바이너리가 아닌) 소스로 배포deployment하는 모델입니다만, 가급적 소스에서 빌드하는 건 피하고, binary cache, pre-built 바이너리를 제공하는 웹서버들을 이용해서 시간 효율을 높입니다. 만일 <code>/nix/store/b5lksdklsjfd...-firefox-33.1</code>을 빌드하라고 하면, 바로 소스에서 빌드하는 게 아니라, 우선 <code>https://cache.nixos.org/b5lksdklsjfd...narinfo</code> 파일이 있는지 체크하고, 있다면 빌드된pre-built 패키지를 가져오고, 없으면 빌드 단계로 들어갑니다.</p>
 <h2 id="nix-packages-collection">Nix Packages collection</h2>
-<p>Nixpkgs는, 수백 개의 유닉스 패키지를 위한 많은 양의 Nix 표현식을 제공합니다.</p>
+<p>Nixpkgs는, 수백 개의 유닉스 패키지를 위한 많은 양의 Nix 표현식(derivation)을 제공합니다. 단순한 바이너리 패키지 모음이 아니라, 패키지를 빌드하는 방법, 패키지를 개발하고 빌드하기 위한 환경을 만드는 방법을 같이 가지고 있습니다.</p>
 <h2 id="nix.conf">nix.conf</h2>
 <p>보통 <code>/etc/nix/nix.conf</code> 에서 찾을 수 있습니다.<br />
 시스템에 설치된 패키지를 덮어 쓸 때는 <code>~/.config/nixpkgs/config.nix</code>를 이용합니다.<br />
@@ -242,8 +242,6 @@ A. <code>let ~ in</code> 구문은 함수 합성의 슈가 문법으로 볼 수 
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>[nix-shell]$ configurePhase</span>
 <span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>[nix-shell]$ buildPhase </span>
 <span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>[nix-shell]$ ./pan/gui/pan</span></code></pre></div>
-<h2 id="이식성portability">이식성portability</h2>
-<p>윈도우에선 쓸 수 없고, 리눅스와 macOS에서 돌아갑니다.</p>
 <h2 id="nixos">NixOS</h2>
 <p>기본 아이디어는 시스템을 설정할 때, 커맨드라인 명령어를 쓴다든지, GUI 툴로 클릭하며 설정하지 않고, 모든 설정은 설정파일에 남기면, 이 설정 파일만 있다면 언제든지 동일한 환경을 만들 수 있을 겁니다.</p>
 <p>닉스를 기반(닉스 언어로 시스템 설정을 표현하는)으로 하는 리눅스 배포판입니다. 패키지 매니징에만 Nix를 쓰는 게 아니라, 시스템 설정에도 씁니다. (ex. <code>/etc</code>에 있는 설정 파일들 빌드할 때) Nix로 시스템을 관리하면, 시스템 자체를 어떤 시점의 설정 상태로 편하게 롤백할 수도 있습니다.</p>
@@ -267,9 +265,9 @@ A. <code>let ~ in</code> 구문은 함수 합성의 슈가 문법으로 볼 수 
 <h2 id="선언적인-쉘-환경">선언적인 쉘 환경</h2>
 <p>환경이 활성화되면, 자동으로 bash 명령어 실행<br />
 자동으로 환경 변수 지정<br />
-버전 컨트롤에 환경 정의를 넣고, 다른 장비에서 불러서 적용한다.<br />
-<code>shell.nix</code>파일을 만든다.<br />
-대충 <code>apt install ...</code> 등을 쉘에서 단발적으로 실행하지 않고, 쉘 스크립트 파일에 모두 모아 놓는 거랑 비슷하다.</p>
+버전 컨트롤에 환경 정의를 넣고, 다른 장비에서 불러서 적용합니다.<br />
+<code>shell.nix</code>파일을 만듭니다.<br />
+대충 <code>apt install ...</code> 등을 쉘에서 단발적으로 실행하지 않고, 쉘 스크립트 파일에 모두 모아 놓는 거랑 비슷합니다.</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 명시적인 버전 지정</span></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="va">nixpkgs</span> <span class="op">=</span> <span class="bu">fetchTarball</span> <span class="st">&quot;https://github.com/NixOS/nixpkgs/tarball/nixos-23.11&quot;</span><span class="op">;</span></span>
@@ -289,31 +287,30 @@ A. <code>let ~ in</code> 구문은 함수 합성의 슈가 문법으로 볼 수 
 <span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a><span class="st">    echo $GREETING | cowsay | lolcat</span></span>
 <span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a><span class="st">  ''</span><span class="op">;</span></span>
 <span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
-<p><code>mkShell</code>의 예시 중에, 패키지를 <code>buildInputs</code>나 <code>nativeBuildInputs</code> 속성에 추가하는 것도 있다. 
-닉스쉘은 원래 “패키지 빌드 디버깅에 필요한 도구”를 가지고 있는 쉘 환경을 만들기 위해 나왔다. 처음 목적은 그랬지만, 지금은 임시 환경을 만드는 용도로도 사용한다.<br />
-<code>nix-shell</code>을 실행하면, 현재 폴더에서 <code>shell.nix</code> 파일을 찾는다. <code>packages</code>에 써 놓은 것들을 <code>$PATH</code>에서 보이게 해 둔다. 닉스쉘을 켜둔 상태에서 <code>shell.nix</code> 파일을 수정해도 바로 반영되진 않는다. 닉스쉘을 내렸다 다시 올리면 반영된다.</p>
-<p>쉘 환경에 들어가기 직전에 실행하고 싶은 것들은 <code>shellHook</code>을 쓴다.</p>
-<h2 id="재현성을-높이기-위해-nixpkgs-고정pinning">재현성을 높이기 위해 Nixpkgs 고정pinning</h2>
+<p><code>mkShell</code>의 예시 중에, 패키지를 <code>buildInputs</code>나 <code>nativeBuildInputs</code> 속성에 추가하는 것도 있습니다. 
+닉스쉘은 원래 “패키지 빌드 디버깅에 필요한 도구”를 가지고 있는 쉘 환경을 만들기 위해 나왔습니다. 처음 목적은 그랬지만, 지금은 임시 환경을 만드는 용도로도 사용합니다.<br />
+<code>nix-shell</code>을 실행하면, 현재 폴더에서 <code>shell.nix</code> 파일을 찾습니다. <code>packages</code>에 써 놓은 것들을 <code>$PATH</code>에서 보이게 해 줍니다. 닉스쉘을 켜둔 상태에서 <code>shell.nix</code> 파일을 수정해도 바로 반영되진 않습니다. 닉스쉘을 내렸다 다시 올리면 반영됩니다.</p>
+<p>쉘 환경에 들어가기 직전에 실행하고 싶은 것들은 <code>shellHook</code>를 씁니다.</p>
+<h2 id="재현성을-높이기-위해-nixpkgs-버전-고정">재현성을 높이기 위해 Nixpkgs 버전 고정</h2>
 <div class="sourceCode" id="cb14"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="op">{</span> <span class="va">pkgs</span> <span class="op">?</span> <span class="bu">import</span> &lt;nixpkgs&gt; <span class="op">{}</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="op">}</span>:</span></code></pre></div>
 <p>닉스 패키지를 불러와서, 닉스 표현식을 실행하는 편리한 방법</p>
 <blockquote>
 <p>However, the resulting Nix expression is not fully reproducible</p>
 </blockquote>
-<p>아직 확실하진 않지만, 결과가 항상 같은 건 아닌가 보다.
-완벽하게 재현가능한 닉스 표현식을 만들려면, Nixpkgs의 버전을 고정해야 한다.</p>
+<p>닉스 패키지가 바뀔 수도 있으면, 결과가 항상 같은 건 아닙니다. 완벽하게 재현가능한 닉스 표현식을 만들려면, Nixpkgs의 버전을 고정해야 합니다.</p>
 <h2 id="import는-예약어가-아니라-보통의-함수다">import는 예약어가 아니라 보통의 함수다</h2>
-<p>좀 특이한데, <code>import &lt;nixpkgs&gt;</code> 이 자체가 하나의 함수고, 이 함수에 <code>{...}</code> 인자를 넘기는 모양이다. 왜 이렇게 동작하냐면, <code>import</code>는 지정한 파일에서 닉스 표현식을 읽어와 반환한다. 이 반환값이 함수인 경우엔 보통의 함수처럼 인자를 취하는 모양이 된다.</p>
+<p>좀 특이한데, <code>import &lt;nixpkgs&gt;</code> 이 자체가 하나의 함수고, 이 함수에 <code>{...}</code> 인자를 넘기는 모양입니다. 왜 이렇게 동작하냐면, <code>import</code>는 지정한 파일에서 닉스 표현식을 읽어와 반환합니다. 이 반환값이 함수인 경우엔 보통의 함수처럼 인자를 취하는 모양이 됩니다.</p>
 <div class="sourceCode" id="cb15"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>pkgs = <span class="bu">import</span> nixpkgs <span class="op">{</span> <span class="va">config</span> <span class="op">=</span> <span class="op">{};</span> <span class="va">overlays</span> <span class="op">=</span> <span class="op">[];</span> <span class="op">}</span>;</span></code></pre></div>
-<p><code>import nixpkgs</code> 함수는 인자로 <code>{ config, overlays }</code> 속성 집합을 받고 있다.</p>
+<p><code>import nixpkgs</code> 함수는 인자로 <code>{ config, overlays }</code> 속성 집합을 받고 있습니다.</p>
 <div class="sourceCode" id="cb16"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>pkgs.mkShell <span class="op">{</span> <span class="op">...</span> <span class="op">}</span> </span></code></pre></div>
-<p><code>mkShell</code>도 마찬가지다. 함수가 <code>{ ... }</code> 인자를 받는 모양이다.</p>
+<p><code>mkShell</code>도 마찬가지입니다. 함수가 <code>{ ... }</code> 인자를 받는 모양입니다.</p>
 <ul>
-<li>닉스 파일을 지정하지 않고, 경로만 적어주면 디폴트로 <code>default.nix</code> 파일을 읽어 온다.
-<code>import ./.</code>이라 써 주면, 현재 디렉토리에서 <code>default.nix</code>를 읽어 온다.</li>
-<li><code>import</code>는 빌트인 함수다. 대부분의 빌트인 함수는 <code>builtins</code>를 통해 접근하는데, <code>import</code>는 예외다.</li>
+<li>닉스 파일을 지정하지 않고, 경로만 적어주면 디폴트로 <code>default.nix</code> 파일을 읽어 옵니다.
+<code>import ./.</code>이라 써 주면, 현재 디렉토리에서 <code>default.nix</code>를 읽어 옵니다.</li>
+<li><code>import</code>는 빌트인 함수입니다. 대부분의 빌트인 함수는 <code>builtins</code>를 통해 접근하는데, <code>import</code>는 예외입니다.</li>
 </ul>
-<p>※ 닉스 언어에서 <code>{ x, y }: x + y</code> 모양은, 속성 <code>x</code>, <code>y</code>를 가지고 있는 집합을 인자로 받는 람다 함수다.</p>
+<p>※ 닉스 언어에서 <code>{ x, y }: x + y</code> 모양은, 속성 <code>x</code>, <code>y</code>를 가지고 있는 집합을 인자로 받는 람다 함수입니다.</p>
 <h3 id="사용자와-상호-작용interactive해서-평가">사용자와 상호 작용interactive해서 평가</h3>
 <p>Lazy 평가 전략을 취한다. WHNF에 머물지 않고, 모두 평가된 걸로 보려면, repl에서 <code>:p</code>를 붙인다.<br />
 <code>runHaskell</code>처럼 닉스 파일을 바로 실행하는 방법도 있다.<br />
@@ -372,7 +369,7 @@ A. <code>let ~ in</code> 구문은 함수 합성의 슈가 문법으로 볼 수 
 <span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;hello </span><span class="sc">${</span>name<span class="sc">}</span><span class="st">&quot;</span></span></code></pre></div>
 <p><a href="https://nix.dev/manual/nix/2.18/language/derivations" class="uri">https://nix.dev/manual/nix/2.18/language/derivations</a>
 <a href="https://nix.dev/" class="uri">https://nix.dev/</a></p>
-<h1 id="닉스로-소프트웨어-패키징하기-nix-package-manager">닉스로 소프트웨어 패키징하기 Nix Package manager</h1>
+<h2 id="닉스로-소프트웨어-패키징하기">닉스로 소프트웨어 패키징하기</h2>
 <div class="sourceCode" id="cb25"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="op">{</span> </span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="va">lib</span><span class="op">,</span></span>
 <span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  <span class="va">stdenv</span><span class="op">,</span></span>
@@ -506,7 +503,7 @@ derive라 하면 무언가를 만드는 과정에서 튕겨져 나온 결과물 
 <span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>    } <span class="ot">-&gt;</span> <span class="dt">Derivation</span></span></code></pre></div>
 <p><strong>stdenv.mkDerivation</strong><br />
 <a href="https://nixos.org/manual/nixpkgs/stable/#part-stdenv">Standard environment</a><br />
-대체로 표준 환경 설정만으로, Unix 패키지 빌드의 많은 부분을 자동으로 할 수 있다. <code>./configure; make; make install</code> 빌드 인터페이스를 가지고 있으면, 따로 빌드 스크립트를 쓸 필요가 없다. 표준 환경이 알아서 한다. 만일 자동으로 안될 경우 다양한 빌드 phases를 오버라이드 해서 상황에 맞게 만들 수 있다. 표준 환경으로 빌드할 때 <code>stdenv.mkDerivation</code>을 쓴다.</p>
+대체로 표준 환경 설정만으로, Unix 패키지 빌드의 많은 부분을 자동으로 할 수 있다. <code>./configure; make; make install</code> 빌드 인터페이스를 가지고 있으면, 따로 빌드 스크립트를 쓸 필요가 없다. 표준 환경이 알아서 한다. 만일 자동으로 안될 경우 다양한 빌드 phases를 오버라이드 해서 상황에 맞게 만들 수 있다. 표준 환경으로 빌드할 때 <code>stdenv.mkDerivation</code>을 쓴다. <a href="https://nix.dev/manual/nix/2.18/language/derivations.html">derivation</a> 함수의 래퍼다.</p>
 <div class="sourceCode" id="cb35"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>stdenv.mkDerivation <span class="op">{</span></span>
 <span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  <span class="va">name</span> <span class="op">=</span> <span class="st">&quot;libfoo-1.2.3&quot;</span><span class="op">;</span></span>
 <span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>  <span class="va">src</span> <span class="op">=</span> fetchurl <span class="op">{</span></span>
@@ -725,11 +722,8 @@ derive라 하면 무언가를 만드는 과정에서 튕겨져 나온 결과물 
 <code>-p</code> (emerg 0, alert, crit, err, warning, notice, info, debug 7) 우선 순위로 정렬?
 <code>--since 20240515 --until 20240516</code>
 <code>--since "-2hour" --until "10min"</code></p>
-<h2 id="갑자기-순간의-프리징이-보이거나-아니면-곧바로-gdm-로그인-상태로-가버린다.">갑자기 순간의 프리징이 보이거나, 아니면 곧바로 gdm 로그인 상태로 가버린다.</h2>
-<p>다시 로그인하면 작업은 모두 사라져 있다.
-저널 로그 확인하니, nouveau 드라이버가 의심간다.
-<a href="https://nixos.wiki/wiki/Nvidia" class="uri">https://nixos.wiki/wiki/Nvidia</a>
-2024-05-17 nvidia 오피셜 드라이브로 바꾸고 문제는 사라진 것 같다.</p>
+<p>※ 갑자기 순간의 프리징이 보이거나, 아니면 곧바로 gdm 로그인 상태로 가버린다.<br />
+다시 로그인하면 작업은 모두 사라져 있다. 저널 로그 확인하니, nouveau 드라이버가 의심간다. <a href="https://nixos.wiki/wiki/Nvidia" class="uri">https://nixos.wiki/wiki/Nvidia</a> 2024-05-17 nvidia 오피셜 드라이브로 바꾸고 문제는 사라진 것 같다.</p>
 <h2 id="flatpak">flatpak</h2>
 <h2 id="nix-home-manager">Nix home-manager</h2>
 <p>시스템 상태를 선언적으로, 즉 configuration.nix 파일에 모두 모아둘 수 있다면, 현실적으로 configuration.nix 파일만 들고 다니면, 똑같은 시스템을 “재현”할 수 있다. 하지만, DB에 들어 있는 설정에 필요한 정보들은 닉스 패키지 매니저로 관리할 수 없고, 사용자 디렉토리에 있는 dotfiles들도 그렇다. 완벽하게, 한 큐에 재현가능한 메커니즘을 만들기는 어렵다.</p>
@@ -769,7 +763,7 @@ NixOS, macOS, 다른 리눅스 배포판에서 모두 돌아가야 할 설정 - 
 <code>program.packages</code>만 이런 동작을 하는 게 아니라, 설정 파일을 여러 개로 쪼개어 관리할 수 있도록, 동일 항목이 있을 경우 모두 merge하는 동작을 한다. 이 동작이 없다면, 설정을 어떻게 쪼갤까 생각해 보면, 당연한 필요한 동작이다. 하지만, 언어적인 입장에선 애매해 보이는 동작이다.</p>
 <h2 id="기존-배포판들과-비교">기존 배포판들과 비교</h2>
 <p><a href="https://wiki.nixos.org/wiki/Overview_of_the_NixOS_Linux_distribution">Overview of the NixOS Linux distribution</a><br />
-닉스OS는 Linux Standard Base (LSB) 파일 시스템 구조를 따르지 않는다.</p>
+닉스OS는 Linux Standard Base (LSB) 파일 시스템 구조를 따르지 않습니다.</p>
 <p>LSB는</p>
 <table>
 <thead>
@@ -797,14 +791,14 @@ NixOS, macOS, 다른 리눅스 배포판에서 모두 돌아가야 할 설정 - 
 </tr>
 </tbody>
 </table>
-<p>닉스OS는 <code>/lib</code>, <code>/usr/lib</code>가 없다. 시스템 라이브러리, 바이너리, 커널, 펌웨어, 설정 파일 모두 Nix Store에 저장한다. 한 번 Nix Store에 저장되면 수정할 수 없다immutable. 새로운 버전은 다른 해시값으로 저장될 뿐, 기존 파일은 건드리지 않는다. <code>/bin</code>, <code>/usr/bin</code>에는 shebang라인을 가진 스크립트와 호환을 위해 <code>/bin/sh</code>, <code>/usr/bin/env</code>만 들어 있다. 사용자 환경은 Nix Store에 있는 것들을 심볼릭 링크를 걸어 만든다. 이 환경을 <code>profiles</code>라 부른다. <code>/nix/var/nix/profiles</code>에 저장된다. 사용자들은 모두 자신만의 <code>profile</code>을 가진다.</p>
-<p>이 구조를 써서 atomicity와 롤백을 지원할 수 있다.</p>
-<p>immutable한 Nix Store에 설정 파일 저장하는 걸 눈여겨 봐야 한다. 설정 파일을 “수정”할 수 없다는 뜻이다. 설정 파일은 실행판을 만들어내는 닉스 설정(클래식 환경에선 <code>/etc/nixos/configuration.nix</code>)에서만 가능하고, 이를 설정하고 빌드(<code>nixos-rebuild switch</code>)하면 바뀐 “수정 파일”을 새로 만들어서 Nix Store에 저장한다. 이전에 설정했던 환경으로 롤백이 가능한 이유다.</p>
-<p>이렇게 설정해서 “빌드”한 결과물을 generation이라 부른다. 롤백은 “이전 generation으로 돌아가기”라 말하면 되겠다.</p>
+<p>닉스OS는 <code>/lib</code>, <code>/usr/lib</code>가 없습니다. 시스템 라이브러리, 바이너리, 커널, 펌웨어, 설정 파일 모두 Nix Store에 저장합니다. 한 번 Nix Store에 저장되면 수정할 수 없습니다immutable. 새로운 버전은 다른 해시값으로 저장될 뿐, 기존 파일은 건드리지 않습니다. <code>/bin</code>, <code>/usr/bin</code>에는 shebang라인을 가진 스크립트와 호환을 위해 <code>/bin/sh</code>, <code>/usr/bin/env</code>만 들어 있습니다. 사용자 환경은 Nix Store에 있는 것들을 심볼릭 링크를 걸어 만듭니다. 이 환경을 <code>profiles</code>라 부릅니다. <code>/nix/var/nix/profiles</code>에 저장됩니다. 사용자들은 모두 자신만의 <code>profile</code>을 가집니다.</p>
+<p>이 구조를 써서 atomicity와 롤백을 지원할 수 있습니다.</p>
+<p>Nix Store에 불변의immutable 설정 파일로 저장하는 걸 눈여겨 봐야 합니다. 설정 파일을 “수정”할 수 없다는 뜻입니다. 설정 파일은 실행판을 만들어내는 닉스 설정(클래식 환경에선 <code>/etc/nixos/configuration.nix</code>)에서만 가능하고, 이를 설정하고 빌드(<code>nixos-rebuild switch</code>)하면, 바뀐 “수정 파일”을 새로 만들어서 Nix Store에 저장합니다. 이전에 설정했던 환경으로 롤백이 가능한 이유입니다.</p>
+<p>이렇게 설정해서 “빌드”한 결과물을 generation이라 부릅니다. 롤백은 “이전 generation으로 돌아가기”라 말하면 되겠습니다.</p>
 <div class="sourceCode" id="cb51"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>$ nix-env --rollback</span>
 <span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>$ nixos-rebuild switch --rollback</span></code></pre></div>
-<p>이 전 generation은 부트 로더에서 고를 수도 있다.</p>
-<p>새로 generation을 만들어도 이 전 generation은 지워지지 않는다. 설정을 변경해서 빌드할 때마다 generation은 쌓이는데, 다음 명령으로 오래된 걸 삭제한다든지 하며 관리 한다.</p>
+<p>이 전 generation은 부트 로더에서 고를 수도 있습니다.</p>
+<p>새로 generation을 만들어도 이 전 generation은 지워지지 않습니다. 설정을 변경해서 빌드할 때마다 generation은 쌓이는데, 다음 명령으로 오래된 걸 삭제한다든지 하며 관리 합니다.</p>
 <div class="sourceCode" id="cb52"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a># 30일 지난 것들 삭제</span>
 <span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>$ nix-collect-garbage --delete-older-than 30d</span>
 <span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -819,9 +813,10 @@ NixOS, macOS, 다른 리눅스 배포판에서 모두 돌아가야 할 설정 - 
 <span id="cb52-12"><a href="#cb52-12" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb52-13"><a href="#cb52-13" aria-hidden="true" tabindex="-1"></a># 특정 generation 삭제</span>
 <span id="cb52-14"><a href="#cb52-14" aria-hidden="true" tabindex="-1"></a>$ nix-env --profile /nix/var/nix/profiles/system --delete-generations 205 206</span></code></pre></div>
-<p><code>/etc/nixos/configuration.nix</code>의 <code>nix.gc</code> 옵션을 통해 자동 삭제automatic garbage collection를 지정할 수 있다.</p>
-<h2 id="최신-디스코드가-아직-nixpkgs에는-안-올라왔다면">최신 디스코드가 아직 nixpkgs에는 안 올라왔다면</h2>
-<p><code>nix-shell</code>을 써서 임시로 설치하든가,<br />
+<p><code>/etc/nixos/configuration.nix</code>의 <code>nix.gc</code> 옵션을 통해 자동 삭제automatic garbage collection를 지정할 수 있습니다.</p>
+<h2 id="최신-패키지가-아직-nixpkgs에는-안-올라왔다면">최신 패키지가 아직 nixpkgs에는 안 올라왔다면</h2>
+<p>예를 들어, 최신 디스코드가 아직 nixpkgs에는 안 올라왔다면
+<code>nix-shell</code>을 써서 임시로 설치하든가,<br />
 <code>nix-env</code>로 사용자 환경에서만 설치하든가,<br />
 <code>overlays</code>로 <code>nixpkgs</code>에 있는 discord를 덮어 씌우든가 할 수 있다.</p>
 <h2 id="flakes가-활성화된-상태에서-default.nix만-있는-프로젝트-빌드">flakes가 활성화된 상태에서 default.nix만 있는 프로젝트 빌드</h2>
@@ -829,6 +824,9 @@ NixOS, macOS, 다른 리눅스 배포판에서 모두 돌아가야 할 설정 - 
 <pre><code>nix build --no-flake -f default.nix
 nix build -f '&lt;nixpkgs&gt;' &lt;패키지명&gt;</code></pre>
 <h2 id="실제-.drv-모양">실제 .drv 모양</h2>
+<p>기계가 읽는 용입니다.</p>
+<h2 id="닉스-시스템-설정을-제어할-수-있는-환경-변수">닉스 시스템 설정을 제어할 수 있는 환경 변수</h2>
+<p><a href="https://nix.dev/manual/nix/2.24/command-ref/env-common">Common Environment Variables</a></p>
 <h2 id="닉스-모형-코드">닉스 모형 코드</h2>
 <p>아래는 닉스 동작을 가늠해 볼 수 있는 초단순 모형 코드입니다. (검증 필요)</p>
 <div class="sourceCode" id="cb54"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>toynix</span>

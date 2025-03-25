@@ -44,9 +44,9 @@
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>lionhairdino - 닉스로 하스켈 빌드 예시 (스케치)</title>
+  <title>lionhairdino - 닉스로 하스켈 빌드 예시 (스케치 중)</title>
   
-  <meta name="description" content="lionhairdino - 닉스로 하스켈 빌드 예시 (스케치)" />
+  <meta name="description" content="lionhairdino - 닉스로 하스켈 빌드 예시 (스케치 중)" />
   <meta property="og:description" content="하스켈 함수형 프로그래밍" />
   
   <link rel="stylesheet" type="text/css" href="../css/default.css" />
@@ -73,7 +73,7 @@
   <meta name="msapplication-TileColor" content="#ff7500" />
   <meta name="theme-color" content="#ffffff" />
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="닉스로 하스켈 빌드 예시 (스케치)" />
+  <meta property="og:title" content="닉스로 하스켈 빌드 예시 (스케치 중)" />
   <meta property="og:site_name" content="Lionhairdino" />
   <meta property="og:url" content="https://lionhairdino.github.io/posts/2025-03-20-beginnerNix.html" />
   
@@ -138,206 +138,251 @@
     </div>
   </div>
   <div class="js-toc-content">
-    <h1>닉스로 하스켈 빌드 예시 (스케치)</h1>
+    <h1>닉스로 하스켈 빌드 예시 (스케치 중)</h1>
     <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
 <div class="info">
     Posted on March 20, 2025
     
 </div>
 
+<h2 id="기본">기본</h2>
+<p><code>default.nix</code>는 빌드용 derivation을 만드는 방법을 가지고 있는 파일입니다. 이 파일이 있는 폴더에서 <code>nix-build</code>를 하면, 기본으로 <code>default.nix</code>파일을 읽어 들여 빌드 작업을 합니다. <code>shell.nix</code>는 개발쉘용 derivation을 만드는 방법을 가지고 있는 파일입니다. 이 파일이 있는 폴더에서 <code>nix-shell</code>을 하면, 기본으로 <code>shell.nix</code>파일을 읽어 들여 개발 쉘을 준비합니다. ※ 반드시 <code>default.nix</code>에서 빌드 설정만, <code>shell.nix</code>에서 개발쉘 설정만 하는 건 아닙니다만, 보통 두 파일을 이용합니다.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>derivation --&gt; stdenv.mkDerivation --&gt; haskellPackages.mkDerivation</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>                       |</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>                       └─-&gt; stdenv.mkShell --&gt; haskellPackages.developPackage</span></code></pre></div>
+<p>아래는 <code>derivation</code>은 derivation을 만들어내는 가장 기본적인 함수입니다.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="bu">derivation</span> <span class="op">{</span> <span class="op">...</span> <span class="op">}</span></span></code></pre></div>
+<p>실제 작업에서는 이 함수를 바로 쓰지 않고, 빌드용, 개발 쉘용으로 래핑한 함수들을 주로 쓰게 됩니다.</p>
+<p><strong>빌드용 derivation을 생성하는 래퍼</strong><br />
+많은 경우, 이 함수를 써서 derivation을 생성합니다. <code>buildPhase</code>, <code>installPhase</code> 같은 기본적인 빌드 단계가 미리 짜여져 있는 프레임 워크입니다.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>stdenv.mkDerivation <span class="op">{</span> <span class="op">...</span> <span class="op">}</span></span></code></pre></div>
+<p><strong>개발 쉘용 derivation을 생성하는 래퍼</strong><br />
+주로 <code>nix-shell</code>이 읽어들이게 됩니다.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>stdenv.mkShell<span class="op">{</span> <span class="op">...</span> <span class="op">}</span></span></code></pre></div>
+<p>이 함수들을 또 다시 하스켈에 쓰기 편하도록 래핑한 함수들이 있습니다.</p>
+<p><strong>하스켈 프로젝트 빌드용 derivation을 생성하는 래퍼</strong><br />
+<code>cabal</code> 빌드와 관련된 설정을 자동으로 추가해 줍니다.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>haskellPackages.mkDerivation <span class="op">{</span> <span class="op">...</span> <span class="op">}</span></span></code></pre></div>
+<p><strong>하스켈 프로젝트 개발 쉘용 derivation을 생성하는 래퍼</strong><br />
+<code>cabal</code>이나 <code>ghc</code>가 필요한 경우 자동으로 포함합니다.<br />
+하스켈 프로젝트에서 <code>nix-shell</code>이 읽어들입니다.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>haskellPackages.developPackage <span class="op">{</span> <span class="op">...</span> <span class="op">}</span></span></code></pre></div>
 <h2 id="가장-간단한-샘플-빌드">가장 간단한 샘플 빌드</h2>
-<div class="sourceCode" id="cb1"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>&gt; mkdir simplist</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>&gt; cd simplist</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>&gt; cabal init </span></code></pre></div>
-<div class="sourceCode" id="cb2"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>simplist</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>├── app</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>│   └── Main.hs</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>├── CHANGELOG.md</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>├── default.nix</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>├── LICENSE</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>├── result -&gt; /nix/store/k3ikgp4j3sbqbcngfmrcjbjks2h9gql7-simplist-0.1.0.0</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>└── simplist.cabal</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>&gt; mkdir simplist</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>&gt; cd simplist</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>&gt; cabal init </span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>simplist</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>├── app</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>│   └── Main.hs</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>├── default.nix</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>└── simplist.cabal</span></code></pre></div>
 <p>위와 같이 한 후, 아래 파일들을 추가하거나, 수정합니다.</p>
 <p><strong>default.nix</strong> 아래 예시에는 빌드 설정은 없고, 개발 쉘 설정만 있습니다.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="va">pkgs</span> <span class="op">=</span> <span class="bu">import</span> &lt;nixpkgs&gt; <span class="op">{</span> <span class="op">};</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="kw">in</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  pkgs.haskellPackages.developPackage <span class="op">{</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="va">root</span> <span class="op">=</span> <span class="ss">./.</span><span class="op">;</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="va">pkgs</span> <span class="op">=</span> <span class="bu">import</span> &lt;nixpkgs&gt; <span class="op">{</span> <span class="op">};</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="kw">in</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  pkgs.haskellPackages.developPackage <span class="op">{</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    <span class="va">root</span> <span class="op">=</span> <span class="ss">./.</span><span class="op">;</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span></code></pre></div>
 <p><code>ghc-9.8</code> 인프라로 컴파일 하려면</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="va">pkgs</span> <span class="op">=</span> <span class="bu">import</span> &lt;nixpkgs&gt; <span class="op">{</span> <span class="op">};</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="va">haskellPackages</span> <span class="op">=</span> pkgs.haskell.packages.ghc98<span class="op">;</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="kw">in</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  haskellPackages.developPackage <span class="op">{</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="va">root</span> <span class="op">=</span> <span class="ss">./.</span><span class="op">;</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="va">pkgs</span> <span class="op">=</span> <span class="bu">import</span> &lt;nixpkgs&gt; <span class="op">{</span> <span class="op">};</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="va">haskellPackages</span> <span class="op">=</span> pkgs.haskell.packages.ghc98<span class="op">;</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="kw">in</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  haskellPackages.developPackage <span class="op">{</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    <span class="va">root</span> <span class="op">=</span> <span class="ss">./.</span><span class="op">;</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span></code></pre></div>
 <p><strong>app/Main.hs</strong></p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ot">{-# LANGUAGE OverloadedStrings #-}</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="kw">module</span> <span class="dt">Main</span> <span class="kw">where</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Data.Text</span> (intercalate)</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="fu">print</span> <span class="op">$</span> intercalate <span class="st">&quot; &quot;</span> [<span class="st">&quot;Haskell&quot;</span>,<span class="st">&quot;and&quot;</span>,<span class="st">&quot;Nix&quot;</span>]</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ot">{-# LANGUAGE OverloadedStrings #-}</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="kw">module</span> <span class="dt">Main</span> <span class="kw">where</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Data.Text</span> (intercalate)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="fu">print</span> <span class="op">$</span> intercalate <span class="st">&quot; &quot;</span> [<span class="st">&quot;Haskell&quot;</span>,<span class="st">&quot;and&quot;</span>,<span class="st">&quot;Nix&quot;</span>]</span></code></pre></div>
 <p><strong>simplist.cabal</strong></p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cabal-version</span><span class="kw">:</span><span class="at">      </span><span class="fl">3.0</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">name</span><span class="kw">:</span><span class="at">               simplist</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="fu">version</span><span class="kw">:</span><span class="at">            </span><span class="fl">0.1.0.0</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="fu">license</span><span class="kw">:</span><span class="at">            MIT</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="fu">license-file</span><span class="kw">:</span><span class="at">       LICENSE</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="fu">author</span><span class="kw">:</span><span class="at">             lionhairdino</span></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="fu">maintainer</span><span class="kw">:</span><span class="at">         lionhairdino@gmail.com</span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="fu">category</span><span class="kw">:</span><span class="at">           Development</span></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="fu">build-type</span><span class="kw">:</span><span class="at">         Simple</span></span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="fu">extra-doc-files</span><span class="kw">:</span><span class="at">    CHANGELOG.md</span></span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="at">common warnings</span></span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">ghc-options</span><span class="kw">:</span><span class="at"> -Wall</span></span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="at">executable simplist</span></span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">import</span><span class="kw">:</span><span class="at">           warnings</span></span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">main-is</span><span class="kw">:</span><span class="at">          Main.hs</span></span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">build-depends</span><span class="kw">:</span><span class="at">    base &gt;=4.18.0.0</span></span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="at">                    , text</span></span>
-<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">hs-source-dirs</span><span class="kw">:</span><span class="at">   app</span></span>
-<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">default-language</span><span class="kw">:</span><span class="at"> Haskell2010</span></span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cabal-version</span><span class="kw">:</span><span class="at">      </span><span class="fl">3.0</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">name</span><span class="kw">:</span><span class="at">               simplist</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="fu">version</span><span class="kw">:</span><span class="at">            </span><span class="fl">0.1.0.0</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="fu">license</span><span class="kw">:</span><span class="at">            MIT</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="fu">license-file</span><span class="kw">:</span><span class="at">       LICENSE</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="fu">author</span><span class="kw">:</span><span class="at">             lionhairdino</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="fu">maintainer</span><span class="kw">:</span><span class="at">         lionhairdino@gmail.com</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="fu">category</span><span class="kw">:</span><span class="at">           Development</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="fu">build-type</span><span class="kw">:</span><span class="at">         Simple</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="fu">extra-doc-files</span><span class="kw">:</span><span class="at">    CHANGELOG.md</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a><span class="at">common warnings</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">ghc-options</span><span class="kw">:</span><span class="at"> -Wall</span></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a><span class="at">executable simplist</span></span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">import</span><span class="kw">:</span><span class="at">           warnings</span></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">main-is</span><span class="kw">:</span><span class="at">          Main.hs</span></span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">build-depends</span><span class="kw">:</span><span class="at">    base &gt;=4.18.0.0</span></span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a><span class="at">                    , text</span></span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">hs-source-dirs</span><span class="kw">:</span><span class="at">   app</span></span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">default-language</span><span class="kw">:</span><span class="at"> Haskell2010</span></span></code></pre></div>
 <p>※ <code>base &gt;=4.18.0.0</code>은 <code>4.18.0.0</code>이상이면 다 허용, <code>base ^&gt;=4.18</code>는 <code>4.18.*.*</code>들만 허용</p>
+<p><code>.cabal</code>에는 <code>text</code> 라이브러리 의존성이 있는데, <code>default.nix</code>에는 이와 관련된 설정이 전혀 없어도 빌드 됩니다. 이유는, <code>haskellPackages.developPackage</code>가 <code>.cabal</code> 파일의 <code>build-depends</code>를 읽고, 필요한 라이브러리를 자동으로 추가합니다. <code>pkgs.haskellPackages</code>는 GHC 버전에 맞는 패키지 집합을 가지고 있고, 이 집합에 <code>text</code> 패키지가 이미 있기 때문에 별도로 추가하는 설정이 없어도 됩니다.</p>
 <h2 id="외부-라이브러리-의존-샘플-빌드">외부 라이브러리 의존 샘플 빌드</h2>
 <p>외부 라이브러리가 필요한 예시를 보기 위해 <code>zlib</code>를 쓰도록 바꿨습니다.</p>
 <p><strong>app/Main.hs</strong></p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ot">{-# LANGUAGE ForeignFunctionInterface #-}</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="kw">module</span> <span class="dt">Main</span> <span class="kw">where</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Foreign.C.String</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>foreign <span class="kw">import</span> ccall &quot;zlibVersion&quot; zlibVersion :: <span class="dt">IO</span> <span class="dt">CString</span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="kw">do</span></span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>  ver <span class="ot">&lt;-</span> zlibVersion</span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  verStr <span class="ot">&lt;-</span> peekCString ver</span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">putStrLn</span> (<span class="st">&quot;zlib version: &quot;</span> <span class="op">++</span> verStr)</span></code></pre></div>
-<div class="sourceCode" id="cb8"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>lionhairdino/workroom/simplist_zlib via λ 9.8.3 ➜ cabal build</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>Build profile: -w ghc-9.8.3 -O1</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>In order, the following will be built (use -v for more details):</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a> - simplist-0.1.0.0 (exe:simplist) (file app/Main.hs changed)</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>...</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>error: undefined reference to 'zlibVersion'</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>...</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>collect2: error: ld returned 1 exit status</span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>ghc-9.8.3: `cc' failed in phase `Linker'. (Exit code: 1)</span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>Error: cabal: Failed to build exe:simplist from simplist-0.1.0.0.</span></code></pre></div>
-<p><code>undefined reference to 'zlibVersion'</code>는 <code>zlib</code> 시스템 라이브러리를 못 찾는다는 에러입니다.<br />
-수작업으로 <code>zlib</code>설치해서 해결해도 되지만, Nix가 알아서 설치하는 빌드 프로세스를 만들 수 있습니다.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="ot">{-# LANGUAGE ForeignFunctionInterface #-}</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="kw">module</span> <span class="dt">Main</span> <span class="kw">where</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Foreign.C.String</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>foreign <span class="kw">import</span> ccall &quot;zlibVersion&quot; zlibVersion :: <span class="dt">IO</span> <span class="dt">CString</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>  ver <span class="ot">&lt;-</span> zlibVersion</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>  verStr <span class="ot">&lt;-</span> peekCString ver</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">putStrLn</span> (<span class="st">&quot;zlib version: &quot;</span> <span class="op">++</span> verStr)</span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>lionhairdino/workroom/simplist_zlib via λ 9.8.3 ➜ cabal build</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>Build profile: -w ghc-9.8.3 -O1</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>In order, the following will be built (use -v for more details):</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a> - simplist-0.1.0.0 (exe:simplist) (file app/Main.hs changed)</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>...</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>error: undefined reference to 'zlibVersion'</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>...</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>collect2: error: ld returned 1 exit status</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>ghc-9.8.3: `cc' failed in phase `Linker'. (Exit code: 1)</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>Error: cabal: Failed to build exe:simplist from simplist-0.1.0.0.</span></code></pre></div>
+<p><code>undefined reference to 'zlibVersion'</code>는 <code>zlib</code> 시스템 라이브러리를 못 찾는다는 에러입니다. 하스켈 패키지에 있는 라이브러리였다면 별도 추가 설정이 없어도 <code>.cabal</code>에 의존성을 추가하는 것만으로 됐겠지만, <code>zlib</code>는 하스켈 패키지에 있는 라이브러리가 아닙니다.</p>
+<p>수작업으로 <code>zlib</code>설치해서 해결해도 되지만, Nix가 알아서 설치하는 빌드 프로세스를 만들 수 있습니다.</p>
 <p><strong>simplist_zlib.cabal</strong>에 <code>z</code> 추가</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="at">executable simplist</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="at">    ...</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">build-depends</span><span class="kw">:</span><span class="at">    base &gt;=4.18.0.0</span></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">extra-libraries</span><span class="kw">:</span><span class="at">  z</span></span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="at">executable simplist</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="at">    ...</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">build-depends</span><span class="kw">:</span><span class="at">    base &gt;=4.18.0.0</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">extra-libraries</span><span class="kw">:</span><span class="at">  z</span></span></code></pre></div>
 <p><strong>default.nix</strong> (아래 예시는 개발 쉘 설정은 없고, 빌드 설정만 있습니다.)</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="op">{</span> <span class="va">pkgs</span> <span class="op">?</span> <span class="bu">import</span> &lt;nixpkgs&gt; <span class="op">{</span> <span class="op">}</span> <span class="op">}</span>:</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  pkgs.haskellPackages.mkDerivation <span class="op">{</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">pname</span> <span class="op">=</span> <span class="st">&quot;simplist_zlib&quot;</span><span class="op">;</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="va">version</span> <span class="op">=</span> <span class="st">&quot;0.1.0.0&quot;</span><span class="op">;</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="va">src</span> <span class="op">=</span> <span class="ss">./.</span><span class="op">;</span></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    <span class="va">license</span> <span class="op">=</span> <span class="st">&quot;&quot;</span><span class="op">;</span></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    <span class="va">configureFlags</span> <span class="op">=</span> <span class="op">[</span> <span class="st">&quot;--extra-include-dirs=</span><span class="sc">${</span>pkgs.zlib.dev<span class="sc">}</span><span class="st">/include&quot;</span></span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>                       <span class="st">&quot;--extra-lib-dirs=</span><span class="sc">${</span>pkgs.zlib.dev<span class="sc">}</span><span class="st">/lib&quot;</span></span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>                     <span class="op">];</span></span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    <span class="va">extraLibraries</span> <span class="op">=</span> <span class="op">[</span> pkgs.zlib.dev <span class="op">];</span></span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="op">{</span> <span class="va">pkgs</span> <span class="op">?</span> <span class="bu">import</span> &lt;nixpkgs&gt; <span class="op">{</span> <span class="op">}</span> <span class="op">}</span>:</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  pkgs.haskellPackages.mkDerivation <span class="op">{</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">pname</span> <span class="op">=</span> <span class="st">&quot;simplist_zlib&quot;</span><span class="op">;</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    <span class="va">version</span> <span class="op">=</span> <span class="st">&quot;0.1.0.0&quot;</span><span class="op">;</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    <span class="va">src</span> <span class="op">=</span> <span class="ss">./.</span><span class="op">;</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>    <span class="va">license</span> <span class="op">=</span> <span class="st">&quot;&quot;</span><span class="op">;</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>    <span class="va">configureFlags</span> <span class="op">=</span> <span class="op">[</span> <span class="st">&quot;--extra-include-dirs=</span><span class="sc">${</span>pkgs.zlib.dev<span class="sc">}</span><span class="st">/include&quot;</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>                       <span class="st">&quot;--extra-lib-dirs=</span><span class="sc">${</span>pkgs.zlib.dev<span class="sc">}</span><span class="st">/lib&quot;</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>                     <span class="op">];</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>    <span class="va">extraLibraries</span> <span class="op">=</span> <span class="op">[</span> pkgs.zlib.dev <span class="op">];</span></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span></code></pre></div>
+<p>하스켈 패키지에 없는 외부 라이브러리 의존성을 위해 <code>extraLibraries</code> 필드를 이용합니다.</p>
 <p><code>default.nix</code>는 함수를 반환해도 되고,</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="op">{</span> <span class="va">pkgs</span> <span class="op">...</span> <span class="op">}</span> :</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="va">devShell</span> <span class="op">=</span> pkgs.haskellPackages.developPackage ...<span class="op">;</span></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="va">package</span> <span class="op">=</span> pkgs.mkDerivation ...<span class="op">;</span></span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="op">{</span> <span class="va">pkgs</span> <span class="op">...</span> <span class="op">}</span> :</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="va">devShell</span> <span class="op">=</span> pkgs.haskellPackages.developPackage ...<span class="op">;</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="va">package</span> <span class="op">=</span> pkgs.mkDerivation ...<span class="op">;</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
 <p>다른 표현식을 반환해도 됩니다.</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="va">pkgs</span> <span class="op">=</span> ...</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>in</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  pkgs.haskellPackages.developPackage ...<span class="op">;</span></span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="va">pkgs</span> <span class="op">=</span> ...</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>in</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  pkgs.haskellPackages.developPackage ...<span class="op">;</span></span></code></pre></div>
 <p>※ 닉스 언어에서 컬리 브라켓 <code>{ }</code>은 <strong>속성 집합</strong>을 표현할 때도 쓰고, <strong>스코프 블록</strong>을 지정할 때도 쓰입니다. 저는 처음 볼 때, 명시적으로 이렇게 설명한 자료를 보지 못해 좀 혼란스럽기도 했습니다. 빌드 설정과 개발 쉘 설정을 같이 정의하려면 속성 집합을 반환하는 함수로 정의해야 합니다.</p>
 <h2 id="개발-쉘과-빌드-설정-같이">개발 쉘과 빌드 설정 같이</h2>
 <p><strong>default.nix</strong> 이 번에는 개발 쉘과 빌드 설정을 같이 해보겠습니다.</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="op">{</span> <span class="va">pkgs</span> <span class="op">?</span> <span class="bu">import</span> &lt;nixpkgs&gt; <span class="op">{}</span> <span class="op">}</span>:</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> <span class="co"># 편의를 위한 바인딩들</span></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="va">haskellPackages</span> <span class="op">=</span> pkgs.haskellPackages<span class="op">;</span></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  <span class="va">ghc</span> <span class="op">=</span> haskellPackages.ghc<span class="op">;</span></span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  <span class="va">cabal-install</span> <span class="op">=</span> haskellPackages.cabal<span class="op">-</span>install<span class="op">;</span></span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="kw">in</span></span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 환경 변수를 잡으려면 developPackage는 적당하지 않습니다.</span></span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>  <span class="va">devShell</span> <span class="op">=</span> pkgs.mkShell <span class="op">{</span></span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>    <span class="va">name</span> <span class="op">=</span> <span class="st">&quot;simplit_zlib&quot;</span><span class="op">;</span></span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>    <span class="va">buildInputs</span> <span class="op">=</span> <span class="op">[</span> pkgs.haskellPackages.ghc pkgs.haskellPackages.cabal-install pkgs.zlib.dev <span class="op">];</span></span>
-<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>    <span class="va">shellHook</span> <span class="op">=</span> <span class="st">''</span></span>
-<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a><span class="st">       export LD_LIBRARY_PATH=&quot;</span><span class="sc">${</span>pkgs.zlib.dev<span class="sc">}</span><span class="st">/lib:$LD_LIBRARY_PATH&quot;</span></span>
-<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a><span class="st">    ''</span><span class="op">;</span></span>
-<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>  <span class="op">};</span></span>
-<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>  <span class="co"># devShell = haskellPackages.developPackage {</span></span>
-<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>  <span class="co">#   root = ./.;</span></span>
-<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>  <span class="co"># #  buildInputs = [ pkgs.zlib.dev ];</span></span>
-<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>  <span class="co">#   shellHook = ''</span></span>
-<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>  <span class="co">#     export LD_LIBRARY_PATH=&quot;${pkgs.zlib.dev}/lib:$LD_LIBRARY_PATH&quot;</span></span>
-<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>  <span class="co">#   '';</span></span>
-<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>  <span class="co"># };</span></span>
-<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a>  <span class="va">package</span> <span class="op">=</span> haskellPackages.mkDerivation <span class="op">{</span></span>
-<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a>    <span class="va">pname</span> <span class="op">=</span> <span class="st">&quot;simplist_zlib&quot;</span><span class="op">;</span></span>
-<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a>    <span class="va">version</span> <span class="op">=</span> <span class="st">&quot;0.1.0.0&quot;</span><span class="op">;</span></span>
-<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a>    <span class="va">src</span> <span class="op">=</span> <span class="ss">./.</span><span class="op">;</span></span>
-<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a>    <span class="va">license</span> <span class="op">=</span> <span class="st">&quot;&quot;</span><span class="op">;</span></span>
-<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a>    <span class="va">configureFlags</span> <span class="op">=</span> <span class="op">[</span> <span class="st">&quot;--extra-include-dirs=</span><span class="sc">${</span>pkgs.zlib.dev<span class="sc">}</span><span class="st">/include&quot;</span></span>
-<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a>                       <span class="st">&quot;--extra-lib-dirs=</span><span class="sc">${</span>pkgs.zlib.dev<span class="sc">}</span><span class="st">/lib&quot;</span></span>
-<span id="cb13-31"><a href="#cb13-31" aria-hidden="true" tabindex="-1"></a>                     <span class="op">];</span></span>
-<span id="cb13-32"><a href="#cb13-32" aria-hidden="true" tabindex="-1"></a>    <span class="va">extraLibraries</span> <span class="op">=</span> <span class="op">[</span> pkgs.zlib.dev <span class="op">];</span></span>
-<span id="cb13-33"><a href="#cb13-33" aria-hidden="true" tabindex="-1"></a>  <span class="op">};</span></span>
-<span id="cb13-34"><a href="#cb13-34" aria-hidden="true" tabindex="-1"></a><span class="op">}</span>  </span></code></pre></div>
-<p><span class="citation" data-cites="TODO">@TODO</span> <code>mkDerivation</code>과 <code>mkShell</code> 비교 설명 추가</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="op">{</span> <span class="va">pkgs</span> <span class="op">?</span> <span class="bu">import</span> &lt;nixpkgs&gt; <span class="op">{}</span> <span class="op">}</span>:</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> <span class="co"># 편의를 위한 바인딩들</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="va">haskellPackages</span> <span class="op">=</span> pkgs.haskellPackages<span class="op">;</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="va">ghc</span> <span class="op">=</span> haskellPackages.ghc<span class="op">;</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>  <span class="va">cabal-install</span> <span class="op">=</span> haskellPackages.cabal<span class="op">-</span>install<span class="op">;</span></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="kw">in</span></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 환경 변수를 잡으려면 developPackage는 적당하지 않습니다.</span></span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>  <span class="va">devShell</span> <span class="op">=</span> pkgs.mkShell <span class="op">{</span></span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>    <span class="va">name</span> <span class="op">=</span> <span class="st">&quot;simplist_zlib&quot;</span><span class="op">;</span></span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>    <span class="va">buildInputs</span> <span class="op">=</span> <span class="op">[</span> pkgs.haskellPackages.ghc pkgs.haskellPackages.cabal-install pkgs.zlib.dev <span class="op">];</span></span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>    <span class="co"># shellHook에서 환경 변수를 설정</span></span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>    <span class="va">shellHook</span> <span class="op">=</span> <span class="st">'' </span></span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a><span class="st">       export LD_LIBRARY_PATH=&quot;</span><span class="sc">${</span>pkgs.zlib.dev<span class="sc">}</span><span class="st">/lib:$LD_LIBRARY_PATH&quot;</span></span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a><span class="st">    ''</span><span class="op">;</span></span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>  <span class="op">};</span></span>
+<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a>  <span class="va">package</span> <span class="op">=</span> haskellPackages.mkDerivation <span class="kw">rec</span> <span class="op">{</span></span>
+<span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a>    <span class="va">pname</span> <span class="op">=</span> <span class="st">&quot;simplist_zlib&quot;</span><span class="op">;</span></span>
+<span id="cb19-21"><a href="#cb19-21" aria-hidden="true" tabindex="-1"></a>    <span class="va">version</span> <span class="op">=</span> <span class="st">&quot;0.1.0.0&quot;</span><span class="op">;</span></span>
+<span id="cb19-22"><a href="#cb19-22" aria-hidden="true" tabindex="-1"></a>    <span class="va">src</span> <span class="op">=</span> <span class="ss">./.</span><span class="op">;</span></span>
+<span id="cb19-23"><a href="#cb19-23" aria-hidden="true" tabindex="-1"></a>    <span class="va">license</span> <span class="op">=</span> <span class="st">&quot;&quot;</span><span class="op">;</span></span>
+<span id="cb19-24"><a href="#cb19-24" aria-hidden="true" tabindex="-1"></a>    <span class="va">configureFlags</span> <span class="op">=</span> <span class="op">[</span> <span class="st">&quot;--extra-include-dirs=</span><span class="sc">${</span>pkgs.zlib.dev<span class="sc">}</span><span class="st">/include&quot;</span></span>
+<span id="cb19-25"><a href="#cb19-25" aria-hidden="true" tabindex="-1"></a>                       <span class="st">&quot;--extra-lib-dirs=</span><span class="sc">${</span>pkgs.zlib.dev<span class="sc">}</span><span class="st">/lib&quot;</span></span>
+<span id="cb19-26"><a href="#cb19-26" aria-hidden="true" tabindex="-1"></a>                     <span class="op">];</span></span>
+<span id="cb19-27"><a href="#cb19-27" aria-hidden="true" tabindex="-1"></a>    <span class="va">extraLibraries</span> <span class="op">=</span> <span class="op">[</span> pkgs.zlib.dev <span class="op">];</span></span>
+<span id="cb19-28"><a href="#cb19-28" aria-hidden="true" tabindex="-1"></a>  <span class="op">};</span></span>
+<span id="cb19-29"><a href="#cb19-29" aria-hidden="true" tabindex="-1"></a><span class="op">}</span>  </span></code></pre></div>
+<p><code>nix-build</code>로 <code>package</code> 속성을 평가한 결과는 바이너리 <code>simplist_zlib</code>을 <code>result</code> 폴더 아래 만들어내고, <code>devShell</code> 속성을 평가한 결과는 <code>result-2</code>란 디렉토리가 아닌 텍스트 파일을 만들어냅니다. <code>devShell</code>은 개발 환경 설정을 위한 항목으로, 개발 환경을 위한 환경 변수 설정 (<code>declare -x AR="ar"</code>같은 내용들)이 잔뜩 들어 있는 파일로, <code>source 메타파일명</code>으로 쉘스크립트 실행을 할 수 있긴 한데, 이런 식으로 언제 쓰이는지 아직 확인하지 못했습니다.</p>
+<p>보통은 쉘 설정은 따로 <code>shell.nix</code>에 넣어 놓고, <code>nix-shell</code>로 개발쉘을 빌드하므로, 위와 같은 상황은 잘 만나지 않는 것 같습니다.</p>
 <p><strong>haskellPackages.mkDerivation</strong><br />
 <code>stdenv</code>와 마찬가지로 <code>haskellPackages</code>도 <code>mkDerivation</code> 함수를 가지고 있습니다. 하스켈 패키지를 빌드하는데 필요한 속성 집합을 인자로 받고, derivation을 반환합니다.</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="op">{</span> <span class="va">isLibrary</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="op">,</span> <span class="va">executableHaskellDepends</span></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="op">,</span> <span class="va">pname</span></span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="op">...</span></span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> : ...</span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="op">{</span> <span class="va">isLibrary</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="op">,</span> <span class="va">executableHaskellDepends</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="op">,</span> <span class="va">pname</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="op">...</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> : ...</span></code></pre></div>
 <p>내부적으로 <code>pkgs/development/haskell-modules/generic-builder.nix</code>를 씁니다.</p>
 <p>일반 하스켈 빌더는 <code>stdenv.mkDerivation</code>의 래퍼입니다.</p>
-<p><strong>mkDerivation</strong><code>= makeOverridable mkDerivationImpl;</code></p>
-<p><strong>mkDerivationImpl</strong><code>= pkgs.callPackage ./generic-builder.nix {...}</code></p>
-<p><strong>callPackage</strong><code>= drv: args: callPackageWithScope defaultScope drv args;</code></p>
-<p><strong>callPackageWithScope</strong><code>= scope: fn: manualArgs: ...</code></p>
+<p><strong>mkDerivation</strong><code>= makeOverridable mkDerivationImpl;</code><br />
+<strong>mkDerivationImpl</strong><code>= pkgs.callPackage ./generic-builder.nix {...}</code><br />
+<strong>callPackage</strong><code>= drv: args: callPackageWithScope defaultScope drv args;</code><br />
+<strong>callPackageWithScope</strong><code>= scope: fn: manualArgs: ...</code></p>
+<h2 id="nixpkgs에-없는-외부-라이브러리를-쓸-때">Nixpkgs에 없는 외부 라이브러리를 쓸 때</h2>
+<div class="sourceCode" id="cb21"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>simplist_libfoo</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>├── app</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>│   └── Main.hs</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>├── default.nix</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>├── libfoo</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>│   ├── foo.c</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>│   ├── foo.h</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>│   └── Makefile</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>└── simplist-libfoo.cabal</span></code></pre></div>
+<p>※ <a href="https://nixos.org/manual/nixpkgs/stable/#trivial-builder-writeTextDir"><strong>writeTextDir</strong></a> Nix 저장소의 서브 디렉토리 안에 텍스트 파일을 만든다.<br />
+아래 둘은 동일하게 <code>/nix/store/&lt;store path&gt;/share/my-file</code> 파일을 만든다.</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>writeTextFile <span class="op">{</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="va">name</span> <span class="op">=</span> <span class="st">&quot;my-file&quot;</span><span class="op">;</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="va">text</span> <span class="op">=</span> <span class="st">''</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="st">    Contents of File</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a><span class="st">  ''</span><span class="op">;</span></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>  <span class="va">destination</span> <span class="op">=</span> <span class="st">&quot;/share/my-file&quot;</span><span class="op">;</span></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>writeTextDir <span class="st">&quot;share/my-file&quot;</span></span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>  <span class="st">''</span></span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a><span class="st">  Contents of File</span></span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a><span class="st">  ''</span></span></code></pre></div>
+<p>비슷한 함수로 <code>writeScript</code>는 파일을 만들고, 실행 속성을 준다. 조금씩 동작이 추가 되어 있는 <code>writeScriptBin</code>, <code>writeShellScript</code>, <code>writeShellScriptBin</code> 등의 함수들이 있는데, 이렇게 api를 늘려가는 게 좋은 방식인지는 모르겠습니다.</p>
+<p>※ <code>.cabal</code>의 <a href="https://cabal.readthedocs.io/en/latest/cabal-package-description-file.html#pkg-field-pkgconfig-depends"><strong>pkgconfig-depends</strong></a> 필드<br />
+Cabal은 <a href="https://ko.wikipedia.org/wiki/Pkg-config">pkg-config</a>를 써서, 현재 패키지가 필요로 하는 시스템에 있는 라이브러리와 extra compilation, 링커 옵션을 찾는다. <code>pkg-config --list-all</code> 명령으로 가용한 라이브러리 목록을 볼 수 있다. 현재 프로젝트에서만 쓸 라이브리라면, 현재 프로젝트 폴더 아래에 라이브러리를 두고, pkg-config 파일인 <code>.pc</code>파일도 프로젝트 안에 만들어 두고, <code>PKG_CONFIG_PATH</code> 환경 변수를 이용할 수 있다.</p>
+<p>※ <a href="https://nix.dev/manual/nix/2.24/command-ref/env-common">NIX_STATE_DIR</a> 환경 변수로 nix 데이터베이스 위치를 임시로 옮길 수 있다.</p>
 <hr />
 <h2 id="함수-인자-속성-집합-확인-방법">함수 인자 속성 집합 확인 방법</h2>
 <p>※ 프레임워크에 있는, 함수들이 받는 인자의 속성 집합이 궁금할 땐, 다음 방법으로 실제 코드를 확인 할 수 있습니다.</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>&gt; nix repl</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>nix-repl&gt; pkgs = import &lt;nixpkgs&gt; {}</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>nix-repl&gt; :edit pkgs.haskellPackages.developPackage</span></code></pre></div>
-<div class="sourceCode" id="cb16"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>  ...</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  developPackage =</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span> <span class="va">root</span></span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">,</span> <span class="va">name</span> <span class="op">?</span> lib.optionalString <span class="op">(</span><span class="bu">builtins</span>.typeOf root == <span class="st">&quot;path&quot;</span><span class="op">)</span> <span class="op">(</span><span class="bu">builtins</span>.<span class="bu">baseNameOf</span> root<span class="op">)</span></span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">,</span> <span class="va">source-overrides</span> <span class="op">?</span> <span class="op">{}</span></span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">,</span> <span class="va">overrides</span> <span class="op">?</span> <span class="va">self</span><span class="op">:</span> <span class="va">super</span><span class="op">:</span> <span class="op">{}</span></span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">,</span> <span class="va">modifier</span> <span class="op">?</span> <span class="va">drv</span><span class="op">:</span> drv</span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>    <span class="op">,</span> <span class="va">returnShellEnv</span> <span class="op">?</span> pkgs.lib.inNixShell</span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>    <span class="op">,</span> <span class="va">withHoogle</span> <span class="op">?</span> returnShellEnv</span>
-<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>    <span class="op">,</span> <span class="va">cabal2nixOptions</span> <span class="op">?</span> <span class="st">&quot;&quot;</span> <span class="op">}</span>:</span>
-<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>  ...</span></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>&gt; nix repl</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>nix-repl&gt; pkgs = import &lt;nixpkgs&gt; {}</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>nix-repl&gt; :edit pkgs.haskellPackages.developPackage</span></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>  ...</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  developPackage =</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span> <span class="va">root</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">,</span> <span class="va">name</span> <span class="op">?</span> lib.optionalString <span class="op">(</span><span class="bu">builtins</span>.typeOf root == <span class="st">&quot;path&quot;</span><span class="op">)</span> <span class="op">(</span><span class="bu">builtins</span>.<span class="bu">baseNameOf</span> root<span class="op">)</span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">,</span> <span class="va">source-overrides</span> <span class="op">?</span> <span class="op">{}</span></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">,</span> <span class="va">overrides</span> <span class="op">?</span> <span class="va">self</span><span class="op">:</span> <span class="va">super</span><span class="op">:</span> <span class="op">{}</span></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">,</span> <span class="va">modifier</span> <span class="op">?</span> <span class="va">drv</span><span class="op">:</span> drv</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>    <span class="op">,</span> <span class="va">returnShellEnv</span> <span class="op">?</span> pkgs.lib.inNixShell</span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>    <span class="op">,</span> <span class="va">withHoogle</span> <span class="op">?</span> returnShellEnv</span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>    <span class="op">,</span> <span class="va">cabal2nixOptions</span> <span class="op">?</span> <span class="st">&quot;&quot;</span> <span class="op">}</span>:</span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>  ...</span></code></pre></div>
 <p>혹은 인자의 속성 집합만 볼 수도 있습니다.</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>nix-repl&gt; pkgs = import &lt;nixpkgs&gt; {}</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>nix-repl&gt; builtins.functionArgs pkgs.haskellPackages.developPackage</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>{</span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  cabal2nixOptions = true;</span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  modifier = true;</span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  name = true;</span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>  overrides = true;</span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>  returnShellEnv = true;</span>
-<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>  root = false; &lt;-------- false: 필수 속성이란 뜻</span>
-<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>  source-overrides = true;</span>
-<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>  withHoogle = true;</span>
-<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>nix-repl&gt; pkgs = import &lt;nixpkgs&gt; {}</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>nix-repl&gt; builtins.functionArgs pkgs.haskellPackages.developPackage</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  cabal2nixOptions = true;</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>  modifier = true;</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>  name = true;</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>  overrides = true;</span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>  returnShellEnv = true;</span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>  root = false; &lt;-------- false: 필수 속성이란 뜻</span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>  source-overrides = true;</span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>  withHoogle = true;</span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 
 <div class="comment">
   <script>
