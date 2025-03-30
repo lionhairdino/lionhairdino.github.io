@@ -44,10 +44,10 @@
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>lionhairdino - 닉스로 하스켈 빌드 예시 (스케치 중)</title>
+  <title>lionhairdino - 닉스로 하스켈 빌드 예시</title>
   
-  <meta name="description" content="lionhairdino - 닉스로 하스켈 빌드 예시 (스케치 중)" />
-  <meta property="og:description" content="하스켈 함수형 프로그래밍" />
+  <meta name="description" content="2025년 현재 검색하면, 닉스에서 하스켈 빌드를 도와주는 여러가지 프레임워크, 툴들이 나옵니다. 그 것들을 쓰기 전에, 기본 수작업으로 할 줄 알아야, 툴들을 이해하는데 도움이 됩니다. 의도적으로 Flake도 안쓰고, 다른 툴도 안쓰고, 클래식 닉스만으로 빌드해보았습니다." />
+  <meta property="og:description" content="2025년 현재 검색하면, 닉스에서 하스켈 빌드를 도와주는 여러가지 프레임워크, 툴들이 나옵니다. 그 것들을 쓰기 전에, 기본 수작업으로 할 줄 알아야, 툴들을 이해하는데 도움이 됩니다. 의도적으로 Flake도 안쓰고, 다른 툴도 안쓰고, 클래식 닉스만으로 빌드해보았습니다." />
   
   <link rel="stylesheet" type="text/css" href="../css/default.css" />
   <link rel="icon" href="https://lionhairdino.github.io/favicon.svg" />
@@ -73,13 +73,14 @@
   <meta name="msapplication-TileColor" content="#ff7500" />
   <meta name="theme-color" content="#ffffff" />
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="닉스로 하스켈 빌드 예시 (스케치 중)" />
+  <meta property="og:title" content="닉스로 하스켈 빌드 예시" />
   <meta property="og:site_name" content="Lionhairdino" />
   <meta property="og:url" content="https://lionhairdino.github.io/posts/2025-03-20-beginnerNix.html" />
   
   <meta property="og:image" content="https://lionhairdino.github.io/images/state400px.png" />
   
   
+  <meta name="keywords" content="Nix, Haskell">
   <!-- Global site tag (gtag.js) - Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-E9WZ6VXGHP"></script>
   <script>
@@ -138,14 +139,15 @@
     </div>
   </div>
   <div class="js-toc-content">
-    <h1>닉스로 하스켈 빌드 예시 (스케치 중)</h1>
+    <h1>닉스로 하스켈 빌드 예시</h1>
     <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
 <div class="info">
     Posted on March 20, 2025
     
 </div>
 
-<p>이 글은 클래식 (non flake) 닉스를 사용합니다.</p>
+<p>이 글은 클래식 (non flake) 닉스를 사용합니다.<br />
+아래 나온 소스는 <a href="https://github.com/lionhairdino/nix_sample/">lionhairdino/nix_sample</a> 에서 다운로드 할 수 있습니다.</p>
 <h2 id="기본">기본</h2>
 <p><code>default.nix</code>는 빌드용 derivation을 만드는 방법을 가지고 있는 파일입니다. 이 파일이 있는 폴더에서 <code>nix-build</code>를 하면, 기본으로 <code>default.nix</code>파일을 읽어 들여 빌드 작업을 합니다. <code>shell.nix</code>는 개발쉘용 derivation을 만드는 방법을 가지고 있는 파일입니다. 이 파일이 있는 폴더에서 <code>nix-shell</code>을 하면, 기본으로 <code>shell.nix</code>파일을 읽어 들여 개발 쉘을 준비합니다. ※ 반드시 <code>default.nix</code>에서 빌드 설정만, <code>shell.nix</code>에서 개발쉘 설정만 하는 건 아닙니다만, 보통 두 파일을 이용합니다.</p>
 <p>아래 <code>derivation</code>은 derivation을 만들어내는 가장 기본적인 함수입니다.</p>
@@ -395,81 +397,121 @@
 <p>※ <code>build-depends: base &gt;=4.18.0.0, foo</code> 이렇게 해야 될 것 같지만, <code>foo</code>는 하스켈 라이브러리가 아니라서, 여기에 추가하지 않고, <code>extra-libraries</code>에 추가해햐 됩니다.<br />
 ※ <code>foo</code>라이브러리 위치를 GHC한테 알려줘야 하는데, 닉스 저장소는 해시를 포함하고 있어 경로를 수동으로 지정하려면 까다롭습니다. <code>pkg-config</code>가 알아서 경로를 제공하도록 하기 위해, <code>pkgconfig-depends</code>를 씁니다.</p>
 <p><code>default.nix</code>와 <code>shell.nix</code> 파일을 만드는데, <code>foo</code> 라이브러리 빌드 및 설치는 두 파일에서 모두 필요로 하니, 따로 빼냅니다.</p>
-<p><code>default.nix</code></p>
+<p><code>libfoo/libfoo.nix</code></p>
 <div class="sourceCode" id="cb27"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="op">{</span> <span class="va">pkgs</span> <span class="op">?</span> <span class="bu">import</span> &lt;nixpkgs&gt; <span class="op">{}</span> <span class="op">}</span>:</span>
 <span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
-<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>  <span class="va">haskellPackages</span> <span class="op">=</span> pkgs.haskellPackages<span class="op">;</span></span>
-<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>  <span class="va">ghc</span> <span class="op">=</span> haskellPackages.ghc<span class="op">;</span></span>
-<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>  <span class="va">cabal-install</span> <span class="op">=</span> haskellPackages.cabal<span class="op">-</span>install<span class="op">;</span></span>
-<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>  <span class="va">libfoo</span> <span class="op">=</span> pkgs.stdenv.mkDerivation <span class="kw">rec</span> <span class="op">{</span></span>
-<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>    <span class="va">pname</span> <span class="op">=</span> <span class="st">&quot;foo&quot;</span><span class="op">;</span></span>
-<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>    <span class="va">version</span> <span class="op">=</span> <span class="st">&quot;0.1&quot;</span><span class="op">;</span></span>
-<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>    <span class="va">src</span> <span class="op">=</span> <span class="ss">./libfoo</span><span class="op">;</span></span>
-<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>    <span class="va">buildInputs</span> <span class="op">=</span> <span class="op">[</span> pkgs.gcc <span class="op">];</span></span>
-<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>    <span class="va">buildPhase</span> <span class="op">=</span> <span class="st">''</span></span>
-<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a><span class="st">      make</span></span>
-<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a><span class="st">    ''</span><span class="op">;</span></span>
-<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 닉스가 기본 동작으로 $out 디렉토리를 만들고, make install을 호출하는데,</span></span>
-<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a>    <span class="co"># installPhase를 지정하면, 기본 동작을 하지 않는다.</span></span>
-<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a>    <span class="va">installPhase</span> <span class="op">=</span> <span class="st">''</span></span>
-<span id="cb27-19"><a href="#cb27-19" aria-hidden="true" tabindex="-1"></a><span class="st">      mkdir -p $out/lib $out/include</span></span>
-<span id="cb27-20"><a href="#cb27-20" aria-hidden="true" tabindex="-1"></a><span class="st">      cp libfoo.so $out/lib</span></span>
-<span id="cb27-21"><a href="#cb27-21" aria-hidden="true" tabindex="-1"></a><span class="st">      cp foo.h $out/include</span></span>
-<span id="cb27-22"><a href="#cb27-22" aria-hidden="true" tabindex="-1"></a><span class="st">    ''</span><span class="op">;</span></span>
-<span id="cb27-23"><a href="#cb27-23" aria-hidden="true" tabindex="-1"></a>    <span class="va">meta</span> <span class="op">=</span> <span class="op">{</span></span>
-<span id="cb27-24"><a href="#cb27-24" aria-hidden="true" tabindex="-1"></a>      <span class="va">description</span> <span class="op">=</span> <span class="st">&quot;foo - C library&quot;</span><span class="op">;</span></span>
-<span id="cb27-25"><a href="#cb27-25" aria-hidden="true" tabindex="-1"></a>      <span class="va">platforms</span> <span class="op">=</span> pkgs.lib.platforms.all<span class="op">;</span></span>
-<span id="cb27-26"><a href="#cb27-26" aria-hidden="true" tabindex="-1"></a>    <span class="op">};</span></span>
-<span id="cb27-27"><a href="#cb27-27" aria-hidden="true" tabindex="-1"></a>    <span class="co"># libfoo는 $out 풀경로를 가진다.</span></span>
-<span id="cb27-28"><a href="#cb27-28" aria-hidden="true" tabindex="-1"></a>  <span class="op">};</span></span>
-<span id="cb27-29"><a href="#cb27-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-30"><a href="#cb27-30" aria-hidden="true" tabindex="-1"></a>  <span class="co"># pkg-config에 등록용 .pc 파일</span></span>
-<span id="cb27-31"><a href="#cb27-31" aria-hidden="true" tabindex="-1"></a>  <span class="va">libfooPkgConfig</span> <span class="op">=</span> pkgs.writeTextDir <span class="st">&quot;foo.pc&quot;</span> <span class="st">''</span></span>
-<span id="cb27-32"><a href="#cb27-32" aria-hidden="true" tabindex="-1"></a><span class="st">    prefix = </span><span class="sc">${</span>libfoo<span class="sc">}</span></span>
-<span id="cb27-33"><a href="#cb27-33" aria-hidden="true" tabindex="-1"></a><span class="st">    includedir = </span><span class="sc">${</span>libfoo<span class="sc">}</span><span class="st">/include</span></span>
-<span id="cb27-34"><a href="#cb27-34" aria-hidden="true" tabindex="-1"></a><span class="st">    libdir = </span><span class="sc">${</span>libfoo<span class="sc">}</span><span class="st">/lib</span></span>
-<span id="cb27-35"><a href="#cb27-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-36"><a href="#cb27-36" aria-hidden="true" tabindex="-1"></a><span class="st">    Name: foo</span></span>
-<span id="cb27-37"><a href="#cb27-37" aria-hidden="true" tabindex="-1"></a><span class="st">    Description: foo - C library</span></span>
-<span id="cb27-38"><a href="#cb27-38" aria-hidden="true" tabindex="-1"></a><span class="st">    Version: 0.1</span></span>
-<span id="cb27-39"><a href="#cb27-39" aria-hidden="true" tabindex="-1"></a><span class="st">    Cflags: -I</span><span class="sc">${</span>libfoo<span class="sc">}</span><span class="st">/include</span></span>
-<span id="cb27-40"><a href="#cb27-40" aria-hidden="true" tabindex="-1"></a><span class="st">    Libs: -L</span><span class="sc">${</span>libfoo<span class="sc">}</span><span class="st">/lib -lfoo</span></span>
-<span id="cb27-41"><a href="#cb27-41" aria-hidden="true" tabindex="-1"></a><span class="st">  ''</span><span class="op">;</span></span>
-<span id="cb27-42"><a href="#cb27-42" aria-hidden="true" tabindex="-1"></a>  <span class="co"># </span></span>
-<span id="cb27-43"><a href="#cb27-43" aria-hidden="true" tabindex="-1"></a><span class="kw">in</span> <span class="op">{</span></span>
-<span id="cb27-44"><a href="#cb27-44" aria-hidden="true" tabindex="-1"></a>  <span class="va">package</span> <span class="op">=</span> <span class="bu">builtins</span>.trace <span class="st">&quot;</span><span class="sc">${</span>libfooPkgConfig<span class="sc">}</span><span class="st">&quot;</span> haskellPackages.mkDerivation <span class="kw">rec</span> <span class="op">{</span></span>
-<span id="cb27-45"><a href="#cb27-45" aria-hidden="true" tabindex="-1"></a>    <span class="va">pname</span> <span class="op">=</span> <span class="st">&quot;simplist_libfoo&quot;</span><span class="op">;</span></span>
-<span id="cb27-46"><a href="#cb27-46" aria-hidden="true" tabindex="-1"></a>    <span class="va">version</span> <span class="op">=</span> <span class="st">&quot;0.1.0.0&quot;</span><span class="op">;</span></span>
-<span id="cb27-47"><a href="#cb27-47" aria-hidden="true" tabindex="-1"></a>    <span class="va">src</span> <span class="op">=</span> <span class="ss">./.</span><span class="op">;</span></span>
-<span id="cb27-48"><a href="#cb27-48" aria-hidden="true" tabindex="-1"></a>    <span class="va">license</span> <span class="op">=</span> <span class="st">&quot;License&quot;</span><span class="op">;</span></span>
-<span id="cb27-49"><a href="#cb27-49" aria-hidden="true" tabindex="-1"></a>    <span class="va">preCompileBuildDriver</span> <span class="op">=</span> <span class="st">''</span></span>
-<span id="cb27-50"><a href="#cb27-50" aria-hidden="true" tabindex="-1"></a><span class="st">      export PKG_CONFIG_PATH=</span><span class="sc">${</span>libfooPkgConfig<span class="sc">}</span><span class="st">:$PKG_CONFIG_PATH</span></span>
-<span id="cb27-51"><a href="#cb27-51" aria-hidden="true" tabindex="-1"></a><span class="st">    ''</span><span class="op">;</span></span>
-<span id="cb27-52"><a href="#cb27-52" aria-hidden="true" tabindex="-1"></a>    <span class="va">buildTools</span> <span class="op">=</span> <span class="op">[</span> pkgs.pkg-config <span class="op">];</span></span>
-<span id="cb27-53"><a href="#cb27-53" aria-hidden="true" tabindex="-1"></a>    <span class="va">pkg-configDepends</span> <span class="op">=</span> <span class="op">[</span> libfoo <span class="op">];</span></span>
-<span id="cb27-54"><a href="#cb27-54" aria-hidden="true" tabindex="-1"></a>  <span class="op">};</span></span>
-<span id="cb27-55"><a href="#cb27-55" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
-<div class="sourceCode" id="cb28"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>&gt; Error: Setup: The program 'pkg-config' version &gt;=0.9.0 is required but it</span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>&gt; could not be found.</span></code></pre></div>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>  <span class="va">libfoo</span> <span class="op">=</span> pkgs.stdenv.mkDerivation <span class="kw">rec</span> <span class="op">{</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>    <span class="va">pname</span> <span class="op">=</span> <span class="st">&quot;foo&quot;</span><span class="op">;</span></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>    <span class="va">version</span> <span class="op">=</span> <span class="st">&quot;0.1&quot;</span><span class="op">;</span></span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>    <span class="va">src</span> <span class="op">=</span> <span class="ss">./.</span><span class="op">;</span></span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>    <span class="va">buildInputs</span> <span class="op">=</span> <span class="op">[</span> pkgs.gcc <span class="op">];</span></span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>    <span class="va">buildPhase</span> <span class="op">=</span> <span class="st">''</span></span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a><span class="st">      make</span></span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a><span class="st">    ''</span><span class="op">;</span></span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 닉스가 기본 동작으로 $out 디렉토리를 만들고, make install을 호출하는데,</span></span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>    <span class="co"># installPhase를 지정하면, 기본 동작을 하지 않는다.</span></span>
+<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a>    <span class="va">installPhase</span> <span class="op">=</span> <span class="st">''</span></span>
+<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a><span class="st">      mkdir -p $out/lib $out/include</span></span>
+<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a><span class="st">      cp libfoo.so $out/lib/</span></span>
+<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a><span class="st">      cp foo.h $out/include</span></span>
+<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a><span class="st">    ''</span><span class="op">;</span></span>
+<span id="cb27-19"><a href="#cb27-19" aria-hidden="true" tabindex="-1"></a>    <span class="va">meta</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb27-20"><a href="#cb27-20" aria-hidden="true" tabindex="-1"></a>      <span class="va">description</span> <span class="op">=</span> <span class="st">&quot;foo - C library&quot;</span><span class="op">;</span></span>
+<span id="cb27-21"><a href="#cb27-21" aria-hidden="true" tabindex="-1"></a>      <span class="va">platforms</span> <span class="op">=</span> pkgs.lib.platforms.all<span class="op">;</span></span>
+<span id="cb27-22"><a href="#cb27-22" aria-hidden="true" tabindex="-1"></a>    <span class="op">};</span></span>
+<span id="cb27-23"><a href="#cb27-23" aria-hidden="true" tabindex="-1"></a>    <span class="co"># libfoo는 $out 풀경로를 가진다.</span></span>
+<span id="cb27-24"><a href="#cb27-24" aria-hidden="true" tabindex="-1"></a>  <span class="op">};</span></span>
+<span id="cb27-25"><a href="#cb27-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-26"><a href="#cb27-26" aria-hidden="true" tabindex="-1"></a>  <span class="co"># pkg-config에 등록용 .pc 파일</span></span>
+<span id="cb27-27"><a href="#cb27-27" aria-hidden="true" tabindex="-1"></a>  <span class="va">libfooPkgConfig</span> <span class="op">=</span> pkgs.writeTextDir <span class="st">&quot;foo.pc&quot;</span> <span class="st">''</span></span>
+<span id="cb27-28"><a href="#cb27-28" aria-hidden="true" tabindex="-1"></a><span class="st">    prefix = </span><span class="sc">${</span>libfoo<span class="sc">}</span></span>
+<span id="cb27-29"><a href="#cb27-29" aria-hidden="true" tabindex="-1"></a><span class="st">    includedir = </span><span class="sc">${</span>libfoo<span class="sc">}</span><span class="st">/include</span></span>
+<span id="cb27-30"><a href="#cb27-30" aria-hidden="true" tabindex="-1"></a><span class="st">    libdir = </span><span class="sc">${</span>libfoo<span class="sc">}</span><span class="st">/lib</span></span>
+<span id="cb27-31"><a href="#cb27-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-32"><a href="#cb27-32" aria-hidden="true" tabindex="-1"></a><span class="st">    Name: foo</span></span>
+<span id="cb27-33"><a href="#cb27-33" aria-hidden="true" tabindex="-1"></a><span class="st">    Description: foo - C library</span></span>
+<span id="cb27-34"><a href="#cb27-34" aria-hidden="true" tabindex="-1"></a><span class="st">    Version: 0.1</span></span>
+<span id="cb27-35"><a href="#cb27-35" aria-hidden="true" tabindex="-1"></a><span class="st">    Cflags: -I</span><span class="sc">${</span>libfoo<span class="sc">}</span><span class="st">/include</span></span>
+<span id="cb27-36"><a href="#cb27-36" aria-hidden="true" tabindex="-1"></a><span class="st">    Libs: -L</span><span class="sc">${</span>libfoo<span class="sc">}</span><span class="st">/lib -lfoo</span></span>
+<span id="cb27-37"><a href="#cb27-37" aria-hidden="true" tabindex="-1"></a><span class="st">  ''</span><span class="op">;</span></span>
+<span id="cb27-38"><a href="#cb27-38" aria-hidden="true" tabindex="-1"></a>  <span class="co"># </span></span>
+<span id="cb27-39"><a href="#cb27-39" aria-hidden="true" tabindex="-1"></a><span class="kw">in</span> <span class="op">{</span></span>
+<span id="cb27-40"><a href="#cb27-40" aria-hidden="true" tabindex="-1"></a>  <span class="kw">inherit</span> libfoo libfooPkgConfig<span class="op">;</span></span>
+<span id="cb27-41"><a href="#cb27-41" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p><code>default.nix</code></p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="op">{</span> <span class="va">pkgs</span> <span class="op">?</span> <span class="bu">import</span> &lt;nixpkgs&gt; <span class="op">{}</span> <span class="op">}</span>:</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>  <span class="va">haskellPackages</span> <span class="op">=</span> pkgs.haskellPackages<span class="op">;</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>  <span class="va">ghc</span> <span class="op">=</span> haskellPackages.ghc<span class="op">;</span></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>  <span class="va">cabal-install</span> <span class="op">=</span> haskellPackages.cabal<span class="op">-</span>install<span class="op">;</span></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>  <span class="va">libfooDefs</span> <span class="op">=</span> <span class="bu">import</span> <span class="ss">./libfoo/libfoo.nix</span> <span class="op">{</span> <span class="kw">inherit</span> pkgs<span class="op">;</span> <span class="op">};</span></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>  <span class="va">libfoo</span> <span class="op">=</span> libfooDefs.libfoo<span class="op">;</span></span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>  <span class="va">libfooPkgConfig</span> <span class="op">=</span> libfooDefs.libfooPkgConfig<span class="op">;</span></span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a><span class="kw">in</span> <span class="op">{</span></span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a>  <span class="va">package</span> <span class="op">=</span> <span class="bu">builtins</span>.trace <span class="st">&quot;</span><span class="sc">${</span>libfooPkgConfig<span class="sc">}</span><span class="st">&quot;</span> haskellPackages.mkDerivation <span class="kw">rec</span> <span class="op">{</span></span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a>    <span class="va">pname</span> <span class="op">=</span> <span class="st">&quot;simplist_libfoo&quot;</span><span class="op">;</span></span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a>    <span class="va">version</span> <span class="op">=</span> <span class="st">&quot;0.1.0.0&quot;</span><span class="op">;</span></span>
+<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a>    <span class="va">src</span> <span class="op">=</span> <span class="ss">./.</span><span class="op">;</span></span>
+<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a>    <span class="va">license</span> <span class="op">=</span> <span class="st">&quot;License&quot;</span><span class="op">;</span></span>
+<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a>    <span class="va">preCompileBuildDriver</span> <span class="op">=</span> <span class="st">''</span></span>
+<span id="cb28-19"><a href="#cb28-19" aria-hidden="true" tabindex="-1"></a><span class="st">      export PKG_CONFIG_PATH=</span><span class="sc">${</span>libfooPkgConfig<span class="sc">}</span><span class="st">:$PKG_CONFIG_PATH</span></span>
+<span id="cb28-20"><a href="#cb28-20" aria-hidden="true" tabindex="-1"></a><span class="st">    ''</span><span class="op">;</span></span>
+<span id="cb28-21"><a href="#cb28-21" aria-hidden="true" tabindex="-1"></a>    <span class="va">buildTools</span> <span class="op">=</span> <span class="op">[</span> pkgs.pkg-config <span class="op">];</span></span>
+<span id="cb28-22"><a href="#cb28-22" aria-hidden="true" tabindex="-1"></a><span class="co">#    pkg-configDepends = [ libfoo ]; </span><span class="al">TODO</span><span class="co"> 용도 확인하기</span></span>
+<span id="cb28-23"><a href="#cb28-23" aria-hidden="true" tabindex="-1"></a>  <span class="op">};</span></span>
+<span id="cb28-24"><a href="#cb28-24" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb29"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>&gt; Error: Setup: The program 'pkg-config' version &gt;=0.9.0 is required but it</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>&gt; could not be found.</span></code></pre></div>
 <p><code>pkg-config</code>가 없다는 오류로, <code>nativeBuildInputs</code>에 항목을 추가하는 속성인 <code>buildTools</code>를 추가한다.</p>
-<div class="sourceCode" id="cb29"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>buildTools = <span class="op">[</span> pkgs.pkg-config <span class="op">]</span>;</span></code></pre></div>
+<div class="sourceCode" id="cb30"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>buildTools = <span class="op">[</span> pkgs.pkg-config <span class="op">]</span>;</span></code></pre></div>
+<p><strong>shell.nix</strong></p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="op">{</span> <span class="va">pkgs</span> <span class="op">?</span> <span class="bu">import</span> &lt;nixpkgs&gt; <span class="op">{}</span> <span class="op">}</span>:</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>  <span class="va">haskellPackages</span> <span class="op">=</span> pkgs.haskellPackages<span class="op">;</span></span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>  <span class="va">ghc</span> <span class="op">=</span> haskellPackages.ghc<span class="op">;</span></span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>  <span class="va">cabal-install</span> <span class="op">=</span> haskellPackages.cabal<span class="op">-</span>install<span class="op">;</span></span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>  <span class="va">libfooDefs</span> <span class="op">=</span> <span class="bu">import</span> <span class="ss">./libfoo/libfoo.nix</span> <span class="op">{</span> <span class="kw">inherit</span> pkgs<span class="op">;</span> <span class="op">};</span></span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>  <span class="va">libfoo</span> <span class="op">=</span> libfooDefs.libfoo<span class="op">;</span></span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>  <span class="va">libfooPkgConfig</span> <span class="op">=</span> libfooDefs.libfooPkgConfig<span class="op">;</span></span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a><span class="kw">in</span> <span class="op">{</span></span>
+<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a>  <span class="va">devShell</span> <span class="op">=</span> <span class="bu">builtins</span>.trace <span class="st">&quot;</span><span class="sc">${</span>libfooPkgConfig<span class="sc">}</span><span class="st">&quot;</span> pkgs.mkShell <span class="op">{</span></span>
+<span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a>    <span class="va">name</span> <span class="op">=</span> <span class="st">&quot;simplist_libfoo&quot;</span><span class="op">;</span></span>
+<span id="cb31-15"><a href="#cb31-15" aria-hidden="true" tabindex="-1"></a>    <span class="va">buildInputs</span> <span class="op">=</span> <span class="op">[</span></span>
+<span id="cb31-16"><a href="#cb31-16" aria-hidden="true" tabindex="-1"></a>      ghc</span>
+<span id="cb31-17"><a href="#cb31-17" aria-hidden="true" tabindex="-1"></a>      cabal-install</span>
+<span id="cb31-18"><a href="#cb31-18" aria-hidden="true" tabindex="-1"></a><span class="co">#      libfoo</span></span>
+<span id="cb31-19"><a href="#cb31-19" aria-hidden="true" tabindex="-1"></a>    <span class="op">];</span></span>
+<span id="cb31-20"><a href="#cb31-20" aria-hidden="true" tabindex="-1"></a>    <span class="va">nativeBuildInputs</span> <span class="op">=</span> <span class="kw">with</span> pkgs<span class="op">;</span> <span class="op">[</span></span>
+<span id="cb31-21"><a href="#cb31-21" aria-hidden="true" tabindex="-1"></a>      pkg-config</span>
+<span id="cb31-22"><a href="#cb31-22" aria-hidden="true" tabindex="-1"></a>    <span class="op">];</span></span>
+<span id="cb31-23"><a href="#cb31-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-24"><a href="#cb31-24" aria-hidden="true" tabindex="-1"></a>    <span class="va">shellHook</span> <span class="op">=</span> <span class="st">''</span></span>
+<span id="cb31-25"><a href="#cb31-25" aria-hidden="true" tabindex="-1"></a><span class="st">      export PKG_CONFIG_PATH=</span><span class="sc">${</span>libfooPkgConfig<span class="sc">}</span><span class="st">:$PKG_CONFIG_PATH</span></span>
+<span id="cb31-26"><a href="#cb31-26" aria-hidden="true" tabindex="-1"></a><span class="st">    ''</span><span class="op">;</span></span>
+<span id="cb31-27"><a href="#cb31-27" aria-hidden="true" tabindex="-1"></a>  <span class="op">};</span></span>
+<span id="cb31-28"><a href="#cb31-28" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
 <p>※ <strong>writeTextDir</strong> Nix 저장소의 서브 디렉토리 안에 텍스트 파일을 만든다.<br />
 <a href="https://nixos.org/manual/nixpkgs/stable/#trivial-builder-writeTextDir">nixos.org/manual - writeTextDir</a><br />
 아래 둘은 동일하게 <code>/nix/store/&lt;store path&gt;/share/my-file</code> 파일을 만든다.</p>
-<div class="sourceCode" id="cb30"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>writeTextFile <span class="op">{</span></span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>  <span class="va">name</span> <span class="op">=</span> <span class="st">&quot;my-file&quot;</span><span class="op">;</span></span>
-<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>  <span class="va">text</span> <span class="op">=</span> <span class="st">''</span></span>
-<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a><span class="st">    Contents of File</span></span>
-<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a><span class="st">  ''</span><span class="op">;</span></span>
-<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>  <span class="va">destination</span> <span class="op">=</span> <span class="st">&quot;/share/my-file&quot;</span><span class="op">;</span></span>
-<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
-<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>writeTextDir <span class="st">&quot;share/my-file&quot;</span></span>
-<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>  <span class="st">''</span></span>
-<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a><span class="st">  Contents of File</span></span>
-<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a><span class="st">  ''</span></span></code></pre></div>
+<div class="sourceCode" id="cb32"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>writeTextFile <span class="op">{</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="va">name</span> <span class="op">=</span> <span class="st">&quot;my-file&quot;</span><span class="op">;</span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>  <span class="va">text</span> <span class="op">=</span> <span class="st">''</span></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a><span class="st">    Contents of File</span></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a><span class="st">  ''</span><span class="op">;</span></span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>  <span class="va">destination</span> <span class="op">=</span> <span class="st">&quot;/share/my-file&quot;</span><span class="op">;</span></span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>writeTextDir <span class="st">&quot;share/my-file&quot;</span></span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>  <span class="st">''</span></span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a><span class="st">  Contents of File</span></span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a><span class="st">  ''</span></span></code></pre></div>
 <p>비슷한 함수로 <code>writeScript</code>는 파일을 만들고, 실행 속성을 줍니다. 조금씩 동작이 추가 되어 있는 <code>writeScriptBin</code>, <code>writeShellScript</code>, <code>writeShellScriptBin</code> 등의 함수들이 있는데, 이렇게 api를 늘려가는 게 좋은 방식인지는 모르겠습니다.</p>
 <p>※ <code>.cabal</code>의 <a href="https://cabal.readthedocs.io/en/latest/cabal-package-description-file.html#pkg-field-pkgconfig-depends"><strong>pkgconfig-depends</strong></a> 필드<br />
 Cabal은 <a href="https://ko.wikipedia.org/wiki/Pkg-config">pkg-config</a>를 써서, 현재 패키지가 필요로 하는 시스템에 있는 라이브러리와 extra compilation, 링커 옵션을 찾는다. <code>pkg-config --list-all</code> 명령으로 가용한 라이브러리 목록을 볼 수 있다. 현재 프로젝트에서만 쓸 라이브리라면, 현재 프로젝트 폴더 아래에 라이브러리를 두고, pkg-config 파일인 <code>.pc</code>파일도 프로젝트 안에 만들어 두고, <code>PKG_CONFIG_PATH</code> 환경 변수를 이용할 수 있다.</p>
@@ -477,41 +519,41 @@ Cabal은 <a href="https://ko.wikipedia.org/wiki/Pkg-config">pkg-config</a>를 �
 <hr />
 <h2 id="함수-인자-속성-집합-확인-방법">함수 인자 속성 집합 확인 방법</h2>
 <p>※ 프레임워크에 있는, 함수들이 받는 인자의 속성 집합이 궁금할 땐, 다음 방법으로 실제 코드를 확인 할 수 있습니다.</p>
-<div class="sourceCode" id="cb31"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>&gt; nix repl</span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>nix-repl&gt; pkgs = import &lt;nixpkgs&gt; {}</span>
-<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>nix-repl&gt; :edit pkgs.haskellPackages.developPackage</span></code></pre></div>
-<div class="sourceCode" id="cb32"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>  ...</span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  developPackage =</span>
-<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span> <span class="va">root</span></span>
-<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">,</span> <span class="va">name</span> <span class="op">?</span> lib.optionalString <span class="op">(</span><span class="bu">builtins</span>.typeOf root == <span class="st">&quot;path&quot;</span><span class="op">)</span> <span class="op">(</span><span class="bu">builtins</span>.<span class="bu">baseNameOf</span> root<span class="op">)</span></span>
-<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">,</span> <span class="va">source-overrides</span> <span class="op">?</span> <span class="op">{}</span></span>
-<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">,</span> <span class="va">overrides</span> <span class="op">?</span> <span class="va">self</span><span class="op">:</span> <span class="va">super</span><span class="op">:</span> <span class="op">{}</span></span>
-<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">,</span> <span class="va">modifier</span> <span class="op">?</span> <span class="va">drv</span><span class="op">:</span> drv</span>
-<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>    <span class="op">,</span> <span class="va">returnShellEnv</span> <span class="op">?</span> pkgs.lib.inNixShell</span>
-<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>    <span class="op">,</span> <span class="va">withHoogle</span> <span class="op">?</span> returnShellEnv</span>
-<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>    <span class="op">,</span> <span class="va">cabal2nixOptions</span> <span class="op">?</span> <span class="st">&quot;&quot;</span> <span class="op">}</span>:</span>
-<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>  ...</span></code></pre></div>
+<div class="sourceCode" id="cb33"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>&gt; nix repl</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>nix-repl&gt; pkgs = import &lt;nixpkgs&gt; {}</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>nix-repl&gt; :edit pkgs.haskellPackages.developPackage</span></code></pre></div>
+<div class="sourceCode" id="cb34"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>  ...</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>  developPackage =</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span> <span class="va">root</span></span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">,</span> <span class="va">name</span> <span class="op">?</span> lib.optionalString <span class="op">(</span><span class="bu">builtins</span>.typeOf root == <span class="st">&quot;path&quot;</span><span class="op">)</span> <span class="op">(</span><span class="bu">builtins</span>.<span class="bu">baseNameOf</span> root<span class="op">)</span></span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">,</span> <span class="va">source-overrides</span> <span class="op">?</span> <span class="op">{}</span></span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">,</span> <span class="va">overrides</span> <span class="op">?</span> <span class="va">self</span><span class="op">:</span> <span class="va">super</span><span class="op">:</span> <span class="op">{}</span></span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">,</span> <span class="va">modifier</span> <span class="op">?</span> <span class="va">drv</span><span class="op">:</span> drv</span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>    <span class="op">,</span> <span class="va">returnShellEnv</span> <span class="op">?</span> pkgs.lib.inNixShell</span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a>    <span class="op">,</span> <span class="va">withHoogle</span> <span class="op">?</span> returnShellEnv</span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a>    <span class="op">,</span> <span class="va">cabal2nixOptions</span> <span class="op">?</span> <span class="st">&quot;&quot;</span> <span class="op">}</span>:</span>
+<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a>  ...</span></code></pre></div>
 <p>혹은 인자의 속성 집합만 볼 수도 있습니다.</p>
-<div class="sourceCode" id="cb33"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>nix-repl&gt; pkgs = import &lt;nixpkgs&gt; {}</span>
-<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>nix-repl&gt; builtins.functionArgs pkgs.haskellPackages.developPackage</span>
-<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>{</span>
-<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>  cabal2nixOptions = true;</span>
-<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>  modifier = true;</span>
-<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>  name = true;</span>
-<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>  overrides = true;</span>
-<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>  returnShellEnv = true;</span>
-<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a>  root = false; &lt;-------- false: 필수 속성이란 뜻</span>
-<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a>  source-overrides = true;</span>
-<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a>  withHoogle = true;</span>
-<span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb35"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>nix-repl&gt; pkgs = import &lt;nixpkgs&gt; {}</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>nix-repl&gt; builtins.functionArgs pkgs.haskellPackages.developPackage</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>  cabal2nixOptions = true;</span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>  modifier = true;</span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>  name = true;</span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>  overrides = true;</span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>  returnShellEnv = true;</span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>  root = false; &lt;-------- false: 필수 속성이란 뜻</span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a>  source-overrides = true;</span>
+<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a>  withHoogle = true;</span>
+<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 <p><code>mkDerivation</code>처럼 고정된 인자 목록이 있는 게 아니라, 속성 집합을 받을 경우는 작동하지 않습니다.</p>
 <h2 id="디버깅---바인딩된-값-표시">디버깅 - 바인딩된 값 표시</h2>
-<div class="sourceCode" id="cb34"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>in <span class="op">{</span></span>
-<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>  <span class="va">devShell</span> <span class="op">=</span> <span class="bu">builtins</span>.trace <span class="st">&quot;</span><span class="sc">${</span>libfooPkgConfig<span class="sc">}</span><span class="st">&quot;</span> pkgs.mkShell <span class="op">{</span></span>
-<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">...</span></span>
-<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>    <span class="va">shellHook</span> = ''</span>
-<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>      <span class="va">export</span> <span class="va">PKG_CONFIG_PATH</span>=${<span class="va">libfooPkgConfig</span><span class="op">}</span>:$PKG_CONFIG_PATH</span>
-<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">'';</span></span></code></pre></div>
+<div class="sourceCode" id="cb36"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>in <span class="op">{</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>  <span class="va">devShell</span> <span class="op">=</span> <span class="bu">builtins</span>.trace <span class="st">&quot;</span><span class="sc">${</span>libfooPkgConfig<span class="sc">}</span><span class="st">&quot;</span> pkgs.mkShell <span class="op">{</span></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">...</span></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>    <span class="va">shellHook</span> = ''</span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>      <span class="va">export</span> <span class="va">PKG_CONFIG_PATH</span>=${<span class="va">libfooPkgConfig</span><span class="op">}</span>:$PKG_CONFIG_PATH</span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">'';</span></span></code></pre></div>
 <p><code>devShell =</code>에서 쓰이고 있는 <code>${libfooPkgConfig}</code>가 궁금하면, <code>builtins.trace 메시지 작업</code> 형식으로 써서, 바인딩 값을 확인할 수 있다.</p>
 
 <div class="comment">

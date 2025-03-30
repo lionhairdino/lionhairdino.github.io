@@ -156,6 +156,7 @@
 <a href="https://nixos.asia/en/haskell">nixos.asia</a><br />
 <a href="https://nixos.org/manual/nixpkgs/unstable/#haskell">nixos.org 문서의 하스켈 섹션</a><br />
 <a href="https://nixos.wiki/wiki/Haskell">NixOS Wiki</a></p>
+<p>닉스 하스켈 생태계는 크게 Nixpkgs의 haskellPackages(이전 haskell4nix) 접근과 IOHK의 haskell.nix로 나누어진다. haskell.nix는 Nixpkgs 바깥에 존재한다.</p>
 <p>로컬에서는 <code>/nix/store/해시-source/pkgs/development/haskell-modules</code>에서 닉스 소스 코드를 확인할 수 있다.</p>
 <h2 id="nixpkgs에-있는-하스켈-언어-프레임-워크">nixpkgs에 있는 하스켈 언어 프레임 워크</h2>
 <p>derviation을 생성하고, 개발쉘을 준비하는 기본적인 닉스 코드 모양은 아래와 같다.</p>
@@ -446,7 +447,7 @@ Nix에서 제공하는 패키지만 사용하고, 시스템 환경 변수나 글
 <li><p><code>nix flake lock</code> (이전 <code>nix flake update</code>)</p></li>
 </ul>
 <h2 id="haskell.nix">haskell.nix</h2>
-<p><a href="https://input-output-hk.github.io/haskell.nix/index.html">haskell.nix</a> Cabal 프로젝트나 Stack 프로젝트를 Nix 코드로 자동 번역한다. <code>Nixpkgs</code>의 <code>haskellPackages</code>를 쓰지 않는, 독립적인 패키지 관리시스템으로 <code>cabal-install</code>이나 <code>stack</code>과의 호환성에 중점을 두고 설계되었다.<br />
+<p><a href="https://input-output-hk.github.io/haskell.nix/index.html">haskell.nix</a> (첫 번째 커밋 날짜 2018-04-06 11:21:33 +0800) Cabal 프로젝트나 Stack 프로젝트를 Nix 코드로 자동 번역한다. <code>Nixpkgs</code>의 <code>haskellPackages</code>를 쓰지 않는, 독립적인 패키지 관리시스템으로 <code>cabal-install</code>이나 <code>stack</code>과의 호환성에 중점을 두고 설계되었다.<br />
 </p>
 <p>※ 이 동네 특징인 것 같은데, 설정 파일 이름도 <code>haskell.nix</code>고, 이 <code>haskell.nix</code> 파일을 읽어 해석하는 Nix 모듈 이름도, 즉 시스템 이름도 <code>haskell.nix</code>라 부른다. 컨텍스트에 따라서 뭘 가리키는지 알아 먹어야 하는 상황을 자주 만난다.</p>
 <p>※ <a href="https://hackage.haskell.org/package/cabal-install">cabal-install</a>: <code>cabal</code> 명령줄 프로그램을 가지고 있는 패키지. cabal이라 하면, cabal 스펙, cabal 라이브러리, cabal 도구(명령줄 프로그램 <code>cabal</code>)을 모두 의미할 수 있지만, 보통 cabal이라 하면, 도구 <code>cabal</code>을 의미하는 경우가 많다.</p>
@@ -564,7 +565,7 @@ Nix에서 제공하는 패키지만 사용하고, 시스템 환경 변수나 글
 <span id="cb28-63"><a href="#cb28-63" aria-hidden="true" tabindex="-1"></a>    <span class="op">});</span></span>
 <span id="cb28-64"><a href="#cb28-64" aria-hidden="true" tabindex="-1"></a>  <span class="op">};</span></span>
 <span id="cb28-65"><a href="#cb28-65" aria-hidden="true" tabindex="-1"></a><span class="op">})</span></span></code></pre></div>
-<p>※ <code>with obelisk;</code>라 하면, 다음 한 표현식 스코프안으로 <code>obelisk</code>가 가진 것들을 가져 온다.</p>
+<p>※ <code>with obelisk;</code>라 하면, 바로 다음 하나의 표현식 스코프안으로 <code>obelisk</code>가 가진 것들을 가져 온다.</p>
 <h3 id="flake-y-nix-에서-haskell.nix-사용하는-방법">flake-y nix 에서 haskell.nix 사용하는 방법</h3>
 <div class="sourceCode" id="cb29"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>nix flake init --template templates#haskell-nix --impure</span>
 <span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a># `--impure` is required by `builtins.currentSystem`</span>

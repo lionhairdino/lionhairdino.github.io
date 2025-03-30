@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko" lang="ko">
+
+<head>
+  <script>
+    (function () {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'dark') {
+        document.documentElement.classList.add('dark-mode');
+      }
+    })();
+
+    function loadUtterances() {
+      const savedTheme = localStorage.getItem('theme');
+      const themeValue = savedTheme === 'dark' ? 'github-dark' : 'github-light';
+
+      console.log("theme");
+      console.log(themeValue);
+      const script = document.createElement('script');
+      script.src = 'https://utteranc.es/client.js';
+      script.setAttribute('repo', 'lionhairdino/lionhairdino.github.io');
+      script.setAttribute('issue-term', 'url');
+      script.setAttribute('theme', themeValue);
+      script.setAttribute('crossorigin', 'anonymous');
+      script.async = true;
+      document.body.appendChild(script);
+    };
+
+    function updateUtterancesTheme() {
+      const savedTheme = localStorage.getItem('theme');
+      const themeValue = savedTheme === 'dark' ? 'github-dark' : 'github-light';
+
+      // Utterances iframe에 메시지 전송
+      const utterances = document.querySelector('.utterances iframe');
+      if (utterances) {
+        utterances.contentWindow.postMessage(
+          {type: 'set-theme', theme: themeValue},
+          'https://utteranc.es'
+        );
+      }
+    }
+
+  </script>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>lionhairdino - Cabal (작성 중)</title>
+  
+  <meta name="description" content="전체 Cabal 설정법을 보기엔 너무 많습니다. 당장, 필요한 것들만 정리하고, 필요할 때마다 정리를 추가할 Cabal의 베이스 캠프 같은 글입니다." />
+  <meta property="og:description" content="전체 Cabal 설정법을 보기엔 너무 많습니다. 당장, 필요한 것들만 정리하고, 필요할 때마다 정리를 추가할 Cabal의 베이스 캠프 같은 글입니다." />
+  
+  <link rel="stylesheet" type="text/css" href="../css/default.css" />
+  <link rel="icon" href="https://lionhairdino.github.io/favicon.svg" />
+  <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino16px.png" sizes="16x16" />
+  <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino24px.png" sizes="24x24" />
+  <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino32px.png" sizes="32x32" />
+  <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino48px.png" sizes="48x48" />
+  <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino57px.png" sizes="57x57" />
+  <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino60px.png" sizes="60x60" />
+  <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino64px.png" sizes="64x64" />
+  <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino72px.png" sizes="72x72" />
+  <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino76px.png" sizes="76x76" />
+  <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino114px.png" sizes="114x114" />
+  <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino120px.png" sizes="120x120" />
+  <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino144px.png" sizes="144x144" />
+  <link rel="shortcut icon" href="../favicon.ico" />
+  <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino152px.png" sizes="152x152" />
+  <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino180px.png" sizes="180x180" />
+  <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino192px.png" sizes="192x192" />
+  <link rel="manifest" href="../site.webmanifest" />
+  <link rel="mask-icon" href="https://lionhairdino.github.io/Lionhairdino_black.svg" color="#ff7500" />
+  <meta name="msapplication-TileImage" content="/images/favicon/Lionhairdino144px.png" />
+  <meta name="msapplication-TileColor" content="#ff7500" />
+  <meta name="theme-color" content="#ffffff" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Cabal (작성 중)" />
+  <meta property="og:site_name" content="Lionhairdino" />
+  <meta property="og:url" content="https://lionhairdino.github.io/posts/2025-03-29-cabal.html" />
+  
+  <meta property="og:image" content="https://lionhairdino.github.io/images/state400px.png" />
+  
+  
+  <meta name="keywords" content="Haskell, 하스켈, Cabal, 카발, Build, 빌드">
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-E9WZ6VXGHP"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-E9WZ6VXGHP');
+  </script>
+  <script src="../script/copycode.js"></script>
+
+  <script src="../script/darkmode.js"></script>
+  <script async src="https://cse.google.com/cse.js?cx=9c53b4915cbb2605c"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.11.1/tocbot.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.11.1/tocbot.css" />
+  <meta name="fediverse:creator" content="@lionhairdino@mastodon.social" />
+  <link rel="alternate" type="application/rss+xml" title="상상 하스켈 - Lionhairdino" href="rss.xml" />
+</head>
+
+<body>
+  <div id="header">
+    <div style="display:inline-block;margin-right:5px;padding-top: 5px;" id="logo">
+      <a href="../"><img style="width:30px;border:none" src="../images/favicon/Lionhairdino48px.png"></a>
+    </div>
+    <div style="display:inline-block;vertical-align: top;padding-top:5px;" id="navigation">
+      <a href="../">lionhairdino</a>
+      <a href="../about.html">about</a>
+      <!--<a href="/archive.html">archive</a>-->
+    </div>
+    <div style="display:inline-block;font-size:0.8em;vertical-align: top;">
+      <div style="display:inline-block;vertical-align: top;padding-top: 5px"></div>
+      <div style="display:inline-block;vertical-align: top;padding-top: 11px; padding-left: 10px;"><a rel="me" href="https://mastodon.social/@lionhairdino"><img style="width:20px;border:none" src="../images/mastodon.svg"></a></div>
+      <div style="display:inline-block;vertical-align: top;padding-top: 11px; padding-left: 2px;"><a href="https://lionhairdino.bsky.social"><img style="width:18px;border:none" src="../images/bluesky.svg"></a>
+      </div>
+      <div style="display:inline-block;vertical-align: top;padding-top: 11px; padding-left: 2px;"><a href="https://discordapp.com/users/lionhairdino#7687"><img style="width:20px;border:none" src="../images/discord.svg"></a></div>
+      <div style="display:inline-block;vertical-align: top;padding-top: 11px; padding-left: 2px;"><a href="https://x.com/lionhairdino"><img style="width:15px;border:none" src="../images/X.svg"></a></div>
+      <div style="display:inline-block;vertical-align: top;padding-top: 11px; padding-left: 2px;"><a href="https://linkedin.com/in/lionhairdino-l-baaa54244"><img style="width:20px;border:none" src="../images/linkedin.svg"></a></div>
+      <div style="display:inline-block;vertical-align: top;padding-top: 11px; padding-left: 2px;"><a href="https://github.com/lionhairdino"><img style="width:20px;border:none" src="../images/github.svg"></a></div>
+      <div style="display:inline-block;vertical-align: top;padding-top: 11px; padding-left: 2px;"><a href="https://www.threads.net/@linohairdino"><img style="width:20px;border:none" src="../images/threads.svg"></a></div>
+    </div>
+    <div>
+      <div style="display:inline-block;width:180px;">
+        <div class="gcse-searchbox-only"></div>
+        <div><button id="theme-toggle">
+            <script>
+              const savedTheme = localStorage.getItem('theme');
+              if (savedTheme === 'dark')
+                document.write("☉");
+              else
+                document.write("☾");
+            </script>
+          </button></div>
+      </div>
+    </div>
+    <div>
+      여기 글들은 일종의 질문입니다. 용어 선택도 학계, 업계에서 쓰는 걸로 되어 있지 않고, 틀린 내용이 있을 수도 있습니다. 여기 글을 처음 읽는 분은, 먼저 <a href="../warning.html">주의문</a>을 꼭 읽어보세요.
+    </div>
+  </div>
+  <div class="js-toc-content">
+    <h1>Cabal (작성 중)</h1>
+    <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+<div class="info">
+    Posted on March 29, 2025
+    
+</div>
+
+<p>Nix로 빌드하는 방법을 보다보니, 정작 Cabal은 튜토리얼 한 번 제대로 읽어 본 적이 없네요. 공식 매뉴얼에서 필요한 부분만 요약했습니다.</p>
+<p><a href="https://cabal.readthedocs.io/en/stable/getting-started.html">cabal 매뉴얼</a></p>
+<p>.cabal 파일은 여러 섹션stanza<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>으로 이루어져 있습니다.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>메타 정보들</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>common</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  ...</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>executable</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  ...</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>library</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  ...</span></code></pre></div>
+<p>executable 섹션과 library 섹션의 필드들은 비슷한데, 다음 차이만 있습니다. library는 public 인터페이스를 만드는 여러 개의 “exposed”된 모듈을 가지고 있고, executable은 <code>Main</code> 모듈을 가진 파일을 갖고 있습니다.</p>
+<p><code>cabal init</code>에서 시작해 보겠습니다.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>.</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>├── app</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>│   └── Main.hs</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>├── cabal-sample.cabal</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>├── CHANGELOG.md</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>└── LICENSE</span></code></pre></div>
+<p><code>cabal-sample.cabal</code></p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cabal-version</span><span class="kw">:</span><span class="at">      </span><span class="fl">3.0</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="at">-- .cabal 스펙 버전으로 cabal-install 도구 버전과 Cabal 라이브러리 버전과 다를 수 있다.</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="at">-- Cabal 라이브러리 버전은 이 필드의 버전값 이상이어야 한다.</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="at">-- 2.2 스펙 버전 이후부터, 이 필드가 .cabal의 첫번째 줄이어야 한다.</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="fu">name</span><span class="kw">:</span><span class="at">               cabal-sample</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="at">-- 패키지 버전 </span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="at">-- 하스켈 package versioning policy (PVP) 표준 가이드</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="at">-- https://pvp.haskell.org</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="fu">-- PVP summary</span><span class="kw">:</span><span class="at">     +-+------- breaking API changes</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="at">--                  | | +----- non-breaking API additions</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="at">--                  | | | +--- code changes with no API change</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="fu">version</span><span class="kw">:</span><span class="at">            </span><span class="fl">0.1.0.0</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="fu">license</span><span class="kw">:</span><span class="at">            MIT</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="fu">license-file</span><span class="kw">:</span><span class="at">       LICENSE</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="fu">author</span><span class="kw">:</span><span class="at">             lionhairdino</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="fu">maintainer</span><span class="kw">:</span><span class="at">         lionhairdino@gmail.com</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="at">--</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="fu">build-type</span><span class="kw">:</span><span class="at">         Simple</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="fu">extra-doc-files</span><span class="kw">:</span><span class="at">    CHANGELOG.md</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="at">-- 예시나 튜토리얼 모듈 등이 있다면 여기 써 준다.</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a><span class="fu">-- extra-source-files</span><span class="kw">:</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a><span class="at">-- 변수 바인딩과 비슷하다. 섹션들에서 공통common으로 쓰일 것들을 모아 둔다. executable과 library 섹션 등에서 import로 가져다 쓸 수 있다.</span></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a><span class="at">common warnings </span></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">ghc-options</span><span class="kw">:</span><span class="at"> -Wall -- GHC에게 넘길 추가 옵션</span></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a><span class="at">executable cabal-sample</span></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a><span class="at">    -- common에서 정의한 항목들을 불러 온다.</span></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">import</span><span class="kw">:</span><span class="at">           warnings</span></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a><span class="at">    -- Main 모듈을 갖고 있는 .hs 또는 .lhs 파일</span></span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">main-is</span><span class="kw">:</span><span class="at">          Main.hs</span></span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a><span class="at">    -- 실행 파일을 만들 때 쓰인 Main 이외의 다른 모듈들</span></span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">other-modules</span><span class="kw">:</span></span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a><span class="at">    -- 패키지에 있는 모듈에서 쓰인 LANGUAGE 확장</span></span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">other-extensions</span><span class="kw">:</span></span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a><span class="at">    -- 프로젝트에 import된 모듈들이 어느 패키지에서 왔는가</span></span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">build-depends</span><span class="kw">:</span><span class="at">    base ^&gt;=4.19.2.0</span></span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a><span class="at">    -- 소스 파일들이 들어 있는 디렉토리</span></span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">hs-source-dirs</span><span class="kw">:</span><span class="at">   app</span></span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a><span class="at">    -- 패키지 작성에 쓰인 기반 언어</span></span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">default-language</span><span class="kw">:</span><span class="at"> Haskell2010</span></span></code></pre></div>
+<p><a href="https://cabal.readthedocs.io/en/stable/how-to-package-haskell-code.html">How to package haskell code</a></p>
+<h3 id="build-type">build-type</h3>
+<p>주로 하스켈 패키지만 빌드하는 게 아니라, 다른 외부 패키지들을 빌드하거나, 시스템 환경 설정들에 무슨 일을 해야한다거나 하면, 적당히 아래 5종류 중 하나를 골라 Cabal의 동작을 그 때 그 때 달리 할 수 있습니다.</p>
+<ul>
+<li><p><strong>Simple</strong>: <code>Setup.hs</code> 없이 Cabal이 직접 <code>Distribution.Simple.defaultMain</code>를 호출하므로, <code>Setup.hs</code>없이 빌드 작업을 할 수 있습니다. (<span class="citation" data-cites="TODO">@TODO</span> <code>Simple</code>인 경우에도 <code>defaultMain</code>을 부르는 <code>Simple.hs</code>를 작성해도 된다고 하는데, 그러면 <code>Custom</code>을 고르면 되지 않나 싶은데, 아직 더 찾아 봐야겠습니다.)</p></li>
+<li><p><strong>Configure</strong>:</p>
+<ul>
+<li><code>Distribution.Simple.defaultMainWithHooks defaultUserHooks</code>: C라이브러리와 연동하지만, <code>autoconf</code>를 쓰지 않는 경우, <code>configure</code> 스크립트가 없고, 특정 빌드 작업이 필요한 경우로 쓴다고 합니다. (이럴 때는 그냥 <code>Simple</code> 타입이라 지정하면 되지 않을까 싶은데요. <span class="citation" data-cites="TODO">@TODO</span>)</li>
+<li><code>Distribution.Simple.defaultMainWithHooks autoconfUserHooks</code>: 이 함수는 빌드 시작하기 전에 <code>autoconf</code>스타일의 <code>./configure</code>를 호출하고, 그 다음 빌드 단계가 진행됩니다. 일반적으로 C언어 FFI를 쓰는 패키지에서 필요합니다. 빌드 전에 환경 설정을 확인해야 할 때 씁니다.</li>
+</ul>
+<p><code>Setup.hs</code>를 <code>Distribution.Simple.DefaultMainWithHooks ~~</code>를 부르게 만들어야 합니다.</p></li>
+<li><p><strong>Make</strong>: <code>Distribution.Make.defaultMain</code>을 호출합니다. Cabal이 직접 하스켈 빌드를 하지 않고, <code>Makefile</code>을 읽어 <code>make</code>로 빌드합니다. 보통 C나 C++ 프로젝트를 같이 빌드할 때 씁니다. <code>Setup.hs</code>가 필요 없고, Cabal은 단순히 <code>make</code> 명령을 부르기만 합니다.</p></li>
+<li><p><strong>Custom</strong>: 사용자가 만든 <code>Setup.hs</code>이나 <code>Setup.lhs</code>를 사용합니다. 반드시 <code>Setup.hs(lhs)</code>가 필요합니다.</p></li>
+<li><p><strong>Hooks</strong>: <code>cabal-version: 3.14</code> 이후에 추가됐다고 합니다. 나중에 <code>custom</code>을 대체할 거라 하는데, 사용할 일이 생기면 그 때 정리해야겠습니다.</p></li>
+</ul>
+<p><a href="https://cabal.readthedocs.io/en/stable/cabal-package-description-file.html#pkg-field-build-type">Cabal 매뉴얼 - build-type</a></p>
+<h3 id="other-modules">other-modules</h3>
+<p>프로젝트가 생성할 패키지를 사용하는 곳에서 <code>import</code>할 수 있는 모듈들은 <code>exposed-modules</code>에 나열하고, 외부로 공개하지 않는 모듈들 (구현 세부 사항, 도우미 함수들…)은 <code>other-modules</code>에 나열합니다. 직접하려고 하면, 생각만해도 귀찮아집니다. 복잡해지면, 손으로 직접 지정하지 않고, <code>hpack</code> 도구를 이용하는 편이 낫습니다. <code>hpack</code>이 <code>package.yaml</code>을 기반으로 <code>.cabal</code> 파일을 자동으로 생성합니다.</p>
+<p><span class="citation" data-cites="TODO">@TODO</span> 당장 전체 필드를 모두 정리하기엔 무리가 있고, 자주 쓰이는 것들 위주로 정리할 예정입니다.</p>
+<h3 id="pkgconfig-depends">pkgconfig-depends</h3>
+<p><code>pkg-config</code>를 이용해 정보를 받아 올 의존 패키지 목록. 패키지들의 버전이나 버전 범위를 지정하지 않으면, 시스템에 있는 아무 버전이나 쓸 수 있는 것으로 간주합니다. 시스템에서 가용한 <code>pkg-config</code> 패키지를 <code>pkg-config --list-all</code>로 확인할 수 있고, <code>pkg-config</code>가 <code>.pc</code> 파일을 찾을 위치는 <code>PKG_CONFIG_PATH</code> 환경 변수로 지정할 수 있습니다.</p>
+<h3 id="extra-libraries">extra-libraries</h3>
+<p>빌드할 때 링크할 <code>.so</code>나 <code>.dll</code> 같은 동적 라이브러리. 시스템에 있는 라이브러리지만 기본으로 추가 되는 것들이 아닌 것들을 써 줍니다.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="at">library</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">builid-depends</span><span class="kw">:</span><span class="at"> base &gt;= 4.7 &amp;&amp; &lt;5</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">extra-libraries</span><span class="kw">:</span><span class="at"> z, m, pthred</span></span></code></pre></div>
+<p>※ <code>pkgconfig-depends: zlib</code>로 추가했다면, <code>pkg-config</code>를 이용해 설치 여부, 경로, 컴파일 플래그, 링크 플래그들을 가져 오기 때문에 <code>extra-libraries: z</code>는 써 줄 필요 없습니다.</p>
+<h2 id="hpack">hpack</h2>
+<p><a href="https://github.com/sol/hpack">hpack: A modern format for haskell packages</a><br />
+stack을 설치하면 자동으로 설치되기도 하고, <code>cabal install hpack</code>으로 설치할 수도 있습니다. hpack은 하스켈 패키지를 위한 포맷(<code>package.yaml</code> 작성 문법 쯤)을 의미하기도 하고, 이 포맷을 읽어들여 <code>.cabal</code>을 만들어내는 명령줄 도구 이름 <code>hpack</code>을 의미하기도 합니다.</p>
+<p>“<code>hpack</code> 명령줄 도구는 hpack 형식으로 작성된 <code>package.yaml</code>을 읽어 들여 <code>.cabal</code> 파일을 생성합니다.”</p>
+<h2 id="setup.hs-명령어">Setup.hs 명령어</h2>
+<p>Cabal 버전 2.0부터 기본으로 생성되진 않습니다. 하지만, 아직도 시스템 특정 라이브러리 연결이라든지, 빌드 중간에 필요한 작업이 있을 때 사용할 수 있습니다. (빌드할 때 복잡한 요구사항이 생기면, 여긴 아예 하스켈 소스 파일을 하나 사용하는 절차를 둔 것이니, 결국 이리 오지 않을까 싶은데요. 지금은 경험해보지 못해 일단 자세한 정리는 다음으로 미뤄야겠습니다.)</p>
+<p>수작업으로 다음 내용을 가진 <code>Setup.hs</code> 파일을 프로젝트 루트에 만들고,</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Distribution.Simple</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> defaultMain</span></code></pre></div>
+<p>아래와 같이 실행해서 기본 사용법을 살펴 볼 수 있습니다.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>&gt; runhaskell Setup.hs --help </span></code></pre></div>
+<p><span class="citation" data-cites="TODO">@TODO</span></p>
+<h2 id="cabal-v1-v2-v3">Cabal v1 v2 v3</h2>
+<p><span class="citation" data-cites="TODO">@TODO</span><br />
+v2 에서 샌드박스 도입<br />
+v3 에서 <code>cabal.project</code> 도입</p>
+<section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes">
+<hr />
+<ol>
+<li id="fn1"><p>stanza: .cabal의 library 섹션, executable 섹션, … 등을 libaray stanza, executable <a href="https://www.etymonline.com/word/stanza">stanza</a>라 부릅니다. stanza는 정보 그룹을 의미합니다.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section>
+
+<div class="comment">
+  <script>
+    document.addEventListener('DOMContentLoaded', loadUtterances, { once: true });
+  </script>
+</div>
+<div style="text-align:right">Github 계정이 없는 분은 메일로 보내주세요. lionhairdino at gmail.com </div>
+
+  </div>
+  <nav class="toc toc-right js-toc relative z-1 transition--300 absolute pa4 pt5 is-position-fixed"></nav>
+  <script>
+    tocbot.init({
+      tocSelector: '.js-toc',
+      contentSelector: '.js-toc-content',
+      headingSelector: 'h2, h3',
+      hasInnerContainers: true,
+    });
+  </script>
+  <div id="footer">
+    © 2025 lionhairdino. All rights reserved. Generated by <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+  </div>
+</body>
+
+</html>
