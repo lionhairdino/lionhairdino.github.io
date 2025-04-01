@@ -44,9 +44,9 @@
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>lionhairdino - 하스켈을 위한 도구들 (스케치 중)</title>
+  <title>lionhairdino - 하스켈을 위한 닉스 도구들 (스케치 중)</title>
   
-  <meta name="description" content="lionhairdino - 하스켈을 위한 도구들 (스케치 중)" />
+  <meta name="description" content="lionhairdino - 하스켈을 위한 닉스 도구들 (스케치 중)" />
   <meta property="og:description" content="하스켈 함수형 프로그래밍" />
   
   <link rel="stylesheet" type="text/css" href="../css/default.css" />
@@ -73,7 +73,7 @@
   <meta name="msapplication-TileColor" content="#ff7500" />
   <meta name="theme-color" content="#ffffff" />
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="하스켈을 위한 도구들 (스케치 중)" />
+  <meta property="og:title" content="하스켈을 위한 닉스 도구들 (스케치 중)" />
   <meta property="og:site_name" content="Lionhairdino" />
   <meta property="og:url" content="https://lionhairdino.github.io/posts/2025-03-26-haskellToolinNix.html" />
   
@@ -138,7 +138,7 @@
     </div>
   </div>
   <div class="js-toc-content">
-    <h1>하스켈을 위한 도구들 (스케치 중)</h1>
+    <h1>하스켈을 위한 닉스 도구들 (스케치 중)</h1>
     <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
 <div class="info">
     Posted on March 26, 2025
@@ -391,9 +391,9 @@
 <li>frameworks</li>
 <li>extra-libraries</li>
 </ul>
-<p>Cabal 파일에 있는 의존 패키지 이름과 일치하는 Nixpkgs의 <code>pkgs</code> 속성이 있으면, 의존성에 추가됩니다. 만일 <strong>같은 패키지인데 양 쪽 세계에서 부르는 이름이 다르다면, 이를 매핑하는 작업이 필요하다.</strong></p>
+<p>Cabal 파일에 있는 의존 패키지 이름과 일치하는 Nixpkgs의 <code>pkgs</code> 속성이 있으면, 의존성에 추가됩니다. 만일 <strong>같은 패키지인데 양 쪽 세계에서 부르는 이름이 다르다면, 이를 매핑하는 작업이 필요합니다.</strong></p>
 <h3 id="nixpkgs-overlay">Nixpkgs overlay</h3>
-<p>아래처럼 패키지이름에 별명alias을 붙여 해결할 수 있다.</p>
+<p>아래처럼 패키지이름에 별명alias을 붙여 해결할 수 있습니다.</p>
 <div class="sourceCode" id="cb27"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>nixpkgs.overlays = <span class="op">[</span></span>
 <span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  <span class="op">(</span><span class="va">self</span><span class="op">:</span> <span class="va">super</span><span class="op">:</span> <span class="op">{</span></span>
 <span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">icuuc</span> <span class="op">=</span> self.icu<span class="op">;</span></span>
@@ -401,8 +401,8 @@
 <span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>    <span class="va">icudata</span>  <span class="op">=</span> self.icu<span class="op">;</span></span>
 <span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>   <span class="op">})</span></span>
 <span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a><span class="op">]</span>;</span></code></pre></div>
-<p>또, 여기다가 의존 패키지가 <code>pkg-config</code>로 찾아야 하는 경우, <code>haskell-nix.extraPkgconfigMappings</code> 속성을 <code>overlay</code>해서, <code>.cabal</code>의 <code>pkgconfig-depends</code>에 있는 패키지 이름과 Nixpkgs에 있는 패키지를 매핑할 수 있다.</p>
-<p>※ <code>pkgconfig-depends</code>: pkg-config 툴을 통해 정보를 얻어 올 패키지를 뜻하는 <code>.cabal</code> 파일의 속성이다. 예를 들어, <code>.cabal</code>에는 <code>pkgconfig-depends: sdl2-gpu</code>라고 되어 있는데, Nixpkgs에는 <code>SDL2-gpu</code>라고 되어 있으면, <code>pkg-config</code>는 <code>sdl2-gpu.pc</code>를 찾지만, 못찾는 상황이 나온다. 이 때 아래와 같이 할 수 있다. 같은 패키지인데 양 쪽에서 이름이 다른 것들을 매핑해주는 딕셔너리와 비슷하다.</p>
+<p>또, 여기다가 의존 패키지를 <code>pkg-config</code>로 찾아야 하는 경우, <code>haskell-nix.extraPkgconfigMappings</code> 속성을 <code>overlay</code>해서, <code>.cabal</code>의 <code>pkgconfig-depends</code>에 있는 패키지 이름과 Nixpkgs에 있는 패키지를 매핑할 수 있습니다.</p>
+<p>※ <code>pkgconfig-depends</code>: pkg-config 툴을 통해 정보를 얻어 올 패키지를 뜻하는 <code>.cabal</code> 파일의 속성입니다. 예를 들어, <code>.cabal</code>에는 <code>pkgconfig-depends: sdl2-gpu</code>라고 되어 있는데, Nixpkgs에는 <code>SDL2-gpu</code>라고 되어 있으면, <code>pkg-config</code>는 <code>sdl2-gpu.pc</code>를 찾지만, 못찾는 상황이 나옵니다. 이 때 아래와 같이 할 수 있습니다. 같은 패키지인데 양 쪽에서 이름이 다른 것들을 매핑해주는 딕셔너리와 비슷합니다.</p>
 <div class="sourceCode" id="cb28"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>nixpkgs.overlays = <span class="op">[</span></span>
 <span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  <span class="op">(</span><span class="va">self</span><span class="op">:</span> <span class="va">super</span><span class="op">:</span> <span class="op">{</span></span>
 <span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">haskell-nix</span> <span class="op">=</span> super.haskell<span class="op">-</span>nix <span class="op">//</span> <span class="op">{</span></span>
@@ -412,25 +412,166 @@
 <span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">};</span></span>
 <span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>   <span class="op">})</span></span>
 <span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a><span class="op">]</span>;</span></code></pre></div>
-<p>※ <code>.cabal</code>에서는 패키지 이름에 <code>_</code> (언더바)를 사용하지 못한다. 실제 패키지 이름에 <code>_</code>가 들어가도, <code>.cabal</code>에선 이를 <code>-</code>(하이픈)으로 바뀐 이름으로 접근한다. 닉스로 빌드할 때는 위와 같은 작업으로 이름이 다른 걸 해결하고, Cabal 만으로 빌드할 때는 <code>.pc</code> 파일을 alias로 만들어 해결할 수 있다. 예) <code>ln -s abc_def.pc abc-def.pc</code>. 혹은 <code>extra-libraries</code>와 <code>extra-lib-dirs</code>로 다음처럼 할 수 있다.</p>
+<p>※ <code>.cabal</code>에서는 패키지 이름에 <code>_</code> (언더바)를 사용하지 못합니다. 실제 패키지 이름에 <code>_</code>가 들어가도, <code>.cabal</code>에선 이를 <code>-</code>(하이픈)으로 바뀐 이름으로 접근합니다. 닉스로 빌드할 때는 위와 같은 작업으로 이름이 다른 걸 해결하고, Cabal 만으로 빌드할 때는 <code>.pc</code> 파일의 alias를 만들어 해결할 수 있습니다. 예) <code>ln -s abc_def.pc abc-def.pc</code>. 혹은 <code>extra-libraries</code>와 <code>extra-lib-dirs</code>로 다음처럼 할 수 있습니다.</p>
 <div class="sourceCode" id="cb29"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="at">library</span></span>
 <span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">build-depends</span><span class="kw">:</span><span class="at"> base</span></span>
 <span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">extra-libraries</span><span class="kw">:</span><span class="at"> abc_def</span></span>
 <span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">extra-lib-dirs</span><span class="kw">:</span><span class="at"> /usr/lib</span></span></code></pre></div>
 <h3 id="컴포넌트의-라이브러리-대체">컴포넌트의 라이브러리 대체</h3>
-<p>※ 컴포넌트: 실행, 라이브러리, 테스트 등을 의미한다.<br />
-컴포넌트가 의존 패키지가 누락된 경우 <code>modules</code>를 통해 추가할 수 있다.</p>
+<p>※ 컴포넌트: 실행, 라이브러리, 테스트 등을 의미합니다.<br />
+컴포넌트가 의존 패키지를 누락한 경우 <code>modules</code>를 통해 추가할 수 있습니다.</p>
 <div class="sourceCode" id="cb30"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>project = pkgs.haskell<span class="op">-</span>nix.project' <span class="op">{</span></span>
 <span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>  <span class="va">src</span> <span class="op">=</span> self<span class="op">;</span></span>
 <span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>  <span class="va">compiler-nix-name</span> <span class="op">=</span> <span class="st">&quot;ghc8102&quot;</span><span class="op">;</span></span>
 <span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>  <span class="va">modules</span> <span class="op">=</span> <span class="op">[{</span></span>
-<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>    <span class="co"># `extra-libraries` 의존성을 대체한다.</span></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>    <span class="co"># extra-libraries 의존성을 대체한다.</span></span>
 <span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>    <span class="va">packages</span>.<span class="va">X11</span>.<span class="va">components</span>.<span class="va">library</span>.<span class="va">libs</span> <span class="op">=</span> pkgs.lib.mkForce <span class="op">(</span><span class="kw">with</span> pkgs.xorg<span class="op">;</span></span>
 <span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>      <span class="op">[</span> libX11 libXrandr libXext libXscrnSaver libXinerama <span class="op">]);</span></span>
 <span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>  <span class="op">}];</span></span>
 <span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a><span class="op">}</span>;</span></code></pre></div>
 <p>Q. 컴포넌트가 필요로 하는 패키지인데 누락된 경우가 뭘 의미할까? 어차피 의존성에 다 써주는 것 아닌가?<br />
-A. 프로젝트가 C 라이브러리를 쓰면, <code>.cabal</code>은 <code>extra-libraries</code>에 지정한다. 여기에 지정된 걸 Nix는 못찾을 수도 있다.</p>
+A. 프로젝트가 C 라이브러리를 쓰면, <code>.cabal</code>은 <code>extra-libraries</code>에 지정합니다. 여기에 지정된 걸 Nix는 못찾을 수도 있습니다.</p>
+<h3 id="haskell.nix에서-매핑">Haskell.nix에서 매핑</h3>
+<p>위에 오버레이와 컴포넌트 라이브러리 대체는 프로젝트에서 가져다 쓰는 Nixpkgs를 변형했는데, 프로젝트에서 설정이 아니라, Haskell.nix에서 매핑을 해두면, 프로젝트마다, 사용자마다 계속 매핑을 해 줄 필요가 없습니다. Haskell.nix 소소에 alias를 추가할 수 있습니다.</p>
+<ul>
+<li><code>pkgconfig-depends</code> 필드를 위해 <code>lib/pkgconf-nixpkgs-map.nix</code></li>
+<li><code>build-tool-depends</code>, <code>frameworkds</code>, <code>extr-libraries</code> 필드를 위해 <code>lib/system-nixpkgs-map.nix</code></li>
+</ul>
+<h2 id="hackage와-stackage-스냅샷-버전-올리기bumping">Hackage와 Stackage 스냅샷 버전 올리기Bumping</h2>
+<p>Haskell.nix는 Hackage와 Stackage 스냅샷에 있는 패키지의 정보를 제공하는 데이터에 의존합니다. 이들 정보는 각기 <code>hackage.nix</code>와 <code>stackage.nix</code>가 가지고 있습니다. 프로젝트가 Hackage에 있는 패키지에 의존하면, <code>hackage.nix</code> 리비전은 이를 포함할 수 있을 만큼 새 것이어야 하며, 스택 패키지는 마찬가지로 <code>stackage.nix</code>이 새 것이야 합니다.</p>
+<h3 id="hackage.nix-stackage.nix-업데이트-및-고정">hackage.nix, stackage.nix 업데이트 및 고정</h3>
+<p><code>haskell.nix</code>는 이들 저장소를 내부적으로 특별한 리비전에 고정할 수 있습니다.</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  <span class="va">hackageSrc</span> <span class="op">=</span> <span class="bu">builtins</span>.<span class="bu">fetchTarball</span> <span class="st">&quot;https://github.com/input-output-hk/hackage.nix/archive/master.tar.gz&quot;</span><span class="op">;</span></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>  <span class="va">stackageSrc</span> <span class="op">=</span> <span class="bu">builtins</span>.<span class="bu">fetchTarball</span> <span class="st">&quot;https://github.com/input-output-hk/stackage.nix/archive/master.tar.gz&quot;</span><span class="op">;</span></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>  <span class="va">haskellSrc</span> <span class="op">=</span> <span class="bu">builtins</span>.<span class="bu">fetchTarball</span> <span class="st">&quot;https://github.com/input-output-hk/haskell.nix/archive/master.tar.gz&quot;</span><span class="op">;</span></span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>  <span class="va">haskellNix</span> <span class="op">=</span> <span class="bu">import</span> haskellSrc <span class="op">{</span></span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>    <span class="va">sourcesOverride</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>      <span class="va">hackage</span> <span class="op">=</span> hackageSrc<span class="op">;</span></span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>      <span class="va">stackage</span> <span class="op">=</span> stackageSrc<span class="op">;</span></span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>    <span class="op">};</span></span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>  <span class="op">};</span></span>
+<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a><span class="kw">in</span> <span class="op">{</span></span>
+<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a>  <span class="kw">inherit</span> haskellNix</span>
+<span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p><code>haskell.nix</code>의 버전을 바꾸지 않고, <code>hackage.nix</code>와 <code>stackage.nix</code>의 버전을 바꿀 수 있습니다.<br />
+※ Stackage는 Hackage를 참고하므로, Stackage 고정 버전이 Hackage 버전보다 최근 것일 수 없습니다.</p>
+<h2 id="materialization">Materialization</h2>
+<h3 id="materialization이란">Materialization이란?</h3>
+<p>프로젝트를 위한 닉스 파일들을 capturing하고 storing해서 빌드하거나 체크할 필요가 없게 만드는 걸 Materialization이라고 합니다. 이 걸 이용해서 IFD의 input을 캐시할 수 있습니다.</p>
+<h3 id="왜-materialization을-사용하지">왜 Materialization을 사용하지?</h3>
+<h3 id="언제-materilize를-해도-되지">언제 materilize를 해도 되지?</h3>
+<h3 id="닉스-파일을-어떻게-materialize하지">닉스 파일을 어떻게 materialize하지?</h3>
+<h3 id="sha256-필드와-materialized-필드가-최신인지-어떻게-알지">sha256 필드와 materialized 필드가 최신인지 어떻게 알지?</h3>
+<h3 id="닉스-파일을-스크립트로-업데이트-하기">닉스 파일을 스크립트로 업데이트 하기</h3>
+<h3 id="materialized-nixstore-를-건너-뛸-수-있나">materialized = /nix/store 를 건너 뛸 수 있나?</h3>
+<h2 id="cross-컴파일">Cross 컴파일</h2>
+<h2 id="coverage">Coverage</h2>
+<p>haskell.nix는 Cabal의 내장된 hpc 지원을 사용하여 패키지 또는 프로젝트에 대한 커버리지 정보를 생성할 수 있습니다.</p>
+<h2 id="hackage나-stackage에-있는-지정-패키지를-빌드하기">Hackage나 Stackage에 있는 지정 패키지를 빌드하기</h2>
+<h3 id="stackage-스냅샷에서">Stackage 스냅샷에서</h3>
+<p>Stackage 스냅샷에 있는 <code>lens</code>를 빌드하기 위해 아래를 실행합니다.</p>
+<div class="sourceCode" id="cb32"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>nix-build -E '(with import &lt;nixpkgs&gt; (import (builtins.fetchTarball &quot;https://github.com/input-output-hk/haskell.nix/archive/master.tar.gz&quot;) {}).nixpkgsArgs; haskell-nix.snapshots.&quot;lts-13.28&quot;).lens.components.library'</span></code></pre></div>
+<p>Hackage에 있는 특정 버전</p>
+<div class="sourceCode" id="cb33"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>nix-build -E '(with import &lt;nixpkgs&gt; (import (builtins.fetchTarball &quot;https://github.com/input-output-hk/haskell.nix/archive/master.tar.gz&quot;) {}).nixpkgsArgs; (haskell-nix.hackage-package { name = &quot;lens&quot;; version = &quot;4.17.1&quot;; compiler-nix-name = &quot;ghc8102&quot;; })).components.library'</span></code></pre></div>
+<h4 id="hackage-목록-고정">Hackage 목록 고정</h4>
+<div class="sourceCode" id="cb34"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>nix-build -E '(with import &lt;nixpkgs&gt; (import (builtins.fetchTarball &quot;https://github.com/input-output-hk/haskell.nix/archive/master.tar.gz&quot;) {}).nixpkgsArgs; (haskell-nix.hackage-package { name = &quot;lens&quot;; version = &quot;4.17.1&quot;; compiler-nix-name = &quot;ghc8102&quot;; index-state = &quot;2019-07-14T00:00:00Z&quot;; })).components.library'</span></code></pre></div>
+<h2 id="content-address-derivations">Content address derivations</h2>
+<h2 id="haskell-flake">haskell-flake</h2>
+<p>Cabal만 지원합니다.
+<code>cabal.project</code> 기반으로 로컬 패키지를 자동 감지합니다.
+<code>.cabal</code> 파일에서 <code>executables</code> 를 파싱해서 Flake 앱을 만듭니다.
+<code>pkgs.haskell.lib.compose.*</code>를 쓰기 위한 모듈식 인터페이스 (<code>packages</code>와 <code>settings</code> 서브 모듈을 이용)
+의존성 오버라이드 합성, Project modules를 이용</p>
+<h3 id="하스켈-패키지-소스-오버라이딩">하스켈 패키지 소스 오버라이딩</h3>
+<p><code>flake.nix</code>파일의 flake 입력에 <code>ema</code> Git 저장소를 추가</p>
+<div class="sourceCode" id="cb35"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  <span class="va">inputs</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">ema</span>.<span class="va">url</span> <span class="op">=</span> <span class="st">&quot;github:srid/ema&quot;</span><span class="op">;</span></span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>    <span class="va">ema</span>.<span class="va">flake</span> <span class="op">=</span> <span class="cn">false</span><span class="op">;</span></span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a><span class="er">}</span></span></code></pre></div>
+<p>이를 <code>callCabal2nix</code>를 써서 빌드한 후, <code>ema</code>라는 이름으로 하스켈 패키지셋에 추가할 수 있습니다. <code>haskell-flake</code>를 사용하는 <code>flake.nix</code>의 <code>packages</code>인자에 포함시키면 됩니다.</p>
+<div class="sourceCode" id="cb36"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>  <span class="va">perSystem</span> <span class="op">=</span> <span class="op">{</span> <span class="va">self'</span><span class="op">,</span> <span class="va">config</span><span class="op">,</span> <span class="va">pkgs</span><span class="op">,</span> <span class="op">...</span> <span class="op">}</span>: <span class="op">{</span></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">haskellProjects</span>.<span class="va">default</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>      <span class="va">packages</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>        <span class="va">ema</span>.<span class="va">source</span> <span class="op">=</span> input.ema<span class="op">;</span></span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>      <span class="op">};</span></span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">};</span></span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>  <span class="op">};</span></span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p><code>perSystem</code> 속성에 각 시스템 (x86_64_linux, aarch64-darwin, …)에 맞는 정의를 가지고 있는 람다 함수를 넣습니다.</p>
+<p><code>haskellProjects</code> 아래에 여러 개의 프로젝트를 정의할 수 있습니다.</p>
+<div class="sourceCode" id="cb37"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>haskellProjects = <span class="op">{</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>  <span class="va">default</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">packages</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>      <span class="op">...</span></span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">};</span></span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>  <span class="op">};</span></span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>  <span class="va">otherProject</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>    <span class="va">packages</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>      <span class="op">...</span></span>
+<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a>    <span class="op">};</span></span>
+<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a>  <span class="op">};</span></span>
+<span id="cb37-12"><a href="#cb37-12" aria-hidden="true" tabindex="-1"></a><span class="op">}</span>;</span></code></pre></div>
+<p><code>nix build .#haskellProjects.otherProject</code>로 빌드할 수 있습니다.</p>
+<h4 id="하나의-저장소에-있는-복수의-패키지에-대한-의존성을-오버라이드-하려면">하나의 저장소에 있는 복수의 패키지에 대한 의존성을 오버라이드 하려면,</h4>
+<div class="sourceCode" id="cb38"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>  <span class="va">inputs</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">haskell-multi-nix</span>.<span class="va">url</span> <span class="op">=</span> <span class="st">&quot;github:srid/haskell-multi-nix&quot;</span><span class="op">;</span></span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>    <span class="va">haskell-multi-nix</span>.<span class="va">flake</span> <span class="op">=</span> <span class="cn">false</span><span class="op">;</span></span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a><span class="er">}</span></span></code></pre></div>
+<p>서브 디렉토리에 있는 패키지들을 <code>haskellProjects.&lt;name&gt;.packages</code>의 엔트리에 나눠서 각 각 추가한다.</p>
+<div class="sourceCode" id="cb39"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>  <span class="va">perSystem</span> <span class="op">=</span> <span class="op">{</span> <span class="va">self'</span><span class="op">,</span> <span class="va">config</span><span class="op">,</span> <span class="va">pkgs</span><span class="op">,</span> <span class="op">...</span> <span class="op">}</span>: <span class="op">{</span></span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">haskellProjects</span>.<span class="va">default</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>      <span class="va">packages</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>        <span class="va">foo</span>.<span class="va">source</span> <span class="op">=</span> inputs.haskell<span class="op">-</span>multi<span class="op">-</span>nix <span class="op">+</span> <span class="ss">/foo</span><span class="op">;</span></span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>        <span class="va">bar</span>.<span class="va">srouce</span> <span class="op">=</span> inputs.haskell<span class="op">-</span>multi<span class="op">-</span>nix <span class="op">+</span> <span class="ss">/bar</span><span class="op">;</span></span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a>      <span class="op">}</span></span>
+<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a>    <span class="er">}</span></span>
+<span id="cb39-9"><a href="#cb39-9" aria-hidden="true" tabindex="-1"></a>  <span class="er">}</span></span>
+<span id="cb39-10"><a href="#cb39-10" aria-hidden="true" tabindex="-1"></a><span class="er">}</span></span></code></pre></div>
+<h4 id="hackage-버전-쓰기">Hackage 버전 쓰기</h4>
+<div class="sourceCode" id="cb40"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>  <span class="va">perSystem</span> <span class="op">=</span> <span class="op">{</span> <span class="va">self'</span><span class="op">,</span> <span class="va">config</span><span class="op">,</span> <span class="va">pkgs</span><span class="op">,</span> <span class="op">...</span> <span class="op">}</span>: <span class="op">{</span></span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">haskellProjects</span>.<span class="va">default</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>      <span class="va">packages</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>        <span class="va">ema</span>.<span class="va">source</span> <span class="op">=</span> <span class="st">&quot;0.8.2.0&quot;</span><span class="op">;</span></span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>      <span class="op">};</span></span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">};</span></span>
+<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a>  <span class="op">};</span></span>
+<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<h4 id="nixpkgs-버전-쓰기">nixpkgs 버전 쓰기</h4>
+<div class="sourceCode" id="cb41"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>haskellProjects.default = <span class="op">{</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>  <span class="va">settings</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">fourmolu</span> <span class="op">=</span> <span class="op">{</span> <span class="va">super</span><span class="op">,</span> <span class="op">...</span> <span class="op">}</span>: <span class="op">{</span> <span class="va">custom</span> <span class="op">=</span> <span class="va">_</span><span class="op">:</span> super.fourmolu_0_13_1_0<span class="op">;</span> <span class="op">};</span></span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>  <span class="op">};</span></span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span>;</span></code></pre></div>
+<h3 id="패키지-설정">패키지 설정</h3>
+<div class="sourceCode" id="cb42"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>haskellProjects.default = <span class="op">{</span></span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>  <span class="va">settings</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">ema</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>      <span class="va">check</span> <span class="op">=</span> <span class="cn">false</span><span class="op">;</span></span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>      <span class="va">haddock</span> <span class="op">=</span> <span class="cn">false</span><span class="op">;</span></span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>      <span class="va">jailbreak</span> <span class="op">=</span> <span class="cn">true</span><span class="op">;</span></span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>      <span class="va">extraBuildDepends</span> <span class="op">=</span> <span class="op">[</span> pkgs.stork <span class="op">];</span></span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a>      <span class="va">patches</span> <span class="op">=</span> <span class="op">[</span> <span class="ss">./patches/ema-bug-fix.patch</span> <span class="op">];</span></span>
+<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a>      <span class="va">cabalFlags</span>.<span class="va">with-generics</span> <span class="op">=</span> <span class="cn">true</span><span class="op">;</span></span>
+<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a>      <span class="va">broken</span> <span class="op">=</span> <span class="cn">false</span><span class="op">;</span></span>
+<span id="cb42-11"><a href="#cb42-11" aria-hidden="true" tabindex="-1"></a>    <span class="op">};</span></span>
+<span id="cb42-12"><a href="#cb42-12" aria-hidden="true" tabindex="-1"></a>  <span class="op">};</span></span>
+<span id="cb42-13"><a href="#cb42-13" aria-hidden="true" tabindex="-1"></a><span class="op">}</span>;</span></code></pre></div>
+<p><code>pkgs.haskell.lib</code> 모듈은 하스켈 패키지를 오버라이드하는데 쓸 다양한 유틸리티 함수를 가지고 있습니다. 공식 문서는 여기 <a href="https://github.com/NixOS/nixpkgs/blob/master/pkgs/development/haskell-modules/lib/compose.nix">소스 코드</a>에서 찾을 수 있습니다. haskell-flake는 <code>settings</code>란 서브 모듈을 가지고 있습니다. 예를 들어 <code>dontCheck</code> 함수는 <code>settings.&lt;name&gt;.check;</code>로 변환 됩니다.</p>
+<h4 id="removereferencesto">removeReferencesTo</h4>
+<p>하스켈 패키지에서 다른 패키지 참조를 없앱니다. 하스켈 실행 파일에서 없어도 되는 데이터 의존성을 제거해서 클로저 사이즈를 줄이는데 씁니다.</p>
+<h4 id="buildfromsdist">buildFromSdist</h4>
+<p>nixpkgs 새 버전은 <code>cabal sdist</code> tarball에서 패키지를 빌드할 수 있도록 <code>buildFromSdist</code> 함수를 제공합니다.</p>
+<h4 id="stan">stan</h4>
+<p>패키지에 정적<strong>ST</strong>atic 분석<strong>AN</strong>alysis을 돌려 HTML 리포트를 뽑을 수 있습니다. <code>/nix/store</code>에 패키지 <code>outputs</code>가 있는 곳에 만들어집니다. 패키지 소스 루트에 <code>.stan.toml</code> 설정 파일을 둡니다.</p>
 <section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes">
 <hr />
 <ol>

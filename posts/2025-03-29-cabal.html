@@ -146,7 +146,7 @@
     
 </div>
 
-<p>Nix로 빌드하는 방법을 보다보니, 정작 Cabal은 튜토리얼 한 번 제대로 읽어 본 적이 없네요. 공식 매뉴얼에서 필요한 부분만 요약했습니다.</p>
+<p>Nix로 빌드하는 방법을 보다보니, 정작 Cabal은 튜토리얼 한 번 제대로 읽어 본 적이 없네요. 공식 매뉴얼에서 필요한 부분만 요약했습니다. 처음 공부할 때는, 상업적으로 쓰려면 Stack이 낫겠다 싶어, Cabal은 안쓰고, Stack으로 프로젝트를 빌드하며 공부했습니다. 하지만, Stack도 빌드에는 Cabal을 쓰기 때문에, 세세한 빌드 제어를 위해서는 결국 Cabal을 봐두어야 합니다.</p>
 <p><a href="https://cabal.readthedocs.io/en/stable/getting-started.html">cabal 매뉴얼</a></p>
 <p>.cabal 파일은 여러 섹션stanza<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>으로 이루어져 있습니다.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>메타 정보들</span>
@@ -157,7 +157,11 @@
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  ...</span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>library</span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  ...</span></code></pre></div>
-<p>executable 섹션과 library 섹션의 필드들은 비슷한데, 다음 차이만 있습니다. library는 public 인터페이스를 만드는 여러 개의 “exposed”된 모듈을 가지고 있고, executable은 <code>Main</code> 모듈을 가진 파일을 갖고 있습니다.</p>
+<p>executable 섹션과 library 섹션의 필드들은 비슷한데, 다음 차이만 있습니다.</p>
+<ul>
+<li>library는 public 인터페이스를 만드는, 여러 개의 외부로 공개한exposed 모듈을 가지고 있고,</li>
+<li>executable은 <code>Main</code> 모듈을 가진 파일을 갖고 있습니다.</li>
+</ul>
 <p><code>cabal init</code>에서 시작해 보겠습니다.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>.</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>├── app</span>
@@ -185,7 +189,7 @@
 <span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="fu">author</span><span class="kw">:</span><span class="at">             lionhairdino</span></span>
 <span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="fu">maintainer</span><span class="kw">:</span><span class="at">         lionhairdino@gmail.com</span></span>
 <span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="at">--</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="at">-- 소스 아래 설명 참고</span></span>
 <span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="fu">build-type</span><span class="kw">:</span><span class="at">         Simple</span></span>
 <span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="fu">extra-doc-files</span><span class="kw">:</span><span class="at">    CHANGELOG.md</span></span>
@@ -218,6 +222,11 @@
 <span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a><span class="at">    -- 패키지 작성에 쓰인 기반 언어</span></span>
 <span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">default-language</span><span class="kw">:</span><span class="at"> Haskell2010</span></span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="at">-- 설치할 데이터를 찾을 디렉토리</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="at">-- 기본값은 소스 디렉토리에서 찾는다.</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">data-dir</span><span class="kw">:</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="fu">data-file</span><span class="kw">:</span></span></code></pre></div>
 <p><a href="https://cabal.readthedocs.io/en/stable/how-to-package-haskell-code.html">How to package haskell code</a></p>
 <h3 id="build-type">build-type</h3>
 <p>주로 하스켈 패키지만 빌드하는 게 아니라, 다른 외부 패키지들을 빌드하거나, 시스템 환경 설정들에 무슨 일을 해야한다거나 하면, 적당히 아래 5종류 중 하나를 골라 Cabal의 동작을 그 때 그 때 달리 할 수 있습니다.</p>
@@ -241,9 +250,10 @@
 <p><code>pkg-config</code>를 이용해 정보를 받아 올 의존 패키지 목록. 패키지들의 버전이나 버전 범위를 지정하지 않으면, 시스템에 있는 아무 버전이나 쓸 수 있는 것으로 간주합니다. 시스템에서 가용한 <code>pkg-config</code> 패키지를 <code>pkg-config --list-all</code>로 확인할 수 있고, <code>pkg-config</code>가 <code>.pc</code> 파일을 찾을 위치는 <code>PKG_CONFIG_PATH</code> 환경 변수로 지정할 수 있습니다.</p>
 <h3 id="extra-libraries">extra-libraries</h3>
 <p>빌드할 때 링크할 <code>.so</code>나 <code>.dll</code> 같은 동적 라이브러리. 시스템에 있는 라이브러리지만 기본으로 추가 되는 것들이 아닌 것들을 써 줍니다.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="at">library</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">builid-depends</span><span class="kw">:</span><span class="at"> base &gt;= 4.7 &amp;&amp; &lt;5</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">extra-libraries</span><span class="kw">:</span><span class="at"> z, m, pthred</span></span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="at">library</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">builid-depends</span><span class="kw">:</span><span class="at"> base &gt;= 4.7 &amp;&amp; &lt;5</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">extra-libraries</span><span class="kw">:</span><span class="at"> z, m, pthred</span></span></code></pre></div>
+<p>여기에 써 준 라이브러리들은 GHC에게 <code>-optl-l&lt;lib&gt;</code> 플래그로 넘어 갑니다.</p>
 <p>※ <code>pkgconfig-depends: zlib</code>로 추가했다면, <code>pkg-config</code>를 이용해 설치 여부, 경로, 컴파일 플래그, 링크 플래그들을 가져 오기 때문에 <code>extra-libraries: z</code>는 써 줄 필요 없습니다.</p>
 <h2 id="hpack">hpack</h2>
 <p><a href="https://github.com/sol/hpack">hpack: A modern format for haskell packages</a><br />
@@ -252,17 +262,36 @@ stack을 설치하면 자동으로 설치되기도 하고, <code>cabal install h
 <h2 id="setup.hs-명령어">Setup.hs 명령어</h2>
 <p>Cabal 버전 2.0부터 기본으로 생성되진 않습니다. 하지만, 아직도 시스템 특정 라이브러리 연결이라든지, 빌드 중간에 필요한 작업이 있을 때 사용할 수 있습니다. (빌드할 때 복잡한 요구사항이 생기면, 여긴 아예 하스켈 소스 파일을 하나 사용하는 절차를 둔 것이니, 결국 이리 오지 않을까 싶은데요. 지금은 경험해보지 못해 일단 자세한 정리는 다음으로 미뤄야겠습니다.)</p>
 <p>수작업으로 다음 내용을 가진 <code>Setup.hs</code> 파일을 프로젝트 루트에 만들고,</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Distribution.Simple</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> defaultMain</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Distribution.Simple</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> defaultMain</span></code></pre></div>
 <p>아래와 같이 실행해서 기본 사용법을 살펴 볼 수 있습니다.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>&gt; runhaskell Setup.hs --help </span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>&gt; runhaskell Setup.hs --help </span></code></pre></div>
 <p><span class="citation" data-cites="TODO">@TODO</span></p>
 <h2 id="cabal-v1-v2-v3">Cabal v1 v2 v3</h2>
 <p><span class="citation" data-cites="TODO">@TODO</span><br />
 v2 에서 샌드박스 도입<br />
 v3 에서 <code>cabal.project</code> 도입</p>
+<h2 id="cabal.project">cabal.project</h2>
+<p>빌드 플래그들을 스크립트화 하기 위해 도입된 걸로 보입니다.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>cabal configure --enable-profiling</span></code></pre></div>
+<p>이렇게 플래그를 주어 지정하던 걸, <code>cabal.project</code>에</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">profiling</span><span class="kw">:</span><span class="at"> </span><span class="ch">True</span></span></code></pre></div>
+<p>처럼 써 줄 수 있습니다.</p>
+<p>아래 파일들을 이용할 수 있고, 나중 것이 정의되면 이전 것을 덮어 씌웁니다.</p>
+<ol type="1">
+<li>사용자 프로젝트들에 모두 쓰일 글로벌 설정 (기본값은 <code>~/.config/cabal/config</code>)</li>
+<li><code>cabal.project</code> 현재 프로젝트 루트에 위치</li>
+<li><code>cabal.project.freeze</code> (<code>cabal freeze</code>의 출력)</li>
+<li><code>cabal.project.local</code> (<code>cabal configure</code>의 출력)</li>
+</ol>
+<p><code>cabal build</code>를 실행했을 때, 현재 폴더에 없으면 상위 폴더에서 <code>cabal.project.*</code> 파일을 찾습니다.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">packages</span><span class="kw">:</span><span class="at"> </span><span class="ot">*/*.cabal</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">with-compiler</span><span class="kw">:</span><span class="at"> /opt/ghc/8.0.1/bin/ghc</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="at">package cryptohash</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">optimization</span><span class="kw">:</span><span class="at"> </span><span class="ch">False</span></span></code></pre></div>
 <section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes">
 <hr />
 <ol>
