@@ -221,7 +221,7 @@
 <h2 id="마치며">마치며</h2>
 <p>하스켈에서</p>
 <p><code>Effect</code>는 펑터 <code>m</code>,(<code>m</code>이 문법적으로 의미가 있는 건 아니고, 관습적으로 이펙트가 있는 구조에 <code>m</code>을 붙입니다.)<br />
-<code>연산 with Effect</code>는 <code>m a</code>, <code>a -&gt; m b</code>로 표현되고,<br />
+<code>연산 with Effect</code>는 <code>m a</code>, <code>a -&gt; m a</code>로 표현되고,<br />
 <code>join</code>은 그대로 <code>join</code>,<br />
 <code>return</code>도 그대로 <code>return</code>,<br />
 <code>∘</code>은 바인드<code>&gt;&gt;=</code>, 혹은 <code>&gt;=&gt;</code>로 나타납니다.</p>
@@ -239,6 +239,7 @@
 <p>2025.1 추가<br />
 아래는 현재 글에서 이어지는 게 적당하지 않을 수 있습니다. 위에 있는 내용들을 이해한 후에, <code>Reader</code> 모나드를 만들면서 왜 모나드가 필요한가를 보기위해 추가해 놓은 설명인데, 그리 쉽게 풀어쓰지 못한 것 같습니다. 다른 자료들을 조금 더 보다가 돌아와서 보셔도 됩니다.</p>
 <p>위에 설명을 잘 보시면, Effect 처리는 사용자(프로그래머)가 딱히 신경 안쓰고 있습니다. <code>m</code>구조에 쓸 <code>&gt;&gt;=</code> 또는 <code>&gt;=&gt;</code> 또는 <code>join</code> 또는 <code>flatmap</code>, 그리고 <code>return</code> 또는 <code>pure</code> 등이 미리 준비되어 있고, 이를 <code>do</code> 표기법 같은 설탕 문법들과 섞어 쓰면 심지어 코드에 드러나지도 않습니다.</p>
+<p>위에 설명들은 이해하기 쉽도록 같은 타입을 인자로 가진 <code>(-&gt;)</code>에 대한 것만 봤습니다. 즉 <code>a -&gt; a</code>들의 합성이나, <code>a -&gt; m a</code>들의 합성만 얘기했습니다. 이제 <code>a -&gt; b</code>와 <code>b -&gt; c</code>의 합성으로 <code>a -&gt; c</code>가 되고, <code>a -&gt; m b</code>와 <code>b -&gt; m c</code>를 합성해서 <code>a -&gt; m c</code>가 되는 걸 보겠습니다. 이들은 모노이드라 부르진 않고 카테고리라 부릅니다. 모노이드는 오브젝트가 하나인 카테고리입니다. 모노이드 성질을 보면, 교환 법칙은 만족하지 않습니다. 순서는 항상 지켜야 하는 구조입니다. 교환 법칙이 없기 때문에 <code>f: a -&gt; a</code>와 <code>g: a -&gt; a</code>를 합성하던 걸, <code>f: a -&gt; b</code>와 <code>g: b -&gt; c</code>의 합성으로 확장해도 위에서 얘기한 모노이드 성질들이 모두 지켜지는 것을 보겠습니다. 단, <strong><em>대상들의 타입이 다르니 모노이드라 부르진 않습니다.</em></strong></p>
 <h3 id="reader">Reader</h3>
 <p>예를 들어, 나중에 환경값 <code>env</code>를 받아야만 값이 되는 함수 <code>env -&gt; a</code>를 <code>Reader env a</code>라 정의하겠습니다. 위 설명을 그대로 적용하면,<br />
 <code>a -&gt; b</code> 함수와 <code>b -&gt; c</code> 함수를 조합하고 싶으면 <code>⋅</code>을 쓰면 되는데,<br />
