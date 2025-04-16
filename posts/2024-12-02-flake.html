@@ -147,7 +147,7 @@
 </div>
 
 <p>Nixpkgs Manual <a href="https://ryantm.github.io/nixpkgs/" class="uri">https://ryantm.github.io/nixpkgs/</a></p>
-<p>※ Flake 영단어 뜻은 작고 얇은 <strong>조각</strong>을 의미합니다. 아침에 먹던 그 콘프레이크의 프레이크와 같은 뜻입니다.</p>
+<p>※ Flake 영단어 뜻은 작고 얇은 <strong>조각</strong>을 의미합니다. 아침에 먹던 그 콘프레이크의 프레이크와 같은 뜻입니다. Nix는 라틴어로 눈이란 뜻입니다. 닉스 로고는 <strong>Snow Flake</strong>(눈송이)입니다. 대기의 온도와 습도에 따라 복잡한 모양을 띠어서 이름으로 썼나 싶습니다.</p>
 <p>닉스 패키지 매니저 2.4부터 도입된, 아직은 실험적 기능이라 합니다만, 실험적인 것 치고는 너무 많은 곳에 쓰이고 있습니다. 어쨌든 공식적으론 여전히 실험적 특징이라 합니다.(2024.11 현재)</p>
 <p>닉스 만으로 각 종 설치, 환경을 완벽히 재현할 수 있으면 좋겠지만, 현재의 닉스는 어떤 패키지의 어떤 버전을 쓰고 있는지 명확히 선언하지 않고 있습니다. 예를 들어, 어떤 채널에 있는 패키지를 참조한다고 한다면, 해당 채널이 고정된 상태가 아니라면 항상 같은 패키지를 가져 온다고 보장할 수 없습니다. 이를 보완하기 위해, 의존성 검사에 필요한 정보들을 추가로 저장해야 나중에 재현 가능성reproduicibily을 높일 수 있습니다. 이를 위해, 닉스에 새로운 기능으로 <strong>Flake</strong>를 도입했습니다.</p>
 <p>Flake는 의존성과 버전 정보를 <code>flake.lock</code> 파일에 저장합니다. Nixpkgs 어떤 커밋을 쓰고 있는지 커밋 해시값까자 모두 기록합니다.</p>
@@ -178,7 +178,7 @@
 <div class="sourceCode" id="cb3"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="va">description</span> <span class="op">=</span> ...<span class="op">;</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="va">inputs</span> <span class="op">=</span> ...<span class="op">;</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="va">outputs</span> <span class="op">=</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="va">outputs</span> <span class="op">=</span> <span class="op">{</span> <span class="va">self</span><span class="op">,</span> <span class="va">nixpkgs</span> <span class="op">}</span>:</span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span></span>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>      <span class="va">lib</span> <span class="op">=</span>                  <span class="op">;</span><span class="co"># 공통 유틸리티들이 들어 있는, 스탠다드 라이브러리 같은 것</span></span>
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>      <span class="va">overlays</span> <span class="op">=</span>             <span class="op">;</span><span class="co"># 닉스pkgs를 수정, 확장하기 위한 오버레이 정의</span></span>
