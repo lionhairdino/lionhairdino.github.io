@@ -180,8 +180,8 @@ effect와 context를 구별해서 써야 합니다. 모나드는 effect가 있�
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>x <span class="op">#</span> f <span class="ot">=</span> f x</span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="kw">infixl</span> <span class="dv">0</span> <span class="op">#</span></span></code></pre></div>
-<p>※ 아래는 Gabriel Gonzalez의 블로그 <a href="https://www.haskellforall.com/2013/02/you-could-have-invented-comonads.html" class="uri">https://www.haskellforall.com/2013/02/you-could-have-invented-comonads.html</a>의 코드 일부를 발췌했습니다.</p>
 <h2 id="builder-패턴">Builder 패턴</h2>
+<p>※ 아래는 <a href="https://www.haskellforall.com/2013/02/you-could-have-invented-comonads.html">Gabriel Gonzalez의 블로그</a>의 코드 일부를 발췌했습니다.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">Option</span> <span class="ot">=</span> <span class="dt">String</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">Builder</span> <span class="ot">=</span> [<span class="dt">Option</span>] <span class="ot">-&gt;</span> <span class="dt">Config</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Config</span> <span class="ot">=</span> <span class="dt">MakeConfig</span> [<span class="dt">Option</span>] <span class="kw">deriving</span> (<span class="dt">Show</span>)</span>
@@ -194,22 +194,23 @@ effect와 context를 구별해서 써야 합니다. 모나드는 effect가 있�
 <span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="ot">opt2 ::</span> <span class="dt">Builder</span> <span class="ot">-&gt;</span> <span class="dt">Config</span></span>
 <span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>opt2 builder <span class="ot">=</span> builder [<span class="st">&quot;-opt2&quot;</span>]</span></code></pre></div>
-<p>위 도구에서 보았던 속성을 먼저 가지고 있는 스타일로 옵션 지정을 하는 코드입니다. 빌더 함수를 넣어서 안에 들어 있는 리스트에 적용합니다.</p>
+<p>위 도구에서 보았던, 속성을 먼저 가지고 있는 스타일로 옵션을 지정하는 코드입니다. 빌더 함수 <code>defaultConfig</code>를 넣어서, 안에 들어 있는 리스트에 적용합니다.</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> defaultConfig <span class="op">#</span> opt1</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="dt">MakeConfig</span> [<span class="st">&quot;-default&quot;</span>,<span class="st">&quot;-opt1&quot;</span>,<span class="st">&quot;-opt1-1&quot;</span>]</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> defaultConfig <span class="op">#</span> opt2</span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="dt">MakeConfig</span> [<span class="st">&quot;-default&quot;</span>,<span class="st">&quot;-opt2&quot;</span>]</span></code></pre></div>
 <h2 id="아직-일이-끝나지-않았다---실행되지-않은-함수">아직 일이 끝나지 않았다 -&gt; 실행되지 않은 함수</h2>
-<p>하지만 <code>opt1</code>과 <code>opt2</code>는 완성된 <code>Config</code>를 리턴합니다. 그럼 <code>opt1</code>과 <code>opt2</code> 두 개 모두 옵션 리스트에 넣으려면 어떻게 할까요? 최종 모양부터 상상하면, (다)를 이용해서 <code>defaultConfig # opt1 # opt2</code> 쯤 되는 모양으로 만들려고 합니다. 하스켈에선 뭔가 연이은 동작을 만들 땐 함수로 엮는 방법이 주로 쓰입니다. ※ 무언가 완성되지 않은 상태로 둔다는 말은 <em>“함수”로 만들어 둔다</em>와 같은 말입니다. 이 것도 함수형 스타일로 생각하는 하나의 팁입니다.</p>
+<p><code>opt1</code>과 <code>opt2</code>는 완성된 <code>Config</code>를 리턴합니다. 그럼 <code>opt1</code>과 <code>opt2</code> 두 개 모두 옵션 리스트에 넣으려면 어떻게 할까요? 최종 모양부터 상상하면, (다)<code>#</code>를 이용해서 <code>defaultConfig # opt1 # opt2</code> 쯤 되는 모양으로 만들려고 합니다. 하스켈에선 뭔가 연이은 동작을 만들 땐 함수로 엮는 방법이 주로 쓰입니다. ※ 무언가 완성되지 않은 상태로 둔다는 말은 <em>“함수”로 만들어 둔다</em>와 같은 말입니다. 이 것도 함수형 스타일로 생각하는 하나의 팁입니다.</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ot">opt1' ::</span> <span class="dt">Builder</span> <span class="ot">-&gt;</span> <span class="dt">Builder</span> </span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>opt1' builder <span class="ot">=</span> \options <span class="ot">-&gt;</span> builder ([<span class="st">&quot;-opt1&quot;</span>, <span class="st">&quot;-opt1-1&quot;</span>] <span class="op">++</span> options)</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="ot">opt2' ::</span> <span class="dt">Builder</span> <span class="ot">-&gt;</span> <span class="dt">Builder</span> </span>
 <span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>opt2' builder <span class="ot">=</span> \options <span class="ot">-&gt;</span> builder ([<span class="st">&quot;-opt2&quot;</span>] <span class="op">++</span> options)</span></code></pre></div>
-<p>이미 가지고 있던 속성에 인자로 받아 온 함수를 적용했는데, 이 걸 바로 실행하지 않고, 인자 하나를 더 받을때까지 실행을 미루기 위해 (나) 방식으로 만들어 놓습니다.</p>
+<p>이미 가지고 있던 속성에 인자로 받아 온 함수를 적용했는데, 이 걸 바로 실행하지 않고, 인자 하나를 더 받을때까지 실행을 미루기 위해 (나) “미리 함수를 넣어 놓기” 방식으로 만들어 놓습니다.</p>
 <p><code>Builder -&gt; Config</code>였던 타입이 <code>Builder -&gt; Builder</code>가 되어, 옵션 체인을 만들 수 있도록 입출력 타입이 같게 되었습니다.</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>            builder  [<span class="st">&quot;-opt1&quot;</span>, <span class="st">&quot;-opt1-1&quot;</span>] <span class="co">-- opt1 결과가 Config 타입</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>\options <span class="ot">-&gt;</span> builder ([<span class="st">&quot;-opt1&quot;</span>, <span class="st">&quot;-opt1-1&quot;</span>] <span class="op">++</span> options) <span class="co">-- opt' 결과가 Builder 타입 = [Options] -&gt; Config</span></span></code></pre></div>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>\options <span class="ot">-&gt;</span> builder ([<span class="st">&quot;-opt1&quot;</span>, <span class="st">&quot;-opt1-1&quot;</span>] <span class="op">++</span> options) </span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- opt' 결과가 Builder 타입 = [Options] -&gt; Config</span></span></code></pre></div>
 <p>그리고, 더 이상 연결할 옵션이 없을 때 완성된 <code>Config</code>를 뽑아내기 위해 <code>extract</code>를 만듭니다.</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ot">extract ::</span> <span class="dt">Builder</span> <span class="ot">-&gt;</span> <span class="dt">Config</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>extract builder <span class="ot">=</span> builder []</span></code></pre></div>
@@ -283,7 +284,7 @@ effect와 context를 구별해서 써야 합니다. 모나드는 effect가 있�
 A. 마치 <code>w a</code>에 <code>(w a -&gt; b)</code>를 바로 적용해도 될 것처럼 보입니다. 그런데, 그렇게 적용해 버리면 <code>b</code>가 나오고, 코모나드는 이 걸 <code>w b</code>로 만들 방법을 제공하지 않습니다. 그래서 컨텍스트를 유지한채로 적용하기 위해 <code>fmap</code>을 정의하면 <code>duplicate :: w a -&gt; w (w a)</code>가 필요한 모양이 나옵니다. (꼭, <code>w</code>가 새로 생기거나 하는 게 아니라, shift 하는 느낌입니다.)</p>
 </blockquote>
 <blockquote>
-<p>Q. <code>fmap</code>으로 적용해도 <code>w</code>가 없어지는 것 아닌가요?
+<p>Q. <code>fmap</code>으로 적용해도 <code>w</code>가 없어지는 것 아닌가요?<br />
 A. <code>m a</code>에서 <code>m</code>을 떼어내고 <code>a</code>를 반환하는 순간 <code>m</code>은 다시 살려낼 수 없습니다. 그런데 <code>fmap</code>도 내부 동작을 보면 패턴 매칭으로 <code>m</code>을 벗겨내고 있습니다. 하지만, 그 <code>m</code>은 스코프에 남아 있는 상태로 처리하고, <code>a</code>에 함수 적용을 마치고 난 후 그 걸 다시 가져와 합친 다음 반환합니다. 그래서, 이 걸 컨텍스트를 유지한다고 말합니다.</p>
 </blockquote>
 <h2 id="왜-a---w-a는-안되는데-w-a---w-w-a는-가능한가">왜 a -&gt; w a는 안되는데 w a -&gt; w (w a)는 가능한가?</h2>
@@ -356,6 +357,53 @@ A. <code>m a</code>에서 <code>m</code>을 떼어내고 <code>a</code>를 반�
 <a href="https://fmapfixreturn.wordpress.com/2008/07/09/comonads-in-everyday-life/">웹사이트 UI로 설명</a><br />
 <a href="https://bartoszmilewski.com/2017/01/02/comonads/">바르토즈 밀레위스키의 코모나드</a><br />
 <a href="http://comonad.com/reader/2018/the-state-comonad/">Comonad.com</a></p>
+<h2 id="모나드와-직관적인-비교">모나드와 직관적인 비교</h2>
+<p>수학에서 말하는 <strong>쌍대dual</strong>는 딱 부러지게 이해하거나, 설명하기가 어려운 것 같습니다. “화살표를 전부 뒤집으면 된다”라는 말로는 직관이 오지 않았습니다. 이를 이해해 보기 위해 아래같은 테스트를 해봤습니다. ※ 리스트는 <code>[]</code>에서 <code>extract</code>할 게 없어 코모나드가 정의되지 않아 <code>NonEmpty</code> 타입으로 테스트 했습니다.</p>
+<div class="sourceCode" id="cb33"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>λ&gt; import Data.List.NonEmpty</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>λ&gt; import Control.Monad</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>λ&gt; import Control.Comonad</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>λ&gt; join $ (1:|[2]):|[3:|[4]]</span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>1 :| [2,3,4]</span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>λ&gt; duplicate $ 1:|[2,3]</span>
+<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a>(1 :| [2,3]) :| [2 :| [3],3 :| []]</span>
+<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a>λ&gt; join $ duplicate $ 1:|[2,3]</span>
+<span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a>1 :| [2,3,2,3,3]</span></code></pre></div>
+<p><code>duplicate :: w a -&gt; w (w a)</code>와 <code>join :: m (m a) -&gt; m a</code>를 연속으로 하면 처음 <strong>구조</strong>로는 돌아 오지만, 완전히 값까지 같은 상태로 돌아 오진 않습니다.</p>
+<p><code>a -&gt; mb</code>, <code>b -&gt; mc</code> 두 개 작업이 실행되면 <code>m</code>이 두 번 생깁니다.<br />
+<strong>a</strong>에 둘을 적용해서 나온 <code>mmc</code>를 인위적으로 <code>join</code>해서 <strong>mc</strong>로 만듭니다.<br />
+<code>a ---------------&gt; mb</code></p>
+<p>마찬가지로<br />
+<code>wa -&gt; b</code>, <code>wb -&gt; c</code> 두 개 작업이 실행되면 <code>w</code>가 두 번 지워집니다.<br />
+<code>wa</code> 에서 <code>b</code>로 되면 다음 함수를 적용할 수 없습니다. 
+<strong>w</strong>(wa가 아니라 구조)를 인위적으로 <code>duplicate</code> 해놓고 <code>wa -&gt; b</code>를 적용한 후 이 duplicate 해 놨던 <code>w</code>를 붙여서 <code>wb -&gt; c</code>를 실행해서 <strong>c</strong>가 된다.<br />
+<code>wa ---------------&gt; c</code></p>
+<h2 id="적용의-체이닝">적용의 체이닝</h2>
+<p>정의, 값, 적용</p>
+<p>정보를<br />
+정의에 두는 방법<br />
+값으로 두는 방법<br />
+적용에 두는 방법<br />
+이 있다.</p>
+<p>값으로 두는 것이 아닌, 값일 것 같은 정보를 함수로 정의한다.<br />
+default 옵션을 값으로 두는 것이 아닌, 나중에 옵션을 받아 추가하는 함수로 <code>정의</code>한다.</p>
+<p>opt1 옵션을 지정하려면, 위에서 정의한 “default 내재 함수”를 받아, <code>적용</code>한다</p>
+<p><code>f a</code>는 <code>a</code>에 <code>f</code>를 적용하는 표현인데, 명시적으로 <strong>적용</strong>이 보이는 <code>$</code>에서 출발해 보자.</p>
+<p><strong>a-&gt;b, b-&gt;c 합성</strong>은, 적용을 주목해서 보면, 합성의 구현은
+b-&gt;c <code>$</code> (a-&gt;b <code>$</code> <code>id</code> a) <strong>적용</strong> <code>$</code>의 체이닝으로 볼 수 있다.</p>
+<div class="sourceCode" id="cb34"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>λ&gt; (+1) $ (+2) $ 3</span></code></pre></div>
+<p>모나드 <strong>a-&gt;mb, b-&gt;mc 합성</strong>은
+<code>return</code> a <code>&gt;&gt;=</code> a-&gt;mb <code>&gt;&gt;=</code> b-&gt;mc <strong>적용</strong> <code>&gt;&gt;=</code>의 체이닝</p>
+<div class="sourceCode" id="cb35"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>λ&gt; Just 3 &gt;&gt;= (\x -&gt; Just (x+1)) &gt;&gt;= (\x -&gt; Just (x+2))</span></code></pre></div>
+<p>코모나드 <strong>wa-&gt;b, wb-&gt;c 합성</strong>은
+wb-&gt;c <code>extend</code> (wa-&gt;b <code>extend</code> <code>duplicate</code> wa) <strong>적용</strong> <code>extend</code>의 체이닝</p>
+<div class="sourceCode" id="cb36"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>λ&gt; (\(Identity x) -&gt; x+1) `extend` (\(Identity x) -&gt; x+2) (duplicate (Identity 3))</span></code></pre></div>
+<p>Q. 어떤 경우에 <code>w</code>를 지우는, 정보를 지우는 게 의미가 있을까?<br />
+<code>w a -&gt; b</code>는 <code>w</code>가 어떤 정보를 가지고 있다. 이 정보를 그냥 지운다는 말이 아니라, 정보에 따라 <code>a</code>에게 어떤식으로든 영향을 주고 사라지는 액션이다.</p>
+<p><code>a -&gt; m b</code>는 나중에 <code>b</code>에 영향을 미치는 정보를 가지고 있게 하는 액션이다.</p>
+<p>Q. 왜 이펙트를 join하는 모나드의 듀얼이, 이펙트를 duplicate하는 것일까?</p>
 <section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes">
 <hr />
 <ol>
@@ -383,6 +431,23 @@ A. <code>m a</code>에서 <code>m</code>을 떼어내고 <code>a</code>를 반�
   <div id="footer">
     © 2025 lionhairdino. All rights reserved. Generated by <a href="http://jaspervdj.be/hakyll">Hakyll</a>
   </div>
+  <script language="javascript">
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("visible");
+        }
+      });
+    },{
+      root: null,
+      rootMargin: "0px 0px -30% 0px",
+      threshold: 0.5
+    });
+    document.querySelectorAll('em').forEach(elem => {
+      observer.observe(elem);
+    })
+  </script>
+
 </body>
 
 </html>

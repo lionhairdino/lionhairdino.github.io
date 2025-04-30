@@ -148,8 +148,22 @@
 </div>
 
 <p>뒤로 미뤄 두던 Nix를 결국 만져야 되는 상황이 왔습니다. 국내에도 쓰는 분들이 점점 늘어나는 추세인듯 하나, 한글 자료는 많지 않습니다. 아래는 전혀 완성되지 않은 글입니다. 아직 필요한 부분들을 확인하고 있는 중입니다. 아래는 순수하게 개인이 볼 노트인 상태로, 아직 다른 분들을 위해 정리하지 않았습니다. 주의해서 보세요.</p>
-<p>닉스는 패키지 빌드와 관리를 위한 도구라고 하는데, 더 줄여서 얘기하면, 빌드 추상 레이어입니다. 빌드한 패키지들을 저장소에 잘 쟁여두고, 또 빌드할 일이 생기면 캐시되어 있는 것들을 잘 활용하는 빌더입니다. 그리고, “패키지”만을 위한 빌더가 아닙니다. 무엇이든, 현실의 것들을 빌드하기 위해 필요한(의존하는) 무언가들을 먼저 준비하고, 환경 변수 같은 것들도 설정하며, 필요한 환경을 만듭니다. 이렇게 빌드에 필요한 지침을 모아 둔 것을 <strong>derivation</strong>이라 부릅니다. <strong>마치 현실의 모든 대상을 derivation으로 바꿔 모형 세계를 만드는 것과 비슷합니다.</strong> 예를 들어, A패키지를 빌드하기 위해 B패키지가 필요하고, C설정이 있어야 하며, D도구들이 있어야 빌드 및 개발할 수 있는 상태일 때, A,B,C,D 각각이 빌드가 필요한 것들이면, 그 것들 역시 derivation으로 표현합니다. 이들을 모아 “개발 환경 준비”를 하는데, 이 “개발 환경 준비”도 하나의 derivation으로 표현합니다. 패키지뿐만 아니라 무언가가 <strong>빌드</strong>라는 과정이 필요하다면, 닉스를 적용할 수 있을지도 모릅니다.</p>
+<p>닉스는 패키지 빌드와 관리를 위한 도구라고 하는데, 더 줄여서 얘기하면, 빌드 추상 레이어입니다. 빌드한 패키지들을 저장소에 잘 쟁여두고, 또 빌드할 일이 생기면 캐시되어 있는 것들을 잘 활용하는 빌더입니다. 그리고, “패키지”만을 위한 빌더가 아닙니다. 무엇이든, 현실의 것들을 빌드하기 위해 필요한(의존하는) 무언가들을 먼저 준비하고, 환경 변수 같은 것들도 설정하며, 필요한 환경을 만듭니다. 이렇게 빌드에 필요한 지침을 모아 둔 것을 <strong>derivation</strong>이라 부릅니다. <strong>마치 현실의 대상을 derivation으로 바꿔 모형 세계를 만드는 것과 비슷합니다.</strong> 예를 들어, A패키지를 빌드하기 위해 B패키지가 필요하고, C설정이 있어야 하며, D도구들이 있어야 빌드 및 개발할 수 있는 상태일 때, A,B,C,D 각각이 빌드가 필요한 것들이면, 그 것들 역시 derivation으로 표현합니다. 이들을 모아 “개발 환경 준비”를 하는데, 이 “개발 환경 준비”도 하나의 derivation으로 표현합니다. 패키지뿐만 아니라 무언가가 <strong>빌드</strong>라는 과정이 필요하다면, 닉스를 적용할 수 있을지도 모릅니다.</p>
 <p>닉스는 패키지 빌드에 필요한 모든 정보를 모아둔 derivation(일종의 명세서 같은 것)을 기반으로, <strong>빌드</strong>, <strong>개발 환경</strong>에 필요한 의존성들을 같이 관리하는 패키지 매니저입니다. derivation이 핵심 아이디어인데, 은근 오해하게 만드는 요소가 있어, 천천히 살펴 보도록 하겠습니다.</p>
+<p>※ <strong>닉스 생태계의 공식 홈</strong><br />
+nix 진영이 은근 <strong>nix</strong>와 <strong>nixos + nixpkgs</strong>가 나뉘어 있는 것 같습니다. (두 진영이 친하지 않다는 소문도 들어 봤습니다.) 아래 두 사이트가 공식 홈인데, 양 쪽 모두에 nix, nixos, nixpkgs 공식 매뉴얼이 있는 듯 하지만,</p>
+<p><a href="https://nixos.org">nixos.org</a> - <a href="https://nixos.org/manual/nixpkgs/stable">nixpkgs 공식 매뉴얼</a>, <a href="https://nixos.org/manual/nixos/stable">nixos 공식 매뉴얼</a><br />
+<a href="https://nix.dev">nix.dev</a> - <a href="https://nixos.org/manual/nix/stable">nix 공식 매뉴얼</a><br />
+</p>
+<p>위와 같이 각각 관리하고 있고, 서로 링크를 걸고 있습니다.<br />
+그런데, 혼란스럽게도 공식 리포는 모두 Github NixOS 계정 아래 있습니다.<br />
+</p>
+<p><a href="https://github.com/NixOS/nix">NixOS/nix</a><br />
+<a href="https://github.com/NixOS/nix.dev">NixOS/nix.dev</a><br />
+<a href="https://github.com/NixOS/nixpkgs">NixOS/nixpkgs</a><br />
+(NixOS는 nixpkgs에서 같이 관리하는 것으로 보입니다.)</p>
+<p>구글링으로 막 검색해서 공식 자료들을 볼 때 좀 산만한 느낌이 드는 이유가 이래서 그랬나 봅니다. NixOS를 쓰지 않고, Nix 패키지 매니저만 쓴다해도, nixpkgs 관련 자료를 봐야 하니, NixOS쪽 자료들도 같이 보게 됩니다.</p>
+<p>이런 닉스 진영의 굵직한 기둥들의 배치를 먼저 알고 입문해도 좋겠습니다.</p>
 <h2 id="문서-찾기">문서 찾기</h2>
 <p>어느 문서를 보며 시작할까 고민이 됐었는데요. <a href="https://github.com/nix-community">nix-community</a>를 방문하면, 커뮤니티에서 관리하는 리포들을 볼 수 있는데, 이 중 볼만한 문서들을 추려놓은 <a href="https://github.com/nix-community/awesome-nix">awesome-nix</a>에서 적당한 것을 고르면 되겠습니다. 저는 <a href="https://nixos.org/guides/nix-pills/">Nix-pills</a>를 골랐는데, 잘 고른 것 같습니다.</p>
 <h2 id="생각-스트레칭">생각 스트레칭</h2>
@@ -635,10 +649,12 @@ nix store에 빌드 결과물을 저장하고, 해당 결과물을 심볼릭 링
 <span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a>  <span class="op">...</span></span>
 <span id="cb50-5"><a href="#cb50-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
 <p>※ 왜 용어로 derivation을 골랐을까?<br />
-derive라 하면 무언가를 만드는 과정에서 튕겨져 나온 결과물 같은 느낌입니다. 예를 들어 <code>A</code>,<code>B</code>,<code>C</code>로 결과물<code>가</code>를 만드는데, <code>A</code>,<code>b</code>,<code>C</code>로 조금 설정을 바꾸면 다른 결과물 <code>나</code>가 나오는 걸 상상할 수 있습니다. 이럴 때 <code>나</code>는 파생물(유도물)이라 불러도 될 것 같습니다.</p>
-<p>우리말로 하면 파생문, 유도문 정도 되겠지만, 익숙하지 않으니 일단은 안쓰기로 합니다. 고유한 개념을 지칭하는 거라 번역 안하는 게 맞을 것 같기도 합니다. 만일 번역한다 해도, 파생<strong>물</strong>, 유도<strong>물</strong>이 아닌 이유는 이들이 패키지 본체가 아니어서, <strong>문</strong>이 더 어울립니다.</p>
+derive라 하면 무언가를 만드는 과정에서 가지쳐 나온 결과물 같은 느낌입니다. 예를 들어 <code>A</code>,<code>B</code>,<code>C</code>로 결과물<code>가</code>를 만드는데, <code>A</code>,<code>b</code>,<code>C</code>로 조금 설정을 바꾸면 다른 결과물 <code>나</code>가 나오는 걸 상상할 수 있습니다. 이럴 때 <code>나</code>는 파생물이라 불러도 될 것 같지만, 조금 어색합니다.</p>
+<p>우리말로 하면 파생문, 유도문 정도 되겠지만, 익숙하지 않으니 일단은 안쓰기로 합니다. 고유한 개념을 지칭하는 거라 번역 안하는 게 맞을 것 같기도 합니다.</p>
 <p>원래 이펙트 가득한 패키지 빌드를 단순히 집합(혹은 리스트)으로 표현하고 있어 보통의 값처럼 함수 인자로 넘기고, 결과로 출력할 수 있습니다. 당연한 듯 보이는 이 문장에 닉스의 핵심 아이디어가 들어가 있습니다. <strong><em>패키지 빌드에 꼭 개입해야 하는 이펙트들을 나몰라라 하고 순수하게 조합하다가, 조합이 끝나서 패키지를 빌드해야 되는 순간이 오면 그 때 realize해서 패키지가 되도록 합니다.</em></strong> 마치, 모나드들의 runner처럼 볼 수 있습니다.</p>
-<p>NixOS.kr에 올렸던 내용을 추가합니다.</p>
+<p>추가 - 몇 달 공부하다 보니, 만일 <strong>derivation</strong>의 번역어가 자리 잡는다면, 파생물보다는, <strong>유도문</strong>이 더 뜻을 잘 표현하지 않나 혼자 생각입니다. 닉스 패키지 매니저에서 derivation은 “부산”물이 아닌 주인공으로, 가지쳐서 나온다는 느낌의 파생과 다른 느낌입니다. 유도”<strong>물</strong>”이 아닌 “<strong>문</strong>”인 이유는, derivation은 실체라기보단, 실체를 선언해 놓은 문서에 가까운 느낌입니다.</p>
+<p>비유하자면, 화살표 <strong>유도등</strong>을 따라가다 보면, 목적지(패키지)에 도달합니다.<br />
+NixOS.kr에 올렸던 내용을 추가합니다.</p>
 <p><a href="https://github.com/NixOS/nix/blob/cb972c789a9fd458c7e09d82c116842552dc4bbd/tests/functional/shell.nix#L125">callPackage = f: args: f (pkgs // args);</a><br />
 Nix Pills에선 좀 더 설명적인 코드로 예를 들어 줍니다.<br />
 <a href="https://nixos.org/guides/nix-pills/13-callpackage-design-pattern.html#implementing-callpackage">callPackage = set: f: overrides: f ((builtins.intersectAttrs (builtins.functionArgs f) set) // overrides)</a></p>
@@ -826,7 +842,7 @@ derivation을 해석해서 패키지 자체가 아니라, 개발 환경에 필�
 <span id="cb70-7"><a href="#cb70-7" aria-hidden="true" tabindex="-1"></a>  <span class="va">hello</span> <span class="op">=</span> pkgs.callPackage <span class="ss">./hello.nix</span> <span class="op">{</span> <span class="op">};</span></span>
 <span id="cb70-8"><a href="#cb70-8" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
 <p><code>callPackage</code>가 <code>hello.nix</code> 파일이 돌려주는 “함수”가 필요로 하는 인자값 <code>stdenv</code>, <code>fetchzip</code>을 넣어 줍니다. 값을 넣어 주면, 또 함수를 돌려 주는데, 거기에 <code>{ }</code>를 넘기고 있습니다.</p>
-<p><code>callPackage</code>함수는 <code>derivation</code> 생성 함수를 <strong>호출</strong>하는 함수입니다. 인자로 받은 표현식(위에선 파일이 가진 <code>derivation</code> 함수)를 실행해서 최종 derivation을 얻습니다. <code>derivation</code>함수가 필요로 하는 <code>stdenv</code>, <code>gcc</code> 같은 걸 자동으로 전달합니다. 패키지를 호출한다는 이름이 어색하긴 한데, 패키지 derivation을 정의하는 <code>derivation</code> 함수를 호출한다고 보면 됩니다.</p>
+<p><code>callPackage</code>함수는 <code>derivation</code> 생성 함수를 <strong>호출apply</strong>하는 함수입니다. 인자로 받은 표현식(위에선 파일이 가진 <code>derivation</code> 함수)를 실행해서 최종 derivation을 얻습니다. <code>derivation</code>함수가 필요로 하는 <code>stdenv</code>, <code>gcc</code> 같은 걸 자동으로 전달합니다. 패키지를 호출한다는 이름이 어색하긴 한데, 패키지 derivation을 정의하는 <code>derivation</code> 함수를 호출한다고 보면 됩니다.</p>
 <p><a href="https://github.com/NixOS/nixpkgs/blob/cdd2ef009676ac92b715ff26630164bb88fec4e0/lib/customisation.nix#L110">lib.costomisation.nix</a></p>
 <div class="sourceCode" id="cb71"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a>callPackage = callPackageWith pkgs; <span class="co"># 아래 autoArgs를 pkgs로 고정하는 래퍼 </span></span>
 <span id="cb71-2"><a href="#cb71-2" aria-hidden="true" tabindex="-1"></a>callPackageWith = <span class="va">autoArgs</span><span class="op">:</span> <span class="va">fn</span><span class="op">:</span> <span class="va">args</span><span class="op">:</span> ... mkAttrOverridable f allargs;</span></code></pre></div>
@@ -1241,6 +1257,23 @@ nix build -f '&lt;nixpkgs&gt;' &lt;패키지명&gt;</code></pre>
   <div id="footer">
     © 2025 lionhairdino. All rights reserved. Generated by <a href="http://jaspervdj.be/hakyll">Hakyll</a>
   </div>
+  <script language="javascript">
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("visible");
+        }
+      });
+    },{
+      root: null,
+      rootMargin: "0px 0px -30% 0px",
+      threshold: 0.5
+    });
+    document.querySelectorAll('em').forEach(elem => {
+      observer.observe(elem);
+    })
+  </script>
+
 </body>
 
 </html>
