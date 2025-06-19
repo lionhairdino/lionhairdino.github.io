@@ -149,9 +149,9 @@
 
 <p>펑터와 Applicatives가 왜 필요했는지 비수학적으로 풀어 봤습니다. 아래가 가장 좋은 이해 방법이라 주장하는 건 아닙니다. 이렇게도 생각해 볼 수 있다 정도로 받아들이시면 좋겠습니다.</p>
 <h2 id="가장-기본적인-적용">가장 기본적인 적용</h2>
-<p>면세점에서 옷을 팔면서, 환율을 적용한 가격표를 붙이는 걸 상상해 보겠습니다.</p>
+<p>면세점에서 옷을 팔면서, 환율을 적용한 가격표와 그렇지 않은 가격표를 붙이는 걸 상상해 보겠습니다. 먼저 보통의 고정된 가격표입니다.</p>
 <pre><code>type Price = Int</code></pre>
-<p>티셔츠를 50프로 할인 금액을 붙이고 싶습니다.</p>
+<p>50프로 할인 금액을 붙이고 싶습니다.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>half <span class="ot">=</span> \price <span class="ot">-&gt;</span> price <span class="op">*</span> (<span class="dv">1</span><span class="op">/</span><span class="dv">2</span>)</span></code></pre></div>
 <p>특별할 것 없이 함수를 가격에 적용하면 됩니다.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>half <span class="op">$</span> price</span></code></pre></div>
@@ -162,26 +162,25 @@
 <p>이제 가격표를 붙이는데, 고정된 금액 <code>Price</code>가 아니라, 시시각각 변하는 환율<code>exRate</code>을 넣으면 값이 되는 <code>exRate -&gt; Price</code>로 붙이는 걸 가정하겠습니다. 똑똑한 전자 가격표쯤으로 보겠습니다.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">ExRatePrice</span> <span class="ot">=</span> <span class="dt">ExRatePrice</span> (exRate <span class="ot">-&gt;</span> <span class="dt">Int</span>)</span></code></pre></div>
 <p>위에서 정의했던 <code>half</code> 함수를, 가격이 변동되게 적용하려면 <code>$</code>만으론 적용할 수 없게 됐습니다.
-먼저 환율 <code>exRate</code>를 <code>exRate -&gt; Price</code> 함수에 넣고 나온 결과에 <code>half</code>를 적용해야 합니다.</p>
+먼저 환율 <code>exRate</code>를 <code>exRate -&gt; Price</code> 함수에 넣고 나온 결과 <code>Price</code>에 <code>half</code>를 적용해야 합니다.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>f <span class="op">&lt;$&gt;</span> (<span class="dt">ExRatePrice</span> ep) <span class="ot">=</span> <span class="dt">ExRatePrice</span> (\exRate <span class="ot">-&gt;</span> f <span class="op">.</span> ep <span class="op">$</span> exRate)</span></code></pre></div>
-<p>환율을 적용하면 값이 되는 <code>ExRatePrice</code>타입이 가진 함수 <code>ep</code>를 환율에 적용하고, 결과에 <code>half</code>같은 함수를 적용하는 걸, 함수 합성<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> <code>f . ep</code>로 표현하고 있습니다.
-이제 50프로 할인 가격은 다음처럼 붙이면 됩니다.</p>
+<p>“환율을 적용하면 값이 되는” <code>ExRatePrice</code>타입이 가진 함수 <code>ep</code>를 환율에 적용하고, 결과에 <code>half</code>같은 함수를 적용하는 걸, 함수 합성<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> <code>f . ep</code>로 표현하고 있습니다. 이제 50프로 할인 가격은 다음처럼 붙이면 됩니다.</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>half <span class="op">&lt;$&gt;</span> exRatePrice</span></code></pre></div>
-<p><code>half</code>를 <code>ExRatePrice</code>에 적용하기 위해, <code>half</code>를 재정의하지 않고, <code>half</code>를 <strong><em>적용</em></strong>하는 <code>$</code>를 재정의 했습니다.
-## Applicatives의 적용
-다음으로, 티셔츠와 바지를 합산하려면?<br />
+<p><code>half</code>를 <code>ExRatePrice</code>에 적용하기 위해, <code>half</code>를 재정의하지 않고, <code>half</code>를 <strong><em>적용</em></strong>하는 <code>$</code>를 재정의 했습니다.</p>
+<h2 id="applicatives의-적용">Applicatives의 적용</h2>
+<p>다음으로, 티셔츠와 바지를 합산하려면?<br />
 <code>Int</code> 두 개를 받아 더하는 <code>+</code> 함수를 두 개의 <code>ExRatePrice</code>에 적용해야 합니다.</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>tep <span class="ot">=</span> \exRate <span class="ot">-&gt;</span> exRate <span class="op">*</span> t<span class="op">-</span>price</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>pep <span class="ot">=</span> \exRate <span class="ot">-&gt;</span> exRate <span class="op">*</span> p<span class="op">-</span>price</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="dt">ExRatePrice</span> tep <span class="op">+</span> <span class="dt">ExRatePrice</span> pep</span></code></pre></div>
-<p><code>(+)</code>는 <code>Price</code>(<code>Int</code>타입)에 적용하는 함수라, 이렇게는 사용할 수 없습니다.
+<p><code>(+)</code>는 <code>Price</code>(<code>Int</code>타입)에 적용하는 함수라, 이렇게는 사용할 수 없습니다.<br />
 <code>(+)</code>를 <code>\a -&gt; (\b -&gt; a + b)</code>로 커링해서, 위에서 정의한 <code>&lt;$&gt;</code>를 적용해 보겠습니다.</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>(<span class="op">+</span>) <span class="op">&lt;$&gt;</span> (<span class="dt">ExRatePrice</span> tep)</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="ot">=</span> <span class="dt">ExRatePrice</span> (\exRate <span class="ot">-&gt;</span> (\a <span class="ot">-&gt;</span> (\b <span class="ot">-&gt;</span> a <span class="op">+</span> b)) <span class="op">.</span> tep <span class="op">$</span> exRate)</span></code></pre></div>
 <p>이제 티셔츠 가격이 먼저 적용된 <code>+</code>를 가진, <code>ExRatePrice (\exRate -&gt; (\b -&gt; (t-price * exRate) + b))</code>를 <code>ExRatePrice pep</code>에 적용하는 미션이 됐습니다.</p>
 <p>컨텍스트가 없는 함수를 컨텍스트가 있는 값에 적용할 때 <code>&lt;$&gt;</code>를 썼는데,<br />
-컨텍스트가 있는 함수를 컨텍스트가 있는 값에 적용하는 방법이 필요해졌습니다.</p>
+<strong>컨텍스트가 있는 함수</strong>를 <strong>컨텍스트가 있는 값</strong>에 적용하는 방법이 필요해졌습니다.</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>f <span class="op">&lt;*&gt;</span> <span class="dt">ExRatePrice</span> tep <span class="op">&lt;$&gt;</span> <span class="dt">ExRatePrice</span> pep <span class="ot">=</span> \exRate <span class="ot">-&gt;</span> (\b <span class="ot">-&gt;</span> f (tep exRate) b) <span class="op">.</span> pep exRate</span></code></pre></div>
 <p>위와 같이 <code>&lt;*&gt;</code>를 정의하면,</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>(<span class="op">+</span>) <span class="op">&lt;*&gt;</span> <span class="dt">ExRatePrice</span> tep <span class="op">&lt;$&gt;</span> <span class="dt">ExRatePrice</span> pep</span></code></pre></div>
@@ -191,7 +190,7 @@
 <p>각 상황에서의 “적용” 모습을 모아서 보겠습니다.</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>                   half  <span class="op">$</span>  price           <span class="co">--                                  함수를 값에 적용</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>                   half <span class="op">&lt;$&gt;</span> exRatePrice     <span class="co">--                  함수를 컨텍스트를 가진 값에 적용</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>                   half <span class="op">&lt;$&gt;</span> <span class="dt">ExRatePrice</span> ep  <span class="co">--                  함수를 컨텍스트를 가진 값에 적용</span></span>
 <span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>(<span class="op">+</span>) <span class="op">&lt;*&gt;</span> <span class="dt">ExRatePrice</span> tep <span class="op">&lt;$&gt;</span> <span class="dt">ExRatePrice</span> pep <span class="co">-- 컨텍스트를 가진 함수를, 컨텍스트를 가진 값에 적용</span></span></code></pre></div>
 <p>각 상황에 맞는 연산자를 정의하니, “적용” 모양이 닮아 보이지 않나요?</p>
