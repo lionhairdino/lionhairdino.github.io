@@ -163,7 +163,7 @@
 <p>티셔츠와 바지를 산 경우 이를 합산하려면, 그냥 더하면 됩니다.</p>
 <pre><code>sum = t-price + p-price</code></pre>
 <h2 id="펑터의-적용">펑터의 적용</h2>
-<p>이제 가격표를 붙이는데, 고정된 금액 <code>Price</code>가 아니라, 시시각각 변하는 환율<code>exRate</code>을 넣으면 값이 되는 <code>exRate -&gt; Price</code>로 붙이는 걸 가정하겠습니다. 똑똑한 전자 가격표쯤으로 보겠습니다.</p>
+<p>이제 가격표를 붙이는데, 고정된 금액 <code>Price</code>가 아니라, 시시각각 변하는 환율<code>exRate</code>을 넣으면 값이 되는 <code>ExRate -&gt; Price</code>로 붙이는 걸 가정하겠습니다. 똑똑한 전자 가격표쯤으로 보겠습니다.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">ExRate</span> <span class="ot">=</span> <span class="dt">Double</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">ExRatePrice</span> a <span class="ot">=</span> <span class="dt">ExRatePrice</span> (<span class="dt">ExRate</span> <span class="ot">-&gt;</span> a)</span></code></pre></div>
 <p>위에서 정의했던 <code>half</code> 함수를, 가격이 변동되게 적용하려면 <code>$</code>만으론 적용할 수 없게 됐습니다.
@@ -195,16 +195,16 @@
 <p>각 상황에서의 “적용” 모습을 모아서 보겠습니다.</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>                   half  <span class="op">$</span>  price           <span class="co">--                            함수를 값에 적용</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>                   half <span class="op">&lt;$&gt;</span> <span class="dt">ExRatePrice</span> ep  <span class="co">--              함수를 컨텍스트를 가진 값에 적용</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>                   half <span class="op">&lt;$&gt;</span> <span class="dt">ExRatePrice</span> ep  <span class="co">--                함수를 컨텍스트를 가진 값에 적용</span></span>
 <span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>(<span class="op">+</span>) <span class="op">&lt;*&gt;</span> <span class="dt">ExRatePrice</span> tep <span class="op">&lt;$&gt;</span> <span class="dt">ExRatePrice</span> pep <span class="co">-- 컨텍스트를 가진 함수를, 컨텍스트를 가진 값에 적용</span></span></code></pre></div>
 <p>각 상황에 맞는 연산자를 정의하니, “적용” 모양이 닮아 보이지 않나요?</p>
 <p><strong><em>목표는 Price의 구조가 ExRatePrice 구조에도 그대로 살아 있기 때문에 (닮았기 때문에),<br />
-Price를 다루는 모양과, ExRatePrice를 다루는 모양을 비슷하게(혹은 같게) 만드는 것입니다</em></strong></p>
+Price를 다루는 코드 모양과, ExRatePrice를 다루는 코드 모양을 비슷하게(혹은 같게) 만드는 것입니다</em></strong></p>
 <p>이 글을 읽고나서,</p>
 <ul>
-<li><code>(+) &lt;*&gt; ExRatePrice tep &lt;$&gt; ExRatePrice pep</code> 같은 것들을 보면, 컨텍스트를 처리하며(컨텍스트가 살아 있는 상태에서) <code>(+)</code>를 하고 있구나,</li>
-<li>“Applicatives 인스턴스가 있다”는 말이 보이면, 다인자 함수도 “적용”할 수 있는 구조구나,</li>
+<li><code>(+) &lt;*&gt; ExRatePrice tep &lt;$&gt; ExRatePrice pep</code> 같은 것들을 보면, 컨텍스트를 처리하며(컨텍스트가 있는 상태에서) <code>(+)</code>를 하고 있구나,</li>
+<li>“Applicatives 인스턴스가 있다”는 말이 보이면, 다인자 함수도 컨텍스트가 있는 상태에서 “적용”할 수 있는 구조구나,</li>
 </ul>
 <p>로 읽을 수 있길 바랍니다.</p>
 <h2 id="그-다음은">그 다음은…</h2>
