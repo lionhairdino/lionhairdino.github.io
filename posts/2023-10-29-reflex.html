@@ -150,6 +150,61 @@
 <p><a href="https://reflex-frp.org/">Reflex 공식 사이트</a><br />
 <a href="http://docs.reflex-frp.org/en/latest/reflex_docs.html">Reflex 공식 문서</a></p>
 <p>앱 만들기를 빠르게 시작하려면 Obelisk를 쓰든가, reflex-platform을 씁니다.</p>
+<p><span class="citation" data-cites="TODO">@TODO</span>: Obelisk와 reflex-platform의 역할</p>
+<p>의외로 Obelisk, reflex-platform, Reflex-DOM 안 쓰는 순수 Reflex 예시를 찾기 어려웠습니다. 아래는 Reflex만 쓰는 예시긴 한데, 실행하기 위한 Reflex 환경을 잡는데, reflex-platform의 <code>./try-reflex</code>를 실행하는 게 편합니다. 환경이 준비된 쉘로 들어가서 <code>runghc only-reflex.hs</code>로 실행하면 됩니다.</p>
+<ul>
+<li><code>newEventWithTriggerRef</code> : 이벤트를 만들고, 트리거를 Ref에 저정합니다.</li>
+<li><code>runHostFrame</code> : 이벤트와 Behavior를 엮어 만들어 둔 코드 덩어리를 한 번 실행하는 걸 Frame이라 부릅니다. 시작점이 되는 이벤트가 발생하면, 이 Frame이 한 번 실행되는데, 이벤트 없이 강제로 시작할 때 씁니다. (하스켈에서 <code>run</code> 접두어가 붙은 것들은, 준비해 두었던 코드 덩어리가 현실과 연결되는 것처럼 보면 편할 때가 많습니다.)</li>
+<li><code>sample</code>: Behavior가 가진 값을 가져옵니다.</li>
+<li><code>fireEvents</code>: 이벤트를 발생시킵니다.</li>
+<li><code>foldDyn</code>: <code>fireEvents</code>가 이벤트를 발생시키면, <code>foldDyn</code>같은 것들이 반응합니다.</li>
+</ul>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- only-reflex.hs</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ot">{-# LANGUAGE RankNTypes #-}</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="kw">module</span> <span class="dt">Main</span> <span class="kw">where</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Reflex</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Reflex.Host.Class</span> (newEventWithTriggerRef, runHostFrame, fireEvents)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Control.Concurrent</span> (forkIO)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Control.Monad</span> (forever)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Control.Monad.Fix</span> (<span class="dt">MonadFix</span>)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Control.Monad.Identity</span> (<span class="dt">Identity</span>(..))</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Control.Monad.IO.Class</span> (liftIO)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Data.IORef</span> (readIORef)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Data.Dependent.Sum</span> (<span class="dt">DSum</span> ((:=&gt;)))</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">System.IO</span> (hSetEcho, hSetBuffering, stdin, <span class="dt">BufferMode</span> (<span class="dt">NoBuffering</span>))</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">TypingApp</span> t m <span class="ot">=</span> (<span class="dt">Reflex</span> t, <span class="dt">MonadHold</span> t m, <span class="dt">MonadFix</span> m)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>                  <span class="ot">=&gt;</span> <span class="dt">Event</span> t <span class="dt">Char</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>                  <span class="ot">-&gt;</span> m (<span class="dt">Behavior</span> t <span class="dt">String</span>)</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="ot">host ::</span> (<span class="kw">forall</span> t m<span class="op">.</span> <span class="dt">TypingApp</span> t m) <span class="ot">-&gt;</span> <span class="dt">IO</span> ()</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>host myGuest <span class="ot">=</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>  runSpiderHost <span class="op">$</span> <span class="kw">do</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    (e, eTriggerRef) <span class="ot">&lt;-</span> newEventWithTriggerRef</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>    b <span class="ot">&lt;-</span> runHostFrame <span class="op">$</span> myGuest e</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>    forever <span class="op">$</span> <span class="kw">do</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>      input <span class="ot">&lt;-</span> liftIO <span class="fu">getChar</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>      liftIO <span class="op">$</span> <span class="fu">putStrLn</span> <span class="op">$</span> <span class="st">&quot;Input Event: &quot;</span> <span class="op">++</span> <span class="fu">show</span> input</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>      mETrigger <span class="ot">&lt;-</span> liftIO <span class="op">$</span> readIORef eTriggerRef</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>      <span class="kw">case</span> mETrigger <span class="kw">of</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>        <span class="dt">Nothing</span> <span class="ot">-&gt;</span> <span class="fu">return</span> ()</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>        <span class="dt">Just</span> eTrigger <span class="ot">-&gt;</span> fireEvents [eTrigger <span class="op">:=&gt;</span> <span class="dt">Identity</span> input]</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>      output <span class="ot">&lt;-</span> runHostFrame <span class="op">$</span> sample b</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>      liftIO <span class="op">$</span> <span class="fu">putStrLn</span> <span class="op">$</span> <span class="st">&quot;Output Behavior: &quot;</span> <span class="op">++</span> <span class="fu">show</span> output</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a><span class="ot">guest ::</span> <span class="dt">TypingApp</span> t m</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>guest e <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>  d <span class="ot">&lt;-</span> foldDyn (<span class="op">:</span>) [] e</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span> <span class="op">$</span> <span class="fu">fmap</span> <span class="fu">reverse</span> <span class="op">$</span> current d</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">putStrLn</span> <span class="st">&quot;Welcome to the example Reflex host app; press Ctrl+C to exit&quot;</span></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>  <span class="fu">putStrLn</span> <span class="st">&quot;Press any key to process it with the Reflex FRP engine&quot;</span></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>  hSetEcho stdin <span class="dt">False</span></span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>  hSetBuffering stdin <span class="dt">NoBuffering</span></span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>  host guest</span></code></pre></div>
 <h2 id="obelisk">Obelisk</h2>
 <p><a href="https://github.com/obsidiansystems/obelisk">obsidiansystems/obelisk</a><br />
 고퀄의 웹, 모바일 앱을 Reflex를 써서 매우 빠르게 만들 수 있다고 합니다. 아직은 제대로 안 써봐서 얼마나 빠르게 만들 수 있을까 싶습니다. 같은 하스켈 코드로 Web, iOS, Android, MacOS, Linux에서 돌아가게 만들 수 있다고 하니, 일단 눈이 갑니다.</p>
@@ -210,20 +265,20 @@ DOM 위젯, 웹 소켓, XHR 요청을 만들기 위한 API를 제공합니다.</
 <p>이론에 대한 설명은 딱히 같이 하지 않아, Reflex만 보는 분들은 다른 쪽(FRAN, Yampa, reactive-banana, …) 문서들을 참고해야겠습니다.</p>
 <p><strong>Behavior</strong><br />
 시간에 따라 변하는 값을 위한 컨테이너. 샘플링할 수는 있지만, 자신이 변한다고 외부에 알릴 방법은 없습니다.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Behavior</span> t a</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Behavior</span> t a</span></code></pre></div>
 <p>모든 시간에 값이 존재해야 하는데, 만일 그렇지 않은 값을 <code>Behavior</code>로 모델링 한다면 <code>Behavior t (Maybe a)</code>를 써야 합니다. Behavior 값들은 <code>tag</code>나 <code>attach</code> 함수를 써서 Event로 태깅할 수 있습니다. 처음 생성할 때 <code>sample</code> 함수를 쓰면 위젯 안에서 샘플링될 수 있습니다.</p>
 <p>※ 태깅tagging - 이벤트가 발생하는 순간 Behavior의 값을 이벤트에 넣는 것.</p>
 <p><strong>Event</strong></p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Event</span> t a</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Event</span> t a</span></code></pre></div>
 <p>예시) 버튼 클릭 <code>Event t ()</code>, 키 누름 <code>Event t Char</code></p>
 <p>실 구현말고, 의미적으론 <code>[(t, a)]</code>로 생각할 수 있습니다.</p>
 <p>다른 프레임워크에서 이벤트 네트워크라 부르는 걸, 여기선 이벤트-전파-그래프라 부릅니다. 외부 값(외부 이벤트)을 이벤트-전파-그래프에 넣을 때는 <code>newTriggerEvent</code> IO 액션을 씁니다.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ot">newTriggerEvent ::</span> <span class="dt">TriggerEvent</span> t m <span class="ot">=&gt;</span> m (<span class="dt">Event</span> t a, a <span class="ot">-&gt;</span> <span class="dt">IO</span> ())</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ot">newTriggerEvent ::</span> <span class="dt">TriggerEvent</span> t m <span class="ot">=&gt;</span> m (<span class="dt">Event</span> t a, a <span class="ot">-&gt;</span> <span class="dt">IO</span> ())</span></code></pre></div>
 <p><strong>Dynamic</strong><br />
 Event와 Behavior를 튜플에 담아 둔 것</p>
 <p>DOM API는 기본적으로 push-기반입니다. 그래서 Behavior를 쓸 곳에 Dynamic을 쓰는 경우가 많습니다.</p>
 <p><code>Dynamic</code>값에 <code>updated</code>를 적용해서, 값이 변했을 때 이벤트를 얻을 수 있습니다.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ot">updated ::</span> (<span class="dt">Reflex</span> t) <span class="ot">=&gt;</span> <span class="dt">Dynamic</span> t a <span class="ot">-&gt;</span> <span class="dt">Event</span> t a</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ot">updated ::</span> (<span class="dt">Reflex</span> t) <span class="ot">=&gt;</span> <span class="dt">Dynamic</span> t a <span class="ot">-&gt;</span> <span class="dt">Event</span> t a</span></code></pre></div>
 <p>타임라인 <code>t</code>는 FRP 컨텍스트와 별 개입니다. 단일 프로그램이 Reflex를 여러 컨텍스트에서 돌릴 경우 꼬이지 않게 해줍니다.?</p>
 <h2 id="reflex-dom-앱의-아키텍처">Reflex-DOM 앱의 아키텍처</h2>
 <p>위젯과 위젯들을 연결하는 접착glue 코드로 구성됩니다. 위젯은 Event나 Dynamic value에 따라 컨텐츠를 수정할 수 있는 능력을 가진 DOM 구조의 무언가로 볼 수 있습니다. 이벤트를 발생시키는 input field 같은 구조들도 있습니다. 위젯들은 마우스 클릭같은 사용자 인터랙션에 반응할 수 있습니다. (이 걸 위젯이 마우스 클릭을 캡처한다고 말하기도 합니다.)</p>
@@ -234,8 +289,153 @@ Event와 Behavior를 튜플에 담아 둔 것</p>
 ghc같은 컴파일러</p>
 <p><strong>ghcjs-dom</strong><br />
 DOM과 웹API와 쓰일 인터페이스 API를 제공하는 라이브러리</p>
+<p>Reflex-Dom 예시를 보여주는 여러 페이지가 있지만, 아래 문서가 가장 보기 편했습니다. Html에 있는 엘리먼트와 대응되는 코드들을 하나 하나 예시를 들어 친절하게 설명합니다.<br />
+<a href="https://github.com/hansroland/reflex-dom-inbits/blob/master/tutorial.md">A Beginner-friendly Step by Step Tutorial for Reflex-Dom</a></p>
 <h2 id="webkit">Webkit</h2>
 <p>KDE의 KHTML과 KJS에 파생된 웹 컨텐트 엔진. Apple 사파리 브라우저에 쓰입니다. HTML, SVG, XML 등을 디스플레이할 때 쓰입니다. DOM, XMLHttpRequest, XSLT, CSS, Javascript/ECMAscript 등을 지원합니다.</p>
+<h2 id="데이터-흐름-아이디어만-보기-위한-모형-코드">※ 데이터 흐름 아이디어만 보기 위한 모형 코드</h2>
+<p>어디 있는 코드를 옮긴 게 아니고, 직접 작성한 코드며, 문제가 많은 코드입니다. 오직 Event, Behavior 흐름만 보기 위한 모형 코드입니다. <strong>Reflex 실제 구현과는 전혀 무관</strong>하게, 아주 간단하게 (실용으로 쓸 수 없는 방식) 루프돌며 폴링하는 것으로 구현해서 데이터 흐름 아이디어만 봤습니다. FRP의 Event, Behavior 조합Combination 능력도 빠져 있으니, FRP 라기 보단, F빠진 RP 아이디어만 봤다고 해야겠습니다.</p>
+<p>각 독립된 루프 하나 하나가 봉화처럼 느껴집니다. 봉화를 바라보는 봉화를 두어 데이터가 흘러갑니다. 실제 동작과 좀 더 유사한 비유를 하자면, 플래시를 깜빡여서 신호를 보내면, 다른 곳에서 받아 깃발을 바꿔 놓고, 플래시를 또 깜빡입니다. 깜빡이는 플래시는 순간적으로만 존재하지만, 깃발은 언제든 필요하면 현재 상태를 알 수 있습니다. 플래시가 Event이고 깃발이 Dynamic 입니다.</p>
+<p>사이드 이펙트로 꽉 채운 함수형스럽지 못한 코드지만, 데이터 흐름은 잘 보이는 것 같아, 일단 버리지 않고 올려 놓습니다.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- MiniReflex.hs</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="ot">{-# LANGUAGE GeneralizedNewtypeDeriving #-}</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="kw">module</span> <span class="dt">MiniReflex</span> <span class="kw">where</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Control.Concurrent</span> (threadDelay, forkIO)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Control.Monad</span> (forever, void)</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Data.IORef</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Control.Monad.IO.Class</span> (<span class="dt">MonadIO</span>(..))</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Control.Monad</span> (when)</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Control.Monad.Fix</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">System.IO.Unsafe</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Debug.Trace</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="co">-- 이벤트가 발생하면 Just a, 아니면 Nothing</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">Event</span> a <span class="ot">=</span> <span class="dt">Event</span> {<span class="ot"> unEvent ::</span> <span class="dt">IORef</span> (<span class="dt">Maybe</span> a) } </span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Functor</span> <span class="dt">Event</span> <span class="kw">where</span></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- 이벤트가 들고 있는 값을 변형하는 역할을 펑터로 표현한다.</span></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- 실용 코드에선 unsafePerformIO를 함부로 쓰면 안된다.</span></span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmap</span> f (<span class="dt">Event</span> ref) <span class="ot">=</span> <span class="dt">Event</span> <span class="op">$</span> unsafePerformIO <span class="op">$</span> <span class="kw">do</span></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>    val <span class="ot">&lt;-</span> readIORef ref </span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>    <span class="kw">case</span> val <span class="kw">of</span></span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>      <span class="dt">Just</span> v <span class="ot">-&gt;</span> <span class="kw">do</span></span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>        traceM (<span class="st">&quot;Just&quot;</span>)</span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>        newIORef (<span class="dt">Just</span> (f v))</span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>      <span class="dt">Nothing</span> <span class="ot">-&gt;</span> <span class="kw">do</span></span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>        newIORef <span class="dt">Nothing</span></span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a><span class="co">-- 실제 Dynamic은 변경될 때 이벤트를 발생시킬 수 있는데, </span></span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a><span class="co">-- updated에서 이벤트를 만들어 내는 것으로 대체했다.</span></span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">Dynamic</span> a <span class="ot">=</span> <span class="dt">Dynamic</span> {<span class="ot"> unDynamic ::</span> <span class="dt">IORef</span> a }</span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">AppM</span> a <span class="ot">=</span> <span class="dt">AppM</span> {<span class="ot"> unAppM ::</span> <span class="dt">IO</span> a }</span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a>  <span class="kw">deriving</span> (<span class="dt">Functor</span>, <span class="dt">Applicative</span>, <span class="dt">Monad</span>, <span class="dt">MonadIO</span>, <span class="dt">MonadFix</span>)</span>
+<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a><span class="co">-- 이벤트를 Ref로 모델링</span></span>
+<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a><span class="ot">newEvent ::</span> <span class="dt">AppM</span> (<span class="dt">Event</span> a, a <span class="ot">-&gt;</span> <span class="dt">IO</span> ())</span>
+<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a>newEvent <span class="ot">=</span> liftIO <span class="op">$</span> <span class="kw">do</span></span>
+<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a>  ref <span class="ot">&lt;-</span> newIORef <span class="dt">Nothing</span></span>
+<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> fireFunc <span class="ot">=</span> \val <span class="ot">-&gt;</span> writeIORef ref (<span class="dt">Just</span> val)</span>
+<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span> (<span class="dt">Event</span> ref, fireFunc) <span class="co">-- (이벤트, 트리거)</span></span>
+<span id="cb7-43"><a href="#cb7-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-44"><a href="#cb7-44" aria-hidden="true" tabindex="-1"></a><span class="co">-- Dynamic을 Ref로 모델링</span></span>
+<span id="cb7-45"><a href="#cb7-45" aria-hidden="true" tabindex="-1"></a><span class="co">-- Event도 Dynamic도 Ref로 모델링하다 보니 헛갈리는데,</span></span>
+<span id="cb7-46"><a href="#cb7-46" aria-hidden="true" tabindex="-1"></a><span class="co">-- Event가 발생하면 Dynamic이 가진 Ref에 값을 넣어서</span></span>
+<span id="cb7-47"><a href="#cb7-47" aria-hidden="true" tabindex="-1"></a><span class="co">-- 이 Ref를 보고 있는 루프가 Just 값을 얻어가는 식이다.</span></span>
+<span id="cb7-48"><a href="#cb7-48" aria-hidden="true" tabindex="-1"></a><span class="ot">holdDyn ::</span> (<span class="dt">Eq</span> a, <span class="dt">Show</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Event</span> a <span class="ot">-&gt;</span> <span class="dt">AppM</span> (<span class="dt">Dynamic</span> a)</span>
+<span id="cb7-49"><a href="#cb7-49" aria-hidden="true" tabindex="-1"></a>holdDyn initialVal (<span class="dt">Event</span> evRef) <span class="ot">=</span> liftIO <span class="op">$</span> <span class="kw">do</span></span>
+<span id="cb7-50"><a href="#cb7-50" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- 이벤트가 발생하면, 이벤트가 가진 값을 dynRef에 기억 </span></span>
+<span id="cb7-51"><a href="#cb7-51" aria-hidden="true" tabindex="-1"></a>  dynRef <span class="ot">&lt;-</span> newIORef initialVal</span>
+<span id="cb7-52"><a href="#cb7-52" aria-hidden="true" tabindex="-1"></a>  void <span class="op">$</span> forkIO <span class="op">$</span> forever <span class="op">$</span> <span class="kw">do</span></span>
+<span id="cb7-53"><a href="#cb7-53" aria-hidden="true" tabindex="-1"></a>    eventVal <span class="ot">&lt;-</span> readIORef evRef</span>
+<span id="cb7-54"><a href="#cb7-54" aria-hidden="true" tabindex="-1"></a>    <span class="kw">case</span> eventVal <span class="kw">of</span></span>
+<span id="cb7-55"><a href="#cb7-55" aria-hidden="true" tabindex="-1"></a>      <span class="dt">Just</span> val <span class="ot">-&gt;</span> <span class="kw">do</span> <span class="co">-- 이벤트가 발생했다면 Just가 들어 있다.</span></span>
+<span id="cb7-56"><a href="#cb7-56" aria-hidden="true" tabindex="-1"></a>        oldDynVal <span class="ot">&lt;-</span> readIORef dynRef</span>
+<span id="cb7-57"><a href="#cb7-57" aria-hidden="true" tabindex="-1"></a>        when (val <span class="op">/=</span> oldDynVal) <span class="op">$</span> writeIORef dynRef val</span>
+<span id="cb7-58"><a href="#cb7-58" aria-hidden="true" tabindex="-1"></a>        writeIORef evRef <span class="dt">Nothing</span> <span class="co">-- 이벤트를 한 번 소비하면 초기화</span></span>
+<span id="cb7-59"><a href="#cb7-59" aria-hidden="true" tabindex="-1"></a>      <span class="dt">Nothing</span> <span class="ot">-&gt;</span> threadDelay <span class="dv">10000</span> <span class="co">-- 10000 밀리초마다 폴링</span></span>
+<span id="cb7-60"><a href="#cb7-60" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span> (<span class="dt">Dynamic</span> dynRef)</span>
+<span id="cb7-61"><a href="#cb7-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-62"><a href="#cb7-62" aria-hidden="true" tabindex="-1"></a><span class="ot">updated ::</span> (<span class="dt">Eq</span> a, <span class="dt">Show</span> a) <span class="ot">=&gt;</span> <span class="dt">Dynamic</span> a <span class="ot">-&gt;</span> <span class="dt">AppM</span> (<span class="dt">Event</span> a)</span>
+<span id="cb7-63"><a href="#cb7-63" aria-hidden="true" tabindex="-1"></a>updated (<span class="dt">Dynamic</span> dynRef) <span class="ot">=</span> liftIO <span class="op">$</span> <span class="kw">do</span></span>
+<span id="cb7-64"><a href="#cb7-64" aria-hidden="true" tabindex="-1"></a>  evRef <span class="ot">&lt;-</span> newIORef <span class="dt">Nothing</span> <span class="co">-- Dynamic이 변할 때 자동으로 fire되는 이벤트라</span></span>
+<span id="cb7-65"><a href="#cb7-65" aria-hidden="true" tabindex="-1"></a>                            <span class="co">-- 따로 트리거가 없는 이벤트로 생각하면 된다.</span></span>
+<span id="cb7-66"><a href="#cb7-66" aria-hidden="true" tabindex="-1"></a>  lastValRef <span class="ot">&lt;-</span> newIORef <span class="op">=&lt;&lt;</span> readIORef dynRef</span>
+<span id="cb7-67"><a href="#cb7-67" aria-hidden="true" tabindex="-1"></a>  void <span class="op">$</span> forkIO <span class="op">$</span> <span class="kw">do</span></span>
+<span id="cb7-68"><a href="#cb7-68" aria-hidden="true" tabindex="-1"></a>    forever <span class="op">$</span> <span class="kw">do</span></span>
+<span id="cb7-69"><a href="#cb7-69" aria-hidden="true" tabindex="-1"></a>      lastVal <span class="ot">&lt;-</span> readIORef lastValRef</span>
+<span id="cb7-70"><a href="#cb7-70" aria-hidden="true" tabindex="-1"></a>      currentVal <span class="ot">&lt;-</span> readIORef dynRef</span>
+<span id="cb7-71"><a href="#cb7-71" aria-hidden="true" tabindex="-1"></a>      <span class="kw">if</span> currentVal <span class="op">/=</span> lastVal </span>
+<span id="cb7-72"><a href="#cb7-72" aria-hidden="true" tabindex="-1"></a>        <span class="kw">then</span> <span class="kw">do</span> <span class="co">-- 값이 바뀌면 알리기 위해 Just 값 넣기</span></span>
+<span id="cb7-73"><a href="#cb7-73" aria-hidden="true" tabindex="-1"></a>          writeIORef evRef (<span class="dt">Just</span> currentVal)</span>
+<span id="cb7-74"><a href="#cb7-74" aria-hidden="true" tabindex="-1"></a>          writeIORef lastValRef currentVal</span>
+<span id="cb7-75"><a href="#cb7-75" aria-hidden="true" tabindex="-1"></a>        <span class="kw">else</span> <span class="kw">do</span></span>
+<span id="cb7-76"><a href="#cb7-76" aria-hidden="true" tabindex="-1"></a>          writeIORef evRef <span class="dt">Nothing</span> <span class="co">-- 아무일도 없다는 뜻으로 Nothing</span></span>
+<span id="cb7-77"><a href="#cb7-77" aria-hidden="true" tabindex="-1"></a>      threadDelay <span class="dv">10000</span> <span class="co">-- 10000 밀리초마다 폴링</span></span>
+<span id="cb7-78"><a href="#cb7-78" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span> (<span class="dt">Event</span> evRef)</span>
+<span id="cb7-79"><a href="#cb7-79" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-80"><a href="#cb7-80" aria-hidden="true" tabindex="-1"></a><span class="ot">performEvent_ ::</span> <span class="dt">Event</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">AppM</span> ()</span>
+<span id="cb7-81"><a href="#cb7-81" aria-hidden="true" tabindex="-1"></a>performEvent_ (<span class="dt">Event</span> evRef) <span class="ot">=</span> liftIO <span class="op">$</span> void <span class="op">$</span> forkIO <span class="op">$</span> forever <span class="op">$</span> <span class="kw">do</span></span>
+<span id="cb7-82"><a href="#cb7-82" aria-hidden="true" tabindex="-1"></a>  evCount <span class="ot">&lt;-</span> readIORef evRef</span>
+<span id="cb7-83"><a href="#cb7-83" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> ioAction <span class="ot">=</span> (\n <span class="ot">-&gt;</span> <span class="fu">putStrLn</span> <span class="op">$</span> <span class="st">&quot;Current count: &quot;</span> <span class="op">++</span> <span class="fu">show</span> n) <span class="op">&lt;$&gt;</span> evCount</span>
+<span id="cb7-84"><a href="#cb7-84" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- Event tick 을 Event (IO a)로 변형한다.</span></span>
+<span id="cb7-85"><a href="#cb7-85" aria-hidden="true" tabindex="-1"></a>  <span class="kw">case</span> ioAction <span class="kw">of</span></span>
+<span id="cb7-86"><a href="#cb7-86" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Just</span> action <span class="ot">-&gt;</span> <span class="kw">do</span></span>
+<span id="cb7-87"><a href="#cb7-87" aria-hidden="true" tabindex="-1"></a>      action</span>
+<span id="cb7-88"><a href="#cb7-88" aria-hidden="true" tabindex="-1"></a>      writeIORef evRef <span class="dt">Nothing</span> <span class="co">-- 이벤트 소비</span></span>
+<span id="cb7-89"><a href="#cb7-89" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Nothing</span> <span class="ot">-&gt;</span> <span class="kw">do</span></span>
+<span id="cb7-90"><a href="#cb7-90" aria-hidden="true" tabindex="-1"></a>      threadDelay <span class="dv">1000</span></span>
+<span id="cb7-91"><a href="#cb7-91" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-92"><a href="#cb7-92" aria-hidden="true" tabindex="-1"></a><span class="ot">runMiniReflex ::</span> <span class="dt">AppM</span> () <span class="ot">-&gt;</span> <span class="dt">IO</span> ()</span>
+<span id="cb7-93"><a href="#cb7-93" aria-hidden="true" tabindex="-1"></a>runMiniReflex app <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb7-94"><a href="#cb7-94" aria-hidden="true" tabindex="-1"></a>  unAppM app</span></code></pre></div>
+<p>위 프레임워크를 사용해서 틱 이벤트가 발생할 때마다 카운트를 출력하고, Enter키를 입력하면 끝내는 동작으로 테스트했습니다.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- Main.hs</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">MiniReflex</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Control.Concurrent</span> (forkIO, threadDelay)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Control.Monad</span> (forever, void)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Control.Monad.IO.Class</span> (liftIO)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Data.IORef</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">System.IO</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> runMiniReflex <span class="op">$</span> <span class="kw">do</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>  liftIO <span class="op">$</span> hSetBuffering stdout <span class="dt">NoBuffering</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>  (tickEvent, fireTick) <span class="ot">&lt;-</span> newEvent</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>  dynCount <span class="ot">&lt;-</span> holdDyn (<span class="dv">0</span><span class="ot"> ::</span> <span class="dt">Int</span>) tickEvent</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>  evCountChanged <span class="ot">&lt;-</span> updated dynCount</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>  performEvent_ evCountChanged</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>  liftIO <span class="op">$</span> <span class="fu">putStrLn</span> <span class="st">&quot;--- Mini Reflex Counter Started ---&quot;</span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>  liftIO <span class="op">$</span> <span class="fu">putStrLn</span> <span class="st">&quot;Press Enter to stop.&quot;</span></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>  void <span class="op">$</span> liftIO <span class="op">$</span> forkIO <span class="op">$</span> <span class="kw">do</span></span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>    countRef <span class="ot">&lt;-</span> newIORef (<span class="dv">0</span><span class="ot"> ::</span> <span class="dt">Int</span>)</span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>    forever <span class="op">$</span> <span class="kw">do</span></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>      threadDelay <span class="dv">1000000</span></span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>      currentCount <span class="ot">&lt;-</span> readIORef countRef</span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>      <span class="kw">let</span> nextCount <span class="ot">=</span> currentCount <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>      writeIORef countRef nextCount</span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>      fireTick nextCount</span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>  liftIO <span class="op">$</span> <span class="kw">do</span></span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>    _ <span class="ot">&lt;-</span> <span class="fu">getLine</span> <span class="co">-- enter가 들어올 때까지 블록</span></span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>    <span class="fu">putStrLn</span> <span class="st">&quot;--- Mini reflex Counter Stopped ---&quot;</span></span></code></pre></div>
+<hr />
+<p><strong>이벤트 구독 모델</strong></p>
+<p>아마도, 사용자에게 프레임워크 API로 노출하진 않지만, 아래와 같이 외부 이벤트와 FRP의 이벤트, Behavior 네트워크를 연결하는 Push 모양이 어딘가에는 있을 거라 생각합니다.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Event</span> a <span class="ot">=</span> <span class="dt">Event</span> {<span class="ot"> subscribe ::</span> (a <span class="ot">-&gt;</span> <span class="dt">IO</span> ()) <span class="ot">-&gt;</span> <span class="dt">IO</span> () } </span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- 이벤트가 발생하면 실행할 함수들을 받아 모아 둔다.</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Behavior</span> a <span class="ot">=</span> <span class="dt">Behavior</span> (<span class="dt">IO</span> a)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="co">-- 이벤트 구독에서 자주 보던, OOP에서 객체 하나 만드는 것과 비슷하다.</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="ot">newEvent ::</span> <span class="dt">IO</span> (<span class="dt">Event</span> a, a <span class="ot">-&gt;</span> <span class="dt">IO</span> ())</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>newEvent <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  subscribersRef <span class="ot">&lt;-</span> newIORef []</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> event <span class="ot">=</span> <span class="dt">Event</span> <span class="op">$</span> \callback <span class="ot">-&gt;</span> modifyIORef' subscribersRef (callback <span class="op">:</span>) </span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>      trigger val <span class="ot">=</span> readIORef subscribersRef <span class="op">&gt;&gt;=</span> <span class="fu">mapM_</span> (\cb <span class="ot">-&gt;</span> cb val)</span></code></pre></div>
 
 <div class="comment">
   <script>
