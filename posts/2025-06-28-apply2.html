@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko" lang="ko">
+
+<head>
+  <script>
+    (function () {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'dark') {
+        document.documentElement.classList.add('dark-mode');
+      }
+    })();
+
+    function loadUtterances() {
+      const savedTheme = localStorage.getItem('theme');
+      const themeValue = savedTheme === 'dark' ? 'github-dark' : 'github-light';
+
+      console.log("theme");
+      console.log(themeValue);
+      const script = document.createElement('script');
+      script.src = 'https://utteranc.es/client.js';
+      script.setAttribute('repo', 'lionhairdino/lionhairdino.github.io');
+      script.setAttribute('issue-term', 'url');
+      script.setAttribute('theme', themeValue);
+      script.setAttribute('crossorigin', 'anonymous');
+      script.async = true;
+      document.body.appendChild(script);
+    };
+
+    function updateUtterancesTheme() {
+      const savedTheme = localStorage.getItem('theme');
+      const themeValue = savedTheme === 'dark' ? 'github-dark' : 'github-light';
+
+      // Utterances iframe에 메시지 전송
+      const utterances = document.querySelector('.utterances iframe');
+      if (utterances) {
+        utterances.contentWindow.postMessage(
+          {type: 'set-theme', theme: themeValue},
+          'https://utteranc.es'
+        );
+      }
+    }
+
+  </script>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>lionhairdino - Apply - 이펙트가 있는 함수들을 연이어 적용하고 싶어</title>
+  
+  <meta name="description" content="펑터와 모나드를 적용Apply 위주로 풀어 봤습니다." />
+  <meta property="og:description" content="펑터와 모나드를 적용Apply 위주로 풀어 봤습니다." />
+  
+  <link rel="stylesheet" type="text/css" href="../css/default.css" />
+  <link rel="icon" href="https://lionhairdino.github.io/favicon.svg" />
+  <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino16px.png" sizes="16x16" />
+  <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino24px.png" sizes="24x24" />
+  <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino32px.png" sizes="32x32" />
+  <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino48px.png" sizes="48x48" />
+  <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino57px.png" sizes="57x57" />
+  <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino60px.png" sizes="60x60" />
+  <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino64px.png" sizes="64x64" />
+  <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino72px.png" sizes="72x72" />
+  <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino76px.png" sizes="76x76" />
+  <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino114px.png" sizes="114x114" />
+  <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino120px.png" sizes="120x120" />
+  <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino144px.png" sizes="144x144" />
+  <link rel="shortcut icon" href="../favicon.ico" />
+  <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino152px.png" sizes="152x152" />
+  <link rel="apple-touch-icon-precomposed" href="../images/favicon/Lionhairdino180px.png" sizes="180x180" />
+  <link rel="icon" type="image/png" href="../images/favicon/Lionhairdino192px.png" sizes="192x192" />
+  <link rel="manifest" href="../site.webmanifest" />
+  <link rel="mask-icon" href="https://lionhairdino.github.io/Lionhairdino_black.svg" color="#ff7500" />
+  <meta name="msapplication-TileImage" content="/images/favicon/Lionhairdino144px.png" />
+  <meta name="msapplication-TileColor" content="#ff7500" />
+  <meta name="theme-color" content="#ffffff" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Apply - 이펙트가 있는 함수들을 연이어 적용하고 싶어" />
+  <meta property="og:site_name" content="Lionhairdino" />
+  <meta property="og:url" content="https://lionhairdino.github.io/posts/2025-06-28-apply2.html" />
+  
+  <meta property="og:image" content="https://lionhairdino.github.com/images/Jeff_Beck.jpg" />
+  
+  
+  <meta name="keywords" content="apply, context, monad, 하스켈, haskell, 모나드, 적용">
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-E9WZ6VXGHP"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-E9WZ6VXGHP');
+  </script>
+  <script src="../script/copycode.js"></script>
+
+  <script src="../script/darkmode.js"></script>
+  <script async src="https://cse.google.com/cse.js?cx=9c53b4915cbb2605c"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.11.1/tocbot.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.11.1/tocbot.css" />
+  <meta name="fediverse:creator" content="@lionhairdino@mastodon.social" />
+  <link rel="alternate" type="application/rss+xml" title="상상 하스켈 - Lionhairdino" href="rss.xml" />
+</head>
+
+<body>
+  <div id="header">
+    <div style="display:inline-block;margin-right:5px;padding-top: 5px;" id="logo">
+      <a href="../"><img style="width:30px;border:none" src="../images/favicon/Lionhairdino48px.png"></a>
+    </div>
+    <div style="display:inline-block;vertical-align: top;padding-top:5px;" id="navigation">
+      <a href="../">lionhairdino</a>
+      <a href="../about.html">about</a>
+      <!--<a href="/archive.html">archive</a>-->
+    </div>
+    <div style="display:inline-block;font-size:0.8em;vertical-align: top;">
+      <div style="display:inline-block;vertical-align: top;padding-top: 5px"></div>
+      <div style="display:inline-block;vertical-align: top;padding-top: 11px; padding-left: 10px;"><a rel="me" href="https://mastodon.social/@lionhairdino"><img style="width:20px;border:none" src="../images/mastodon.svg"></a></div>
+      <div style="display:inline-block;vertical-align: top;padding-top: 11px; padding-left: 2px;"><a rel="me" href="https://lionhairdino.bsky.social"><img style="width:18px;border:none" src="../images/bluesky.svg"></a>
+      </div>
+      <div style="display:inline-block;vertical-align: top;padding-top: 11px; padding-left: 2px;"><a rel="me" href="https://discordapp.com/users/lionhairdino#7687"><img style="width:20px;border:none" src="../images/discord.svg"></a></div>
+      <div style="display:inline-block;vertical-align: top;padding-top: 11px; padding-left: 2px;"><a rel="me" href="https://x.com/lionhairdino"><img style="width:15px;border:none" src="../images/X.svg"></a></div>
+      <div style="display:inline-block;vertical-align: top;padding-top: 11px; padding-left: 2px;"><a rel="me" href="https://linkedin.com/in/lionhairdino-l-baaa54244"><img style="width:20px;border:none" src="../images/linkedin.svg"></a></div>
+      <div style="display:inline-block;vertical-align: top;padding-top: 11px; padding-left: 2px;"><a rel="me" href="https://github.com/lionhairdino"><img style="width:20px;border:none" src="../images/github.svg"></a></div>
+      <div style="display:inline-block;vertical-align: top;padding-top: 11px; padding-left: 2px;"><a rel="me" href="https://www.threads.net/@linohairdino"><img style="width:20px;border:none" src="../images/threads.svg"></a></div>
+      <div style="display:inline-block;vertical-align: top;padding-top: 11px; padding-left: 2px;"><a rel="me" href="https://hackers.pub/@lionhairdino">Hackers'Pub</a></div>
+    </div>
+    <div>
+      <div style="display:inline-block;width:180px;">
+        <div class="gcse-searchbox-only"></div>
+        <div><button id="theme-toggle">
+            <script>
+              const savedTheme = localStorage.getItem('theme');
+              if (savedTheme === 'dark')
+                document.write("☉");
+              else
+                document.write("☾");
+            </script>
+          </button></div>
+      </div>
+    </div>
+    <div>
+      여기 글들은 일종의 질문입니다. 용어 선택도 학계, 업계에서 쓰는 걸로 되어 있지 않고, 틀린 내용이 있을 수도 있습니다. 여기 글을 처음 읽는 분은, 먼저 <a href="../warning.html">주의문</a>을 꼭 읽어보세요.
+    </div>
+  </div>
+  <div class="js-toc-content">
+    <h1>Apply - 이펙트가 있는 함수들을 연이어 적용하고 싶어</h1>
+    <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+<div class="info">
+    Posted on June 28, 2025
+    
+</div>
+
+<p><img src="../images/Jeff_Beck.jpg" alt="Jeff Beck" /><br />
+출처 <a href="https://commons.wikimedia.org/wiki/File:Jeff_Beck_in_Amsterdam_1979_%28cropped%29.jpg">Wikimedia Commons - Jeff Beck in Amsterdam 1979</a></p>
+<p>오래 전에 타브 악보를 보고, 더듬 더듬 곡을 연습하다가, 이렇게 하는 게 아닌데란 생각이 들었었습니다. 원곡자들은 오랫동안 베어 있는 자신의 멜로디 습관이나, 익숙한 손놀림등을 기반으로 나온 연주일텐데, 그 걸 기본기 없이 따라해서 내 것이 될까하는 의문이었습니다. 아마도, 시간 투자를 많이한다면, 언젠가는 내 것이 될지도 모르지만, 더 효율적인 방법은 스케일 연습같은 것들을 먼저하고, 조금씩 곡 해석을 하며 내 것으로 만드는 게 더 빠르지 않을까 생각했었습니다.</p>
+<p>함수형 프로그래밍도 비슷하게 접근하고 있습니다. 절차형에 찌든 사람이 느끼는 함수형의 이 독특한 패턴들을 떠올리고 구현하기까지, 만든 사람들은 분명 하루 아침에 순간적으로 만든 것이 아닌, 그들이 지나온 생각의 길이 있었을텐데요. 물론, 천재들이 걸어 온 길을 나도 아무 정보 없이 찾아내겠다는 아니고, 적어도 도착지는 알고 있는 상태니 역으로 추적해보는 생각 놀이를 자주합니다.</p>
+<p>이 글을 읽는다고, 함수형이 갑자기 편해지거나, 무슨 태초의 원리를 알게된다거나 하는 글은 당연히 아닙니다. 아직 검증되지 않은, 이런 생각 길도 있지 않았을까 정도의 글일 뿐입니다. 주의해서 보세요. 아직 Apply만 따로 떼어 이렇게 설명하는 문서는 본적이 없으니, 제가 틀린 눈을 가졌을 수 있습니다.</p>
+<p>이미 함수형이 네이티브인 분들한테는 필요한 해석이 아닐 수 있습니다. 절차형에 쩔은 사람이 함수형으로 넘어가는 중에 정리한 해석입니다. 요즘은 <code>Apply</code>에 꽂혀 있습니다. 그동안 <code>Apply</code>의 강력함을 왜 눈치 못챘나 싶습니다. 언젠가 더 진도가 나가면 또 바뀔지 모르지만, 지금은 함수형에서 원톱 주인공이 <code>Apply</code>로 보입니다.</p>
+<p>※ 아래 나오는 코드들은 실제 구현과 다르고, 실제 동작하지 않는 의사 코드입니다.</p>
+<h2 id="값을-값이-아닌-함수로-표현">값을, 값이 아닌 함수로 표현</h2>
+<p>함수가 필요한 정보를 값으로 넘기지 않고, 함수로 넘기면 어떤 효과가 날까요?</p>
+<p>예를 들어 다음과 같은 경우</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ot">func1 ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>func1 arg <span class="ot">=</span> arg <span class="op">+</span> <span class="dv">1</span></span></code></pre></div>
+<p>인데, <code>arg</code>를 값으로 넘기지 않고, 일부 정보가 없어, 아직 값이 안된 함수인 채로 넘긴다면,</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- func2 :: (Int -&gt; Int) -&gt; Int</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- func2 f = f x + 1</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">--           ^^^</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">--  뭔지 모를 x에 '적용'하고 있다.</span></span></code></pre></div>
+<p>나중에 함수를 적용(실행)해야 값을 얻으니, 인자가 필요하고, 이를 <code>x</code>라 하면 이는 나중에 무언가와 바인딩 될 값이니, 최종 아래와 같은 모양이 됩니다.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ot">func3 ::</span> (<span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span>) <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>func3 f <span class="ot">=</span> \x <span class="ot">-&gt;</span> f x <span class="op">+</span> <span class="dv">1</span></span></code></pre></div>
+<p><code>arg</code>란 값을 받아 <code>+1</code>하는 작업이었는데, <code>arg</code>를 함수로 만들어 넘겨서, 나중에 외부에서 개입할 수 있는 여지 <code>x</code>를 남길 수 있게 됐습니다. 예를 들어 <code>100</code>원을 넘겨 <code>101</code>원이 되는 작업이었는데, <code>100</code>원이 아니라 <code>\x -&gt; 100 * x</code>같은 것들을 넘기고, <code>x</code>를 통해 <strong>미래</strong><a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>에 (환율 같은 것들을 적용해) 값을 바꿔줄 수 있습니다. 값을 넘길 때 미리 했어야 하는 작업을, 당장은 모르니 뒤로 미뤘다고 볼 수도 있습니다. <strong><em>당장은 모르는 것들은 그대로 두고, 구조를 만들어 가는 것이 함수형의 특징</em></strong>중 하나입니다.</p>
+<p>실제로 작업이 일어나진 않고, 작업을 모아둔 상태입니다. <code>값들에 고정적으로 할 일</code>과 <code>(+1)</code>을 하겠다는 걸 모아 두기만 했습니다.</p>
+<p><code>func3</code> 구현에 보면, <code>f x</code>가 보입니다. 이렇게, 함수를 적용Apply하는 걸, 또 다른 함수가 담당하게 만들어 두는 건 굉장한 유연성을 줍니다. 이 글은, Apply를 이리 저리 정의해서 어떤 효과가 있는가를 보는 글입니다.</p>
+<p>여기서 주연과 조연을 바꿔 보겠습니다. <code>(+1)</code>하는데 추가로 <code>값들에 고정적으로 할 일</code>을 하는 게 아니라, <code>값들에 어떤 일</code>을 하는데, 추가로 <code>(+1)</code>을 하는 걸로 바꿔서 바라 보겠습니다.
+## Apply
+위 <code>func3</code>이 하는 일을 보면, 별로 특별할 것 없는 <strong><em>적용</em></strong> <code>Apply</code> <code>\x -&gt; f x</code>입니다. 잘 보면 이 때, <code>Apply</code>전이나 후에 추가 작업을 할 수 있습니다. 위의 예에서 <code>+ 1</code>처럼 말입니다. 한 마디로, 특별한 <code>Apply</code>를 만들어 두고, 항상 해야 되는 작업을 심어둘 수 있습니다. 어떤 함수든 이 <code>Apply</code>를 거치면, 항상해야 되는 절차 <code>(+1)</code>이 진행됩니다.</p>
+<p><strong><em>추가 작업을 둘 수 있다</em></strong>라는 속성이, 지금 보기에는(저의 지금 지식 한계에선) 람다 산법의 근간이 되는, 즉 함수형의 근간이 되는 굉장히 중요한 속성이지 않을까 생각합니다. (함수형으로 여러 제약을 돌파하는 구현들을 보다 보면, 함수 몸체와 인자를 <strong>연결</strong>해주는 지점인, <strong>적용</strong>이 바로 매직이 일어나는 순간입니다.) 함수들이 공통적으로 해야되는 작업인 컨텍스트가 있다면, 이를 통해 구현할 수 있습니다.</p>
+<p>※ 잠깐, 컨텍스트 구현 전에, 눈에 확연히 보이는 장점을 먼저 보겠습니다. 하스켈에선 <code>Apply</code> 정의를 통해 표현(외관)이 간결해지는 효과도 있습니다. 다른 함수형 언어를 몰라, 다른 언어가 얼마나 이쁘게 나오는지는 잘 모릅니다.</p>
+<p>적용을 다음과 같이 정의하면,</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- 하스켈에선 함수를 두 인자 사이에 두는 &quot;연산자&quot;로 정의할 수 있다. 중위 표현식이라한다.</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>f <span class="op">&lt;:</span><span class="ot"> v ::</span> (<span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span>) <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span> </span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>f <span class="op">&lt;:</span> v <span class="ot">=</span> f v <span class="co">-- 특별히 하는 일 없이, 그냥 적용</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="kw">infixr</span> 오른쪽 우선 결합으로 지정</span></code></pre></div>
+<p><code>func1 &lt;: v1</code> 의 결과값은 <code>Int</code>입니다. 그럼, 이 결과값을 받아, 연이어 실행할 함수들을 아래처럼 써 줄 수 있습니다.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>func3 <span class="op">&lt;:</span> func2 <span class="op">&lt;:</span> func1 <span class="op">&lt;:</span> v1</span></code></pre></div>
+<p>원래 <code>func3 (func2 (func1 v1))</code> 이렇게 써 줘야 되는데, 괄호 없이 예쁘게 바뀌었습니다.</p>
+<p>제일 먼저 실행할 함수가 가장 뒤에 나오는 게 불편하다면, 인자 순서를 바꿔서 좀 더 직관적인 모양으로 바꿀 수도 있습니다.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>v <span class="op">:&gt;</span><span class="ot"> f ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> (<span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span>) <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="kw">infixl</span> 왼쪽 우선 결합으로 지정</span></code></pre></div>
+<p>이제 다음 처럼 써 줄 수 있습니다.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>v1 <span class="op">:&gt;</span> func1 <span class="op">:&gt;</span> func2 <span class="op">:&gt;</span> func3</span></code></pre></div>
+<p>예쁘지요?. (지금은 에디터의 도움을 받아, 괄호를 다루는 게 특별히 어려운 일은 아니지만, 예전에 단순 메모장으로 Lisp를 하려면 괄호가 하나의 장벽이기도 했습니다.)</p>
+<h2 id="컨텍스트맥락">컨텍스트(맥락)</h2>
+<p>이제 함수의 <strong>텍스트</strong><a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>와 <strong>컨텍스트</strong>를 분리해서 볼 준비가 끝났습니다.</p>
+<p>예를 들어, <code>func1</code>, <code>func2</code>, <code>func3</code>이 실행할 때, 모두 <strong>공통</strong>으로 환경값 <code>Env</code>가 필요하다면, 공통되는 작업인, 환경값을 받아 참조하는 작업을 컨텍스트로 보고 <code>Env</code>를 유통하는 역할을 하는 <strong>추가 작업</strong>을 <code>Apply</code>, 즉 <code>:&gt;</code>에 심어둘 수 있습니다.<code>Env</code>의 흐름은 <code>:&gt;</code>가 담당하는 거지요. 나중에 더 얘기하겠지만, 하스켈에선 타입으로 살짝 가리면, <code>:&gt;</code>가 컨텍스트를 담당하고 있다는 사실까지도 눈에 안띄게 할 수 있습니다. <code>Apply</code>를 잘 정의하면, 드라마틱하게 프로그래머 뇌의 수고를 덜어 줄 수 있게 됩니다.</p>
+<h3 id="section">($)</h3>
+<p>하스켈에선, 특별히 추가 작업이 없는 적용을 <code>func $ arg = func arg (오른쪽 우선 결합)</code> 로 정의해 두었습니다.</p>
+<p>람다 산법의 프로그래밍 흐름은 오직 Apply에 의해서 만들어집니다. <code>h (g (f x))</code> 식으로 써서 Apply를 눈치 못챘다면, Apply가 눈에 보이게 <code>$</code>를 쓰면, <code>h $ g $ f $ x</code>으로 쓸 수 있습니다. 다른 곳에선 <strong>함수의 합성</strong>으로 흐름이 만들어진다고 말하곤 하지만, 함수 합성 구현을 보면 안에서 적용이 이루어지고 있습니다. 여기선 콕 찝어서 적용으로 흐름이 만들어진다고 보겠습니다. 흐름을 만들어내는 <strong><em>적용은 다양하게 만들 수 있습니다.</em></strong></p>
+<p><code>Int -&gt; Int</code>란 함수들의 흐름을 아래와 같이 표현할 수 있습니다.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>h <span class="op">$</span> g <span class="op">$</span> f <span class="op">$</span> x</span></code></pre></div>
+<p>이제 연이어 적용할 때 추가적인 작업이 필요한 함수들의 흐름을 만들어 보겠습니다.</p>
+<h3 id="maybe">Maybe</h3>
+<p>최대한, 필요한 사전 지식이 없도록 쓰려고 노력 중인데, <code>Maybe</code> 정도는 있어야 말이 풀리는 것 같아, 어쩔 수 없이 간단히 설명하고 넘어 가겠습니다.<br />
+<code>Maybe Int</code>: 정수를 계산하는 흐름을 만들다가 값이 없을 수 있는 경우를 가정해 보겠습니다. 아래 <code>reciprocal</code>(역수)은 <code>0</code>이 인자로 넘어 오면 계산할 수 없습니다. 값이 있을 수도 있고, 없을 수도 있는 상황을 하나의 타입으로 모델링 하려면 어떻게 할까요? 다음과 같이 정의합니다.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Maybe</span> a <span class="ot">=</span> <span class="dt">Just</span> a <span class="op">|</span> <span class="dt">Nothing</span></span></code></pre></div>
+<p>값이 있는 경우는 <code>Just 값</code>으로 표현하고, 값이 없을 때는 <code>Nothing</code>으로 표현합니다. 이제 값이 있든, 값이 없든 <code>Maybe</code> 타입을 반환한다고 말할 수 있습니다.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ot">reciprocal ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Maybe</span> <span class="dt">Int</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>reciprocal <span class="ot">=</span> \x <span class="ot">-&gt;</span> <span class="kw">if</span> x <span class="op">==</span> <span class="dv">0</span> <span class="kw">then</span> <span class="dt">Nothing</span> <span class="kw">else</span> <span class="dt">Just</span> (<span class="dv">1</span> <span class="op">/</span> x)</span></code></pre></div>
+<p><code>0</code>을 인자로 넘기면, <code>1/0</code>이면 불능이 되니, <code>Maybe</code>로 결과를 표현했습니다.</p>
+<p>이제 <code>(+1)</code>, <code>(+2)</code>등과 어울려서 <code>reciprocal</code>을 쓰는 상황을 가정하겠습니다.</p>
+<p>※ 다른 언어에선 <code>Optional</code>이라 표현하는 곳도 있습니다. 컨텍스트가 있는 타입중에 만만한 타입이라 설명에 자주 등장합니다.</p>
+<h3 id="추가-작업이-필요한-흐름">추가 작업이 필요한 흐름</h3>
+<div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>(<span class="op">+</span><span class="dv">1</span>) <span class="op">$</span> (<span class="op">+</span><span class="dv">2</span>) <span class="op">$</span> reciprocal <span class="op">$</span> (<span class="op">+</span><span class="dv">1</span>) <span class="op">$</span> <span class="dv">1</span></span></code></pre></div>
+<p>이렇게 쓸 수 있으면 좋겠지만, 그냥은 위와 같이 쓸 수 없습니다. 최대한 위와 비슷하게 쓰는 게 목표입니다.</p>
+<p>다른 연산들은 괜찮지만, 역수 때문에 언제든 Maybe 타입을 받는 걸 가정해야 되는 상황입니다. <code>(+1)</code>도, <code>(+2)</code>도 <code>Int</code>가 아닌 <code>Maybe Int</code>용으로 만들어야 합니다. 연산자가 한 두개면 다시 정의하는 것도 어렵지 않겠지만, 연산자가 많다면? 바로 <strong>특별한 적용을 정의</strong>하면 됩니다. <code>Int -&gt; Int</code>를 <code>Maybe Int</code>에 적용하는, 새로운 적용을 만들어 보겠습니다.</p>
+<h4 id="section-1">1.</h4>
+<p><code>Maybe</code> 타입 값이 <code>Just 값</code>이면 <code>값</code>에 보통의 함수 적용을 하면 되고, <code>Nothing</code>이면, 함수 적용 없이 그냥 <code>Nothing</code>으로 두면 됩니다.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>f <span class="op">&lt;$&gt;</span> v <span class="ot">=</span> 만일 v가 <span class="dt">Just</span> val 이면 <span class="dt">Just</span> (f <span class="op">$</span> val)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>          아니면 <span class="dt">Nothing</span></span></code></pre></div>
+<p>※ 실제 하스켈 구현<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a>의 결합 우선 순위는 왼쪽으로 되어 있는데, 괄호를 없애고 보기 위해 여기선 오른쪽 우선 결합으로 가정하겠습니다. 실제 구현은 주석을 참고하세요.</p>
+<p>이제 다음처럼 써 줄 수 있을 것만 같은데, 안됩니다.</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>(<span class="op">+</span><span class="dv">1</span>) <span class="op">&lt;$&gt;</span> (<span class="op">+</span><span class="dv">2</span>) <span class="op">&lt;$&gt;</span> reciprocal <span class="op">&lt;$&gt;</span> (<span class="op">+</span><span class="dv">1</span>) <span class="op">&lt;$&gt;</span> <span class="dv">1</span></span></code></pre></div>
+<p><code>(+1) &lt;$&gt; reciprocal $ 1</code> 은 되지만,<br />
+<code>reciprocal &lt;$&gt; (+1) $ 1</code> 은 안됩니다. <code>(+1) $ 1 = 2</code>로 <code>Just 2</code>가 아니니 <code>&lt;$&gt;</code>를 쓰지 못합니다. <code>Int</code>를 받으면 <code>$</code>를, <code>Maybe Int</code>를 받으면 <code>&lt;$&gt;</code>를 써야 되는데, 어떻게 해결하는 게 좋을까요? <code>Int</code>를 받는 경우가 없고, 항상 <code>Maybe Int</code>만 들어오게 만들면, 해결할 수 있을 것만 같습니다.</p>
+<pre><code>pure :: Int -&gt; Maybe Int
+pure n = Just n</code></pre>
+<p><code>Int</code>를 단순히 <code>Just 값</code>으로 만들어 주는 함수입니다. 이를 이용하면,</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>reciprocal <span class="op">&lt;$&gt;</span> (<span class="op">+</span><span class="dv">1</span>) <span class="op">&lt;$&gt;</span> <span class="fu">pure</span> <span class="dv">1</span></span></code></pre></div>
+<p>이제 될 것 같지만, 여전히 다음이 문제 입니다.</p>
+<h4 id="section-2">2.</h4>
+<div class="sourceCode" id="cb17"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>reciprocal <span class="op">&lt;$&gt;</span> (reciprocal <span class="op">&lt;$&gt;</span> ((<span class="op">+</span><span class="dv">1</span>) <span class="op">&lt;$&gt;</span> <span class="fu">pure</span> <span class="dv">1</span>))</span></code></pre></div>
+<p><code>&lt;$&gt;</code>의 구현을 잘 보시면 <code>Just (f val)</code>입니다. 만일 <code>f</code>가 결과로 <code>Maybe</code> 타입 값을 만들어 내는 함수라면 <code>Maybe (Maybe Int)</code> 타입이 되어 버립니다. 예를 들어 <code>reciprocal</code>의 결과가 <code>Just 1</code>이 나왔는데, 여기에 다시 <code>reciprocal</code>을 <code>&lt;$&gt;</code>하면 <code>Just ( Just 1 )</code> 되어 버립니다. 계산은 오류가 난 건 아니니 더 가볼까요? <code>reciprocal</code>을 한 번 더 적용 하려 하면, <code>&lt;$&gt;</code>구현 안에서 <code>Just 1</code>에 <code>f</code>를 <code>&lt;$&gt;</code>이 아니라 <code>f $ (Just 1)</code>을 하는 상황이 되어 계산을 할 수 없는 상태가 됩니다.</p>
+<p><code>reciprocal :: Int -&gt; Maybe Int</code>를 <code>Just (Just 1)</code>에 적용할 방법이 필요해졌습니다.</p>
+<p><code>Just (Just 1)</code>을 <code>Just 1</code>로 만들면, <code>&lt;$&gt;</code>을 이용해 다시 적용할 수 있습니다.</p>
+<p><code>Just (Just 1)</code>의 의미를 살펴 보겠습니다. <code>Just</code>는 값이 있다는 의미를 표현하는 값 생성자로, 의미상 <code>Just (Just 1)</code>은 <code>Just 1</code>과 다른 의미를 가지고 있지 않습니다. 만일, <code>Nothing</code>이었으면, <code>Just (Nothing)</code>까지 가지도 않고 <code>Nothing</code>입니다.</p>
+<p><code>Maybe (Maybe a) -&gt; Maybe a</code>로 봐도 의미가 달라지지 않는, 즉 <code>Maybe (Mayb a)</code>와 <code>Maybe a</code>는 다른 구조지만, <strong>같게 봐도 되는 상황입니다</strong>. <strong>필요에 따라서는 말이지요.</strong> <a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a>이를 코드로 표현하면,</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="ot">join ::</span> <span class="dt">Maybe</span> (<span class="dt">Maybe</span> a) <span class="ot">-&gt;</span> <span class="dt">Maybe</span> a</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>join (<span class="dt">Just</span> (<span class="dt">Just</span> v)) <span class="ot">=</span> <span class="dt">Just</span> v</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>join _ <span class="ot">=</span> <span class="dt">Nothing</span></span></code></pre></div>
+<p>이제, 다음처럼 쓸 수 있습니다.</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>reciprocal (join <span class="op">.</span> <span class="op">&lt;$&gt;</span>) reciprocal <span class="op">&lt;$&gt;</span> (<span class="op">+</span><span class="dv">1</span>) <span class="op">&lt;$&gt;</span> <span class="fu">pure</span> <span class="dv">1</span></span></code></pre></div>
+<p>결과 타입이 <code>Maybe a</code>인 것들로만 흐름을 만들기 위해 <code>(+1)</code>은 빼고 보겠습니다. (<code>(+1)</code>이 필요하면 <code>(+1) &lt;$&gt; pure 1 = pure (1+1)</code> 상태로 흐름에 들어오면 됩니다.)</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>reciprocal (join <span class="op">.</span> <span class="op">&lt;$&gt;</span>) reciprocal (join <span class="op">.</span> <span class="op">&lt;$&gt;</span>) <span class="fu">pure</span> <span class="dv">1</span></span></code></pre></div>
+<p>실제 하스켈에 정의되어 있는 것과 맞추기 위해, 인자 순서를 바꾸고, 결합 우선 순위를 왼쪽으로 조정한 <code>&gt;&gt;=</code>를 정의하면</p>
+<pre><code>pure 1 &gt;&gt;= reciprocal &gt;&gt;= reciprocal</code></pre>
+<p>이라 쓸 수 있게 됐습니다. <code>a -&gt; m b</code>를 <code>m a</code>에 적용하는 새로운, <strong>특별한 적용</strong>을 정의했습니다.</p>
+<h3 id="마무리">마무리</h3>
+<p>Apply를 활용한 이런 구조는 특별한 테크닉이 아니라, 함수형 전반에서 쓰는 테크닉입니다. 테크닉이라 하기에도 뭐한 <strong>본질</strong> 같은 것입니다. 이렇게 따로 떼어내서 보는 것이, “왜, 이렇게 구현을 했지?”, 혹은 “어떻게 이런 구현을 떠올렸지?”가 궁금한, 저같이 함수형이 제 2 외국 코딩 언어인 분들에겐 도움이 될 수 있습니다.</p>
+<p>하스켈에선 위와 같은 연산자 기호들을 무수히 만나게 되는데, 주요 연산자들은 <code>Apply</code>인 경우가 많습니다. 아직 함수형이 네이티브가 아닌, 제 2, 제 3 외국어쯤 되는 분들이, 기호가 잔뜩 들어간 문장을 <strong>독해</strong>할 때, 전 후에 특별한 작업이 들어간 <code>Apply</code>겠거니 하는 눈이 생긴다면, 이 글을 읽는데 들인 시간의 본전은 뽑으신 게 아닐까 합니다.</p>
+<p>※ 일부러 제목을 적지 않았습니다. 1번은 펑터고, 2번은 모나드입니다. 수학쪽에서 기가 막히게 똑같은 개념이 존재합니다. 위에서 정의한 걸로만, 그대로 되는 건 아니고, 둘 다 <strong>몇가지 법칙을 만족하게 설계</strong>하면 수학쪽 개념과 완전히 일치하는 펑터, 모나드가 됩니다. 이 법칙들은 코드로 구현되는 건 아니고, 프로그래머가 해당 법칙을 따르는지 잘 보면서 설계해야 하는데, 여기선 코드로 나오는 <code>&lt;$&gt;</code>, <code>pure</code>, <code>&gt;&gt;=</code>들의 필요성과, 그렇게 설계한 이유만 먼저 보는 글입니다.</p>
+<p>너무 비수학적으로 풀어서 도움이 안되는 것 아닐까 걱정하는 분이 계실수도 있는데, 혼자 생각으론 수학쪽 개념의 시작도 여기서 본 것과 다르지 않다고 생각합니다. 서로 조금씩 다르지만, 닮은 것들을 얼마나 닮았는지 표현하며, 때로는 같게 보기 위한 개념들입니다. <code>a</code>와 <code>Maybe a</code>와 <code>Maybe (Maybe a)</code> 들을 다루면서 최대한 통일성 있는 방법을 찾습니다.</p>
+<section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes">
+<hr />
+<ol>
+<li id="fn1"><p>람다 함수는 아래처럼 읽을 수도 있습니다. 재미난 인문 표현이지만, 가끔 필요한 해석입니다.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>\미래 <span class="ot">-&gt;</span> 미래와 작업</span></code></pre></div>
+<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></li>
+<li id="fn2"><p>원래 텍스트란 용어는, 글자로 된 것만 텍스트가 아니라, 무언가 해석이 필요한 것(그림이든, 건축이든, 뭐든…)을 텍스트라 하고, Text를 해석하는데 필요한 부가 정보를 Context라 합니다. Con은 함께together란 뜻입니다.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn3"><p>아직 <code>(-&gt;)</code>를 하나의 타입으로 바라보는 것에 익숙하지 않은 분은 나중에 봐도 됩니다. 아래는 여기에 꼭 필요한 내용은 아닙니다.</p>
+<p>실제 하스켈에서 구현은 <code>$</code>는 <strong>오른쪽</strong> 우선 결합, <code>&lt;$&gt;</code>는 <strong>왼쪽</strong> 우선 결합입니다. <code>&lt;$&gt; :: (a -&gt; b) -&gt; f a -&gt; f b</code>로 되어 있는데, 왼쪽 결합이면, <code>(+2) &lt;$&gt; (+1) &lt;$&gt; Just 1</code>이 안돼야 될 것처럼 보입니다. <code>(+2) &lt;$&gt; (+1)</code> 자체가 타입이 맞지 않을 것 같으니까요. 하지만, 하스켈의 다른 기능이 쓰였습니다. 여기서 <code>&lt;$&gt;</code>는 <code>Maybe</code>에 적용하기 위한 적용이 아니라, <strong>함수 타입에 쓰기 위한 적용</strong>입니다. 그리고 <code>(+1) &lt;$&gt; Just 1</code>에서 쓰인 <code>&lt;$&gt;</code>는 <strong>Maybe에 쓰기 위한 적용</strong>입니다. 하나의 구문에 들어 있지만, 컴파일러가 영리하게 적당한 구현을 찾아옵니다.</p>
+<p>하스켈은 타입 클래스를 이용해, 컴파일러가 인자에 따라서 적절한 구현(인스턴스)을 불러다 쓸 수 있어, 왼쪽 우선인데도 <code>(+1) &lt;$&gt; (+1) &lt;$&gt; Just 1</code> 이렇게 쓸 수 있습니다. 아래는 좀 생각이 복잡해지긴 하는데, <code>(-&gt;)</code>를 하나의 타입처럼 바라보는 경우를 자주 만나니, 읽는 훈련을 해두면 좋긴 합니다.</p>
+<p>함수 타입<code>(r -&gt;)</code>의 <code>&lt;$&gt;</code>는 다음처럼 정의되어 있습니다.
+<code>haskell   &lt;$&gt; :: (a -&gt; b) -&gt; f a -&gt; f b   -- f 에 (r -&gt;)를 넣는다.   &lt;$&gt; :: (a -&gt; b) -&gt; (r -&gt; a) -&gt; (r -&gt; b)</code>
+<code>(a -&gt; b)</code> 함수를 <code>(r -&gt; a)</code>에 있는 <code>a</code>에 적용하려면, <code>(r -&gt; a)</code>의 결과 <code>a</code>에 <code>(a -&gt; b)</code>를 적용하면 됩니다.
+<code>haskell   f &lt;$&gt; f' = f . f' -- fmap = (.)</code>
+함수 타입의 적용은 합성으로 정의되어 있습니다.<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn4"><p>모나드 구조가 되기 위한 조건입니다. 두 번의 구조 변환 혹은 추가가 한 번의 구조 변환과 다를 게 없을 때 (다를 게 없다고 봐도 내가 필요한 만큼에선 문제가 없을 때) 모나드 구조를 만들 수 있습니다.<a href="#fnref4" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section>
+
+<div class="comment">
+  <script>
+    document.addEventListener('DOMContentLoaded', loadUtterances, { once: true });
+  </script>
+</div>
+<div style="text-align:right">Github 계정이 없는 분은 메일로 보내주세요. lionhairdino at gmail.com </div>
+
+  </div>
+  <nav class="toc toc-right js-toc relative z-1 transition--300 absolute pa4 pt5 is-position-fixed"></nav>
+  <script>
+    tocbot.init({
+      tocSelector: '.js-toc',
+      contentSelector: '.js-toc-content',
+      headingSelector: 'h2, h3',
+      hasInnerContainers: true,
+    });
+  </script>
+  <div id="footer">
+    © 2025 lionhairdino. All rights reserved. Generated by <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+  </div>
+  <script language="javascript">
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("visible");
+        }
+      });
+    },{
+      root: null,
+      rootMargin: "0px 0px -30% 0px",
+      threshold: 0.5
+    });
+    document.querySelectorAll('em').forEach(elem => {
+      observer.observe(elem);
+    })
+  </script>
+
+</body>
+
+</html>
