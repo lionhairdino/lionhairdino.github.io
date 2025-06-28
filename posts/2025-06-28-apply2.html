@@ -147,6 +147,11 @@
     
 </div>
 
+<p>일주일 사이로 두 개의 Apply 글을 올렸습니다.
+- Apply - Price와 (exRate -&gt; Price)를 다루는 프로그램의 골격을 똑같이 하고 싶어<br />
+이 글은 목적지가 Applicatives Functor이고,
+- Apply - 이펙트가 있는 함수들을 연이어 적용하고 싶어<br />
+현재 글은 목적지가 모나드입니다.</p>
 <p><img src="../images/Jeff_Beck.jpg" alt="Jeff Beck" /><br />
 출처 <a href="https://commons.wikimedia.org/wiki/File:Jeff_Beck_in_Amsterdam_1979_%28cropped%29.jpg">Wikimedia Commons - Jeff Beck in Amsterdam 1979</a></p>
 <p>오래 전에 타브 악보를 보고, 더듬 더듬 곡을 연습하다가, 이렇게 하는 게 아닌데란 생각이 들었었습니다. 원곡자들은 오랫동안 베어 있는 자신의 멜로디 습관이나, 익숙한 손놀림등을 기반으로 나온 연주일텐데, 그 걸 기본기 없이 따라해서 내 것이 될까하는 의문이었습니다. 아마도, 시간 투자를 많이한다면, 언젠가는 내 것이 될지도 모르지만, 더 효율적인 방법은 스케일 연습같은 것들을 먼저하고, 조금씩 곡 해석을 하며 내 것으로 만드는 게 더 빠르지 않을까 생각했었습니다.</p>
@@ -170,9 +175,9 @@
 <p><code>arg</code>란 값을 받아 <code>+1</code>하는 작업이었는데, <code>arg</code>를 함수로 만들어 넘겨서, 나중에 외부에서 개입할 수 있는 여지 <code>x</code>를 남길 수 있게 됐습니다. 예를 들어 <code>100</code>원을 넘겨 <code>101</code>원이 되는 작업이었는데, <code>100</code>원이 아니라 <code>\x -&gt; 100 * x</code>같은 것들을 넘기고, <code>x</code>를 통해 <strong>미래</strong><a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>에 (환율 같은 것들을 적용해) 값을 바꿔줄 수 있습니다. 값을 넘길 때 미리 했어야 하는 작업을, 당장은 모르니 뒤로 미뤘다고 볼 수도 있습니다. <strong><em>당장은 모르는 것들은 그대로 두고, 구조를 만들어 가는 것이 함수형의 특징</em></strong>중 하나입니다.</p>
 <p>실제로 작업이 일어나진 않고, 작업을 모아둔 상태입니다. <code>값들에 고정적으로 할 일</code>과 <code>(+1)</code>을 하겠다는 걸 모아 두기만 했습니다.</p>
 <p><code>func3</code> 구현에 보면, <code>f x</code>가 보입니다. 이렇게, 함수를 적용Apply하는 걸, 또 다른 함수가 담당하게 만들어 두는 건 굉장한 유연성을 줍니다. 이 글은, Apply를 이리 저리 정의해서 어떤 효과가 있는가를 보는 글입니다.</p>
-<p>여기서 주연과 조연을 바꿔 보겠습니다. <code>(+1)</code>하는데 추가로 <code>값들에 고정적으로 할 일</code>을 하는 게 아니라, <code>값들에 어떤 일</code>을 하는데, 추가로 <code>(+1)</code>을 하는 걸로 바꿔서 바라 보겠습니다.
-## Apply
-위 <code>func3</code>이 하는 일을 보면, 별로 특별할 것 없는 <strong><em>적용</em></strong> <code>Apply</code> <code>\x -&gt; f x</code>입니다. 잘 보면 이 때, <code>Apply</code>전이나 후에 추가 작업을 할 수 있습니다. 위의 예에서 <code>+ 1</code>처럼 말입니다. 한 마디로, 특별한 <code>Apply</code>를 만들어 두고, 항상 해야 되는 작업을 심어둘 수 있습니다. 어떤 함수든 이 <code>Apply</code>를 거치면, 항상해야 되는 절차 <code>(+1)</code>이 진행됩니다.</p>
+<p>여기서 주연과 조연을 바꿔 보겠습니다. <code>(+1)</code>하는데 추가로 <code>값들에 고정적으로 할 일</code>을 하는 게 아니라, <code>값들에 어떤 일</code>을 하는데, 추가로 <code>(+1)</code>을 하는 걸로 바꿔서 바라 보겠습니다.</p>
+<h2 id="apply">Apply</h2>
+<p>위 <code>func3</code>이 하는 일을 보면, 별로 특별할 것 없는 <strong><em>적용</em></strong> <code>Apply</code> <code>\x -&gt; f x</code>입니다. 잘 보면 이 때, <code>Apply</code>전이나 후에 추가 작업을 할 수 있습니다. 위의 예에서 <code>+ 1</code>처럼 말입니다. 한 마디로, 특별한 <code>Apply</code>를 만들어 두고, 항상 해야 되는 작업을 심어둘 수 있습니다. 어떤 함수든 이 <code>Apply</code>를 거치면, 항상해야 되는 절차 <code>(+1)</code>이 진행됩니다.</p>
 <p><strong><em>추가 작업을 둘 수 있다</em></strong>라는 속성이, 지금 보기에는(저의 지금 지식 한계에선) 람다 산법의 근간이 되는, 즉 함수형의 근간이 되는 굉장히 중요한 속성이지 않을까 생각합니다. (함수형으로 여러 제약을 돌파하는 구현들을 보다 보면, 함수 몸체와 인자를 <strong>연결</strong>해주는 지점인, <strong>적용</strong>이 바로 매직이 일어나는 순간입니다.) 함수들이 공통적으로 해야되는 작업인 컨텍스트가 있다면, 이를 통해 구현할 수 있습니다.</p>
 <p>※ 잠깐, 컨텍스트 구현 전에, 눈에 확연히 보이는 장점을 먼저 보겠습니다. 하스켈에선 <code>Apply</code> 정의를 통해 표현(외관)이 간결해지는 효과도 있습니다. 다른 함수형 언어를 몰라, 다른 언어가 얼마나 이쁘게 나오는지는 잘 모릅니다.</p>
 <p>적용을 다음과 같이 정의하면,</p>
@@ -207,7 +212,7 @@
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>reciprocal <span class="ot">=</span> \x <span class="ot">-&gt;</span> <span class="kw">if</span> x <span class="op">==</span> <span class="dv">0</span> <span class="kw">then</span> <span class="dt">Nothing</span> <span class="kw">else</span> <span class="dt">Just</span> (<span class="dv">1</span> <span class="op">/</span> x)</span></code></pre></div>
 <p><code>0</code>을 인자로 넘기면, <code>1/0</code>이면 불능이 되니, <code>Maybe</code>로 결과를 표현했습니다.</p>
 <p>이제 <code>(+1)</code>, <code>(+2)</code>등과 어울려서 <code>reciprocal</code>을 쓰는 상황을 가정하겠습니다.</p>
-<p>※ 다른 언어에선 <code>Optional</code>이라 표현하는 곳도 있습니다. 컨텍스트가 있는 타입중에 만만한 타입이라 설명에 자주 등장합니다.</p>
+<p>※ 다른 언어에선 <code>Optional</code>이라 표현하는 곳도 있습니다. 컨텍스트가 있는 타입 중에 만만한 타입이라 설명에 자주 등장합니다.</p>
 <h3 id="추가-작업이-필요한-흐름">추가 작업이 필요한 흐름</h3>
 <div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>(<span class="op">+</span><span class="dv">1</span>) <span class="op">$</span> (<span class="op">+</span><span class="dv">2</span>) <span class="op">$</span> reciprocal <span class="op">$</span> (<span class="op">+</span><span class="dv">1</span>) <span class="op">$</span> <span class="dv">1</span></span></code></pre></div>
 <p>이렇게 쓸 수 있으면 좋겠지만, 그냥은 위와 같이 쓸 수 없습니다. 최대한 위와 비슷하게 쓰는 게 목표입니다.</p>
