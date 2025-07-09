@@ -172,25 +172,63 @@
 <p><em>값은 타입으로 분류하고(추상화하고), 타입은 카인드로 분류(추상화)합니다.</em></p>
 <h2 id="런타임에는-타입이-없다">런타임에는 타입이 없다</h2>
 <p>타입은 컴파일 타임에 코드를 “조립”할 때만 필요합니다. 예를 들어, 반드시 Int 타입만 받게 지정해 놓은 타입에 Double을 내뱉는 코드 조각이 맞춰지는 상황이 오면 문제를 잡아냅니다. 이렇게 타입 체크를 일일이 하면서 문제 없이 모든 코드 조각을 맞췄다면(타입 추론을 통과했다면), 타입이 달라 문제가 생기는 경우는 없게됩니다. 그러면 런타임에는 굳이 타입 정보를 끌고 다녀야 할 이유가 없어집니다. 그렇기 때문에 타입 레벨 프로그래밍도 컴파일 타임까지만 노리고 개념을 활용하는데, 너무 적극적으로 쓰다 보면 런타임에도 타입 레벨에 있는 정보가 필요할 때가 있습니다. 이럴 때 <strong>싱글턴 라이브러리</strong>의 도움을 받습니다.</p>
-<p>참고 - <a href="https://stackoverflow.com/questions/50283169/what-does-type-level-programming-mean-at-runtime">stackoverflow - type level programming meaning at run time</a></p>
+<p>참고 - <a href="https://stackoverflow.com/questions/50283169/what-does-type-level-programming-mean-at-runtime">stackoverflow - type level programming meaning at run time</a><br />
+## 타입 레벨과 값 레벨을 이어주는 브릿지
+처음 볼 때, 타입 레벨에 존재하는 정보들을 값 레벨로 가져오는 방법이 궁금했습니다. 두 레벨을 이어주는 방법은 reflection, singleton 패턴등이 있다고 말합니다. 복잡하게 생각했는데, 엄밀히 말하면, 두 레벨을 이어주는 방법은 타입 인스턴스 뿐이 없습니다. 예를 들어 <code>Int -&gt; Bool</code> 이라 하면, <code>Int</code> 타입과 <code>Bool</code> 타입을 이어주는 함수입니다. 서로 다른 타입인데 연결을 맺듯이, 타입과 값을 이어 주는 것도 어딘가의 함수로 나타날 거라 예상할 수 있습니다. <code>Int</code>가 뭐냐에 따라 <code>Bool</code>값이 달라지는 걸 함수라 합니다. <code>1 - True</code>, <code>2 - False</code>, <code>3 -True</code>… 처럼 매핑을 해놓으면 함수 구실을 하게 됩니다. 마찬가지로 타입과 값이 매핑되는 방법을, 하스켈 문법에서 찾으면, 바로 타입 클래스와 인스턴스입니다.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">One</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Two</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">ValueInType</span> t <span class="kw">where</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="ot">  get ::</span> <span class="dt">Proxy</span> t <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">ValueInType</span> <span class="dt">One</span> <span class="kw">where</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  get _ <span class="ot">=</span> <span class="dv">1</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">ValueInType</span> <span class="dt">Two</span> <span class="kw">where</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  get _ <span class="ot">=</span> <span class="dv">2</span></span></code></pre></div>
+<p>위와 같이 <code>Three</code>, <code>Four</code> … 타입들을 만들면, 타입 레벨에 자연수를 만들 수 있을 겁니다. 설마, 이 걸 다 만들까 싶은데, <code>Nat</code> kind의 윈리가 이 것과 같습니다. 값 <code>1</code>,<code>2</code>…는 타입으로 그룹짓고, <code>1</code>,<code>2</code>… 타입은 <code>Nat</code> 카인드로 그룹 짓습니다.</p>
+<p>※ <code>Nat</code>,<code>Symbol</code>,<code>Char</code> 카인드(타입이 아닙니다.)는 GHC에 하드 코딩된 리터럴 카인드입니다. 아마도 이들을 위해 특별한 동작이 GHC에 들어가 있을 거라 예상합니다. GHC의 아무런 지원 없이 타입 레벨 프로그래밍을 하긴 어렵습니다.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- 보통 class Some a where 라고 써서 * 카인드에 대한 클래스를 정의하는데,</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- 여기선 Nat 카인드에 대해서 정의하고 있습니다.</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- 이 클래스&quot;류&quot;가 되려면, 즉 Nat 카인드 타입만 인스턴스를 만들 수 있습니다.</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">-- SNat은 Singleton Natural을 의미합니다.</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co">-- Int 타입, Bool 타입, 1 타입, 2 타입, ... 낯설긴 하지만, 여기서 1은 값이 아니라 타입을 의미합니다. 실제 코드로 3 타입, 4 타입 ...을 모두 정의하는 것이 아니라, GHC가 컴파일 타임에 내부적으로 Adhoc한 방식으로 처리할 거라 예상합니다.</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co">-- 1 타입, 2 타입, ... 들은 Nat 카인드로 그룹 지었습니다.</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co">-- KnownNat 클래스는 1타입, 2타입... 등과 매핑되는 대상을 정해주는 함수입니다. 1 타입과 매핑되는 natSing의 결과값은 SNat 1타입 입니다.</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">KnownNat</span> (<span class="ot">n ::</span> <span class="dt">Nat</span>) <span class="kw">where</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="ot">  natSing ::</span> <span class="dt">SNat</span> n <span class="co">-- Some Intger 랑 비교</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="co">-- 보통 data SNat a where 로 정의하는데, 여기선 Nat 카인드 타입만 해당합니다.</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">SNat</span> (<span class="ot">n ::</span> <span class="dt">Nat</span>) <span class="kw">where</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>  <span class="dt">SNat</span><span class="ot"> ::</span> <span class="dt">Integer</span> <span class="ot">-&gt;</span> <span class="dt">SNat</span> n</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- SNat 값 생성자는 정수를 받아, Nat 카인드 타입을 가진 SNat 타입을 반환합니다.</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="ot">natVal ::</span> <span class="kw">forall</span> n proxy<span class="op">.</span> <span class="dt">KnownNat</span> n <span class="ot">=&gt;</span> proxy n <span class="ot">-&gt;</span> <span class="dt">Natural</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>natVal _ <span class="ot">=</span> <span class="kw">case</span><span class="ot"> natSing ::</span> <span class="dt">SNat</span> n <span class="kw">of</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>             <span class="dt">UnsafeSNat</span> x <span class="ot">-&gt;</span> x</span></code></pre></div>
+<blockquote>
+<p>This class gives the integer associated with a type-level natural.<br />
+이 클래스는 타입 레벨 자연수와 연관된 정수를 돌려 준다.
+<a href="https://hackage.haskell.org/package/base-4.21.0.0/docs/GHC-TypeLits.html#t:KnownNat">GHC-TypeLits</a></p>
+</blockquote>
+<p><strong>클래스</strong>가 값을 준다는 조금은 이상한 표현처럼 느껴집니다. 생각해 보면, 클래스는 타입에 대응하는 여러 인스턴스들을 정의하는 방법으로, (인스턴스에 있는 메소드들은 결국 값을 돌려 주니) 타입에 따른 “값”을 돌려 주는 함수입니다.</p>
 <h2 id="싱글턴-라이브러리">싱글턴 라이브러리</h2>
 <p>런타임에는 타입 정보가 모두 사라집니다. 컴파일 타임을 넘어 런타임에도 타입 레벨에 있는 정보가 필요할 경우, 값 레벨로 정보를 복사해 놓을 때 쓰는 라이브러리입니다.<br />
 <a href="https://ryanglscott.github.io/2019/08/29/how-ghc-8-8-nearly-killed-singletons/" class="uri">https://ryanglscott.github.io/2019/08/29/how-ghc-8-8-nearly-killed-singletons/</a><br />
 <a href="https://blog.jle.im/entry/introduction-to-singletons-1.html" class="uri">https://blog.jle.im/entry/introduction-to-singletons-1.html</a></p>
 <p>필요한 확장</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">TypeFamilies</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="dt">DataKinds</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="dt">PolyKinds</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="dt">GADTs</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="dt">RankNTypes</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="dt">ScopedTypeVariables</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="dt">TypeApplications</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="dt">TypeOperators</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="dt">MultiParamTypeClasses</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="dt">FlexibleContexts</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="dt">FlexibleInstances</span></span></code></pre></div>
-<p>… 계속</p>
-<p>미완성 포스트</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="dt">TypeFamilies</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="dt">DataKinds</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="dt">PolyKinds</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="dt">GADTs</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="dt">RankNTypes</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="dt">ScopedTypeVariables</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="dt">TypeApplications</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="dt">TypeOperators</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="dt">MultiParamTypeClasses</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="dt">FlexibleContexts</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="dt">FlexibleInstances</span></span></code></pre></div>
 
 <div class="comment">
   <script>
