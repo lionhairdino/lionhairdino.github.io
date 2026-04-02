@@ -191,12 +191,12 @@ Git 저장소,<br />
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>      <span class="va">lib</span> <span class="op">=</span>                  <span class="op">;</span><span class="co"># 공통 유틸리티들이 들어 있는, 스탠다드 라이브러리 같은 것</span></span>
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>      <span class="va">overlays</span> <span class="op">=</span>             <span class="op">;</span><span class="co"># 닉스pkgs를 수정, 확장하기 위한 오버레이 정의</span></span>
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>      <span class="va">packages</span> <span class="op">=</span>             <span class="op">;</span><span class="co"># default, x86_64-linux, aarch64-darwin...에 맞는 패키지 정의</span></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>                             ;<span class="co"># nix run 실행할 때 참조</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>                             ;<span class="co"># nix run 실행할 때 fallback으로 보기도 한다.</span></span>
 <span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>      <span class="va">apps</span> <span class="op">=</span>                 <span class="op">;</span><span class="co"># nix run 으로 애플리케이션을 실행</span></span>
 <span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>      <span class="va">checks</span> <span class="op">=</span>               <span class="op">;</span><span class="co"># 테스트 정의</span></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>      <span class="va">defaultPackage</span> <span class="op">=</span>      <span class="op">;</span><span class="co"># Flake가 실행될 때 기본적으로 사용할 패키지</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>      <span class="co"># defaultPackage =      ;# Flake가 실행될 때 기본적으로 사용할 패키지 deprecated</span></span>
 <span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>                             ;<span class="co"># nix build 에서 참조</span></span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>      <span class="va">defaultApp</span> <span class="op">=</span>           <span class="op">;</span><span class="co"># Flake가 실행될 때 기본적으로 실행할 애플리케이션</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>      <span class="co"># defaultApp =           ;# Flake가 실행될 때 기본적으로 실행할 애플리케이션 deprecated</span></span>
 <span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>                             ;<span class="co"># nix run 와 연동</span></span>
 <span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>      <span class="va">devShells</span> <span class="op">=</span>            <span class="op">;</span><span class="co"># 개발 환경을 정의</span></span>
 <span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>                             ;<span class="co"># nix develop 이 호출</span></span>
@@ -264,8 +264,7 @@ Git 저장소,<br />
 <li><code>lib</code>: nixpkg에 내장된 함수 라이브러리로, Nix 표현식을 위한 실용적인 함수들을 제공합니다.</li>
 <li><code>config</code>: 이어지는 모듈 섹션에서 쓰일, 현재 환경에 있는 모든 옵션값들이 들어 있는 집합</li>
 <li><code>options</code>: 현재 환경에 있는 모든 모듈에 정의되어 있는 모든 옵션 집합</li>
-<li><code>pkgs</code>: 모든 nixpkgs 패키지와 유틸리티 함수를 갖고 있는 컬렉션,
-입문자는 기본 값으로 <code>nixpkgs.legacyPackages."${system}"</code>이 고정되어 있다고 생각해도 됩니다.</li>
+<li><code>pkgs</code>: 모든 nixpkgs 패키지와 유틸리티 함수를 갖고 있는 컬렉션</li>
 <li><code>modulesPath</code>: NixOS에서만 유효한 매개 변수, NixOS의 모듈 디렉토리를 나타내며 <code>nixpkgs/nixos/modules</code>를 가리킵니다. <code>NIX_PATH</code> 환경 변수에서 가져옵니다.</li>
 </ul>
 <p>※ 기본값이 아닌 값을 서브 모듈에 넘길 때 <code>nixpkgs.lib.nixosSystem</code> 함수의 <code>specialArgs</code> 매개 변수를 이용하거나, <code>_module.args</code> 옵션을 이용합니다.</p>
@@ -342,7 +341,7 @@ Git 저장소,<br />
 <span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>        <span class="ss">./packages.nix</span></span>
 <span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>      <span class="op">];</span></span></code></pre></div>
 <h3 id="mkbefore-함수">mkBefore 함수</h3>
-<p>※ 만일 <code>configuration.nix</code>와 <code>someModule.nix</code>에서 모두 <code>environment.systemPackages</code> 옵션을 정의하면, 닉스OS가 알아서 병합merge합니다. 그런데, 병합 순서가 있습니다. <code>configuration.nix</code>에 있는 것들이 가장 끝에 병합됩니다. 순서를 바꾸려면 유틸리티에 있는 <code>mkBefore</code>를 씁니다.</p>
+<p>※ 만일 <code>configuration.nix</code>와 <code>someModule.nix</code>에서 모두 <code>environment.systemPackages</code> 옵션을 정의하면, 닉스OS가 알아서 병합merge합니다. 그런데, 병합 순서가 있습니다. ~~ <code>configuration.nix</code>에 있는 것들이 가장 끝에 병합됩니다.~~ (파일 이름 기반 우선 순위는 없다고 합니다. configuration.nix를 최종 설정 파일로 인식하는데서 오는 오해라 합니다.) 순서를 바꾸려면 유틸리티에 있는 <code>mkBefore</code>를 씁니다.</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="va">boot</span>.<span class="va">kernelModules</span> <span class="op">=</span> mkBefore <span class="op">[</span><span class="st">&quot;kvm-intel&quot;</span><span class="op">]</span></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="er">}</span></span></code></pre></div>
@@ -406,39 +405,42 @@ Git 저장소,<br />
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
 <span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>  <span class="va">nixpkgs</span>.<span class="va">overlays</span> <span class="op">=</span> <span class="op">[</span></span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Overlay 1: 상속 관계를 표현하기 위해 `self`와 `super`를 씁니다.</span></span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">(</span><span class="va">self</span><span class="op">:</span> <span class="va">super</span><span class="op">:</span> <span class="op">{</span></span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>      <span class="va">google-chrome</span> <span class="op">=</span> super.google<span class="op">-</span>chrome.override <span class="op">{</span></span>
-<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>        <span class="va">commandLineArgs</span> <span class="op">=</span></span>
-<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>          <span class="st">&quot;--proxy-server='https=127.0.0.1:3128;http=127.0.0.1:3128'&quot;</span><span class="op">;</span></span>
-<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>      <span class="op">};</span></span>
-<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>    <span class="op">})</span></span>
-<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Overlay 2: 새로운 것과 오래된 것을 나타내는 의미로 `final`과 `prev`를 씁니다.</span></span>
-<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>    <span class="op">(</span><span class="va">final</span><span class="op">:</span> <span class="va">prev</span><span class="op">:</span> <span class="op">{</span></span>
-<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>      <span class="va">steam</span> <span class="op">=</span> prev.steam.override <span class="op">{</span></span>
-<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>        <span class="va">extraPkgs</span> <span class="op">=</span> <span class="va">pkgs</span><span class="op">:</span> <span class="kw">with</span> pkgs<span class="op">;</span> <span class="op">[</span></span>
-<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>          keyutils</span>
-<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>          libkrb5</span>
-<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a>          libpng</span>
-<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a>          libpulseaudio</span>
-<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a>          libvorbis</span>
-<span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a>          stdenv.cc.cc.lib</span>
-<span id="cb18-24"><a href="#cb18-24" aria-hidden="true" tabindex="-1"></a>          xorg.libXcursor</span>
-<span id="cb18-25"><a href="#cb18-25" aria-hidden="true" tabindex="-1"></a>          xorg.libXi</span>
-<span id="cb18-26"><a href="#cb18-26" aria-hidden="true" tabindex="-1"></a>          xorg.libXinerama</span>
-<span id="cb18-27"><a href="#cb18-27" aria-hidden="true" tabindex="-1"></a>          xorg.libXScrnSaver</span>
-<span id="cb18-28"><a href="#cb18-28" aria-hidden="true" tabindex="-1"></a>        <span class="op">];</span></span>
-<span id="cb18-29"><a href="#cb18-29" aria-hidden="true" tabindex="-1"></a>        <span class="va">extraProfile</span> <span class="op">=</span> <span class="st">&quot;export GDK_SCALE=2&quot;</span><span class="op">;</span></span>
-<span id="cb18-30"><a href="#cb18-30" aria-hidden="true" tabindex="-1"></a>      <span class="op">};</span></span>
-<span id="cb18-31"><a href="#cb18-31" aria-hidden="true" tabindex="-1"></a>    <span class="op">})</span></span>
-<span id="cb18-32"><a href="#cb18-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-33"><a href="#cb18-33" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Overlay 3: 다른 파일에 overlays를 정의합니다.</span></span>
-<span id="cb18-34"><a href="#cb18-34" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ./overlays/overlay3/default.nix 의 내용은 위와 같습니다.</span></span>
-<span id="cb18-35"><a href="#cb18-35" aria-hidden="true" tabindex="-1"></a>    <span class="co"># `(final: prev: { xxx = prev.xxx.override { ... }; })`</span></span>
-<span id="cb18-36"><a href="#cb18-36" aria-hidden="true" tabindex="-1"></a>    <span class="op">(</span><span class="bu">import</span> <span class="ss">./overlay3</span><span class="op">)</span></span>
-<span id="cb18-37"><a href="#cb18-37" aria-hidden="true" tabindex="-1"></a>  <span class="op">];</span></span>
-<span id="cb18-38"><a href="#cb18-38" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Overlay 1: `self`와 `super`는 상속 관계를 표현한다기 보다</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># self 는 모든 overlay가 다 적용된 후의 최종 패키지 집합</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>    <span class="co"># super 는 이전 overlay까지만 적용된 패키지 집합</span></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>    <span class="op">(</span><span class="va">self</span><span class="op">:</span> <span class="va">super</span><span class="op">:</span> <span class="op">{</span></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>      <span class="va">google-chrome</span> <span class="op">=</span> super.google<span class="op">-</span>chrome.override <span class="op">{</span></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>        <span class="va">commandLineArgs</span> <span class="op">=</span></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>          <span class="st">&quot;--proxy-server='https=127.0.0.1:3128;http=127.0.0.1:3128'&quot;</span><span class="op">;</span></span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>      <span class="op">};</span></span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>    <span class="op">})</span></span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Overlay 2: 새로운 것과 오래된 것을 나타내는 의미로 `final`과 `prev`를 씁니다.</span></span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>    <span class="co"># self, final 과 같은 역할로 둘 다 자주 보이는 관습입니다.</span></span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>    <span class="op">(</span><span class="va">final</span><span class="op">:</span> <span class="va">prev</span><span class="op">:</span> <span class="op">{</span></span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>      <span class="va">steam</span> <span class="op">=</span> prev.steam.override <span class="op">{</span></span>
+<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a>        <span class="va">extraPkgs</span> <span class="op">=</span> <span class="va">pkgs</span><span class="op">:</span> <span class="kw">with</span> pkgs<span class="op">;</span> <span class="op">[</span></span>
+<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a>          keyutils</span>
+<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a>          libkrb5</span>
+<span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a>          libpng</span>
+<span id="cb18-24"><a href="#cb18-24" aria-hidden="true" tabindex="-1"></a>          libpulseaudio</span>
+<span id="cb18-25"><a href="#cb18-25" aria-hidden="true" tabindex="-1"></a>          libvorbis</span>
+<span id="cb18-26"><a href="#cb18-26" aria-hidden="true" tabindex="-1"></a>          stdenv.cc.cc.lib</span>
+<span id="cb18-27"><a href="#cb18-27" aria-hidden="true" tabindex="-1"></a>          xorg.libXcursor</span>
+<span id="cb18-28"><a href="#cb18-28" aria-hidden="true" tabindex="-1"></a>          xorg.libXi</span>
+<span id="cb18-29"><a href="#cb18-29" aria-hidden="true" tabindex="-1"></a>          xorg.libXinerama</span>
+<span id="cb18-30"><a href="#cb18-30" aria-hidden="true" tabindex="-1"></a>          xorg.libXScrnSaver</span>
+<span id="cb18-31"><a href="#cb18-31" aria-hidden="true" tabindex="-1"></a>        <span class="op">];</span></span>
+<span id="cb18-32"><a href="#cb18-32" aria-hidden="true" tabindex="-1"></a>        <span class="va">extraProfile</span> <span class="op">=</span> <span class="st">&quot;export GDK_SCALE=2&quot;</span><span class="op">;</span></span>
+<span id="cb18-33"><a href="#cb18-33" aria-hidden="true" tabindex="-1"></a>      <span class="op">};</span></span>
+<span id="cb18-34"><a href="#cb18-34" aria-hidden="true" tabindex="-1"></a>    <span class="op">})</span></span>
+<span id="cb18-35"><a href="#cb18-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-36"><a href="#cb18-36" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Overlay 3: 다른 파일에 overlays를 정의합니다.</span></span>
+<span id="cb18-37"><a href="#cb18-37" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ./overlays/overlay3/default.nix 의 내용은 위와 같습니다.</span></span>
+<span id="cb18-38"><a href="#cb18-38" aria-hidden="true" tabindex="-1"></a>    <span class="co"># `(final: prev: { xxx = prev.xxx.override { ... }; })`</span></span>
+<span id="cb18-39"><a href="#cb18-39" aria-hidden="true" tabindex="-1"></a>    <span class="op">(</span><span class="bu">import</span> <span class="ss">./overlay3</span><span class="op">)</span></span>
+<span id="cb18-40"><a href="#cb18-40" aria-hidden="true" tabindex="-1"></a>  <span class="op">];</span></span>
+<span id="cb18-41"><a href="#cb18-41" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
 <p>위와 같이 작성하고 <code>flake.nix</code>는 아래와 같이 작성해서 오버레이를 불러 옵니다.</p>
 <div class="sourceCode" id="cb19"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ./flake.nix</span></span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
@@ -612,7 +614,8 @@ Git 저장소,<br />
 <span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>        <span class="va">devShell</span> <span class="op">=</span> pkgs.mkShell <span class="op">{</span> <span class="va">buildInputs</span> <span class="op">=</span> <span class="op">[</span> pkgs.hello pkgs.cowsay <span class="op">];</span> <span class="op">};</span></span>
 <span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>      <span class="op">});</span></span>
 <span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
-<p>아래 코드들은 <a href="https://ayats.org/blog/no-flake-utils">Ayats.org Blog - Why you don’t need flake-utils</a>에서 발췌했습니다.</p>
+<p>※ <code>devShell</code>은 deprecated 라 합니다. 현재는 <code>devShells.&lt;system&gt;.default</code>가 표준입니다.
+아래 코드들은 <a href="https://ayats.org/blog/no-flake-utils">Ayats.org Blog - Why you don’t need flake-utils</a>에서 발췌했습니다.</p>
 <p>flake의 <code>outputs</code> 함수가 반환하는 속성셋속에 써 주는 속성에 제한은 없지만, <code>nix shell | develop | build | run</code>이 인식하는 속성은 정해져 있습니다.</p>
 <ul>
 <li><code>packages.&lt;system&gt;.&lt;name&gt;</code></li>
