@@ -155,11 +155,11 @@
 <code>~/.config/nixpkgs/config.nix</code>같은 파일들,<br />
 환경 변수,<br />
 Git 저장소,<br />
-<code>$NIX_PAH</code>에 있는 파일들<br />
+<code>$NIX_PATH</code>에 있는 파일들<br />
 명령줄 인자 (<code>--arg</code>)<br />
 시스템 타입 (<code>builtins.currentSystem</code>)<br />
 에 접근할 수 있습니다.</p>
-<p>이를 보완하기 위해, 의존성 검사에 필요한 정보들을 추가로 저장해야 나중에 재현 가능성reproduicibily을 높일 수 있습니다. 이를 위해, 닉스에 새로운 기능으로 <strong>Flake</strong>를 도입했습니다. Flake는 의존성과 버전 정보를 <code>flake.lock</code> 파일에 저장합니다. Nixpkgs 어떤 커밋을 쓰고 있는지 커밋 해시값까지 모두 기록하고, <code>flake.nix</code>의 <code>input</code>에 써 준 모든 것들의 데이터 소스, 해시값, 버전을 기록합니다.</p>
+<p>이를 보완하기 위해, 의존성 검사에 필요한 정보들을 추가로 저장해야 나중에 재현 가능성reproducibily을 높일 수 있습니다. 이를 위해, 닉스에 새로운 기능으로 <strong>Flake</strong>를 도입했습니다. Flake는 의존성과 버전 정보를 <code>flake.lock</code> 파일에 저장합니다. Nixpkgs 어떤 커밋을 쓰고 있는지 커밋 해시값까지 모두 기록하고, <code>flake.nix</code>의 <code>input</code>에 써 준 모든 것들의 데이터 소스, 해시값, 버전을 기록합니다.</p>
 <p>패키지를 의존성은 <code>[ ]</code>로 표시하겠습니다.<br />
 <code>A[가1]</code>, <code>B[A]</code>이라고 할 때, 만일 <code>A</code>패키지 제작자가 <code>가1</code>의 버전을 <code>가2</code>를 쓰게 바꿨는데도 <strong>자신의 버전 번호를 변경하지 않았다면,</strong> <code>B[A[가1]]</code>이었던 게 <code>B[A[가2]]</code>가 되는데, 이 때 <code>B</code>가 <code>가2</code>와 호환이 안되는 경우가 있을 수 있습니다. 이런 경우를 Flake는 방지할 수 있고, 클래식 닉스는 할 수 없습니다.</p>
 <p>한 마디로 클래식 닉스는 <code>B[A]</code>라고 쓰지만, Flake는 (<code>flake.lock</code>을 이용해서) 항상 <code>B[A[가1]]</code>라고 지정한다고 볼 수 있습니다.</p>
@@ -194,7 +194,7 @@ Git 저장소,<br />
 <span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>                             ;<span class="co"># nix run 실행할 때 참조</span></span>
 <span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>      <span class="va">apps</span> <span class="op">=</span>                 <span class="op">;</span><span class="co"># nix run 으로 애플리케이션을 실행</span></span>
 <span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>      <span class="va">checks</span> <span class="op">=</span>               <span class="op">;</span><span class="co"># 테스트 정의</span></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>      <span class="va">defaultPacakage</span> <span class="op">=</span>      <span class="op">;</span><span class="co"># Flake가 실행될 때 기본적으로 사용할 패키지</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>      <span class="va">defaultPackage</span> <span class="op">=</span>      <span class="op">;</span><span class="co"># Flake가 실행될 때 기본적으로 사용할 패키지</span></span>
 <span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>                             ;<span class="co"># nix build 에서 참조</span></span>
 <span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>      <span class="va">defaultApp</span> <span class="op">=</span>           <span class="op">;</span><span class="co"># Flake가 실행될 때 기본적으로 실행할 애플리케이션</span></span>
 <span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>                             ;<span class="co"># nix run 와 연동</span></span>
@@ -212,8 +212,9 @@ Git 저장소,<br />
 <p>때에 따라 <code>inputs</code> 블록을 아예 생략할 수 있습니다.</p>
 <h2 id="flake.lock">flake.lock</h2>
 <p><code>nix build</code>등 빌드하는 명령을 실행하면, nix가 알아서 현재 쓰고 있는 의존성 파일들을 최신으로 맞추는데, 이를 해당 의존성의 lock을 추가한다고 말합니다. 이미 같은 의존성 파일의 lock이 있으면, 덮어 씌우지 않습니다. 이들 버전을 최신으로 올리리면</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>&gt; nix flake lock --update-input nixpkgs</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>&gt; nix build</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode default"><code class="sourceCode default"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>&gt; nix flake lock --update-input nixpkgs &lt;----- deprecated, 아래로 바뀌었다고 합니다.</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>&gt; nix update nixpkgs</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>&gt; nix build</span></code></pre></div>
 <h2 id="flake-스키마">Flake 스키마</h2>
 <p><code>packages.&lt;system&gt;.&lt;name&gt;</code> -&gt; <code>nix build</code>, <code>nix shell</code><br />
 </p>
@@ -226,8 +227,8 @@ Git 저장소,<br />
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="va">config</span><span class="op">,</span></span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="va">options</span><span class="op">,</span></span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="va">pkgs</span><span class="op">,</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 위의 것들이 자주 보이는데, 아래도 표준이라 합니다.</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="va">modulePath</span><span class="op">,</span> </span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="va">modulesPath</span><span class="op">,</span> </span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 위의 것들이 표준 인자고, 아래는 특정 상황에만 쓰이거나, 사용자 정의 인자라 합니다.</span></span>
 <span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="va">configDir</span><span class="op">,</span> </span>
 <span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="va">system</span><span class="op">,</span> </span>
 <span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="va">parentConfig</span><span class="op">,</span> </span>
@@ -265,7 +266,7 @@ Git 저장소,<br />
 <li><code>options</code>: 현재 환경에 있는 모든 모듈에 정의되어 있는 모든 옵션 집합</li>
 <li><code>pkgs</code>: 모든 nixpkgs 패키지와 유틸리티 함수를 갖고 있는 컬렉션,
 입문자는 기본 값으로 <code>nixpkgs.legacyPackages."${system}"</code>이 고정되어 있다고 생각해도 됩니다.</li>
-<li><code>modulePath</code>: NixOS에서만 유효한 매개 변수, NixOS의 모듈 디렉토리를 나타내며 <code>nixpkgs/nixos/modules</code>를 가리킵니다. <code>NIX_PATH</code> 환경 변수에서 가져옵니다.</li>
+<li><code>modulesPath</code>: NixOS에서만 유효한 매개 변수, NixOS의 모듈 디렉토리를 나타내며 <code>nixpkgs/nixos/modules</code>를 가리킵니다. <code>NIX_PATH</code> 환경 변수에서 가져옵니다.</li>
 </ul>
 <p>※ 기본값이 아닌 값을 서브 모듈에 넘길 때 <code>nixpkgs.lib.nixosSystem</code> 함수의 <code>specialArgs</code> 매개 변수를 이용하거나, <code>_module.args</code> 옵션을 이용합니다.</p>
 <h3 id="imports">imports</h3>
@@ -295,7 +296,7 @@ Git 저장소,<br />
 <span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>    <span class="op">};</span></span>
 <span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>  <span class="op">};</span></span>
 <span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
-<p><code>flake.nix</code>의 <code>inputs</code>에서 데이터 소스(위 <code>helix</code>같은 것)를 설정해 주면, <code>specailArgs = { inherit inputs }</code>를 통해 <code>configuration.nix</code>에 넘겨서, 이 소스를 가져다 쓸 수 있습니다. <code>inputs</code> 인자를 받기 위해 매개 변수 <code>inputs</code>를 추가했습니다.</p>
+<p><code>flake.nix</code>의 <code>inputs</code>에서 데이터 소스(위 <code>helix</code>같은 것)를 설정해 주면, <code>specialArgs = { inherit inputs }</code>를 통해 <code>configuration.nix</code>에 넘겨서, 이 소스를 가져다 쓸 수 있습니다. <code>inputs</code> 인자를 받기 위해 매개 변수 <code>inputs</code>를 추가했습니다.</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># configuration.nix</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span> <span class="va">config</span><span class="op">,</span> <span class="va">pkgs</span><span class="op">,</span> <span class="va">inputs</span><span class="op">,</span> <span class="op">...</span> <span class="op">}</span>:</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
@@ -345,7 +346,7 @@ Git 저장소,<br />
 <div class="sourceCode" id="cb11"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="va">boot</span>.<span class="va">kernelModules</span> <span class="op">=</span> mkBefore <span class="op">[</span><span class="st">&quot;kvm-intel&quot;</span><span class="op">]</span></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="er">}</span></span></code></pre></div>
-<p><code>kernelMondules</code> 중에 가장 먼저 <code>kvm-intel</code>이 로드 됩니다. 두 모듈에 리스트 타입이 아닌데 겹치는 옵션이 있으면 병합을 못하고, 오류가 납니다.</p>
+<p><code>kernelModules</code> 중에 가장 먼저 <code>kvm-intel</code>이 로드 됩니다. 두 모듈에 리스트 타입이 아닌데 겹치는 옵션이 있으면 병합을 못하고, 오류가 납니다.</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="va">services</span>.<span class="va">httpd</span>.<span class="va">adminAddr</span> <span class="op">=</span> pkgs.lib.mkForce <span class="st">&quot;bob@example.org&quot;</span><span class="op">;</span></span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
@@ -641,7 +642,7 @@ Git 저장소,<br />
 <span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>  <span class="va">outputs</span> <span class="op">=</span> <span class="op">{</span><span class="va">nixpkgs</span><span class="op">,</span> <span class="va">flake-utils</span><span class="op">,</span> <span class="op">...}</span>: </span>
 <span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>    flake<span class="op">-</span>utils.lib.eachSystem <span class="op">[</span><span class="st">&quot;x86_64-linux&quot;</span> <span class="st">&quot;aarch64-linux&quot;</span><span class="op">]</span> <span class="op">(</span><span class="va">system</span><span class="op">:</span> <span class="op">{</span></span>
-<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>      <span class="va">packages</span>.<span class="va">default</span> <span class="op">=</span> nixpkgs.legacyPackages.$<span class="op">{</span><span class="va">system</span><span class="op">}</span>.callPackage = <span class="ss">./package.nix</span> <span class="op">{</span></span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>      <span class="va">packages</span>.<span class="va">default</span> <span class="op">=</span> nixpkgs.legacyPackages.$<span class="op">{</span><span class="va">system</span><span class="op">}</span>.callPackage <span class="ss">./package.nix</span> <span class="op">{</span></span>
 <span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>        <span class="va">some-special-arg</span> <span class="op">=</span> ...<span class="op">;</span></span>
 <span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>      <span class="op">};</span></span>
 <span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>  <span class="op">});</span></span>
@@ -736,17 +737,17 @@ Flake를 작성할 때, <code>flake.nix</code> 파일에 여러 필드를 정의
 </tr>
 <tr>
 <td>nix-collect-garbage</td>
-<td><strong>nix flake prune</strong></td>
+<td><strong>nix store </strong></td>
 <td>사용하지 않는 패키지 삭제</td>
 </tr>
 <tr>
 <td>nix-store</td>
-<td><strong>nix flake show</strong></td>
+<td><strong>nix store</strong></td>
 <td></td>
 </tr>
 <tr>
 <td>nix-repl</td>
-<td><strong>nix eval</strong></td>
+<td><strong>nix repl</strong></td>
 <td></td>
 </tr>
 <tr>
